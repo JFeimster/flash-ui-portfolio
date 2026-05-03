@@ -1,12 +1,10 @@
 **# Recommended Pages**
 
-
+---
 
 **Attorney Partner Dashboard**
 
 A secure portal where attorneys can track the real-time status of their referred clients, view total capital deployed via their referrals, and access unique referral links and generated QR codes for their physical office spaces.
-
-
 
 Suggested Structure:
 
@@ -15,7 +13,6 @@ Suggested Structure:
 * referral-tracker.js
 * metrics-chart.js
 * api-config.js
-
 
 **Client Funding Application Form**
 
