@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash UI Export</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="hero">
+        <h1>Generate Partner Widget Embed Code</h1>
+        <p class="subheadline">Create copy/paste embed snippets for funding tools, calculators, application CTAs, and partner profile cards.</p>
+        <button class="btn-primary" onclick="document.getElementById('config-start').scrollIntoView({behavior: 'smooth'})">Build Embed Code</button>
+    </header>
+
+    <main class="container" id="config-start">
+        <!-- Sidebar: Customization -->
+        <aside class="panel">
+            <h3 style="margin-bottom: 20px;">Configuration</h3>
+            
+            <div class="form-group">
+                <label>Widget Type</label>
+                <select id="widgetType">
+                    <option value="score">Funding Readiness Score</option>
+                    <option value="matcher">Funding Route Matcher</option>
+                    <option value="cta">Application CTA Button</option>
+                    <option value="checklist">Document Checklist</option>
+                    <option value="faq">FAQ Widget</option>
+                    <option value="estimator">Commission Estimator</option>
+                    <option value="profile">Partner Profile Card</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Partner Name</label>
+                <input type="text" id="partnerName" placeholder="e.g. Acme Consulting">
+            </div>
+
+            <div class="form-group">
+                <label>Partner ID / Slug</label>
+                <input type="text" id="partnerId" placeholder="partner-123">
+            </div>
+
+            <div class="form-group">
+                <label>Brand Color</label>
+                <input type="text" id="brandColor" value="#00f2ff">
+                <div class="color-grid">
+                    <div class="color-swatch" style="background: #00f2ff;" onclick="setColor('#00f2ff')"></div>
+                    <div class="color-swatch" style="background: #39ff14;" onclick="setColor('#39ff14')"></div>
+                    <div class="color-swatch" style="background: #ff00ff;" onclick="setColor('#ff00ff')"></div>
+                    <div class="color-swatch" style="background: #7000ff;" onclick="setColor('#7000ff')"></div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="form-group">
+                    <label>Width</label>
+                    <input type="text" id="width" value="100%">
+                </div>
+                <div class="form-group">
+                    <label>Height</label>
+                    <input type="text" id="height" value="500px">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Tracking Source (UTM)</label>
+                <input type="text" id="trackingSource" placeholder="e.g. blog_sidebar">
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
+            
+            <label>Recent Embeds</label>
+            <ul class="history-list" id="historyList">
+                <li class="history-item">No recent embeds found</li>
+            </ul>
+        </aside>
+
+        <!-- Right Content: Preview & Output -->
+        <section>
+            <div class="panel">
+                <div class="preview-header">
+                    <h3 style="font-size: 0.9rem; text-transform: uppercase; color: var(--text-dim);">Live Preview</h3>
+                    <span class="status-badge">Responsive Active</span>
+                </div>
+                <div class="preview-window">
+                    <div class="widget-mockup" id="previewMock">
+                        <h2 id="mockTitle">Funding Readiness Score</h2>
+                        <p style="margin: 15px 0; font-size: 0.9rem; color: #555;">Check your eligibility for capital in 60 seconds.</p>
+                        <div style="background: #f4f4f4; height: 10px; border-radius: 5px; margin: 20px 0;">
+                            <div id="mockProgress" style="width: 65%; height: 100%; background: var(--accent-blue); border-radius: 5px;"></div>
+                        </div>
+                        <button id="mockBtn" style="background: var(--accent-blue); color: #fff; border: none; padding: 10px 20px; border-radius: 5px; width: 100%; font-weight: bold;">Get My Score</button>
+                        <p id="mockPartner" style="margin-top: 15px; font-size: 0.7rem; color: #999;">Powered by Moonshine Capital x Acme</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel" style="margin-top: 24px;">
+                <div class="code-section">
+                    <div class="code-header">
+                        <label>iFrame Embed Code</label>
+                        <button class="copy-btn" onclick="copyCode('iframeCode')">Copy Snippet</button>
+                    </div>
+                    <div class="code-container">
+                        <pre id="iframeCode"></pre>
+                    </div>
+                </div>
+
+                <div class="code-section">
+                    <div class="code-header">
+                        <label>Direct Link</label>
+                        <button class="copy-btn" onclick="copyCode('directLink')">Copy URL</button>
+                    </div>
+                    <div class="code-container">
+                        <pre id="directLink" style="color: var(--accent-blue);"></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Instructions -->
+        <section class="platforms">
+            <div class="platform-card">
+                <h4>WordPress</h4>
+                <p>Use the "Custom HTML" block. Paste the iFrame code directly into the block editor.</p>
+            </div>
+            <div class="platform-card">
+                <h4>Wix</h4>
+                <p>Add &gt; Embed Code &gt; Embed HTML. Paste the code and click "Update". Enable "Stretch" for full width.</p>
+            </div>
+            <div class="platform-card">
+                <h4>Framer / Carrd</h4>
+                <p>Drag the "Embed" element onto your canvas. Paste code into the HTML/Code property field.</p>
+            </div>
+            <div class="platform-card">
+                <h4>Static HTML</h4>
+                <p>Place the snippet inside the &lt;body&gt; of your page where you want the widget to appear.</p>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section class="faq-section">
+            <h2 style="margin-bottom: 24px;">Troubleshooting & Support</h2>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <h5>Widget is cut off?</h5>
+                    <p>Adjust the "Height" parameter in the configuration panel. Most widgets require at least 500px to display correctly on mobile.</p>
+                </div>
+                <div class="faq-item">
+                    <h5>Tracking isn't showing?</h5>
+                    <p>Ensure the UTM tracking source field doesn't contain spaces or special characters. Use underscores instead.</p>
+                </div>
+                <div class="faq-item">
+                    <h5>SSL/Security Errors?</h5>
+                    <p>All Moonshine widgets are served via HTTPS. Ensure your parent site is also using HTTPS to avoid mixed-content blocks.</p>
+                </div>
+                <div class="faq-item">
+                    <h5>Styling doesn't match?</h5>
+                    <p>Use the Brand Color picker to align the primary buttons and accents with your partner site's UI.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const inputs = ['widgetType', 'partnerName', 'partnerId', 'brandColor', 'width', 'height', 'trackingSource'];
+        const mockTitles = {
+            score: "Funding Readiness Score",
+            matcher: "Funding Route Matcher",
+            cta: "Apply for Capital",
+            checklist: "Document Checklist",
+            faq: "Funding FAQ",
+            estimator: "Commission Estimator",
+            profile: "Partner Profile"
+        };
+
+        function updateGenerator() {
+            const config = {};
+            inputs.forEach(id => {
+                config[id] = document.getElementById(id).value;
+            });
+
+            // Update Mockup
+            document.getElementById('mockTitle').innerText = mockTitles[config.widgetType];
+            document.getElementById('mockBtn').style.backgroundColor = config.brandColor;
+            document.getElementById('mockProgress').style.backgroundColor = config.brandColor;
+            document.getElementById('mockPartner').innerText = `Powered by Moonshine Capital x ${config.partnerName || 'Partner'}`;
+            
+            // Build URL
+            const baseUrl = `https://widgets.moonshinecapital.com/${config.widgetType}`;
+            const params = new URLSearchParams({
+                pid: config.partnerId || 'default',
+                utm_source: config.trackingSource || 'affiliate',
+                color: config.brandColor.replace('#', '')
+            });
+            const fullUrl = `${baseUrl}?${params.toString()}`;
+
+            // Build iFrame
+            const iframe = `<iframe \n  src="${fullUrl}" \n  width="${config.width}" \n  height="${config.height}" \n  frameborder="0" \n  scrolling="no" \n  style="border-radius: 8px; border: 1px solid #eee;">\n</iframe>`;
+            
+            document.getElementById('iframeCode').textContent = iframe;
+            document.getElementById('directLink').textContent = fullUrl;
+
+            saveToLocal(config);
+        }
+
+        function setColor(hex) {
+            document.getElementById('brandColor').value = hex;
+            updateGenerator();
+        }
+
+        function copyCode(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.target;
+                const originalText = btn.innerText;
+                btn.innerText = 'Copied!';
+                btn.style.color = 'var(--accent-green)';
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.color = 'var(--text-dim)';
+                }, 2000);
+            });
+        }
+
+        function saveToLocal(config) {
+            const history = JSON.parse(localStorage.getItem('ms_embed_history') || '[]');
+            const entry = { type: config.widgetType, time: new Date().toLocaleTimeString() };
+            
+            // Basic prevent duplicates
+            if (history.length === 0 || history[0].type !== entry.type) {
+                history.unshift(entry);
+                if (history.length > 5) history.pop();
+                localStorage.setItem('ms_embed_history', JSON.stringify(history));
+                renderHistory();
+            }
+        }
+
+        function renderHistory() {
+            const history = JSON.parse(localStorage.getItem('ms_embed_history') || '[]');
+            const list = document.getElementById('historyList');
+            if (history.length > 0) {
+                list.innerHTML = history.map(h => `
+                    <li class="history-item">
+                        <span>${mockTitles[h.type]}</span>
+                        <span>${h.time}</span>
+                    </li>
+                `).join('');
+            }
+        }
+
+        // Listeners
+        inputs.forEach(id => {
+            document.getElementById(id).addEventListener('input', updateGenerator);
+        });
+
+        // Init
+        updateGenerator();
+        renderHistory();
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

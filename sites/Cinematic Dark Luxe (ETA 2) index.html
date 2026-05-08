@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;800&family=JetBrains+Mono:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bronze-deep: #2b1f14;
+            --bronze-mid: #7c5c3e;
+            --bronze-bright: #c5a17a;
+            --patina: #3d6363;
+            --bg-dark: #080808;
+            --glass: rgba(255, 255, 255, 0.03);
+            --transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e0e0e0;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Patina Grain Filter */
+        .noise-svg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.04;
+            z-index: 9999;
+        }
+
+        /* Layout Architecture */
+        .container {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            min-height: 100vh;
+            align-items: center;
+        }
+
+        /* Branding */
+        .brand-cluster {
+            grid-column: 1 / span 5;
+            position: relative;
+            z-index: 10;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            font-size: 0.75rem;
+            color: var(--patina);
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        h1 {
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 800;
+            line-height: 0.95;
+            color: #fff;
+            margin-bottom: 2rem;
+        }
+
+        h1 span {
+            color: var(--bronze-mid);
+            background: linear-gradient(135deg, var(--bronze-bright), var(--bronze-mid));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* The Interlock Component */
+        .interlock-visual {
+            grid-column: 7 / span 6;
+            position: relative;
+            height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .structural-frame {
+            position: absolute;
+            border: 1px solid rgba(197, 161, 122, 0.2);
+            background: linear-gradient(135deg, rgba(43, 31, 20, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%);
+            box-shadow: 0 50px 100px rgba(0,0,0,0.5);
+            transition: var(--transition);
+            overflow: hidden;
+        }
+
+        /* Frame 1: Deep Base */
+        .frame-1 {
+            width: 80%;
+            height: 80%;
+            z-index: 1;
+            transform: translate(-10%, -5%);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Frame 2: The Bronze Accent */
+        .frame-2 {
+            width: 70%;
+            height: 60%;
+            z-index: 2;
+            transform: translate(15%, 15%);
+            border: 1px solid var(--bronze-mid);
+            background: radial-gradient(circle at top left, var(--bronze-deep), transparent);
+        }
+
+        /* Frame 3: Data Interlock */
+        .frame-3 {
+            width: 45%;
+            height: 40%;
+            z-index: 3;
+            transform: translate(-25%, 40%);
+            border: 1px solid var(--patina);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: var(--bg-dark);
+        }
+
+        /* Hover Interaction */
+        .interlock-visual:hover .frame-1 { transform: translate(-12%, -7%) scale(1.02); }
+        .interlock-visual:hover .frame-2 { transform: translate(18%, 18%) scale(0.98); }
+        .interlock-visual:hover .frame-3 { transform: translate(-28%, 45%) rotate(-2deg); }
+
+        .metric-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--patina);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--bronze-bright);
+        }
+
+        /* Abstract Patina "Verdigris" Smudges */
+        .patina-smudge {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, var(--patina) 0%, transparent 70%);
+            opacity: 0.15;
+            filter: blur(40px);
+            pointer-events: none;
+        }
+
+        .cta-section {
+            margin-top: 3rem;
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .primary-btn {
+            background: var(--bronze-mid);
+            color: #000;
+            padding: 1.25rem 2.5rem;
+            text-decoration: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
+            font-size: 0.8rem;
+            position: relative;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+        }
+
+        .primary-btn::after {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 100%;
+            height: 100%;
+            border: 1px solid var(--bronze-mid);
+            z-index: -1;
+            transition: var(--transition);
+        }
+
+        .primary-btn:hover {
+            background: var(--bronze-bright);
+            transform: translate(-2px, -2px);
+        }
+
+        .primary-btn:hover::after {
+            transform: translate(6px, 6px);
+            border-color: var(--patina);
+        }
+
+        .secondary-link {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: #666;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: var(--transition);
+        }
+
+        .secondary-link:hover {
+            color: var(--patina);
+            border-color: var(--patina);
+        }
+
+        /* Decorative Interlock Grid */
+        .grid-line {
+            position: absolute;
+            background: rgba(197, 161, 122, 0.05);
+        }
+        .v-line { width: 1px; height: 100%; top: 0; }
+        .h-line { height: 1px; width: 100%; left: 0; }
+
+        @media (max-width: 968px) {
+            .container { grid-template-columns: 1fr; padding-top: 2rem; }
+            .brand-cluster { grid-column: 1; }
+            .interlock-visual { grid-column: 1; height: 400px; margin-top: 4rem; }
+            h1 { font-size: 3rem; }
+        }
+
+        /* Entry Animation */
+        @keyframes reveal {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .reveal {
+            animation: reveal 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+
+    </style>
+</head>
+<body>
+
+    <svg class="noise-svg">
+        <filter id="noiseFilter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+        </filter>
+        <rect width="100%" height="100%" filter="url(#noiseFilter)" />
+    </svg>
+
+    <!-- Structural Grid Background -->
+    <div class="grid-line v-line" style="left: 10%;"></div>
+    <div class="grid-line v-line" style="left: 50%;"></div>
+    <div class="grid-line v-line" style="right: 10%;"></div>
+    <div class="grid-line h-line" style="top: 20%;"></div>
+    <div class="grid-line h-line" style="bottom: 20%;"></div>
+
+    <main class="container">
+        <div class="brand-cluster reveal">
+            <span class="mono">Interlock Acquisition Partners</span>
+            <h1>Forging the <br><span>Legacy Bridge</span></h1>
+            <p style="color: #888; line-height: 1.6; max-width: 400px; font-weight: 300;">
+                A specialized search fund focused on the transition of enduring small-to-midmarket enterprises. We don't just acquire; we interlock legacy with future growth.
+            </p>
+            
+            <div class="cta-section delay-1">
+                <button class="primary-btn">INITIATE SEARCH</button>
+                <a href="#" class="secondary-link">01. OUR THESIS</a>
+            </div>
+        </div>
+
+        <div class="interlock-visual reveal delay-2">
+            <div class="patina-smudge" style="top: -20%; left: 0;"></div>
+            <div class="patina-smudge" style="bottom: -10%; right: 10%;"></div>
+            
+            <div class="structural-frame frame-1">
+                <div style="padding: 2rem;">
+                    <span class="mono" style="color: rgba(255,255,255,0.2)">Institutional Discipline</span>
+                </div>
+            </div>
+
+            <div class="structural-frame frame-2">
+                <div style="position: absolute; bottom: 2rem; right: 2rem; text-align: right;">
+                    <div class="mono" style="font-size: 0.5rem; color: var(--bronze-bright)">Structural Integrity</div>
+                    <div style="width: 100px; height: 1px; background: var(--bronze-bright); margin-top: 0.5rem;"></div>
+                </div>
+            </div>
+
+            <div class="structural-frame frame-3">
+                <div>
+                    <span class="metric-label">Target EBITDA</span>
+                    <div class="metric-value">$1.5M - $5M</div>
+                </div>
+                <div>
+                    <span class="metric-label">Search Status</span>
+                    <div class="metric-value" style="font-size: 1.2rem; color: var(--patina);">ACTIVE_SEARCH</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Subtle mouse tracking for the interlock panels
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 20;
+            const y = (e.clientY / window.innerHeight - 0.5) * 20;
+            
+            const frames = document.querySelectorAll('.structural-frame');
+            frames.forEach((frame, index) => {
+                const depth = (index + 1) * 0.5;
+                frame.style.margin = `${y * depth}px ${x * depth}px`;
+            });
+        });
+    </script>
+</body>
+</html>

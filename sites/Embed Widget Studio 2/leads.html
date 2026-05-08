@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonshine Capital | Lead & Application Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #05070a;
+            --bg-card: #0d1117;
+            --bg-input: #161b22;
+            --border-color: #30363d;
+            --accent-blue: #00f2ff;
+            --accent-green: #39ff14;
+            --accent-yellow: #f1c40f;
+            --text-main: #e6edf3;
+            --text-dim: #8b949e;
+            --grid-line: rgba(48, 54, 61, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, sans-serif;
+            line-height: 1.6;
+            background-image: 
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 40px 40px;
+            min-height: 100vh;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 60px 20px 30px;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subheadline {
+            font-size: 1.1rem;
+            color: var(--text-dim);
+            margin-bottom: 2rem;
+        }
+
+        /* Stats Overview */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto 40px;
+            padding: 0 20px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            border-radius: 12px;
+            text-align: left;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-delta {
+            font-size: 0.8rem;
+            color: var(--accent-green);
+            margin-top: 4px;
+        }
+
+        /* Main Table Section */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px 100px;
+        }
+
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        /* Filters Bar */
+        .filters-bar {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-input-wrapper {
+            flex-grow: 1;
+            position: relative;
+        }
+
+        input, select {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px 15px;
+            color: var(--text-main);
+            font-family: inherit;
+            outline: none;
+            font-size: 0.9rem;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent-blue);
+        }
+
+        input { width: 100%; }
+
+        /* Table Styling */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: rgba(255,255,255,0.02);
+            color: var(--text-dim);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background: rgba(255,255,255,0.01);
+        }
+
+        .lead-name {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .widget-source {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-funded { background: rgba(57, 255, 20, 0.1); color: var(--accent-green); }
+        .status-review { background: rgba(0, 242, 255, 0.1); color: var(--accent-blue); }
+        .status-pending { background: rgba(241, 196, 15, 0.1); color: var(--accent-yellow); }
+        .status-closed { background: rgba(139, 148, 158, 0.1); color: var(--text-dim); }
+
+        .commission-value {
+            font-weight: 600;
+            color: var(--accent-green);
+        }
+
+        .timestamp {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .filters-bar { flex-direction: column; align-items: stretch; }
+            h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="hero">
+        <h1>Partner Lead Tracker</h1>
+        <p class="subheadline">Monitor application status and commission earnings from your embedded widgets.</p>
+    </header>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <p class="stat-label">Total Leads</p>
+            <p class="stat-value">124</p>
+            <p class="stat-delta">+12% this month</p>
+        </div>
+        <div class="stat-card">
+            <p class="stat-label">Active Applications</p>
+            <p class="stat-value">42</p>
+            <p class="stat-delta" style="color: var(--accent-blue);">18 in final review</p>
+        </div>
+        <div class="stat-card">
+            <p class="stat-label">Est. Commission</p>
+            <p class="stat-value" style="color: var(--accent-green);">$14,250.00</p>
+            <p class="stat-delta">Paid monthly via Wire</p>
+        </div>
+        <div class="stat-card">
+            <p class="stat-label">Conversion Rate</p>
+            <p class="stat-value">8.4%</p>
+            <p class="stat-delta">Top 10% of partners</p>
+        </div>
+    </div>
+
+    <main class="container">
+        <div class="panel">
+            <div class="filters-bar">
+                <div class="search-input-wrapper">
+                    <input type="text" id="leadSearch" placeholder="Search by name or company..." onkeyup="filterLeads()">
+                </div>
+                <select id="statusFilter" onchange="filterLeads()">
+                    <option value="all">All Statuses</option>
+                    <option value="funded">Funded</option>
+                    <option value="in review">In Review</option>
+                    <option value="pending">Pending Docs</option>
+                    <option value="closed">Closed</option>
+                </select>
+                <select id="sourceFilter" onchange="filterLeads()">
+                    <option value="all">All Sources</option>
+                    <option value="score">Readiness Score</option>
+                    <option value="matcher">Route Matcher</option>
+                    <option value="cta">Direct CTA</option>
+                </select>
+            </div>
+
+            <div class="table-container">
+                <table id="leadsTable">
+                    <thead>
+                        <tr>
+                            <th>Lead / Company</th>
+                            <th>Source Widget</th>
+                            <th>Date Created</th>
+                            <th>Current Status</th>
+                            <th>Est. Commission</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-status="in review" data-source="matcher">
+                            <td>
+                                <div class="lead-name">Alexander Wright</div>
+                                <div style="font-size: 0.75rem; color: var(--text-dim);">Wright Logistics Solutions</div>
+                            </td>
+                            <td><span class="widget-source">funding-route-matcher</span></td>
+                            <td class="timestamp">Oct 24, 2023</td>
+                            <td><span class="status-badge status-review">In Review</span></td>
+                            <td class="commission-value">$1,200.00</td>
+                        </tr>
+                        <tr data-status="funded" data-source="score">
+                            <td>
+                                <div class="lead-name">Sarah Chen</div>
+                                <div style="font-size: 0.75rem; color: var(--text-dim);">Apex Tech Ventures</div>
+                            </td>
+                            <td><span class="widget-source">readiness-score</span></td>
+                            <td class="timestamp">Oct 22, 2023</td>
+                            <td><span class="status-badge status-funded">Funded</span></td>
+                            <td class="commission-value">$4,500.00</td>
+                        </tr>
+                        <tr data-status="pending" data-source="cta">
+                            <td>
+                                <div class="lead-name">Marcus Miller</div>
+                                <div style="font-size: 0.75rem; color: var(--text-dim);">Miller & Sons HVAC</div>
+                            </td>
+                            <td><span class="widget-source">application-cta</span></td>
+                            <td class="timestamp">Oct 21, 2023</td>
+                            <td><span class="status-badge status-pending">Pending Docs</span></td>
+                            <td class="commission-value">$850.00</td>
+                        </tr>
+                        <tr data-status="in review" data-source="matcher">
+                            <td>
+                                <div class="lead-name">Elena Rodriguez</div>
+                                <div style="font-size: 0.75rem; color: var(--text-dim);">Glow Cosmetics Ltd.</div>
+                            </td>
+                            <td><span class="widget-source">funding-route-matcher</span></td>
+                            <td class="timestamp">Oct 20, 2023</td>
+                            <td><span class="status-badge status-review">In Review</span></td>
+                            <td class="commission-value">$2,100.00</td>
+                        </tr>
+                        <tr data-status="closed" data-source="score">
+                            <td>
+                                <div class="lead-name">David Thompson</div>
+                                <div style="font-size: 0.75rem; color: var(--text-dim);">Thompson Craft Brewery</div>
+                            </td>
+                            <td><span class="widget-source">readiness-score</span></td>
+                            <td class="timestamp">Oct 18, 2023</td>
+                            <td><span class="status-badge status-closed">Closed</span></td>
+                            <td class="commission-value">$0.00</td>
+                        </tr>
+                        <tr data-status="funded" data-source="matcher">
+                            <td>
+                                <div class="lead-name">Jordan Smith</div>
+                                <div style="font-size: 0.75rem; color: var(--text-dim);">JS Creative Agency</div>
+                            </td>
+                            <td><span class="widget-source">funding-route-matcher</span></td>
+                            <td class="timestamp">Oct 15, 2023</td>
+                            <td><span class="status-badge status-funded">Funded</span></td>
+                            <td class="commission-value">$3,200.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function filterLeads() {
+            const searchQuery = document.getElementById('leadSearch').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const sourceFilter = document.getElementById('sourceFilter').value;
+            const table = document.getElementById('leadsTable');
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+            for (let row of rows) {
+                const text = row.innerText.toLowerCase();
+                const status = row.getAttribute('data-status');
+                const source = row.getAttribute('data-source');
+
+                const matchesSearch = text.includes(searchQuery);
+                const matchesStatus = statusFilter === 'all' || status === statusFilter;
+                const matchesSource = sourceFilter === 'all' || source === sourceFilter;
+
+                if (matchesSearch && matchesStatus && matchesSource) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            }
+        }
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonshine Capital | Lead & Application Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #05070a;
+            --bg-card: #0d1117;
+            --bg-input: #161b22;
+            --border-color: #30363d;
+            --accent-blue: #00f2ff;
+            --accent-green: #39ff14;
+            --accent-yellow: #f1c40f;
+            --text-main: #e6edf3;
+            --text-dim: #8b949e;
+            --grid-line: rgba(48, 54, 61, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, sans-serif;
+            line-height: 1.6;
+            background-image: 
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 40px 40px;
+            min-height: 100vh;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 60px 20px 30px;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subheadline {
+            font-size: 1.1rem;
+            color: var(--text-dim);
+            margin-bottom: 2rem;
+        }
+
+        /* Stats Overview */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto 40px;
+            padding: 0 20px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            border-radius: 12px;
+            text-align: left;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-delta {
+            font-size: 0.8rem;
+            color: var(--accent-green);
+            margin-top: 4px;
+        }
+
+        /* Main Table Section */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px 100px;
+        }
+
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        /* Filters Bar */
+        .filters-bar {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-input-wrapper {
+            flex-grow: 1;
+            position: relative;
+        }
+
+        input, select {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px 15px;
+            color: var(--text-main);
+            font-family: inherit;
+            outline: none;
+            font-size: 0.9rem;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent-blue);
+        }
+
+        input { width: 100%; }
+
+        /* Table Styling */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: rgba(255,255,255,0.02);
+            color: var(--text-dim);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background: rgba(255,255,255,0.01);
+        }
+
+        .lead-name {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .widget-source {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-funded { background: rgba(57, 255, 20, 0.1); color: var(--accent-green); }
+        .status-review { background: rgba(0, 242, 255, 0.1); color: var(--accent-blue); }
+        .status-pending { background: rgba(241, 196, 15, 0.1); color: var(--accent-yellow); }
+        .status-closed { background: rgba(139, 148, 158, 0.1); color: var(--text-dim); }
+
+        .commission-value {
+            font-weight: 600;
+            color: var(--accent-green);
+        }
+
+        .timestamp {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .filters-bar { flex-direction: column; align-items: stretch; }
+            h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="hero">
+        <h1>Partner Lead Tracker</h1>
+        <p class="subheadline">Monitor application status and commission earnings from your embedded widgets.</p>
+    </header>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <p class="stat-label">Total Leads</p>
+            <p class="stat-value">124</p>
+            <p class="stat-delta">+12% this month</p>
+        </div>
+        <div class="stat-card">
+            <p class="stat-label">Active Applications</p>
+            <p class="stat-value">42</p>
+            <p class="stat-delta" style="color: var(--accent-blue);">18 in final review</p>
+        </div>
+        <div class="stat-card">
+            <p class="stat-label">Est. Commission</p>
+            <p class="stat-value" style="color: var(--accent-green);">$14,250.00</p>
+            <p class="stat-delta">Paid monthly via Wire</p>
+        </div>
+        <div class="stat-card">
+            <p class="stat-label">Conversion Rate</p>
+            <p class="stat-value">8.4%</p>
+            <p class="stat-delta">Top 10% of partners</p>
+        </div>
+    </div>
+
+    <main class="container">
+        <div class="panel">
+            <div class="filters-bar">
+                <div class="search-input-wrapper">
+                    <input type="text" id="leadSearch" placeholder="Search by name or company..." onkeyup="filterLeads()">
+                </div>
+                <select id="statusFilter" onchange="filterLeads()">
+                    <option value="all">All Statuses</option>
+                    <option value="funded">Funded</option>
+                    <option value="in review">In Review</option>
+                    <option value="pending">Pending Docs</option>
+                    <option value="closed">Closed</option>
+                </select>
+                <select id="sourceFilter" onchange="filterLeads()">
+                    <option value="all">All Sources</option>
+                    <option value="score">Readiness Score</option>
+                    <option value="matcher">Route Matcher</option>
+                    <option value="cta">Direct CTA</option>
+                </select>
+            </div>
+
+            <div class="table-container">
+                <table id="leadsTable">
+                    <thead>
+                        <tr>
+                            <th>Lead / Company</th>
+                            <th>Source Widget</th>
+                            <th>Date Created</th>
+                            <th>Current Status</th>
+                            <th>Est. Commission</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-status="in review" data-source="matcher">
+                            <td>
+                                <div class="lead-name">Alexander Wright</div>
+                                <div style="font-size: 0.75rem; color: var(--text-dim);">Wright Logistics Solutions</div>
+                            </td>
+                            <td><span class="widget-source">funding-route-matcher</span></td>
+                            <td class="timestamp">Oct 24, 2023</td>
+                            <td><span class="status-badge status-review">In Review</span></td>
+                            <td class="commission-value">$1,200.00</td>
+                        </tr>
+                        <tr data-status="funded" data-source="score">
+                            <td>
+                                <div class="lead-name">Sarah Chen</div>
+                                <div style="font-size: 0.75rem; color: var(--text-dim);">Apex Tech Ventures</div>
+                            </td>
+                            <td><span class="widget-source">readiness-score</span></td>
+                            <td class="timestamp">Oct 22, 2023</td>
+                            <td><span class="status-badge status-funded">Funded</span></td>
+                            <td class="commission-value">$4,500.00</td>
+                        </tr>
+                        <tr data-status="pending" data-source="cta">
+                            <td>
+                                <div class="lead-name">Marcus Miller</div>
+                                <div style="font-size: 0.75rem; color: var(--text-dim);">Miller & Sons HVAC</div>
+                            </td>
+                            <td><span class="widget-source">application-cta</span></td>
+                            <td class="timestamp">Oct 21, 2023</td>
+                            <td><span class="status-badge status-pending">Pending Docs</span></td>
+                            <td class="commission-value">$850.00</td>
+                        </tr>
+                        <tr data-status="in review" data-source="matcher">
+                            <td>
+                                <div class="lead-name">Elena Rodriguez</div>
+                                <div style="font-size: 0.75rem; color: var(--text-dim);">Glow Cosmetics Ltd.</div>
+                            </td>
+                            <td><span class="widget-source">funding-route-matcher</span></td>
+                            <td class="timestamp">Oct 20, 2023</td>
+                            <td><span class="status-badge status-review">In Review</span></td>
+                            <td class="commission-value">$2,100.00</td>
+                        </tr>
+                        <tr data-status="closed" data-source="score">
+                            <td>
+                                <div class="lead-name">David Thompson</div>
+                                <div style="font-size: 0.75rem; color: var(--text-dim);">Thompson Craft Brewery</div>
+                            </td>
+                            <td><span class="widget-source">readiness-score</span></td>
+                            <td class="timestamp">Oct 18, 2023</td>
+                            <td><span class="status-badge status-closed">Closed</span></td>
+                            <td class="commission-value">$0.00</td>
+                        </tr>
+                        <tr data-status="funded" data-source="matcher">
+                            <td>
+                                <div class="lead-name">Jordan Smith</div>
+                                <div style="font-size: 0.75rem; color: var(--text-dim);">JS Creative Agency</div>
+                            </td>
+                            <td><span class="widget-source">funding-route-matcher</span></td>
+                            <td class="timestamp">Oct 15, 2023</td>
+                            <td><span class="status-badge status-funded">Funded</span></td>
+                            <td class="commission-value">$3,200.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function filterLeads() {
+            const searchQuery = document.getElementById('leadSearch').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const sourceFilter = document.getElementById('sourceFilter').value;
+            const table = document.getElementById('leadsTable');
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+            for (let row of rows) {
+                const text = row.innerText.toLowerCase();
+                const status = row.getAttribute('data-status');
+                const source = row.getAttribute('data-source');
+
+                const matchesSearch = text.includes(searchQuery);
+                const matchesStatus = statusFilter === 'all' || status === statusFilter;
+                const matchesSource = sourceFilter === 'all' || source === sourceFilter;
+
+                if (matchesSearch && matchesStatus && matchesSource) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            }
+        }
+    </script>
+</body>
+</html>

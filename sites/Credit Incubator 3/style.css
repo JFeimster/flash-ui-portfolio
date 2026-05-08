@@ -1,0 +1,367 @@
+:root {
+            --bg-obsidian: #0a0e14;
+            --vault-gold: #ffc107;
+            --vault-gold-glow: rgba(255, 193, 7, 0.3);
+            --progress-blue: #2196f3;
+            --progress-blue-glow: rgba(33, 150, 243, 0.3);
+            --card-bg: #161b22;
+            --border-color: #30363d;
+            --text-main: #e6edf3;
+            --text-dim: #8b949e;
+            --success: #238636;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-obsidian);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .dashboard-container {
+            max-width: 1100px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+        }
+
+        /* --- LEFT COLUMN: THE GAUGE --- */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-title {
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--vault-gold);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--vault-gold);
+        }
+
+        .gauge-container {
+            position: relative;
+            text-align: center;
+            padding: 1rem 0;
+        }
+
+        .gauge-svg {
+            width: 220px;
+            transform: rotate(-90deg);
+        }
+
+        .gauge-bg {
+            fill: none;
+            stroke: #21262d;
+            stroke-width: 12;
+        }
+
+        .gauge-fill {
+            fill: none;
+            stroke: var(--progress-blue);
+            stroke-width: 12;
+            stroke-linecap: round;
+            stroke-dasharray: 565.48; /* 2 * PI * 90 */
+            stroke-dashoffset: 282.74; /* 50% filled */
+            transition: stroke-dashoffset 1s ease-out;
+            filter: drop-shadow(0 0 8px var(--progress-blue-glow));
+        }
+
+        .gauge-value {
+            position: absolute;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .score-num {
+            font-size: 3rem;
+            font-weight: 800;
+            display: block;
+            color: var(--text-main);
+        }
+
+        .score-label {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .rank-badge {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid var(--vault-gold);
+            color: var(--vault-gold);
+            border-radius: 100px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        /* --- ROADMAP PATH --- */
+        .roadmap-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 2rem 0;
+            position: relative;
+            padding: 0 1rem;
+        }
+
+        .roadmap-line {
+            position: absolute;
+            top: 25px;
+            left: 50px;
+            right: 50px;
+            height: 4px;
+            background: #21262d;
+            z-index: 1;
+        }
+
+        .roadmap-progress {
+            position: absolute;
+            top: 25px;
+            left: 50px;
+            width: 40%;
+            height: 4px;
+            background: var(--progress-blue);
+            z-index: 2;
+            box-shadow: 0 0 10px var(--progress-blue-glow);
+        }
+
+        .step {
+            position: relative;
+            z-index: 3;
+            text-align: center;
+            width: 100px;
+        }
+
+        .step-node {
+            width: 50px;
+            height: 50px;
+            background: var(--card-bg);
+            border: 3px solid #30363d;
+            border-radius: 50%;
+            margin: 0 auto 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .step.active .step-node {
+            border-color: var(--progress-blue);
+            background: #0d1117;
+            color: var(--progress-blue);
+        }
+
+        .step.complete .step-node {
+            border-color: var(--success);
+            background: var(--success);
+            color: white;
+        }
+
+        .step.locked .step-node {
+            opacity: 0.5;
+            filter: grayscale(1);
+        }
+
+        .step-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-dim);
+        }
+
+        .step.active .step-label {
+            color: var(--text-main);
+        }
+
+        /* --- ACTION ITEMS --- */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .quest-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .quest-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 1.25rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+
+        .quest-item:hover {
+            transform: translateX(10px);
+            border-color: var(--vault-gold);
+        }
+
+        .quest-info {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .quest-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(33, 150, 243, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--progress-blue);
+        }
+
+        .quest-text h4 {
+            font-size: 1rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .quest-text p {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        .xp-reward {
+            color: var(--vault-gold);
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        /* --- THE PRIZE (VAULT) --- */
+        .prize-card {
+            background: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
+            border: 2px solid var(--vault-gold);
+            text-align: center;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(255, 193, 7, 0.1);
+        }
+
+        .prize-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, var(--vault-gold-glow), transparent 30%);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .prize-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .prize-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 0 15px var(--vault-gold));
+        }
+
+        .prize-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--vault-gold);
+        }
+
+        .prize-desc {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .unlock-btn {
+            background: var(--vault-gold);
+            color: #000;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+
+        .unlock-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--vault-gold);
+        }
+
+        .locked-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 14, 20, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+            z-index: 10;
+        }
+
+        .lock-msg {
+            font-weight: 700;
+            color: var(--text-dim);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .lock-icon {
+            font-size: 1.5rem;
+        }
