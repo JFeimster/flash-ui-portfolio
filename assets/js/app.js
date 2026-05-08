@@ -1,0 +1,143 @@
+const state = {
+  items: [],
+  query: "",
+  category: "All",
+  status: "All"
+};
+
+const els = {
+  grid: document.querySelector("#cardGrid"),
+  search: document.querySelector("#searchInput"),
+  categoryFilters: document.querySelector("#categoryFilters"),
+  statusFilters: document.querySelector("#statusFilters"),
+  assetCount: document.querySelector("#assetCount"),
+  deployableCount: document.querySelector("#deployableCount"),
+  visibleCount: document.querySelector("#visibleCount")
+};
+
+function escapeHtml(value = "") {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function isDeployable(item) {
+  return Boolean(item.livePath) && item.status !== "nested-app" && !item.needsStandaloneDeploy;
+}
+
+function unique(values) {
+  return ["All", ...Array.from(new Set(values.filter(Boolean))).sort()];
+}
+
+function renderButtons(container, values, key) {
+  container.innerHTML = values.map(value => `
+    <button class="${state[key] === value ? "active" : ""}" data-filter-key="${key}" data-filter-value="${escapeHtml(value)}">${escapeHtml(value)}</button>
+  `).join("");
+}
+
+function itemMatches(item) {
+  const haystack = [item.title, item.category, item.type, item.status, item.path, item.notes].join(" ").toLowerCase();
+  const matchesQuery = !state.query || haystack.includes(state.query.toLowerCase());
+  const matchesCategory = state.category === "All" || item.category === state.category;
+  const matchesStatus = state.status === "All" || item.status === state.status;
+  return matchesQuery && matchesCategory && matchesStatus;
+}
+
+function renderCards() {
+  const visible = state.items.filter(itemMatches);
+  els.visibleCount.textContent = String(visible.length);
+
+  if (!state.items.length) {
+    els.grid.innerHTML = `
+      <section class="empty">
+        <h2>The vault is empty. Time to stop admiring the shelf and load the ammo.</h2>
+        <p>Run Batch 2 bulk import/indexing to add desktop starter folders into <code>/sites/[slug]/</code>, then update <code>data/site-registry.json</code>.</p>
+      </section>
+    `;
+    return;
+  }
+
+  if (!visible.length) {
+    els.grid.innerHTML = `
+      <section class="empty">
+        <h2>No matching assets found.</h2>
+        <p>Clear a filter or search for another term. The goblins are in here somewhere.</p>
+      </section>
+    `;
+    return;
+  }
+
+  els.grid.innerHTML = visible.map(item => {
+    const deployable = isDeployable(item);
+    const openButton = item.livePath
+      ? `<a class="btn primary" href="${escapeHtml(item.livePath)}" target="_blank" rel="noreferrer">Open</a>`
+      : "";
+    const reviewBadge = !deployable ? `<span class="badge review">Review</span>` : "";
+
+    return `
+      <article class="card">
+        <div class="card-top">
+          <h2>${escapeHtml(item.title)}</h2>
+          ${reviewBadge}
+        </div>
+        <div class="meta">
+          <span class="badge">${escapeHtml(item.category || "Uncategorized")}</span>
+          <span class="badge">${escapeHtml(item.type || "Unknown")}</span>
+          <span class="badge">${escapeHtml(item.status || "Unknown")}</span>
+        </div>
+        <div class="path">${escapeHtml(item.path || "No path recorded")}</div>
+        ${item.notes ? `<p class="notes">${escapeHtml(item.notes)}</p>` : ""}
+        <div class="card-actions">
+          ${openButton}
+          ${item.needsNormalization ? `<span class="badge">Needs normalization</span>` : ""}
+          ${item.needsStandaloneDeploy ? `<span class="badge">Standalone deploy</span>` : ""}
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+function renderShell() {
+  const categories = unique(state.items.map(item => item.category));
+  const statuses = unique(state.items.map(item => item.status));
+  const deployableCount = state.items.filter(isDeployable).length;
+
+  els.assetCount.textContent = String(state.items.length);
+  els.deployableCount.textContent = String(deployableCount);
+  renderButtons(els.categoryFilters, categories, "category");
+  renderButtons(els.statusFilters, statuses, "status");
+  renderCards();
+}
+
+function bindEvents() {
+  els.search.addEventListener("input", event => {
+    state.query = event.target.value.trim();
+    renderCards();
+  });
+
+  document.addEventListener("click", event => {
+    const button = event.target.closest("button[data-filter-key]");
+    if (!button) return;
+    const key = button.dataset.filterKey;
+    state[key] = button.dataset.filterValue;
+    renderShell();
+  });
+}
+
+async function init() {
+  bindEvents();
+  try {
+    const response = await fetch("/data/site-registry.json", { cache: "no-store" });
+    if (!response.ok) throw new Error(`Registry request failed: ${response.status}`);
+    state.items = await response.json();
+  } catch (error) {
+    console.error(error);
+    state.items = [];
+  }
+  renderShell();
+}
+
+init();
