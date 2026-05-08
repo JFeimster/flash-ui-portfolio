@@ -5,6 +5,8 @@ const state = {
   status: "All"
 };
 
+const REPO_URL = "https://github.com/JFeimster/flash-ui-portfolio";
+
 const els = {
   grid: document.querySelector("#cardGrid"),
   search: document.querySelector("#searchInput"),
@@ -12,6 +14,10 @@ const els = {
   statusFilters: document.querySelector("#statusFilters"),
   assetCount: document.querySelector("#assetCount"),
   deployableCount: document.querySelector("#deployableCount"),
+  legacyCount: document.querySelector("#legacyCount"),
+  sitesCount: document.querySelector("#sitesCount"),
+  nestedAppCount: document.querySelector("#nestedAppCount"),
+  archiveCount: document.querySelector("#archiveCount"),
   visibleCount: document.querySelector("#visibleCount")
 };
 
@@ -24,12 +30,35 @@ function escapeHtml(value = "") {
     .replaceAll("'", "&#039;");
 }
 
+function isNestedApp(item) {
+  return item.type === "nextjs-app" || Boolean(item.needsStandaloneDeploy);
+}
+
+function isArchive(item) {
+  return item.status === "archive-needs-review" || item.type === "zip-archive" || item.type === "docs-archive" || item.hasZip || item.hasMarkdown;
+}
+
 function isDeployable(item) {
-  return Boolean(item.livePath) && item.status !== "nested-app" && !item.needsStandaloneDeploy;
+  return Boolean(item.livePath) && !isNestedApp(item) && !isArchive(item);
+}
+
+function isLegacy(item) {
+  return item.status === "legacy-root" || item.status === "legacy-root-folder" || item.source === "existing-root-file" || item.source === "existing-root-folder";
+}
+
+function isSitesAsset(item) {
+  return String(item.path || "").startsWith("sites/");
 }
 
 function unique(values) {
   return ["All", ...Array.from(new Set(values.filter(Boolean))).sort()];
+}
+
+function sourceUrl(item) {
+  const path = String(item.path || "");
+  const encoded = path.split("/").map(encodeURIComponent).join("/");
+  const looksFile = /\.[a-z0-9]+$/i.test(path);
+  return `${REPO_URL}/${looksFile ? "blob" : "tree"}/main/${encoded}`;
 }
 
 function renderButtons(container, values, key) {
@@ -39,7 +68,7 @@ function renderButtons(container, values, key) {
 }
 
 function itemMatches(item) {
-  const haystack = [item.title, item.category, item.type, item.status, item.path, item.notes].join(" ").toLowerCase();
+  const haystack = [item.title, item.category, item.type, item.status, item.path, item.source, item.notes].join(" ").toLowerCase();
   const matchesQuery = !state.query || haystack.includes(state.query.toLowerCase());
   const matchesCategory = state.category === "All" || item.category === state.category;
   const matchesStatus = state.status === "All" || item.status === state.status;
@@ -54,7 +83,7 @@ function renderCards() {
     els.grid.innerHTML = `
       <section class="empty">
         <h2>The vault is empty. Time to stop admiring the shelf and load the ammo.</h2>
-        <p>Run Batch 2 bulk import/indexing to add desktop starter folders into <code>/sites/[slug]/</code>, then update <code>data/site-registry.json</code>.</p>
+        <p>Run the indexing batch again and rebuild <code>data/site-registry.json</code>.</p>
       </section>
     `;
     return;
@@ -72,16 +101,21 @@ function renderCards() {
 
   els.grid.innerHTML = visible.map(item => {
     const deployable = isDeployable(item);
+    const nested = isNestedApp(item);
+    const archive = isArchive(item);
     const openButton = item.livePath
-      ? `<a class="btn primary" href="${escapeHtml(item.livePath)}" target="_blank" rel="noreferrer">Open</a>`
+      ? `<a class="btn primary" href="${escapeHtml(item.livePath)}" target="_blank" rel="noreferrer">Open Site</a>`
       : "";
-    const reviewBadge = !deployable ? `<span class="badge review">Review</span>` : "";
+    const sourceButton = `<a class="btn" href="${escapeHtml(sourceUrl(item))}" target="_blank" rel="noreferrer">View Source Path</a>`;
+    const reviewBadge = !deployable ? `<span class="badge review">Needs Review</span>` : "";
+    const nestedBadge = nested ? `<span class="badge app">Nested App</span>` : "";
+    const archiveBadge = archive ? `<span class="badge archive">Archive</span>` : "";
 
     return `
       <article class="card">
         <div class="card-top">
           <h2>${escapeHtml(item.title)}</h2>
-          ${reviewBadge}
+          <div class="badge-stack">${reviewBadge}${nestedBadge}${archiveBadge}</div>
         </div>
         <div class="meta">
           <span class="badge">${escapeHtml(item.category || "Uncategorized")}</span>
@@ -89,9 +123,16 @@ function renderCards() {
           <span class="badge">${escapeHtml(item.status || "Unknown")}</span>
         </div>
         <div class="path">${escapeHtml(item.path || "No path recorded")}</div>
+        <ul class="flags">
+          <li>${item.hasIndex ? "index.html" : "no index.html"}</li>
+          <li>${item.hasPackageJson ? "package.json" : "no package.json"}</li>
+          <li>${item.hasZip ? "ZIP present" : "no ZIP flagged"}</li>
+          <li>${item.hasMarkdown ? "Markdown/docs" : "no docs flagged"}</li>
+        </ul>
         ${item.notes ? `<p class="notes">${escapeHtml(item.notes)}</p>` : ""}
         <div class="card-actions">
           ${openButton}
+          ${sourceButton}
           ${item.needsNormalization ? `<span class="badge">Needs normalization</span>` : ""}
           ${item.needsStandaloneDeploy ? `<span class="badge">Standalone deploy</span>` : ""}
         </div>
@@ -103,10 +144,14 @@ function renderCards() {
 function renderShell() {
   const categories = unique(state.items.map(item => item.category));
   const statuses = unique(state.items.map(item => item.status));
-  const deployableCount = state.items.filter(isDeployable).length;
 
   els.assetCount.textContent = String(state.items.length);
-  els.deployableCount.textContent = String(deployableCount);
+  els.deployableCount.textContent = String(state.items.filter(isDeployable).length);
+  els.legacyCount.textContent = String(state.items.filter(isLegacy).length);
+  els.sitesCount.textContent = String(state.items.filter(isSitesAsset).length);
+  els.nestedAppCount.textContent = String(state.items.filter(isNestedApp).length);
+  els.archiveCount.textContent = String(state.items.filter(isArchive).length);
+
   renderButtons(els.categoryFilters, categories, "category");
   renderButtons(els.statusFilters, statuses, "status");
   renderCards();
