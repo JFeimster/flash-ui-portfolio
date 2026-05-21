@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE WAR ROOM | LETHALITY TRACKER</title>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #000000;
+            --white: #ffffff;
+            --red: #ff0000;
+            --yellow: #ffff00;
+            --border-width: 4px;
+            --shadow: 8px 8px 0px var(--black);
+            --shadow-small: 4px 4px 0px var(--black);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--white);
+            color: var(--black);
+            font-family: 'Space Mono', monospace;
+            overflow-x: hidden;
+            border: var(--border-width) solid var(--black);
+        }
+
+        .marquee {
+            background: var(--red);
+            color: var(--white);
+            padding: 10px 0;
+            border-bottom: var(--border-width) solid var(--black);
+            overflow: hidden;
+            white-space: nowrap;
+            font-weight: bold;
+            font-family: 'Archivo Black', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .marquee span {
+            display: inline-block;
+            animation: scroll 15s linear infinite;
+        }
+
+        @keyframes scroll {
+            from { transform: translateX(100%); }
+            to { transform: translateX(-100%); }
+        }
+
+        header {
+            padding: 60px 20px;
+            background: var(--black);
+            color: var(--white);
+            border-bottom: var(--border-width) solid var(--black);
+            text-align: center;
+            position: relative;
+        }
+
+        .glitch {
+            position: relative;
+            text-shadow: 3px 0 var(--red), -3px 0 var(--yellow);
+            font-family: 'Archivo Black', sans-serif;
+            font-size: clamp(2.5rem, 8vw, 6rem);
+            text-transform: uppercase;
+        }
+
+        .nav-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: var(--yellow);
+            text-decoration: underline;
+            font-weight: bold;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            border-bottom: var(--border-width) solid var(--black);
+        }
+
+        .stat-card {
+            padding: 40px;
+            border-right: var(--border-width) solid var(--black);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .stat-card:last-child { border-right: none; }
+
+        .stat-value {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 4rem;
+            line-height: 1;
+        }
+
+        .stat-label {
+            background: var(--black);
+            color: var(--white);
+            padding: 5px 10px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .war-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            min-height: 800px;
+        }
+
+        @media (max-width: 992px) {
+            .war-container { grid-template-columns: 1fr; }
+        }
+
+        .main-panel {
+            padding: 40px;
+            border-right: var(--border-width) solid var(--black);
+        }
+
+        .sidebar-panel {
+            padding: 40px;
+            background: #f0f0f0;
+        }
+
+        h2.section-title {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            border-bottom: var(--border-width) solid var(--black);
+            display: inline-block;
+        }
+
+        /* LETHALITY CHART */
+        .chart-container {
+            margin-top: 40px;
+            background: var(--black);
+            padding: 30px;
+            border: var(--border-width) solid var(--black);
+            box-shadow: var(--shadow);
+            color: var(--yellow);
+        }
+
+        .chart-bar-row {
+            margin-bottom: 20px;
+        }
+
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .bar-outer {
+            width: 100%;
+            height: 30px;
+            background: #333;
+            border: 2px solid var(--yellow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bar-inner {
+            height: 100%;
+            background: var(--red);
+            width: 0%;
+            transition: width 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .bar-inner::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: glitch-slide 2s infinite;
+        }
+
+        @keyframes glitch-slide {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* LEADERBOARD TABLE */
+        .leaderboard {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .leaderboard th {
+            background: var(--yellow);
+            text-align: left;
+            padding: 15px;
+            border: var(--border-width) solid var(--black);
+            font-family: 'Archivo Black', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .leaderboard td {
+            padding: 15px;
+            border: var(--border-width) solid var(--black);
+            font-weight: bold;
+        }
+
+        .leaderboard tr:nth-child(even) { background: #fafafa; }
+        .leaderboard tr:hover { background: var(--black); color: var(--white); }
+
+        .rank-badge {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: var(--red);
+            color: var(--white);
+            text-align: center;
+            line-height: 30px;
+            font-family: 'Archivo Black', sans-serif;
+        }
+
+        .minister-card {
+            background: var(--white);
+            border: var(--border-width) solid var(--black);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-small);
+            position: relative;
+        }
+
+        .minister-card::before {
+            content: 'TOP ASSET';
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background: var(--black);
+            color: var(--white);
+            font-size: 0.7rem;
+            padding: 2px 8px;
+        }
+
+        .impact-meter {
+            height: 10px;
+            background: #ddd;
+            margin-top: 10px;
+        }
+
+        .impact-fill {
+            height: 100%;
+            background: var(--black);
+        }
+
+        .cta-box {
+            background: var(--yellow);
+            padding: 40px;
+            text-align: center;
+            border-top: var(--border-width) solid var(--black);
+        }
+
+        .big-btn {
+            background: var(--red);
+            color: var(--white);
+            padding: 25px 50px;
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 2rem;
+            border: var(--border-width) solid var(--black);
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            text-transform: uppercase;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .big-btn:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 12px 12px 0px var(--black);
+        }
+
+        footer {
+            padding: 40px;
+            background: var(--black);
+            color: var(--white);
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="marquee">
+        <span> ⚠️ URGENT: COGNITIVE OVERLOAD DETECTED IN SECTOR 7 ⚠️ IMPACT RADIUS EXPANDING ⚠️ VIRALITY COEFFICIENT AT CRITICAL LEVELS ⚠️ ENFORCE THE NARRATIVE ⚠️ </span>
+    </div>
+
+    <header>
+        <a href="index.html" class="nav-link">← RETURN TO VAULT</a>
+        <h1 class="glitch" id="mainTitle">THE WAR ROOM</h1>
+        <p style="color: var(--yellow); font-weight: bold; letter-spacing: 2px; margin-top: 10px;">CULTURAL IMPACT & LETHALITY MONITOR</p>
+    </header>
+
+    <div class="stats-grid">
+        <div class="stat-card" style="background: var(--yellow);">
+            <div class="stat-value" id="sharesCounter">842K</div>
+            <div class="stat-label">TOTAL DEPLOYMENTS (SHARES)</div>
+        </div>
+        <div class="stat-card" style="background: var(--white);">
+            <div class="stat-value" id="impactScore">9.8</div>
+            <div class="stat-label">GLOBAL LETHALITY INDEX</div>
+        </div>
+        <div class="stat-card" style="background: var(--red); color: white;">
+            <div class="stat-value" id="activeOps">4,102</div>
+            <div class="stat-label">ACTIVE PSYOP AGENTS</div>
+        </div>
+    </div>
+
+    <div class="war-container">
+        <section class="main-panel">
+            <h2 class="section-title">High-Lethality Assets</h2>
+            <p>Tracking the memes with the highest emotional damage scores and reach.</p>
+            
+            <div class="chart-container">
+                <div class="chart-bar-row">
+                    <div class="bar-label">
+                        <span>ASSET #9912 - "AI OVERLORD"</span>
+                        <span>98% LETHALITY</span>
+                    </div>
+                    <div class="bar-outer">
+                        <div class="bar-inner" style="width: 98%;"></div>
+                    </div>
+                </div>
+                <div class="chart-bar-row">
+                    <div class="bar-label">
+                        <span>ASSET #4401 - "FOUNDER COPE"</span>
+                        <span>82% LETHALITY</span>
+                    </div>
+                    <div class="bar-outer">
+                        <div class="bar-inner" style="width: 82%;"></div>
+                    </div>
+                </div>
+                <div class="chart-bar-row">
+                    <div class="bar-label">
+                        <span>ASSET #1022 - "DEGEN RECKONING"</span>
+                        <span>71% LETHALITY</span>
+                    </div>
+                    <div class="bar-outer">
+                        <div class="bar-inner" style="width: 71%;"></div>
+                    </div>
+                </div>
+                <div class="chart-bar-row">
+                    <div class="bar-label">
+                        <span>ASSET #5567 - "POLITICAL VOID"</span>
+                        <span>64% LETHALITY</span>
+                    </div>
+                    <div class="bar-outer">
+                        <div class="bar-inner" style="width: 64%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <table class="leaderboard">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Meme Signature</th>
+                        <th>Reach</th>
+                        <th>Casualties</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="rank-badge">01</span></td>
+                        <td>SUBSCRIPTION DEMOCRACY</td>
+                        <td>4.2M</td>
+                        <td>12.5K RAGE-QUITS</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rank-badge">02</span></td>
+                        <td>LIMESTONE SAAS PIVOT</td>
+                        <td>3.8M</td>
+                        <td>800 VC TEARS</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rank-badge">03</span></td>
+                        <td>PROMPT WIZARD TRAGEDY</td>
+                        <td>2.1M</td>
+                        <td>1.2M CONFUSED BOOMERS</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rank-badge">04</span></td>
+                        <td>BULLISH RUGPULL</td>
+                        <td>1.9M</td>
+                        <td>45K BANKRUPTCIES</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="sidebar-panel">
+            <h2 class="section-title">Propaganda Ministers</h2>
+            <p style="margin-bottom: 20px;">Top contributing agents by cultural displacement volume.</p>
+
+            <div class="minister-card">
+                <h3 style="font-family: 'Archivo Black';">AGENT_VOID</h3>
+                <p>Impact: 450.2k pts</p>
+                <div class="impact-meter"><div class="impact-fill" style="width: 95%;"></div></div>
+            </div>
+
+            <div class="minister-card">
+                <h3 style="font-family: 'Archivo Black';">CHAOS_ENGINEER</h3>
+                <p>Impact: 388.1k pts</p>
+                <div class="impact-meter"><div class="impact-fill" style="width: 82%;"></div></div>
+            </div>
+
+            <div class="minister-card">
+                <h3 style="font-family: 'Archivo Black';">GLITCH_WITCH_66</h3>
+                <p>Impact: 312.9k pts</p>
+                <div class="impact-meter"><div class="impact-fill" style="width: 65%;"></div></div>
+            </div>
+
+            <div class="minister-card" style="border-style: dashed; background: transparent;">
+                <h3 style="font-family: 'Archivo Black';">RECRUIT_NEEDED</h3>
+                <p>Upload 5 assets to rank.</p>
+                <div class="impact-meter"><div class="impact-fill" style="width: 10%;"></div></div>
+            </div>
+            
+            <div style="background: var(--red); color: white; padding: 20px; border: var(--border-width) solid black; margin-top: 40px;">
+                <h4 style="font-family: 'Archivo Black'; margin-bottom: 10px;">SITUATION REPORT</h4>
+                <p style="font-size: 0.8rem; line-height: 1.5;">Memetic warfare is intensifying. The frontline has shifted from Twitter to private Discord servers. Deployment of "Absurdity V2" scheduled for 0400 hours.</p>
+            </div>
+        </section>
+    </div>
+
+    <section class="cta-box">
+        <h2 style="font-family: 'Archivo Black'; font-size: 3rem; margin-bottom: 20px;">READY TO ESCALATE?</h2>
+        <a href="#" class="big-btn">DEPLOY NEW PROPAGANDA</a>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 MEME PROPAGANDA DEPARTMENT | THE WAR ROOM | CLASSIFIED SENSITIVE</p>
+    </footer>
+
+    <script>
+        // Randomize stats for "live" feel
+        setInterval(() => {
+            const shares = document.getElementById('sharesCounter');
+            const impact = document.getElementById('impactScore');
+            const title = document.getElementById('mainTitle');
+
+            // Fluctuate shares
+            const currentShares = parseInt(shares.innerText.replace('K', ''));
+            if(Math.random() > 0.5) {
+                shares.innerText = (currentShares + 1) + "K";
+            }
+
+            // Fluctuate impact
+            impact.innerText = (9.5 + Math.random() * 0.4).toFixed(1);
+
+            // Occasional title glitch
+            title.style.transform = `translate(${Math.random() * 6 - 3}px, ${Math.random() * 6 - 3}px)`;
+            setTimeout(() => {
+                title.style.transform = `translate(0,0)`;
+            }, 100);
+
+        }, 2000);
+
+        // Bar animation delay
+        window.addEventListener('load', () => {
+            const bars = document.querySelectorAll('.bar-inner');
+            bars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 500);
+            });
+        });
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE WAR ROOM | LETHALITY TRACKER</title>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #000000;
+            --white: #ffffff;
+            --red: #ff0000;
+            --yellow: #ffff00;
+            --border-width: 4px;
+            --shadow: 8px 8px 0px var(--black);
+            --shadow-small: 4px 4px 0px var(--black);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--white);
+            color: var(--black);
+            font-family: 'Space Mono', monospace;
+            overflow-x: hidden;
+            border: var(--border-width) solid var(--black);
+        }
+
+        .marquee {
+            background: var(--red);
+            color: var(--white);
+            padding: 10px 0;
+            border-bottom: var(--border-width) solid var(--black);
+            overflow: hidden;
+            white-space: nowrap;
+            font-weight: bold;
+            font-family: 'Archivo Black', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .marquee span {
+            display: inline-block;
+            animation: scroll 15s linear infinite;
+        }
+
+        @keyframes scroll {
+            from { transform: translateX(100%); }
+            to { transform: translateX(-100%); }
+        }
+
+        header {
+            padding: 60px 20px;
+            background: var(--black);
+            color: var(--white);
+            border-bottom: var(--border-width) solid var(--black);
+            text-align: center;
+            position: relative;
+        }
+
+        .glitch {
+            position: relative;
+            text-shadow: 3px 0 var(--red), -3px 0 var(--yellow);
+            font-family: 'Archivo Black', sans-serif;
+            font-size: clamp(2.5rem, 8vw, 6rem);
+            text-transform: uppercase;
+        }
+
+        .nav-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: var(--yellow);
+            text-decoration: underline;
+            font-weight: bold;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            border-bottom: var(--border-width) solid var(--black);
+        }
+
+        .stat-card {
+            padding: 40px;
+            border-right: var(--border-width) solid var(--black);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .stat-card:last-child { border-right: none; }
+
+        .stat-value {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 4rem;
+            line-height: 1;
+        }
+
+        .stat-label {
+            background: var(--black);
+            color: var(--white);
+            padding: 5px 10px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .war-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            min-height: 800px;
+        }
+
+        @media (max-width: 992px) {
+            .war-container { grid-template-columns: 1fr; }
+        }
+
+        .main-panel {
+            padding: 40px;
+            border-right: var(--border-width) solid var(--black);
+        }
+
+        .sidebar-panel {
+            padding: 40px;
+            background: #f0f0f0;
+        }
+
+        h2.section-title {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            border-bottom: var(--border-width) solid var(--black);
+            display: inline-block;
+        }
+
+        /* LETHALITY CHART */
+        .chart-container {
+            margin-top: 40px;
+            background: var(--black);
+            padding: 30px;
+            border: var(--border-width) solid var(--black);
+            box-shadow: var(--shadow);
+            color: var(--yellow);
+        }
+
+        .chart-bar-row {
+            margin-bottom: 20px;
+        }
+
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .bar-outer {
+            width: 100%;
+            height: 30px;
+            background: #333;
+            border: 2px solid var(--yellow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bar-inner {
+            height: 100%;
+            background: var(--red);
+            width: 0%;
+            transition: width 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .bar-inner::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: glitch-slide 2s infinite;
+        }
+
+        @keyframes glitch-slide {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* LEADERBOARD TABLE */
+        .leaderboard {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .leaderboard th {
+            background: var(--yellow);
+            text-align: left;
+            padding: 15px;
+            border: var(--border-width) solid var(--black);
+            font-family: 'Archivo Black', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .leaderboard td {
+            padding: 15px;
+            border: var(--border-width) solid var(--black);
+            font-weight: bold;
+        }
+
+        .leaderboard tr:nth-child(even) { background: #fafafa; }
+        .leaderboard tr:hover { background: var(--black); color: var(--white); }
+
+        .rank-badge {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: var(--red);
+            color: var(--white);
+            text-align: center;
+            line-height: 30px;
+            font-family: 'Archivo Black', sans-serif;
+        }
+
+        .minister-card {
+            background: var(--white);
+            border: var(--border-width) solid var(--black);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-small);
+            position: relative;
+        }
+
+        .minister-card::before {
+            content: 'TOP ASSET';
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background: var(--black);
+            color: var(--white);
+            font-size: 0.7rem;
+            padding: 2px 8px;
+        }
+
+        .impact-meter {
+            height: 10px;
+            background: #ddd;
+            margin-top: 10px;
+        }
+
+        .impact-fill {
+            height: 100%;
+            background: var(--black);
+        }
+
+        .cta-box {
+            background: var(--yellow);
+            padding: 40px;
+            text-align: center;
+            border-top: var(--border-width) solid var(--black);
+        }
+
+        .big-btn {
+            background: var(--red);
+            color: var(--white);
+            padding: 25px 50px;
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 2rem;
+            border: var(--border-width) solid var(--black);
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            text-transform: uppercase;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .big-btn:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 12px 12px 0px var(--black);
+        }
+
+        footer {
+            padding: 40px;
+            background: var(--black);
+            color: var(--white);
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="marquee">
+        <span> ⚠️ URGENT: COGNITIVE OVERLOAD DETECTED IN SECTOR 7 ⚠️ IMPACT RADIUS EXPANDING ⚠️ VIRALITY COEFFICIENT AT CRITICAL LEVELS ⚠️ ENFORCE THE NARRATIVE ⚠️ </span>
+    </div>
+
+    <header>
+        <a href="#" class="nav-link">← RETURN TO VAULT</a>
+        <h1 class="glitch" id="mainTitle">THE WAR ROOM</h1>
+        <p style="color: var(--yellow); font-weight: bold; letter-spacing: 2px; margin-top: 10px;">CULTURAL IMPACT & LETHALITY MONITOR</p>
+    </header>
+
+    <div class="stats-grid">
+        <div class="stat-card" style="background: var(--yellow);">
+            <div class="stat-value" id="sharesCounter">842K</div>
+            <div class="stat-label">TOTAL DEPLOYMENTS (SHARES)</div>
+        </div>
+        <div class="stat-card" style="background: var(--white);">
+            <div class="stat-value" id="impactScore">9.8</div>
+            <div class="stat-label">GLOBAL LETHALITY INDEX</div>
+        </div>
+        <div class="stat-card" style="background: var(--red); color: white;">
+            <div class="stat-value" id="activeOps">4,102</div>
+            <div class="stat-label">ACTIVE PSYOP AGENTS</div>
+        </div>
+    </div>
+
+    <div class="war-container">
+        <section class="main-panel">
+            <h2 class="section-title">High-Lethality Assets</h2>
+            <p>Tracking the memes with the highest emotional damage scores and reach.</p>
+            
+            <div class="chart-container">
+                <div class="chart-bar-row">
+                    <div class="bar-label">
+                        <span>ASSET #9912 - "AI OVERLORD"</span>
+                        <span>98% LETHALITY</span>
+                    </div>
+                    <div class="bar-outer">
+                        <div class="bar-inner" style="width: 98%;"></div>
+                    </div>
+                </div>
+                <div class="chart-bar-row">
+                    <div class="bar-label">
+                        <span>ASSET #4401 - "FOUNDER COPE"</span>
+                        <span>82% LETHALITY</span>
+                    </div>
+                    <div class="bar-outer">
+                        <div class="bar-inner" style="width: 82%;"></div>
+                    </div>
+                </div>
+                <div class="chart-bar-row">
+                    <div class="bar-label">
+                        <span>ASSET #1022 - "DEGEN RECKONING"</span>
+                        <span>71% LETHALITY</span>
+                    </div>
+                    <div class="bar-outer">
+                        <div class="bar-inner" style="width: 71%;"></div>
+                    </div>
+                </div>
+                <div class="chart-bar-row">
+                    <div class="bar-label">
+                        <span>ASSET #5567 - "POLITICAL VOID"</span>
+                        <span>64% LETHALITY</span>
+                    </div>
+                    <div class="bar-outer">
+                        <div class="bar-inner" style="width: 64%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <table class="leaderboard">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Meme Signature</th>
+                        <th>Reach</th>
+                        <th>Casualties</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="rank-badge">01</span></td>
+                        <td>SUBSCRIPTION DEMOCRACY</td>
+                        <td>4.2M</td>
+                        <td>12.5K RAGE-QUITS</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rank-badge">02</span></td>
+                        <td>LIMESTONE SAAS PIVOT</td>
+                        <td>3.8M</td>
+                        <td>800 VC TEARS</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rank-badge">03</span></td>
+                        <td>PROMPT WIZARD TRAGEDY</td>
+                        <td>2.1M</td>
+                        <td>1.2M CONFUSED BOOMERS</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rank-badge">04</span></td>
+                        <td>BULLISH RUGPULL</td>
+                        <td>1.9M</td>
+                        <td>45K BANKRUPTCIES</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="sidebar-panel">
+            <h2 class="section-title">Propaganda Ministers</h2>
+            <p style="margin-bottom: 20px;">Top contributing agents by cultural displacement volume.</p>
+
+            <div class="minister-card">
+                <h3 style="font-family: 'Archivo Black';">AGENT_VOID</h3>
+                <p>Impact: 450.2k pts</p>
+                <div class="impact-meter"><div class="impact-fill" style="width: 95%;"></div></div>
+            </div>
+
+            <div class="minister-card">
+                <h3 style="font-family: 'Archivo Black';">CHAOS_ENGINEER</h3>
+                <p>Impact: 388.1k pts</p>
+                <div class="impact-meter"><div class="impact-fill" style="width: 82%;"></div></div>
+            </div>
+
+            <div class="minister-card">
+                <h3 style="font-family: 'Archivo Black';">GLITCH_WITCH_66</h3>
+                <p>Impact: 312.9k pts</p>
+                <div class="impact-meter"><div class="impact-fill" style="width: 65%;"></div></div>
+            </div>
+
+            <div class="minister-card" style="border-style: dashed; background: transparent;">
+                <h3 style="font-family: 'Archivo Black';">RECRUIT_NEEDED</h3>
+                <p>Upload 5 assets to rank.</p>
+                <div class="impact-meter"><div class="impact-fill" style="width: 10%;"></div></div>
+            </div>
+            
+            <div style="background: var(--red); color: white; padding: 20px; border: var(--border-width) solid black; margin-top: 40px;">
+                <h4 style="font-family: 'Archivo Black'; margin-bottom: 10px;">SITUATION REPORT</h4>
+                <p style="font-size: 0.8rem; line-height: 1.5;">Memetic warfare is intensifying. The frontline has shifted from Twitter to private Discord servers. Deployment of "Absurdity V2" scheduled for 0400 hours.</p>
+            </div>
+        </section>
+    </div>
+
+    <section class="cta-box">
+        <h2 style="font-family: 'Archivo Black'; font-size: 3rem; margin-bottom: 20px;">READY TO ESCALATE?</h2>
+        <a href="#" class="big-btn">DEPLOY NEW PROPAGANDA</a>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 MEME PROPAGANDA DEPARTMENT | THE WAR ROOM | CLASSIFIED SENSITIVE</p>
+    </footer>
+
+    <script>
+        // Randomize stats for "live" feel
+        setInterval(() => {
+            const shares = document.getElementById('sharesCounter');
+            const impact = document.getElementById('impactScore');
+            const title = document.getElementById('mainTitle');
+
+            // Fluctuate shares
+            const currentShares = parseInt(shares.innerText.replace('K', ''));
+            if(Math.random() > 0.5) {
+                shares.innerText = (currentShares + 1) + "K";
+            }
+
+            // Fluctuate impact
+            impact.innerText = (9.5 + Math.random() * 0.4).toFixed(1);
+
+            // Occasional title glitch
+            title.style.transform = `translate(${Math.random() * 6 - 3}px, ${Math.random() * 6 - 3}px)`;
+            setTimeout(() => {
+                title.style.transform = `translate(0,0)`;
+            }, 100);
+
+        }, 2000);
+
+        // Bar animation delay
+        window.addEventListener('load', () => {
+            const bars = document.querySelectorAll('.bar-inner');
+            bars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 500);
+            });
+        });
+    </script>
+</body>
+</html>

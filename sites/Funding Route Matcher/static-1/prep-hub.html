@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --bg-dark: #07080a;
+            --card-bg: #111318;
+            --card-border: #1f222c;
+            --electric-blue: #00f2ff;
+            --neon-green: #39ff14;
+            --text-main: #ffffff;
+            --text-muted: #8a8f9d;
+            --accent-gradient: linear-gradient(135deg, #00f2ff 0%, #39ff14 100%);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        #prep-hub-container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Header */
+        .hub-header {
+            padding: 50px 40px;
+            background: radial-gradient(circle at top left, rgba(57, 255, 20, 0.05), transparent);
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .route-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background: rgba(57, 255, 20, 0.1);
+            color: var(--neon-green);
+            border-radius: 100px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            margin-bottom: 16px;
+            border: 1px solid rgba(57, 255, 20, 0.2);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -1px;
+        }
+
+        .highlight {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hub-header p {
+            color: var(--text-muted);
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        /* Progress Tracker */
+        .progress-section {
+            padding: 30px 40px;
+            background: #0d0f14;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .progress-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .progress-container {
+            height: 8px;
+            background: var(--card-border);
+            border-radius: 4px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        #readiness-bar {
+            height: 100%;
+            background: var(--accent-gradient);
+            width: 35%;
+            transition: width 0.8s ease;
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.3);
+        }
+
+        /* Main Content Grid */
+        .hub-content {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 1px;
+            background: var(--card-border);
+        }
+
+        .main-track {
+            background: var(--card-bg);
+            padding: 40px;
+        }
+
+        .sidebar {
+            background: #0d0f14;
+            padding: 40px;
+        }
+
+        /* Phase Styling */
+        .phase-block {
+            margin-bottom: 40px;
+        }
+
+        .phase-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .phase-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--electric-blue);
+            border: 1px solid var(--electric-blue);
+        }
+
+        .phase-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        /* Checklist */
+        .task-list {
+            list-style: none;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 16px;
+            background: #1a1d26;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .task-item:hover {
+            border-color: var(--electric-blue);
+        }
+
+        .task-item.completed {
+            border-color: var(--neon-green);
+            background: rgba(57, 255, 20, 0.02);
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--card-border);
+            border-radius: 6px;
+            flex-shrink: 0;
+            margin-top: 2px;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .task-item.completed .checkbox {
+            background: var(--neon-green);
+            border-color: var(--neon-green);
+        }
+
+        .task-item.completed .checkbox::after {
+            content: "✓";
+            position: absolute;
+            color: #000;
+            font-size: 14px;
+            font-weight: 800;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .task-info h4 {
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .task-info p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Sidebar Widgets */
+        .widget {
+            margin-bottom: 32px;
+        }
+
+        .widget-title {
+            color: var(--neon-green);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .tip-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+        }
+
+        .tip-card h5 {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: var(--electric-blue);
+        }
+
+        .tip-card p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Buttons */
+        .cta-button {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: var(--accent-gradient);
+            color: #000;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 242, 255, 0.2);
+        }
+
+        @media (max-width: 850px) {
+            .hub-content { grid-template-columns: 1fr; }
+            .sidebar { border-top: 1px solid var(--card-border); }
+        }
+    </style>
+</head>
+<body>
+
+<div id="prep-hub-container">
+    <div class="hub-header">
+        <div class="route-badge">PREP PATH: OPTIMIZATION</div>
+        <h1>Fundability <span class="highlight">Prep Hub</span></h1>
+        <p>Your current profile needs adjustment before a high-probability approval. Complete the roadmap below to unlock your funding route.</p>
+    </div>
+
+    <div class="progress-section">
+        <div class="progress-meta">
+            <span>READINESS SCORE</span>
+            <span id="readiness-percent">35%</span>
+        </div>
+        <div class="progress-container">
+            <div id="readiness-bar"></div>
+        </div>
+    </div>
+
+    <div class="hub-content">
+        <div class="main-track">
+            <!-- Phase 1 -->
+            <div class="phase-block">
+                <div class="phase-header">
+                    <div class="phase-number">01</div>
+                    <h3 class="phase-title">Foundation & Compliance</h3>
+                </div>
+                <div class="task-list">
+                    <div class="task-item completed" onclick="toggleTask(this)">
+                        <div class="checkbox"></div>
+                        <div class="task-info">
+                            <h4>Entity Registration</h4>
+                            <p>Verify EIN matches Secretary of State records exactly.</p>
+                        </div>
+                    </div>
+                    <div class="task-item" onclick="toggleTask(this)">
+                        <div class="checkbox"></div>
+                        <div class="task-info">
+                            <h4>Business Physical Address</h4>
+                            <p>Avoid PO Boxes or virtual offices; lenders prefer a physical site.</p>
+                        </div>
+                    </div>
+                    <div class="task-item" onclick="toggleTask(this)">
+                        <div class="checkbox"></div>
+                        <div class="task-info">
+                            <h4>Professional Email & Domain</h4>
+                            <p>Switch from @gmail.com to a branded domain (name@company.com).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phase 2 -->
+            <div class="phase-block">
+                <div class="phase-header">
+                    <div class="phase-number">02</div>
+                    <h3 class="phase-title">Financial Hygiene</h3>
+                </div>
+                <div class="task-list">
+                    <div class="task-item" onclick="toggleTask(this)">
+                        <div class="checkbox"></div>
+                        <div class="task-info">
+                            <h4>Dedicated Business Account</h4>
+                            <p>Separate all personal and business transactions immediately.</p>
+                        </div>
+                    </div>
+                    <div class="task-item" onclick="toggleTask(this)">
+                        <div class="checkbox"></div>
+                        <div class="task-info">
+                            <h4>Clean 3-Month Trajectory</h4>
+                            <p>Maintain average daily balances above $1,000 for 90 days.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phase 3 -->
+            <div class="phase-block">
+                <div class="phase-header">
+                    <div class="phase-number">03</div>
+                    <h3 class="phase-title">Credit Building</h3>
+                </div>
+                <div class="task-list">
+                    <div class="task-item" onclick="toggleTask(this)">
+                        <div class="checkbox"></div>
+                        <div class="task-info">
+                            <h4>D&B Profile Setup</h4>
+                            <p>Claim your DUNS number and ensure industry codes (NAICS) are correct.</p>
+                        </div>
+                    </div>
+                    <div class="task-item" onclick="toggleTask(this)">
+                        <div class="checkbox"></div>
+                        <div class="task-info">
+                            <h4>Trade Line Activation</h4>
+                            <p>Open 3 Net-30 accounts (Uline, Grainger, etc.) to report payment history.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="widget">
+                <h4 class="widget-title">Quick Tips</h4>
+                <div class="tip-card">
+                    <h5>Lender Optics</h5>
+                    <p>Banks use AI to scan your bank statements for "NSF" (Non-Sufficient Funds). Ensure zero bounce-backs.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>NAICS Codes</h5>
+                    <p>Certain codes are "high risk" (e.g., Credit Repair). Ensure yours accurately reflects your business.</p>
+                </div>
+            </div>
+
+            <div class="widget">
+                <h4 class="widget-title">Doc Vault</h4>
+                <button class="cta-button btn-outline" style="font-size: 0.75rem; padding: 10px;">Upload DL/Passport</button>
+                <button class="cta-button btn-outline" style="font-size: 0.75rem; padding: 10px;">Upload Formation Docs</button>
+            </div>
+
+            <div class="widget">
+                <h4 class="widget-title">Next Action</h4>
+                <button class="cta-button btn-primary" onclick="alert('Scheduling your strategy session...')">Book Strategy Call</button>
+                <button class="cta-button btn-outline" onclick="location.reload()">Re-Run Matcher</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleTask(element) {
+        element.classList.toggle('completed');
+        updateProgress();
+    }
+
+    function updateProgress() {
+        const total = document.querySelectorAll('.task-item').length;
+        const completed = document.querySelectorAll('.task-item.completed').length;
+        const percentage = Math.round((completed / total) * 100);
+        
+        const bar = document.getElementById('readiness-bar');
+        const text = document.getElementById('readiness-percent');
+        
+        bar.style.width = percentage + '%';
+        text.innerText = percentage + '%';
+
+        // Update badge color if high enough
+        if (percentage >= 80) {
+            document.querySelector('.route-badge').style.color = 'var(--neon-green)';
+            document.querySelector('.route-badge').innerText = 'STATUS: FUNDING READY';
+        } else {
+            document.querySelector('.route-badge').style.color = 'var(--electric-blue)';
+            document.querySelector('.route-badge').innerText = 'STATUS: OPTIMIZATION';
+        }
+    }
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --bg-dark: #07080a;
+            --card-bg: #111318;
+            --card-border: #1f222c;
+            --electric-blue: #00f2ff;
+            --neon-green: #39ff14;
+            --text-main: #ffffff;
+            --text-muted: #8a8f9d;
+            --accent-gradient: linear-gradient(135deg, #00f2ff 0%, #39ff14 100%);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        #prep-hub-container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Header */
+        .hub-header {
+            padding: 50px 40px;
+            background: radial-gradient(circle at top left, rgba(57, 255, 20, 0.05), transparent);
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .route-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background: rgba(57, 255, 20, 0.1);
+            color: var(--neon-green);
+            border-radius: 100px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            margin-bottom: 16px;
+            border: 1px solid rgba(57, 255, 20, 0.2);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -1px;
+        }
+
+        .highlight {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hub-header p {
+            color: var(--text-muted);
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        /* Progress Tracker */
+        .progress-section {
+            padding: 30px 40px;
+            background: #0d0f14;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .progress-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .progress-container {
+            height: 8px;
+            background: var(--card-border);
+            border-radius: 4px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        #readiness-bar {
+            height: 100%;
+            background: var(--accent-gradient);
+            width: 35%;
+            transition: width 0.8s ease;
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.3);
+        }
+
+        /* Main Content Grid */
+        .hub-content {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 1px;
+            background: var(--card-border);
+        }
+
+        .main-track {
+            background: var(--card-bg);
+            padding: 40px;
+        }
+
+        .sidebar {
+            background: #0d0f14;
+            padding: 40px;
+        }
+
+        /* Phase Styling */
+        .phase-block {
+            margin-bottom: 40px;
+        }
+
+        .phase-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .phase-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--electric-blue);
+            border: 1px solid var(--electric-blue);
+        }
+
+        .phase-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        /* Checklist */
+        .task-list {
+            list-style: none;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 16px;
+            background: #1a1d26;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .task-item:hover {
+            border-color: var(--electric-blue);
+        }
+
+        .task-item.completed {
+            border-color: var(--neon-green);
+            background: rgba(57, 255, 20, 0.02);
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--card-border);
+            border-radius: 6px;
+            flex-shrink: 0;
+            margin-top: 2px;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .task-item.completed .checkbox {
+            background: var(--neon-green);
+            border-color: var(--neon-green);
+        }
+
+        .task-item.completed .checkbox::after {
+            content: "✓";
+            position: absolute;
+            color: #000;
+            font-size: 14px;
+            font-weight: 800;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .task-info h4 {
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .task-info p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Sidebar Widgets */
+        .widget {
+            margin-bottom: 32px;
+        }
+
+        .widget-title {
+            color: var(--neon-green);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .tip-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+        }
+
+        .tip-card h5 {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: var(--electric-blue);
+        }
+
+        .tip-card p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Buttons */
+        .cta-button {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: var(--accent-gradient);
+            color: #000;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 242, 255, 0.2);
+        }
+
+        @media (max-width: 850px) {
+            .hub-content { grid-template-columns: 1fr; }
+            .sidebar { border-top: 1px solid var(--card-border); }
+        }
+    </style>
+</head>
+<body>
+
+<div id="prep-hub-container">
+    <div class="hub-header">
+        <div class="route-badge">PREP PATH: OPTIMIZATION</div>
+        <h1>Fundability <span class="highlight">Prep Hub</span></h1>
+        <p>Your current profile needs adjustment before a high-probability approval. Complete the roadmap below to unlock your funding route.</p>
+    </div>
+
+    <div class="progress-section">
+        <div class="progress-meta">
+            <span>READINESS SCORE</span>
+            <span id="readiness-percent">35%</span>
+        </div>
+        <div class="progress-container">
+            <div id="readiness-bar"></div>
+        </div>
+    </div>
+
+    <div class="hub-content">
+        <div class="main-track">
+            <!-- Phase 1 -->
+            <div class="phase-block">
+                <div class="phase-header">
+                    <div class="phase-number">01</div>
+                    <h3 class="phase-title">Foundation & Compliance</h3>
+                </div>
+                <div class="task-list">
+                    <div class="task-item completed" onclick="toggleTask(this)">
+                        <div class="checkbox"></div>
+                        <div class="task-info">
+                            <h4>Entity Registration</h4>
+                            <p>Verify EIN matches Secretary of State records exactly.</p>
+                        </div>
+                    </div>
+                    <div class="task-item" onclick="toggleTask(this)">
+                        <div class="checkbox"></div>
+                        <div class="task-info">
+                            <h4>Business Physical Address</h4>
+                            <p>Avoid PO Boxes or virtual offices; lenders prefer a physical site.</p>
+                        </div>
+                    </div>
+                    <div class="task-item" onclick="toggleTask(this)">
+                        <div class="checkbox"></div>
+                        <div class="task-info">
+                            <h4>Professional Email & Domain</h4>
+                            <p>Switch from @gmail.com to a branded domain (name@company.com).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phase 2 -->
+            <div class="phase-block">
+                <div class="phase-header">
+                    <div class="phase-number">02</div>
+                    <h3 class="phase-title">Financial Hygiene</h3>
+                </div>
+                <div class="task-list">
+                    <div class="task-item" onclick="toggleTask(this)">
+                        <div class="checkbox"></div>
+                        <div class="task-info">
+                            <h4>Dedicated Business Account</h4>
+                            <p>Separate all personal and business transactions immediately.</p>
+                        </div>
+                    </div>
+                    <div class="task-item" onclick="toggleTask(this)">
+                        <div class="checkbox"></div>
+                        <div class="task-info">
+                            <h4>Clean 3-Month Trajectory</h4>
+                            <p>Maintain average daily balances above $1,000 for 90 days.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phase 3 -->
+            <div class="phase-block">
+                <div class="phase-header">
+                    <div class="phase-number">03</div>
+                    <h3 class="phase-title">Credit Building</h3>
+                </div>
+                <div class="task-list">
+                    <div class="task-item" onclick="toggleTask(this)">
+                        <div class="checkbox"></div>
+                        <div class="task-info">
+                            <h4>D&B Profile Setup</h4>
+                            <p>Claim your DUNS number and ensure industry codes (NAICS) are correct.</p>
+                        </div>
+                    </div>
+                    <div class="task-item" onclick="toggleTask(this)">
+                        <div class="checkbox"></div>
+                        <div class="task-info">
+                            <h4>Trade Line Activation</h4>
+                            <p>Open 3 Net-30 accounts (Uline, Grainger, etc.) to report payment history.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="widget">
+                <h4 class="widget-title">Quick Tips</h4>
+                <div class="tip-card">
+                    <h5>Lender Optics</h5>
+                    <p>Banks use AI to scan your bank statements for "NSF" (Non-Sufficient Funds). Ensure zero bounce-backs.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>NAICS Codes</h5>
+                    <p>Certain codes are "high risk" (e.g., Credit Repair). Ensure yours accurately reflects your business.</p>
+                </div>
+            </div>
+
+            <div class="widget">
+                <h4 class="widget-title">Doc Vault</h4>
+                <button class="cta-button btn-outline" style="font-size: 0.75rem; padding: 10px;">Upload DL/Passport</button>
+                <button class="cta-button btn-outline" style="font-size: 0.75rem; padding: 10px;">Upload Formation Docs</button>
+            </div>
+
+            <div class="widget">
+                <h4 class="widget-title">Next Action</h4>
+                <button class="cta-button btn-primary" onclick="alert('Scheduling your strategy session...')">Book Strategy Call</button>
+                <button class="cta-button btn-outline" onclick="location.reload()">Re-Run Matcher</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleTask(element) {
+        element.classList.toggle('completed');
+        updateProgress();
+    }
+
+    function updateProgress() {
+        const total = document.querySelectorAll('.task-item').length;
+        const completed = document.querySelectorAll('.task-item.completed').length;
+        const percentage = Math.round((completed / total) * 100);
+        
+        const bar = document.getElementById('readiness-bar');
+        const text = document.getElementById('readiness-percent');
+        
+        bar.style.width = percentage + '%';
+        text.innerText = percentage + '%';
+
+        if (percentage >= 80) {
+            document.querySelector('.route-badge').style.color = 'var(--neon-green)';
+            document.querySelector('.route-badge').innerText = 'STATUS: FUNDING READY';
+        } else {
+            document.querySelector('.route-badge').style.color = 'var(--neon-green)';
+            document.querySelector('.route-badge').innerText = 'PREP PATH: OPTIMIZATION';
+        }
+    }
+</script>
+
+</body>
+</html>

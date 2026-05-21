@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAYLOAD CUSTOMIZER | Quote Grenade</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=Syne:wght@800&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --black: #000000;
+            --white: #ffffff;
+            --cream: #f4f1ea;
+            --red: #ff3c00;
+            --border: 4px solid #000000;
+            --shadow: 8px 8px 0px #000000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--cream);
+            color: var(--black);
+            font-family: 'Space Grotesk', sans-serif;
+            line-height: 1.1;
+            padding-bottom: 100px;
+        }
+
+        header {
+            border-bottom: var(--border);
+            padding: 20px 0;
+            background: var(--black);
+            color: var(--white);
+            margin-bottom: 40px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .customizer-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 40px;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .customizer-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Preview Area */
+        .preview-pane {
+            background: #ccc;
+            background-image: radial-gradient(#000 1px, transparent 1px);
+            background-size: 20px 20px;
+            padding: 60px;
+            border: var(--border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 600px;
+            position: relative;
+        }
+
+        #export-target {
+            width: 500px;
+            height: 500px;
+            background: var(--white);
+            border: 8px solid var(--black);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        #preview-text {
+            font-family: 'Syne', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            word-wrap: break-word;
+        }
+
+        .watermark {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: bold;
+            opacity: 0.5;
+        }
+
+        /* Controls Area */
+        .control-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .control-box {
+            background: var(--white);
+            border: var(--border);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .control-box h3 {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--black);
+            padding-bottom: 5px;
+        }
+
+        .control-row {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: 800;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 10px;
+            appearance: none;
+            background: var(--black);
+            outline: none;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--black);
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .color-swatch {
+            height: 40px;
+            border: 2px solid var(--black);
+            cursor: pointer;
+        }
+
+        .btn-export {
+            background: var(--red);
+            color: var(--white);
+            border: var(--border);
+            padding: 20px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            box-shadow: var(--shadow);
+            transition: 0.1s;
+        }
+
+        .btn-export:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 4px 4px 0px var(--black);
+        }
+
+        .btn-export:active {
+            transform: translate(8px, 8px);
+            box-shadow: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container" style="display:flex; justify-content: space-between; align-items: center;">
+            <div style="font-weight: 900; font-size: 1.5rem; letter-spacing: -1px;">PAYLOAD CUSTOMIZER v1.0</div>
+            <a href="index.html" style="color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; text-decoration: none;">[ EXIT TO BASE ]</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="customizer-grid">
+            <section class="preview-pane">
+                <div id="export-target">
+                    <div id="preview-text">SOVEREIGNTY IS A SKILL, NOT A RIGHT.</div>
+                    <div class="watermark">QUOTEGRENADE.SH</div>
+                </div>
+            </section>
+
+            <aside class="control-panel">
+                <div class="control-box">
+                    <h3>ORDNANCE CONTENT</h3>
+                    <div class="control-row">
+                        <label>PAYLOAD TEXT</label>
+                        <textarea id="input-text" rows="3" oninput="updatePreview()">SOVEREIGNTY IS A SKILL, NOT A RIGHT.</textarea>
+                    </div>
+                </div>
+
+                <div class="control-box">
+                    <h3>VISUAL CALIBRATION</h3>
+                    <div class="control-row">
+                        <label>FONT SIZE</label>
+                        <input type="range" id="size-slider" min="20" max="80" value="48" oninput="updatePreview()">
+                    </div>
+                    <div class="control-row">
+                        <label>BORDER THICKNESS</label>
+                        <input type="range" id="border-slider" min="0" max="30" value="8" oninput="updatePreview()">
+                    </div>
+                    <div class="control-row">
+                        <label>BACKGROUND COLOR</label>
+                        <div class="color-grid">
+                            <div class="color-swatch" style="background: #ffffff;" onclick="setColor('bg', '#ffffff')"></div>
+                            <div class="color-swatch" style="background: #ff3c00;" onclick="setColor('bg', '#ff3c00')"></div>
+                            <div class="color-swatch" style="background: #f4f1ea;" onclick="setColor('bg', '#f4f1ea')"></div>
+                            <div class="color-swatch" style="background: #000000;" onclick="setColor('bg', '#000000')"></div>
+                        </div>
+                    </div>
+                    <div class="control-row">
+                        <label>TEXT COLOR</label>
+                        <div class="color-grid">
+                            <div class="color-swatch" style="background: #000000;" onclick="setColor('text', '#000000')"></div>
+                            <div class="color-swatch" style="background: #ffffff;" onclick="setColor('text', '#ffffff')"></div>
+                            <div class="color-swatch" style="background: #ff3c00;" onclick="setColor('text', '#ff3c00')"></div>
+                            <div class="color-swatch" style="background: #f4f1ea;" onclick="setColor('text', '#f4f1ea')"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-export" onclick="exportImage()">DEPLOY PAYLOAD (PNG)</button>
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; text-align: center; opacity: 0.6;">
+                    * OPTIMIZED FOR SQUARE SOCIAL FEEDS (1:1)
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <script>
+        // Load initial text from URL if present
+        window.onload = () => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('quote')) {
+                document.getElementById('input-text').value = params.get('quote');
+            }
+            updatePreview();
+        };
+
+        function updatePreview() {
+            const text = document.getElementById('input-text').value;
+            const size = document.getElementById('size-slider').value;
+            const border = document.getElementById('border-slider').value;
+            
+            const display = document.getElementById('preview-text');
+            const target = document.getElementById('export-target');
+
+            display.innerText = text;
+            display.style.fontSize = size + 'px';
+            target.style.borderWidth = border + 'px';
+        }
+
+        function setColor(type, color) {
+            const target = document.getElementById('export-target');
+            const text = document.getElementById('preview-text');
+            const watermark = target.querySelector('.watermark');
+
+            if (type === 'bg') {
+                target.style.backgroundColor = color;
+                // Auto-adjust watermark contrast
+                watermark.style.color = (color === '#000000') ? '#ffffff' : '#000000';
+            } else {
+                text.style.color = color;
+            }
+        }
+
+        function exportImage() {
+            const target = document.getElementById('export-target');
+            const btn = document.querySelector('.btn-export');
+            
+            btn.innerText = "PREPARING...";
+            btn.disabled = true;
+
+            html2canvas(target, {
+                scale: 3, // High resolution
+                backgroundColor: null,
+                logging: false,
+                useCORS: true
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `quote-grenade-${Date.now()}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                btn.innerText = "DEPLOY PAYLOAD (PNG)";
+                btn.disabled = false;
+            });
+        }
+    </script>
+</body>
+</html>

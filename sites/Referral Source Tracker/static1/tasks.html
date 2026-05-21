@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Follow-Up Command Center | Moonshine Capital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy-deep: #020617;
+            --navy-muted: #0f172a;
+            --gold: #d4af37;
+            --gold-light: #fef3c7;
+            --emerald: #10b981;
+            --panel-bg: #ffffff;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, #020617 0%, #1e293b 100%);
+        }
+
+        .btn-gold {
+            background: var(--gold);
+            color: var(--navy-deep);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-gold:hover {
+            background: #b8962e;
+        }
+
+        .focus-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border: 1px solid var(--border-color);
+        }
+
+        .task-item {
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 4px solid transparent;
+        }
+
+        .task-item.active {
+            background: white;
+            border-left-color: var(--gold);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .quality-pill {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: white;
+        }
+
+        .scroll-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .shimmer {
+            background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- Top Header -->
+    <header class="hero-gradient text-white px-6 py-4 flex justify-between items-center z-50">
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="text-[#d4af37] hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </a>
+            <div>
+                <h1 class="text-lg font-bold leading-none">Follow-Up Command Center</h1>
+                <p class="text-xs text-slate-400">Moonshine Capital Partner Growth</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-6">
+            <div class="text-right hidden md:block">
+                <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Daily Goal</p>
+                <div class="w-32 h-1.5 bg-white/10 rounded-full mt-1 overflow-hidden">
+                    <div id="goal-progress" class="h-full bg-emerald-500" style="width: 0%"></div>
+                </div>
+            </div>
+            <div id="task-count-badge" class="bg-amber-500 text-navy-deep px-3 py-1 rounded-full text-xs font-black">
+                0 TASKS DUE
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 flex overflow-hidden">
+        <!-- Sidebar: Task Queue -->
+        <aside class="w-80 lg:w-96 bg-slate-100 border-r border-slate-200 flex flex-col">
+            <div class="p-4 border-b border-slate-200 bg-white/50">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-xs font-black text-slate-500 uppercase tracking-tighter">Priority Queue</h2>
+                    <select id="sort-filter" onchange="renderQueue()" class="text-[10px] font-bold bg-transparent border-none focus:ring-0 cursor-pointer text-slate-600">
+                        <option value="quality">Sort by Quality</option>
+                        <option value="date">Sort by Date</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div id="queue-list" class="flex-1 overflow-y-auto scroll-container p-2 space-y-2">
+                <!-- Task items generated by JS -->
+            </div>
+        </aside>
+
+        <!-- Focus Mode Area -->
+        <section class="flex-1 overflow-y-auto bg-slate-50 p-6 lg:p-12">
+            <div id="empty-state" class="hidden h-full flex flex-col items-center justify-center text-center">
+                <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-800">Clear Skies!</h2>
+                <p class="text-slate-500 max-w-sm mt-2">You've completed all your scheduled follow-ups for today. Time to find new referral sources.</p>
+                <a href="index.html" class="mt-6 btn-gold px-6 py-2 rounded-lg inline-block">Back to Pipeline</a>
+            </div>
+
+            <div id="focus-mode" class="max-w-3xl mx-auto hidden">
+                <div class="focus-card p-8">
+                    <div class="flex justify-between items-start mb-8">
+                        <div>
+                            <span id="f-category" class="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 inline-block">Category</span>
+                            <h2 id="f-name" class="text-4xl font-black text-slate-900 tracking-tight">Name</h2>
+                            <p id="f-company" class="text-xl text-slate-500 font-medium">Company Name</p>
+                        </div>
+                        <div class="text-center">
+                            <div id="f-quality" class="w-16 h-16 rounded-2xl flex flex-col items-center justify-center text-white font-black text-2xl shadow-lg">
+                                0
+                            </div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase mt-2">Quality</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-6 mb-8">
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Last Interaction</p>
+                            <p id="f-last-date" class="font-semibold text-slate-700">None recorded</p>
+                        </div>
+                        <div class="bg-amber-50 p-4 rounded-xl border border-amber-100">
+                            <p class="text-[10px] font-black text-amber-600 uppercase mb-2">Target Follow-up</p>
+                            <p id="f-due-date" class="font-semibold text-amber-700">Today</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Previous Notes</label>
+                        <div id="f-notes" class="text-sm text-slate-600 italic bg-white border border-dashed border-slate-200 p-4 rounded-lg">
+                            "No previous notes found."
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase">Log New Interaction</label>
+                        <textarea id="interaction-log" class="w-full h-32 p-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none transition-all text-sm" placeholder="What happened? Did they have a lead? What are the next steps?"></textarea>
+                        
+                        <div class="flex flex-wrap gap-3">
+                            <div class="flex-1">
+                                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Set Next Date</label>
+                                <input type="date" id="next-followup-date" class="w-full p-2 border border-slate-200 rounded-lg text-sm">
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Update Stage</label>
+                                <select id="next-stage" class="w-full p-2 border border-slate-200 rounded-lg text-sm">
+                                    <option>Contacted</option>
+                                    <option>Conversation Started</option>
+                                    <option>Referral Agreement Discussed</option>
+                                    <option>Active Source</option>
+                                    <option>Dormant</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="pt-6 flex gap-4">
+                            <button onclick="completeTask()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-emerald-200 transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Log & Complete
+                            </button>
+                            <button onclick="skipTask()" class="px-6 py-4 border border-slate-200 text-slate-400 font-bold rounded-xl hover:bg-slate-100 transition-all">
+                                Skip
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let sources = JSON.parse(localStorage.getItem('moonshine_referrals')) || [];
+        let dueTasks = [];
+        let currentIndex = 0;
+        let completedToday = 0;
+
+        function init() {
+            refreshData();
+            renderQueue();
+            updateProgress();
+        }
+
+        function refreshData() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // Filter for anything due today or in the past
+            dueTasks = sources.filter(s => {
+                if (!s.nextFollowUp) return false;
+                const d = new Date(s.nextFollowUp);
+                return d <= today;
+            });
+
+            // Sorting
+            const sortBy = document.getElementById('sort-filter').value;
+            if (sortBy === 'quality') {
+                dueTasks.sort((a, b) => b.qualityScore - a.qualityScore);
+            } else {
+                dueTasks.sort((a, b) => new Date(a.nextFollowUp) - new Date(b.nextFollowUp));
+            }
+
+            document.getElementById('task-count-badge').innerText = `${dueTasks.length} TASKS DUE`;
+        }
+
+        function renderQueue() {
+            refreshData();
+            const list = document.getElementById('queue-list');
+            list.innerHTML = '';
+
+            if (dueTasks.length === 0) {
+                document.getElementById('focus-mode').classList.add('hidden');
+                document.getElementById('empty-state').classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('focus-mode').classList.remove('hidden');
+            document.getElementById('empty-state').classList.add('hidden');
+
+            dueTasks.forEach((task, index) => {
+                const isOverdue = new Date(task.nextFollowUp) < new Date().setHours(0,0,0,0);
+                const item = document.createElement('div');
+                item.className = `task-item p-4 rounded-lg bg-white/50 border border-slate-200 flex items-center gap-3 ${index === currentIndex ? 'active' : ''}`;
+                item.onclick = () => setFocus(index);
+                
+                item.innerHTML = `
+                    <div class="quality-pill ${getScoreColor(task.qualityScore)}">${task.qualityScore}</div>
+                    <div class="flex-1 overflow-hidden">
+                        <h4 class="font-bold text-slate-800 text-sm truncate">${task.name}</h4>
+                        <p class="text-[10px] text-slate-500 font-medium truncate">${task.company}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[9px] font-black ${isOverdue ? 'text-red-500' : 'text-slate-400'} uppercase">${isOverdue ? 'Overdue' : 'Due Today'}</p>
+                        <p class="text-[10px] font-bold text-slate-600">${task.nextFollowUp.split('-').slice(1).join('/')}</p>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+
+            loadFocusCard();
+        }
+
+        function getScoreColor(score) {
+            if (score > 80) return 'bg-emerald-500';
+            if (score > 50) return 'bg-amber-500';
+            return 'bg-slate-400';
+        }
+
+        function setFocus(index) {
+            currentIndex = index;
+            renderQueue();
+        }
+
+        function loadFocusCard() {
+            const task = dueTasks[currentIndex];
+            if (!task) return;
+
+            document.getElementById('f-name').innerText = task.name;
+            document.getElementById('f-company').innerText = task.company;
+            document.getElementById('f-category').innerText = task.category;
+            document.getElementById('f-notes').innerText = task.notes || "No interaction history recorded.";
+            document.getElementById('f-due-date').innerText = task.nextFollowUp;
+            document.getElementById('f-last-date').innerText = task.lastContact || "Never";
+            
+            const scoreEl = document.getElementById('f-quality');
+            scoreEl.innerText = task.qualityScore;
+            scoreEl.className = `w-16 h-16 rounded-2xl flex flex-col items-center justify-center text-white font-black text-2xl shadow-lg ${getScoreColor(task.qualityScore)}`;
+
+            // Reset inputs
+            document.getElementById('interaction-log').value = '';
+            document.getElementById('next-stage').value = task.stage;
+            
+            // Default next follow up to +14 days
+            const next = new Date();
+            next.setDate(next.getDate() + 14);
+            document.getElementById('next-followup-date').value = next.toISOString().split('T')[0];
+        }
+
+        function completeTask() {
+            const task = dueTasks[currentIndex];
+            const log = document.getElementById('interaction-log').value;
+            const nextDate = document.getElementById('next-followup-date').value;
+            const nextStage = document.getElementById('next-stage').value;
+
+            // Find and update in original array
+            const originalIndex = sources.findIndex(s => s.id === task.id);
+            if (originalIndex !== -1) {
+                sources[originalIndex].lastContact = new Date().toISOString().split('T')[0];
+                sources[originalIndex].nextFollowUp = nextDate;
+                sources[originalIndex].stage = nextStage;
+                if (log) {
+                    sources[originalIndex].notes = `[${new Date().toLocaleDateString()}] ${log}\n\n${sources[originalIndex].notes || ''}`;
+                }
+                
+                // Recalculate score based on stage logic from main app
+                const scores = { "Identified": 10, "Contacted": 30, "Conversation Started": 50, "Referral Agreement Discussed": 75, "Active Source": 95, "Dormant": 20 };
+                sources[originalIndex].qualityScore = scores[nextStage] || sources[originalIndex].qualityScore;
+            }
+
+            save();
+            completedToday++;
+            updateProgress();
+            
+            // Move to next or refresh
+            if (dueTasks.length > 1) {
+                if (currentIndex >= dueTasks.length - 1) currentIndex = 0;
+                renderQueue();
+            } else {
+                renderQueue(); // Will trigger empty state
+            }
+        }
+
+        function skipTask() {
+            currentIndex = (currentIndex + 1) % dueTasks.length;
+            renderQueue();
+        }
+
+        function save() {
+            localStorage.setItem('moonshine_referrals', JSON.stringify(sources));
+        }
+
+        function updateProgress() {
+            const goal = 10; // Daily goal of 10 follow-ups
+            const pct = Math.min((completedToday / goal) * 100, 100);
+            document.getElementById('goal-progress').style.width = `${pct}%`;
+        }
+
+        // Initialize
+        init();
+    </script>
+</body>
+</html>

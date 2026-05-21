@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE MEME FACTORY | TACTICAL MEDIA GENERATOR</title>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #000000;
+            --white: #ffffff;
+            --red: #ff0000;
+            --yellow: #ffff00;
+            --border-width: 4px;
+            --shadow: 8px 8px 0px var(--black);
+            --shadow-small: 4px 4px 0px var(--black);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--white);
+            color: var(--black);
+            font-family: 'Space Mono', monospace;
+            overflow-x: hidden;
+            border: var(--border-width) solid var(--black);
+            min-height: 100vh;
+        }
+
+        .marquee {
+            background: var(--black);
+            color: var(--white);
+            padding: 10px 0;
+            border-bottom: var(--border-width) solid var(--black);
+            overflow: hidden;
+            white-space: nowrap;
+            font-weight: bold;
+            font-family: 'Archivo Black', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .marquee span {
+            display: inline-block;
+            animation: scroll 20s linear infinite;
+        }
+
+        @keyframes scroll {
+            from { transform: translateX(100%); }
+            to { transform: translateX(-100%); }
+        }
+
+        header {
+            padding: 20px;
+            background: var(--red);
+            border-bottom: var(--border-width) solid var(--black);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .factory-title {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 2rem;
+            color: var(--white);
+            text-transform: uppercase;
+        }
+
+        .nav-link {
+            background: var(--black);
+            color: var(--white);
+            padding: 5px 15px;
+            text-decoration: none;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        main {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            min-height: calc(100vh - 120px);
+        }
+
+        @media (max-width: 900px) {
+            main { grid-template-columns: 1fr; }
+        }
+
+        /* EDITOR AREA */
+        .editor-container {
+            background: #ddd;
+            background-image: radial-gradient(var(--black) 1px, transparent 0);
+            background-size: 20px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #meme-canvas-container {
+            position: relative;
+            background: var(--white);
+            border: var(--border-width) solid var(--black);
+            box-shadow: var(--shadow);
+            line-height: 0;
+            max-width: 100%;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* CONTROLS AREA */
+        .controls {
+            background: var(--white);
+            border-left: var(--border-width) solid var(--black);
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 900px) {
+            .controls { border-left: none; border-top: var(--border-width) solid var(--black); }
+        }
+
+        .control-group {
+            margin-bottom: 30px;
+        }
+
+        .control-label {
+            font-family: 'Archivo Black', sans-serif;
+            text-transform: uppercase;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            display: block;
+            background: var(--yellow);
+            padding: 5px;
+            border: 2px solid var(--black);
+            display: inline-block;
+        }
+
+        input[type="text"], input[type="file"], select {
+            width: 100%;
+            padding: 12px;
+            border: var(--border-width) solid var(--black);
+            font-family: 'Space Mono', monospace;
+            font-weight: bold;
+            margin-bottom: 10px;
+            box-shadow: var(--shadow-small);
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .tool-btn {
+            background: var(--white);
+            border: 2px solid var(--black);
+            padding: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+
+        .tool-btn:hover {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .tool-btn.active {
+            background: var(--red);
+            color: var(--white);
+        }
+
+        .cta-btn {
+            background: var(--red);
+            color: var(--white);
+            padding: 15px;
+            font-size: 1.5rem;
+            font-family: 'Archivo Black', sans-serif;
+            text-transform: uppercase;
+            border: var(--border-width) solid var(--black);
+            box-shadow: var(--shadow-small);
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .cta-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px var(--black);
+        }
+
+        .sticker-gallery {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .sticker-item {
+            border: 2px solid var(--black);
+            padding: 5px;
+            text-align: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            cursor: pointer;
+            background: var(--white);
+        }
+
+        .sticker-item:hover { background: var(--yellow); }
+
+        .glitch-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            mix-blend-mode: difference;
+            opacity: 0.2;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="marquee">
+        <span> ⚠️ WARNING: UNREGISTERED MEME PRODUCTION DETECTED ⚠️ ASSEMBLY LINE ACTIVE ⚠️ WEAPONIZING IMAGERY ⚠️ ⚠️ WARNING: UNREGISTERED MEME PRODUCTION DETECTED ⚠️ ASSEMBLY LINE ACTIVE ⚠️ WEAPONIZING IMAGERY ⚠️ </span>
+    </div>
+
+    <header>
+        <div class="factory-title">THE FACTORY</div>
+        <a href="index.html" class="nav-link">Return to Vault</a>
+    </header>
+
+    <main>
+        <div class="editor-container">
+            <div id="meme-canvas-container">
+                <canvas id="memeCanvas"></canvas>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <span class="control-label">1. RAW MATERIAL</span>
+                <input type="file" id="imageLoader" accept="image/*">
+            </div>
+
+            <div class="control-group">
+                <span class="control-label">2. PROPAGANDA TEXT</span>
+                <input type="text" id="topText" placeholder="TOP CAPTION (BRUTAL)">
+                <input type="text" id="bottomText" placeholder="BOTTOM CAPTION (AGGRESSIVE)">
+            </div>
+
+            <div class="control-group">
+                <span class="control-label">3. VISUAL DISTORTION</span>
+                <div class="btn-grid">
+                    <button class="tool-btn" onclick="toggleGlitch()">GLITCH ON/OFF</button>
+                    <button class="tool-btn" onclick="setContrast()">HIGH CONTRAST</button>
+                    <button class="tool-btn" onclick="resetFilters()">RESET ALL</button>
+                    <button class="tool-btn" onclick="invertColors()">INVERT</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <span class="control-label">4. ATTACH STICKERS</span>
+                <div class="sticker-gallery">
+                    <div class="sticker-item" onclick="addSticker('CLASSIFIED', 'red')">CLASSIFIED</div>
+                    <div class="sticker-item" onclick="addSticker('DANGEROUS', 'black')">DANGEROUS</div>
+                    <div class="sticker-item" onclick="addSticker('PSYOP', 'red')">PSYOP</div>
+                    <div class="sticker-item" onclick="addSticker('APPROVED', 'yellow')">APPROVED</div>
+                    <div class="sticker-item" onclick="addSticker('CANCELLED', 'black')">CANCELLED</div>
+                    <div class="sticker-item" onclick="addSticker('DELETED', 'red')">DELETED</div>
+                </div>
+            </div>
+
+            <button class="cta-btn" id="downloadBtn">EXPORT WEAPON</button>
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('memeCanvas');
+        const ctx = canvas.getContext('2d');
+        const imageLoader = document.getElementById('imageLoader');
+        const topTextInput = document.getElementById('topText');
+        const bottomTextInput = document.getElementById('bottomText');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        let img = new Image();
+        let stickers = [];
+        let filters = {
+            glitch: false,
+            contrast: 100,
+            invert: 0
+        };
+
+        // Initialize Canvas
+        canvas.width = 600;
+        canvas.height = 600;
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0, 0, 600, 600);
+        ctx.fillStyle = "#fff";
+        ctx.font = "20px 'Space Mono'";
+        ctx.textAlign = "center";
+        ctx.fillText("UPLOAD IMAGE TO START PRODUCTION", 300, 300);
+
+        imageLoader.addEventListener('change', handleImage, false);
+        topTextInput.addEventListener('input', drawMeme);
+        bottomTextInput.addEventListener('input', drawMeme);
+
+        function handleImage(e) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                img = new Image();
+                img.onload = function() {
+                    // Adjust canvas to image aspect ratio
+                    const aspect = img.width / img.height;
+                    canvas.width = 800;
+                    canvas.height = 800 / aspect;
+                    drawMeme();
+                }
+                img.src = event.target.result;
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        }
+
+        function drawMeme() {
+            if (!img.src) return;
+
+            // Apply Filters
+            ctx.filter = `contrast(${filters.contrast}%) invert(${filters.invert}%)`;
+            
+            // Draw Background Image
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            
+            // Text Settings
+            ctx.filter = 'none';
+            ctx.fillStyle = 'white';
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 6;
+            ctx.textAlign = 'center';
+            ctx.font = `900 ${canvas.width/10}px 'Archivo Black'`;
+            ctx.textBaseline = 'top';
+
+            const topText = topTextInput.value.toUpperCase();
+            const bottomText = bottomTextInput.value.toUpperCase();
+
+            // Top Text
+            if (topText) {
+                ctx.strokeText(topText, canvas.width/2, 20);
+                ctx.fillText(topText, canvas.width/2, 20);
+            }
+
+            // Bottom Text
+            ctx.textBaseline = 'bottom';
+            if (bottomText) {
+                ctx.strokeText(bottomText, canvas.width/2, canvas.height - 20);
+                ctx.fillText(bottomText, canvas.width/2, canvas.height - 20);
+            }
+
+            // Draw Stickers
+            stickers.forEach(s => {
+                ctx.save();
+                ctx.translate(s.x, s.y);
+                ctx.rotate(s.rotate);
+                
+                ctx.fillStyle = s.bg === 'red' ? '#ff0000' : (s.bg === 'yellow' ? '#ffff00' : '#000000');
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 3;
+                
+                const textWidth = ctx.measureText(s.text).width / 2; // Approximate width based on main font
+                const padding = 15;
+                const h = 40;
+                const w = (s.text.length * 20) + padding;
+
+                ctx.fillRect(-w/2, -h/2, w, h);
+                ctx.strokeRect(-w/2, -h/2, w, h);
+                
+                ctx.fillStyle = s.bg === 'yellow' ? '#000' : '#fff';
+                ctx.font = "bold 20px 'Space Mono'";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(s.text, 0, 0);
+                ctx.restore();
+            });
+
+            if (filters.glitch) {
+                applyGlitchEffect();
+            }
+        }
+
+        function applyGlitchEffect() {
+            for (let i = 0; i < 5; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const w = Math.random() * canvas.width / 2;
+                const h = Math.random() * 20;
+                ctx.drawImage(canvas, x, y, w, h, x + (Math.random() * 20 - 10), y, w, h);
+            }
+        }
+
+        function addSticker(text, color) {
+            stickers.push({
+                text: text,
+                bg: color,
+                x: Math.random() * (canvas.width - 100) + 50,
+                y: Math.random() * (canvas.height - 100) + 50,
+                rotate: (Math.random() * 0.4) - 0.2
+            });
+            drawMeme();
+        }
+
+        function toggleGlitch() {
+            filters.glitch = !filters.glitch;
+            drawMeme();
+        }
+
+        function setContrast() {
+            filters.contrast = filters.contrast === 100 ? 200 : 100;
+            drawMeme();
+        }
+
+        function invertColors() {
+            filters.invert = filters.invert === 0 ? 100 : 0;
+            drawMeme();
+        }
+
+        function resetFilters() {
+            filters = { glitch: false, contrast: 100, invert: 0 };
+            stickers = [];
+            topTextInput.value = "";
+            bottomTextInput.value = "";
+            drawMeme();
+        }
+
+        downloadBtn.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = 'propaganda-asset.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+
+        // Loop for glitch effect if active
+        setInterval(() => {
+            if (filters.glitch) drawMeme();
+        }, 150);
+
+    </script>
+</body>
+</html>
+```

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash UI Export</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="marquee">
+        <div class="marquee-inner">
+            PULL THE PIN. POST THE THOUGHT. &nbsp; • &nbsp; NO BEIGE OPINIONS ALLOWED. &nbsp; • &nbsp; SOVEREIGNTY IS A SKILL. &nbsp; • &nbsp; EXIT IS THE ONLY VOICE. &nbsp; • &nbsp; PULL THE PIN. POST THE THOUGHT. &nbsp; • &nbsp; 
+        </div>
+    </div>
+
+    <header>
+        <div class="container" style="display:flex; justify-content: space-between; align-items: center;">
+            <div style="font-weight: 900; font-size: 1.5rem; letter-spacing: -1px;">QUOTE GRENADE v1.0</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem;">[ STATUS: UNSTABLE ]</div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>PULL THE PIN.</h1>
+            <div class="hero-sub">
+                Generate sharp quotes, philosophical grenades, founder truths, and liberty riffs for people allergic to beige opinions.
+            </div>
+        </div>
+    </section>
+
+    <main class="container">
+        <div class="generator-grid">
+            <section>
+                <div class="quote-card" id="grenade-card">
+                    <div id="quote-text">Click "Pull the Pin" to generate a truth grenade.</div>
+                    <div id="quote-meta">/ / / WAITING / / /</div>
+                </div>
+                <div style="margin-top: 40px; display: flex; gap: 20px;">
+                    <button class="btn" style="flex:1" onclick="copyQuote()">Copy To Clipboard</button>
+                    <button class="btn" style="flex:1" onclick="shareTwitter()">Share to X</button>
+                </div>
+            </section>
+
+            <aside class="controls">
+                <button class="btn btn-main" onclick="detonate()">PULL THE PIN</button>
+                
+                <div class="category-group">
+                    <label>AMMO CATEGORY</label>
+                    <div class="tag-cloud" id="tag-filters">
+                        <button class="tag-btn active" onclick="setCategory('all')">ALL</button>
+                        <button class="tag-btn" onclick="setCategory('liberty')">LIBERTY</button>
+                        <button class="tag-btn" onclick="setCategory('founder')">FOUNDER</button>
+                        <button class="tag-btn" onclick="setCategory('contrarian')">CONTRARIAN</button>
+                        <button class="tag-btn" onclick="setCategory('metamodern')">METAMODERN</button>
+                    </div>
+                </div>
+
+                <div style="border: var(--border); padding: 20px; background: #000; color: #fff; font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem;">
+                    <p>> WARNING: High velocity insights.</p>
+                    <p>> Use quotes responsibly in civilian digital areas.</p>
+                    <p>> Decentralize everything.</p>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <section class="wall">
+        <div class="container">
+            <h2 class="wall-title">Recent Explosions</h2>
+            <div class="grid-layout">
+                <div class="mini-card">The state is a hallucination with a budget.</div>
+                <div class="mini-card">Sovereignty is a skill, not a right.</div>
+                <div class="mini-card">Optimism is a moral duty, pessimism is a luxury of the bored.</div>
+                <div class="mini-card">Build things that make the government obsolete.</div>
+                <div class="mini-card">Protocol is greater than politics.</div>
+                <div class="mini-card">If you aren't building, you're being built.</div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <a href="#" class="footer-cta" onclick="detonate()">ARM THE NEXT ONE.</a>
+            <p style="margin-top: 40px; font-family: 'IBM Plex Mono', monospace; font-weight: bold;">© 2024 RADICAL LIBERTARIAN LABS. NO RIGHTS RESERVED.</p>
+        </div>
+    </footer>
+
+    <div id="toast" class="toast">COPIED TO CLIPBOARD</div>
+
+    <script>
+        const quotes = [
+            { text: "Sovereignty is a skill, not a right.", cat: "liberty" },
+            { text: "The state is a hallucination with a budget.", cat: "liberty" },
+            { text: "Build things that make the government obsolete.", cat: "founder" },
+            { text: "Optimism is a moral duty, pessimism is a luxury of the bored.", cat: "metamodern" },
+            { text: "If it's not a 'Hell Yes', it's a 'Don't tax me'.", cat: "contrarian" },
+            { text: "Protocol > Politics.", cat: "liberty" },
+            { text: "Exit is the only real voice.", cat: "liberty" },
+            { text: "Your attention is the only remaining scarce resource.", cat: "metamodern" },
+            { text: "Be the glitch in the simulation.", cat: "metamodern" },
+            { text: "Permission is for people who don't have code.", cat: "founder" },
+            { text: "The future is a series of opt-in networks.", cat: "liberty" },
+            { text: "Everything is a remix, but the ownership is mine.", cat: "founder" },
+            { text: "Logic is the ultimate weapon of the unarmed.", cat: "contrarian" },
+            { text: "The most radical thing you can do is be happy.", cat: "metamodern" },
+            { text: "Stop asking for a seat at the table and build your own floor.", cat: "founder" },
+            { text: "Consensus is a trap. Conviction is a tool.", cat: "contrarian" },
+            { text: "Taxes are the subscription fee for a service you can't cancel.", cat: "liberty" },
+            { text: "Play stupid games, win stupid regulations.", cat: "contrarian" },
+            { text: "Code is the only law that doesn't require a police force.", cat: "founder" },
+            { text: "They can't cancel what they can't coordinate.", cat: "metamodern" }
+        ];
+
+        let currentCategory = 'all';
+
+        function setCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.tag-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.innerText.toLowerCase() === cat) btn.classList.add('active');
+            });
+        }
+
+        function detonate() {
+            const card = document.getElementById('grenade-card');
+            const textDisplay = document.getElementById('quote-text');
+            const metaDisplay = document.getElementById('quote-meta');
+
+            card.classList.add('detonate');
+            
+            setTimeout(() => {
+                const filtered = currentCategory === 'all' 
+                    ? quotes 
+                    : quotes.filter(q => q.cat === currentCategory);
+                
+                const random = filtered[Math.floor(Math.random() * filtered.length)];
+                
+                textDisplay.innerText = random.text;
+                metaDisplay.innerText = `TYPE: ${random.cat.toUpperCase()} // FRAGMENT: ${Math.floor(Math.random() * 9999)}`;
+                card.classList.remove('detonate');
+            }, 400);
+        }
+
+        function copyQuote() {
+            const text = document.getElementById('quote-text').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const toast = document.getElementById('toast');
+                toast.style.display = 'block';
+                setTimeout(() => toast.style.display = 'none', 2000);
+            });
+        }
+
+        function shareTwitter() {
+            const text = document.getElementById('quote-text').innerText;
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)} - via @QuoteGrenade`, '_blank');
+        }
+
+        // Initial Detonation
+        window.onload = () => detonate();
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

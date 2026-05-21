@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Industry Benchmarks | Emerald Circuit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050807;
+            --bg-card: #0c1210;
+            --emerald: #00ff88;
+            --emerald-dim: rgba(0, 255, 136, 0.2);
+            --emerald-glow: rgba(0, 255, 136, 0.5);
+            --danger: #ff4757;
+            --warning: #ffa502;
+            --text-main: #e0e0e0;
+            --text-dim: #889990;
+            --circuit-line: rgba(0, 255, 136, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 2px 2px, var(--circuit-line) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+
+        .analyzer-container {
+            width: 100%;
+            max-width: 1000px;
+            padding: 40px;
+            position: relative;
+        }
+
+        .main-card {
+            background: var(--bg-card);
+            border: 1px solid var(--emerald-dim);
+            border-radius: 20px;
+            padding: 48px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 20px var(--emerald-dim);
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            border-top: 2px solid var(--emerald);
+            border-right: 2px solid var(--emerald);
+            border-radius: 0 20px 0 0;
+            opacity: 0.5;
+        }
+
+        .header {
+            text-align: left;
+            border-bottom: 1px solid var(--emerald-dim);
+            padding-bottom: 24px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            background: linear-gradient(to right, #fff, var(--emerald));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        .input-panel {
+            background: rgba(255,255,255,0.02);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .input-panel label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--emerald);
+            text-transform: uppercase;
+        }
+
+        input[type="range"] {
+            flex-grow: 1;
+            accent-color: var(--emerald);
+            cursor: pointer;
+        }
+
+        .current-value-box {
+            background: var(--bg-deep);
+            padding: 10px 20px;
+            border: 1px solid var(--emerald);
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: var(--emerald);
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .benchmark-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .benchmark-row {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .row-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .industry-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+
+        .performance-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .tag-top { background: var(--emerald-dim); color: var(--emerald); border: 1px solid var(--emerald); }
+        .tag-median { background: rgba(255, 165, 2, 0.1); color: var(--warning); border: 1px solid var(--warning); }
+        .tag-low { background: rgba(255, 71, 87, 0.1); color: var(--danger); border: 1px solid var(--danger); }
+
+        .track-container {
+            height: 40px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 6px;
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.05);
+            overflow: hidden;
+        }
+
+        .track-gradient {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(to right, 
+                var(--emerald-dim) 0%, 
+                rgba(255, 165, 2, 0.1) 50%, 
+                rgba(255, 71, 87, 0.1) 100%);
+        }
+
+        .benchmark-marker {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(255,255,255,0.2);
+            z-index: 1;
+        }
+
+        .benchmark-marker span {
+            position: absolute;
+            bottom: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            color: var(--text-dim);
+            white-space: nowrap;
+        }
+
+        .user-indicator {
+            position: absolute;
+            top: 50%;
+            width: 16px;
+            height: 16px;
+            background: #fff;
+            border: 3px solid var(--emerald);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+            box-shadow: 0 0 15px var(--emerald-glow);
+            transition: left 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.7rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+        }
+
+        .footer-cta {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid var(--emerald-dim);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--emerald);
+            padding: 12px 30px;
+            border: 1px solid var(--emerald);
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline:hover {
+            background: var(--emerald-dim);
+            box-shadow: 0 0 20px var(--emerald-dim);
+        }
+
+        @media (max-width: 600px) {
+            .input-panel { flex-direction: column; align-items: stretch; }
+            .main-card { padding: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="analyzer-container">
+        <div class="main-card">
+            <header class="header">
+                <h1>Efficiency Matrix</h1>
+                <p>Cross-Industry Payback Comparison Protocol</p>
+            </header>
+
+            <div class="input-panel">
+                <label>Your Payback (Months)</label>
+                <input type="range" id="payback-slider" min="1" max="24" step="0.5" value="8">
+                <div class="current-value-box" id="payback-val">8.0 Months</div>
+            </div>
+
+            <div class="benchmark-grid">
+                <!-- SaaS -->
+                <div class="benchmark-row">
+                    <div class="row-info">
+                        <span class="industry-name">SaaS / Subscription</span>
+                        <span id="saas-tag" class="performance-tag">Median</span>
+                    </div>
+                    <div class="track-container">
+                        <div class="track-gradient"></div>
+                        <div class="benchmark-marker" style="left: 25%;"><span>6m (Elite)</span></div>
+                        <div class="benchmark-marker" style="left: 50%;"><span>12m (Median)</span></div>
+                        <div id="saas-user" class="user-indicator" style="left: 33%;"></div>
+                    </div>
+                </div>
+
+                <!-- E-Commerce -->
+                <div class="benchmark-row">
+                    <div class="row-info">
+                        <span class="industry-name">E-Commerce / D2C</span>
+                        <span id="ecom-tag" class="performance-tag">Median</span>
+                    </div>
+                    <div class="track-container">
+                        <div class="track-gradient"></div>
+                        <div class="benchmark-marker" style="left: 8.3%;"><span>2m (Elite)</span></div>
+                        <div class="benchmark-marker" style="left: 25%;"><span>6m (Median)</span></div>
+                        <div id="ecom-user" class="user-indicator" style="left: 33%;"></div>
+                    </div>
+                </div>
+
+                <!-- B2B Enterprise -->
+                <div class="benchmark-row">
+                    <div class="row-info">
+                        <span class="industry-name">B2B Enterprise</span>
+                        <span id="b2b-tag" class="performance-tag">Median</span>
+                    </div>
+                    <div class="track-container">
+                        <div class="track-gradient"></div>
+                        <div class="benchmark-marker" style="left: 50%;"><span>12m (Elite)</span></div>
+                        <div class="benchmark-marker" style="left: 75%;"><span>18m (Median)</span></div>
+                        <div id="b2b-user" class="user-indicator" style="left: 33%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item"><div class="legend-dot" style="background: var(--emerald);"></div> Top Quartile</div>
+                <div class="legend-item"><div class="legend-dot" style="background: var(--warning);"></div> Market Median</div>
+                <div class="legend-item"><div class="legend-dot" style="background: var(--danger);"></div> Underperforming</div>
+            </div>
+
+            <div class="footer-cta">
+                <button class="btn-outline">Export Competitive Report</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const slider = document.getElementById('payback-slider');
+        const display = document.getElementById('payback-val');
+        
+        const industries = {
+            saas: { elite: 6, median: 12, indicator: document.getElementById('saas-user'), tag: document.getElementById('saas-tag') },
+            ecom: { elite: 2, median: 6, indicator: document.getElementById('ecom-user'), tag: document.getElementById('ecom-tag') },
+            b2b: { elite: 12, median: 18, indicator: document.getElementById('b2b-user'), tag: document.getElementById('b2b-tag') }
+        };
+
+        function updateComparison() {
+            const val = parseFloat(slider.value);
+            display.textContent = val.toFixed(1) + ' Months';
+
+            // Max scale for the UI is 24 months
+            const percentage = (val / 24) * 100;
+
+            Object.keys(industries).forEach(key => {
+                const ind = industries[key];
+                ind.indicator.style.left = `${Math.min(percentage, 98)}%`;
+
+                if (val <= ind.elite) {
+                    ind.tag.textContent = "Top Quartile";
+                    ind.tag.className = "performance-tag tag-top";
+                } else if (val <= ind.median) {
+                    ind.tag.textContent = "Median";
+                    ind.tag.className = "performance-tag tag-median";
+                } else {
+                    ind.tag.textContent = "Underperforming";
+                    ind.tag.className = "performance-tag tag-low";
+                }
+            });
+        }
+
+        slider.addEventListener('input', updateComparison);
+        window.addEventListener('DOMContentLoaded', updateComparison);
+    </script>
+</body>
+</html>

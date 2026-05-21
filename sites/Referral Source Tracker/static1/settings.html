@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings | Moonshine Capital Referral Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy-deep: #020617;
+            --navy-muted: #0f172a;
+            --gold: #d4af37;
+            --gold-light: #fef3c7;
+            --emerald: #10b981;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, #020617 0%, #1e293b 100%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .settings-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .btn-gold {
+            background: var(--gold);
+            color: var(--navy-deep);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-gold:hover {
+            background: #b8962e;
+        }
+
+        .btn-outline {
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+
+        .btn-outline:hover {
+            background: #f1f5f9;
+        }
+
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: var(--gold);
+            background-color: var(--gold);
+        }
+        
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: var(--navy-muted);
+        }
+
+        input, select {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0.6rem;
+            outline: none;
+            width: 100%;
+        }
+
+        input:focus {
+            border-color: var(--gold);
+            ring: 2px solid var(--gold-light);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="hero-gradient text-white py-8 px-6">
+        <div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center">
+            <div>
+                <div class="flex items-center gap-2 mb-2">
+                    <a href="index.html" class="text-[#d4af37] text-sm font-bold uppercase tracking-widest flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                        Back to Board
+                    </a>
+                </div>
+                <h1 class="text-3xl font-bold">Account <span class="text-[#d4af37]">Settings</span></h1>
+                <p class="text-slate-400 text-sm mt-1">Manage your profile and automation preferences.</p>
+            </div>
+            <div class="mt-4 md:mt-0">
+                <button onclick="saveAllSettings()" class="btn-gold px-6 py-2.5 rounded-lg shadow-lg">
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto p-6 space-y-6">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Left Column: Navigation -->
+            <div class="lg:col-span-1 space-y-4">
+                <nav class="settings-card p-2">
+                    <a href="#profile" class="flex items-center gap-3 px-4 py-3 bg-slate-50 text-navy-deep font-bold rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        User Profile
+                    </a>
+                    <a href="#automation" class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        Automation
+                    </a>
+                    <a href="#data" class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        Data & Export
+                    </a>
+                </nav>
+
+                <div class="settings-card p-6 bg-amber-50 border-amber-200">
+                    <h4 class="font-bold text-amber-800 text-sm mb-2">Storage Status</h4>
+                    <div class="w-full bg-amber-200 rounded-full h-2 mb-2">
+                        <div class="bg-amber-600 h-2 rounded-full" style="width: 15%"></div>
+                    </div>
+                    <p class="text-xs text-amber-700">Using 1.2MB of local browser storage for 17 referral sources.</p>
+                </div>
+            </div>
+
+            <!-- Right Column: Form Panels -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- Profile Section -->
+                <section id="profile" class="settings-card">
+                    <div class="p-6 border-b border-slate-100">
+                        <h3 class="font-bold text-lg text-slate-900">User Profile</h3>
+                        <p class="text-sm text-slate-500">How your information appears on exported reports.</p>
+                    </div>
+                    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-1">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Your Full Name</label>
+                            <input type="text" id="user-name" value="Partner Admin">
+                        </div>
+                        <div class="md:col-span-1">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Company / Firm</label>
+                            <input type="text" id="user-firm" value="Moonshine Capital">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Email Address</label>
+                            <input type="email" id="user-email" value="admin@moonshinecapital.com">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Automation Section -->
+                <section id="automation" class="settings-card">
+                    <div class="p-6 border-b border-slate-100">
+                        <h3 class="font-bold text-lg text-slate-900">Automation & Notifications</h3>
+                        <p class="text-sm text-slate-500">Configure how the system handles follow-ups.</p>
+                    </div>
+                    <div class="p-6 space-y-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="font-semibold text-slate-800">Auto-Calculate Quality Score</h4>
+                                <p class="text-xs text-slate-500">Updates score automatically based on relationship stage.</p>
+                            </div>
+                            <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                                <input type="checkbox" name="toggle" id="toggle-score" checked class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                                <label for="toggle-score" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Default Follow-up Cycle</label>
+                                <select id="follow-up-days">
+                                    <option value="7">Every 7 Days</option>
+                                    <option value="14">Every 14 Days</option>
+                                    <option value="30" selected>Every 30 Days</option>
+                                    <option value="90">Every Quarter (90 Days)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Alert Threshold</label>
+                                <select id="alert-threshold">
+                                    <option value="0">On the day of</option>
+                                    <option value="1">1 day before</option>
+                                    <option value="3" selected>3 days before</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Data Management -->
+                <section id="data" class="settings-card">
+                    <div class="p-6 border-b border-slate-100">
+                        <h3 class="font-bold text-lg text-slate-900">Data Management</h3>
+                        <p class="text-sm text-slate-500">Your data is stored locally in your browser and is never uploaded to our servers.</p>
+                    </div>
+                    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 border border-slate-200 rounded-lg">
+                            <h4 class="font-bold text-slate-800 mb-1">Export Backup</h4>
+                            <p class="text-xs text-slate-500 mb-4">Download all referral data to a CSV file for Excel or CRM import.</p>
+                            <button onclick="exportCSV()" class="w-full btn-outline py-2 rounded font-bold text-sm flex items-center justify-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                Download .CSV
+                            </button>
+                        </div>
+                        <div class="p-4 border border-red-100 bg-red-50 rounded-lg">
+                            <h4 class="font-bold text-red-800 mb-1">Reset Database</h4>
+                            <p class="text-xs text-red-600/70 mb-4">Permanently delete all referral sources and history. This cannot be undone.</p>
+                            <button onclick="clearDatabase()" class="w-full bg-white border border-red-200 text-red-600 py-2 rounded font-bold text-sm hover:bg-red-600 hover:text-white transition-colors">
+                                Clear Local Storage
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center py-10 text-slate-400 text-sm">
+        Moonshine Capital Referral Tracker &copy; 2024. Your data, your privacy.
+    </footer>
+
+    <script>
+        // Load existing settings on init
+        window.onload = function() {
+            const settings = JSON.parse(localStorage.getItem('moonshine_settings')) || {
+                name: "Partner Admin",
+                firm: "Moonshine Capital",
+                email: "admin@moonshinecapital.com",
+                followUp: "30",
+                alert: "3",
+                autoScore: true
+            };
+
+            document.getElementById('user-name').value = settings.name;
+            document.getElementById('user-firm').value = settings.firm;
+            document.getElementById('user-email').value = settings.email;
+            document.getElementById('follow-up-days').value = settings.followUp;
+            document.getElementById('alert-threshold').value = settings.alert;
+            document.getElementById('toggle-score').checked = settings.autoScore;
+        };
+
+        function saveAllSettings() {
+            const settings = {
+                name: document.getElementById('user-name').value,
+                firm: document.getElementById('user-firm').value,
+                email: document.getElementById('user-email').value,
+                followUp: document.getElementById('follow-up-days').value,
+                alert: document.getElementById('alert-threshold').value,
+                autoScore: document.getElementById('toggle-score').checked
+            };
+
+            localStorage.setItem('moonshine_settings', JSON.stringify(settings));
+            
+            // Visual feedback
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = "Saved Successfully!";
+            btn.classList.replace('btn-gold', 'btn-green');
+            btn.style.backgroundColor = '#10b981';
+            btn.style.color = 'white';
+
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.backgroundColor = '';
+                btn.style.color = '';
+                btn.classList.replace('btn-green', 'btn-gold');
+            }, 2000);
+        }
+
+        function exportCSV() {
+            const sources = JSON.parse(localStorage.getItem('moonshine_referrals')) || [];
+            if (sources.length === 0) {
+                alert("No data to export.");
+                return;
+            }
+
+            let csv = "Name,Company,Category,Location,Email,Phone,Stage,Quality\n";
+            sources.forEach(s => {
+                csv += `"${s.name}","${s.company}","${s.category}","${s.location}","${s.email}","${s.phone}","${s.stage}","${s.qualityScore}"\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', `moonshine_backup_${new Date().toISOString().split('T')[0]}.csv`);
+            a.click();
+        }
+
+        function clearDatabase() {
+            if (confirm("DANGER: This will delete ALL referral data. This cannot be undone. Are you absolutely sure?")) {
+                localStorage.removeItem('moonshine_referrals');
+                alert("Database cleared. Redirecting to dashboard...");
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings | Moonshine Capital Referral Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy-deep: #020617;
+            --navy-muted: #0f172a;
+            --gold: #d4af37;
+            --gold-light: #fef3c7;
+            --emerald: #10b981;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, #020617 0%, #1e293b 100%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .settings-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .btn-gold {
+            background: var(--gold);
+            color: var(--navy-deep);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-gold:hover {
+            background: #b8962e;
+        }
+
+        .btn-outline {
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+
+        .btn-outline:hover {
+            background: #f1f5f9;
+        }
+
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: var(--gold);
+            background-color: var(--gold);
+        }
+        
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: var(--navy-muted);
+        }
+
+        input, select {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0.6rem;
+            outline: none;
+            width: 100%;
+        }
+
+        input:focus {
+            border-color: var(--gold);
+            ring: 2px solid var(--gold-light);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="hero-gradient text-white py-8 px-6">
+        <div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center">
+            <div>
+                <div class="flex items-center gap-2 mb-2">
+                    <a href="index.html" class="text-[#d4af37] text-sm font-bold uppercase tracking-widest flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                        Back to Board
+                    </a>
+                </div>
+                <h1 class="text-3xl font-bold">Account <span class="text-[#d4af37]">Settings</span></h1>
+                <p class="text-slate-400 text-sm mt-1">Manage your profile and automation preferences.</p>
+            </div>
+            <div class="mt-4 md:mt-0">
+                <button onclick="saveAllSettings()" class="btn-gold px-6 py-2.5 rounded-lg shadow-lg">
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto p-6 space-y-6">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Left Column: Navigation -->
+            <div class="lg:col-span-1 space-y-4">
+                <nav class="settings-card p-2">
+                    <a href="#profile" class="flex items-center gap-3 px-4 py-3 bg-slate-50 text-navy-deep font-bold rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        User Profile
+                    </a>
+                    <a href="#automation" class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        Automation
+                    </a>
+                    <a href="#data" class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        Data & Export
+                    </a>
+                </nav>
+
+                <div class="settings-card p-6 bg-amber-50 border-amber-200">
+                    <h4 class="font-bold text-amber-800 text-sm mb-2">Storage Status</h4>
+                    <div class="w-full bg-amber-200 rounded-full h-2 mb-2">
+                        <div class="bg-amber-600 h-2 rounded-full" style="width: 15%"></div>
+                    </div>
+                    <p class="text-xs text-amber-700">Using local browser storage for referral records.</p>
+                </div>
+            </div>
+
+            <!-- Right Column: Form Panels -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- Profile Section -->
+                <section id="profile" class="settings-card">
+                    <div class="p-6 border-b border-slate-100">
+                        <h3 class="font-bold text-lg text-slate-900">User Profile</h3>
+                        <p class="text-sm text-slate-500">How your information appears on exported reports.</p>
+                    </div>
+                    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-1">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Your Full Name</label>
+                            <input type="text" id="user-name" value="Partner Admin" placeholder="e.g. John Doe">
+                        </div>
+                        <div class="md:col-span-1">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Company / Firm</label>
+                            <input type="text" id="user-firm" value="Moonshine Capital" placeholder="e.g. Acme Corp">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Email Address</label>
+                            <input type="email" id="user-email" value="admin@moonshinecapital.com" placeholder="email@example.com">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Automation Section -->
+                <section id="automation" class="settings-card">
+                    <div class="p-6 border-b border-slate-100">
+                        <h3 class="font-bold text-lg text-slate-900">Automation & Notifications</h3>
+                        <p class="text-sm text-slate-500">Configure how the system handles follow-ups.</p>
+                    </div>
+                    <div class="p-6 space-y-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="font-semibold text-slate-800">Auto-Calculate Quality Score</h4>
+                                <p class="text-xs text-slate-500">Updates score automatically based on relationship stage.</p>
+                            </div>
+                            <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                                <input type="checkbox" name="toggle" id="toggle-score" checked class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                                <label for="toggle-score" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Default Follow-up Cycle</label>
+                                <select id="follow-up-days">
+                                    <option value="7">Every 7 Days</option>
+                                    <option value="14">Every 14 Days</option>
+                                    <option value="30" selected>Every 30 Days</option>
+                                    <option value="90">Every Quarter (90 Days)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Alert Threshold</label>
+                                <select id="alert-threshold">
+                                    <option value="0">On the day of</option>
+                                    <option value="1">1 day before</option>
+                                    <option value="3" selected>3 days before</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Data Management -->
+                <section id="data" class="settings-card">
+                    <div class="p-6 border-b border-slate-100">
+                        <h3 class="font-bold text-lg text-slate-900">Data Management</h3>
+                        <p class="text-sm text-slate-500">Your data is stored locally in your browser and is never uploaded to our servers.</p>
+                    </div>
+                    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 border border-slate-200 rounded-lg">
+                            <h4 class="font-bold text-slate-800 mb-1">Export Backup</h4>
+                            <p class="text-xs text-slate-500 mb-4">Download all referral data to a CSV file for Excel or CRM import.</p>
+                            <button onclick="exportCSV()" class="w-full btn-outline py-2 rounded font-bold text-sm flex items-center justify-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                Download .CSV
+                            </button>
+                        </div>
+                        <div class="p-4 border border-red-100 bg-red-50 rounded-lg">
+                            <h4 class="font-bold text-red-800 mb-1">Reset Database</h4>
+                            <p class="text-xs text-red-600/70 mb-4">Permanently delete all referral sources and history. This cannot be undone.</p>
+                            <button onclick="clearDatabase()" class="w-full bg-white border border-red-200 text-red-600 py-2 rounded font-bold text-sm hover:bg-red-600 hover:text-white transition-colors">
+                                Clear Local Storage
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center py-10 text-slate-400 text-sm">
+        Moonshine Capital Referral Tracker &copy; 2024. Your data, your privacy.
+    </footer>
+
+    <script>
+        // Load existing settings on init
+        window.onload = function() {
+            const settings = JSON.parse(localStorage.getItem('moonshine_settings')) || {
+                name: "Partner Admin",
+                firm: "Moonshine Capital",
+                email: "admin@moonshinecapital.com",
+                followUp: "30",
+                alert: "3",
+                autoScore: true
+            };
+
+            document.getElementById('user-name').value = settings.name;
+            document.getElementById('user-firm').value = settings.firm;
+            document.getElementById('user-email').value = settings.email;
+            document.getElementById('follow-up-days').value = settings.followUp;
+            document.getElementById('alert-threshold').value = settings.alert;
+            document.getElementById('toggle-score').checked = settings.autoScore;
+        };
+
+        function saveAllSettings() {
+            const settings = {
+                name: document.getElementById('user-name').value,
+                firm: document.getElementById('user-firm').value,
+                email: document.getElementById('user-email').value,
+                followUp: document.getElementById('follow-up-days').value,
+                alert: document.getElementById('alert-threshold').value,
+                autoScore: document.getElementById('toggle-score').checked
+            };
+
+            localStorage.setItem('moonshine_settings', JSON.stringify(settings));
+            alert("Settings saved successfully.");
+        }
+
+        function exportCSV() {
+            const sources = JSON.parse(localStorage.getItem('moonshine_referrals')) || [];
+            if (sources.length === 0) {
+                alert("No data to export.");
+                return;
+            }
+
+            let csv = "Name,Company,Category,Location,Email,Phone,Stage,Quality\n";
+            sources.forEach(s => {
+                csv += `"${s.name}","${s.company}","${s.category}","${s.location}","${s.email}","${s.phone}","${s.stage}","${s.qualityScore}"\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', `moonshine_backup_${new Date().toISOString().split('T')[0]}.csv`);
+            a.click();
+        }
+
+        function clearDatabase() {
+            if (confirm("DANGER: This will delete ALL referral data. This cannot be undone. Are you absolutely sure?")) {
+                localStorage.removeItem('moonshine_referrals');
+                alert("Database cleared. Redirecting to dashboard...");
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Route Library | Funding Knowledge Base</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --bg-dark: #07080a;
+            --card-bg: #111318;
+            --card-border: #1f222c;
+            --electric-blue: #00f2ff;
+            --neon-green: #39ff14;
+            --text-main: #ffffff;
+            --text-muted: #8a8f9d;
+            --accent-gradient: linear-gradient(135deg, #00f2ff 0%, #39ff14 100%);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .route-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background: rgba(0, 242, 255, 0.1);
+            color: var(--electric-blue);
+            border-radius: 100px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            margin-bottom: 16px;
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            text-transform: uppercase;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+        }
+
+        .highlight {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Library Grid */
+        .library-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 32px;
+        }
+
+        .route-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            transition: var(--transition);
+        }
+
+        .route-card:hover {
+            border-color: rgba(0, 242, 255, 0.3);
+            transform: translateY(-4px);
+        }
+
+        .route-sidebar {
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.02);
+            border-right: 1px solid var(--card-border);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .route-main {
+            padding: 40px;
+        }
+
+        .data-point {
+            margin-bottom: 15px;
+        }
+
+        .data-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--neon-green);
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .data-value {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 12px;
+        }
+
+        .description {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+        }
+
+        .requirements-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .requirements-title::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--card-border);
+        }
+
+        .prep-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .prep-list li {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+        }
+
+        .prep-list li::before {
+            content: "→";
+            color: var(--electric-blue);
+            margin-right: 8px;
+            font-weight: bold;
+        }
+
+        .cta-inline {
+            margin-top: 32px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--electric-blue);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .cta-inline:hover {
+            gap: 18px;
+            filter: brightness(1.2);
+        }
+
+        .back-nav {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+        }
+
+        .btn-outline {
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 1px solid var(--card-border);
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-block;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--electric-blue);
+            color: var(--text-main);
+        }
+
+        @media (max-width: 900px) {
+            .route-card {
+                grid-template-columns: 1fr;
+            }
+            .route-sidebar {
+                border-right: none;
+                border-bottom: 1px solid var(--card-border);
+                flex-direction: row;
+                flex-wrap: wrap;
+                padding: 30px;
+            }
+            .data-point {
+                flex: 1 1 150px;
+            }
+            .prep-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .back-nav {
+                position: static;
+                margin-bottom: 40px;
+                text-align: center;
+            }
+            h1 { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="back-nav">
+        <a href="#" class="btn-outline">← Return to Matcher</a>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="route-badge">Knowledge Base v2.0</div>
+            <h1>Funding <span class="highlight">Route Library</span></h1>
+            <p class="subtitle">A technical deep-dive into the diverse capital lanes available for modern business entities.</p>
+        </header>
+
+        <div class="library-grid">
+            
+            <!-- Working Capital -->
+            <div class="route-card">
+                <div class="route-sidebar">
+                    <div class="data-point">
+                        <span class="data-label">Speed</span>
+                        <span class="data-value">48 - 72 Hours</span>
+                    </div>
+                    <div class="data-point">
+                        <span class="data-label">Max Limit</span>
+                        <span class="data-value">$500,000</span>
+                    </div>
+                    <div class="data-point">
+                        <span class="data-label">Difficulty</span>
+                        <span class="data-value">Moderate</span>
+                    </div>
+                </div>
+                <div class="route-main">
+                    <h2>Working Capital</h2>
+                    <p class="description">Standard unsecured business funding designed for operational expansion, marketing, or general liquidity. This is the "Gold Standard" for established businesses with consistent revenue streams and dedicated business banking.</p>
+                    <div class="requirements-title">Primary Requirements</div>
+                    <ul class="prep-list">
+                        <li>Registered LLC/Corp</li>
+                        <li>6+ Months in Business</li>
+                        <li>$15k+ Monthly Revenue</li>
+                        <li>Business Checking Account</li>
+                        <li>Clean NSF History</li>
+                        <li>600+ Credit Score</li>
+                    </ul>
+                    <a href="#" class="cta-inline">View detailed terms and fee structure →</a>
+                </div>
+            </div>
+
+            <!-- Micro-Funding -->
+            <div class="route-card">
+                <div class="route-sidebar">
+                    <div class="data-point">
+                        <span class="data-label">Speed</span>
+                        <span class="data-value">Same Day</span>
+                    </div>
+                    <div class="data-point">
+                        <span class="data-label">Max Limit</span>
+                        <span class="data-value">$15,000</span>
+                    </div>
+                    <div class="data-point">
+                        <span class="data-label">Difficulty</span>
+                        <span class="data-value">Very Low</span>
+                    </div>
+                </div>
+                <div class="route-main">
+                    <h2>Quick Micro-Funding</h2>
+                    <p class="description">Optimized for gig-economy workers, solopreneurs, and micro-businesses. This route relies heavily on real-time bank data (Plaid) rather than credit scores or lengthy tax documentation.</p>
+                    <div class="requirements-title">Primary Requirements</div>
+                    <ul class="prep-list">
+                        <li>3 Months Bank History</li>
+                        <li>Active Personal/Gig Acct</li>
+                        <li>$3k+ Monthly Deposits</li>
+                        <li>Valid Gov. ID</li>
+                        <li>US Citizenship/Residency</li>
+                        <li>Instant Data Connection</li>
+                    </ul>
+                    <a href="#" class="cta-inline">How micro-funding affects your credit →</a>
+                </div>
+            </div>
+
+            <!-- Real Estate -->
+            <div class="route-card">
+                <div class="route-sidebar">
+                    <div class="data-point">
+                        <span class="data-label">Speed</span>
+                        <span class="data-value">7 - 14 Days</span>
+                    </div>
+                    <div class="data-point">
+                        <span class="data-label">Max Limit</span>
+                        <span class="data-value">$5,000,000+</span>
+                    </div>
+                    <div class="data-point">
+                        <span class="data-label">Difficulty</span>
+                        <span class="data-value">Asset-Based</span>
+                    </div>
+                </div>
+                <div class="route-main">
+                    <h2>Real Estate Funding</h2>
+                    <p class="description">Bridge loans and fix-and-flip financing for investors. Unlike traditional business loans, the primary underwriting criteria is the After Repair Value (ARV) and the property's specific equity position.</p>
+                    <div class="requirements-title">Primary Requirements</div>
+                    <ul class="prep-list">
+                        <li>Property Address</li>
+                        <li>HUD Settlement Table</li>
+                        <li>Rehab/Project Budget</li>
+                        <li>Track Record (Preferred)</li>
+                        <li>Entity Formation Docs</li>
+                        <li>640+ Mid-Score</li>
+                    </ul>
+                    <a href="#" class="cta-inline">Explore asset-based lending rates →</a>
+                </div>
+            </div>
+
+            <!-- Equipment -->
+            <div class="route-card">
+                <div class="route-sidebar">
+                    <div class="data-point">
+                        <span class="data-label">Speed</span>
+                        <span class="data-value">3 - 5 Days</span>
+                    </div>
+                    <div class="data-point">
+                        <span class="data-label">Max Limit</span>
+                        <span class="data-value">Invoice Total</span>
+                    </div>
+                    <div class="data-point">
+                        <span class="data-label">Difficulty</span>
+                        <span class="data-value">Low (Secured)</span>
+                    </div>
+                </div>
+                <div class="route-main">
+                    <h2>Equipment Financing</h2>
+                    <p class="description">Secured financing for vehicles, heavy machinery, or tech hardware. Because the equipment serves as collateral, terms are often longer (up to 72 months) and interest rates are significantly lower than unsecured lines.</p>
+                    <div class="requirements-title">Primary Requirements</div>
+                    <ul class="prep-list">
+                        <li>Vendor Quote/Invoice</li>
+                        <li>2 Years Tax Returns</li>
+                        <li>Insurance Proof</li>
+                        <li>660+ Credit Score</li>
+                        <li>Entity in Good Standing</li>
+                        <li>Down Payment (5-10%)</li>
+                    </ul>
+                    <a href="#" class="cta-inline">Calculate your equipment lease payment →</a>
+                </div>
+            </div>
+
+            <!-- Business Credit Prep -->
+            <div class="route-card">
+                <div class="route-sidebar">
+                    <div class="data-point">
+                        <span class="data-label">Speed</span>
+                        <span class="data-value">30 - 90 Days</span>
+                    </div>
+                    <div class="data-point">
+                        <span class="data-label">Max Limit</span>
+                        <span class="data-value">Building Stage</span>
+                    </div>
+                    <div class="data-point">
+                        <span class="data-label">Difficulty</span>
+                        <span class="data-value">Nurture Path</span>
+                    </div>
+                </div>
+                <div class="route-main">
+                    <h2>Business Credit Prep</h2>
+                    <p class="description">For applicants who don't yet meet the criteria for institutional capital. This is a strategic "rebuild" lane focused on establishing trade lines, fixing entity data mismatches, and improving the personal-to-business credit bridge.</p>
+                    <div class="requirements-title">Focus Areas</div>
+                    <ul class="prep-list">
+                        <li>D&B / Experian Biz Profile</li>
+                        <li>Tier 1 Trade Vendors</li>
+                        <li>Entity Address Cleanup</li>
+                        <li>Personal Credit Repair</li>
+                        <li>P&L Optimization</li>
+                        <li>Nav.com Monitoring</li>
+                    </ul>
+                    <a href="#" class="cta-inline">Download the 90-day prep checklist →</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Route Library | Funding Knowledge Base</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --bg-dark: #07080a;
+            --card-bg: #111318;
+            --card-border: #1f222c;
+            --electric-blue: #00f2ff;
+            --neon-green: #39ff14;
+            --text-main: #ffffff;
+            --text-muted: #8a8f9d;
+            --accent-gradient: linear-gradient(135deg, #00f2ff 0%, #39ff14 100%);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .route-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background: rgba(0, 242, 255, 0.1);
+            color: var(--electric-blue);
+            border-radius: 100px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            margin-bottom: 16px;
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            text-transform: uppercase;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+        }
+
+        .highlight {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Library Grid */
+        .library-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 32px;
+        }
+
+        .route-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            transition: var(--transition);
+        }
+
+        .route-card:hover {
+            border-color: rgba(0, 242, 255, 0.3);
+            transform: translateY(-4px);
+        }
+
+        .route-sidebar {
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.02);
+            border-right: 1px solid var(--card-border);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .route-main {
+            padding: 40px;
+        }
+
+        .data-point {
+            margin-bottom: 15px;
+        }
+
+        .data-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--neon-green);
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .data-value {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 12px;
+        }
+
+        .description {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+        }
+
+        .requirements-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .requirements-title::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--card-border);
+        }
+
+        .prep-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .prep-list li {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+        }
+
+        .prep-list li::before {
+            content: "→";
+            color: var(--electric-blue);
+            margin-right: 8px;
+            font-weight: bold;
+        }
+
+        .cta-inline {
+            margin-top: 32px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--electric-blue);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .cta-inline:hover {
+            gap: 18px;
+            filter: brightness(1.2);
+        }
+
+        .back-nav {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+        }
+
+        .btn-outline {
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 1px solid var(--card-border);
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-block;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--electric-blue);
+            color: var(--text-main);
+        }
+
+        @media (max-width: 900px) {
+            .route-card {
+                grid-template-columns: 1fr;
+            }
+            .route-sidebar {
+                border-right: none;
+                border-bottom: 1px solid var(--card-border);
+                flex-direction: row;
+                flex-wrap: wrap;
+                padding: 30px;
+            }
+            .data-point {
+                flex: 1 1 150px;
+            }
+            .prep-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .back-nav {
+                position: static;
+                margin-bottom: 40px;
+                text-align: center;
+            }
+            h1 { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="back-nav">
+        <a href="#" class="btn-outline">← Return to Matcher</a>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="route-badge">Knowledge Base v2.0</div>
+            <h1>Funding <span class="highlight">Route Library</span></h1>
+            <p class="subtitle">A technical deep-dive into the diverse capital lanes available for modern business entities.</p>
+        </header>
+
+        <div class="library-grid">
+            
+            <!-- Working Capital -->
+            <div class="route-card">
+                <div class="route-sidebar">
+                    <div class="data-point">
+                        <span class="data-label">Speed</span>
+                        <span class="data-value">48 - 72 Hours</span>
+                    </div>
+                    <div class="data-point">
+                        <span class="data-label">Max Limit</span>
+                        <span class="data-value">$500,000</span>
+                    </div>
+                    <div class="data-point">
+                        <span class="data-label">Difficulty</span>
+                        <span class="data-value">Moderate</span>
+                    </div>
+                </div>
+                <div class="route-main">
+                    <h2>Working Capital</h2>
+                    <p class="description">Standard unsecured business funding designed for operational expansion, marketing, or general liquidity. This is the "Gold Standard" for established businesses with consistent revenue streams and dedicated business banking.</p>
+                    <div class="requirements-title">Primary Requirements</div>
+                    <ul class="prep-list">
+                        <li>Registered LLC/Corp</li>
+                        <li>6+ Months in Business</li>
+                        <li>$15k+ Monthly Revenue</li>
+                        <li>Business Checking Account</li>
+                        <li>Clean NSF History</li>
+                        <li>600+ Credit Score</li>
+                    </ul>
+                    <a href="#" class="cta-inline">View detailed terms and fee structure →</a>
+                </div>
+            </div>
+
+            <!-- Micro-Funding -->
+            <div class="route-card">
+                <div class="route-sidebar">
+                    <div class="data-point">
+                        <span class="data-label">Speed</span>
+                        <span class="data-value">Same Day</span>
+                    </div>
+                    <div class="data-point">
+                        <span class="data-label">Max Limit</span>
+                        <span class="data-value">$15,000</span>
+                    </div>
+                    <div class="data-point">
+                        <span class="data-label">Difficulty</span>
+                        <span class="data-value">Very Low</span>
+                    </div>
+                </div>
+                <div class="route-main">
+                    <h2>Quick Micro-Funding</h2>
+                    <p class="description">Optimized for gig-economy workers, solopreneurs, and micro-businesses. This route relies heavily on real-time bank data (Plaid) rather than credit scores or lengthy tax documentation.</p>
+                    <div class="requirements-title">Primary Requirements</div>
+                    <ul class="prep-list">
+                        <li>3 Months Bank History</li>
+                        <li>Active Personal/Gig Acct</li>
+                        <li>$3k+ Monthly Deposits</li>
+                        <li>Valid Gov. ID</li>
+                        <li>US Citizenship/Residency</li>
+                        <li>Instant Data Connection</li>
+                    </ul>
+                    <a href="#" class="cta-inline">How micro-funding affects your credit →</a>
+                </div>
+            </div>
+
+            <!-- Real Estate -->
+            <div class="route-card">
+                <div class="route-sidebar">
+                    <div class="data-point">
+                        <span class="data-label">Speed</span>
+                        <span class="data-value">7 - 14 Days</span>
+                    </div>
+                    <div class="data-point">
+                        <span class="data-label">Max Limit</span>
+                        <span class="data-value">$5,000,000+</span>
+                    </div>
+                    <div class="data-point">
+                        <span class="data-label">Difficulty</span>
+                        <span class="data-value">Asset-Based</span>
+                    </div>
+                </div>
+                <div class="route-main">
+                    <h2>Real Estate Funding</h2>
+                    <p class="description">Bridge loans and fix-and-flip financing for investors. Unlike traditional business loans, the primary underwriting criteria is the After Repair Value (ARV) and the property's specific equity position.</p>
+                    <div class="requirements-title">Primary Requirements</div>
+                    <ul class="prep-list">
+                        <li>Property Address</li>
+                        <li>HUD Settlement Table</li>
+                        <li>Rehab/Project Budget</li>
+                        <li>Track Record (Preferred)</li>
+                        <li>Entity Formation Docs</li>
+                        <li>640+ Mid-Score</li>
+                    </ul>
+                    <a href="#" class="cta-inline">Explore asset-based lending rates →</a>
+                </div>
+            </div>
+
+            <!-- Equipment -->
+            <div class="route-card">
+                <div class="route-sidebar">
+                    <div class="data-point">
+                        <span class="data-label">Speed</span>
+                        <span class="data-value">3 - 5 Days</span>
+                    </div>
+                    <div class="data-point">
+                        <span class="data-label">Max Limit</span>
+                        <span class="data-value">Invoice Total</span>
+                    </div>
+                    <div class="data-point">
+                        <span class="data-label">Difficulty</span>
+                        <span class="data-value">Low (Secured)</span>
+                    </div>
+                </div>
+                <div class="route-main">
+                    <h2>Equipment Financing</h2>
+                    <p class="description">Secured financing for vehicles, heavy machinery, or tech hardware. Because the equipment serves as collateral, terms are often longer (up to 72 months) and interest rates are significantly lower than unsecured lines.</p>
+                    <div class="requirements-title">Primary Requirements</div>
+                    <ul class="prep-list">
+                        <li>Vendor Quote/Invoice</li>
+                        <li>2 Years Tax Returns</li>
+                        <li>Insurance Proof</li>
+                        <li>660+ Credit Score</li>
+                        <li>Entity in Good Standing</li>
+                        <li>Down Payment (5-10%)</li>
+                    </ul>
+                    <a href="#" class="cta-inline">Calculate your equipment lease payment →</a>
+                </div>
+            </div>
+
+            <!-- Business Credit Prep -->
+            <div class="route-card">
+                <div class="route-sidebar">
+                    <div class="data-point">
+                        <span class="data-label">Speed</span>
+                        <span class="data-value">30 - 90 Days</span>
+                    </div>
+                    <div class="data-point">
+                        <span class="data-label">Max Limit</span>
+                        <span class="data-value">Building Stage</span>
+                    </div>
+                    <div class="data-point">
+                        <span class="data-label">Difficulty</span>
+                        <span class="data-value">Nurture Path</span>
+                    </div>
+                </div>
+                <div class="route-main">
+                    <h2>Business Credit Prep</h2>
+                    <p class="description">For applicants who don't yet meet the criteria for institutional capital. This is a strategic "rebuild" lane focused on establishing trade lines, fixing entity data mismatches, and improving the personal-to-business credit bridge.</p>
+                    <div class="requirements-title">Focus Areas</div>
+                    <ul class="prep-list">
+                        <li>D&B / Experian Biz Profile</li>
+                        <li>Tier 1 Trade Vendors</li>
+                        <li>Entity Address Cleanup</li>
+                        <li>Personal Credit Repair</li>
+                        <li>P&L Optimization</li>
+                        <li>Nav.com Monitoring</li>
+                    </ul>
+                    <a href="#" class="cta-inline">Download the 90-day prep checklist →</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

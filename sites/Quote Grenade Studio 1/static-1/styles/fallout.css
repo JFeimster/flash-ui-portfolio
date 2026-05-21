@@ -1,0 +1,189 @@
+:root {
+    --black: #000000;
+    --white: #ffffff;
+    --cream: #f4f1ea;
+    --red: #ff3c00;
+    --border: 4px solid #000000;
+    --shadow: 8px 8px 0px #000000;
+    --shadow-hover: 4px 4px 0px #000000;
+    --mono: 'IBM Plex Mono', monospace;
+}
+
+.fallout-wall {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 30px;
+    padding: 40px 0;
+    background-image: radial-gradient(var(--black) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+.fallout-item {
+    background: var(--white);
+    border: var(--border);
+    box-shadow: var(--shadow);
+    padding: 30px;
+    position: relative;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.fallout-item:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 12px 12px 0px var(--red);
+}
+
+.fallout-item::before {
+    content: "FRAGMENT_" attr(data-id);
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: rgba(0,0,0,0.3);
+}
+
+.fallout-platform {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    background: var(--black);
+    color: var(--white);
+    padding: 4px 8px;
+    display: inline-block;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+.fallout-quote {
+    font-size: 1.8rem;
+    font-weight: 800;
+    line-height: 1;
+    text-transform: uppercase;
+    margin-bottom: 25px;
+    flex-grow: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.fallout-quote::selection {
+    background: var(--red);
+    color: var(--white);
+}
+
+.fallout-metrics {
+    display: flex;
+    gap: 15px;
+    border-top: 2px solid var(--black);
+    padding-top: 15px;
+    font-family: var(--mono);
+    font-size: 0.85rem;
+}
+
+.metric-unit {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.metric-unit span {
+    font-weight: bold;
+    color: var(--red);
+}
+
+/* Viral Variant Styles */
+.fallout-item.high-impact {
+    background: var(--red);
+    color: var(--white);
+}
+
+.fallout-item.high-impact .fallout-platform {
+    background: var(--white);
+    color: var(--black);
+}
+
+.fallout-item.high-impact .fallout-metrics {
+    border-top-color: var(--white);
+}
+
+.fallout-item.high-impact .metric-unit span {
+    color: var(--black);
+}
+
+/* Glitch Textures */
+.fallout-item.glitch-bg {
+    background: repeating-linear-gradient(
+        45deg,
+        #fff,
+        #fff 10px,
+        #f0f0f0 10px,
+        #f0f0f0 20px
+    );
+}
+
+.fallout-item::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    right: -10px;
+    width: 50px;
+    height: 50px;
+    background: var(--red);
+    z-index: 0;
+    opacity: 0.1;
+    clip-path: polygon(100% 0, 0% 100%, 100% 100%);
+}
+
+@media (max-width: 600px) {
+    .fallout-wall {
+        grid-template-columns: 1fr;
+        padding: 20px;
+    }
+    
+    .fallout-quote {
+        font-size: 1.5rem;
+    }
+}
+
+/* Scramble Animation for new entries */
+@keyframes scramble {
+    from { filter: blur(5px) invert(1); transform: scale(0.9); }
+    to { filter: blur(0) invert(0); transform: scale(1); }
+}
+
+.new-impact {
+    animation: scramble 0.5s steps(4);
+}
+
+.impact-header {
+    background: var(--black);
+    color: var(--white);
+    padding: 20px;
+    border: var(--border);
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.impact-header h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    text-transform: uppercase;
+}
+
+.scanline {
+    width: 100%;
+    height: 100px;
+    z-index: 10;
+    background: linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(255,60,0,0.1) 50%, rgba(0,0,0,0) 100%);
+    position: absolute;
+    pointer-events: none;
+    animation: scanline 8s linear infinite;
+}
+
+@keyframes scanline {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(1000%); }
+}

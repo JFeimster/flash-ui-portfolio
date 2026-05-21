@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonshine Capital | Deal & Commission Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy-deep: #020617;
+            --navy-muted: #0f172a;
+            --gold: #d4af37;
+            --gold-light: #fef3c7;
+            --emerald: #10b981;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--navy-deep);
+            color: #1e293b;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, #020617 0%, #1e293b 100%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .pipeline-container {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding-bottom: 1.5rem;
+            scrollbar-width: thin;
+            scrollbar-color: var(--gold) transparent;
+        }
+
+        .pipeline-column {
+            min-width: 300px;
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .deal-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border-top: 3px solid var(--gold);
+            transition: all 0.2s ease;
+        }
+
+        .deal-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-gold {
+            background: var(--gold);
+            color: var(--navy-deep);
+            font-weight: 600;
+        }
+
+        .btn-gold:hover {
+            background: #b8962e;
+        }
+
+        .status-pill {
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 12px;
+        }
+
+        #modal-overlay {
+            background: rgba(2, 6, 23, 0.8);
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+        }
+
+        input, select, textarea {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0.5rem;
+            outline: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+
+    <!-- Header / Hero -->
+    <header class="hero-gradient text-white py-10 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+                <div>
+                    <div class="flex items-center gap-3 mb-2">
+                        <a href="index.html" class="text-[#d4af37] text-sm font-bold hover:underline">← Back to Sources</a>
+                        <span class="text-slate-500">|</span>
+                        <span class="bg-emerald-500 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase">Revenue Tracker</span>
+                    </div>
+                    <h1 class="text-4xl font-bold">Deal <span class="text-[#d4af37]">Pipeline.</span></h1>
+                    <p class="text-slate-400 mt-2">Track submissions, monitor funding stages, and calculate projected commissions.</p>
+                </div>
+                <button onclick="openModal()" class="mt-6 md:mt-0 btn-gold px-6 py-3 rounded-lg flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    Submit New Deal
+                </button>
+            </div>
+
+            <!-- Dashboard Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="stat-card">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Active Pipeline</p>
+                    <p class="text-2xl font-black" id="stat-active-volume">$0.00</p>
+                </div>
+                <div class="stat-card">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total Funded</p>
+                    <p class="text-2xl font-black text-emerald-400" id="stat-funded-volume">$0.00</p>
+                </div>
+                <div class="stat-card">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Estimated Comm.</p>
+                    <p class="text-2xl font-black text-[#d4af37]" id="stat-comm-pending">$0.00</p>
+                </div>
+                <div class="stat-card">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Closed (MTD)</p>
+                    <p class="text-2xl font-black" id="stat-closed-count">0</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-[1600px] mx-auto p-6">
+        <div class="pipeline-container" id="deal-board">
+            <!-- Columns generated by JS -->
+        </div>
+    </main>
+
+    <!-- Modal: Add Deal -->
+    <div id="modal-overlay">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden">
+            <div class="bg-slate-900 p-6 text-white flex justify-between items-center">
+                <h2 class="text-xl font-bold">Submit Deal to Pipeline</h2>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white">&times;</button>
+            </div>
+            <form id="deal-form" class="p-8 grid grid-cols-2 gap-4">
+                <div class="col-span-2">
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Referral Source</label>
+                    <select id="d-source" class="w-full" required>
+                        <!-- Populated via JS -->
+                    </select>
+                </div>
+                <div class="col-span-2 md:col-span-1">
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Merchant/Business Name</label>
+                    <input type="text" id="d-merchant" class="w-full" placeholder="Acme Corp" required>
+                </div>
+                <div class="col-span-2 md:col-span-1">
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Requested Amount</label>
+                    <input type="number" id="d-amount" class="w-full" placeholder="50000" required>
+                </div>
+                <div class="col-span-2 md:col-span-1">
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Deal Type</label>
+                    <select id="d-type" class="w-full">
+                        <option>Term Loan</option>
+                        <option>Line of Credit</option>
+                        <option>Equipment Finance</option>
+                        <option>MCA</option>
+                        <option>SBA 7(a)</option>
+                    </select>
+                </div>
+                <div class="col-span-2 md:col-span-1">
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Initial Status</label>
+                    <select id="d-status" class="w-full">
+                        <option>Application</option>
+                        <option>Underwriting</option>
+                        <option>Approved</option>
+                        <option>Funded</option>
+                        <option>Declined</option>
+                    </select>
+                </div>
+                <div class="col-span-2 md:col-span-1">
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Commission Rate (%)</label>
+                    <input type="number" step="0.1" id="d-comm" class="w-full" value="2.0">
+                </div>
+                <div class="col-span-2 md:col-span-1">
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Est. Close Date</label>
+                    <input type="date" id="d-close" class="w-full">
+                </div>
+                <div class="col-span-2 flex justify-end gap-3 mt-4">
+                    <button type="button" onclick="closeModal()" class="px-6 py-2 text-slate-500 font-bold">Cancel</button>
+                    <button type="submit" class="bg-emerald-600 text-white px-8 py-2 rounded-lg font-bold">Submit Deal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="text-center py-10 text-slate-400 text-sm border-t border-slate-200 bg-white mt-10">
+        Moonshine Capital Deal Tracker &copy; 2024. Revenue through Relationships.
+    </footer>
+
+    <script>
+        const STAGES = ["Application", "Underwriting", "Approved", "Funded", "Declined"];
+        
+        let deals = JSON.parse(localStorage.getItem('moonshine_deals')) || [
+            { id: 101, sourceName: "Marcus Thorne", merchant: "Velocity Logistics", amount: 150000, type: "Term Loan", status: "Underwriting", commRate: 2.5, closeDate: "2024-02-15" },
+            { id: 102, sourceName: "Sarah Jenkins", merchant: "Green Valley Landscaping", amount: 45000, type: "Equipment Finance", status: "Funded", commRate: 3.0, closeDate: "2024-01-05" }
+        ];
+
+        let sources = JSON.parse(localStorage.getItem('moonshine_referrals')) || [];
+
+        function renderDeals() {
+            const board = document.getElementById('deal-board');
+            board.innerHTML = '';
+
+            STAGES.forEach(stage => {
+                const filteredDeals = deals.filter(d => d.status === stage);
+                const col = document.createElement('div');
+                col.className = 'pipeline-column';
+                col.innerHTML = `
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-slate-600 text-xs uppercase tracking-tighter">${stage}</h3>
+                        <span class="bg-slate-300 text-slate-700 text-[10px] px-2 py-0.5 rounded-full font-bold">${filteredDeals.length}</span>
+                    </div>
+                    <div>
+                        ${filteredDeals.map(d => `
+                            <div class="deal-card">
+                                <div class="flex justify-between items-start mb-1">
+                                    <h4 class="font-bold text-slate-900 truncate pr-2">${d.merchant}</h4>
+                                    <span class="text-emerald-600 font-black text-sm">$${(d.amount/1000).toFixed(0)}k</span>
+                                </div>
+                                <div class="text-[10px] text-slate-400 font-bold uppercase mb-3">Via: ${d.sourceName}</div>
+                                
+                                <div class="bg-slate-50 p-2 rounded mb-3 flex justify-between items-center">
+                                    <div>
+                                        <p class="text-[9px] text-slate-400 uppercase font-black">Commission</p>
+                                        <p class="text-xs font-bold text-[#d4af37]">$${((d.amount * d.commRate) / 100).toLocaleString()}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-[9px] text-slate-400 uppercase font-black">Rate</p>
+                                        <p class="text-xs font-bold text-slate-600">${d.commRate}%</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[10px] text-slate-500 italic">${d.type}</span>
+                                    <button onclick="deleteDeal(${d.id})" class="text-slate-300 hover:text-red-500 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                board.appendChild(col);
+            });
+            updateStats();
+        }
+
+        function updateStats() {
+            let activeVol = 0;
+            let fundedVol = 0;
+            let pendingComm = 0;
+            let closedCount = 0;
+
+            deals.forEach(d => {
+                if (d.status === 'Funded') {
+                    fundedVol += parseFloat(d.amount);
+                    closedCount++;
+                    pendingComm += (d.amount * d.commRate / 100);
+                } else if (d.status !== 'Declined') {
+                    activeVol += parseFloat(d.amount);
+                    pendingComm += (d.amount * d.commRate / 100);
+                }
+            });
+
+            document.getElementById('stat-active-volume').innerText = `$${activeVol.toLocaleString()}`;
+            document.getElementById('stat-funded-volume').innerText = `$${fundedVol.toLocaleString()}`;
+            document.getElementById('stat-comm-pending').innerText = `$${pendingComm.toLocaleString()}`;
+            document.getElementById('stat-closed-count').innerText = closedCount;
+        }
+
+        function openModal() {
+            const select = document.getElementById('d-source');
+            select.innerHTML = sources.length > 0 
+                ? sources.map(s => `<option>${s.name}</option>`).join('')
+                : '<option disabled>Add sources first...</option>';
+            document.getElementById('modal-overlay').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').style.display = 'none';
+        }
+
+        document.getElementById('deal-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newDeal = {
+                id: Date.now(),
+                sourceName: document.getElementById('d-source').value,
+                merchant: document.getElementById('d-merchant').value,
+                amount: document.getElementById('d-amount').value,
+                type: document.getElementById('d-type').value,
+                status: document.getElementById('d-status').value,
+                commRate: document.getElementById('d-comm').value,
+                closeDate: document.getElementById('d-close').value
+            };
+            deals.push(newDeal);
+            localStorage.setItem('moonshine_deals', JSON.stringify(deals));
+            renderDeals();
+            closeModal();
+            e.target.reset();
+        });
+
+        function deleteDeal(id) {
+            if(confirm('Archive this deal record?')) {
+                deals = deals.filter(d => d.id !== id);
+                localStorage.setItem('moonshine_deals', JSON.stringify(deals));
+                renderDeals();
+            }
+        }
+
+        // Init
+        renderDeals();
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonshine Capital | Deal & Commission Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy-deep: #020617;
+            --navy-muted: #0f172a;
+            --gold: #d4af37;
+            --gold-light: #fef3c7;
+            --emerald: #10b981;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--navy-deep);
+            color: #1e293b;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, #020617 0%, #1e293b 100%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .pipeline-container {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding-bottom: 1.5rem;
+            scrollbar-width: thin;
+            scrollbar-color: var(--gold) transparent;
+        }
+
+        .pipeline-column {
+            min-width: 300px;
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .deal-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border-top: 3px solid var(--gold);
+            transition: all 0.2s ease;
+        }
+
+        .deal-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-gold {
+            background: var(--gold);
+            color: var(--navy-deep);
+            font-weight: 600;
+        }
+
+        .btn-gold:hover {
+            background: #b8962e;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 12px;
+        }
+
+        #modal-overlay {
+            background: rgba(2, 6, 23, 0.8);
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+        }
+
+        input, select, textarea {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0.5rem;
+            outline: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+
+    <!-- Header / Hero -->
+    <header class="hero-gradient text-white py-10 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+                <div>
+                    <div class="flex items-center gap-3 mb-2">
+                        <a href="index.html" class="text-[#d4af37] text-sm font-bold hover:underline">← Back to Sources</a>
+                        <span class="text-slate-500">|</span>
+                        <span class="bg-emerald-500 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase">Revenue Tracker</span>
+                    </div>
+                    <h1 class="text-4xl font-bold">Deal <span class="text-[#d4af37]">Pipeline.</span></h1>
+                    <p class="text-slate-400 mt-2">Track submissions, monitor funding stages, and calculate projected commissions.</p>
+                </div>
+                <button onclick="openModal()" class="mt-6 md:mt-0 btn-gold px-6 py-3 rounded-lg flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    Submit New Deal
+                </button>
+            </div>
+
+            <!-- Dashboard Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="stat-card">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Active Pipeline</p>
+                    <p class="text-2xl font-black" id="stat-active-volume">$0.00</p>
+                </div>
+                <div class="stat-card">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total Funded</p>
+                    <p class="text-2xl font-black text-emerald-400" id="stat-funded-volume">$0.00</p>
+                </div>
+                <div class="stat-card">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Estimated Comm.</p>
+                    <p class="text-2xl font-black text-[#d4af37]" id="stat-comm-pending">$0.00</p>
+                </div>
+                <div class="stat-card">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Closed (MTD)</p>
+                    <p class="text-2xl font-black" id="stat-closed-count">0</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-[1600px] mx-auto p-6">
+        <div class="pipeline-container" id="deal-board">
+            <!-- Columns generated by JS -->
+        </div>
+    </main>
+
+    <!-- Modal: Add Deal -->
+    <div id="modal-overlay">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden">
+            <div class="bg-slate-900 p-6 text-white flex justify-between items-center">
+                <h2 class="text-xl font-bold">Submit Deal to Pipeline</h2>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white">&times;</button>
+            </div>
+            <form id="deal-form" class="p-8 grid grid-cols-2 gap-4">
+                <div class="col-span-2">
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Referral Source</label>
+                    <select id="d-source" class="w-full" required>
+                        <!-- Populated via JS -->
+                    </select>
+                </div>
+                <div class="col-span-2 md:col-span-1">
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Merchant/Business Name</label>
+                    <input type="text" id="d-merchant" class="w-full" placeholder="Acme Corp" required>
+                </div>
+                <div class="col-span-2 md:col-span-1">
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Requested Amount</label>
+                    <input type="number" id="d-amount" class="w-full" placeholder="50000" required>
+                </div>
+                <div class="col-span-2 md:col-span-1">
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Deal Type</label>
+                    <select id="d-type" class="w-full">
+                        <option>Term Loan</option>
+                        <option>Line of Credit</option>
+                        <option>Equipment Finance</option>
+                        <option>MCA</option>
+                        <option>SBA 7(a)</option>
+                    </select>
+                </div>
+                <div class="col-span-2 md:col-span-1">
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Initial Status</label>
+                    <select id="d-status" class="w-full">
+                        <option>Application</option>
+                        <option>Underwriting</option>
+                        <option>Approved</option>
+                        <option>Funded</option>
+                        <option>Declined</option>
+                    </select>
+                </div>
+                <div class="col-span-2 md:col-span-1">
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Commission Rate (%)</label>
+                    <input type="number" step="0.1" id="d-comm" class="w-full" value="2.0">
+                </div>
+                <div class="col-span-2 md:col-span-1">
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Est. Close Date</label>
+                    <input type="date" id="d-close" class="w-full">
+                </div>
+                <div class="col-span-2 flex justify-end gap-3 mt-4">
+                    <button type="button" onclick="closeModal()" class="px-6 py-2 text-slate-500 font-bold">Cancel</button>
+                    <button type="submit" class="bg-emerald-600 text-white px-8 py-2 rounded-lg font-bold">Submit Deal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="text-center py-10 text-slate-400 text-sm border-t border-slate-200 bg-white mt-10">
+        Moonshine Capital Deal Tracker &copy; 2024. Revenue through Relationships.
+    </footer>
+
+    <script>
+        const STAGES = ["Application", "Underwriting", "Approved", "Funded", "Declined"];
+        
+        let deals = JSON.parse(localStorage.getItem('moonshine_deals')) || [
+            { id: 101, sourceName: "Marcus Thorne", merchant: "Velocity Logistics", amount: 150000, type: "Term Loan", status: "Underwriting", commRate: 2.5, closeDate: "2024-02-15" },
+            { id: 102, sourceName: "Sarah Jenkins", merchant: "Green Valley Landscaping", amount: 45000, type: "Equipment Finance", status: "Funded", commRate: 3.0, closeDate: "2024-01-05" }
+        ];
+
+        let sources = JSON.parse(localStorage.getItem('moonshine_referrals')) || [];
+
+        function renderDeals() {
+            const board = document.getElementById('deal-board');
+            board.innerHTML = '';
+
+            STAGES.forEach(stage => {
+                const filteredDeals = deals.filter(d => d.status === stage);
+                const col = document.createElement('div');
+                col.className = 'pipeline-column';
+                col.innerHTML = `
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-slate-600 text-xs uppercase tracking-tighter">${stage}</h3>
+                        <span class="bg-slate-300 text-slate-700 text-[10px] px-2 py-0.5 rounded-full font-bold">${filteredDeals.length}</span>
+                    </div>
+                    <div>
+                        ${filteredDeals.map(d => `
+                            <div class="deal-card">
+                                <div class="flex justify-between items-start mb-1">
+                                    <h4 class="font-bold text-slate-900 truncate pr-2">${d.merchant}</h4>
+                                    <span class="text-emerald-600 font-black text-sm">$${(d.amount/1000).toFixed(0)}k</span>
+                                </div>
+                                <div class="text-[10px] text-slate-400 font-bold uppercase mb-3">Via: ${d.sourceName}</div>
+                                
+                                <div class="bg-slate-50 p-2 rounded mb-3 flex justify-between items-center">
+                                    <div>
+                                        <p class="text-[9px] text-slate-400 uppercase font-black">Commission</p>
+                                        <p class="text-xs font-bold text-[#d4af37]">$${((d.amount * d.commRate) / 100).toLocaleString()}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-[9px] text-slate-400 uppercase font-black">Rate</p>
+                                        <p class="text-xs font-bold text-slate-600">${d.commRate}%</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[10px] text-slate-500 italic">${d.type}</span>
+                                    <button onclick="deleteDeal(${d.id})" class="text-slate-300 hover:text-red-500 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                board.appendChild(col);
+            });
+            updateStats();
+        }
+
+        function updateStats() {
+            let activeVol = 0;
+            let fundedVol = 0;
+            let pendingComm = 0;
+            let closedCount = 0;
+
+            deals.forEach(d => {
+                const amt = parseFloat(d.amount);
+                const rt = parseFloat(d.commRate);
+                if (d.status === 'Funded') {
+                    fundedVol += amt;
+                    closedCount++;
+                    pendingComm += (amt * rt / 100);
+                } else if (d.status !== 'Declined') {
+                    activeVol += amt;
+                    pendingComm += (amt * rt / 100);
+                }
+            });
+
+            document.getElementById('stat-active-volume').innerText = `$${activeVol.toLocaleString()}`;
+            document.getElementById('stat-funded-volume').innerText = `$${fundedVol.toLocaleString()}`;
+            document.getElementById('stat-comm-pending').innerText = `$${pendingComm.toLocaleString()}`;
+            document.getElementById('stat-closed-count').innerText = closedCount;
+        }
+
+        function openModal() {
+            const select = document.getElementById('d-source');
+            select.innerHTML = sources.length > 0 
+                ? sources.map(s => `<option>${s.name}</option>`).join('')
+                : '<option disabled>Add sources first...</option>';
+            document.getElementById('modal-overlay').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').style.display = 'none';
+        }
+
+        document.getElementById('deal-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newDeal = {
+                id: Date.now(),
+                sourceName: document.getElementById('d-source').value,
+                merchant: document.getElementById('d-merchant').value,
+                amount: document.getElementById('d-amount').value,
+                type: document.getElementById('d-type').value,
+                status: document.getElementById('d-status').value,
+                commRate: document.getElementById('d-comm').value,
+                closeDate: document.getElementById('d-close').value
+            };
+            deals.push(newDeal);
+            localStorage.setItem('moonshine_deals', JSON.stringify(deals));
+            renderDeals();
+            closeModal();
+            e.target.reset();
+        });
+
+        function deleteDeal(id) {
+            if(confirm('Archive this deal record?')) {
+                deals = deals.filter(d => d.id !== id);
+                localStorage.setItem('moonshine_deals', JSON.stringify(deals));
+                renderDeals();
+            }
+        }
+
+        renderDeals();
+    </script>
+</body>
+</html>
