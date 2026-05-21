@@ -34,11 +34,17 @@ The root homepage reads from:
 data/site-registry.json
 ```
 
-That registry powers the cards, counts, search, category filters, and status filters.
+That registry powers the cards, counts, search, category filters, and status filters. The public homepage labels this as the raw developer registry so normal visitors do not mistake the JSON file for a broken page.
 
 ## Static deployment
 
 Vercel can deploy the root directory as a static directory. The root `index.html` provides the portfolio interface, while `data/site-registry.json` powers the browsable vault.
+
+Current deployment:
+
+```txt
+https://flash-ui-portfolio.vercel.app/
+```
 
 ## Asset types
 
@@ -68,5 +74,6 @@ Production winners can later be promoted into standalone repositories, separate 
 
 1. Batch 1: create the deployable directory shell.
 2. Batch 2: index existing and bulk-imported Flash UI assets.
-3. Batch 3: normalize priority assets into `/sites/[slug]/`.
-4. Batch 4: deploy and verify on Vercel.
+3. Batch 3: polish deployed portfolio UX and clarify registry/deployment states.
+4. Batch 4: normalize priority assets into `/sites/[slug]/`.
+5. Batch 5: plan ZIP extraction and standalone app promotion.
