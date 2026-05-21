@@ -61,10 +61,12 @@ function sourceUrl(item) {
   return `${REPO_URL}/${looksFile ? "blob" : "tree"}/main/${encoded}`;
 }
 
-function renderButtons(container, values, key) {
-  container.innerHTML = values.map(value => `
-    <button class="${state[key] === value ? "active" : ""}" data-filter-key="${key}" data-filter-value="${escapeHtml(value)}">${escapeHtml(value)}</button>
-  `).join("");
+function renderSelect(container, values, key, label) {
+  container.innerHTML = `
+    <select data-filter-key="${key}" aria-label="${escapeHtml(label)}">
+      ${values.map(value => `<option value="${escapeHtml(value)}" ${state[key] === value ? "selected" : ""}>${escapeHtml(value)}</option>`).join("")}
+    </select>
+  `;
 }
 
 function itemMatches(item) {
@@ -153,8 +155,8 @@ function renderShell() {
   els.nestedAppCount.textContent = String(state.items.filter(isNestedApp).length);
   els.archiveCount.textContent = String(state.items.filter(isArchive).length);
 
-  renderButtons(els.categoryFilters, categories, "category");
-  renderButtons(els.statusFilters, statuses, "status");
+  renderSelect(els.categoryFilters, categories, "category", "Category filter");
+  renderSelect(els.statusFilters, statuses, "status", "Status filter");
   renderCards();
 }
 
@@ -164,11 +166,10 @@ function bindEvents() {
     renderCards();
   });
 
-  document.addEventListener("click", event => {
-    const button = event.target.closest("button[data-filter-key]");
-    if (!button) return;
-    const key = button.dataset.filterKey;
-    state[key] = button.dataset.filterValue;
+  document.addEventListener("change", event => {
+    const select = event.target.closest("select[data-filter-key]");
+    if (!select) return;
+    state[select.dataset.filterKey] = select.value;
     renderShell();
   });
 }
