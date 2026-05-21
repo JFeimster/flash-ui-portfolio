@@ -30,6 +30,31 @@ function escapeHtml(value = "") {
     .replaceAll("'", "&#039;");
 }
 
+function slugify(value = "") {
+  return String(value)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function encodePath(path = "", trailingSlash = false) {
+  const encoded = String(path).split("/").map(encodeURIComponent).join("/");
+  return `/${encoded}${trailingSlash ? "/" : ""}`;
+}
+
+function guessCategory(name = "") {
+  if (name.includes("Lead Magnet")) return "Lead Magnets";
+  if (name.includes("Funding Calculators") || name.includes("Calculator") || name.includes("Credit") || name.includes("Funding Route") || name.includes("CFO") || name.includes("CAC")) return "Funding Tools";
+  if (["Referral", "Partner", "Affiliate", "Darwin"].some(term => name.includes(term))) return "Partner Sites";
+  if (["Personal", "Founder", "Jester", "Radical Libertarian"].some(term => name.includes(term))) return "Personal Brand Sites";
+  if (name.includes("AI Agent")) return "AI Agent Libraries";
+  if (name.includes("Widget") || name.includes("Embed")) return "Widgets";
+  if (name.includes("From Idea to URL") || name.includes("Static Site Generator")) return "Static Site Factories";
+  if (["Editorial", "Bento", "Content Hub"].some(term => name.includes(term))) return "Content Hubs";
+  if (["CFO", "financing-widget", "moonshine-affiliate-hub"].some(term => name.includes(term))) return "Apps";
+  return "Experiments";
+}
+
 function isNestedApp(item) {
   return item.type === "nextjs-app" || Boolean(item.needsStandaloneDeploy);
 }
@@ -174,12 +199,126 @@ function bindEvents() {
   });
 }
 
+function buildRootHtmlEntry(fileName) {
+  const title = fileName.replace(/ index\.html$/i, "").replace(/\.html$/i, "");
+  return {
+    title: `sites ${title}`,
+    slug: `sites-${slugify(title)}`,
+    category: guessCategory(title),
+    type: "sites-root-html",
+    status: "portfolio-root-html",
+    source: "incremental-sync",
+    path: `sites/${fileName}`,
+    livePath: encodePath(`sites/${fileName}`),
+    hasIndex: true,
+    hasPackageJson: false,
+    hasZip: false,
+    hasMarkdown: false,
+    needsNormalization: true,
+    needsStandaloneDeploy: false,
+    notes: "Incremental-sync /sites root-level HTML file; normalize later."
+  };
+}
+
+function buildStaticEntry(tuple) {
+  const [name, subdir = "", hasZip = false, hasMarkdown = false] = tuple;
+  const livePath = subdir ? `sites/${name}/${subdir}` : `sites/${name}`;
+  return {
+    title: `sites ${name}`,
+    slug: `sites-${slugify(name)}`,
+    category: guessCategory(name),
+    type: "static-site",
+    status: "portfolio-site",
+    source: "incremental-sync",
+    path: `sites/${name}`,
+    livePath: encodePath(livePath, true),
+    hasIndex: true,
+    hasPackageJson: false,
+    hasZip: Boolean(hasZip),
+    hasMarkdown: Boolean(hasMarkdown),
+    needsNormalization: false,
+    needsStandaloneDeploy: false,
+    notes: "Incremental-sync /sites static asset."
+  };
+}
+
+function buildDocsEntry(name) {
+  return {
+    title: `sites ${name}`,
+    slug: `sites-${slugify(name)}`,
+    category: "Docs",
+    type: "docs-archive",
+    status: "archive-needs-review",
+    source: "incremental-sync",
+    path: `sites/${name}`,
+    livePath: "",
+    hasIndex: false,
+    hasPackageJson: false,
+    hasZip: false,
+    hasMarkdown: true,
+    needsNormalization: false,
+    needsStandaloneDeploy: false,
+    notes: "Incremental-sync docs/markdown asset; review later."
+  };
+}
+
+function buildAppEntry(tuple) {
+  const [name, folder, category = "Apps"] = tuple;
+  return {
+    title: `sites ${name}`,
+    slug: `sites-${slugify(name)}`,
+    category,
+    type: "nextjs-app",
+    status: "nested-app-needs-standalone-deploy",
+    source: "incremental-sync",
+    path: `sites/${folder}`,
+    livePath: "",
+    hasIndex: false,
+    hasPackageJson: true,
+    hasZip: false,
+    hasMarkdown: true,
+    needsNormalization: false,
+    needsStandaloneDeploy: true,
+    notes: "Incremental-sync nested app; deploy separately or promote later."
+  };
+}
+
+function expandBatch5Manifest(manifest) {
+  return [
+    ...(manifest.rootHtml || []).map(buildRootHtmlEntry),
+    ...(manifest.static || []).map(buildStaticEntry),
+    ...(manifest.docs || []).map(buildDocsEntry),
+    ...(manifest.apps || []).map(buildAppEntry)
+  ];
+}
+
+async function fetchJson(path) {
+  const response = await fetch(path, { cache: "no-store" });
+  if (!response.ok) throw new Error(`Registry request failed for ${path}: ${response.status}`);
+  return response.json();
+}
+
 async function init() {
   bindEvents();
   try {
-    const response = await fetch("/data/site-registry.json", { cache: "no-store" });
-    if (!response.ok) throw new Error(`Registry request failed: ${response.status}`);
-    state.items = await response.json();
+    const baseRegistry = await fetchJson("/data/site-registry.json");
+    let batch5Registry = [];
+
+    try {
+      const manifest = await fetchJson("/data/site-registry-batch-5-additions.json");
+      batch5Registry = expandBatch5Manifest(manifest);
+    } catch (batchError) {
+      console.warn(batchError);
+    }
+
+    const merged = new Map();
+    [...baseRegistry, ...batch5Registry].forEach(item => {
+      const key = item.path || item.slug || item.title;
+      if (!key) return;
+      merged.set(key, item);
+    });
+
+    state.items = Array.from(merged.values());
   } catch (error) {
     console.error(error);
     state.items = [];
