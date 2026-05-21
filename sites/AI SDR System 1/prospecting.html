@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Kinetic | Prospecting Lab</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --bg: #050505;
+            --surface: #0d0d0d;
+            --border: #222222;
+            --accent: #00f2ff;
+            --accent-soft: rgba(0, 242, 255, 0.1);
+            --text-main: #e0e0e0;
+            --text-dim: #777777;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 50% -20%, #112244 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, #0a0a0a 0%, transparent 100%);
+        }
+
+        .lab-container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            height: 90vh;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* --- Sidebar Navigation & Filters --- */
+        .sidebar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            overflow-y: auto;
+        }
+
+        .nav-header h2 {
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+
+        .nav-header p {
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .filter-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-group label {
+            font-size: 9px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            font-weight: 700;
+        }
+
+        .input-field {
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 10px;
+            color: #fff;
+            font-size: 12px;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .input-field:focus {
+            border-color: var(--accent);
+        }
+
+        .btn-action {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-action:hover {
+            background: var(--accent-soft);
+            box-shadow: 0 0 15px var(--accent-soft);
+        }
+
+        .btn-action.primary {
+            background: var(--accent);
+            color: #000;
+        }
+
+        /* --- Main Discovery Area --- */
+        .main-lab {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            gap: 20px;
+            overflow: hidden;
+        }
+
+        .status-bar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .engine-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+            font-family: var(--font-mono);
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .progress-container {
+            flex: 1;
+            margin: 0 40px;
+            height: 4px;
+            background: #1a1a1a;
+            border-radius: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: var(--accent);
+            width: 65%;
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        /* --- Discovery Grid --- */
+        .discovery-view {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            overflow: hidden;
+        }
+
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .panel-header h3 {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+        }
+
+        .count-badge {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            background: #1a1a1a;
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: var(--accent);
+        }
+
+        .lead-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .lead-card {
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .lead-card:hover {
+            border-color: #444;
+            transform: translateX(4px);
+        }
+
+        .lead-card.qualified {
+            border-left: 3px solid var(--success);
+        }
+
+        .lead-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .lead-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .lead-title {
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .lead-tags {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .tag {
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            background: #1a1a1a;
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+        }
+
+        .score {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .score.high { color: var(--success); }
+        .score.med { color: var(--warning); }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+        /* --- Footer Info --- */
+        .lab-footer {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-dim);
+        }
+
+        .data-stream {
+            color: var(--accent);
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="lab-container">
+        <!-- Discovery Controls -->
+        <aside class="sidebar">
+            <div class="nav-header">
+                <h2>Research Lab</h2>
+                <p>Lead Discovery & Enrichment</p>
+            </div>
+
+            <div class="filter-section">
+                <div class="input-group">
+                    <label>Target Geography</label>
+                    <input type="text" class="input-field" value="Austin, TX | San Francisco, CA">
+                </div>
+                <div class="input-group">
+                    <label>Industry Vertical</label>
+                    <input type="text" class="input-field" value="SaaS, FinTech, Web3">
+                </div>
+                <div class="input-group">
+                    <label>Employee Headcount</label>
+                    <select class="input-field" style="width: 100%; background: #000;">
+                        <option>11-50 employees</option>
+                        <option>51-200 employees</option>
+                        <option>201-500 employees</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Tech Stack Requirement</label>
+                    <input type="text" class="input-field" placeholder="e.g. Stripe, AWS, HubSpot">
+                </div>
+            </div>
+
+            <div class="filter-section" style="margin-top: auto;">
+                <button class="btn-action primary">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    Begin Crawl
+                </div>
+                <button class="btn-action">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Export Batch
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-lab">
+            
+            <!-- Global Discovery Status -->
+            <div class="status-bar">
+                <div class="engine-status">
+                    <div class="pulse-dot"></div>
+                    <span>CRAWLER_ACTIVE: 14.2 req/s</span>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-fill"></div>
+                </div>
+                <div style="font-size: 11px; font-family: var(--font-mono); color: var(--text-dim);">
+                    ENRICHING: 492/750
+                </div>
+            </div>
+
+            <div class="discovery-view">
+                <!-- Raw Stream -->
+                <section class="panel">
+                    <div class="panel-header">
+                        <h3>Raw Discovery Stream</h3>
+                        <span class="count-badge">842 found</span>
+                    </div>
+                    <div class="lead-list">
+                        <div class="lead-card">
+                            <div class="lead-meta">
+                                <div>
+                                    <div class="lead-name">Solaris Systems</div>
+                                    <div class="lead-title">Infrastructure • Series B</div>
+                                </div>
+                                <span class="score med">52%</span>
+                            </div>
+                            <div class="lead-tags">
+                                <span class="tag">LinkedIn</span>
+                                <span class="tag">Apollo</span>
+                                <span class="tag">Crunchbase</span>
+                            </div>
+                        </div>
+                        <div class="lead-card">
+                            <div class="lead-meta">
+                                <div>
+                                    <div class="lead-name">Quantum Ledger</div>
+                                    <div class="lead-title">Blockchain • Bootstrapped</div>
+                                </div>
+                                <span class="score med">38%</span>
+                            </div>
+                            <div class="lead-tags">
+                                <span class="tag">Twitter/X</span>
+                                <span class="tag">BuiltWith</span>
+                            </div>
+                        </div>
+                        <div class="lead-card" style="opacity: 0.5;">
+                            <div class="lead-meta">
+                                <div>
+                                    <div class="lead-name">Vertex Digital</div>
+                                    <div class="lead-title">Agency • Local</div>
+                                </div>
+                                <span class="score">12%</span>
+                            </div>
+                        </div>
+                        <div class="lead-card">
+                            <div class="lead-meta">
+                                <div>
+                                    <div class="lead-name">Neo-Bank Labs</div>
+                                    <div class="lead-title">Fintech • Series A</div>
+                                </div>
+                                <span class="score high">89%</span>
+                            </div>
+                            <div class="lead-tags">
+                                <span class="tag">Y-Combinator</span>
+                                <span class="tag">Stripe User</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Qualified Pipeline -->
+                <section class="panel">
+                    <div class="panel-header">
+                        <h3>Qualified Prospects</h3>
+                        <span class="count-badge" style="color: var(--success);">42 Ready</span>
+                    </div>
+                    <div class="lead-list">
+                        <div class="lead-card qualified">
+                            <div class="lead-meta">
+                                <div>
+                                    <div class="lead-name">Sarah Jenkins</div>
+                                    <div class="lead-title">VP Engineering @ CloudFlow</div>
+                                </div>
+                                <span class="score high">98%</span>
+                            </div>
+                            <div style="font-size: 10px; color: var(--accent); margin-bottom: 8px;">Trigger: Recently hired 3 DevOps Eng</div>
+                            <div class="lead-tags">
+                                <span class="tag">Direct Email</span>
+                                <span class="tag">Verified</span>
+                                <span class="tag" style="color: var(--success);">In-Profile</span>
+                            </div>
+                        </div>
+
+                        <div class="lead-card qualified">
+                            <div class="lead-meta">
+                                <div>
+                                    <div class="lead-name">Marcus Thorne</div>
+                                    <div class="lead-title">CTO @ NexusPay</div>
+                                </div>
+                                <span class="score high">94%</span>
+                            </div>
+                            <div style="font-size: 10px; color: var(--accent); margin-bottom: 8px;">Trigger: Mentioned "Scaling Latency" on Podcast</div>
+                            <div class="lead-tags">
+                                <span class="tag">Direct Email</span>
+                                <span class="tag" style="color: var(--success);">HQ Phone</span>
+                            </div>
+                        </div>
+
+                        <div class="lead-card qualified">
+                            <div class="lead-meta">
+                                <div>
+                                    <div class="lead-name">Elena Rodriguez</div>
+                                    <div class="lead-title">Founder @ GreenCap</div>
+                                </div>
+                                <span class="score high">91%</span>
+                            </div>
+                            <div style="font-size: 10px; color: var(--accent); margin-bottom: 8px;">Trigger: Just raised $12M Series A</div>
+                            <div class="lead-tags">
+                                <span class="tag">LinkedIn</span>
+                                <span class="tag">Mutual Connect</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="lab-footer">
+                <div class="data-stream">
+                    [0xAD4] Enrichment node: active // Fetching socials for 'Marcus Thorne'...
+                </div>
+                <div>
+                    SYSTEM_STABILITY: 99.9% // API_LATENCY: 124ms
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

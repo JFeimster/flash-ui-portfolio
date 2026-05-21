@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Kinetic | Sequence Architect</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --bg: #050505;
+            --surface: #0d0d0d;
+            --border: #222222;
+            --accent: #00f2ff;
+            --accent-soft: rgba(0, 242, 255, 0.1);
+            --text-main: #e0e0e0;
+            --text-dim: #777777;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 50% -20%, #112244 0%, transparent 50%),
+                radial-gradient(circle at 0% 0%, #0a0a0a 0%, transparent 100%);
+        }
+
+        .sdr-container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Sidebar --- */
+        .config-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .brand-header h1 {
+            font-size: 14px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .brand-header p {
+            font-size: 11px;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            font-weight: 600;
+        }
+
+        .input-field, .select-field {
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .input-field:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-soft);
+        }
+
+        /* --- Architect Canvas --- */
+        .architect-canvas {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .canvas-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface);
+            padding: 16px 24px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .canvas-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-badge {
+            font-size: 9px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .workflow-editor {
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            height: 580px;
+            position: relative;
+            overflow: hidden;
+            background-image: radial-gradient(var(--border) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        /* --- Flow Nodes --- */
+        .node-flow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            gap: 30px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .node {
+            width: 280px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            position: relative;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .node:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .node-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .node-icon {
+            width: 24px;
+            height: 24px;
+            background: #1a1a1a;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+        }
+
+        .node-type {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .node-content {
+            font-size: 13px;
+            color: var(--text-main);
+            font-family: var(--font-mono);
+        }
+
+        .node-meta {
+            font-size: 10px;
+            color: var(--text-dim);
+            margin-top: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Connectors */
+        .connector-line {
+            width: 2px;
+            height: 30px;
+            background: var(--border);
+            position: relative;
+        }
+
+        .connector-line::after {
+            content: '▼';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: var(--border);
+        }
+
+        .wait-label {
+            background: #000;
+            border: 1px solid var(--border);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 10px;
+            color: var(--warning);
+            font-weight: 600;
+            z-index: 2;
+        }
+
+        /* --- Integration Triggers --- */
+        .trigger-node {
+            border-style: dashed;
+            background: rgba(0, 255, 136, 0.03);
+        }
+
+        .trigger-node:hover {
+            border-color: var(--success);
+        }
+
+        .trigger-node .node-icon {
+            color: var(--success);
+        }
+
+        /* Actions Bar */
+        .actions-bar {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-action {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-action:hover {
+            background: var(--accent);
+            color: #000;
+            border-color: var(--accent);
+        }
+
+        .btn-save {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        /* Custom Scrollbar */
+        .node-flow::-webkit-scrollbar { width: 4px; }
+        .node-flow::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="sdr-container">
+        <!-- Sidebar Config -->
+        <aside class="config-panel">
+            <header class="brand-header">
+                <h1>Architect</h1>
+                <p>Logic & Trigger Designer v1.2</p>
+            </header>
+
+            <div class="input-group">
+                <label>Sequence Name</label>
+                <input type="text" class="input-field" value="Fintech Founders Alpha">
+            </div>
+
+            <div class="input-group">
+                <label>Send Schedule</label>
+                <select class="select-field">
+                    <option>Business Hours (EST)</option>
+                    <option>Weekends Only</option>
+                    <option>Global 24/7</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Max Daily Volume</label>
+                <input type="number" class="input-field" value="50">
+            </div>
+
+            <div class="input-group">
+                <label>Safety Throttle</label>
+                <div style="display: flex; align-items: center; gap: 10px; padding: 10px 0;">
+                    <input type="checkbox" checked>
+                    <span style="font-size: 11px; color: var(--text-dim);">Enable AI-based rate limiting</span>
+                </div>
+            </div>
+
+            <div style="margin-top: auto; border-top: 1px solid var(--border); padding-top: 20px;">
+                <label style="font-size: 9px; color: var(--text-dim); display: block; margin-bottom: 10px; text-transform: uppercase;">Active Triggers</label>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <div style="font-size: 11px; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                        <img src="https://cdn.worldvectorlogo.com/logos/notion-2.svg" width="14" style="filter:invert(1)">
+                        Notion: Sync CRM
+                    </div>
+                    <div style="font-size: 11px; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                        <img src="https://cdn.worldvectorlogo.com/logos/make-com.svg" width="14">
+                        Make.com: Webhook 0x1
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Architect Main -->
+        <main class="architect-canvas">
+            
+            <div class="canvas-header">
+                <div class="canvas-title">
+                    <span class="status-badge">Live</span>
+                    <h2 style="font-size: 16px; font-weight: 600;">Main Outreach Flow</h2>
+                </div>
+                <button class="btn-save">Deploy Sequence</button>
+            </div>
+
+            <div class="workflow-editor">
+                <div class="node-flow">
+                    
+                    <!-- Step 1 -->
+                    <div class="node">
+                        <div class="node-header">
+                            <div class="node-icon">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                            </div>
+                            <span class="node-type">Email Step 01</span>
+                        </div>
+                        <div class="node-content">Initial Research Hook</div>
+                        <div class="node-meta">
+                            <span>Template: Intro_v4</span>
+                            <span style="color: var(--accent);">Personalized</span>
+                        </div>
+                    </div>
+
+                    <div class="wait-label">Wait 48 Hours</div>
+                    <div class="connector-line"></div>
+
+                    <!-- Step 2 -->
+                    <div class="node">
+                        <div class="node-header">
+                            <div class="node-icon">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                            </div>
+                            <span class="node-type">Follow-up 01</span>
+                        </div>
+                        <div class="node-content">Case Study: Fintech Scaling</div>
+                        <div class="node-meta">
+                            <span>Template: Social_Proof</span>
+                            <span style="color: var(--success);">Optimized</span>
+                        </div>
+                    </div>
+
+                    <div class="wait-label">On Response</div>
+                    <div class="connector-line"></div>
+
+                    <!-- Trigger Node -->
+                    <div class="node trigger-node">
+                        <div class="node-header">
+                            <div class="node-icon">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                            </div>
+                            <span class="node-type">External Trigger</span>
+                        </div>
+                        <div class="node-content">POST: make.com/hook/0x88f</div>
+                        <div class="node-meta">
+                            <span>Notion Sync: Active</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Floating Toolbar -->
+                <div class="actions-bar">
+                    <button class="btn-action">+ Add Email</button>
+                    <button class="btn-action">+ Add Delay</button>
+                    <button class="btn-action">+ Add Webhook</button>
+                </div>
+            </div>
+
+            <!-- Footer Stats -->
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+                <div style="display: flex; gap: 20px;">
+                    <span style="font-size: 10px; color: var(--text-dim); text-transform: uppercase;">Sequence ID: SEQ-9942</span>
+                    <span style="font-size: 10px; color: var(--text-dim); text-transform: uppercase;">Last Edited: 2m ago</span>
+                </div>
+                <div style="font-size: 10px; color: var(--success); font-family: var(--font-mono);">
+                    LOGIC_GATE_VERIFIED // STABLE_FLOW
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Kinetic | Sequence Architect</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --bg: #050505;
+            --surface: #0d0d0d;
+            --border: #222222;
+            --accent: #00f2ff;
+            --accent-soft: rgba(0, 242, 255, 0.1);
+            --text-main: #e0e0e0;
+            --text-dim: #777777;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 50% -20%, #112244 0%, transparent 50%),
+                radial-gradient(circle at 0% 0%, #0a0a0a 0%, transparent 100%);
+        }
+
+        .sdr-container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Sidebar --- */
+        .config-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .brand-header h1 {
+            font-size: 14px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .brand-header p {
+            font-size: 11px;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            font-weight: 600;
+        }
+
+        .input-field, .select-field {
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .input-field:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-soft);
+        }
+
+        /* --- Architect Canvas --- */
+        .architect-canvas {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .canvas-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface);
+            padding: 16px 24px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .canvas-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-badge {
+            font-size: 9px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .workflow-editor {
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            height: 580px;
+            position: relative;
+            overflow: hidden;
+            background-image: radial-gradient(var(--border) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        /* --- Flow Nodes --- */
+        .node-flow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            gap: 30px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .node {
+            width: 280px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            position: relative;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .node:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .node-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .node-icon {
+            width: 24px;
+            height: 24px;
+            background: #1a1a1a;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+        }
+
+        .node-type {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .node-content {
+            font-size: 13px;
+            color: var(--text-main);
+            font-family: var(--font-mono);
+        }
+
+        .node-meta {
+            font-size: 10px;
+            color: var(--text-dim);
+            margin-top: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Connectors */
+        .connector-line {
+            width: 2px;
+            height: 30px;
+            background: var(--border);
+            position: relative;
+        }
+
+        .connector-line::after {
+            content: '▼';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: var(--border);
+        }
+
+        .wait-label {
+            background: #000;
+            border: 1px solid var(--border);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 10px;
+            color: var(--warning);
+            font-weight: 600;
+            z-index: 2;
+        }
+
+        /* --- Integration Triggers --- */
+        .trigger-node {
+            border-style: dashed;
+            background: rgba(0, 255, 136, 0.03);
+        }
+
+        .trigger-node:hover {
+            border-color: var(--success);
+        }
+
+        .trigger-node .node-icon {
+            color: var(--success);
+        }
+
+        /* Actions Bar */
+        .actions-bar {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-action {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-action:hover {
+            background: var(--accent);
+            color: #000;
+            border-color: var(--accent);
+        }
+
+        .btn-save {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        /* Custom Scrollbar */
+        .node-flow::-webkit-scrollbar { width: 4px; }
+        .node-flow::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="sdr-container">
+        <!-- Sidebar Config -->
+        <aside class="config-panel">
+            <header class="brand-header">
+                <h1>Architect</h1>
+                <p>Logic & Trigger Designer v1.2</p>
+            </header>
+
+            <div class="input-group">
+                <label>Sequence Name</label>
+                <input type="text" class="input-field" value="Fintech Founders Alpha">
+            </div>
+
+            <div class="input-group">
+                <label>Send Schedule</label>
+                <select class="select-field">
+                    <option>Business Hours (EST)</option>
+                    <option>Weekends Only</option>
+                    <option>Global 24/7</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Max Daily Volume</label>
+                <input type="number" class="input-field" value="50">
+            </div>
+
+            <div class="input-group">
+                <label>Safety Throttle</label>
+                <div style="display: flex; align-items: center; gap: 10px; padding: 10px 0;">
+                    <input type="checkbox" checked>
+                    <span style="font-size: 11px; color: var(--text-dim);">Enable AI-based rate limiting</span>
+                </div>
+            </div>
+
+            <div style="margin-top: auto; border-top: 1px solid var(--border); padding-top: 20px;">
+                <label style="font-size: 9px; color: var(--text-dim); display: block; margin-bottom: 10px; text-transform: uppercase;">Active Triggers</label>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <div style="font-size: 11px; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                        <img src="https://cdn.worldvectorlogo.com/logos/notion-2.svg" width="14" style="filter:invert(1)">
+                        Notion: Sync CRM
+                    </div>
+                    <div style="font-size: 11px; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                        <img src="https://cdn.worldvectorlogo.com/logos/make-com.svg" width="14">
+                        Make.com: Webhook 0x1
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Architect Main -->
+        <main class="architect-canvas">
+            
+            <div class="canvas-header">
+                <div class="canvas-title">
+                    <span class="status-badge">Live</span>
+                    <h2 style="font-size: 16px; font-weight: 600;">Main Outreach Flow</h2>
+                </div>
+                <button class="btn-save">Deploy Sequence</button>
+            </div>
+
+            <div class="workflow-editor">
+                <div class="node-flow">
+                    
+                    <!-- Step 1 -->
+                    <div class="node">
+                        <div class="node-header">
+                            <div class="node-icon">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                            </div>
+                            <span class="node-type">Email Step 01</span>
+                        </div>
+                        <div class="node-content">Initial Research Hook</div>
+                        <div class="node-meta">
+                            <span>Template: Intro_v4</span>
+                            <span style="color: var(--accent);">Personalized</span>
+                        </div>
+                    </div>
+
+                    <div class="wait-label">Wait 48 Hours</div>
+                    <div class="connector-line"></div>
+
+                    <!-- Step 2 -->
+                    <div class="node">
+                        <div class="node-header">
+                            <div class="node-icon">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                            </div>
+                            <span class="node-type">Follow-up 01</span>
+                        </div>
+                        <div class="node-content">Case Study: Fintech Scaling</div>
+                        <div class="node-meta">
+                            <span>Template: Social_Proof</span>
+                            <span style="color: var(--success);">Optimized</span>
+                        </div>
+                    </div>
+
+                    <div class="wait-label">On Response</div>
+                    <div class="connector-line"></div>
+
+                    <!-- Trigger Node -->
+                    <div class="node trigger-node">
+                        <div class="node-header">
+                            <div class="node-icon">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                            </div>
+                            <span class="node-type">External Trigger</span>
+                        </div>
+                        <div class="node-content">POST: make.com/hook/0x88f</div>
+                        <div class="node-meta">
+                            <span>Notion Sync: Active</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Floating Toolbar -->
+                <div class="actions-bar">
+                    <button class="btn-action">+ Add Email</button>
+                    <button class="btn-action">+ Add Delay</button>
+                    <button class="btn-action">+ Add Webhook</button>
+                </div>
+            </div>
+
+            <!-- Footer Meta -->
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+                <div style="display: flex; gap: 20px;">
+                    <span style="font-size: 10px; color: var(--text-dim); text-transform: uppercase;">Sequence ID: SEQ-9942</span>
+                    <span style="font-size: 10px; color: var(--text-dim); text-transform: uppercase;">Last Edited: 2m ago</span>
+                </div>
+                <div style="font-size: 10px; color: var(--success); font-family: var(--font-mono);">
+                    LOGIC_GATE_VERIFIED // STABLE_FLOW
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,226 @@
+.workflow-canvas {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    padding: 20px;
+    position: relative;
+    max-height: 500px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+
+.workflow-canvas::-webkit-scrollbar {
+    width: 4px;
+}
+
+.workflow-canvas::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
+}
+
+/* Node Connector Lines */
+.workflow-canvas::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50px;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--accent) 0%, var(--border) 100%);
+    opacity: 0.3;
+    z-index: 0;
+}
+
+/* Base Node Styling */
+.wf-node {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 520px;
+    margin-left: 30px;
+    position: relative;
+    z-index: 1;
+    transition: var(--transition);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.wf-node:hover {
+    border-color: var(--accent);
+    transform: translateX(4px);
+}
+
+.wf-node::after {
+    content: '';
+    position: absolute;
+    left: -32px;
+    top: 50%;
+    width: 32px;
+    height: 2px;
+    background: var(--border);
+}
+
+/* Node Header */
+.wf-node-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255,255,255,0.02);
+    border-radius: 12px 12px 0 0;
+}
+
+.wf-node-type {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+}
+
+.wf-node-type svg {
+    color: var(--accent);
+}
+
+/* Node Content */
+.wf-node-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.wf-param-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.wf-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    min-width: 80px;
+}
+
+.wf-val-chip {
+    background: #000;
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+}
+
+/* Specific Node Themes */
+.node-delay { border-left: 3px solid #ffcc00; }
+.node-email { border-left: 3px solid var(--accent); }
+.node-trigger { border-left: 3px solid var(--success); }
+.node-webhook { border-left: 3px solid #6366f1; }
+
+/* Logic Trigger Indicators */
+.wf-trigger-badge {
+    font-size: 9px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid rgba(0, 242, 255, 0.2);
+}
+
+/* Interaction States */
+.wf-node.is-active {
+    border-color: var(--accent);
+    box-shadow: 0 0 20px var(--accent-soft);
+}
+
+.wf-node.is-active .wf-node-type {
+    color: var(--accent);
+}
+
+/* Control Inputs for Workflow */
+.wf-input-small {
+    background: #111;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: #fff;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    width: 60px;
+    outline: none;
+}
+
+.wf-input-small:focus {
+    border-color: var(--accent);
+}
+
+/* External Integrations styling inside nodes */
+.wf-integration-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.05);
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--text-main);
+}
+
+.wf-integration-pill img {
+    width: 14px;
+    height: 14px;
+}
+
+/* Step Counter (the node dot on the line) */
+.wf-step-marker {
+    position: absolute;
+    left: 45px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    background: var(--bg);
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    z-index: 2;
+    box-shadow: 0 0 10px var(--accent);
+}
+
+/* Animations */
+@keyframes flowPulse {
+    0% { box-shadow: 0 0 0 0 rgba(0, 242, 255, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(0, 242, 255, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 242, 255, 0); }
+}
+
+.wf-node.executing {
+    animation: flowPulse 2s infinite;
+}
+
+/* Empty State / Add Node */
+.wf-add-node {
+    margin-left: 30px;
+    border: 1px dashed var(--border);
+    padding: 16px;
+    border-radius: 12px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.wf-add-node:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-soft);
+}

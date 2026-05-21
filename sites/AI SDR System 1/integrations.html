@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integrations | Carbon Kinetic</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --bg: #050505;
+            --surface: #0d0d0d;
+            --border: #222222;
+            --accent: #00f2ff;
+            --accent-soft: rgba(0, 242, 255, 0.1);
+            --text-main: #e0e0e0;
+            --text-dim: #777777;
+            --success: #00ff88;
+            --warning: #ffb800;
+            --danger: #ff4444;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 50% -20%, #112244 0%, transparent 50%),
+                radial-gradient(circle at 0% 0%, #0a0a0a 0%, transparent 100%);
+        }
+
+        .sdr-container {
+            width: 100%;
+            max-width: 1100px;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Sidebar Navigation --- */
+        .sidebar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .brand-header h1 {
+            font-size: 14px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--text-dim);
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.03);
+            color: #fff;
+        }
+
+        .nav-item.active {
+            background: var(--accent-soft);
+            color: var(--accent);
+            border-color: rgba(0, 242, 255, 0.2);
+        }
+
+        /* --- Integration Grid --- */
+        .main-hub {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .hub-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hub-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .hub-header p {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+
+        .integration-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 20px;
+        }
+
+        .int-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transition: var(--transition);
+        }
+
+        .int-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .int-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .int-info {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .int-logo {
+            width: 40px;
+            height: 40px;
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+        }
+
+        .int-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .int-meta h3 {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .int-meta span {
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .status-badge {
+            font-size: 9px;
+            text-transform: uppercase;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.connected {
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        .status-badge.disconnected {
+            background: rgba(255, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(255, 68, 68, 0.2);
+        }
+
+        .status-badge.pending {
+            background: rgba(255, 184, 0, 0.1);
+            color: var(--warning);
+            border: 1px solid rgba(255, 184, 0, 0.2);
+        }
+
+        .int-config {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 4px;
+        }
+
+        .input-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-wrap label {
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .key-input {
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 8px 12px;
+            color: #fff;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            width: 100%;
+            outline: none;
+        }
+
+        .key-input:focus {
+            border-color: var(--accent);
+        }
+
+        .int-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        .btn-sm {
+            padding: 8px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #000;
+            border: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--text-dim);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--success);
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 4px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+        @media (max-width: 900px) {
+            .sdr-container { grid-template-columns: 1fr; }
+            .integration-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sdr-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <header class="brand-header">
+                <h1>Kinetic SDR</h1>
+            </header>
+
+            <nav class="nav-links">
+                <a href="#" class="nav-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    Engine Console
+                </a>
+                <a href="#" class="nav-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    Leads Manager
+                </a>
+                <a href="#" class="nav-item active">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                    API Integrations
+                </a>
+                <a href="#" class="nav-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    Settings
+                </a>
+            </nav>
+
+            <div style="margin-top: auto;">
+                <div style="font-size: 10px; color: var(--text-dim); margin-bottom: 8px;">SYSTEM STATUS</div>
+                <div style="display: flex; align-items: center; font-size: 11px; color: var(--success);">
+                    <span class="status-dot"></span> All Nodes Operational
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-hub">
+            <header class="hub-header">
+                <div>
+                    <h2>Integration Hub</h2>
+                    <p>Manage authentication and synchronization for your outreach stack.</p>
+                </div>
+                <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-dim);">
+                    Session: 0x88f21_active
+                </div>
+            </header>
+
+            <div class="integration-grid">
+                <!-- Gmail -->
+                <div class="int-card">
+                    <div class="int-card-top">
+                        <div class="int-info">
+                            <div class="int-logo"><img src="https://cdn.worldvectorlogo.com/logos/gmail-icon.svg"></div>
+                            <div class="int-meta">
+                                <h3>Gmail API</h3>
+                                <span>Email Sending & Monitoring</span>
+                            </div>
+                        </div>
+                        <div class="status-badge connected">Connected</div>
+                    </div>
+                    <div class="int-config">
+                        <div class="input-wrap">
+                            <label>OAuth Account</label>
+                            <input type="text" class="key-input" value="outreach@carbon-kinetic.ai" readonly>
+                        </div>
+                    </div>
+                    <div class="int-actions">
+                        <button class="btn-sm btn-outline">Settings</button>
+                        <button class="btn-sm btn-outline" style="color: var(--danger);">Revoke</button>
+                    </div>
+                </div>
+
+                <!-- OpenAI -->
+                <div class="int-card">
+                    <div class="int-card-top">
+                        <div class="int-info">
+                            <div class="int-logo"><img src="https://cdn.worldvectorlogo.com/logos/openai-2.svg"></div>
+                            <div class="int-meta">
+                                <h3>OpenAI / GPT-4o</h3>
+                                <span>Research & Personalization</span>
+                            </div>
+                        </div>
+                        <div class="status-badge connected">Active</div>
+                    </div>
+                    <div class="int-config">
+                        <div class="input-wrap">
+                            <label>API Key</label>
+                            <input type="password" class="key-input" value="sk-proj-••••••••••••••••">
+                        </div>
+                    </div>
+                    <div class="int-actions">
+                        <button class="btn-sm btn-primary">Update Key</button>
+                        <button class="btn-sm btn-outline">Usage</button>
+                    </div>
+                </div>
+
+                <!-- Notion -->
+                <div class="int-card">
+                    <div class="int-card-top">
+                        <div class="int-info">
+                            <div class="int-logo"><img src="https://cdn.worldvectorlogo.com/logos/notion-2.svg"></div>
+                            <div class="int-meta">
+                                <h3>Notion CRM</h3>
+                                <span>Lead Database Sync</span>
+                            </div>
+                        </div>
+                        <div class="status-badge pending">Action Req</div>
+                    </div>
+                    <div class="int-config">
+                        <div class="input-wrap">
+                            <label>Database ID</label>
+                            <input type="text" class="key-input" placeholder="Enter Database ID...">
+                        </div>
+                    </div>
+                    <div class="int-actions">
+                        <button class="btn-sm btn-primary">Connect Workspace</button>
+                    </div>
+                </div>
+
+                <!-- Gemini -->
+                <div class="int-card">
+                    <div class="int-card-top">
+                        <div class="int-info">
+                            <div class="int-logo"><img src="https://cdn.worldvectorlogo.com/logos/google-gemini-icon.svg"></div>
+                            <div class="int-meta">
+                                <h3>Google Gemini</h3>
+                                <span>High-Speed Inference</span>
+                            </div>
+                        </div>
+                        <div class="status-badge connected">Connected</div>
+                    </div>
+                    <div class="int-config">
+                        <div class="input-wrap">
+                            <label>Model Version</label>
+                            <input type="text" class="key-input" value="Gemini 1.5 Pro (Latest)" readonly>
+                        </div>
+                    </div>
+                    <div class="int-actions">
+                        <button class="btn-sm btn-outline">Settings</button>
+                        <button class="btn-sm btn-outline">Test Latency</button>
+                    </div>
+                </div>
+
+                <!-- Apps Script -->
+                <div class="int-card">
+                    <div class="int-card-top">
+                        <div class="int-info">
+                            <div class="int-logo">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--text-main)"><path d="M12 2L2 19.77h20L12 2zm0 3.77l6.86 12.14H5.14L12 5.77z"></path></svg>
+                            </div>
+                            <div class="int-meta">
+                                <h3>Apps Script</h3>
+                                <span>Custom Workflow Triggers</span>
+                            </div>
+                        </div>
+                        <div class="status-badge disconnected">Offline</div>
+                    </div>
+                    <div class="int-config">
+                        <div class="input-wrap">
+                            <label>Deployment URL</label>
+                            <input type="text" class="key-input" placeholder="https://script.google.com/...">
+                        </div>
+                    </div>
+                    <div class="int-actions">
+                        <button class="btn-sm btn-primary">Authorize</button>
+                    </div>
+                </div>
+
+                <!-- Anthropic -->
+                <div class="int-card">
+                    <div class="int-card-top">
+                        <div class="int-info">
+                            <div class="int-logo">
+                                <span style="font-weight: 800; color: #fff; font-size: 18px;">A</span>
+                            </div>
+                            <div class="int-meta">
+                                <h3>Anthropic / Claude</h3>
+                                <span>Content Drafting</span>
+                            </div>
+                        </div>
+                        <div class="status-badge disconnected">Not Linked</div>
+                    </div>
+                    <div class="int-config">
+                        <div class="input-wrap">
+                            <label>API Key</label>
+                            <input type="password" class="key-input" placeholder="sk-ant-...">
+                        </div>
+                    </div>
+                    <div class="int-actions">
+                        <button class="btn-sm btn-primary">Initialize</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Global Footer Meta -->
+            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--border); margin-top: auto;">
+                <div style="display: flex; gap: 20px;">
+                    <span style="font-size: 10px; color: var(--text-dim); text-transform: uppercase;">Total Active APIs: 03</span>
+                    <span style="font-size: 10px; color: var(--text-dim); text-transform: uppercase;">Sync Int: 5m</span>
+                </div>
+                <div style="font-size: 10px; color: var(--accent); font-family: var(--font-mono);">
+                    ENCRYPTION_AES_256_GCM
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>
