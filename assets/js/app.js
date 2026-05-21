@@ -103,7 +103,8 @@ function renderCards() {
     const deployable = isDeployable(item);
     const nested = isNestedApp(item);
     const archive = isArchive(item);
-    const openButton = item.livePath
+    const cardClass = nested ? " app-card" : archive ? " archive-card" : !deployable ? " review-card" : "";
+    const openButton = deployable
       ? `<a class="btn primary" href="${escapeHtml(item.livePath)}" target="_blank" rel="noreferrer">Open Site</a>`
       : "";
     const sourceButton = `<a class="btn" href="${escapeHtml(sourceUrl(item))}" target="_blank" rel="noreferrer">View Source Path</a>`;
@@ -112,7 +113,7 @@ function renderCards() {
     const archiveBadge = archive ? `<span class="badge archive">Archive</span>` : "";
 
     return `
-      <article class="card">
+      <article class="card${cardClass}">
         <div class="card-top">
           <h2>${escapeHtml(item.title)}</h2>
           <div class="badge-stack">${reviewBadge}${nestedBadge}${archiveBadge}</div>
