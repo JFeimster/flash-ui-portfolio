@@ -1,0 +1,112 @@
+{
+  "batch": "Batch 3",
+  "purpose": "Audit archive, ZIP, docs, and review-needed assets without extracting, deleting, moving, or converting files.",
+  "rules": {
+    "delete_files": false,
+    "move_files": false,
+    "extract_zip_files": false,
+    "convert_nextjs_apps": false,
+    "create_standalone_repos": false,
+    "deploy_new_projects": false
+  },
+  "summary": {
+    "registry_entries_reviewed": 58,
+    "archive_or_review_entries": 3,
+    "nested_app_entries": 3,
+    "recommended_immediate_extractions": 0,
+    "recommended_next_step": "Run a deeper file-tree inventory for ZIP contents and orphaned /sites paths before extraction."
+  },
+  "archive_entries": [
+    {
+      "title": "Flash UI ZIP Archives",
+      "slug": "flash-ui-zip-archives",
+      "category": "Experiments",
+      "type": "zip-archive",
+      "status": "archive-needs-review",
+      "source": "bulk-import",
+      "path": "sites/Flash UI ZIP Archives",
+      "livePath": "",
+      "hasIndex": false,
+      "hasPackageJson": false,
+      "hasZip": true,
+      "hasMarkdown": false,
+      "recommended_action": "inventory-before-extraction",
+      "priority": "medium",
+      "risk_notes": "ZIP files may contain duplicate exports, nested build systems, malformed paths, junk files, or generated app code. Do not extract directly into production paths until contents are inventoried.",
+      "next_batch_instruction": "List ZIP filenames, sizes, root folders, whether each contains index.html, package.json, markdown files, or nested archives. Then decide extract, archive-only, standalone app, or duplicate-ignore."
+    },
+    {
+      "title": "Fash UI Templates Notion",
+      "slug": "fash-ui-templates-notion",
+      "category": "Docs",
+      "type": "docs-archive",
+      "status": "archive-needs-review",
+      "source": "existing-root-folder",
+      "path": "1. Fash UI Templates (Notion)",
+      "livePath": "",
+      "hasIndex": false,
+      "hasPackageJson": false,
+      "hasZip": false,
+      "hasMarkdown": true,
+      "recommended_action": "convert-docs-to-browseable-index",
+      "priority": "medium",
+      "risk_notes": "Notion exports may include duplicate markdown pages, generated assets, and internal naming that is not production-friendly.",
+      "next_batch_instruction": "Create a docs index page only after confirming markdown filenames and whether they duplicate registry assets."
+    },
+    {
+      "title": "sites Fash UI Templates Notion",
+      "slug": "sites-fash-ui-templates-notion",
+      "category": "Docs",
+      "type": "docs-archive",
+      "status": "archive-needs-review",
+      "source": "bulk-import",
+      "path": "sites/1. Fash UI Templates (Notion)",
+      "livePath": "",
+      "hasIndex": false,
+      "hasPackageJson": false,
+      "hasZip": false,
+      "hasMarkdown": true,
+      "recommended_action": "dedupe-against-root-docs-archive",
+      "priority": "low",
+      "risk_notes": "Likely duplicate or near-duplicate of the root Notion export. Preserve until confirmed.",
+      "next_batch_instruction": "Compare file names and checksums against the root docs archive before converting or removing in a later approval-gated cleanup batch."
+    }
+  ],
+  "nested_app_entries": [
+    {
+      "title": "Financing Widget",
+      "slug": "financing-widget",
+      "path": "financing-widget",
+      "type": "nextjs-app",
+      "status": "nested-app-needs-standalone-deploy",
+      "recommended_action": "standalone-project-review",
+      "notes": "Keep indexed as a card, but do not expose an Open Site button from the static portfolio shell."
+    },
+    {
+      "title": "Moonshine Affiliate Hub",
+      "slug": "moonshine-affiliate-hub",
+      "path": "moonshine-affiliate-hub",
+      "type": "nextjs-app",
+      "status": "nested-app-needs-standalone-deploy",
+      "recommended_action": "standalone-project-review",
+      "notes": "Keep indexed as a card, but do not expose an Open Site button from the static portfolio shell."
+    },
+    {
+      "title": "Moonshine Editorial Bento",
+      "slug": "moonshine-editorial-bento",
+      "path": "Moonshine Editorial Bento",
+      "type": "nextjs-app",
+      "status": "nested-app-needs-standalone-deploy",
+      "recommended_action": "standalone-project-review",
+      "notes": "Review whether this should remain an app, be exported as static, or be promoted to a separate repo."
+    }
+  ],
+  "normalization_policy": {
+    "static_site_target": "sites/[clean-slug]/",
+    "required_static_entry": "index.html",
+    "optional_static_files": ["style.css", "styles.css", "script.js", "app.js", "assets/"],
+    "root_html_policy": "Preserve root files until intentionally copied or moved in a cleanup batch.",
+    "zip_policy": "Do not extract ZIPs in bulk. Inventory first, extract only selected winners later.",
+    "docs_policy": "Do not convert Notion/Markdown exports until duplicate paths and content value are reviewed."
+  }
+}
