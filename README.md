@@ -52,6 +52,19 @@ The registry tracks:
 - ZIP/archive assets preserved for later extraction or review
 - Markdown/Notion/doc exports
 
+## Batch 3 archive audit
+
+Batch 3 adds an archive review layer without extracting or modifying source assets.
+
+New audit files:
+
+```txt
+data/archive-audit.json
+docs/archive-review-playbook.md
+```
+
+Use these files to decide what happens to ZIPs, Notion exports, Markdown docs, and nested app folders before any extraction or cleanup.
+
 ## Nested apps
 
 Folders with `package.json`, such as nested Next.js apps, may need their own standalone Vercel projects or later promotion into dedicated repositories. They are intentionally not converted in this indexing batch.
@@ -59,6 +72,14 @@ Folders with `package.json`, such as nested Next.js apps, may need their own sta
 ## ZIP and docs archives
 
 ZIP archives and Markdown/Notion exports are preserved. They should be extracted, reviewed, or converted only in a future cleanup batch.
+
+Recommended order:
+
+1. Inventory archive contents.
+2. Detect duplicates.
+3. Identify whether an archive contains `index.html`, `package.json`, docs, or nested ZIPs.
+4. Extract only selected static winners.
+5. Update `data/site-registry.json` after approved extraction.
 
 ## Production promotion
 
@@ -68,5 +89,5 @@ Production winners can later be promoted into standalone repositories, separate 
 
 1. Batch 1: create the deployable directory shell.
 2. Batch 2: index existing and bulk-imported Flash UI assets.
-3. Batch 3: normalize priority assets into `/sites/[slug]/`.
-4. Batch 4: deploy and verify on Vercel.
+3. Batch 3: archive audit and orphan/review reconciliation.
+4. Batch 4: deep ZIP inventory or priority static normalization.
