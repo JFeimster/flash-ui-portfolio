@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonshine Capital | Lead Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #05070a;
+            --bg-card: #0d1117;
+            --bg-input: #161b22;
+            --neon-blue: #00f2ff;
+            --neon-green: #00ff9d;
+            --text-main: #e6edf3;
+            --text-dim: #8b949e;
+            --border: #30363d;
+            --accent-glow: rgba(0, 242, 255, 0.15);
+            --font-mono: 'Fira Code', monospace;
+            --font-sans: 'Inter', sans-serif;
+            --danger: #ff4a4a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: left;
+        }
+
+        .stat-label {
+            color: var(--text-dim);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--neon-blue);
+            font-family: var(--font-mono);
+        }
+
+        /* Controls */
+        .toolbar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 300px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .search-input:focus { border-color: var(--neon-blue); }
+
+        select {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 0.75rem;
+            border-radius: 6px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid transparent;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: var(--neon-blue);
+            color: var(--bg-deep);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border-color: var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        /* Table Style */
+        .table-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        thead {
+            background: rgba(48, 54, 61, 0.3);
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            padding: 1rem;
+            color: var(--text-dim);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        tr:hover {
+            background: rgba(0, 242, 255, 0.02);
+        }
+
+        .badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-source { background: rgba(0, 242, 255, 0.1); color: var(--neon-blue); border: 1px solid var(--neon-blue); }
+        .badge-status { background: rgba(0, 255, 157, 0.1); color: var(--neon-green); border: 1px solid var(--neon-green); }
+
+        .lead-name { font-weight: 600; color: #fff; }
+        .lead-email { color: var(--text-dim); font-size: 0.8rem; font-family: var(--font-mono); }
+
+        .timestamp { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-dim); }
+
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--neon-green);
+            color: #000;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-weight: 600;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .empty-state {
+            padding: 4rem;
+            text-align: center;
+            color: var(--text-dim);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div>
+            <h1>Lead Management</h1>
+            <p style="color: var(--text-dim);">Central repository for all leads captured through your partner widgets.</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+            <a href="index.html" class="btn btn-outline" style="text-decoration: none;">&larr; Generator</a>
+            <button class="btn btn-primary" onclick="exportToCSV()">Export to CSV</button>
+        </div>
+    </header>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Leads (30d)</div>
+            <div class="stat-value" id="count-total">124</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Avg. Readiness Score</div>
+            <div class="stat-value" id="avg-score">78%</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Top Source</div>
+            <div class="stat-value" id="top-source" style="font-size: 1.2rem; margin-top: 10px;">blog-sidebar</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Conversion Rate</div>
+            <div class="stat-value" id="conv-rate">4.2%</div>
+        </div>
+    </div>
+
+    <div class="toolbar">
+        <input type="text" id="leadSearch" class="search-input" placeholder="Search by name, email or partner ID...">
+        <select id="filterType">
+            <option value="all">All Widget Types</option>
+            <option value="readiness">Readiness Score</option>
+            <option value="matcher">Route Matcher</option>
+            <option value="cta">CTA Button</option>
+        </select>
+        <button class="btn btn-outline" onclick="resetFilters()">Reset</button>
+    </div>
+
+    <div class="table-container">
+        <table id="leadsTable">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Lead Contact</th>
+                    <th>Widget Type</th>
+                    <th>Source Tag</th>
+                    <th>Partner ID</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="leadsBody">
+                <!-- Rows injected by JavaScript -->
+            </tbody>
+        </table>
+        <div id="noLeads" class="empty-state" style="display:none;">
+            No leads found matching your criteria.
+        </div>
+    </div>
+</div>
+
+<div id="toast">Exporting leads...</div>
+
+<script>
+    const mockLeads = [
+        { id: 1, date: '2023-10-24 14:22', name: 'Alex Rivers', email: 'arivers@techcorp.io', type: 'readiness', source: 'blog-sidebar', partnerId: 'MS-9982', status: 'Qualified' },
+        { id: 2, date: '2023-10-24 11:05', name: 'Sarah Chen', email: 'sarah@chensolutions.com', type: 'matcher', source: 'footer-link', partnerId: 'MS-9982', status: 'New' },
+        { id: 3, date: '2023-10-23 16:45', name: 'Marcus Thorne', email: 'm.thorne@startup.co', type: 'cta', source: 'header-button', partnerId: 'MS-1044', status: 'Contacted' },
+        { id: 4, date: '2023-10-23 09:12', name: 'Elena Rodriguez', email: 'elena@rod-agency.com', type: 'readiness', source: 'blog-sidebar', partnerId: 'MS-9982', status: 'Qualified' },
+        { id: 5, date: '2023-10-22 13:30', name: 'Jordan Smith', email: 'j.smith@freelance.net', type: 'matcher', source: 'direct', partnerId: 'MS-5521', status: 'New' },
+        { id: 6, date: '2023-10-21 15:20', name: 'Priya Patel', email: 'ppatel@fintech.ly', type: 'readiness', source: 'sidebar-fixed', partnerId: 'MS-9982', status: 'Qualified' },
+        { id: 7, date: '2023-10-21 10:05', name: 'Tom Baker', email: 'tom@bakeryinc.com', type: 'cta', source: 'email-campaign', partnerId: 'MS-2210', status: 'Nurture' }
+    ];
+
+    function renderLeads(data) {
+        const tbody = document.getElementById('leadsBody');
+        const emptyState = document.getElementById('noLeads');
+        
+        if (data.length === 0) {
+            tbody.innerHTML = '';
+            emptyState.style.display = 'block';
+            return;
+        }
+
+        emptyState.style.display = 'none';
+        tbody.innerHTML = data.map(lead => `
+            <tr>
+                <td class="timestamp">${lead.date}</td>
+                <td>
+                    <div class="lead-name">${lead.name}</div>
+                    <div class="lead-email">${lead.email}</div>
+                </td>
+                <td>${lead.type.charAt(0).toUpperCase() + lead.type.slice(1)}</td>
+                <td><span class="badge badge-source">${lead.source}</span></td>
+                <td style="font-family: var(--font-mono); font-size: 0.8rem;">${lead.partnerId}</td>
+                <td><span class="badge badge-status">${lead.status}</span></td>
+            </tr>
+        `).join('');
+    }
+
+    function filterLeads() {
+        const searchTerm = document.getElementById('leadSearch').value.toLowerCase();
+        const typeFilter = document.getElementById('filterType').value;
+
+        const filtered = mockLeads.filter(lead => {
+            const matchesSearch = lead.name.toLowerCase().includes(searchTerm) || 
+                                lead.email.toLowerCase().includes(searchTerm) || 
+                                lead.partnerId.toLowerCase().includes(searchTerm);
+            const matchesType = typeFilter === 'all' || lead.type === typeFilter;
+            return matchesSearch && matchesType;
+        });
+
+        renderLeads(filtered);
+    }
+
+    function resetFilters() {
+        document.getElementById('leadSearch').value = '';
+        document.getElementById('filterType').value = 'all';
+        renderLeads(mockLeads);
+    }
+
+    function exportToCSV() {
+        showToast('Preparing CSV Export...');
+        
+        const headers = ['Date', 'Name', 'Email', 'Widget Type', 'Source', 'Partner ID', 'Status'];
+        const rows = mockLeads.map(l => [l.date, l.name, l.email, l.type, l.source, l.partnerId, l.status].join(','));
+        const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join('\n');
+        
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `moonshine_leads_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        setTimeout(() => showToast('Export Complete!'), 1000);
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.style.display = 'block';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 2500);
+    }
+
+    // Initialize
+    document.getElementById('leadSearch').addEventListener('input', filterLeads);
+    document.getElementById('filterType').addEventListener('change', filterLeads);
+    
+    window.onload = () => renderLeads(mockLeads);
+</script>
+
+</body>
+</html></html>

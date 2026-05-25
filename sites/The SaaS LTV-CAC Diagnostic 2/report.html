@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investor Readiness Report | Unit Economics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050507;
+            --card-bg: rgba(13, 13, 18, 0.9);
+            --neon-cyan: #00f2ff;
+            --neon-purple: #9d00ff;
+            --neon-green: #00ff88;
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            line-height: 1.6;
+            padding: 40px 20px;
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(157, 0, 255, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(0, 242, 255, 0.05) 0%, transparent 40%);
+        }
+
+        .report-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 60px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 24px;
+        }
+
+        .brand-section h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 28px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #fff, var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .report-meta {
+            text-align: right;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 32px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+        }
+
+        .metric-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .metric-title::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--neon-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        .large-stat {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 64px;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 8px;
+            color: var(--neon-green);
+        }
+
+        .stat-desc {
+            font-size: 14px;
+            color: var(--text-dim);
+        }
+
+        .gauge-mini {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .gauge-mini-fill {
+            position: absolute;
+            height: 100%;
+            background: var(--neon-green);
+            border-radius: 4px;
+            box-shadow: 0 0 15px var(--neon-green);
+            width: 75%; /* Based on 4.5x ratio */
+        }
+
+        .narrative-box h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+
+        .narrative-box p {
+            color: var(--text-dim);
+            font-size: 15px;
+            margin-bottom: 16px;
+        }
+
+        .benchmark-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .benchmark-table th {
+            text-align: left;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            padding: 12px 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .benchmark-table td {
+            padding: 16px 8px;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+        }
+
+        .val-highlight {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            color: var(--neon-cyan);
+        }
+
+        .status-pill {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            color: var(--neon-green);
+            border-radius: 100px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .footer-note {
+            margin-top: 60px;
+            padding: 32px;
+            background: rgba(157, 0, 255, 0.05);
+            border-radius: 24px;
+            border: 1px solid rgba(157, 0, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-text h3 {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .footer-text p {
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+
+        .stamp {
+            border: 2px solid var(--neon-purple);
+            color: var(--neon-purple);
+            padding: 8px 16px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            transform: rotate(-12deg);
+            border-radius: 8px;
+            opacity: 0.8;
+        }
+
+        @media print {
+            body { background: white; color: black; padding: 0; }
+            .card { border: 1px solid #eee; background: white; box-shadow: none; }
+            .large-stat { color: #000; }
+            .gauge-mini { background: #eee; }
+            .gauge-mini-fill { background: #333; }
+            .brand-section h1 { -webkit-text-fill-color: black; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="report-wrapper">
+    <header>
+        <div class="brand-section">
+            <div class="status-pill">Ready for Series A / Non-Dilutive</div>
+            <h1>Investor Readiness Synthesis</h1>
+        </div>
+        <div class="report-meta">
+            <div>Fiscal Period: Q3 2024</div>
+            <div>Generated: Oct 24, 2023</div>
+        </div>
+    </header>
+
+    <div class="grid">
+        <div class="card">
+            <div class="metric-title">Unit Economics Diagnostic</div>
+            <div class="large-stat">4.5:1</div>
+            <div class="stat-desc">Lifetime Value to CAC Ratio</div>
+            <div class="gauge-mini">
+                <div class="gauge-mini-fill"></div>
+            </div>
+            <div class="narrative-box">
+                <h2>The Compounding Verdict</h2>
+                <p>Based on a $150 ARPU and 3.3% monthly churn, the current customer profile generates a $4,500 LTV against a $1,000 acquisition cost. This represents a "High Efficiency" engine.</p>
+                <p>The unit economics suggest that for every $1.00 spent on marketing, the business captures $4.50 in future contract value, making it an ideal candidate for debt-based financing or aggressive equity-backed scaling.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="metric-title">Vertical Benchmarks</div>
+            <table class="benchmark-table">
+                <thead>
+                    <tr>
+                        <th>Vertical</th>
+                        <th>Target Ratio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Horizontal SaaS</td>
+                        <td class="val-highlight">3.5x</td>
+                    </tr>
+                    <tr>
+                        <td>Vertical SaaS</td>
+                        <td class="val-highlight">4.0x+</td>
+                    </tr>
+                    <tr>
+                        <td>Enterprise / ACV</td>
+                        <td class="val-highlight">5.0x+</td>
+                    </tr>
+                    <tr>
+                        <td>Fintech / Infra</td>
+                        <td class="val-highlight">3.0x</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="margin-top: 32px;">
+                <div class="metric-title">Payback Period</div>
+                <div style="font-family: 'Space Grotesk'; font-size: 24px;">6.7 Months</div>
+                <p class="stat-desc">Time to recover CAC. Top 10% of cohort.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        <div class="footer-text">
+            <h3>Strategic Recommendation</h3>
+            <p>Deploy capital into direct-response channels immediately. Marginal CAC can double while maintaining healthy unit economics.</p>
+        </div>
+        <div class="stamp">Verified Asset</div>
+    </div>
+</div>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investor Readiness Report | Unit Economics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050507;
+            --card-bg: rgba(13, 13, 18, 0.9);
+            --neon-cyan: #00f2ff;
+            --neon-purple: #9d00ff;
+            --neon-green: #00ff88;
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            line-height: 1.6;
+            padding: 40px 20px;
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(157, 0, 255, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(0, 242, 255, 0.05) 0%, transparent 40%);
+        }
+
+        .report-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 60px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 24px;
+        }
+
+        .brand-section h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 28px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #fff, var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .report-meta {
+            text-align: right;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 32px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+        }
+
+        .metric-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .metric-title::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--neon-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        .large-stat {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 64px;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 8px;
+            color: var(--neon-green);
+        }
+
+        .stat-desc {
+            font-size: 14px;
+            color: var(--text-dim);
+        }
+
+        .gauge-mini {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .gauge-mini-fill {
+            position: absolute;
+            height: 100%;
+            background: var(--neon-green);
+            border-radius: 4px;
+            box-shadow: 0 0 15px var(--neon-green);
+            width: 75%; /* Based on 4.5x ratio */
+        }
+
+        .narrative-box h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+
+        .narrative-box p {
+            color: var(--text-dim);
+            font-size: 15px;
+            margin-bottom: 16px;
+        }
+
+        .benchmark-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .benchmark-table th {
+            text-align: left;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            padding: 12px 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .benchmark-table td {
+            padding: 16px 8px;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+        }
+
+        .val-highlight {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            color: var(--neon-cyan);
+        }
+
+        .status-pill {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            color: var(--neon-green);
+            border-radius: 100px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .footer-note {
+            margin-top: 60px;
+            padding: 32px;
+            background: rgba(157, 0, 255, 0.05);
+            border-radius: 24px;
+            border: 1px solid rgba(157, 0, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-text h3 {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .footer-text p {
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+
+        .stamp {
+            border: 2px solid var(--neon-purple);
+            color: var(--neon-purple);
+            padding: 8px 16px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            transform: rotate(-12deg);
+            border-radius: 8px;
+            opacity: 0.8;
+        }
+
+        @media print {
+            body { background: white; color: black; padding: 0; }
+            .card { border: 1px solid #eee; background: white; box-shadow: none; }
+            .large-stat { color: #000; }
+            .gauge-mini { background: #eee; }
+            .gauge-mini-fill { background: #333; }
+            .brand-section h1 { -webkit-text-fill-color: black; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="report-wrapper">
+    <header>
+        <div class="brand-section">
+            <div class="status-pill">Ready for Series A / Non-Dilutive</div>
+            <h1>Investor Readiness Synthesis</h1>
+        </div>
+        <div class="report-meta">
+            <div>Fiscal Period: Q3 2024</div>
+            <div>Generated: Oct 24, 2023</div>
+        </div>
+    </header>
+
+    <div class="grid">
+        <div class="card">
+            <div class="metric-title">Unit Economics Diagnostic</div>
+            <div class="large-stat">4.5:1</div>
+            <div class="stat-desc">Lifetime Value to CAC Ratio</div>
+            <div class="gauge-mini">
+                <div class="gauge-mini-fill"></div>
+            </div>
+            <div class="narrative-box">
+                <h2>The Compounding Verdict</h2>
+                <p>Based on a $150 ARPU and 3.3% monthly churn, the current customer profile generates a $4,500 LTV against a $1,000 acquisition cost. This represents a "High Efficiency" engine.</p>
+                <p>The unit economics suggest that for every $1.00 spent on marketing, the business captures $4.50 in future contract value, making it an ideal candidate for debt-based financing or aggressive equity-backed scaling.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="metric-title">Vertical Benchmarks</div>
+            <table class="benchmark-table">
+                <thead>
+                    <tr>
+                        <th>Vertical</th>
+                        <th>Target Ratio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Horizontal SaaS</td>
+                        <td class="val-highlight">3.5x</td>
+                    </tr>
+                    <tr>
+                        <td>Vertical SaaS</td>
+                        <td class="val-highlight">4.0x+</td>
+                    </tr>
+                    <tr>
+                        <td>Enterprise / ACV</td>
+                        <td class="val-highlight">5.0x+</td>
+                    </tr>
+                    <tr>
+                        <td>Fintech / Infra</td>
+                        <td class="val-highlight">3.0x</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="margin-top: 32px;">
+                <div class="metric-title">Payback Period</div>
+                <div style="font-family: 'Space Grotesk'; font-size: 24px;">6.7 Months</div>
+                <p class="stat-desc">Time to recover CAC. Top 10% of cohort.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        <div class="footer-text">
+            <h3>Strategic Recommendation</h3>
+            <p>Deploy capital into direct-response channels immediately. Marginal CAC can double while maintaining healthy unit economics.</p>
+        </div>
+        <div class="stamp">Verified Asset</div>
+    </div>
+</div>
+
+</body>
+</html>

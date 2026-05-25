@@ -1,0 +1,76 @@
+{
+  "version": "2.4.0",
+  "environment": "production",
+  "documentation_url": "https://developers.moonshine.cap/docs/integration",
+  "cdn_endpoints": {
+    "sdk": "https://cdn.moonshine.cap/sdk/v1/widget.min.js",
+    "styles": "https://cdn.moonshine.cap/sdk/v1/themes/cyber-dark.css"
+  },
+  "widget_registry": [
+    {
+      "slug": "readiness",
+      "name": "Funding Readiness Score",
+      "data_attributes": ["data-ms-pid", "data-ms-source", "data-ms-accent"],
+      "api_endpoint": "https://api.moonshine.cap/v1/readiness/calculate",
+      "custom_events": ["ms_score_generated", "ms_widget_loaded"]
+    },
+    {
+      "slug": "matcher",
+      "name": "Funding Route Matcher",
+      "data_attributes": ["data-ms-pid", "data-ms-type-filter"],
+      "api_endpoint": "https://api.moonshine.cap/v1/routes/match",
+      "custom_events": ["ms_route_selected"]
+    },
+    {
+      "slug": "cta",
+      "name": "Application CTA",
+      "data_attributes": ["data-ms-pid", "data-ms-btn-text", "data-ms-glow"],
+      "api_endpoint": null,
+      "custom_events": ["ms_cta_click"]
+    }
+  ],
+  "theme_engine": {
+    "css_variables": [
+      {
+        "variable": "--ms-neon-blue",
+        "description": "Primary accent color for interactive elements",
+        "default": "#00f2ff"
+      },
+      {
+        "variable": "--ms-neon-green",
+        "description": "Success state and secondary highlight color",
+        "default": "#00ff9d"
+      },
+      {
+        "variable": "--ms-bg-card",
+        "description": "Background for the widget container",
+        "default": "#0d1117"
+      },
+      {
+        "variable": "--ms-border-radius",
+        "description": "Corner rounding for cards and buttons",
+        "default": "12px"
+      }
+    ],
+    "override_methods": [
+      "Inline Style Injection",
+      "Global CSS !important Flags",
+      "PostMessage Style Update API"
+    ]
+  },
+  "advanced_configuration": {
+    "auth": "Public Partner Key (MS-XXXX)",
+    "rate_limits": {
+      "widget_loads": "Unlimited",
+      "api_calls": "100/min per IP"
+    },
+    "custom_variables": {
+      "pass_through_params": ["utm_campaign", "sub_id", "click_id"],
+      "storage_mechanism": "SessionStorage"
+    }
+  },
+  "compliance": {
+    "tracking": "GDPR/CCPA Compliant - Anonymous telemetry only unless lead submitted",
+    "csp_directives": "frame-src https://*.moonshine.cap; script-src https://cdn.moonshine.cap;"
+  }
+}

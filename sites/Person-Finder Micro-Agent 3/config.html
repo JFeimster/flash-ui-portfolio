@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prism Config | Search Sequence Configurator</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Inter:wght@300;400;600&display=swap');
+
+        :root {
+            --bg-deep: #05070a;
+            --glass: rgba(15, 20, 28, 0.9);
+            --accent-cyan: #00f2ff;
+            --accent-magenta: #ff00ea;
+            --accent-lime: #bcff00;
+            --border-glow: rgba(0, 242, 255, 0.2);
+            --text-main: #e0e6ed;
+            --text-dim: #7a869a;
+            --prism-gradient: linear-gradient(135deg, #00f2ff 0%, #ff00ea 50%, #bcff00 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg-deep);
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 32px 32px;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .prism-container {
+            width: 1000px;
+            max-width: 95vw;
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 4px;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .prism-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--prism-gradient);
+            z-index: 10;
+        }
+
+        .header {
+            padding: 20px 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 20px;
+            height: 20px;
+            background: var(--prism-gradient);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+
+        .brand-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 13px;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            height: 600px;
+        }
+
+        /* Sidebar: Sequence Ordering */
+        .config-sidebar {
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 24px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .section-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title::after {
+            content: '';
+            height: 1px;
+            flex-grow: 1;
+            background: rgba(0, 242, 255, 0.2);
+        }
+
+        .draggable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .source-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: move;
+            transition: all 0.2s ease;
+        }
+
+        .source-item:hover {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: var(--accent-cyan);
+        }
+
+        .drag-handle {
+            color: var(--text-dim);
+            font-size: 18px;
+            cursor: grab;
+        }
+
+        .source-info {
+            flex-grow: 1;
+        }
+
+        .source-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            display: block;
+        }
+
+        .source-meta {
+            font-size: 10px;
+            color: var(--text-dim);
+        }
+
+        /* Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 32px;
+            height: 18px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #2a2a2a;
+            transition: .4s;
+            border-radius: 20px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 12px;
+            width: 12px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--text-dim);
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: rgba(0, 242, 255, 0.2);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(14px);
+            background-color: var(--accent-cyan);
+            box-shadow: 0 0 8px var(--accent-cyan);
+        }
+
+        /* Main Content: Custom Strings */
+        .config-main {
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            overflow-y: auto;
+        }
+
+        .input-block {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .label-wrap {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .panel-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .industry-tag {
+            font-size: 10px;
+            color: var(--accent-magenta);
+            border: 1px solid var(--accent-magenta);
+            padding: 2px 6px;
+            border-radius: 2px;
+        }
+
+        .code-input {
+            width: 100%;
+            background: #0a0c10;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--accent-lime);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            padding: 16px;
+            min-height: 100px;
+            resize: vertical;
+            outline: none;
+        }
+
+        .code-input:focus {
+            border-color: var(--accent-lime);
+        }
+
+        .hint {
+            font-size: 11px;
+            color: var(--text-dim);
+            font-style: italic;
+        }
+
+        .action-footer {
+            margin-top: auto;
+            padding: 24px 0 0 0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .btn {
+            font-family: 'JetBrains Mono', monospace;
+            padding: 12px 24px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: transparent;
+            border: 1px solid transparent;
+        }
+
+        .btn-ghost {
+            color: var(--text-dim);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-ghost:hover {
+            color: white;
+            border-color: white;
+        }
+
+        .btn-primary {
+            background: var(--accent-cyan);
+            color: var(--bg-deep);
+            border-color: var(--accent-cyan);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body>
+
+    <div class="prism-container">
+        <header class="header">
+            <div class="brand">
+                <div class="brand-logo"></div>
+                <h1 class="brand-name">Logic Configurator</h1>
+            </div>
+            <div class="panel-label">Agent Node: PRISM-X1</div>
+        </header>
+
+        <main class="config-grid">
+            <aside class="config-sidebar">
+                <div class="section-title">Search Sequence</div>
+                <div class="draggable-list" id="sequenceList">
+                    <div class="source-item">
+                        <span class="drag-handle">⠿</span>
+                        <div class="source-info">
+                            <span class="source-name">Domain Parser</span>
+                            <span class="source-meta">Web-scraping /about</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="source-item">
+                        <span class="drag-handle">⠿</span>
+                        <div class="source-info">
+                            <span class="source-name">LinkedIn Crawler</span>
+                            <span class="source-meta">Social Graph Match</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="source-item">
+                        <span class="drag-handle">⠿</span>
+                        <div class="source-info">
+                            <span class="source-name">Google Dorking</span>
+                            <span class="source-meta">Advanced Query Ops</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="source-item">
+                        <span class="drag-handle">⠿</span>
+                        <div class="source-info">
+                            <span class="source-name">Secretary of State</span>
+                            <span class="source-meta">Legal Entity Registry</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="source-item">
+                        <span class="drag-handle">⠿</span>
+                        <div class="source-info">
+                            <span class="source-name">BBB Registry</span>
+                            <span class="source-meta">Third-party Trust</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="source-item">
+                        <span class="drag-handle">⠿</span>
+                        <div class="source-info">
+                            <span class="source-name">Yelp Meta-Data</span>
+                            <span class="source-meta">Local Business Signals</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </aside>
+
+            <section class="config-main">
+                <div class="section-title">Execution Logic</div>
+                
+                <div class="input-block">
+                    <div class="label-wrap">
+                        <label class="panel-label">Custom Search Strings</label>
+                        <span class="industry-tag">Universal</span>
+                    </div>
+                    <textarea class="code-input" placeholder="Enter logic parameters...">site:linkedin.com/in/ "{COMPANY}" (Owner OR Director OR Founder OR "CEO")</textarea>
+                    <span class="hint">Use {COMPANY}, {DOMAIN}, and {LOCATION} as dynamic variables.</span>
+                </div>
+
+                <div class="input-block">
+                    <div class="label-wrap">
+                        <label class="panel-label">Industry-Specific Overrides</label>
+                        <span class="industry-tag">Real Estate</span>
+                    </div>
+                    <textarea class="code-input" style="color: var(--accent-magenta); opacity: 0.8;">{COMPANY} "Licensed Broker" site:trec.texas.gov</textarea>
+                </div>
+
+                <div class="input-block">
+                    <div class="label-wrap">
+                        <label class="panel-label">Confidence Threshold</label>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <input type="range" min="0" max="100" value="85" style="flex-grow: 1; accent-color: var(--accent-cyan);">
+                        <span style="font-family: 'JetBrains Mono'; color: var(--accent-cyan);">85%</span>
+                    </div>
+                </div>
+
+                <div class="action-footer">
+                    <button class="btn btn-ghost" onclick="window.location.reload()">Reset Defaults</button>
+                    <button class="btn btn-primary" onclick="alert('Configuration Synced to Agent')">Apply Changes</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Static visual interaction for reordering (visual feedback only)
+        const items = document.querySelectorAll('.source-item');
+        items.forEach(item => {
+            item.addEventListener('dragstart', () => {
+                item.style.opacity = '0.4';
+                item.style.borderColor = 'var(--accent-magenta)';
+            });
+            item.addEventListener('dragend', () => {
+                item.style.opacity = '1';
+                item.style.borderColor = 'rgba(255, 255, 255, 0.05)';
+            });
+        });
+    </script>
+</body>
+</html>

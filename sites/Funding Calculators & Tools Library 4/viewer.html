@@ -1,0 +1,1328 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Core Flow - Document Preview & Feedback Hub</title>
+    <!-- Google Fonts & Tailwind-inspired Layout system -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #08090d;
+            --bg-secondary: #0f111a;
+            --bg-tertiary: #161a26;
+            --border-color: #242b3d;
+            --border-hover: #3b4764;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            
+            /* High-voltage Neobrutalist Accents */
+            --accent-cyan: #00f0ff;
+            --accent-orange: #ff5c00;
+            --accent-magenta: #ff007a;
+            --accent-lime: #39ff14;
+            
+            --shadow-cyan: 0px 0px 20px rgba(0, 240, 255, 0.15);
+            --shadow-orange: 0px 0px 20px rgba(255, 92, 0, 0.15);
+            --shadow-magenta: 0px 0px 20px rgba(255, 0, 122, 0.15);
+            --shadow-lime: 0px 0px 20px rgba(57, 255, 20, 0.15);
+            
+            --brutal-shadow: 6px 6px 0px #000000;
+            --brutal-shadow-hover: 2px 2px 0px #000000;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-sans);
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-cyan);
+        }
+
+        /* Utility classes */
+        .text-glow-cyan { text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
+        .text-glow-orange { text-shadow: 0 0 10px rgba(255, 92, 0, 0.5); }
+        .text-glow-magenta { text-shadow: 0 0 10px rgba(255, 0, 122, 0.5); }
+        .text-glow-lime { text-shadow: 0 0 10px rgba(57, 255, 20, 0.5); }
+
+        /* Navigation Header */
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: var(--bg-secondary);
+            border-bottom: 3px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 22px;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            color: var(--text-primary);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+            border: 2px solid #000;
+            box-shadow: 2px 2px 0px #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 18px;
+            color: #000;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            padding: 8px 16px;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-cyan);
+            border-bottom: 2px solid var(--accent-cyan);
+        }
+
+        /* Hub Layout Framework */
+        .hub-container {
+            max-width: 1720px;
+            margin: 30px auto;
+            padding: 0 30px;
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 30px;
+        }
+
+        @media (max-width: 1280px) {
+            .hub-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Workspace Controls Panel */
+        .workspace-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-secondary);
+            border: 3px solid var(--border-color);
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: var(--brutal-shadow);
+        }
+
+        @media (max-width: 768px) {
+            .workspace-header {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+        }
+
+        .workspace-meta h1 {
+            font-family: var(--font-display);
+            font-size: 28px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            line-height: 1.1;
+        }
+
+        .workspace-meta h1 span {
+            color: var(--accent-cyan);
+        }
+
+        .workspace-status-badge {
+            display: inline-block;
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--accent-cyan);
+            border: 1px solid var(--accent-cyan);
+            font-family: var(--font-display);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            margin-top: 6px;
+        }
+
+        .control-strip {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn:hover {
+            border-color: var(--accent-orange);
+            color: var(--accent-orange);
+        }
+
+        .control-btn.active {
+            background: var(--accent-orange);
+            color: #000;
+            border-color: #000;
+            box-shadow: 2px 2px 0px #000;
+        }
+
+        /* 3-Column Side-by-Side Document Grid */
+        .documents-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        @media (max-width: 1024px) {
+            .documents-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .document-wrapper {
+            background: var(--bg-secondary);
+            border: 3px solid var(--border-color);
+            box-shadow: var(--brutal-shadow);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transition: border-color 0.2s ease;
+        }
+
+        .document-wrapper:hover {
+            border-color: var(--border-hover);
+        }
+
+        .document-wrapper.active-annotating {
+            border-color: var(--accent-magenta);
+        }
+
+        /* Document Header */
+        .document-header {
+            background: var(--bg-tertiary);
+            padding: 14px 20px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .doc-title-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .doc-icon {
+            font-size: 20px;
+        }
+
+        .doc-title {
+            font-family: var(--font-display);
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .doc-tag {
+            font-size: 9px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        /* Interactive Visual Document Mock Area */
+        .document-viewer-container {
+            padding: 20px;
+            min-height: 480px;
+            background: var(--bg-primary);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            cursor: crosshair;
+            user-select: none;
+        }
+
+        /* Annotation Sticky Note CSS representation */
+        .sticky-note {
+            position: absolute;
+            background: #ffe600;
+            color: #000;
+            border: 2px solid #000;
+            padding: 10px;
+            width: 160px;
+            min-height: 80px;
+            box-shadow: 4px 4px 0px #000;
+            z-index: 10;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: move;
+            transition: transform 0.1s;
+        }
+
+        .sticky-note::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 12px 12px 0;
+            border-color: transparent #000 transparent transparent;
+        }
+
+        .sticky-note-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+            padding-bottom: 4px;
+            margin-bottom: 4px;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 9px;
+            text-transform: uppercase;
+        }
+
+        .sticky-note-close {
+            cursor: pointer;
+            font-weight: 900;
+            font-size: 11px;
+        }
+
+        .sticky-note textarea {
+            width: 100%;
+            height: 45px;
+            background: transparent;
+            border: none;
+            resize: none;
+            outline: none;
+            font-size: 11px;
+            font-family: var(--font-sans);
+            color: #000;
+            font-weight: 600;
+        }
+
+        /* Doc Content Styles */
+        .doc-raw-text {
+            color: var(--text-secondary);
+            font-size: 12px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .highlight-clause {
+            background: rgba(255, 92, 0, 0.15);
+            border-left: 2px solid var(--accent-orange);
+            padding-left: 8px;
+            margin: 8px 0;
+        }
+
+        .highlight-clause.cyan-accent {
+            background: rgba(0, 240, 255, 0.1);
+            border-left-color: var(--accent-cyan);
+        }
+
+        /* Document Ledgers & Tables */
+        .ledger-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        .ledger-table th {
+            text-align: left;
+            border-bottom: 2px solid var(--border-color);
+            padding: 6px;
+            color: var(--text-secondary);
+            font-weight: 700;
+        }
+
+        .ledger-table td {
+            padding: 8px 6px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .ledger-table tr.alert-row {
+            background: rgba(255, 0, 122, 0.1);
+            color: var(--accent-magenta);
+        }
+
+        /* Credit Metric Visualizer Dial mockup */
+        .radial-credit-metric {
+            border: 2px solid var(--border-color);
+            background: var(--bg-secondary);
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            border-radius: 4px;
+        }
+
+        .metric-score {
+            font-family: var(--font-display);
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--accent-lime);
+        }
+
+        /* Double Indicator */
+        .double-indicator-bar {
+            height: 6px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            position: relative;
+            margin-top: 8px;
+        }
+
+        .double-indicator-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: var(--accent-lime);
+        }
+
+        /* Right Sidebar: Unified Feed & Decision Hub */
+        .hub-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Decision Controls Card */
+        .decision-card {
+            background: var(--bg-secondary);
+            border: 3px solid var(--border-color);
+            box-shadow: var(--brutal-shadow);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .decision-card h3 {
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        /* Comments Engine Card */
+        .comments-card {
+            background: var(--bg-secondary);
+            border: 3px solid var(--border-color);
+            box-shadow: var(--brutal-shadow);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            flex-grow: 1;
+            min-height: 400px;
+        }
+
+        .comments-card h3 {
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 12px;
+            color: var(--accent-magenta);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .comments-count-badge {
+            background: var(--accent-magenta);
+            color: #000;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        /* Comments Feed Log */
+        .comments-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow-y: auto;
+            max-height: 320px;
+            padding-right: 6px;
+        }
+
+        .comment-item {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .comment-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+        .comment-text {
+            font-size: 12px;
+            color: var(--text-primary);
+        }
+
+        .comment-tag {
+            align-self: flex-start;
+            font-size: 9px;
+            font-weight: 800;
+            background: rgba(0, 240, 255, 0.15);
+            color: var(--accent-cyan);
+            padding: 1px 6px;
+            border: 1px solid var(--accent-cyan);
+            border-radius: 2px;
+            text-transform: uppercase;
+        }
+
+        .comment-tag.flag {
+            background: rgba(255, 92, 0, 0.15);
+            color: var(--accent-orange);
+            border-color: var(--accent-orange);
+        }
+
+        /* Comment Composer Form */
+        .comment-composer {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 16px;
+        }
+
+        .comment-textarea {
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 10px;
+            font-size: 13px;
+            resize: none;
+            height: 70px;
+            outline: none;
+            transition: border-color 0.15s ease;
+        }
+
+        .comment-textarea:focus {
+            border-color: var(--accent-magenta);
+        }
+
+        .composer-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .composer-select {
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 8px;
+            text-transform: uppercase;
+            outline: none;
+        }
+
+        /* Signature Pad */
+        .signature-box {
+            border: 2px dashed var(--border-color);
+            background: var(--bg-primary);
+            border-radius: 4px;
+            position: relative;
+            height: 120px;
+            overflow: hidden;
+        }
+
+        .signature-canvas {
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+
+        .signature-label {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            font-size: 9px;
+            font-weight: 800;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            pointer-events: none;
+        }
+
+        .signature-clear {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 6px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .signature-clear:hover {
+            border-color: var(--accent-magenta);
+            color: var(--accent-magenta);
+        }
+
+        /* Direct Action Brutalist Buttons */
+        .btn-approve {
+            background: var(--accent-lime);
+            color: #000;
+            padding: 14px 20px;
+            border: 3px solid #000;
+            font-weight: 800;
+            font-family: var(--font-display);
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px #000;
+            transition: all 0.1s ease;
+            text-align: center;
+        }
+
+        .btn-approve:hover {
+            box-shadow: 2px 2px 0px #000;
+            transform: translate(2px, 2px);
+            background: #fff;
+        }
+
+        .btn-reject {
+            background: var(--accent-magenta);
+            color: #000;
+            padding: 14px 20px;
+            border: 3px solid #000;
+            font-weight: 800;
+            font-family: var(--font-display);
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px #000;
+            transition: all 0.1s ease;
+            text-align: center;
+        }
+
+        .btn-reject:hover {
+            box-shadow: 2px 2px 0px #000;
+            transform: translate(2px, 2px);
+            background: #fff;
+        }
+
+        /* Status Toast Alert */
+        .toast-notify {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--accent-cyan);
+            padding: 16px 24px;
+            box-shadow: var(--brutal-shadow);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--font-display);
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            transform: translateY(150%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .toast-notify.visible {
+            transform: translateY(0);
+        }
+
+        .toast-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-cyan);
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            100% { transform: scale(1.1); opacity: 1; }
+        }
+
+        /* Instructions overlay box */
+        .instruction-banner {
+            background: rgba(255, 92, 0, 0.08);
+            border: 1px dashed var(--accent-orange);
+            padding: 12px 16px;
+            font-size: 12px;
+            color: var(--text-primary);
+            line-height: 1.5;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .instruction-badge {
+            background: var(--accent-orange);
+            color: #000;
+            font-family: var(--font-display);
+            font-weight: 800;
+            padding: 3px 8px;
+            text-transform: uppercase;
+            font-size: 10px;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation -->
+    <nav class="nav-header">
+        <div class="logo-area">
+            <div class="logo-icon">C</div>
+            CORE FLOW <span style="font-size: 14px; color: var(--accent-orange); margin-left: 8px;">AUDIT HUB</span>
+        </div>
+        <div class="nav-links">
+            <a href="#documents" class="nav-link">Document Viewers</a>
+            <a href="#feedback" class="nav-link">Decision log</a>
+        </div>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-secondary);">Audit Session: #CF-9082</div>
+            <a href="index.html" class="btn-action" style="background: transparent; color: var(--text-primary); border: 2px solid var(--border-color); padding: 8px 16px; font-size: 12px; text-transform: uppercase; font-weight: 700; text-decoration: none; cursor: pointer;">Exit Workspace</a>
+        </div>
+    </nav>
+
+    <!-- Main Dynamic Workspace -->
+    <main class="hub-container" id="documents">
+        
+        <!-- Left Section: Document Grid -->
+        <div>
+            <!-- Workspace Controls & Stats -->
+            <div class="workspace-header">
+                <div class="workspace-meta">
+                    <h1>Document Verification Pipeline <span>(3 Files Loaded)</span></h1>
+                    <div class="workspace-status-badge">Awaiting Funder Endorsement</div>
+                </div>
+                
+                <div class="control-strip">
+                    <button class="control-btn active" id="btn-sticky-toggle" onclick="toggleAnnotationTool()">
+                        <span style="display: inline-block; width: 10px; height: 10px; background: #ffe600; border: 1px solid #000;"></span>
+                        Sticky Annotator: ON
+                    </button>
+                    <button class="control-btn" onclick="clearAllAnnotations()">
+                        Clear Notes
+                    </button>
+                    <button class="control-btn" id="btn-demo-data" onclick="loadSimulationData()">
+                        Reset Pre-loaded Marks
+                    </button>
+                </div>
+            </div>
+
+            <!-- Custom User Instruction Alert -->
+            <div class="instruction-banner">
+                <div class="instruction-badge">INSTRUCTION</div>
+                <p>Click on any document coordinate to insert a custom review sticky note. Drag, delete, or type feedback live. Adjust values or add general comments in the Unified Audit panel on the right.</p>
+            </div>
+
+            <!-- Documents Row: 3-Col Split -->
+            <div class="documents-grid">
+
+                <!-- ATTACHMENT 1: Bank Balance Sheet / Ledger Statement -->
+                <div class="document-wrapper" id="doc-container-1">
+                    <div class="document-header">
+                        <div class="doc-title-group">
+                            <span class="doc-icon">📊</span>
+                            <span class="doc-title">MTA_Bank_Statements_Oct2024.pdf</span>
+                        </div>
+                        <span class="doc-tag">Bank Ledger</span>
+                    </div>
+
+                    <div class="document-viewer-container" id="doc-viewer-1" onclick="placeStickyNote(event, 'doc-viewer-1')">
+                        <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--accent-cyan); margin-bottom: 5px;">Deposits & Balances Analytics Summary</div>
+                        
+                        <!-- Table ledger widget -->
+                        <table class="ledger-table">
+                            <thead>
+                                <tr>
+                                    <th>Post Date</th>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                    <th>End Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>10/12/24</td>
+                                    <td>Stripe Payout Ref#9821</td>
+                                    <td style="color: var(--accent-lime);">+$12,450.00</td>
+                                    <td>$42,109.20</td>
+                                </tr>
+                                <tr>
+                                    <td>10/15/24</td>
+                                    <td>Vendor Pymt: ACME Cloud</td>
+                                    <td style="color: var(--accent-magenta);">- $3,100.00</td>
+                                    <td>$39,009.20</td>
+                                </tr>
+                                <tr class="alert-row">
+                                    <td>10/18/24</td>
+                                    <td>OD fee / Ret. Item NSF</td>
+                                    <td style="color: var(--accent-orange);">- $125.00</td>
+                                    <td>$38,884.20</td>
+                                </tr>
+                                <tr>
+                                    <td>10/22/24</td>
+                                    <td>Amazon Seller Settlement</td>
+                                    <td style="color: var(--accent-lime);">+$24,180.50</td>
+                                    <td>$63,064.70</td>
+                                </tr>
+                                <tr>
+                                    <td>10/25/24</td>
+                                    <td>Daily ACH MCA Draw #1</td>
+                                    <td style="color: var(--accent-orange);">- $1,250.00</td>
+                                    <td>$61,814.70</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="flow-graph-container" style="background: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 12px; margin-top: auto; font-size: 11px;">
+                            <div style="font-weight: 700; text-transform: uppercase; margin-bottom: 6px; color: var(--text-secondary);">Risk Analysis Engine Verdict</div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                <span>Monthly Net Volume</span>
+                                <span style="font-family: var(--font-display); font-weight: 700; color: var(--accent-cyan);">$84,200.00</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>ACH Outflow/Deposit ratio</span>
+                                <span style="font-family: var(--font-display); font-weight: 700; color: var(--accent-orange);">18.4% (Elevated)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ATTACHMENT 2: Funding Contract / Agreement -->
+                <div class="document-wrapper" id="doc-container-2">
+                    <div class="document-header">
+                        <div class="doc-title-group">
+                            <span class="doc-icon">📄</span>
+                            <span class="doc-title">MCA_Funding_Contract_TermSheet.pdf</span>
+                        </div>
+                        <span class="doc-tag">Agreement</span>
+                    </div>
+
+                    <div class="document-viewer-container" id="doc-viewer-2" onclick="placeStickyNote(event, 'doc-viewer-2')">
+                        <div class="doc-raw-text">
+<div style="font-family: var(--font-display); font-weight: 700; font-size: 12px; color: var(--text-primary); margin-bottom: 8px;">MASTER REVENUE PURCHASE DEED</div>This dynamic term-sheet outlines the conditional terms under which Core Flow Funder Group agrees to purchase $150,000 of future gross receivables for a payment price of $120,000.
+
+<div class="highlight-clause">Section 3.1: Factor Rate Conversions
+ Funder reserves the option to collect future receivables at a factor multiplier of 1.25x. Total Repayable value of $150,000.00 represents a fixed amount.</div>
+<div class="highlight-clause cyan-accent">Section 4.2: Daily Split Remittance
+Daily split allocation percentage is hardcoded at 11.5% of total gross sales deposit. Direct daily ACH withdraws from clearing account.</div>
+The underwriting process represents an automated decision factor based on bank transactions. High level risk elements remain valid for up to 14 business calendar days from calculation baseline.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ATTACHMENT 3: Credit Report / Experian summary -->
+                <div class="document-wrapper" id="doc-container-3">
+                    <div class="document-header">
+                        <div class="doc-title-group">
+                            <span class="doc-icon">⭐</span>
+                            <span class="doc-title">Experian_Intelliscore_Report.pdf</span>
+                        </div>
+                        <span class="doc-tag">Credit Bureau</span>
+                    </div>
+
+                    <div class="document-viewer-container" id="doc-viewer-3" onclick="placeStickyNote(event, 'doc-viewer-3')">
+                        <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--accent-magenta); margin-bottom: 5px;">Credit Risk Profiler Scorecard</div>
+                        
+                        <div class="radial-credit-metric">
+                            <div>
+                                <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase;">Experian Score</div>
+                                <div class="metric-score text-glow-lime">82 / 100</div>
+                                <div style="font-size: 9px; font-weight: 800; color: var(--accent-lime); text-transform: uppercase; margin-top: 2px;">LOW RISK</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase;">Paydex Rating</div>
+                                <div class="metric-score text-glow-cyan" style="color: var(--accent-cyan);">78</div>
+                                <div style="font-size: 9px; font-weight: 800; color: var(--accent-cyan); text-transform: uppercase; margin-top: 2px;">PRIME GRADE</div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 10px;">
+                            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary);">Risk Weight Indicators</div>
+                            <div class="double-indicator-bar">
+                                <div class="double-indicator-fill" style="width: 82%;"></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 9px; margin-top: 4px; color: var(--text-secondary);">
+                                <span>CRITICAL RISKS (0)</span>
+                                <span>STANDARD VERIFICATION</span>
+                            </div>
+                        </div>
+
+                        <div class="flow-graph-container" style="background: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 12px; margin-top: auto; font-size: 11px;">
+                            <div style="font-weight: 700; text-transform: uppercase; margin-bottom: 4px; color: var(--text-secondary);">Active Trade Lines Summary</div>
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 4px; margin-bottom: 4px;">
+                                <span>Total Account Lines</span>
+                                <span style="font-weight: 700;">14 Lines</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>Average Age Limit</span>
+                                <span style="font-weight: 700;">4.2 Years</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Right Section: Decision Card & Feed Panel -->
+        <aside class="hub-sidebar" id="feedback">
+            
+            <!-- Audit Decision Controller Card -->
+            <div class="decision-card">
+                <h3>Decision Action Hub</h3>
+                
+                <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">Provide a physical signature trace below to execute or reject the core evaluation file.</p>
+                
+                <!-- Digital Signatures Pad -->
+                <div class="signature-box">
+                    <div class="signature-label">Owner Sign-off Node</div>
+                    <canvas class="signature-canvas" id="canvas-sig"></canvas>
+                    <button class="signature-clear" onclick="clearSignatureCanvas()">Clear Trace</button>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 5px;">
+                    <button class="btn-approve" onclick="processDecision('APPROVED')">
+                        Approve & Sign Off &rarr;
+                    </button>
+                    <button class="btn-reject" onclick="processDecision('REJECTED')">
+                        Reject With Feedback &cross;
+                    </button>
+                </div>
+            </div>
+
+            <!-- Threaded Comments Feed -->
+            <div class="comments-card">
+                <h3>
+                    Audit Log Feed
+                    <span class="comments-count-badge" id="comment-count">3</span>
+                </h3>
+
+                <div class="comments-feed" id="comments-container">
+                    <!-- Standard pre-loaded comments -->
+                    <div class="comment-item">
+                        <div class="comment-meta">
+                            <span>Underwriter Node</span>
+                            <span>2 hours ago</span>
+                        </div>
+                        <div class="comment-text">Deposits look highly consistent. The single NSF item on 10/18 is the only concern, but immediate recovery on 10/22 balances it.</div>
+                        <span class="comment-tag">Verified Balance</span>
+                    </div>
+
+                    <div class="comment-item">
+                        <div class="comment-meta">
+                            <span>Broker Agent</span>
+                            <span>1 hour ago</span>
+                        </div>
+                        <div class="comment-text">Agreement clause 3.1 matches exactly our broker split expectations. Ready for sign-off.</div>
+                        <span class="comment-tag">Agreement Match</span>
+                    </div>
+
+                    <div class="comment-item">
+                        <div class="comment-meta">
+                            <span>Compliance Auto Bot</span>
+                            <span>30 mins ago</span>
+                        </div>
+                        <div class="comment-text">Auto verification passed for Experian profile metrics. Low overall hazard.</div>
+                        <span class="comment-tag" style="background: rgba(57, 255, 20, 0.1); color: var(--accent-lime); border-color: var(--accent-lime);">System Clear</span>
+                    </div>
+                </div>
+
+                <!-- Add Comment Form -->
+                <div class="comment-composer">
+                    <textarea class="comment-textarea" id="text-new-comment" placeholder="Write custom audit note or comment here..."></textarea>
+                    <div class="composer-options">
+                        <select class="composer-select" id="select-category">
+                            <option value="General">General Note</option>
+                            <option value="Risk Alert">Risk Alert</option>
+                            <option value="Correction Needed">Correction Required</option>
+                            <option value="Signature Lock">Signature Lock</option>
+                        </select>
+                        <button class="control-btn" style="background: var(--accent-magenta); color: #000; border-color: #000; box-shadow: 2px 2px 0px #000;" onclick="postComment()">
+                            Post Note
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+
+    </main>
+
+    <!-- Dynamic update Toast container -->
+    <div id="toast" class="toast-notify">
+        <div class="toast-dot"></div>
+        <div id="toast-text">Feedback Hub Loaded successfully</div>
+    </div>
+
+    <!-- Active dynamic logic -->
+    <script>
+        let isAnnotationEnabled = true;
+        let stickyNotesCount = 0;
+        let commentsCount = 3;
+
+        // Signature Canvas State
+        const canvas = document.getElementById('canvas-sig');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+
+        // Custom Initial Setup
+        window.addEventListener('load', () => {
+            initCanvas();
+            loadSimulationData();
+            showNotification("Document Workspace Ready for Auditing");
+        });
+
+        // Initialize Canvas Metrics
+        function initCanvas() {
+            // Match internal coordinate space with element clientWidth
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            ctx.strokeStyle = '#00f0ff'; // Neon Cyan paint
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+
+            // Event Listeners for Freehand drawing
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseleave', stopDrawing);
+
+            // Touch events for mobile support
+            canvas.addEventListener('touchstart', (e) => {
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                startDrawing({ clientX: touch.clientX, clientY: touch.clientY });
+            });
+            canvas.addEventListener('touchmove', (e) => {
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                draw({ clientX: touch.clientX, clientY: touch.clientY });
+                e.preventDefault();
+            });
+            canvas.addEventListener('touchend', stopDrawing);
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            ctx.stroke();
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function clearSignatureCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            showNotification("Signature pad cleared");
+        }
+
+        // Toggle global interactive state of annotation notes
+        function toggleAnnotationTool() {
+            isAnnotationEnabled = !isAnnotationEnabled;
+            const btn = document.getElementById('btn-sticky-toggle');
+            
+            if (isAnnotationEnabled) {
+                btn.classList.add('active');
+                btn.innerHTML = `<span style="display: inline-block; width: 10px; height: 10px; background: #ffe600; border: 1px solid #000;"></span> Sticky Annotator: ON`;
+                showNotification("Click documents to place sticky notes");
+                document.querySelectorAll('.document-viewer-container').forEach(c => c.style.cursor = 'crosshair');
+            } else {
+                btn.classList.remove('active');
+                btn.innerHTML = `Sticky Annotator: OFF`;
+                showNotification("Sticky notes placing tool deactivated");
+                document.querySelectorAll('.document-viewer-container').forEach(c => c.style.cursor = 'default');
+            }
+        }
+
+        // Drop customized Annotation elements
+        function placeStickyNote(event, targetViewerId) {
+            if (!isAnnotationEnabled) return;
+            
+            // Ignore click if it targets a pre-existing sticky or interactive elements
+            if (event.target.closest('.sticky-note') || event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA' || event.target.tagName === 'BUTTON') {
+                return;
+            }
+
+            const viewer = document.getElementById(targetViewerId);
+            const rect = viewer.getBoundingClientRect();
+            const x = event.clientX - rect.left - 10; // offset placement
+            const y = event.clientY - rect.top - 10;
+
+            createNoteElement(viewer, x, y, `Note #${++stickyNotesCount}`, "Add details...");
+            showNotification(`Placed note #${stickyNotesCount}`);
+        }
+
+        // Helper element creator
+        function createNoteElement(parent, x, y, idLabel, contentText) {
+            const note = document.createElement('div');
+            note.className = 'sticky-note';
+            note.style.left = `${x}px`;
+            note.style.top = `${y}px`;
+
+            note.innerHTML = `
+                <div class="sticky-note-header">
+                    <span>${idLabel}</span>
+                    <span class="sticky-note-close" onclick="this.parentElement.parentElement.remove(); showNotification('Annotation removed'); event.stopPropagation();">&times;</span>
+                </div>
+                <textarea placeholder="Write text...">${contentText}</textarea>
+            `;
+
+            // Drag and drop mechanics inside relative parent
+            note.addEventListener('mousedown', (e) => {
+                if(e.target.tagName === 'TEXTAREA' || e.target.classList.contains('sticky-note-close')) return;
+                
+                let shiftX = e.clientX - note.getBoundingClientRect().left;
+                let shiftY = e.clientY - note.getBoundingClientRect().top;
+
+                function moveAt(clientX, clientY) {
+                    const rect = parent.getBoundingClientRect();
+                    let finalX = clientX - rect.left - shiftX;
+                    let finalY = clientY - rect.top - shiftY;
+                    
+                    // Constraints inside boundary box
+                    finalX = Math.max(0, Math.min(finalX, rect.width - 160));
+                    finalY = Math.max(0, Math.min(finalY, rect.height - 80));
+
+                    note.style.left = `${finalX}px`;
+                    note.style.top = `${finalY}px`;
+                }
+
+                function onMouseMove(event) {
+                    moveAt(event.clientX, event.clientY);
+                }
+
+                document.addEventListener('mousemove', onMouseMove);
+
+                document.onmouseup = function() {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.onmouseup = null;
+                };
+            });
+
+            // Prevent map parent click triggers
+            note.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+
+            parent.appendChild(note);
+        }
+
+        // Clear all elements inside workspace
+        function clearAllAnnotations() {
+            document.querySelectorAll('.sticky-note').forEach(note => note.remove());
+            stickyNotesCount = 0;
+            showNotification("All annotations cleared");
+        }
+
+        // Preset interactive visual models for simulation testing
+        function loadSimulationData() {
+            clearAllAnnotations();
+            
+            const viewer1 = document.getElementById('doc-viewer-1');
+            const viewer2 = document.getElementById('doc-viewer-2');
+            
+            // Mock dynamic markers matching high compliance status
+            createNoteElement(viewer1, 200, 140, "Verification Node", "Verified transaction. NSF transaction was addressed.");
+            createNoteElement(viewer2, 40, 240, "Compliance Flag", "Section 4.2: Ensure exact percentage logic checks out with Stripe ACH limits.");
+            
+            stickyNotesCount = 2;
+            showNotification("Loaded demo audit template annotations");
+        }
+
+        // Post custom Audit Log comments
+        function postComment() {
+            const commentText = document.getElementById('text-new-comment').value.trim();
+            const category = document.getElementById('select-category').value;
+            
+            if (!commentText) {
+                showNotification("Comment content cannot be blank");
+                return;
+            }
+
+            const feed = document.getElementById('comments-container');
+            const newComment = document.createElement('div');
+            newComment.className = 'comment-item';
+
+            // Tag status configurations
+            let tagStyle = '';
+            if (category === 'Risk Alert' || category === 'Correction Needed') {
+                tagStyle = 'class="comment-tag flag"';
+            } else {
+                tagStyle = 'class="comment-tag"';
+            }
+
+            newComment.innerHTML = `
+                <div class="comment-meta">
+                    <span>Audit Officer</span>
+                    <span>Just now</span>
+                </div>
+                <div class="comment-text">${commentText}</div>
+                <span ${tagStyle}>${category}</span>
+            `;
+
+            feed.prepend(newComment);
+            commentsCount++;
+            document.getElementById('comment-count').innerText = commentsCount;
+            document.getElementById('text-new-comment').value = '';
+            showNotification(`Note posted: categorized as ${category}`);
+        }
+
+        // Finalize Approve / Reject State Decisions
+        function processDecision(state) {
+            const hasSignature = checkCanvasHasData();
+            
+            if (!hasSignature) {
+                alert("ERROR: Signature missing. Please provide physical sign-off inside signature pad before continuing.");
+                showNotification("Signature trace required!");
+                return;
+            }
+
+            if (state === 'APPROVED') {
+                showNotification("FILE SUCCESSFULLY SIGNED-OFF & LOCKED!");
+                document.querySelector('.workspace-status-badge').innerText = "PROCESSED & APPROVED";
+                document.querySelector('.workspace-status-badge').style.borderColor = "var(--accent-lime)";
+                document.querySelector('.workspace-status-badge').style.color = "var(--accent-lime)";
+                document.querySelector('.workspace-status-badge').style.background = "rgba(57, 255, 20, 0.1)";
+            } else {
+                showNotification("FILE MARKED AS CORRECTION REQUIRED");
+                document.querySelector('.workspace-status-badge').innerText = "REJECTED WITH CORRECTIONS";
+                document.querySelector('.workspace-status-badge').style.borderColor = "var(--accent-orange)";
+                document.querySelector('.workspace-status-badge').style.color = "var(--accent-orange)";
+                document.querySelector('.workspace-status-badge').style.background = "rgba(255, 92, 0, 0.1)";
+            }
+        }
+
+        // Simple checker to detect signature presence
+        function checkCanvasHasData() {
+            const blank = document.createElement('canvas');
+            blank.width = canvas.width;
+            blank.height = canvas.height;
+            return canvas.toDataURL() !== blank.toDataURL();
+        }
+
+        // Custom notification toaster triggers
+        function showNotification(text) {
+            const toast = document.getElementById('toast');
+            const toastText = document.getElementById('toast-text');
+            toastText.innerText = text;
+            
+            toast.classList.add('visible');
+            setTimeout(() => {
+                toast.classList.remove('visible');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
+```

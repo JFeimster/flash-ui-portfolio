@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Channel Efficiency Matrix</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050507;
+            --card-bg: rgba(13, 13, 18, 0.8);
+            --neon-cyan: #00f2ff;
+            --neon-purple: #9d00ff;
+            --neon-green: #00ff88;
+            --neon-red: #ff0055;
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+            --glow-cyan: 0 0 20px rgba(0, 242, 255, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 242, 255, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(157, 0, 255, 0.15) 0%, transparent 40%);
+        }
+
+        .matrix-card {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 32px;
+            padding: 40px;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 28px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, #fff, var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: var(--text-dim);
+            font-size: 14px;
+        }
+
+        .quadrant-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        /* Axis Lines */
+        .axis-x {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            top: 0;
+            width: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .axis-y {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Quadrant Labels */
+        .quadrant-label {
+            position: absolute;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.3);
+            padding: 15px;
+        }
+
+        .tl { top: 0; left: 0; color: var(--neon-purple); }
+        .tr { top: 0; right: 0; color: var(--neon-green); }
+        .bl { bottom: 0; left: 0; color: var(--neon-red); }
+        .br { bottom: 0; right: 0; color: var(--neon-cyan); }
+
+        .axis-caption-y {
+            position: absolute;
+            left: -40px;
+            top: 50%;
+            transform: rotate(-90deg) translateY(-50%);
+            font-size: 10px;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+        }
+
+        .axis-caption-x {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+        }
+
+        /* Channel Nodes */
+        .channel-node {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2;
+        }
+
+        .channel-node::after {
+            content: attr(data-label);
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .channel-node:hover {
+            transform: translate(-50%, -50%) scale(1.5);
+            box-shadow: 0 0 20px currentColor;
+        }
+
+        /* Specific node colors and positions */
+        .node-google { background: var(--neon-purple); left: 30%; top: 30%; box-shadow: 0 0 10px rgba(157, 0, 255, 0.4); }
+        .node-seo { background: var(--neon-green); left: 85%; top: 25%; box-shadow: 0 0 10px rgba(0, 255, 136, 0.4); }
+        .node-referral { background: var(--neon-green); left: 70%; top: 70%; box-shadow: 0 0 10px rgba(0, 255, 136, 0.4); }
+        .node-social { background: var(--neon-red); left: 20%; top: 80%; box-shadow: 0 0 10px rgba(255, 0, 85, 0.4); }
+        .node-affiliate { background: var(--neon-cyan); left: 80%; top: 60%; box-shadow: 0 0 10px rgba(0, 242, 255, 0.4); }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 40px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-name {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            font-weight: 700;
+        }
+
+        .stat-val {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .stat-action {
+            font-size: 11px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .action-fuel { color: var(--neon-green); }
+        .action-optimize { color: var(--neon-cyan); }
+        .action-cut { color: var(--neon-red); }
+
+        @media (max-width: 600px) {
+            .quadrant-container { aspect-ratio: 1/1; }
+            .matrix-card { padding: 20px; }
+            h1 { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="matrix-card">
+    <header>
+        <h1>Channel Efficiency</h1>
+        <p class="subtitle">LTV:CAC Matrix & Budget Reallocation Map</p>
+    </header>
+
+    <div style="position: relative; margin: 0 40px;">
+        <div class="axis-caption-y">SCALE (VOLUME)</div>
+        <div class="axis-caption-x">EFFICIENCY (LTV:CAC)</div>
+        
+        <div class="quadrant-container">
+            <div class="axis-x"></div>
+            <div class="axis-y"></div>
+            
+            <div class="quadrant-label tl">Scale Trap</div>
+            <div class="quadrant-label tr">Golden Goose</div>
+            <div class="quadrant-label bl">Resource Drain</div>
+            <div class="quadrant-label br">Hidden Gems</div>
+
+            <!-- Nodes -->
+            <div class="channel-node node-google" data-label="Paid Search" title="LTV:CAC 1.8x | High Volume"></div>
+            <div class="channel-node node-seo" data-label="SEO" title="LTV:CAC 5.2x | High Volume"></div>
+            <div class="channel-node node-referral" data-label="Referrals" title="LTV:CAC 4.1x | Low Volume"></div>
+            <div class="channel-node node-social" data-label="Paid Social" title="LTV:CAC 0.9x | Low Volume"></div>
+            <div class="channel-node node-affiliate" data-label="Affiliates" title="LTV:CAC 3.5x | Med Volume"></div>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-item">
+            <span class="stat-name">Top Performer</span>
+            <span class="stat-val" style="color: var(--neon-green)">SEO</span>
+            <div class="stat-action action-fuel">▲ Increase Budget 25%</div>
+        </div>
+        <div class="stat-item">
+            <span class="stat-name">Under-Performing</span>
+            <span class="stat-val" style="color: var(--neon-red)">Paid Social</span>
+            <div class="stat-action action-cut">▼ Cut or Re-strategize</div>
+        </div>
+        <div class="stat-item">
+            <span class="stat-name">Scaling Opportunity</span>
+            <span class="stat-val" style="color: var(--neon-cyan)">Referrals</span>
+            <div class="stat-action action-optimize">◈ Focus on Virality</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Simple hover effect for interaction
+    document.querySelectorAll('.channel-node').forEach(node => {
+        node.addEventListener('mouseover', function() {
+            this.style.zIndex = "10";
+        });
+        node.addEventListener('mouseout', function() {
+            this.style.zIndex = "2";
+        });
+    });
+</script>
+
+</body>
+</html>

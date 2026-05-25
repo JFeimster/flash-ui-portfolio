@@ -1,0 +1,1157 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Borrower Onboarding &amp; Financial Integration Portal | Prism Debt Systems</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #03050a;
+            --bg-surface: rgba(10, 15, 30, 0.75);
+            --bg-surface-elevated: rgba(18, 25, 47, 0.9);
+            --border-glow-primary: rgba(37, 99, 235, 0.25);
+            --border-glow-accent: rgba(124, 58, 237, 0.2);
+            --accent-cobalt: #2563eb;
+            --accent-prism-violet: #7c3aed;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-rose: #f43f5e;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #475569;
+            --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .white-label-mode {
+            --bg-base: #fafaf9;
+            --bg-surface: rgba(255, 255, 255, 0.9);
+            --bg-surface-elevated: #ffffff;
+            --border-glow-primary: rgba(120, 113, 108, 0.15);
+            --border-glow-accent: rgba(120, 113, 108, 0.1);
+            --accent-cobalt: #1c1917;
+            --accent-prism-violet: #44403c;
+            --accent-cyan: #0f766e;
+            --text-primary: #1c1917;
+            --text-secondary: #57534e;
+            --text-muted: #a8a29e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(124, 58, 237, 0.08) 0%, transparent 40%);
+            background-attachment: fixed;
+            transition: background-color 0.5s ease;
+        }
+
+        .app-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            background: var(--bg-surface);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            transition: var(--transition-smooth);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-prism {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-cobalt), var(--accent-prism-violet), var(--accent-cyan));
+            border-radius: 8px;
+            transform: rotate(45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .logo-prism::after {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: var(--bg-base);
+            border-radius: 3px;
+            transform: rotate(-45deg);
+        }
+
+        .logo-text h1 {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text p {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .btn-toggle-view {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-toggle-view:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--accent-cobalt);
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.2);
+        }
+
+        /* Wizard Layout */
+        .onboarding-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+        }
+
+        .col-8 { grid-column: span 8; }
+        .col-4 { grid-column: span 4; }
+        .col-12 { grid-column: span 12; }
+
+        @media (max-width: 1024px) {
+            .col-8, .col-4 {
+                grid-column: span 12 !important;
+            }
+        }
+
+        .bento-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-glow-primary);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+            transition: var(--transition-smooth);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+        }
+
+        /* Stepper Styling */
+        .stepper-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.15);
+            padding: 16px 24px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 24px;
+        }
+
+        .step-indicators {
+            display: flex;
+            gap: 32px;
+            width: 100%;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            transition: var(--transition-smooth);
+        }
+
+        .step-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: var(--transition-smooth);
+        }
+
+        .step-item.active .step-num {
+            background: var(--accent-cobalt);
+            color: white;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+        }
+
+        .step-item.active .step-label {
+            color: var(--text-primary);
+        }
+
+        .step-item.completed .step-num {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: var(--accent-emerald);
+            color: var(--accent-emerald);
+        }
+
+        .step-item.completed .step-label {
+            color: var(--accent-emerald);
+        }
+
+        /* Form styling */
+        .form-section {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-title-group {
+            margin-bottom: 24px;
+        }
+
+        .form-title-group h2 {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .form-title-group p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 640px) {
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+        }
+
+        .form-control {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-family: var(--font-sans);
+            font-size: 14px;
+            color: var(--text-primary);
+            outline: none;
+            transition: var(--transition-smooth);
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.15);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        /* Provider Link Cards */
+        .integration-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .integration-card {
+            background: rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: var(--transition-smooth);
+        }
+
+        .integration-card:hover {
+            border-color: rgba(6, 182, 212, 0.25);
+            background: rgba(0, 0, 0, 0.25);
+        }
+
+        .integration-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .integration-logo-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 800;
+            font-family: var(--font-mono);
+        }
+
+        .plaid-logo { background: linear-gradient(135deg, #0a0a0c, #1f222d); color: #fff; border: 1px solid #333; }
+        .stripe-logo { background: linear-gradient(135deg, #635bff, #7a73ff); color: #fff; }
+        .qb-logo { background: linear-gradient(135deg, #2ca01c, #258517); color: #fff; }
+
+        .integration-details h4 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .integration-details p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .btn-link-action {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-link-action:hover {
+            background: var(--accent-cobalt);
+            border-color: var(--accent-cobalt);
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-link-action.linked {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: var(--accent-emerald);
+            color: var(--accent-emerald);
+            cursor: default;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            display: inline-block;
+        }
+
+        .status-dot.active {
+            background: var(--accent-emerald);
+            box-shadow: 0 0 8px var(--accent-emerald);
+            animation: pulse-green 1.5s infinite;
+        }
+
+        @keyframes pulse-green {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Navigation buttons */
+        .wizard-actions {
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 20px;
+            margin-top: 24px;
+        }
+
+        .btn-nav {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-nav:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .btn-nav:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .btn-nav-primary {
+            background: linear-gradient(90deg, var(--accent-cobalt), var(--accent-cyan));
+            border: none;
+            color: white;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-nav-primary:hover:not(:disabled) {
+            box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
+            transform: translateY(-1px);
+        }
+
+        /* Live Data Ingestion Terminal & Insights sidebar */
+        .telemetry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .telemetry-header h3 {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .live-pulse {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-family: var(--font-mono);
+            color: var(--accent-emerald);
+            background: rgba(16, 185, 129, 0.1);
+            padding: 4px 10px;
+            border-radius: 100px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .telemetry-terminal {
+            background: #020306;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 16px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: #a8b2c2;
+            height: 240px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .terminal-log-line {
+            display: flex;
+            gap: 8px;
+            line-height: 1.4;
+        }
+
+        .terminal-log-line .time { color: var(--accent-cyan); }
+        .terminal-log-line .tag { color: var(--accent-prism-violet); font-weight: 700; }
+        .terminal-log-line .success { color: var(--accent-emerald); }
+        .terminal-log-line .warning { color: var(--accent-rose); }
+
+        .metrics-radar-card {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 16px;
+        }
+
+        .metrics-radar-card h4 {
+            font-size: 12px;
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .radar-stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .radar-stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .radar-stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .radar-stat-value {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Final JSON Integration Schema Output preview */
+        .schema-preview-wrap {
+            margin-top: 16px;
+        }
+
+        .schema-title {
+            font-size: 12px;
+            font-family: var(--font-mono);
+            color: var(--accent-prism-violet);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .code-block {
+            background: #020306;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 12px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: #cbd5e1;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        /* Success & Transfer Complete screen */
+        .transfer-success-wrapper {
+            text-align: center;
+            padding: 30px 10px;
+        }
+
+        .success-circle {
+            width: 64px;
+            height: 64px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--accent-emerald);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-emerald);
+            margin: 0 auto 16px;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+        }
+
+        .success-circle svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        /* Compliance regulatory disclaimer in Wizard */
+        .wizard-disclaimer {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.4;
+            margin-top: 16px;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .wizard-disclaimer svg {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+            stroke: var(--text-muted);
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    
+    <!-- Header -->
+    <header>
+        <div class="logo-area">
+            <div class="logo-prism"></div>
+            <div class="logo-text">
+                <h1>PRISM INTAKE MODULE</h1>
+                <p>Onboarding &amp; Data Synchronization Gateway</p>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <div class="live-pulse">
+                <span class="status-dot active"></span>
+                <span>SECURE ENCRYPTED PORTAL</span>
+            </div>
+            <!-- White-label Switcher -->
+            <button class="btn-toggle-view" onclick="toggleWhiteLabelView()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2.25a.75.75 0 0 0-1.137-.65l-8.25 4.75A1.5 1.5 0 0 0 2 7.65v8.7a1.5 1.5 0 0 0 .613 1.3l8.25 4.75a.75.75 0 0 0 .774 0l8.25-4.75a1.5 1.5 0 0 0 .613-1.3v-8.7a1.5 1.5 0 0 0-.613-1.3l-8.25-4.75Z"/>
+                </svg>
+                <span id="toggleText">Switch to White-Label</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="onboarding-grid">
+        
+        <!-- Left Side: Interactive Progress Stepper Form -->
+        <div class="bento-card col-8">
+            <div class="stepper-header">
+                <div class="step-indicators">
+                    <div class="step-item active" id="stepIndicator1">
+                        <div class="step-num">1</div>
+                        <span class="step-label">Baseline</span>
+                    </div>
+                    <div class="step-item" id="stepIndicator2">
+                        <div class="step-num">2</div>
+                        <span class="step-label">Financial APIs</span>
+                    </div>
+                    <div class="step-item" id="stepIndicator3">
+                        <div class="step-num">3</div>
+                        <span class="step-label">Ledger Verify</span>
+                    </div>
+                    <div class="step-item" id="stepIndicator4">
+                        <div class="step-num">4</div>
+                        <span class="step-label">Sync Complete</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Step 1: Baseline Metrics -->
+            <div class="form-section active" id="formStep1">
+                <div class="form-title-group">
+                    <h2>Operational baseline profile parameters</h2>
+                    <p>Provide baseline enterprise context. This seeds the structural risk classification models prior to deep API extraction.</p>
+                </div>
+
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label for="companyName">Legal Entity Name</label>
+                        <input type="text" class="form-control" id="companyName" placeholder="Acme Technology Inc." oninput="updateProfilePayload()">
+                    </div>
+                    <div class="input-group">
+                        <label for="borrowerArchetype">Borrower Archetype Model</label>
+                        <select class="form-control" id="borrowerArchetype" onchange="applyArchetypeTemplate()">
+                            <option value="saas">SaaS Scaleup (High Velocity MRR)</option>
+                            <option value="ecom">E-Commerce Titan (High Inventory Turn)</option>
+                            <option value="industrial">Heavy Manufacturing (Asset Rich)</option>
+                            <option value="realestate">Commercial RE Asset Class</option>
+                            <option value="acquisition">LBO / Acquisition Search Fund</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="statedMRR">Self-Stated MRR / Sales ($)</label>
+                        <input type="number" class="form-control" id="statedMRR" value="250000" oninput="updateProfilePayload()">
+                    </div>
+                    <div class="input-group">
+                        <label for="existingDebt">Total Outstanding Debt ($)</label>
+                        <input type="number" class="form-control" id="existingDebt" value="500000" oninput="updateProfilePayload()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Step 2: Instant API Integrations -->
+            <div class="form-section" id="formStep2">
+                <div class="form-title-group">
+                    <h2>Establish High-Fidelity API Channels</h2>
+                    <p>Integrate structured platforms to extract true capital indicators. Zero physical tax return scanning required.</p>
+                </div>
+
+                <div class="integration-cards">
+                    <!-- Card 1: Plaid -->
+                    <div class="integration-card">
+                        <div class="integration-meta">
+                            <div class="integration-logo-box plaid-logo">P</div>
+                            <div class="integration-details">
+                                <h4>Plaid Asset Sync</h4>
+                                <p id="plaid-desc">Pending verification - Extracting liquid cash reserves and banking history.</p>
+                            </div>
+                        </div>
+                        <button class="btn-link-action" id="plaidBtn" onclick="simulateIntegration('plaid')">
+                            <span class="status-dot" id="plaidDot"></span>
+                            <span id="plaidBtnText">Link Sandbox Node</span>
+                        </button>
+                    </div>
+
+                    <!-- Card 2: Stripe -->
+                    <div class="integration-card">
+                        <div class="integration-meta">
+                            <div class="integration-logo-box stripe-logo">S</div>
+                            <div class="integration-details">
+                                <h4>Stripe Payment Portal</h4>
+                                <p id="stripe-desc">Pending verification - Processing gross sales volume and chargeback rates.</p>
+                            </div>
+                        </div>
+                        <button class="btn-link-action" id="stripeBtn" onclick="simulateIntegration('stripe')">
+                            <span class="status-dot" id="stripeDot"></span>
+                            <span id="stripeBtnText">Authenticate Stripe</span>
+                        </button>
+                    </div>
+
+                    <!-- Card 3: QuickBooks Online -->
+                    <div class="integration-card">
+                        <div class="integration-meta">
+                            <div class="integration-logo-box qb-logo">Q</div>
+                            <div class="integration-details">
+                                <h4>QuickBooks Cloud Ledger</h4>
+                                <p id="qb-desc">Pending verification - Scanning profit margins, asset statements, and COGS.</p>
+                            </div>
+                        </div>
+                        <button class="btn-link-action" id="qbBtn" onclick="simulateIntegration('qb')">
+                            <span class="status-dot" id="qbDot"></span>
+                            <span id="qbBtnText">Connect Ledger API</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Step 3: Ledger Verification -->
+            <div class="form-section" id="formStep3">
+                <div class="form-title-group">
+                    <h2>Ingested Ledger Verification</h2>
+                    <p>Review real-time structural assertions extracted automatically from linked accounts. Confirm baseline alignment.</p>
+                </div>
+
+                <div style="background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 12px;">
+                        <div>
+                            <span style="font-size: 11px; font-family: var(--font-mono); color: var(--accent-cyan); text-transform: uppercase;">VERIFIED INSIGHT</span>
+                            <h4 style="font-size: 15px; font-weight: 700; margin-top: 2px;">Extracted Net Liquid Balances</h4>
+                        </div>
+                        <div style="font-family: var(--font-mono); font-size: 18px; font-weight: 700; color: var(--accent-emerald);" id="extLiquidValue">$410,250</div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 12px;">
+                        <div>
+                            <span style="font-size: 11px; font-family: var(--font-mono); color: var(--accent-cyan); text-transform: uppercase;">VERIFIED INSIGHT</span>
+                            <h4 style="font-size: 15px; font-weight: 700; margin-top: 2px;">Calculated Growth Rate (L3M)</h4>
+                        </div>
+                        <div style="font-family: var(--font-mono); font-size: 18px; font-weight: 700; color: var(--accent-emerald);" id="extGrowthValue">+14.2%</div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px;">
+                        <div>
+                            <span style="font-size: 11px; font-family: var(--font-mono); color: var(--accent-prism-violet); text-transform: uppercase;">RISK MITIGATION STATUS</span>
+                            <h4 style="font-size: 15px; font-weight: 700; margin-top: 2px;">Tangible Physical Liens</h4>
+                        </div>
+                        <div style="font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--text-muted);" id="extCollateralValue">None Registered</div>
+                    </div>
+                </div>
+
+                <div class="input-group" style="margin-bottom: 12px;">
+                    <label for="underwriterOverrideMsg">Underwriting Narrative Addendum</label>
+                    <textarea class="form-control" id="underwriterOverrideMsg" rows="3" style="resize: none;" placeholder="Provide specific operational circumstances, inventory schedules, or contract cycles to append to the system routing path..." oninput="updateProfilePayload()"></textarea>
+                </div>
+            </div>
+
+            <!-- Form Step 4: Verification / Sync Complete -->
+            <div class="form-section" id="formStep4">
+                <div class="transfer-success-wrapper">
+                    <div class="success-circle">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                    <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 8px;">Asset Profiler Complete</h2>
+                    <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto 24px; font-size: 14px; line-height: 1.6;">
+                        Onboarding parameters have been successfully structured, parsed, and signed. Data package ready to feed directly into the central Funding Intelligence Engine.
+                    </p>
+
+                    <button class="btn-nav btn-nav-primary" style="margin: 0 auto; width: auto;" onclick="transferDataToTerminal()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        Initiate Terminal Allocations
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stepper Actions Bar -->
+            <div class="wizard-actions">
+                <button class="btn-nav" id="btnPrev" onclick="navigateWizard(-1)" disabled>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    Previous Step
+                </button>
+                <button class="btn-nav btn-nav-primary" id="btnNext" onclick="navigateWizard(1)">
+                    Next Step
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+
+            <div class="wizard-disclaimer">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                <span>Compliance parameters checked on keystroke: By submitting this financial payload, you authorize secure dynamic scraping of linked corporate asset pools in strict alignment with regional FDIC &amp; SOC2 framework guarantees.</span>
+            </div>
+        </div>
+
+        <!-- Right Side: Real-Time Verification Telemetry and Live Diagnostics -->
+        <div class="bento-card col-4">
+            <div class="telemetry-header">
+                <h3>System Data Sync</h3>
+                <div class="live-pulse">
+                    <span class="status-dot active"></span>
+                    <span>LIVE PIPELINE</span>
+                </div>
+            </div>
+
+            <!-- Real-Time Trace Log -->
+            <div class="telemetry-terminal" id="ingestTerminal">
+                <div class="terminal-log-line">
+                    <span class="time">[00:00:01]</span>
+                    <span class="tag">SECURE_INIT</span>
+                    <span>Intake pipeline armed and waiting.</span>
+                </div>
+            </div>
+
+            <!-- Live Indicators derived from Inputs -->
+            <div class="metrics-radar-card">
+                <h4>Dynamic Performance Indicators</h4>
+                <div class="radar-stat-row">
+                    <span class="radar-stat-label">Calculated Liquidity</span>
+                    <span class="radar-stat-value" id="radarLiquidity">0%</span>
+                </div>
+                <div class="radar-stat-row">
+                    <span class="radar-stat-label">Leverage Footprint</span>
+                    <span class="radar-stat-value" id="radarLeverage">0%</span>
+                </div>
+                <div class="radar-stat-row">
+                    <span class="radar-stat-label">Velocity Premium</span>
+                    <span class="radar-stat-value" id="radarVelocity">0%</span>
+                </div>
+            </div>
+
+            <!-- Real-Time Payload Schema -->
+            <div class="schema-preview-wrap">
+                <div class="schema-title">Live Schema Package (borrower_profile.json)</div>
+                <pre class="code-block" id="payloadCode"><code>{
+  "borrower": {
+    "entity": "Stating Entity",
+    "archetype": "saas",
+    "metrics": {
+      "mrr": 250000,
+      "debt": 500000,
+      "linked_reserves": 0
+    },
+    "verified": false
+  }
+}</code></pre>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Strict Compliance Regulatory Footer -->
+    <footer>
+        <div style="font-size: 11px; color: var(--text-muted); line-height: 1.6; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 24px;">
+            <p style="font-weight: 700; margin-bottom: 6px; color: var(--text-secondary);">DATA PRIVACY PROTOCOLS &amp; END-USER ACCESS AGREEMENT</p>
+            All ingested data records and API endpoint connections are sandboxed. Encryption schemes conform strictly with AES-GCM 256-bit secure key generation guidelines and standard financial data transport mechanisms. Prism Systems retains no local copies of external corporate bank authorization codes outside transient operational sessions.
+        </div>
+    </footer>
+
+</div>
+
+<!-- Portal Logic Script -->
+<script>
+    // State Tracking
+    let activeStep = 1;
+    let isWhiteLabelActive = false;
+    let connectedSystems = {
+        plaid: false,
+        stripe: false,
+        qb: false
+    };
+
+    let profileData = {
+        entity: "Acme Technology Inc.",
+        archetype: "saas",
+        mrr: 250000,
+        debt: 500000,
+        linked_reserves: 0,
+        verified_growth: 14.2,
+        addendum: "",
+        calculated_liquidity: 45,
+        calculated_leverage: 32,
+        calculated_velocity: 80
+    };
+
+    const templates = {
+        saas: { mrr: 350000, debt: 150000, growth: 22.5, liquidity: 85, leverage: 15, velocity: 90, reserves: 125000 },
+        ecom: { mrr: 600000, debt: 800000, growth: 12.8, liquidity: 50, leverage: 55, velocity: 72, reserves: 45000 },
+        industrial: { mrr: 1500000, debt: 4500000, growth: 4.5, liquidity: 35, leverage: 78, velocity: 30, reserves: 320000 },
+        realestate: { mrr: 2200000, debt: 12000000, growth: 8.1, liquidity: 40, leverage: 68, velocity: 52, reserves: 850000 },
+        acquisition: { mrr: 120000, debt: 2500000, growth: 15.0, liquidity: 60, leverage: 42, velocity: 65, reserves: 150000 }
+    };
+
+    // Apply specific archetype parameters from selector template
+    function applyArchetypeTemplate() {
+        const type = document.getElementById("borrowerArchetype").value;
+        const currentTemplate = templates[type];
+        
+        document.getElementById("statedMRR").value = currentTemplate.mrr;
+        document.getElementById("existingDebt").value = currentTemplate.debt;
+        
+        profileData.archetype = type;
+        profileData.verified_growth = currentTemplate.growth;
+        profileData.calculated_liquidity = currentTemplate.liquidity;
+        profileData.calculated_leverage = currentTemplate.leverage;
+        profileData.calculated_velocity = currentTemplate.velocity;
+        profileData.linked_reserves = currentTemplate.reserves;
+
+        logTrace("SYSTEM_RECAL", `Stated baseline parameters updated. Model configured to '${type.toUpperCase()}' template specifications.`);
+        updateProfilePayload();
+    }
+
+    // Step Navigation Handler
+    function navigateWizard(direction) {
+        // Validation check for steps
+        if (direction === 1 && activeStep === 2) {
+            let connectionsCount = Object.values(connectedSystems).filter(Boolean).length;
+            if (connectionsCount === 0) {
+                alert("Please authenticate at least one secure financial API parameter to verify operational balance history before continuing.");
+                return;
+            }
+        }
+
+        // Apply visual updates to steps
+        document.getElementById(`formStep${activeStep}`).classList.remove("active");
+        document.getElementById(`stepIndicator${activeStep}`).classList.remove("active");
+        if (direction === 1) {
+            document.getElementById(`stepIndicator${activeStep}`).classList.add("completed");
+        }
+
+        activeStep += direction;
+
+        document.getElementById(`formStep${activeStep}`).classList.add("active");
+        document.getElementById(`stepIndicator${activeStep}`).classList.add("active");
+
+        // Action Buttons Handling
+        document.getElementById("btnPrev").disabled = activeStep === 1 || activeStep === 4;
+        
+        if (activeStep === 4) {
+            document.getElementById("btnNext").style.display = "none";
+            document.getElementById("btnPrev").style.display = "none";
+            logTrace("INTAKE_COMPLETED", "Final verified entity structure signed and compiled successfully.");
+        } else {
+            document.getElementById("btnNext").style.display = "flex";
+            document.getElementById("btnPrev").style.display = "flex";
+        }
+
+        logTrace("WIZARD_NAV", `User progressed to Step ${activeStep}/4.`);
+        updateProfilePayload();
+    }
+
+    // Connect mock APIs
+    function simulateIntegration(system) {
+        if (connectedSystems[system]) return;
+
+        const btn = document.getElementById(`${system}Btn`);
+        const dot = document.getElementById(`${system}Dot`);
+        const text = document.getElementById(`${system}BtnText`);
+        const desc = document.getElementById(`${system}-desc`);
+
+        btn.disabled = true;
+        text.innerText = "Connecting secure channel...";
+        logTrace("API_HANDSHAKE_START", `Initializing handshakes with remote '${system.toUpperCase()}' API node...`);
+
+        setTimeout(() => {
+            connectedSystems[system] = true;
+            btn.classList.add("linked");
+            dot.classList.add("active");
+            btn.disabled = false;
+            text.innerText = "Linked Successfully";
+            
+            // Adjust verified elements depending on systems linked
+            if (system === 'plaid') {
+                desc.innerText = "Linked - Extracted asset reserves secure.";
+                logTrace("BANK_INGEST", "Liquid balance mapping completed. Structured reserves verified.");
+                profileData.calculated_liquidity = Math.min(100, profileData.calculated_liquidity + 20);
+            } else if (system === 'stripe') {
+                desc.innerText = "Linked - Recurring gross merchant velocity logs verified.";
+                logTrace("STRIPE_INGEST", "Extracted monthly sales and chargeback rate parameters.");
+                profileData.calculated_velocity = Math.min(100, profileData.calculated_velocity + 15);
+            } else if (system === 'qb') {
+                desc.innerText = "Linked - Scanned operational margins and equity schedules.";
+                logTrace("LEDGER_INGEST", "Profit/loss declarations verified against active bank transactions.");
+                profileData.calculated_leverage = Math.max(10, profileData.calculated_leverage - 8);
+            }
+
+            updateProfilePayload();
+        }, 1500);
+    }
+
+    // Core Trace Telemetry Logs Update
+    function logTrace(tag, message) {
+        const terminal = document.getElementById("ingestTerminal");
+        const timestamp = new Date().toLocaleTimeString();
+        
+        const line = document.createElement("div");
+        line.className = "terminal-log-line";
+        
+        let customStyling = "";
+        if (tag.includes("COMPLETED") || tag.includes("INGEST")) {
+            customStyling = "success";
+        } else if (tag.includes("START") || tag.includes("RECAL")) {
+            customStyling = "tag";
+        }
+
+        line.innerHTML = `
+            <span class="time">[${timestamp}]</span>
+            <span class="tag ${customStyling}">${tag}</span>
+            <span>${message}</span>
+        `;
+        terminal.appendChild(line);
+        terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    // Dynamic state recalculation and JSON generator
+    function updateProfilePayload() {
+        profileData.entity = document.getElementById("companyName").value || "Acme Technology Inc.";
+        profileData.mrr = parseFloat(document.getElementById("statedMRR").value) || 0;
+        profileData.debt = parseFloat(document.getElementById("existingDebt").value) || 0;
+        profileData.addendum = document.getElementById("underwriterOverrideMsg").value;
+
+        // Visual sidebar telemetry values
+        document.getElementById("radarLiquidity").innerText = `${profileData.calculated_liquidity}%`;
+        document.getElementById("radarLeverage").innerText = `${profileData.calculated_leverage}%`;
+        document.getElementById("radarVelocity").innerText = `${profileData.calculated_velocity}%`;
+
+        // Verification step metrics updates
+        document.getElementById("extLiquidValue").innerText = `$${(profileData.linked_reserves).toLocaleString()}`;
+        document.getElementById("extGrowthValue").innerText = `${profileData.verified_growth > 0 ? '+' : ''}${profileData.verified_growth}%`;
+
+        // Output Preview payload mapping
+        const outputPayload = {
+            borrower_onboarding_package: {
+                metadata: {
+                    entity_name: profileData.entity,
+                    target_archetype: profileData.archetype,
+                    package_signed_timestamp: new Date().toISOString()
+                },
+                extracted_indicators: {
+                    stated_mrr: profileData.mrr,
+                    unsecured_outstanding_debt: profileData.debt,
+                    verified_liquid_reserves: profileData.linked_reserves,
+                    system_calculated_velocity: profileData.calculated_velocity,
+                    underwriter_override_narrative: profileData.addendum
+                },
+                system_assertions: {
+                    liquidity_metric: profileData.calculated_liquidity,
+                    leverage_multiplier: profileData.calculated_leverage,
+                    verification_complete: activeStep === 4
+                }
+            }
+        };
+
+        document.getElementById("payloadCode").innerHTML = `<code>${JSON.stringify(outputPayload, null, 2)}</code>`;
+    }
+
+    // Final transfer transition pipeline event trigger
+    function transferDataToTerminal() {
+        alert("Initializing live secure handshake pipeline...\nRedirecting formatted payload payload packages straight into Funding Intelligence Allocation engine templates.");
+        logTrace("DISPATCH", "Handing execution thread context back to Central Engine...");
+    }
+
+    // Toggle Between Full Operator View and White-Labeled Client Presentation
+    function toggleWhiteLabelView() {
+        isWhiteLabelActive = !isWhiteLabelActive;
+        const bodyEl = document.body;
+        const toggleText = document.getElementById("toggleText");
+
+        if (isWhiteLabelActive) {
+            bodyEl.classList.add("white-label-mode");
+            toggleText.innerText = "Switch to Operator Mode";
+            logTrace("VIEW_SHIELDED", "Enabling client-facing white-label environments...");
+        } else {
+            bodyEl.classList.remove("white-label-mode");
+            toggleText.innerText = "Switch to White-Label";
+            logTrace("VIEW_RESTORED", "Enabling multi-dimensional platform developer views...");
+        }
+    }
+
+    // Page initialization
+    window.onload = function() {
+        applyArchetypeTemplate();
+    };
+</script>
+
+</body>
+</html>
+```

@@ -1,0 +1,987 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Edge - Submission History & Audit Trail</title>
+    <!-- Google Fonts for Ultra-Modern High-Contrast Look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0c10;
+            --surface: #14161f;
+            --surface-card: #1a1d29;
+            --text-raw: #ffffff;
+            --text-muted: #8e95ad;
+            --accent-cyan: #00f3ff;
+            --accent-magenta: #ff0055;
+            --accent-yellow: #ffee00;
+            --accent-green: #00ffaa;
+            --border-width: 3px;
+            --brutal-shadow-cyan: 6px 6px 0px var(--accent-cyan);
+            --brutal-shadow-magenta: 6px 6px 0px var(--accent-magenta);
+            --brutal-shadow-yellow: 6px 6px 0px var(--accent-yellow);
+            --transition-speed: 0.15s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-raw);
+            line-height: 1.4;
+            padding: 20px;
+            overflow-x: hidden;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* Container Limit */
+        .wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header Section */
+        header {
+            position: relative;
+            padding: 80px 40px;
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            box-shadow: var(--brutal-shadow-cyan);
+            margin-bottom: 60px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        /* Ambient glowing background grid */
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,243,255,0.08) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--accent-cyan);
+            color: #000;
+            border: 2px solid #fff;
+            font-weight: 900;
+            font-size: 14px;
+            letter-spacing: 1.5px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            transform: rotate(-1.5deg);
+            box-shadow: 4px 4px 0px #fff;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        h1 {
+            font-size: clamp(38px, 6vw, 76px);
+            font-weight: 900;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            line-height: 0.95;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        h1 span {
+            color: transparent;
+            -webkit-text-stroke: 1.5px #fff;
+            background: linear-gradient(90deg, var(--accent-magenta), var(--accent-yellow));
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .hero-sub {
+            font-size: 20px;
+            color: var(--text-muted);
+            max-width: 750px;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        /* Filter & Search Bar */
+        .controls-wrapper {
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            padding: 30px;
+            box-shadow: var(--brutal-shadow-magenta);
+            margin-bottom: 40px;
+        }
+
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-container {
+            position: relative;
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--surface-card);
+            border: var(--border-width) solid #fff;
+            padding: 18px 20px 18px 50px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            box-shadow: inset 4px 4px 0px rgba(0, 0, 0, 0.5);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-container::before {
+            content: '🔍';
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            pointer-events: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-cyan);
+        }
+
+        .filter-btn {
+            background: var(--surface-card);
+            border: var(--border-width) solid #fff;
+            color: #fff;
+            padding: 16px 28px;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 15px;
+            text-transform: uppercase;
+            transition: all var(--transition-speed);
+            box-shadow: 4px 4px 0px rgba(255,255,255,0.15);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .filter-btn:hover {
+            background: #fff;
+            color: #000;
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active {
+            background: var(--accent-magenta);
+            color: #fff;
+            box-shadow: 4px 4px 0px #fff;
+        }
+
+        /* Timeline Log Layout */
+        .timeline-container {
+            position: relative;
+            margin-bottom: 60px;
+        }
+
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            left: 45px;
+            top: 20px;
+            bottom: 20px;
+            width: 4px;
+            background: dashed rgba(255, 255, 255, 0.15);
+            z-index: 1;
+        }
+
+        .audit-item {
+            position: relative;
+            display: flex;
+            gap: 30px;
+            margin-bottom: 40px;
+            z-index: 2;
+        }
+
+        .timeline-marker {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: var(--surface-card);
+            border: var(--border-width) solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+            box-shadow: 4px 4px 0px #fff;
+            z-index: 3;
+            transition: transform 0.2s;
+        }
+
+        .audit-item:hover .timeline-marker {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .audit-card {
+            flex-grow: 1;
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            padding: 30px;
+            box-shadow: var(--brutal-shadow-yellow);
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .audit-card:hover {
+            transform: translate(-6px, -6px);
+            box-shadow: 12px 12px 0px var(--accent-yellow);
+        }
+
+        .audit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .audit-title-area {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .audit-title {
+            font-size: 22px;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-family: 'Space Grotesk', sans-serif;
+            letter-spacing: -0.5px;
+        }
+
+        .audit-meta {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .audit-meta span {
+            color: #fff;
+        }
+
+        .audit-tag {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 900;
+            background: #fff;
+            color: #000;
+            padding: 4px 10px;
+            border: 2px solid #000;
+            display: inline-block;
+            letter-spacing: 1px;
+        }
+
+        /* Color configurations for tags */
+        .audit-item[data-category="upload"] .audit-tag {
+            background: var(--accent-cyan);
+            color: #000;
+        }
+        .audit-item[data-category="view"] .audit-tag {
+            background: var(--accent-magenta);
+            color: #fff;
+        }
+        .audit-item[data-category="verify"] .audit-tag {
+            background: var(--accent-green);
+            color: #000;
+        }
+        .audit-item[data-category="system"] .audit-tag {
+            background: var(--accent-yellow);
+            color: #000;
+        }
+
+        .audit-item[data-category="upload"] .audit-card {
+            box-shadow: var(--brutal-shadow-cyan);
+        }
+        .audit-item[data-category="upload"] .audit-card:hover {
+            box-shadow: 12px 12px 0px var(--accent-cyan);
+        }
+        .audit-item[data-category="view"] .audit-card {
+            box-shadow: var(--brutal-shadow-magenta);
+        }
+        .audit-item[data-category="view"] .audit-card:hover {
+            box-shadow: 12px 12px 0px var(--accent-magenta);
+        }
+        .audit-item[data-category="verify"] .audit-card {
+            box-shadow: 6px 6px 0px var(--accent-green);
+        }
+        .audit-item[data-category="verify"] .audit-card:hover {
+            box-shadow: 12px 12px 0px var(--accent-green);
+        }
+
+        .audit-desc {
+            font-size: 15px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .audit-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 2px dashed rgba(255, 255, 255, 0.1);
+            padding-top: 15px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .system-hash {
+            font-family: monospace;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--accent-cyan);
+        }
+
+        .audit-action {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 14px;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 2px solid #fff;
+            padding: 8px 16px;
+            background: var(--surface-card);
+            transition: all 0.2s;
+            cursor: pointer;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .audit-action:hover {
+            background: #fff;
+            color: #000;
+            box-shadow: 4px 4px 0px var(--accent-cyan);
+        }
+
+        /* Banner styling */
+        .immutable-banner {
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            margin: 80px 0;
+            padding: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 40px;
+            box-shadow: var(--brutal-shadow-cyan);
+        }
+
+        .banner-content h2 {
+            font-size: clamp(32px, 4vw, 48px);
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .banner-content p {
+            font-size: 18px;
+            color: var(--text-muted);
+            max-width: 600px;
+        }
+
+        .banner-cta {
+            background: var(--accent-magenta);
+            color: #fff;
+            padding: 20px 40px;
+            border: var(--border-width) solid #fff;
+            text-decoration: none;
+            font-weight: 900;
+            font-size: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 6px 6px 0px #fff;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            font-family: 'Space Grotesk', sans-serif;
+            white-space: nowrap;
+        }
+
+        .banner-cta:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 10px 10px 0px #fff;
+        }
+
+        /* Detail/Inspection Drawer Overlay */
+        .calculator-overlay {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            max-width: 580px;
+            height: 100vh;
+            background: var(--surface);
+            border-left: var(--border-width) solid #fff;
+            box-shadow: -20px 0px 0px rgba(0,0,0,0.8);
+            z-index: 1000;
+            transform: translateX(110%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
+            padding: 40px;
+        }
+
+        .calculator-overlay.active {
+            transform: translateX(0);
+        }
+
+        .overlay-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay-backdrop.active {
+            display: block;
+        }
+
+        .calc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: var(--border-width) solid #fff;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .calc-title {
+            font-size: 24px;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--accent-cyan);
+        }
+
+        .close-calc {
+            background: var(--accent-magenta);
+            color: #fff;
+            border: 2px solid #fff;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-weight: 900;
+            font-size: 14px;
+            text-transform: uppercase;
+            box-shadow: 3px 3px 0px #fff;
+        }
+
+        .close-calc:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px;
+        }
+
+        /* Meta block styling inside details drawer */
+        .meta-box {
+            background: var(--surface-card);
+            border: 2px solid #fff;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 4px 4px 0px rgba(255,255,255,0.08);
+        }
+
+        .meta-box h4 {
+            font-size: 16px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            color: var(--accent-yellow);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .meta-property {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed rgba(255,255,255,0.1);
+            font-size: 14px;
+        }
+
+        .meta-property:last-child {
+            border-bottom: none;
+        }
+
+        .meta-key {
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .meta-val {
+            font-family: monospace;
+            color: #fff;
+            text-align: right;
+            word-break: break-all;
+            max-width: 60%;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 100px;
+            padding: 80px 40px;
+            border: var(--border-width) solid #fff;
+            background: #000;
+            color: #fff;
+            box-shadow: var(--brutal-shadow-magenta);
+            text-align: center;
+            position: relative;
+        }
+
+        .footer-cta h2 {
+            font-size: clamp(36px, 5vw, 64px);
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 35px;
+            font-family: 'Space Grotesk', sans-serif;
+            letter-spacing: -1px;
+        }
+
+        .footer-copyright {
+            margin-top: 80px;
+            font-weight: 900;
+            color: var(--accent-cyan);
+            letter-spacing: 2px;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        /* Response Adjustments */
+        @media (max-width: 900px) {
+            .timeline-container::before {
+                left: 25px;
+            }
+            .audit-item {
+                gap: 15px;
+            }
+            .timeline-marker {
+                width: 54px;
+                height: 54px;
+                font-size: 20px;
+            }
+            .immutable-banner {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 40px;
+            }
+            .banner-cta {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            header {
+                padding: 40px 20px;
+            }
+            .controls-wrapper {
+                padding: 20px;
+            }
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-btn {
+                width: 100%;
+                text-align: center;
+            }
+            .calculator-overlay {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <!-- HEADER / HERO -->
+        <header>
+            <div class="hero-badge">🔐 SECURE LEDGER SYSTEM</div>
+            <h1>Compliance <span>Audit Trail</span></h1>
+            <p class="hero-sub">Track real-time transactional records, file uploads, document verification flows, and cryptographically verified operator changes in a complete, immutable system timeline.</p>
+        </header>
+
+        <!-- FILTERS & CONTROLS -->
+        <div class="tools-container">
+            <div class="controls-wrapper">
+                <div class="filter-bar">
+                    <div class="search-container">
+                        <input type="text" id="auditSearch" class="search-input" placeholder="SEARCH LOGS BY FILENAME, IP, OR USER...">
+                    </div>
+                    <button class="filter-btn active" data-filter="all">ALL ENTRIES</button>
+                    <button class="filter-btn" data-filter="upload">UPLOADS</button>
+                    <button class="filter-btn" data-filter="view">ACCESS LOGS</button>
+                    <button class="filter-btn" data-filter="verify">VERIFICATIONS</button>
+                    <button class="filter-btn" data-filter="system">SYSTEM CHANGES</button>
+                </div>
+            </div>
+
+            <!-- CHRONOLOGICAL TIMELINE -->
+            <div class="timeline-container" id="timelineList">
+                
+                <!-- Entry 1 -->
+                <div class="audit-item" data-category="verify">
+                    <div class="timeline-marker">✅</div>
+                    <div class="audit-card">
+                        <div class="audit-header">
+                            <div class="audit-title-area">
+                                <span class="audit-tag">Verification</span>
+                                <h3 class="audit-title">Credit Bureau Assessment Verified</h3>
+                            </div>
+                            <div class="audit-meta">
+                                <div>TIMESTAMP: <span>2024-10-24 14:32:10 UTC</span></div>
+                                <div>BY: <span>compliance.agent@fintech.co</span></div>
+                            </div>
+                        </div>
+                        <p class="audit-desc">System integration received Experian Commercial Score data. Verification parameter cleared (Score: 82 / Low Risk Index matches criteria).</p>
+                        <div class="audit-footer">
+                            <span class="system-hash">MD5: e7967b2d28f804e38bf030580dc5b7ec</span>
+                            <button class="audit-action" onclick="inspectAudit(0)">Inspect Metadata ↗</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Entry 2 -->
+                <div class="audit-item" data-category="upload">
+                    <div class="timeline-marker">📁</div>
+                    <div class="audit-card">
+                        <div class="audit-header">
+                            <div class="audit-title-area">
+                                <span class="audit-tag">Upload</span>
+                                <h3 class="audit-title">New Version Uploaded: Business Plan v2</h3>
+                            </div>
+                            <div class="audit-meta">
+                                <div>TIMESTAMP: <span>2024-10-24 11:15:43 UTC</span></div>
+                                <div>BY: <span>operator_john.doe</span></div>
+                            </div>
+                        </div>
+                        <p class="audit-desc">Updated core operational blueprint submitted to override expired documentation file from Q1 framework sequence.</p>
+                        <div class="audit-footer">
+                            <span class="system-hash">SHA-256: 8a4f3b7c2c9d1e0f3a4b5c6d7e8f9a0b</span>
+                            <button class="audit-action" onclick="inspectAudit(1)">Inspect Metadata ↗</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Entry 3 -->
+                <div class="audit-item" data-category="view">
+                    <div class="timeline-marker">👁️</div>
+                    <div class="audit-card">
+                        <div class="audit-header">
+                            <div class="audit-title-area">
+                                <span class="audit-tag">View Log</span>
+                                <h3 class="audit-title">Security view access: Bank Statements 2023</h3>
+                            </div>
+                            <div class="audit-meta">
+                                <div>TIMESTAMP: <span>2024-10-23 18:22:15 UTC</span></div>
+                                <div>BY: <span>external_underwriter_t1</span></div>
+                            </div>
+                        </div>
+                        <p class="audit-desc">Authorized partner institution decrypted file payload for validation of liquidity assertions and DSCR benchmarks.</p>
+                        <div class="audit-footer">
+                            <span class="system-hash">IP: 192.168.10.234 (Secure Node)</span>
+                            <button class="audit-action" onclick="inspectAudit(2)">Inspect Metadata ↗</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Entry 4 -->
+                <div class="audit-item" data-category="verify">
+                    <div class="timeline-marker">🔒</div>
+                    <div class="audit-card">
+                        <div class="audit-header">
+                            <div class="audit-title-area">
+                                <span class="audit-tag">Verification</span>
+                                <h3 class="audit-title">Corporate Filing Verified Good Standing</h3>
+                            </div>
+                            <div class="audit-meta">
+                                <div>TIMESTAMP: <span>2024-10-22 09:05:00 UTC</span></div>
+                                <div>BY: <span>system.daemon</span></div>
+                            </div>
+                        </div>
+                        <p class="audit-desc">Automatic script querying Secretary of State registry successfully confirmed active status, lack of priority UCC liens, and correct entity designation.</p>
+                        <div class="audit-footer">
+                            <span class="system-hash">MD5: a1b2c3d4e5f67890123456789abcdef0</span>
+                            <button class="audit-action" onclick="inspectAudit(3)">Inspect Metadata ↗</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Entry 5 -->
+                <div class="audit-item" data-category="system">
+                    <div class="timeline-marker">⚙️</div>
+                    <div class="audit-card">
+                        <div class="audit-header">
+                            <div class="audit-title-area">
+                                <span class="audit-tag">System Change</span>
+                                <h3 class="audit-title">Vault Cryptographic Keys Rotated</h3>
+                            </div>
+                            <div class="audit-meta">
+                                <div>TIMESTAMP: <span>2024-10-20 00:00:01 UTC</span></div>
+                                <div>BY: <span>security.admin</span></div>
+                            </div>
+                        </div>
+                        <p class="audit-desc">Scheduled standard dynamic rotation of private key sets guarding all uploaded attachment blocks in cold storage.</p>
+                        <div class="audit-footer">
+                            <span class="system-hash">ALGO: AES-256-GCM / Ephemeral-HSM</span>
+                            <button class="audit-action" onclick="inspectAudit(4)">Inspect Metadata ↗</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- STRATEGY BANNER -->
+        <section class="immutable-banner">
+            <div class="banner-content">
+                <h2>Cryptographically Secured</h2>
+                <p>Every transaction log entry is hash-chained and distributed into decentralized backup layers, preventing any post-factor record tampering.</p>
+            </div>
+            <button class="banner-cta" onclick="alert('Audit ledger cryptographically validated as authentic (Zero Tampering Detected).')">Validate Chain</button>
+        </section>
+
+        <!-- FOOTER -->
+        <footer>
+            <div class="footer-cta">
+                <h2>Continuous Compliance Monitoring</h2>
+                <a href="index.html" class="audit-action" style="background-color: var(--accent-magenta); color: white; padding: 18px 36px; font-size: 18px; border: 3px solid #fff;">Back To Main Library</a>
+            </div>
+            <p class="footer-copyright">&copy; 2024 FINTECH UTILITY. SECURE COMPLIANCE LEDGER PROTOCOL V4.</p>
+        </footer>
+    </div>
+
+    <!-- FLOATING DETAILS PANEL -->
+    <div class="overlay-backdrop" id="backdrop" onclick="closeInspector()"></div>
+    
+    <div class="calculator-overlay" id="inspectOverlay">
+        <div class="calc-header">
+            <div class="calc-title" id="inspectTitle">Record Details</div>
+            <button class="close-calc" onclick="closeInspector()">CLOSE [X]</button>
+        </div>
+        
+        <!-- DETAILS METADATA BODY -->
+        <div id="inspectBody">
+            <!-- Dynamically populated payload -->
+        </div>
+    </div>
+
+    <!-- CORE LOGIC -->
+    <script>
+        /* Sample structured data mapping to inspection metrics */
+        const auditData = [
+            {
+                title: "Credit Bureau Assessment Verified",
+                timestamp: "2024-10-24 14:32:10 UTC",
+                operator: "compliance.agent@fintech.co",
+                category: "Verification",
+                details: "Automatic validation check against mainstream business credit reference agency. Score received exceeds threshold limit.",
+                properties: {
+                    "Provider": "Experian Commercial Engine",
+                    "Score Returned": "82 / 100",
+                    "Risk Categorization": "Low Risk Profile",
+                    "Assigned Margin Penalty": "0.00%",
+                    "Query Signature": "EXP-QS-88712-40",
+                    "Payload Encrypted Hash": "MD5: e7967b2d28f804e38bf030580dc5b7ec"
+                }
+            },
+            {
+                title: "Business Plan v2 Uploaded",
+                timestamp: "2024-10-24 11:15:43 UTC",
+                operator: "operator_john.doe",
+                category: "Upload",
+                details: "Secure upload via operator portal. Original file validated for virus signatures before system database serialization.",
+                properties: {
+                    "File Name": "Business_Plan_v2_Q4_FINAL.pdf",
+                    "File Size": "12.4 MB",
+                    "Mime-Type": "application/pdf",
+                    "Anti-Virus Status": "Clean (No Signatures)",
+                    "Storage Segment": "Vault-S3-B2",
+                    "Payload Encrypted Hash": "SHA256: 8a4f3b7c2c9d1e0f3a4b5c6d7e8f9a0b"
+                }
+            },
+            {
+                title: "Bank Statements Decrypted & Viewed",
+                timestamp: "2024-10-23 18:22:15 UTC",
+                operator: "external_underwriter_t1",
+                category: "Access View",
+                details: "Dynamic system decryption initiated upon secure token authentication. Session parameters monitored strictly for unusual page traversal.",
+                properties: {
+                    "Authenticated ID": "USR-EXT-UND-0092",
+                    "IP Address": "192.168.10.234",
+                    "Session Duration": "184 seconds",
+                    "Pages Rendered": "4 of 4",
+                    "Export/Download Triggered": "NO",
+                    "Client Token Identity": "JWT-RSA-4096-7a8b"
+                }
+            },
+            {
+                title: "Corporate Filing Checked",
+                timestamp: "2024-10-22 09:05:00 UTC",
+                operator: "system.daemon",
+                category: "Verification",
+                details: "Cron job triggered routine verification parameters of active loan files. External queries fetched from public state entity records.",
+                properties: {
+                    "Target Jurisdiction": "Delaware Division of Corporations",
+                    "Registration ID": "DE-REG-882191",
+                    "Filing Status Match": "Good Standing (Confirmed)",
+                    "UCC Liens Found": "None",
+                    "Next Scheduled Run": "2024-10-29 09:05:00 UTC",
+                    "Query Hostname": "daemon.node.01"
+                }
+            },
+            {
+                title: "Vault Cryptographic Keys Rotated",
+                timestamp: "2024-10-20 00:00:01 UTC",
+                operator: "security.admin",
+                category: "System Change",
+                details: "Zero-downtime key rotation mechanism successfully completed. Old files re-signed under the new encryption matrix automatically.",
+                properties: {
+                    "Active Standard": "AES-GCM-256 (NSA Compliant)",
+                    "Rotated Sets": "4 Key Pair Rings",
+                    "Status Code": "SUCCESS - Code 200",
+                    "System Block Re-Index": "14,892 files processed",
+                    "Security Framework Version": "FIPS 140-3 Standard",
+                    "Controller Key Hash": "RSA-PUB-KEY-ROT-400922"
+                }
+            }
+        ];
+
+        /* Interactive Filter Action */
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const auditItems = document.querySelectorAll('.audit-item');
+        const searchInput = document.getElementById('auditSearch');
+
+        function filterLogs() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+
+            auditItems.forEach(item => {
+                const title = item.querySelector('.audit-title').innerText.toLowerCase();
+                const desc = item.querySelector('.audit-desc').innerText.toLowerCase();
+                const author = item.querySelector('.audit-meta').innerText.toLowerCase();
+                const category = item.dataset.category;
+
+                const matchesSearch = title.includes(searchTerm) || desc.includes(searchTerm) || author.includes(searchTerm);
+                const matchesFilter = activeFilter === 'all' || category === activeFilter;
+
+                if (matchesSearch && matchesFilter) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                filterLogs();
+            });
+        });
+
+        searchInput.addEventListener('input', filterLogs);
+
+        /* Inspector Drawer Control */
+        const overlay = document.getElementById('inspectOverlay');
+        const backdrop = document.getElementById('backdrop');
+        const inspectTitle = document.getElementById('inspectTitle');
+        const inspectBody = document.getElementById('inspectBody');
+
+        function inspectAudit(index) {
+            overlay.classList.add('active');
+            backdrop.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            const record = auditData[index];
+            if (!record) return;
+
+            inspectTitle.innerText = "Audit Ledger Details";
+
+            // Generate metadata list elements
+            let propertiesHtml = "";
+            for (const [key, value] of Object.entries(record.properties)) {
+                propertiesHtml += `
+                    <div class="meta-property">
+                        <span class="meta-key">${key}</span>
+                        <span class="meta-val">${value}</span>
+                    </div>
+                `;
+            }
+
+            inspectBody.innerHTML = `
+                <div class="meta-box" style="border-color: var(--accent-cyan);">
+                    <h4>Event Category: ${record.category}</h4>
+                    <p style="font-size: 15px; line-height: 1.5; color: var(--text-muted); margin-bottom: 10px;">${record.details}</p>
+                </div>
+                <div class="meta-box" style="border-color: var(--accent-magenta);">
+                    <h4>Technical Registry Data</h4>
+                    <div class="meta-property">
+                        <span class="meta-key">Event Name</span>
+                        <span class="meta-val" style="color: var(--accent-cyan); font-weight: 900;">${record.title}</span>
+                    </div>
+                    <div class="meta-property">
+                        <span class="meta-key">Logged Operator</span>
+                        <span class="meta-val">${record.operator}</span>
+                    </div>
+                    <div class="meta-property">
+                        <span class="meta-key">Global UTC Time</span>
+                        <span class="meta-val">${record.timestamp}</span>
+                    </div>
+                </div>
+                <div class="meta-box" style="border-color: var(--accent-yellow);">
+                    <h4>Signature Attributes</h4>
+                    ${propertiesHtml}
+                </div>
+            `;
+        }
+
+        function closeInspector() {
+            overlay.classList.remove('active');
+            backdrop.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    </script>
+</body>
+</html>
+```

@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalization Studio | Obsidian AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --glass-bg: rgba(18, 18, 18, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent-glow: rgba(120, 120, 120, 0.15);
+            --text-primary: #e0e0e0;
+            --text-secondary: #888888;
+            --accent-color: #ffffff;
+            --step-active: #ffffff;
+            --input-bg: rgba(255, 255, 255, 0.03);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 50% -20%, #1a1a1a 0%, transparent 70%),
+                radial-gradient(circle at 0% 100%, #0a0a0a 0%, transparent 50%);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .studio-container {
+            width: 100%;
+            max-width: 1200px;
+            height: 85vh;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            display: grid;
+            grid-template-columns: 350px 1fr 400px;
+            overflow: hidden;
+        }
+
+        /* Common Sidebar Styles */
+        .panel {
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--glass-border);
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .panel-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        /* Lead Context Panel */
+        .context-item {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--glass-border);
+            transition: background 0.2s;
+        }
+
+        .context-item:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .context-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            color: #888;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .context-content {
+            font-size: 0.8rem;
+            line-height: 1.5;
+            color: var(--text-primary);
+        }
+
+        .tag-pill {
+            display: inline-block;
+            padding: 2px 8px;
+            background: var(--input-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 4px;
+            font-size: 0.65rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Logic / Prompt Panel */
+        .config-panel {
+            padding: 1.5rem;
+            background: rgba(0,0,0,0.1);
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .prompt-area {
+            width: 100%;
+            height: 200px;
+            background: var(--input-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 1rem;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            resize: none;
+            line-height: 1.6;
+        }
+
+        .prompt-area:focus {
+            outline: none;
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        .model-select {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+
+        .tone-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .tone-btn {
+            padding: 0.5rem;
+            background: var(--input-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 4px;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .tone-btn.active {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            background: rgba(255,255,255,0.05);
+        }
+
+        /* Draft Preview Panel */
+        .preview-panel {
+            border-right: none;
+            background: #000;
+        }
+
+        .draft-container {
+            padding: 2rem;
+            flex-grow: 1;
+        }
+
+        .email-card {
+            background: #0a0a0a;
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .email-header {
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .email-subject {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .email-body {
+            font-size: 0.9rem;
+            line-height: 1.8;
+            color: #ccc;
+            white-space: pre-line;
+        }
+
+        .highlight {
+            color: #fff;
+            background: rgba(255,255,255,0.1);
+            padding: 0 4px;
+            border-radius: 2px;
+        }
+
+        .action-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+            transition: all 0.2s;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            border: none;
+            color: #000;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--glass-border);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="studio-container">
+        <!-- Panel 1: Research Context -->
+        <aside class="panel">
+            <div class="panel-header">
+                <h2 class="panel-title">Research Data</h2>
+                <span class="context-label" style="margin:0">Lead: ID_921</span>
+            </div>
+            
+            <div class="context-item">
+                <span class="context-label">LinkedIn Activity</span>
+                <p class="context-content">"Just shared a post about the friction in B2B data enrichment pipelines and why manual SDR work is dead."</p>
+                <div class="tag-pill">2 days ago</div>
+            </div>
+
+            <div class="context-item">
+                <span class="context-label">Company News</span>
+                <p class="context-content">Acme Corp recently closed $12M Series A to expand their outbound engineering team.</p>
+                <div class="tag-pill">TechCrunch</div>
+            </div>
+
+            <div class="context-item">
+                <span class="context-label">Tech Stack</span>
+                <p class="context-content">Currently using: Salesforce, Outreach.io, Apollo.io, Segment.</p>
+            </div>
+
+            <div class="context-item">
+                <span class="context-label">ICP Fit Score</span>
+                <div style="font-size: 1.25rem; font-weight: 300; margin-top: 0.5rem;">94%</div>
+                <p class="context-content" style="font-size: 0.7rem; color: #4ade80;">High intent signal detected.</p>
+            </div>
+        </aside>
+
+        <!-- Panel 2: Engine Config -->
+        <section class="panel config-panel">
+            <div class="panel-header" style="padding-left: 0; padding-right: 0;">
+                <h2 class="panel-title">Prompt Engineering</h2>
+            </div>
+
+            <div class="input-group">
+                <label>Model selection</label>
+                <select class="model-select">
+                    <option>GPT-4o (Optimized)</option>
+                    <option>Gemini 1.5 Pro</option>
+                    <option>Claude 3.5 Sonnet</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>System Prompt / Icebreaker Logic</label>
+                <textarea class="prompt-area">Write a short, provocative email.
+Reference their recent LinkedIn post about [LinkedIn Activity].
+Link it to our ability to automate [Tech Stack] workflows.
+No fluff. Max 3 sentences.</textarea>
+            </div>
+
+            <div class="input-group">
+                <label>Tone of Voice</label>
+                <div class="tone-grid">
+                    <div class="tone-btn">Formal</div>
+                    <div class="tone-btn active">Direct</div>
+                    <div class="tone-btn">Witty</div>
+                    <div class="tone-btn">Consultative</div>
+                </div>
+            </div>
+
+            <div class="input-group" style="margin-top: auto;">
+                <button class="btn btn-ghost" style="width: 100%;">Test Variables</button>
+            </div>
+        </section>
+
+        <!-- Panel 3: Live Preview -->
+        <main class="panel preview-panel">
+            <div class="panel-header">
+                <h2 class="panel-title">Draft Preview</h2>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <div style="width:6px; height:6px; background:#4ade80; border-radius:50%;"></div>
+                    <span style="font-size: 0.6rem; font-family: 'JetBrains Mono';">AI GENERATED</span>
+                </div>
+            </div>
+
+            <div class="draft-container">
+                <div class="email-card">
+                    <div class="email-header">
+                        <div class="email-subject"><span style="color: var(--text-secondary)">Subject:</span> Data enrichment friction at Acme Corp</div>
+                    </div>
+                    <div class="email-body">
+                        Hi Alex,
+
+                        Saw your post about <span class="highlight">manual SDR work being dead</span> — caught my eye because most Series A teams are still stuck in that friction.
+
+                        Since you're already running <span class="highlight">Outreach and Segment</span>, we’ve built a way to automate the enrichment loop directly into your CRM without the manual lift.
+
+                        Worth a 5-minute look at how we're doing this for SaaS founders?
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-footer">
+                <button class="btn btn-ghost">Regenerate</button>
+                <button class="btn btn-primary">Approve & Queue</button>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LISTING ARCHITECT | Equity Terminal Submission</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --obsidian: #050505;
+            --graphite: #121212;
+            --graphite-light: #1A1A1A;
+            --bone: #F5F5F0;
+            --acid-green: #C1FF00;
+            --oxidized-copper: #8E522F;
+            --copper-glow: #D97706;
+            --blood-orange: #FF4500;
+            --cream: #FFFDD0;
+            --border-thick: 2px;
+            --grain-opacity: 0.04;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--bone);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: var(--grain-opacity);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: -0.02em; }
+        
+        nav {
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            border-bottom: var(--border-thick) solid var(--graphite-light);
+            background: var(--obsidian);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--bone); }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { text-decoration: none; color: var(--bone); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 4rem;
+        }
+
+        .header-area {
+            grid-column: 1 / -1;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--graphite-light);
+            padding-bottom: 2rem;
+        }
+
+        .header-area h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 0.9;
+            margin-bottom: 1rem;
+        }
+
+        .header-area p {
+            color: #888;
+            max-width: 600px;
+        }
+
+        /* Form Styling */
+        .submission-form {
+            display: flex;
+            flex-direction: column;
+            gap: 4rem;
+        }
+
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .section-label {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--oxidized-copper);
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .section-label::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--graphite-light);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .input-group label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #666;
+        }
+
+        .input-group input, 
+        .input-group select, 
+        .input-group textarea {
+            background: var(--graphite);
+            border: var(--border-thick) solid var(--graphite-light);
+            padding: 1.25rem;
+            color: var(--bone);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .input-group input:focus, 
+        .input-group textarea:focus {
+            border-color: var(--acid-green);
+            outline: none;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .upload-zone {
+            border: 2px dashed var(--graphite-light);
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .upload-zone:hover {
+            border-color: var(--acid-green);
+            background: rgba(193, 255, 0, 0.05);
+        }
+
+        /* Sidebar & Intelligence Score */
+        .sidebar {
+            position: sticky;
+            top: 110px;
+            height: fit-content;
+        }
+
+        .intelligence-card {
+            background: var(--graphite);
+            border: var(--border-thick) solid var(--bone);
+            padding: 2rem;
+        }
+
+        .score-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 1.5rem;
+        }
+
+        .score-value {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1;
+            color: var(--acid-green);
+        }
+
+        .score-bar-bg {
+            height: 8px;
+            background: var(--graphite-light);
+            width: 100%;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .score-bar-fill {
+            height: 100%;
+            background: var(--acid-green);
+            width: 15%;
+            transition: width 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .score-feedback {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            list-style: none;
+        }
+
+        .score-feedback li {
+            margin-bottom: 0.75rem;
+            padding-left: 1.5rem;
+            position: relative;
+            color: #666;
+        }
+
+        .score-feedback li.complete {
+            color: var(--bone);
+        }
+
+        .score-feedback li.complete::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--acid-green);
+        }
+
+        .score-feedback li.pending::before {
+            content: "○";
+            position: absolute;
+            left: 0;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.25rem 2rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+            text-decoration: none;
+            border: var(--border-thick) solid var(--bone);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .btn-primary { background: var(--acid-green); color: var(--obsidian); border-color: var(--acid-green); width: 100%; margin-top: 2rem; }
+        .btn-primary:hover { transform: translate(-4px, -4px); box-shadow: 4px 4px 0 var(--bone); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+
+        .notice-box {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: var(--oxidized-copper);
+            color: var(--bone);
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 1024px) {
+            .container { grid-template-columns: 1fr; }
+            .sidebar { position: static; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo mono">EQUITY.TERMINAL</div>
+        <div class="nav-links">
+            <a href="index.html">BROWSE DEALS</a>
+            <a href="#">ANALYZER</a>
+            <a href="#">FINANCING</a>
+            <a href="#">SUBMIT</a>
+        </div>
+        <div>
+            <button class="btn mono" style="padding: 0.5rem 1rem; font-size: 0.7rem;">Dashboard</button>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="header-area">
+            <div class="mono" style="color: var(--acid-green); margin-bottom: 1rem;">Listing Architect v1.0</div>
+            <h1>Premium Deal Architecture.</h1>
+            <p>Our algorithm prioritizes listings with high data-density and verified financials. High-signal listings receive 4x more qualified buyer inquiries.</p>
+        </div>
+
+        <form class="submission-form" id="architectForm">
+            <!-- Section 1: The Core -->
+            <section class="form-section">
+                <div class="section-label">01. CORE ASSET DATA</div>
+                <div class="input-group">
+                    <label>BUSINESS NAME (PUBLIC TITLE)</label>
+                    <input type="text" placeholder="e.g. Niche SaaS - Marketing Automation Tool" data-score="10" class="score-input">
+                </div>
+                <div class="grid-2">
+                    <div class="input-group">
+                        <label>INDUSTRY</label>
+                        <select data-score="5" class="score-input">
+                            <option value="">Select Sector</option>
+                            <option>SaaS / Digital</option>
+                            <option>Home Services</option>
+                            <option>Manufacturing</option>
+                            <option>Retail / Food</option>
+                            <option>Healthcare</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>HQ LOCATION</label>
+                        <input type="text" placeholder="City, State or Remote" data-score="5" class="score-input">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Financials -->
+            <section class="form-section">
+                <div class="section-label">02. FINANCIAL VERIFICATION</div>
+                <div class="grid-2">
+                    <div class="input-group">
+                        <label>GROSS REVENUE (TTM)</label>
+                        <input type="number" placeholder="$0.00" data-score="15" class="score-input">
+                    </div>
+                    <div class="input-group">
+                        <label>CASH FLOW / SDE (TTM)</label>
+                        <input type="number" placeholder="$0.00" data-score="15" class="score-input">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>FINANCIAL NARRATIVE & GROWTH</label>
+                    <textarea rows="4" placeholder="Explain the margin profile, growth trends, and historical performance..." data-score="10" class="score-input"></textarea>
+                </div>
+                <div class="input-group">
+                    <label>VERIFIED DOCUMENTS (PDF/XLSX)</label>
+                    <div class="upload-zone mono" onclick="alert('Upload integration placeholder')">
+                        DROP P&L AND TAX RETURNS HERE<br>
+                        <span style="font-size: 0.6rem; color: #666;">+25 POINTS TO INTELLIGENCE SCORE</span>
+                    </div>
+                    <div style="display:flex; gap: 1rem; margin-top: 1rem;">
+                        <label><input type="checkbox" id="docsCheck" data-score="25" class="score-input"> I have attached P&L statements for the last 3 years.</label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Operations -->
+            <section class="form-section">
+                <div class="section-label">03. OPERATIONS & EXIT</div>
+                <div class="input-group">
+                    <label>REASON FOR SALE</label>
+                    <input type="text" placeholder="Retirement, M&A, new venture, etc." data-score="5" class="score-input">
+                </div>
+                <div class="input-group">
+                    <label>SELLER FINANCING OFFERED</label>
+                    <select data-score="10" class="score-input">
+                        <option value="">Select Option</option>
+                        <option value="yes">YES - Up to 20%</option>
+                        <option value="yes">YES - Up to 50%</option>
+                        <option value="no">NO - Cash Only</option>
+                        <option value="negotiable">Negotiable</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- Section 4: Asking -->
+            <section class="form-section">
+                <div class="section-label">04. VALUATION</div>
+                <div class="input-group">
+                    <label>ASKING PRICE</label>
+                    <input type="number" placeholder="$0.00" style="font-size: 2rem; font-weight: 800; color: var(--acid-green);" data-score="10" class="score-input">
+                </div>
+            </section>
+        </form>
+
+        <aside class="sidebar">
+            <div class="intelligence-card">
+                <div class="score-header">
+                    <span class="mono" style="font-size: 0.7rem;">Intelligence<br>Score</span>
+                    <span class="score-value" id="scoreDisplay">0</span>
+                </div>
+                <div class="score-bar-bg">
+                    <div class="score-bar-fill" id="scoreBar"></div>
+                </div>
+                
+                <ul class="score-feedback">
+                    <li id="step1" class="pending">Core Asset Identity</li>
+                    <li id="step2" class="pending">Revenue & Margin Clarity</li>
+                    <li id="step3" class="pending">Verified Documentation</li>
+                    <li id="step4" class="pending">Deal Structure & Financing</li>
+                </ul>
+
+                <button class="btn btn-primary mono" id="submitBtn" disabled>Review & Publish</button>
+                
+                <p style="font-size: 0.65rem; color: #555; margin-top: 1.5rem; text-align: center;" class="mono">
+                    Score must be > 75 to reach "Premium" directory status.
+                </p>
+            </div>
+
+            <div class="notice-box mono">
+                <strong>SOTHEBY'S GRADE</strong><br>
+                All listings undergo a 48-hour manual audit before being broadcast to our private buyer network.
+            </div>
+        </aside>
+    </main>
+
+    <script>
+        const form = document.getElementById('architectForm');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const scoreBar = document.getElementById('scoreBar');
+        const inputs = document.querySelectorAll('.score-input');
+        const submitBtn = document.getElementById('submitBtn');
+
+        function calculateScore() {
+            let total = 0;
+            inputs.forEach(input => {
+                const value = input.type === 'checkbox' ? input.checked : input.value.trim();
+                const points = parseInt(input.getAttribute('data-score'));
+                
+                if (value && value !== "") {
+                    total += points;
+                }
+            });
+
+            // Cap at 100
+            total = Math.min(total, 100);
+            
+            // Update UI
+            scoreDisplay.textContent = total;
+            scoreBar.style.width = total + '%';
+
+            // Checkmark logic
+            document.getElementById('step1').className = (total >= 20) ? 'complete' : 'pending';
+            document.getElementById('step2').className = (total >= 50) ? 'complete' : 'pending';
+            document.getElementById('step3').className = (total >= 75) ? 'complete' : 'pending';
+            document.getElementById('step4').className = (total >= 90) ? 'complete' : 'pending';
+
+            // Button state
+            if (total >= 75) {
+                submitBtn.disabled = false;
+                submitBtn.style.background = 'var(--acid-green)';
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.style.background = 'transparent';
+            }
+        }
+
+        inputs.forEach(input => {
+            input.addEventListener('input', calculateScore);
+            input.addEventListener('change', calculateScore);
+        });
+
+        // Initial check
+        calculateScore();
+    </script>
+</body>
+</html>

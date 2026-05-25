@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLASH-UI // Prompt Alchemy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050505;
+            --card-bg: #0d0d0d;
+            --border: #222;
+            --accent: #ff00ea;
+            --accent-glow: rgba(255, 0, 234, 0.3);
+            --text-main: #e0e0e0;
+            --text-dim: #888;
+            --glass: rgba(255, 255, 255, 0.03);
+            --font-main: 'Space Grotesk', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+            --success: #00ffaa;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 50% -20%, #1a0a1a 0%, transparent 50%),
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 60px;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span {
+            background: linear-gradient(90deg, var(--accent), #7000ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            background: var(--glass);
+            padding: 4px 12px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--accent);
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 700;
+            letter-spacing: -2px;
+            line-height: 1;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            color: var(--text-dim);
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-label {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-label::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        /* Alchemy Specific */
+        .input-area { grid-column: span 8; }
+        .stats-area { grid-column: span 4; }
+        .suggestions-area { grid-column: span 12; }
+        .metrics-grid { display: grid; gap: 15px; margin-top: 20px; }
+
+        .metric-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .metric-val {
+            font-family: var(--font-mono);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .metric-label {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #222;
+            border-radius: 2px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        textarea {
+            width: 100%;
+            height: 280px;
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+            resize: none;
+            line-height: 1.5;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .suggestion-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            align-items: flex-start;
+        }
+
+        .suggestion-item:last-child { border-bottom: none; }
+
+        .suggestion-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--glass);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: var(--accent);
+            font-size: 0.8rem;
+            border: 1px solid var(--border);
+        }
+
+        .suggestion-text h4 { font-size: 0.9rem; margin-bottom: 4px; }
+        .suggestion-text p { font-size: 0.8rem; color: var(--text-dim); }
+
+        .impact-btn {
+            grid-column: span 12;
+            padding: 18px;
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-family: var(--font-mono);
+            transition: all 0.3s;
+        }
+
+        .impact-btn:hover {
+            background: var(--accent);
+            color: #000;
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+
+        .badge-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .keyword-badge {
+            font-size: 0.65rem;
+            padding: 4px 10px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+        }
+
+        .keyword-badge.active {
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        @media (max-width: 900px) {
+            .input-area, .stats-area { grid-column: span 12; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <div class="logo">⚡ FLASH-<span>ALCHEMY</span></div>
+            <div class="status">Mode: Optimization Laboratory</div>
+        </header>
+
+        <section class="hero">
+            <h1>Transmute Text into Interface Gold.</h1>
+            <p>Analyze your prompt architecture before execution. Our Alchemy Engine evaluates density, structural logic, and visual clarity to ensure the highest fidelity generation.</p>
+        </section>
+
+        <main class="bento-grid">
+            <!-- Raw Input -->
+            <div class="card input-area">
+                <div class="card-label">01. Raw Prompt Materia</div>
+                <textarea id="promptInput" placeholder="Enter your draft UI prompt here... e.g. 'Build a dark mode crypto dashboard with a bento grid and neon buttons...'"></textarea>
+                <div class="badge-grid" id="keywordList">
+                    <span class="keyword-badge" data-key="dark">Dark Theme</span>
+                    <span class="keyword-badge" data-key="grid">Bento Grid</span>
+                    <span class="keyword-badge" data-key="typography">Typography</span>
+                    <span class="keyword-badge" data-key="color">Color Palette</span>
+                    <span class="keyword-badge" data-key="component">Components</span>
+                    <span class="keyword-badge" data-key="data">Data Viz</span>
+                    <span class="keyword-badge" data-key="responsive">Responsive</span>
+                    <span class="keyword-badge" data-key="padding">Spacing</span>
+                </div>
+            </div>
+
+            <!-- Impact Calculator -->
+            <div class="card stats-area">
+                <div class="card-label">02. Impact Calculator</div>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">Clarity Score</div>
+                        <div class="metric-val" id="clarityVal">0%</div>
+                        <div class="progress-bar"><div class="progress-fill" id="clarityBar"></div></div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Keyword Density</div>
+                        <div class="metric-val" id="densityVal">0%</div>
+                        <div class="progress-bar"><div class="progress-fill" id="densityBar" style="background: var(--success)"></div></div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Structural Integrity</div>
+                        <div class="metric-val" id="structureVal">0%</div>
+                        <div class="progress-bar"><div class="progress-fill" id="structureBar" style="background: #7000ff"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="impact-btn" onclick="calculateImpact()">Run Alchemy Analysis</button>
+
+            <!-- Suggestions -->
+            <div class="card suggestions-area">
+                <div class="card-label">03. Refinement Strategy</div>
+                <div id="suggestionsList">
+                    <div class="suggestion-item">
+                        <div class="suggestion-icon">i</div>
+                        <div class="suggestion-text">
+                            <h4>System Idle</h4>
+                            <p>Input a prompt above and run analysis to receive optimization suggestions based on the FLASH-UI framework.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const input = document.getElementById('promptInput');
+        const keywords = document.querySelectorAll('.keyword-badge');
+
+        function calculateImpact() {
+            const text = input.value.toLowerCase();
+            if (!text) return;
+
+            // 1. Clarity Score (Based on length and sentence structure)
+            let clarity = Math.min(100, (text.length / 300) * 100);
+            updateMetric('clarity', Math.round(clarity));
+
+            // 2. Keyword Density
+            let foundCount = 0;
+            keywords.forEach(badge => {
+                if (text.includes(badge.dataset.key)) {
+                    badge.classList.add('active');
+                    foundCount++;
+                } else {
+                    badge.classList.remove('active');
+                }
+            });
+            let density = (foundCount / keywords.length) * 100;
+            updateMetric('density', Math.round(density));
+
+            // 3. Structural Integrity (Check for lists or line breaks)
+            let hasNewLines = (text.match(/\n/g) || []).length > 2;
+            let hasLists = text.includes('-') || text.includes('1.') || text.includes(':');
+            let structure = (hasNewLines ? 50 : 0) + (hasLists ? 50 : 0);
+            updateMetric('structure', structure);
+
+            generateSuggestions(clarity, density, structure);
+        }
+
+        function updateMetric(id, val) {
+            document.getElementById(id + 'Val').innerText = val + '%';
+            document.getElementById(id + 'Bar').style.width = val + '%';
+        }
+
+        function generateSuggestions(c, d, s) {
+            const list = document.getElementById('suggestionsList');
+            let html = '';
+
+            if (c < 40) {
+                html += createSuggestion('!', 'Insufficient Materia', 'Your prompt is too brief. AI thrives on context. Add details about the brand voice or target audience.');
+            }
+            if (d < 50) {
+                html += createSuggestion('?', 'Visual Ambiguity', 'Few UI keywords detected. Mention "border-radius", "typography", or specific components like "hero section" for better results.');
+            }
+            if (s < 100) {
+                html += createSuggestion('+', 'Structural Chaos', 'Try organizing requirements into a bulleted manifest to help the LLM parse your layout hierarchy.');
+            }
+            
+            if (c >= 40 && d >= 50 && s >= 100) {
+                html = createSuggestion('✓', 'Pure Interface Gold', 'The prompt architecture is highly optimized. You are ready to generate high-fidelity results.');
+            }
+
+            list.innerHTML = html;
+        }
+
+        function createSuggestion(icon, title, desc) {
+            return `
+                <div class="suggestion-item">
+                    <div class="suggestion-icon">${icon}</div>
+                    <div class="suggestion-text">
+                        <h4>${title}</h4>
+                        <p>${desc}</p>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

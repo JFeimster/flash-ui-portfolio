@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEAL INTEL // Asset #10842-X</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --obsidian: #050505;
+            --graphite: #141414;
+            --bone: #F5F5F0;
+            --acid-green: #C5FF00;
+            --copper: #8B9D83;
+            --blood-orange: #FF3D00;
+            --cream: #FFFDE7;
+            --border-width: 2px;
+            --grain-opacity: 0.04;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--bone);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.4;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3BaseFilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/feFilter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: var(--grain-opacity);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        h1, h2, h3 { text-transform: uppercase; letter-spacing: -0.02em; font-weight: 900; }
+        .mono { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; }
+        .editorial { font-family: 'Playfair Display', serif; font-style: italic; text-transform: none; }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: var(--border-width) solid var(--graphite);
+            background: var(--obsidian);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo { font-weight: 900; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+        .logo span { background: var(--acid-green); color: var(--obsidian); padding: 2px 6px; }
+
+        .status-bar {
+            background: var(--graphite);
+            padding: 0.5rem 2rem;
+            display: flex;
+            gap: 2rem;
+            border-bottom: 1px solid var(--bone);
+        }
+
+        .ticker-item { display: flex; align-items: center; gap: 8px; font-size: 0.7rem; color: var(--copper); }
+        .ticker-item span { color: var(--acid-green); font-weight: 700; }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 4rem;
+        }
+
+        .tearsheet-header {
+            grid-column: 1 / -1;
+            border-bottom: var(--border-width) solid var(--bone);
+            padding-bottom: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .tearsheet-header h1 {
+            font-size: clamp(3rem, 8vw, 6rem);
+            line-height: 0.85;
+            margin: 1rem 0;
+        }
+
+        .tag {
+            background: var(--copper);
+            color: var(--obsidian);
+            padding: 4px 12px;
+            font-size: 0.8rem;
+            font-weight: 900;
+            display: inline-block;
+        }
+
+        .financial-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--graphite);
+            border: 1px solid var(--graphite);
+            margin-bottom: 4rem;
+        }
+
+        .metric-box {
+            background: var(--obsidian);
+            padding: 2rem;
+        }
+
+        .metric-box .label { color: var(--copper); margin-bottom: 0.5rem; }
+        .metric-box .val { font-size: 2.5rem; font-weight: 900; }
+        .metric-box .val.highlight { color: var(--acid-green); }
+
+        .chart-container {
+            background: var(--graphite);
+            padding: 2rem;
+            border: 1px solid var(--bone);
+            margin-bottom: 4rem;
+        }
+
+        .narrative-section {
+            padding-right: 2rem;
+        }
+
+        .narrative-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: var(--acid-green);
+        }
+
+        .narrative-body {
+            font-size: 1.4rem;
+            color: var(--bone);
+            line-height: 1.6;
+        }
+
+        .narrative-body p { margin-bottom: 2rem; }
+
+        .sidebar-section {
+            border: 1px solid var(--graphite);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-title {
+            color: var(--copper);
+            border-bottom: 1px solid var(--graphite);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .vault-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--graphite);
+        }
+
+        .vault-item .file-name { font-size: 0.8rem; font-weight: 700; }
+        .vault-item .lock { color: var(--blood-orange); font-size: 0.7rem; }
+
+        .cta-box {
+            background: var(--acid-green);
+            color: var(--obsidian);
+            padding: 2.5rem;
+            text-align: center;
+            position: sticky;
+            top: 120px;
+        }
+
+        .cta-box h3 { font-size: 1.5rem; margin-bottom: 1rem; }
+        .cta-box button {
+            width: 100%;
+            background: var(--obsidian);
+            color: var(--bone);
+            border: none;
+            padding: 1rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-top: 1rem;
+        }
+
+        .asset-list {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .asset-list li {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            font-size: 0.9rem;
+            border-bottom: 1px dotted var(--graphite);
+        }
+
+        @media (max-width: 1024px) {
+            .container { grid-template-columns: 1fr; }
+            .financial-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">ACQUISITION <span>INDEX</span></div>
+        <div class="nav-links">
+            <div class="mono" style="color: var(--copper)">Terminal Connected // ID: 882-991</div>
+        </div>
+    </nav>
+
+    <div class="status-bar mono">
+        <div class="ticker-item">Deal Status: <span>LIVE</span></div>
+        <div class="ticker-item">NDA Required: <span>YES</span></div>
+        <div class="ticker-item">Inquiry Count: <span>14</span></div>
+        <div class="ticker-item" style="margin-left: auto;">Security Level: <span>Tier 4 Gold</span></div>
+    </div>
+
+    <main class="container">
+        <header class="tearsheet-header">
+            <div class="tag">#10842-X // SERVICE SECTOR</div>
+            <h1>ESTABLISHED HVAC <br><span class="editorial">Market Leader.</span></h1>
+            <div class="mono" style="font-size: 1.2rem; color: var(--copper);">Austin Metropolitan Area // 14-Year Operating History</div>
+        </header>
+
+        <section class="content-left">
+            <div class="financial-grid">
+                <div class="metric-box">
+                    <div class="mono label">Asking Price</div>
+                    <div class="val">$1,200,000</div>
+                </div>
+                <div class="metric-box">
+                    <div class="mono label">Adjusted SDE</div>
+                    <div class="val highlight">$450,000</div>
+                </div>
+                <div class="metric-box">
+                    <div class="mono label">Multiple</div>
+                    <div class="val">2.6x</div>
+                </div>
+                <div class="metric-box">
+                    <div class="mono label">LTV Potential</div>
+                    <div class="val">85%</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="mono sidebar-title" style="border:none">Financial Performance Trend (3-Year)</div>
+                <canvas id="financialChart" height="150"></canvas>
+            </div>
+
+            <article class="narrative-section">
+                <h2 class="mono">Seller’s Narrative</h2>
+                <div class="narrative-body editorial">
+                    <p>Founded in 2010, this operation has transitioned from a single-truck service to a dominant regional provider. With a fleet of 8 fully-equipped service vehicles and a master-licensed technician team, the infrastructure is built for scale.</p>
+                    <p>The revenue model is anchored by a robust preventative maintenance program with over 400 active residential contracts, providing a predictable "floor" for monthly cash flow. Unlike competitors, this entity maintains a 92% customer retention rate over a trailing 36-month period.</p>
+                    <p>Strategic positioning in the Austin metroplex ensures high-demand year-round. The owner is looking to retire but offers a 6-month transition period to ensure relationship continuity with key commercial accounts.</p>
+                </div>
+            </article>
+
+            <div class="sidebar-section">
+                <h3 class="mono sidebar-title">Asset Breakdown</h3>
+                <ul class="asset-list">
+                    <li><span>Service Fleet (8 Vehicles, Late Models)</span> <span>$240,000</span></li>
+                    <li><span>Specialized HVAC Tooling & Inventory</span> <span>$85,000</span></li>
+                    <li><span>CRM & Proprietary Dispatch Software</span> <span>$15,000</span></li>
+                    <li><span>Work in Progress (Contracted)</span> <span>$110,000</span></li>
+                </ul>
+            </div>
+        </section>
+
+        <aside class="content-right">
+            <div class="cta-box">
+                <div class="mono">Action Terminal</div>
+                <h3>Secure This Asset</h3>
+                <p style="font-size: 0.8rem; opacity: 0.8;">Finalizing letter of intent (LOI) requires verified proof of funds.</p>
+                <button>Download Prospectus</button>
+                <button style="background: var(--bone); color: var(--obsidian);">Initiate Due Diligence</button>
+            </div>
+
+            <div class="sidebar-section" style="margin-top: 3rem;">
+                <h3 class="mono sidebar-title">Data Vault Preview</h3>
+                <div class="vault-item">
+                    <div class="file-name">P&L Statements (2021-2023)</div>
+                    <div class="mono lock">[LOCKED]</div>
+                </div>
+                <div class="vault-item">
+                    <div class="file-name">Tax Returns (Certified)</div>
+                    <div class="mono lock">[LOCKED]</div>
+                </div>
+                <div class="vault-item">
+                    <div class="file-name">Equipment Appraisal Report</div>
+                    <div class="mono lock" style="color: var(--acid-green)">[VIEWABLE]</div>
+                </div>
+                <div class="vault-item">
+                    <div class="file-name">Customer Concentration Analysis</div>
+                    <div class="mono lock">[LOCKED]</div>
+                </div>
+                <div class="vault-item" style="border:none">
+                    <div class="file-name">Employee Roster & Tenure</div>
+                    <div class="mono lock">[LOCKED]</div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="mono sidebar-title">Risk Assessment</h3>
+                <div style="margin-bottom: 1rem;">
+                    <div class="mono" style="display:flex; justify-content:space-between; font-size: 0.6rem; margin-bottom: 4px;">
+                        <span>Market Concentration</span> <span>LOW</span>
+                    </div>
+                    <div style="height: 4px; background: var(--graphite);"><div style="width: 20%; height: 100%; background: var(--acid-green);"></div></div>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <div class="mono" style="display:flex; justify-content:space-between; font-size: 0.6rem; margin-bottom: 4px;">
+                        <span>Owner Dependency</span> <span>MODERATE</span>
+                    </div>
+                    <div style="height: 4px; background: var(--graphite);"><div style="width: 45%; height: 100%; background: var(--copper);"></div></div>
+                </div>
+                <div>
+                    <div class="mono" style="display:flex; justify-content:space-between; font-size: 0.6rem; margin-bottom: 4px;">
+                        <span>Defensibility</span> <span>HIGH</span>
+                    </div>
+                    <div style="height: 4px; background: var(--graphite);"><div style="width: 90%; height: 100%; background: var(--acid-green);"></div></div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <footer style="padding: 4rem 2rem; border-top: 1px solid var(--graphite); background: #000;">
+        <div class="mono" style="color: var(--copper); font-size: 0.7rem; max-width: 800px;">
+            CONFIDENTIALITY NOTICE: This document contains proprietary information regarding Asset #10842-X. Unauthorized reproduction or distribution is strictly prohibited. Terminal sessions are logged and monitored via IP 192.168.1.1.
+        </div>
+    </footer>
+
+    <script>
+        const ctx = document.getElementById('financialChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['2021 FY', '2022 FY', '2023 FY', '2024 (Proj)'],
+                datasets: [{
+                    label: 'Gross Revenue',
+                    data: [2800000, 3100000, 3500000, 3850000],
+                    borderColor: '#C5FF00',
+                    backgroundColor: 'rgba(197, 255, 0, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: 'Seller Discretionary Earnings (SDE)',
+                    data: [320000, 390000, 450000, 510000],
+                    borderColor: '#8B9D83',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#F5F5F0',
+                            font: { family: 'JetBrains Mono', size: 10 }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        grid: { color: '#141414' },
+                        ticks: { 
+                            color: '#8B9D83',
+                            callback: value => '$' + (value / 1000000).toFixed(1) + 'M'
+                        }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#8B9D83' }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaaS Cohort Explorer</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        :root {
+            --bg: #050505;
+            --card-bg: #0d0d0d;
+            --border: #222222;
+            --accent: #ffffff;
+            --text-dim: #888888;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff4444;
+            --font-main: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--accent);
+            font-family: var(--font-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .explorer-card {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .explorer-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--success), transparent);
+            opacity: 0.3;
+        }
+
+        header {
+            margin-bottom: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .header-title h1 {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .header-title p {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 32px;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 0;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 600;
+            font-family: var(--font-mono);
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 32px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            text-align: left;
+        }
+
+        th {
+            color: var(--text-dim);
+            font-weight: 400;
+            text-transform: uppercase;
+            padding: 12px 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 10px 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+        }
+
+        .cohort-month {
+            color: var(--accent);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .retention-cell {
+            text-align: center;
+            width: 60px;
+            transition: transform 0.2s ease;
+        }
+
+        .retention-cell span {
+            display: block;
+            padding: 6px 0;
+            border-radius: 2px;
+        }
+
+        /* Heatmap Logic */
+        .level-high { background: rgba(0, 255, 136, 0.2); color: var(--success); }
+        .level-mid { background: rgba(255, 170, 0, 0.15); color: var(--warning); }
+        .level-low { background: rgba(255, 68, 68, 0.1); color: var(--danger); }
+        .level-zero { color: #333; }
+
+        .legend {
+            display: flex;
+            gap: 16px;
+            margin-top: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            font-family: var(--font-mono);
+        }
+
+        .legend-box {
+            width: 10px;
+            height: 10px;
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-link {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-dim);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: var(--accent);
+        }
+
+        .impact-badge {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            padding: 12px 20px;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+
+        .impact-badge strong {
+            color: var(--success);
+        }
+
+        @media (max-width: 600px) {
+            .summary-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="explorer-card">
+        <header>
+            <div class="header-title">
+                <h1>Cohort Retention Matrix</h1>
+                <p>Granular look at customer decay by acquisition month.</p>
+            </div>
+            <div class="legend">
+                <div class="legend-item"><div class="legend-box level-high"></div> Healthy</div>
+                <div class="legend-item"><div class="legend-box level-mid"></div> Warning</div>
+                <div class="legend-item"><div class="legend-box level-low"></div> Critical</div>
+            </div>
+        </header>
+
+        <div class="summary-stats">
+            <div class="stat-item">
+                <span class="stat-label">Avg. Monthly Churn</span>
+                <span class="stat-value" id="avg-churn">4.2%</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">N-12 Retention</span>
+                <span class="stat-value" id="n12-retention">62.1%</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">ARPU Influence</span>
+                <span class="stat-value" id="arpu-impact">+$12.40</span>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cohort</th>
+                        <th>Size</th>
+                        <th>M0</th>
+                        <th>M1</th>
+                        <th>M2</th>
+                        <th>M3</th>
+                        <th>M4</th>
+                        <th>M5</th>
+                        <th>M6</th>
+                    </tr>
+                </thead>
+                <tbody id="cohort-body">
+                    <!-- Data injected via JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer-nav">
+            <a href="#" class="back-link">
+                ← BACK TO DIAGNOSTIC
+            </a>
+            <div class="impact-badge">
+                Weighted Churn used in LTV: <strong>4.2%</strong>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const cohorts = [
+            { month: 'OCT 2023', size: 1240, data: [100, 94, 91, 88, 85, 82, 80] },
+            { month: 'NOV 2023', size: 1100, data: [100, 92, 88, 84, 81, 78, 0] },
+            { month: 'DEC 2023', size: 1560, data: [100, 89, 82, 78, 74, 0, 0] },
+            { month: 'JAN 2024', size: 980,  data: [100, 91, 87, 83, 0, 0, 0] },
+            { month: 'FEB 2024', size: 1320, data: [100, 93, 89, 0, 0, 0, 0] },
+            { month: 'MAR 2024', size: 1450, data: [100, 95, 0, 0, 0, 0, 0] },
+            { month: 'APR 2024', size: 1800, data: [100, 0, 0, 0, 0, 0, 0] }
+        ];
+
+        const tbody = document.getElementById('cohort-body');
+
+        function getLevelClass(val) {
+            if (val === 0) return 'level-zero';
+            if (val >= 90) return 'level-high';
+            if (val >= 80) return 'level-mid';
+            return 'level-low';
+        }
+
+        function renderTable() {
+            tbody.innerHTML = cohorts.map(cohort => `
+                <tr>
+                    <td class="cohort-month">${cohort.month}</td>
+                    <td style="color: var(--text-dim)">${cohort.size.toLocaleString()}</td>
+                    ${cohort.data.map(val => `
+                        <td class="retention-cell">
+                            <span class="${getLevelClass(val)}">
+                                ${val > 0 ? val + '%' : '-'}
+                            </span>
+                        </td>
+                    `).join('')}
+                </tr>
+            `).join('');
+        }
+
+        renderTable();
+
+        // Simulate interaction / highlight
+        document.querySelectorAll('.retention-cell').forEach(cell => {
+            cell.addEventListener('mouseenter', () => {
+                cell.style.transform = 'scale(1.1)';
+                cell.style.zIndex = '10';
+            });
+            cell.addEventListener('mouseleave', () => {
+                cell.style.transform = 'scale(1)';
+                cell.style.zIndex = '1';
+            });
+        });
+    </script>
+</body>
+</html>

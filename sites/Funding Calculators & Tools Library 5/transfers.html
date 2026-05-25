@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Edge - Secure Transfer & Share Link Manager</title>
+    <!-- Google Fonts for Ultra-Modern High-Contrast Look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0c10;
+            --surface: #14161f;
+            --surface-card: #1a1d29;
+            --text-raw: #ffffff;
+            --text-muted: #8e95ad;
+            --accent-cyan: #00f3ff;
+            --accent-magenta: #ff0055;
+            --accent-yellow: #ffee00;
+            --border-width: 3px;
+            --brutal-shadow-cyan: 6px 6px 0px var(--accent-cyan);
+            --brutal-shadow-magenta: 6px 6px 0px var(--accent-magenta);
+            --brutal-shadow-yellow: 6px 6px 0px var(--accent-yellow);
+            --transition-speed: 0.15s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-raw);
+            line-height: 1.4;
+            padding: 20px;
+            overflow-x: hidden;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* Container Limit */
+        .wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header Section */
+        header {
+            position: relative;
+            padding: 80px 40px;
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            box-shadow: var(--brutal-shadow-cyan);
+            margin-bottom: 60px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,243,255,0.08) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--accent-magenta);
+            color: #fff;
+            border: 2px solid #fff;
+            font-weight: 900;
+            font-size: 14px;
+            letter-spacing: 1.5px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            transform: rotate(-1.5deg);
+            box-shadow: 4px 4px 0px #fff;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        h1 {
+            font-size: clamp(38px, 6vw, 76px);
+            font-weight: 900;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            line-height: 0.95;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        h1 span {
+            color: transparent;
+            -webkit-text-stroke: 1.5px #fff;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-magenta));
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .hero-sub {
+            font-size: 20px;
+            color: var(--text-muted);
+            max-width: 750px;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        /* Metrics Strip */
+        .metrics-strip {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .metric-card {
+            background: var(--surface-card);
+            border: var(--border-width) solid #fff;
+            padding: 20px;
+            box-shadow: 4px 4px 0px var(--accent-cyan);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .metric-card:nth-child(2) {
+            box-shadow: 4px 4px 0px var(--accent-magenta);
+        }
+
+        .metric-card:nth-child(3) {
+            box-shadow: 4px 4px 0px var(--accent-yellow);
+        }
+
+        .metric-card:nth-child(4) {
+            box-shadow: 4px 4px 0px #fff;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 900;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+
+        .metric-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 32px;
+            font-weight: 900;
+            color: #fff;
+        }
+
+        /* Controls Block */
+        .controls-wrapper {
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            padding: 30px;
+            box-shadow: var(--brutal-shadow-magenta);
+            margin-bottom: 40px;
+        }
+
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-container {
+            position: relative;
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--surface-card);
+            border: var(--border-width) solid #fff;
+            padding: 18px 20px 18px 50px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            box-shadow: inset 4px 4px 0px rgba(0, 0, 0, 0.5);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-container::before {
+            content: '🔍';
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            pointer-events: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-cyan);
+        }
+
+        .filter-btn {
+            background: var(--surface-card);
+            border: var(--border-width) solid #fff;
+            color: #fff;
+            padding: 16px 28px;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 15px;
+            text-transform: uppercase;
+            transition: all var(--transition-speed);
+            box-shadow: 4px 4px 0px rgba(255,255,255,0.15);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .filter-btn:hover {
+            background: #fff;
+            color: #000;
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active {
+            background: var(--accent-magenta);
+            color: #fff;
+            box-shadow: 4px 4px 0px #fff;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-cyan);
+            color: #000;
+            padding: 18px 32px;
+            border: var(--border-width) solid #fff;
+            text-decoration: none;
+            font-weight: 900;
+            font-size: 18px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 6px 6px 0px #fff;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform var(--transition-speed) cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                        box-shadow var(--transition-speed) cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .btn-primary:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 10px 10px 0px #fff;
+        }
+
+        /* Transfer Grid */
+        .transfer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .transfer-card {
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            padding: 35px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: var(--brutal-shadow-yellow);
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+        }
+
+        .transfer-card:hover {
+            transform: translate(-6px, -6px);
+            box-shadow: 12px 12px 0px var(--accent-yellow);
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .transfer-icon {
+            font-size: 32px;
+            background: var(--surface-card);
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #fff;
+            box-shadow: 4px 4px 0px rgba(255,255,255,0.2);
+        }
+
+        .status-tag {
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 900;
+            background: #fff;
+            color: #000;
+            padding: 6px 14px;
+            border: 2px solid #000;
+            letter-spacing: 1px;
+            box-shadow: 3px 3px 0px #000;
+        }
+
+        .transfer-card[data-status="Active"] {
+            box-shadow: var(--brutal-shadow-cyan);
+        }
+        .transfer-card[data-status="Active"]:hover {
+            box-shadow: 12px 12px 0px var(--accent-cyan);
+        }
+        .transfer-card[data-status="Active"] .status-tag {
+            background: var(--accent-cyan);
+        }
+
+        .transfer-card[data-status="Secured"] {
+            box-shadow: var(--brutal-shadow-yellow);
+        }
+        .transfer-card[data-status="Secured"]:hover {
+            box-shadow: 12px 12px 0px var(--accent-yellow);
+        }
+        .transfer-card[data-status="Secured"] .status-tag {
+            background: var(--accent-yellow);
+        }
+
+        .transfer-card[data-status="Expired"] {
+            box-shadow: var(--brutal-shadow-magenta);
+        }
+        .transfer-card[data-status="Expired"]:hover {
+            box-shadow: 12px 12px 0px var(--accent-magenta);
+        }
+        .transfer-card[data-status="Expired"] .status-tag {
+            background: var(--accent-magenta);
+            color: #fff;
+        }
+
+        .transfer-card h3 {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            font-family: 'Space Grotesk', sans-serif;
+            letter-spacing: -0.5px;
+        }
+
+        .meta-list {
+            list-style: none;
+            margin-bottom: 25px;
+            font-size: 14px;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .meta-list li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .meta-list li strong {
+            color: #fff;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: auto;
+        }
+
+        .tool-action {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 14px;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 2px solid #fff;
+            padding: 12px 18px;
+            background: var(--surface-card);
+            transition: all 0.2s;
+            cursor: pointer;
+            font-family: 'Space Grotesk', sans-serif;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .tool-action:hover {
+            background: #fff;
+            color: #000;
+            box-shadow: 4px 4px 0px var(--accent-cyan);
+        }
+
+        .tool-action.action-sec:hover {
+            box-shadow: 4px 4px 0px var(--accent-magenta);
+        }
+
+        /* Side Drawer Overlay Panel */
+        .calculator-overlay {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            max-width: 580px;
+            height: 100vh;
+            background: var(--surface);
+            border-left: var(--border-width) solid #fff;
+            box-shadow: -20px 0px 0px rgba(0,0,0,0.8);
+            z-index: 1000;
+            transform: translateX(110%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
+            padding: 40px;
+        }
+
+        .calculator-overlay.active {
+            transform: translateX(0);
+        }
+
+        .overlay-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay-backdrop.active {
+            display: block;
+        }
+
+        .calc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: var(--border-width) solid #fff;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .calc-title {
+            font-size: 24px;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--accent-cyan);
+        }
+
+        .close-calc {
+            background: var(--accent-magenta);
+            color: #fff;
+            border: 2px solid #fff;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-weight: 900;
+            font-size: 14px;
+            text-transform: uppercase;
+            box-shadow: 3px 3px 0px #fff;
+        }
+
+        .close-calc:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px;
+        }
+
+        /* Input Styles */
+        .calc-group {
+            margin-bottom: 25px;
+        }
+
+        .calc-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+
+        .calc-input {
+            width: 100%;
+            background: var(--surface-card);
+            border: var(--border-width) solid #fff;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            outline: none;
+        }
+
+        .calc-input:focus {
+            border-color: var(--accent-cyan);
+        }
+
+        /* Checklists and Toggles */
+        .checklist-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 15px;
+            background: var(--surface-card);
+            border: 2px solid #fff;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .checklist-item.checked {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 243, 255, 0.05);
+        }
+
+        .checklist-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .checklist-item.checked .checklist-checkbox {
+            background: var(--accent-cyan);
+            color: #000;
+            border-color: var(--accent-cyan);
+        }
+
+        .checklist-text h4 {
+            font-size: 16px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .checklist-text p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Danger Action */
+        .btn-danger {
+            background: var(--accent-magenta);
+            color: #fff;
+            padding: 16px 20px;
+            border: var(--border-width) solid #fff;
+            width: 100%;
+            text-align: center;
+            font-weight: 900;
+            font-size: 16px;
+            text-transform: uppercase;
+            box-shadow: 6px 6px 0px #fff;
+            cursor: pointer;
+            display: block;
+            margin-top: 30px;
+            font-family: 'Space Grotesk', sans-serif;
+            transition: all 0.1s;
+        }
+
+        .btn-danger:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 8px 8px 0px #fff;
+        }
+
+        .btn-danger:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #fff;
+        }
+
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            box-shadow: var(--brutal-shadow-cyan);
+            padding: 20px 30px;
+            z-index: 1100;
+            display: none;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .toast.show {
+            display: flex;
+            animation: slideIn 0.2s forwards;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .toast-icon {
+            font-size: 24px;
+        }
+
+        .toast-body {
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        /* Create Transfer Header */
+        .section-header-wrap {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .section-header-wrap h2 {
+            font-size: 38px;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .section-header-wrap {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .section-header-wrap .btn-primary {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            header {
+                padding: 40px 20px;
+            }
+            .controls-wrapper {
+                padding: 20px;
+            }
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-btn {
+                width: 100%;
+                text-align: center;
+            }
+            .calculator-overlay {
+                padding: 20px;
+            }
+            .transfer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <!-- HEADER / HERO -->
+        <header>
+            <div class="hero-badge">🔒 Secure Sharing System</div>
+            <h1>Secure <span>Transfers</span></h1>
+            <p class="hero-sub">Manage client-facing secure share links, toggle instant document parameters, reset passwords, track live analytics, and establish exact link expiration configurations across the enterprise portal.</p>
+        </header>
+
+        <!-- PORTAL LIVE STATISTICS -->
+        <div class="metrics-strip">
+            <div class="metric-card">
+                <span class="metric-label">Total Secure Links</span>
+                <span class="metric-value" id="stat-total">14</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-label">Active Downloads</span>
+                <span class="metric-value" id="stat-downloads">189</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-label">Secured Links</span>
+                <span class="metric-value" id="stat-secured">8</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-label">Total Volume Out</span>
+                <span class="metric-value" id="stat-volume">1.4 GB</span>
+            </div>
+        </div>
+
+        <!-- PORTAL CONTROLS -->
+        <div class="section-header-wrap">
+            <h2>Active share links</h2>
+            <button class="btn-primary" onclick="openCreatePanel()">
+                Create secure transfer
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+        </div>
+
+        <div class="controls-wrapper">
+            <div class="filter-bar">
+                <div class="search-container">
+                    <input type="text" id="transferSearch" class="search-input" placeholder="SEARCH ACTIVE SECURE TRANSFERS...">
+                </div>
+                <button class="filter-btn active" data-filter="All">All transfers</button>
+                <button class="filter-btn" data-filter="Active">Active</button>
+                <button class="filter-btn" data-filter="Secured">Secured</button>
+                <button class="filter-btn" data-filter="Expired">Expired</button>
+            </div>
+        </div>
+
+        <!-- TRANSFERS DISPLAY GRID -->
+        <div class="transfer-grid" id="transferGrid">
+            <!-- Dynamic items rendered via script -->
+        </div>
+
+    </div>
+
+    <!-- PERSISTENT SIDEBAR DRAWER OVERLAY -->
+    <div class="overlay-backdrop" id="backdrop" onclick="closeOverlay()"></div>
+    
+    <div class="calculator-overlay" id="transferOverlay">
+        <div class="calc-header">
+            <div class="calc-title" id="overlayTitle">Configure Security Parameters</div>
+            <button class="close-calc" onclick="closeOverlay()">CLOSE [X]</button>
+        </div>
+        
+        <div id="overlayBody">
+            <!-- Dynamic setup rules inserted here -->
+        </div>
+    </div>
+
+    <!-- TOAST ALERT ELEMENT -->
+    <div class="toast" id="systemToast">
+        <span class="toast-icon">⚡</span>
+        <div class="toast-body" id="toastText">Action successfully committed.</div>
+    </div>
+
+    <!-- CORE LOGIC AND ENGINE -->
+    <script>
+        // Core transfer storage array
+        let transfers = [
+            {
+                id: 1,
+                title: "Q4 Financial Audits & Pitch",
+                files: 14,
+                size: "42.8 MB",
+                status: "Active",
+                expires: "2024-12-15",
+                password: "",
+                downloadAllowed: true,
+                url: "https://edge.ft/t/q4-financial-audits-pitch"
+            },
+            {
+                id: 2,
+                title: "KYC Corporate Verification Bundle",
+                files: 6,
+                size: "18.2 MB",
+                status: "Secured",
+                expires: "2024-12-25",
+                password: "ClientSecureVault99",
+                downloadAllowed: true,
+                url: "https://edge.ft/t/kyc-corporate-verification"
+            },
+            {
+                id: 3,
+                title: "Merchant Statements & Underwriting",
+                files: 22,
+                size: "105.4 MB",
+                status: "Expired",
+                expires: "2024-11-10",
+                password: "",
+                downloadAllowed: false,
+                url: "https://edge.ft/t/merchant-statements-underwrite"
+            },
+            {
+                id: 4,
+                title: "Lien Releases & Legal Entities",
+                files: 3,
+                size: "11.2 MB",
+                status: "Active",
+                expires: "2024-12-20",
+                password: "FilingDischarge1",
+                downloadAllowed: true,
+                url: "https://edge.ft/t/lien-releases-legal"
+            },
+            {
+                id: 5,
+                title: "Machinery Lease Appraisal Docs",
+                files: 9,
+                size: "54.1 MB",
+                status: "Secured",
+                expires: "2024-12-18",
+                password: "CapitalAssess*",
+                downloadAllowed: false,
+                url: "https://edge.ft/t/machinery-lease-appraisal"
+            }
+        ];
+
+        // System setup
+        const grid = document.getElementById('transferGrid');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const searchInput = document.getElementById('transferSearch');
+        const overlay = document.getElementById('transferOverlay');
+        const backdrop = document.getElementById('backdrop');
+
+        // Dynamic metrics renderer
+        function computeMetrics() {
+            const activeCount = transfers.filter(t => t.status === "Active").length;
+            const securedCount = transfers.filter(t => t.status === "Secured").length;
+            const expiredCount = transfers.filter(t => t.status === "Expired").length;
+            
+            document.getElementById('stat-total').innerText = transfers.length;
+            document.getElementById('stat-downloads').innerText = (activeCount * 45) + (securedCount * 22) + 5;
+            document.getElementById('stat-secured').innerText = securedCount;
+            
+            let totalMegs = transfers.reduce((acc, curr) => acc + parseFloat(curr.size), 0);
+            document.getElementById('stat-volume').innerText = totalMegs.toFixed(1) + " MB";
+        }
+
+        // Search and filter core execution
+        function renderTransfers() {
+            const query = searchInput.value.toLowerCase();
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+
+            grid.innerHTML = "";
+
+            transfers.forEach(t => {
+                const matchesQuery = t.title.toLowerCase().includes(query) || t.url.toLowerCase().includes(query);
+                const matchesFilter = activeFilter === "All" || t.status === activeFilter;
+
+                if (matchesQuery && matchesFilter) {
+                    const card = document.createElement('div');
+                    card.className = "transfer-card";
+                    card.setAttribute('data-status', t.status);
+
+                    card.innerHTML = `
+                        <div class="card-top">
+                            <div class="transfer-icon">📁</div>
+                            <span class="status-tag">${t.status}</span>
+                        </div>
+                        <h3>${t.title}</h3>
+                        <ul class="meta-list">
+                            <li><strong>Files:</strong> ${t.files} assets</li>
+                            <li><strong>Size:</strong> ${t.size}</li>
+                            <li><strong>Expires:</strong> ${t.expires}</li>
+                            <li><strong>Access Type:</strong> ${t.password ? '🔑 Password Protected' : '🔓 Public Link'}</li>
+                        </ul>
+                        <div class="card-actions">
+                            <button class="tool-action" onclick="copyLink('${t.url}')">Copy Link</button>
+                            <button class="tool-action action-sec" onclick="openSecurityDrawer(${t.id})">Configure Security</button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                }
+            });
+            computeMetrics();
+        }
+
+        // Copy simulation
+        function copyLink(url) {
+            navigator.clipboard.writeText(url).then(() => {
+                triggerToast("SECURED LINK COPIED TO SYSTEM CLIPBOARD");
+            }).catch(() => {
+                // Fallback inside local memory
+                triggerToast("LINK COPIED: " + url);
+            });
+        }
+
+        // Notification utility
+        function triggerToast(message) {
+            const toast = document.getElementById('systemToast');
+            const txt = document.getElementById('toastText');
+            txt.innerText = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Overlay close
+        function closeOverlay() {
+            overlay.classList.remove('active');
+            backdrop.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Open custom security parameter panel
+        function openSecurityDrawer(id) {
+            const item = transfers.find(t => t.id === id);
+            if(!item) return;
+
+            document.getElementById('overlayTitle').innerText = "Configure Transfer Rules";
+            document.getElementById('overlayBody').innerHTML = `
+                <div class="calc-group">
+                    <label class="calc-label">Link Endpoint Target</label>
+                    <input type="text" class="calc-input" value="${item.url}" readonly style="background: rgba(255,255,255,0.05); color: var(--accent-cyan);">
+                </div>
+
+                <div class="calc-group">
+                    <label class="calc-label">Restrict Access (Optional Password)</label>
+                    <input type="text" id="sec_password" class="calc-input" value="${item.password}" placeholder="No Password Assigned">
+                </div>
+
+                <div class="calc-group">
+                    <label class="calc-label">Expiration Parameters</label>
+                    <input type="date" id="sec_expiry" class="calc-input" value="${item.expires}">
+                </div>
+
+                <div class="calc-group">
+                    <label class="calc-label">Operational Status</label>
+                    <select id="sec_status" class="calc-input" style="color: #fff; background: var(--surface-card);">
+                        <option value="Active" ${item.status === 'Active' ? 'selected' : ''}>Active - Open for target access</option>
+                        <option value="Secured" ${item.status === 'Secured' ? 'selected' : ''}>Secured - Password Required</option>
+                        <option value="Expired" ${item.status === 'Expired' ? 'selected' : ''}>Expired - Access Blocked</option>
+                    </select>
+                </div>
+
+                <div class="checklist-wrapper">
+                    <div class="checklist-item ${item.downloadAllowed ? 'checked' : ''}" id="check_download" onclick="this.classList.toggle('checked')">
+                        <div class="checklist-checkbox">${item.downloadAllowed ? '✔' : ''}</div>
+                        <div class="checklist-text">
+                            <h4>Allow Asset Downloads</h4>
+                            <p>Enables full resolution zip downloads of the verification assets inside.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-primary" style="width:100%; justify-content:center; margin-top:10px;" onclick="saveRules(${item.id})">
+                    Apply Rules to Transfer ⚡
+                </button>
+
+                <button class="btn-danger" onclick="revokeTransfer(${item.id})">
+                    Revoke and Terminate Link Immediately
+                </button>
+            `;
+
+            overlay.classList.add('active');
+            backdrop.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Save modifications
+        function saveRules(id) {
+            const item = transfers.find(t => t.id === id);
+            if(!item) return;
+
+            const pwd = document.getElementById('sec_password').value;
+            const exp = document.getElementById('sec_expiry').value;
+            const isDownload = document.getElementById('check_download').classList.contains('checked');
+            const status = document.getElementById('sec_status').value;
+
+            item.password = pwd;
+            item.expires = exp;
+            item.downloadAllowed = isDownload;
+            item.status = status;
+
+            // Auto status logic override
+            if (pwd && status === 'Active') {
+                item.status = "Secured";
+            } else if (!pwd && status === 'Secured') {
+                item.status = "Active";
+            }
+
+            closeOverlay();
+            renderTransfers();
+            triggerToast("SECURITY PARAMETERS APPLIED SUCCESSFULLY");
+        }
+
+        // Revoke transfer simulation
+        function revokeTransfer(id) {
+            transfers = transfers.filter(t => t.id !== id);
+            closeOverlay();
+            renderTransfers();
+            triggerToast("TRANSFER LINK SUSPENDED AND DISCHARGED FROM GATEWAY");
+        }
+
+        // Create Secure Transfer Drawer
+        function openCreatePanel() {
+            document.getElementById('overlayTitle').innerText = "Create Secure Transfer Link";
+            document.getElementById('overlayBody').innerHTML = `
+                <div class="calc-group">
+                    <label class="calc-label">Share Title / Destination</label>
+                    <input type="text" id="new_title" class="calc-input" placeholder="e.g. Acme Q3 Operating Statements" required>
+                </div>
+
+                <div class="calc-group">
+                    <label class="calc-label">Number of Document Attachments</label>
+                    <input type="number" id="new_files" class="calc-input" value="1" min="1">
+                </div>
+
+                <div class="calc-group">
+                    <label class="calc-label">Total Bundle Size Estimator</label>
+                    <input type="text" id="new_size" class="calc-input" value="15.0 MB" placeholder="e.g. 15.0 MB">
+                </div>
+
+                <div class="calc-group">
+                    <label class="calc-label">Target Security Password</label>
+                    <input type="text" id="new_password" class="calc-input" placeholder="Optional Protection Key">
+                </div>
+
+                <div class="calc-group">
+                    <label class="calc-label">Automatic Expiration Target</label>
+                    <input type="date" id="new_expiry" class="calc-input" value="2024-12-30">
+                </div>
+
+                <button class="btn-primary" style="width:100%; justify-content:center; margin-top:20px;" onclick="generateLink()">
+                    Deploy To Secured Edge Network
+                </button>
+            `;
+
+            overlay.classList.add('active');
+            backdrop.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Generate logic
+        function generateLink() {
+            const title = document.getElementById('new_title').value || "Asset Bundle Share";
+            const files = parseInt(document.getElementById('new_files').value) || 1;
+            const size = document.getElementById('new_size').value || "10.0 MB";
+            const pwd = document.getElementById('new_password').value;
+            const expiry = document.getElementById('new_expiry').value;
+
+            const cleanSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+            const url = `https://edge.ft/t/${cleanSlug || 'bundle-' + Math.floor(Math.random()*1000)}`;
+
+            const nextId = transfers.length ? Math.max(...transfers.map(t => t.id)) + 1 : 1;
+
+            transfers.push({
+                id: nextId,
+                title: title,
+                files: files,
+                size: size,
+                status: pwd ? "Secured" : "Active",
+                expires: expiry,
+                password: pwd,
+                downloadAllowed: true,
+                url: url
+            });
+
+            closeOverlay();
+            renderTransfers();
+            triggerToast("DOCK DEPLOYED TO EDGE SERVER AT DIRECT ADDRESS");
+        }
+
+        // Event Hookups for real-time controls
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderTransfers();
+            });
+        });
+
+        searchInput.addEventListener('input', renderTransfers);
+
+        // Bootstrap Core Setup
+        renderTransfers();
+    </script>
+</body>
+</html>

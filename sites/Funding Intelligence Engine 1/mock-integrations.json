@@ -1,0 +1,178 @@
+{
+  "onboarding_wizard": {
+    "current_step": "financial_verification",
+    "steps": [
+      {
+        "id": "company_profile",
+        "label": "Company Profile",
+        "status": "completed",
+        "completed_at": "2026-03-30T09:14:22Z"
+      },
+      {
+        "id": "financial_verification",
+        "label": "Financial Sync",
+        "status": "in_progress",
+        "estimated_remaining_seconds": 45
+      },
+      {
+        "id": "metric_calibration",
+        "label": "Metric Calibration",
+        "status": "pending"
+      },
+      {
+        "id": "intelligence_routing",
+        "label": "Engine Routing",
+        "status": "pending"
+      }
+    ]
+  },
+  "integration_categories": [
+    {
+      "category": "banking",
+      "display_name": "Banking & Treasury",
+      "providers": [
+        {
+          "id": "plaid_copilot",
+          "name": "Plaid Enterprise Link",
+          "icon": "plaid",
+          "status": "connected",
+          "last_sync": "2026-03-30T10:00:05Z",
+          "data_ingested": {
+            "institutions_synced": ["Silicon Valley Bank (Primary)", "JPMorgan Chase (Operating)"],
+            "cash_balance_usd": 1245000.00,
+            "monthly_burn_rate_avg_usd": 115000.00,
+            "computed_runway_months": 10.8,
+            "dscr": 1.45
+          }
+        },
+        {
+          "id": "openbank_eu",
+          "name": "OpenBank Europe Hub",
+          "icon": "openbank",
+          "status": "disconnected",
+          "last_sync": null,
+          "data_ingested": {}
+        }
+      ]
+    },
+    {
+      "category": "payment_processors",
+      "display_name": "Payment Gateways & Merchant Accounts",
+      "providers": [
+        {
+          "id": "stripe",
+          "name": "Stripe Connect",
+          "icon": "stripe",
+          "status": "syncing",
+          "progress_percent": 82,
+          "last_sync": "Syncing currently...",
+          "data_ingested": {
+            "mrr_usd": 284500.00,
+            "arr_usd": 3414000.00,
+            "ltv_to_cac_ratio": 4.2,
+            "churn_rate_annualized_percent": 3.8,
+            "growth_velocity_mom_percent": 8.4
+          }
+        },
+        {
+          "id": "shopify",
+          "name": "Shopify Merchant Solutions",
+          "icon": "shopify",
+          "status": "available",
+          "last_sync": null,
+          "data_ingested": {}
+        }
+      ]
+    },
+    {
+      "category": "accounting",
+      "display_name": "Accounting & ERP Systems",
+      "providers": [
+        {
+          "id": "quickbooks_online",
+          "name": "QuickBooks Online",
+          "icon": "qbo",
+          "status": "pending_mfa",
+          "last_sync": "2026-03-29T18:30:00Z",
+          "data_ingested": {
+            "gross_margin_percent": 74.2,
+            "ebitda_run_rate_usd": 420000.00,
+            "accounts_receivable_usd": 145000.00,
+            "accounts_payable_usd": 35000.00
+          }
+        },
+        {
+          "id": "xero",
+          "name": "Xero Business Cloud",
+          "icon": "xero",
+          "status": "available",
+          "last_sync": null,
+          "data_ingested": {}
+        }
+      ]
+    }
+  ],
+  "ingest_telemetry_stream": [
+    {
+      "timestamp": "10:01:14",
+      "event": "PLAID_HANDSHAKE_SUCCESS",
+      "level": "info",
+      "message": "Connected securely to SVB sandbox container with 256-bit AES-GCM encryption."
+    },
+    {
+      "timestamp": "10:01:15",
+      "event": "INGEST_BALANCE_PROCESSED",
+      "level": "success",
+      "message": "Aggregated absolute liquidity index value: $1,245,000 across 2 institutions."
+    },
+    {
+      "timestamp": "10:01:18",
+      "event": "STRIPE_POLLING_INITIALIZED",
+      "level": "info",
+      "message": "Initiating high-velocity subscription metrics synchronization stream..."
+    },
+    {
+      "timestamp": "10:01:21",
+      "event": "STRIPE_MRR_AGGREGATED",
+      "level": "success",
+      "message": "Calculated MRR at $284,500.00. Growth Velocity Mom: +8.4%."
+    },
+    {
+      "timestamp": "10:01:23",
+      "event": "QBO_REAUTH_REQUIRED",
+      "level": "warning",
+      "message": "QuickBooks ledger sync paused. MFA challenge required by user."
+    }
+  ],
+  "engine_ingestion_payload_map": {
+    "source_system": "Borrower Onboarding Portal v2.6.1",
+    "target_endpoint": "/api/v1/engine/allocate",
+    "mapped_parameters": {
+      "liquidity": {
+        "score_contribution": 92,
+        "raw_metric": "$1,245,000 Cash on Hand",
+        "confidence_index": 0.98
+      },
+      "leverage": {
+        "score_contribution": 45,
+        "raw_metric": "0.38 Debt-to-Equity Ratio",
+        "confidence_index": 0.95
+      },
+      "growth": {
+        "score_contribution": 96,
+        "raw_metric": "100.8% YoY Revenue Runway Growth",
+        "confidence_index": 0.92
+      },
+      "collateral": {
+        "score_contribution": 20,
+        "raw_metric": "Zero Physical Assets, $420k IP Valuation",
+        "confidence_index": 0.60
+      },
+      "cash_flow": {
+        "score_contribution": 88,
+        "raw_metric": "1.45x DSCR Coverage",
+        "confidence_index": 0.94
+      }
+    }
+  }
+}

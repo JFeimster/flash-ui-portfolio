@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead Vault | Prism Scan</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Inter:wght@300;400;600&display=swap');
+
+        :root {
+            --bg-deep: #05070a;
+            --glass: rgba(15, 20, 28, 0.85);
+            --accent-cyan: #00f2ff;
+            --accent-magenta: #ff00ea;
+            --accent-lime: #bcff00;
+            --border-glow: rgba(0, 242, 255, 0.2);
+            --text-main: #e0e6ed;
+            --text-dim: #7a869a;
+            --prism-gradient: linear-gradient(135deg, #00f2ff 0%, #ff00ea 50%, #bcff00 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg-deep);
+            background-image: 
+                radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 32px 32px;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .vault-container {
+            width: 1100px;
+            height: 700px;
+            max-width: 95vw;
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 4px;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .vault-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--prism-gradient);
+            z-index: 10;
+        }
+
+        .header {
+            padding: 20px 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 20px;
+            height: 20px;
+            background: var(--prism-gradient);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+
+        .brand-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 13px;
+        }
+
+        .vault-stats {
+            display: flex;
+            gap: 24px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-cyan);
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        /* Sidebar Filters */
+        .sidebar {
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-section-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: block;
+            letter-spacing: 1px;
+        }
+
+        .filter-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-item {
+            font-size: 12px;
+            padding: 8px 12px;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            border: 1px solid transparent;
+        }
+
+        .filter-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .filter-item.active {
+            background: rgba(0, 242, 255, 0.05);
+            border-color: rgba(0, 242, 255, 0.3);
+            color: var(--accent-cyan);
+        }
+
+        .count-badge {
+            font-family: 'JetBrains Mono', monospace;
+            opacity: 0.6;
+            font-size: 10px;
+        }
+
+        /* Content Area */
+        .content {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .toolbar {
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .search-vault {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            width: 300px;
+            outline: none;
+        }
+
+        .lead-table-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 0 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        th {
+            text-align: left;
+            padding: 16px 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            background: var(--bg-deep);
+            z-index: 5;
+        }
+
+        td {
+            padding: 16px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .lead-name {
+            font-weight: 600;
+            color: white;
+            display: block;
+        }
+
+        .lead-company {
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .source-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.05);
+            text-transform: uppercase;
+        }
+
+        .source-tag.linkedin { color: #0077b5; border: 1px solid rgba(0, 119, 181, 0.3); }
+        .source-tag.sos { color: var(--accent-lime); border: 1px solid rgba(188, 255, 0, 0.3); }
+        .source-tag.web { color: var(--accent-cyan); border: 1px solid rgba(0, 242, 255, 0.3); }
+
+        .priority-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .priority-high { background: var(--accent-magenta); box-shadow: 0 0 8px var(--accent-magenta); }
+        .priority-low { background: #333; }
+
+        .action-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-dim);
+            padding: 4px 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body>
+
+    <div class="vault-container">
+        <header class="header">
+            <div class="brand">
+                <div class="brand-logo"></div>
+                <h1 class="brand-name">Lead Management Vault</h1>
+            </div>
+            <div class="vault-stats">
+                <div class="stat-item">
+                    <span class="stat-value">124</span>
+                    <span class="stat-label">Total Nodes</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" style="color: var(--accent-magenta);">12</span>
+                    <span class="stat-label">High Priority</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-layout">
+            <aside class="sidebar">
+                <div class="filter-group">
+                    <span class="filter-section-title">Industry Sector</span>
+                    <ul class="filter-list">
+                        <li class="filter-item active">All Sectors <span class="count-badge">124</span></li>
+                        <li class="filter-item">Technology <span class="count-badge">42</span></li>
+                        <li class="filter-item">Logistics <span class="count-badge">18</span></li>
+                        <li class="filter-item">Financial Services <span class="count-badge">31</span></li>
+                        <li class="filter-item">Manufacturing <span class="count-badge">23</span></li>
+                    </ul>
+                </div>
+
+                <div class="filter-group">
+                    <span class="filter-section-title">Geography</span>
+                    <ul class="filter-list">
+                        <li class="filter-item">North America <span class="count-badge">88</span></li>
+                        <li class="filter-item">European Union <span class="count-badge">24</span></li>
+                        <li class="filter-item">APAC <span class="count-badge">12</span></li>
+                    </ul>
+                </div>
+
+                <button class="action-btn" style="margin-top: auto; padding: 12px; border-color: var(--accent-lime); color: var(--accent-lime);">EXPORT DATASET (.CSV)</button>
+            </aside>
+
+            <section class="content">
+                <div class="toolbar">
+                    <input type="text" class="search-vault" placeholder="Filter by name, company, or domain...">
+                    <div style="display: flex; gap: 8px;">
+                        <button class="action-btn">LATEST FIRST</button>
+                        <button class="action-btn">PRIORITY</button>
+                    </div>
+                </div>
+
+                <div class="lead-table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;"></th>
+                                <th>Contact Identity</th>
+                                <th>Organization</th>
+                                <th>Verification Source</th>
+                                <th>Location</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="priority-dot priority-high"></span></td>
+                                <td>
+                                    <span class="lead-name">Sarah Jenkins</span>
+                                    <span class="lead-company">Director of Operations</span>
+                                </td>
+                                <td>Acme Dynamics Corp</td>
+                                <td><span class="source-tag sos">SOS Registry</span></td>
+                                <td style="color: var(--text-dim);">Austin, TX</td>
+                                <td><button class="action-btn">VIEW</button></td>
+                            </tr>
+                            <tr>
+                                <td><span class="priority-dot priority-high"></span></td>
+                                <td>
+                                    <span class="lead-name">Marcus Thorne</span>
+                                    <span class="lead-company">CTO</span>
+                                </td>
+                                <td>Nexus Systems LLC</td>
+                                <td><span class="source-tag linkedin">LinkedIn</span></td>
+                                <td style="color: var(--text-dim);">Palo Alto, CA</td>
+                                <td><button class="action-btn">VIEW</button></td>
+                            </tr>
+                            <tr>
+                                <td><span class="priority-dot priority-low"></span></td>
+                                <td>
+                                    <span class="lead-name">Elena Rodriguez</span>
+                                    <span class="lead-company">Head of Procurement</span>
+                                </td>
+                                <td>Global Freight Ltd</td>
+                                <td><span class="source-tag web">Web Scrape</span></td>
+                                <td style="color: var(--text-dim);">Miami, FL</td>
+                                <td><button class="action-btn">VIEW</button></td>
+                            </tr>
+                            <tr>
+                                <td><span class="priority-dot priority-low"></span></td>
+                                <td>
+                                    <span class="lead-name">David Chen</span>
+                                    <span class="lead-company">Regional Manager</span>
+                                </td>
+                                <td>Apex Financials</td>
+                                <td><span class="source-tag sos">SOS Registry</span></td>
+                                <td style="color: var(--text-dim);">Chicago, IL</td>
+                                <td><button class="action-btn">VIEW</button></td>
+                            </tr>
+                            <tr>
+                                <td><span class="priority-dot priority-high"></span></td>
+                                <td>
+                                    <span class="lead-name">Julian Vane</span>
+                                    <span class="lead-company">Managing Partner</span>
+                                </td>
+                                <td>Vane & Associates</td>
+                                <td><span class="source-tag linkedin">LinkedIn</span></td>
+                                <td style="color: var(--text-dim);">London, UK</td>
+                                <td><button class="action-btn">VIEW</button></td>
+                            </tr>
+                            <tr>
+                                <td><span class="priority-dot priority-low"></span></td>
+                                <td>
+                                    <span class="lead-name">Ingrid Meyer</span>
+                                    <span class="lead-company">Logistics Coordinator</span>
+                                </td>
+                                <td>Berlin Express</td>
+                                <td><span class="source-tag web">Web Scrape</span></td>
+                                <td style="color: var(--text-dim);">Berlin, DE</td>
+                                <td><button class="action-btn">VIEW</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead Vault | Prism Scan</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Inter:wght@300;400;600&display=swap');
+
+        :root {
+            --bg-deep: #05070a;
+            --glass: rgba(15, 20, 28, 0.85);
+            --accent-cyan: #00f2ff;
+            --accent-magenta: #ff00ea;
+            --accent-lime: #bcff00;
+            --border-glow: rgba(0, 242, 255, 0.2);
+            --text-main: #e0e6ed;
+            --text-dim: #7a869a;
+            --prism-gradient: linear-gradient(135deg, #00f2ff 0%, #ff00ea 50%, #bcff00 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg-deep);
+            background-image: 
+                radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 32px 32px;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .vault-container {
+            width: 1100px;
+            height: 700px;
+            max-width: 95vw;
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 4px;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .vault-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--prism-gradient);
+            z-index: 10;
+        }
+
+        .header {
+            padding: 20px 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 20px;
+            height: 20px;
+            background: var(--prism-gradient);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+
+        .brand-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 13px;
+        }
+
+        .vault-stats {
+            display: flex;
+            gap: 24px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-cyan);
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        /* Sidebar Filters */
+        .sidebar {
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-section-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: block;
+            letter-spacing: 1px;
+        }
+
+        .filter-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-item {
+            font-size: 12px;
+            padding: 8px 12px;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            border: 1px solid transparent;
+        }
+
+        .filter-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .filter-item.active {
+            background: rgba(0, 242, 255, 0.05);
+            border-color: rgba(0, 242, 255, 0.3);
+            color: var(--accent-cyan);
+        }
+
+        .count-badge {
+            font-family: 'JetBrains Mono', monospace;
+            opacity: 0.6;
+            font-size: 10px;
+        }
+
+        /* Content Area */
+        .content {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .toolbar {
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .search-vault {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            width: 300px;
+            outline: none;
+        }
+
+        .lead-table-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 0 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        th {
+            text-align: left;
+            padding: 16px 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            background: var(--bg-deep);
+            z-index: 5;
+        }
+
+        td {
+            padding: 16px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .lead-name {
+            font-weight: 600;
+            color: white;
+            display: block;
+        }
+
+        .lead-company {
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .source-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.05);
+            text-transform: uppercase;
+        }
+
+        .source-tag.linkedin { color: #0077b5; border: 1px solid rgba(0, 119, 181, 0.3); }
+        .source-tag.sos { color: var(--accent-lime); border: 1px solid rgba(188, 255, 0, 0.3); }
+        .source-tag.web { color: var(--accent-cyan); border: 1px solid rgba(0, 242, 255, 0.3); }
+
+        .priority-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .priority-high { background: var(--accent-magenta); box-shadow: 0 0 8px var(--accent-magenta); }
+        .priority-low { background: #333; }
+
+        .action-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-dim);
+            padding: 4px 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body>
+
+    <div class="vault-container">
+        <header class="header">
+            <div class="brand">
+                <div class="brand-logo"></div>
+                <h1 class="brand-name">Lead Management Vault</h1>
+            </div>
+            <div class="vault-stats">
+                <div class="stat-item">
+                    <span class="stat-value">124</span>
+                    <span class="stat-label">Total Nodes</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" style="color: var(--accent-magenta);">12</span>
+                    <span class="stat-label">High Priority</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-layout">
+            <aside class="sidebar">
+                <div class="filter-group">
+                    <span class="filter-section-title">Industry Sector</span>
+                    <ul class="filter-list">
+                        <li class="filter-item active">All Sectors <span class="count-badge">124</span></li>
+                        <li class="filter-item">Technology <span class="count-badge">42</span></li>
+                        <li class="filter-item">Logistics <span class="count-badge">18</span></li>
+                        <li class="filter-item">Financial Services <span class="count-badge">31</span></li>
+                        <li class="filter-item">Manufacturing <span class="count-badge">23</span></li>
+                    </ul>
+                </div>
+
+                <div class="filter-group">
+                    <span class="filter-section-title">Geography</span>
+                    <ul class="filter-list">
+                        <li class="filter-item">North America <span class="count-badge">88</span></li>
+                        <li class="filter-item">European Union <span class="count-badge">24</span></li>
+                        <li class="filter-item">APAC <span class="count-badge">12</span></li>
+                    </ul>
+                </div>
+
+                <button class="action-btn" style="margin-top: auto; padding: 12px; border-color: var(--accent-lime); color: var(--accent-lime);">EXPORT DATASET (.CSV)</button>
+            </aside>
+
+            <section class="content">
+                <div class="toolbar">
+                    <input type="text" class="search-vault" placeholder="Filter by name, company, or domain...">
+                    <div style="display: flex; gap: 8px;">
+                        <button class="action-btn">LATEST FIRST</button>
+                        <button class="action-btn">PRIORITY</button>
+                    </div>
+                </div>
+
+                <div class="lead-table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;"></th>
+                                <th>Contact Identity</th>
+                                <th>Organization</th>
+                                <th>Verification Source</th>
+                                <th>Location</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="priority-dot priority-high"></span></td>
+                                <td>
+                                    <span class="lead-name">Sarah Jenkins</span>
+                                    <span class="lead-company">Director of Operations</span>
+                                </td>
+                                <td>Acme Dynamics Corp</td>
+                                <td><span class="source-tag sos">SOS Registry</span></td>
+                                <td style="color: var(--text-dim);">Austin, TX</td>
+                                <td><button class="action-btn">VIEW</button></td>
+                            </tr>
+                            <tr>
+                                <td><span class="priority-dot priority-high"></span></td>
+                                <td>
+                                    <span class="lead-name">Marcus Thorne</span>
+                                    <span class="lead-company">CTO</span>
+                                </td>
+                                <td>Nexus Systems LLC</td>
+                                <td><span class="source-tag linkedin">LinkedIn</span></td>
+                                <td style="color: var(--text-dim);">Palo Alto, CA</td>
+                                <td><button class="action-btn">VIEW</button></td>
+                            </tr>
+                            <tr>
+                                <td><span class="priority-dot priority-low"></span></td>
+                                <td>
+                                    <span class="lead-name">Elena Rodriguez</span>
+                                    <span class="lead-company">Head of Procurement</span>
+                                </td>
+                                <td>Global Freight Ltd</td>
+                                <td><span class="source-tag web">Web Scrape</span></td>
+                                <td style="color: var(--text-dim);">Miami, FL</td>
+                                <td><button class="action-btn">VIEW</button></td>
+                            </tr>
+                            <tr>
+                                <td><span class="priority-dot priority-low"></span></td>
+                                <td>
+                                    <span class="lead-name">David Chen</span>
+                                    <span class="lead-company">Regional Manager</span>
+                                </td>
+                                <td>Apex Financials</td>
+                                <td><span class="source-tag sos">SOS Registry</span></td>
+                                <td style="color: var(--text-dim);">Chicago, IL</td>
+                                <td><button class="action-btn">VIEW</button></td>
+                            </tr>
+                            <tr>
+                                <td><span class="priority-dot priority-high"></span></td>
+                                <td>
+                                    <span class="lead-name">Julian Vane</span>
+                                    <span class="lead-company">Managing Partner</span>
+                                </td>
+                                <td>Vane & Associates</td>
+                                <td><span class="source-tag linkedin">LinkedIn</span></td>
+                                <td style="color: var(--text-dim);">London, UK</td>
+                                <td><button class="action-btn">VIEW</button></td>
+                            </tr>
+                            <tr>
+                                <td><span class="priority-dot priority-low"></span></td>
+                                <td>
+                                    <span class="lead-name">Ingrid Meyer</span>
+                                    <span class="lead-company">Logistics Coordinator</span>
+                                </td>
+                                <td>Berlin Express</td>
+                                <td><span class="source-tag web">Web Scrape</span></td>
+                                <td style="color: var(--text-dim);">Berlin, DE</td>
+                                <td><button class="action-btn">VIEW</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+
+</body>
+</html>

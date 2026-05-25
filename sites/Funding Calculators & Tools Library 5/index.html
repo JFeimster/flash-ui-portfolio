@@ -1,0 +1,1393 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Edge - Client Workspace & Vault</title>
+    <!-- Google Fonts for Ultra-Modern High-Contrast Look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0c10;
+            --surface: #14161f;
+            --surface-card: #1a1d29;
+            --text-raw: #ffffff;
+            --text-muted: #8e95ad;
+            --accent-cyan: #00f3ff;
+            --accent-magenta: #ff0055;
+            --accent-yellow: #ffee00;
+            --border-width: 3px;
+            --brutal-shadow-cyan: 6px 6px 0px var(--accent-cyan);
+            --brutal-shadow-magenta: 6px 6px 0px var(--accent-magenta);
+            --brutal-shadow-yellow: 6px 6px 0px var(--accent-yellow);
+            --transition-speed: 0.15s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-raw);
+            line-height: 1.4;
+            padding: 20px;
+            overflow-x: hidden;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* Container Limit */
+        .wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header Section */
+        header {
+            position: relative;
+            padding: 80px 40px;
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            box-shadow: var(--brutal-shadow-cyan);
+            margin-bottom: 40px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        /* Ambient glowing background grid */
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,243,255,0.08) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--accent-cyan);
+            color: #000;
+            border: 2px solid #fff;
+            font-weight: 900;
+            font-size: 14px;
+            letter-spacing: 1.5px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            transform: rotate(-1deg);
+            box-shadow: 4px 4px 0px #fff;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        h1 {
+            font-size: clamp(38px, 6vw, 76px);
+            font-weight: 900;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            line-height: 0.95;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        h1 span {
+            color: transparent;
+            -webkit-text-stroke: 1.5px #fff;
+            background: linear-gradient(90deg, var(--accent-magenta), var(--accent-cyan));
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .hero-sub {
+            font-size: 20px;
+            color: var(--text-muted);
+            max-width: 750px;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .metric-card {
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            padding: 30px;
+            position: relative;
+            transition: transform var(--transition-speed);
+        }
+
+        .metric-card:nth-child(1) { box-shadow: var(--brutal-shadow-cyan); }
+        .metric-card:nth-child(2) { box-shadow: var(--brutal-shadow-magenta); }
+        .metric-card:nth-child(3) { box-shadow: var(--brutal-shadow-yellow); }
+
+        .metric-card:hover {
+            transform: translate(-4px, -4px);
+        }
+
+        .metric-label {
+            font-size: 13px;
+            text-transform: uppercase;
+            font-weight: 900;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .metric-value {
+            font-size: 42px;
+            font-weight: 900;
+            font-family: 'Space Grotesk', sans-serif;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .metric-unit {
+            font-size: 18px;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        /* Custom progress bar */
+        .progress-container {
+            width: 100%;
+            height: 14px;
+            background: var(--surface-card);
+            border: 2px solid #fff;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--accent-cyan);
+            width: 62.4%;
+            transition: width 0.5s ease;
+        }
+
+        .metric-card:nth-child(2) .progress-bar {
+            background: var(--accent-magenta);
+            width: 48%;
+        }
+
+        .metric-card:nth-child(3) .progress-bar {
+            background: var(--accent-yellow);
+            width: 100%;
+        }
+
+        .metric-footer {
+            margin-top: 15px;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            color: #fff;
+        }
+
+        /* Core Workspace Layout Split */
+        .workspace-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        @media (max-width: 1100px) {
+            .workspace-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Section Title Styling */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-family: 'Space Grotesk', sans-serif;
+            letter-spacing: -0.5px;
+            position: relative;
+        }
+
+        .section-title span {
+            color: var(--accent-cyan);
+        }
+
+        /* Quick Upload Zone */
+        .upload-zone {
+            background: var(--surface);
+            border: var(--border-width) dashed #fff;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            box-shadow: var(--brutal-shadow-yellow);
+            margin-bottom: 40px;
+        }
+
+        .upload-zone:hover {
+            border-style: solid;
+            border-color: var(--accent-yellow);
+            transform: translate(-3px, -3px);
+            box-shadow: 10px 10px 0px var(--accent-yellow);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .upload-zone h3 {
+            font-size: 20px;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-family: 'Space Grotesk', sans-serif;
+            margin-bottom: 8px;
+        }
+
+        .upload-zone p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn-upload {
+            background: #fff;
+            color: #000;
+            padding: 12px 24px;
+            border: 2px solid #000;
+            font-weight: 900;
+            font-size: 14px;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px var(--accent-cyan);
+            font-family: 'Space Grotesk', sans-serif;
+            transition: all 0.1s;
+        }
+
+        .btn-upload:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px var(--accent-cyan);
+        }
+
+        /* Recently Received Files Section */
+        .feed-container {
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            padding: 30px;
+            box-shadow: var(--brutal-shadow-cyan);
+        }
+
+        /* Filter Controls Inside Workspace */
+        .feed-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .feed-filter-btn {
+            background: var(--surface-card);
+            border: 2px solid #fff;
+            color: #fff;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .feed-filter-btn:hover, .feed-filter-btn.active {
+            background: var(--accent-cyan);
+            color: #000;
+            box-shadow: 3px 3px 0px #fff;
+        }
+
+        /* Document Table/List */
+        .document-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .document-row {
+            background: var(--surface-card);
+            border: 2px solid #fff;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: auto 1fr auto auto;
+            align-items: center;
+            gap: 20px;
+            transition: transform var(--transition-speed);
+        }
+
+        .document-row:hover {
+            transform: scale(1.01);
+            border-color: var(--accent-cyan);
+        }
+
+        .doc-icon {
+            font-size: 28px;
+            width: 50px;
+            height: 50px;
+            background: var(--surface);
+            border: 2px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .doc-info h4 {
+            font-size: 16px;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-family: 'Space Grotesk', sans-serif;
+            margin-bottom: 4px;
+        }
+
+        .doc-meta {
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            gap: 15px;
+        }
+
+        .doc-status {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 900;
+            padding: 4px 10px;
+            border: 1px solid #000;
+            background: var(--accent-yellow);
+            color: #000;
+            height: fit-content;
+        }
+
+        .doc-status.verified {
+            background: var(--accent-cyan);
+        }
+
+        .doc-status.pending {
+            background: var(--accent-magenta);
+            color: #fff;
+        }
+
+        .doc-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-action {
+            background: var(--surface);
+            border: 2px solid #fff;
+            color: #fff;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 900;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .btn-action:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        .btn-action.primary {
+            background: var(--accent-magenta);
+            color: #fff;
+        }
+
+        .btn-action.primary:hover {
+            background: #fff;
+            color: #000;
+            box-shadow: 3px 3px 0px var(--accent-magenta);
+        }
+
+        /* Sidebar - Secure Shared Folders */
+        .secure-folders-section {
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            padding: 30px;
+            box-shadow: var(--brutal-shadow-magenta);
+            height: fit-content;
+        }
+
+        .folder-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .folder-card {
+            background: var(--surface-card);
+            border: 2px solid #fff;
+            padding: 20px;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .folder-card:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: 6px 6px 0px var(--accent-magenta);
+            border-color: var(--accent-magenta);
+        }
+
+        .folder-icon {
+            font-size: 32px;
+        }
+
+        .folder-details {
+            flex-grow: 1;
+        }
+
+        .folder-details h4 {
+            font-size: 15px;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-family: 'Space Grotesk', sans-serif;
+            margin-bottom: 2px;
+        }
+
+        .folder-details p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .folder-arrow {
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--accent-magenta);
+        }
+
+        /* Strategy Banner */
+        .strategy-banner {
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            margin: 60px 0;
+            padding: 60px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            gap: 40px;
+            box-shadow: var(--brutal-shadow-yellow);
+            position: relative;
+        }
+
+        .strategy-content h2 {
+            font-size: clamp(32px, 4vw, 48px);
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .strategy-content p {
+            font-size: 18px;
+            color: var(--text-muted);
+            max-width: 600px;
+        }
+
+        .btn-white {
+            background: var(--accent-yellow);
+            color: #000;
+            padding: 20px 40px;
+            border: var(--border-width) solid #fff;
+            text-decoration: none;
+            font-weight: 900;
+            font-size: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 6px 6px 0px #fff;
+            text-transform: uppercase;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .btn-white:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 10px 10px 0px #fff;
+        }
+
+        /* FAQ */
+        .faq-section {
+            max-width: 1000px;
+            margin: 80px 0;
+        }
+
+        .faq-section h2 {
+            font-size: 52px;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 45px;
+            font-family: 'Space Grotesk', sans-serif;
+            position: relative;
+            display: inline-block;
+        }
+
+        .faq-section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: var(--accent-cyan);
+            z-index: -1;
+        }
+
+        .faq-item {
+            border: var(--border-width) solid #fff;
+            background: var(--surface);
+            margin-bottom: 20px;
+            box-shadow: var(--brutal-shadow-cyan);
+            transition: transform 0.2s;
+        }
+
+        .faq-question {
+            padding: 25px 30px;
+            font-weight: 800;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-transform: uppercase;
+            font-family: 'Space Grotesk', sans-serif;
+            user-select: none;
+        }
+
+        .faq-question span {
+            font-size: 24px;
+            color: var(--accent-cyan);
+            font-family: monospace;
+            transition: transform 0.2s;
+        }
+
+        .faq-answer {
+            padding: 0 30px 25px 30px;
+            font-weight: 500;
+            font-size: 17px;
+            color: var(--text-muted);
+            display: none;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 100px;
+            padding: 80px 40px;
+            border: var(--border-width) solid #fff;
+            background: #000;
+            color: #fff;
+            box-shadow: var(--brutal-shadow-magenta);
+            text-align: center;
+            position: relative;
+        }
+
+        .footer-cta h2 {
+            font-size: clamp(36px, 5vw, 64px);
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 35px;
+            font-family: 'Space Grotesk', sans-serif;
+            letter-spacing: -1px;
+        }
+
+        .footer-copyright {
+            margin-top: 80px;
+            font-weight: 900;
+            color: var(--accent-cyan);
+            letter-spacing: 2px;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        /* Dynamic Sidebar / Overlay Panel for secure sharing config */
+        .calculator-overlay {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            max-width: 580px;
+            height: 100vh;
+            background: var(--surface);
+            border-left: var(--border-width) solid #fff;
+            box-shadow: -20px 0px 0px rgba(0,0,0,0.8);
+            z-index: 1000;
+            transform: translateX(110%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
+            padding: 40px;
+        }
+
+        .calculator-overlay.active {
+            transform: translateX(0);
+        }
+
+        .overlay-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay-backdrop.active {
+            display: block;
+        }
+
+        .calc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: var(--border-width) solid #fff;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .calc-title {
+            font-size: 24px;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--accent-cyan);
+        }
+
+        .close-calc {
+            background: var(--accent-magenta);
+            color: #fff;
+            border: 2px solid #fff;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-weight: 900;
+            font-size: 14px;
+            text-transform: uppercase;
+            box-shadow: 3px 3px 0px #fff;
+        }
+
+        .close-calc:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px;
+        }
+
+        /* Dynamic form styling */
+        .calc-group {
+            margin-bottom: 25px;
+        }
+
+        .calc-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+
+        .calc-input {
+            width: 100%;
+            background: var(--surface-card);
+            border: var(--border-width) solid #fff;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            outline: none;
+        }
+
+        .calc-input:focus {
+            border-color: var(--accent-cyan);
+        }
+
+        .calc-range {
+            width: 100%;
+            accent-color: var(--accent-cyan);
+            margin-top: 10px;
+        }
+
+        .calc-results {
+            background: var(--surface-card);
+            border: var(--border-width) solid #fff;
+            padding: 25px;
+            margin-top: 35px;
+            box-shadow: 6px 6px 0px var(--accent-cyan);
+        }
+
+        .calc-result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px dashed rgba(255,255,255,0.15);
+        }
+
+        .calc-result-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .calc-result-value {
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--accent-yellow);
+            font-family: 'Space Grotesk', sans-serif;
+            word-break: break-all;
+        }
+
+        /* Custom dynamic checklist visual */
+        .checklist-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 15px;
+            background: var(--surface-card);
+            border: 2px solid #fff;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .checklist-item.checked {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 243, 255, 0.05);
+        }
+
+        .checklist-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .checklist-item.checked .checklist-checkbox {
+            background: var(--accent-cyan);
+            color: #000;
+            border-color: var(--accent-cyan);
+        }
+
+        .checklist-text h4 {
+            font-size: 16px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .checklist-text p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* File Upload Alert Box */
+        .upload-alert {
+            display: none;
+            background: rgba(0, 243, 255, 0.1);
+            border: 2px solid var(--accent-cyan);
+            color: #fff;
+            padding: 15px;
+            margin-bottom: 25px;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Responsiveness adjustments */
+        @media (max-width: 900px) {
+            .strategy-banner {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 40px;
+            }
+            .btn-white {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            header {
+                padding: 40px 20px;
+            }
+            .document-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                text-align: center;
+            }
+            .doc-icon {
+                margin: 0 auto;
+            }
+            .doc-meta {
+                justify-content: center;
+            }
+            .doc-actions {
+                justify-content: center;
+            }
+            .calculator-overlay {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <!-- HEADER / HERO -->
+        <header>
+            <div class="hero-badge">⚡ Secure Client Workspace</div>
+            <h1>Secure Client <span>Vault & Storage</span></h1>
+            <p class="hero-sub">Upload critical underwriting data, track verification progress metrics, access shared institutional folders, and configure secure cryptographic share links instantly in a high-security container.</p>
+            <a href="#workspace" class="btn-primary" style="
+                background-color: var(--accent-cyan);
+                color: #000;
+                padding: 20px 40px;
+                border: var(--border-width) solid #fff;
+                text-decoration: none;
+                font-weight: 900;
+                font-size: 20px;
+                display: inline-flex;
+                align-items: center;
+                gap: 12px;
+                box-shadow: 6px 6px 0px #fff;
+                text-transform: uppercase;
+                cursor: pointer;
+                transition: transform var(--transition-speed) cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                            box-shadow var(--transition-speed) cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                font-family: 'Space Grotesk', sans-serif;
+            ">
+                Launch Workspace 
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </a>
+        </header>
+
+        <!-- AGGREGATE METRICS -->
+        <div class="metrics-grid">
+            <!-- Metric 1 -->
+            <div class="metric-card">
+                <span class="metric-label">SECURE STORAGE METRIC</span>
+                <div class="metric-value">62.4 <span class="metric-unit">GB / 100 GB</span></div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="storageProgressBar"></div>
+                </div>
+                <div class="metric-footer">
+                    <span>Used Space</span>
+                    <span id="storageProgressText">62.4% Allocated</span>
+                </div>
+            </div>
+
+            <!-- Metric 2 -->
+            <div class="metric-card">
+                <span class="metric-label">AGGREGATE DOCUMENT RECORD</span>
+                <div class="metric-value" id="docCountVal">48 <span class="metric-unit">Files Verified</span></div>
+                <div class="progress-container">
+                    <div class="progress-bar"></div>
+                </div>
+                <div class="metric-footer">
+                    <span>Audit Success Index</span>
+                    <span>100% Compliant</span>
+                </div>
+            </div>
+
+            <!-- Metric 3 -->
+            <div class="metric-card">
+                <span class="metric-label">SECURITY PROTOCOL STATE</span>
+                <div class="metric-value">AES-256 <span class="metric-unit">Active</span></div>
+                <div class="progress-container">
+                    <div class="progress-bar"></div>
+                </div>
+                <div class="metric-footer">
+                    <span>Data Compliance Rating</span>
+                    <span>Class-A Secure</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN INTERACTIVE WORKSPACE -->
+        <div class="workspace-layout" id="workspace">
+            
+            <!-- LEFT COLUMN: UPLOAD ZONE & FEED -->
+            <div class="workspace-main">
+                
+                <!-- Quick Upload Zone -->
+                <div class="upload-zone" onclick="triggerFileSelect()">
+                    <div class="upload-icon">📥</div>
+                    <h3>Drag & Drop Critical Files Here</h3>
+                    <p>Or click to browse secure local storage. Supports PDF, XML, CSV, DOCX (Max 250MB per file)</p>
+                    <button class="btn-upload">Select Files to Encrypt</button>
+                    <input type="file" id="secureFileInput" class="file-input" onchange="handleFileSelect(event)">
+                </div>
+
+                <div id="uploadSuccessAlert" class="upload-alert">
+                    🔒 FILE DETECTED & SUCCESSFULLY ENCRYPTED TO LOCAL VAULT CONTAINER.
+                </div>
+
+                <!-- Feed of Recently Received/Uploaded Files -->
+                <div class="feed-container">
+                    <div class="section-header">
+                        <h2 class="section-title">Workspace <span>Feed</span></h2>
+                        <div class="feed-filters">
+                            <button class="feed-filter-btn active" onclick="filterFeed('all')">All Vault Files</button>
+                            <button class="feed-filter-btn" onclick="filterFeed('verified')">Verified</button>
+                            <button class="feed-filter-btn" onclick="filterFeed('pending')">Pending Review</button>
+                        </div>
+                    </div>
+
+                    <!-- Search Input inside Feed -->
+                    <div style="position: relative; margin-bottom: 25px;">
+                        <input type="text" id="feedSearch" class="calc-input" placeholder="SEARCH VAULT BY FILENAME..." oninput="searchFeed()" style="padding-left: 50px;">
+                        <span style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); font-size: 20px;">🔍</span>
+                    </div>
+
+                    <!-- Document list structure -->
+                    <div class="document-list" id="documentFeed">
+                        <!-- Doc Item 1 -->
+                        <div class="document-row" data-status="verified" data-name="broker_payout_agreement_q3.pdf">
+                            <div class="doc-icon">📄</div>
+                            <div class="doc-info">
+                                <h4>broker_payout_agreement_q3.pdf</h4>
+                                <div class="doc-meta">
+                                    <span>File size: 4.8 MB</span>
+                                    <span>Received: 2 hours ago</span>
+                                    <span>Format: PDF</span>
+                                </div>
+                            </div>
+                            <span class="doc-status verified">Verified Integrity</span>
+                            <div class="doc-actions">
+                                <button class="btn-action" onclick="openShareLinkModal('broker_payout_agreement_q3.pdf')">Share ↗</button>
+                                <button class="btn-action primary" onclick="mockDownload('broker_payout_agreement_q3.pdf')">Download</button>
+                            </div>
+                        </div>
+
+                        <!-- Doc Item 2 -->
+                        <div class="document-row" data-status="pending" data-name="underwriting_assessment_tier1.xlsx">
+                            <div class="doc-icon">📊</div>
+                            <div class="doc-info">
+                                <h4>underwriting_assessment_tier1.xlsx</h4>
+                                <div class="doc-meta">
+                                    <span>File size: 12.4 MB</span>
+                                    <span>Received: Yesterday</span>
+                                    <span>Format: XLSX</span>
+                                </div>
+                            </div>
+                            <span class="doc-status pending">Pending Review</span>
+                            <div class="doc-actions">
+                                <button class="btn-action" onclick="openShareLinkModal('underwriting_assessment_tier1.xlsx')">Share ↗</button>
+                                <button class="btn-action primary" onclick="mockDownload('underwriting_assessment_tier1.xlsx')">Download</button>
+                            </div>
+                        </div>
+
+                        <!-- Doc Item 3 -->
+                        <div class="document-row" data-status="verified" data-name="tax_clearance_certificate_2024.pdf">
+                            <div class="doc-icon">📄</div>
+                            <div class="doc-info">
+                                <h4>tax_clearance_certificate_2024.pdf</h4>
+                                <div class="doc-meta">
+                                    <span>File size: 1.2 MB</span>
+                                    <span>Received: 3 days ago</span>
+                                    <span>Format: PDF</span>
+                                </div>
+                            </div>
+                            <span class="doc-status verified">Verified Integrity</span>
+                            <div class="doc-actions">
+                                <button class="btn-action" onclick="openShareLinkModal('tax_clearance_certificate_2024.pdf')">Share ↗</button>
+                                <button class="btn-action primary" onclick="mockDownload('tax_clearance_certificate_2024.pdf')">Download</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: SECURE FOLDERS -->
+            <div class="workspace-sidebar">
+                <div class="secure-folders-section">
+                    <h2 class="section-title" style="margin-bottom: 20px;">Secure <span>Folders</span></h2>
+                    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 25px;">Vault directories synchronized with active liquidity network and compliance officers.</p>
+                    
+                    <div class="folder-list">
+                        <!-- Folder 1 -->
+                        <div class="folder-card" onclick="openFolderDetails('Corporate & Entity Tax Compliance', '9 Files • Last active: 2 hours ago')">
+                            <div class="folder-icon">📁</div>
+                            <div class="folder-details">
+                                <h4>Tax & Entities</h4>
+                                <p>9 Files • Modified today</p>
+                            </div>
+                            <div class="folder-arrow">→</div>
+                        </div>
+
+                        <!-- Folder 2 -->
+                        <div class="folder-card" onclick="openFolderDetails('Underwriting & Credit Risk Assessments', '14 Files • Last active: Yesterday')">
+                            <div class="folder-icon">📁</div>
+                            <div class="folder-details">
+                                <h4>Underwriting Assays</h4>
+                                <p>14 Files • Modified Yesterday</p>
+                            </div>
+                            <div class="folder-arrow">→</div>
+                        </div>
+
+                        <!-- Folder 3 -->
+                        <div class="folder-card" onclick="openFolderDetails('Executed Funding Contracts & Escrow Accounts', '22 Files • Last active: 3 days ago')">
+                            <div class="folder-icon">📁</div>
+                            <div class="folder-details">
+                                <h4>Executed Contracts</h4>
+                                <p>22 Files • Modified 3 days ago</p>
+                            </div>
+                            <div class="folder-arrow">→</div>
+                        </div>
+
+                        <!-- Folder 4 -->
+                        <div class="folder-card" onclick="openFolderDetails('Escrow Accounts & Liquidation Audits', '3 Files • Last active: 1 week ago')">
+                            <div class="folder-icon">📁</div>
+                            <div class="folder-details">
+                                <h4>Escrow & Liquidity</h4>
+                                <p>3 Files • Modified 1 week ago</p>
+                            </div>
+                            <div class="folder-arrow">→</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- STRATEGY BANNER -->
+        <section class="strategy-banner">
+            <div class="strategy-content">
+                <h2>Request Third-Party Security Audit</h2>
+                <p>Have our compliance experts run an isolated, high-grade technical and security parameters checkup on your vault files directly.</p>
+            </div>
+            <a href="#" class="btn-white">Request Audit Suite</a>
+        </section>
+
+        <!-- QUESTIONS / FAQ SECTION -->
+        <section class="faq-section">
+            <h2>Common Security Queries</h2>
+            
+            <div class="faq-item">
+                <div class="faq-question">How is data encrypted within the Secure Vault? <span>[+]</span></div>
+                <div class="faq-answer">All files uploaded to the Workspace Vault are instantly encrypted client-side using industry-standard Advanced Encryption Standard (AES) 256-bit protocols before they are synchronized with our high-speed, secure server relays.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Can external third parties download my shared documents? <span>[+]</span></div>
+                <div class="faq-answer">Only if you intentionally provision an expiring Cryptographic Share Link via the drawer engine. You can customize the specific expiration duration, limit total downloads, and track file logs directly.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Does Workspace storage satisfy FinCEN and SEC parameters? <span>[+]</span></div>
+                <div class="faq-answer">Yes. The Dynamic Edge platform structure employs rigorous audit trail logs, data compartmentalization, and dual-party compliance handshakes designed to support SEC Rule 17a-4 and FinCEN standards.</div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer>
+            <div class="footer-cta">
+                <h2>Ready to fund your growth parameters?</h2>
+                <a href="#" class="btn-primary" style="background-color: var(--accent-magenta); color: white; border: var(--border-width) solid #fff; box-shadow: 6px 6px 0px #fff; text-transform: uppercase;">Secure Application</a>
+            </div>
+            <p class="footer-copyright">&copy; 2024 FINTECH UTILITY. DATA-DRIVEN ARCHITECTURE FOR MODERN ENTERPRISE.</p>
+        </footer>
+    </div>
+
+    <!-- FLOATING CALCULATOR COMPONENT / OVERLAY PANEL -->
+    <div class="overlay-backdrop" id="backdrop" onclick="closeCalculator()"></div>
+    
+    <div class="calculator-overlay" id="calcOverlay">
+        <div class="calc-header">
+            <div class="calc-title" id="calcName">Share Dispatcher</div>
+            <button class="close-calc" onclick="closeCalculator()">CLOSE [X]</button>
+        </div>
+        
+        <!-- DYNAMIC CONTENT CONTAINERS -->
+        <div id="calcBody">
+            <!-- Dynamic drawer contents injected via JavaScript -->
+        </div>
+    </div>
+
+    <!-- CORE INTERACTION SCRIPT -->
+    <script>
+        /* Accordion Logic */
+        document.querySelectorAll('.faq-question').forEach(q => {
+            q.addEventListener('click', () => {
+                const answer = q.nextElementSibling;
+                const isOpen = answer.style.display === 'block';
+                answer.style.display = isOpen ? 'none' : 'block';
+                q.querySelector('span').innerText = isOpen ? '[+]' : '[-]';
+                q.querySelector('span').style.color = isOpen ? 'var(--accent-cyan)' : 'var(--accent-magenta)';
+            });
+        });
+
+        /* Dynamic Drawers Engine */
+        const overlay = document.getElementById('calcOverlay');
+        const backdrop = document.getElementById('backdrop');
+        const calcName = document.getElementById('calcName');
+        const calcBody = document.getElementById('calcBody');
+
+        function openDrawer() {
+            overlay.classList.add('active');
+            backdrop.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeCalculator() {
+            overlay.classList.remove('active');
+            backdrop.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        /* File Upload Handler Simulation */
+        function triggerFileSelect() {
+            document.getElementById('secureFileInput').click();
+        }
+
+        let uploadedFileCount = 0;
+        let mockStorageGB = 62.4;
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Trigger Alert
+            const alertBox = document.getElementById('uploadSuccessAlert');
+            alertBox.style.display = 'block';
+            alertBox.innerText = `🔒 FILE DETECTED & SUCCESSFULLY ENCRYPTED TO LOCAL VAULT CONTAINER: ${file.name.toUpperCase()}`;
+
+            // Increase storage dynamically
+            mockStorageGB += Math.random() * (2.5 - 0.1) + 0.1;
+            if(mockStorageGB > 100) mockStorageGB = 100;
+            
+            // Re-render Metrics
+            document.getElementById('storageProgressBar').style.width = mockStorageGB + '%';
+            document.getElementById('storageProgressText').innerText = `${mockStorageGB.toFixed(1)}% Allocated`;
+            document.querySelector('.metric-value').innerHTML = `${mockStorageGB.toFixed(1)} <span class="metric-unit">GB / 100 GB</span>`;
+
+            // Append to table list mock
+            const feed = document.getElementById('documentFeed');
+            const newRow = document.createElement('div');
+            newRow.className = "document-row";
+            newRow.setAttribute('data-status', 'pending');
+            newRow.setAttribute('data-name', file.name.toLowerCase());
+
+            const formattedSize = (file.size / (1024 * 1024)).toFixed(1);
+            
+            newRow.innerHTML = `
+                <div class="doc-icon">📁</div>
+                <div class="doc-info">
+                    <h4>${file.name.toLowerCase()}</h4>
+                    <div class="doc-meta">
+                        <span>File size: ${formattedSize} MB</span>
+                        <span>Received: Just now</span>
+                        <span>Format: Uploaded File</span>
+                    </div>
+                </div>
+                <span class="doc-status pending">Pending Review</span>
+                <div class="doc-actions">
+                    <button class="btn-action" onclick="openShareLinkModal('${file.name}')">Share ↗</button>
+                    <button class="btn-action primary" onclick="mockDownload('${file.name}')">Download</button>
+                </div>
+            `;
+            
+            feed.insertBefore(newRow, feed.firstChild);
+
+            // Update files count UI
+            const activeFiles = document.querySelectorAll('.document-row').length;
+            document.getElementById('docCountVal').innerHTML = `${activeFiles} <span class="metric-unit">Files Active</span>`;
+
+            // Auto-scroll to view
+            newRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        /* Mock Download Button Trigger */
+        function mockDownload(filename) {
+            alert(`Initializing cryptographic secure download sequence for: ${filename}\nDecryption handshakes are executing directly within client sandbox.`);
+        }
+
+        /* Share Dispatcher overlay generator modal */
+        function openShareLinkModal(filename) {
+            calcName.innerText = "Secure Link Dispatcher";
+            calcBody.innerHTML = `
+                <div class="calc-group">
+                    <label class="calc-label">Target Shared Resource</label>
+                    <input type="text" class="calc-input" value="${filename}" disabled style="opacity: 0.7;">
+                </div>
+                <div class="calc-group">
+                    <label class="calc-label">Link Validity Duration (Days)</label>
+                    <input type="number" id="share_days" class="calc-input" value="7" oninput="generateMockLink()">
+                    <input type="range" class="calc-range" min="1" max="30" step="1" value="7" oninput="syncRangeValue('share_days', this.value); generateMockLink();">
+                </div>
+                <div class="calc-group">
+                    <label class="calc-label">Maximum Total Downloads</label>
+                    <input type="number" id="share_downloads" class="calc-input" value="5" oninput="generateMockLink()">
+                    <input type="range" class="calc-range" min="1" max="100" step="1" value="5" oninput="syncRangeValue('share_downloads', this.value); generateMockLink();">
+                </div>
+                
+                <div class="calc-results" style="box-shadow: 6px 6px 0px var(--accent-magenta);">
+                    <h4 style="margin-bottom: 15px; text-transform: uppercase; color: var(--accent-magenta);">Live Crypto-Link output</h4>
+                    <div class="calc-result-row" style="flex-direction: column; align-items: flex-start; gap: 10px;">
+                        <span>Secure Cryptographic Share URL</span>
+                        <span class="calc-result-value" id="generated_link_text" style="font-size: 14px; text-transform: none; color: #fff; background: var(--surface); padding: 10px; border: 1px solid #fff; width: 100%;"></span>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <button class="btn-upload" style="width:100%;" onclick="copyMockLink()">Copy Cryptographic Link</button>
+                    </div>
+                </div>
+            `;
+            openDrawer();
+            generateMockLink();
+        }
+
+        function generateMockLink() {
+            const days = document.getElementById('share_days').value || 1;
+            const max = document.getElementById('share_downloads').value || 1;
+            const randHash = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+            document.getElementById('generated_link_text').innerText = `https://vault.dynamic-edge.net/s/${randHash}?exp=${days}d&dl=${max}`;
+        }
+
+        function copyMockLink() {
+            const linkText = document.getElementById('generated_link_text').innerText;
+            navigator.clipboard.writeText(linkText);
+            alert("Cryptographic share link copied to clipboard successfully!");
+        }
+
+        /* Folder Detail Drawer overlay modal */
+        function openFolderDetails(folderName, statsText) {
+            calcName.innerText = "Folder Properties";
+            calcBody.innerHTML = `
+                <div class="calc-group">
+                    <label class="calc-label">Directory Name</label>
+                    <input type="text" class="calc-input" value="${folderName}" disabled style="opacity: 0.7;">
+                </div>
+                <div class="calc-group">
+                    <label class="calc-label">Compliance / Directory Metrics</label>
+                    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 15px;">${statsText}</p>
+                </div>
+                
+                <div class="checklist-wrapper">
+                    <div class="checklist-item checked">
+                        <div class="checklist-checkbox">✔</div>
+                        <div class="checklist-text">
+                            <h4>256-Bit SSL Path Sockets Active</h4>
+                            <p>Direct pipe transmission tunnels secured by state-level security.</p>
+                        </div>
+                    </div>
+                    <div class="checklist-item checked">
+                        <div class="checklist-checkbox">✔</div>
+                        <div class="checklist-text">
+                            <h4>Auto-Revocation Matrix Valid</h4>
+                            <p>Files purged in real time when share validity parameters lapse.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px; display: flex; gap: 15px;">
+                    <button class="btn-action primary" style="flex:1;" onclick="alert('Preparing folder compression archive. Standard packaging output ready.')">Download Folder Zip</button>
+                    <button class="btn-action" style="flex:1;" onclick="alert('Access Controls Locked. External permissions synced.')">Access Rights</button>
+                </div>
+            `;
+            openDrawer();
+        }
+
+        /* Filter Feed List Logic */
+        function filterFeed(filterType) {
+            // Update active state on button elements
+            document.querySelectorAll('.feed-filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const rows = document.querySelectorAll('.document-row');
+            rows.forEach(row => {
+                const rowStatus = row.getAttribute('data-status');
+                if (filterType === 'all' || rowStatus === filterType) {
+                    row.style.display = 'grid';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        /* Search input trigger logic inside Workspace */
+        function searchFeed() {
+            const searchVal = document.getElementById('feedSearch').value.toLowerCase();
+            const rows = document.querySelectorAll('.document-row');
+
+            rows.forEach(row => {
+                const name = row.getAttribute('data-name');
+                if (name.includes(searchVal)) {
+                    row.style.display = 'grid';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        /* Helper to keep sliders synced with digital values on the fly */
+        function syncRangeValue(targetId, val) {
+            document.getElementById(targetId).value = val;
+        }
+    </script>
+</body>
+</html>
+```

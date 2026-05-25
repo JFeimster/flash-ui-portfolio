@@ -1,0 +1,1560 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Core Flow - Link Tracking & Download Analytics</title>
+    <!-- Google Fonts & Tailwind-inspired Layout system -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #08090d;
+            --bg-secondary: #0f111a;
+            --bg-tertiary: #161a26;
+            --border-color: #242b3d;
+            --border-hover: #3b4764;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            
+            /* High-voltage Neobrutalist Accents */
+            --accent-cyan: #00f0ff;
+            --accent-orange: #ff5c00;
+            --accent-magenta: #ff007a;
+            --accent-lime: #39ff14;
+            
+            --shadow-cyan: 0px 0px 20px rgba(0, 240, 255, 0.15);
+            --shadow-orange: 0px 0px 20px rgba(255, 92, 0, 0.15);
+            --shadow-magenta: 0px 0px 20px rgba(255, 0, 122, 0.15);
+            --shadow-lime: 0px 0px 20px rgba(57, 255, 20, 0.15);
+            
+            --brutal-shadow: 6px 6px 0px #000000;
+            --brutal-shadow-hover: 2px 2px 0px #000000;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-sans);
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-cyan);
+        }
+
+        /* Utility classes */
+        .text-glow-cyan { text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
+        .text-glow-orange { text-shadow: 0 0 10px rgba(255, 92, 0, 0.5); }
+        .text-glow-magenta { text-shadow: 0 0 10px rgba(255, 0, 122, 0.5); }
+        .text-glow-lime { text-shadow: 0 0 10px rgba(57, 255, 20, 0.5); }
+
+        /* Navigation Header */
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: var(--bg-secondary);
+            border-bottom: 3px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 22px;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+            border: 2px solid #000;
+            box-shadow: 2px 2px 0px #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 18px;
+            color: #000;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            padding: 8px 16px;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-cyan);
+            border-bottom: 2px solid var(--accent-cyan);
+        }
+
+        /* Hero Dashboard Stats */
+        header {
+            max-width: 1440px;
+            margin: 40px auto 20px auto;
+            padding: 0 40px;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        @media (max-width: 1024px) {
+            header {
+                grid-template-columns: 1fr;
+                margin: 20px auto;
+                padding: 0 20px;
+            }
+        }
+
+        .hero-left {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .hero-badge {
+            align-self: flex-start;
+            background: var(--accent-cyan);
+            color: #000;
+            padding: 6px 14px;
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 2px solid #000;
+            box-shadow: var(--brutal-shadow-hover);
+            transform: rotate(-1deg);
+        }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: clamp(32px, 5vw, 56px);
+            font-weight: 800;
+            line-height: 1.1;
+            text-transform: uppercase;
+            color: var(--text-primary);
+            letter-spacing: -2px;
+        }
+
+        h1 span {
+            color: transparent;
+            -webkit-text-stroke: 1.5px var(--accent-magenta);
+            text-stroke: 1.5px var(--accent-magenta);
+        }
+
+        .hero-sub {
+            font-size: 16px;
+            color: var(--text-secondary);
+            max-width: 620px;
+            line-height: 1.6;
+            border-left: 4px solid var(--accent-magenta);
+            padding-left: 20px;
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 640px) {
+            .hero-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .stat-box {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            padding: 16px;
+            box-shadow: var(--brutal-shadow-hover);
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-val {
+            font-family: var(--font-display);
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+
+        /* Active Console Sandbox Layout */
+        .analytics-sandbox {
+            max-width: 1440px;
+            margin: 20px auto 60px auto;
+            padding: 0 40px;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 1024px) {
+            .analytics-sandbox {
+                grid-template-columns: 1fr;
+                padding: 0 20px;
+            }
+        }
+
+        /* Left Side: Monitor Console */
+        .terminal-box {
+            background: var(--bg-secondary);
+            border: 3px solid var(--border-color);
+            box-shadow: var(--brutal-shadow);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .terminal-header {
+            background: var(--bg-tertiary);
+            padding: 14px 20px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--border-color);
+        }
+        .dot.active-1 { background: var(--accent-cyan); }
+        .dot.active-2 { background: var(--accent-orange); }
+        .dot.active-3 { background: var(--accent-magenta); }
+
+        .terminal-title {
+            font-family: var(--font-display);
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .terminal-badge {
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--accent-cyan);
+            padding: 3px 8px;
+            font-size: 10px;
+            text-transform: uppercase;
+            border: 1px solid var(--accent-cyan);
+            font-weight: 700;
+        }
+
+        .terminal-body {
+            padding: 24px;
+            min-height: 520px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Filter Controls Inside Terminal */
+        .console-filter-bar {
+            display: flex;
+            gap: 12px;
+            background: var(--bg-tertiary);
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .console-search-wrapper {
+            position: relative;
+            flex-grow: 1;
+            min-width: 200px;
+        }
+
+        .console-search-wrapper input {
+            width: 100%;
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 8px 12px 8px 34px;
+            outline: none;
+        }
+
+        .console-search-wrapper input:focus {
+            border-color: var(--accent-cyan);
+        }
+
+        .console-search-wrapper svg {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 14px;
+            height: 14px;
+            color: var(--text-secondary);
+        }
+
+        .console-filter-tabs {
+            display: flex;
+            gap: 6px;
+        }
+
+        .console-tab {
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 6px 12px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .console-tab:hover {
+            border-color: var(--accent-cyan);
+            color: var(--text-primary);
+        }
+
+        .console-tab.active {
+            background: var(--accent-cyan);
+            color: #000;
+            border-color: #000;
+            box-shadow: 2px 2px 0px #000;
+        }
+
+        /* Custom Table for Secure Links */
+        .links-table-container {
+            overflow-x: auto;
+            border: 2px solid var(--border-color);
+        }
+
+        .links-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        .links-table th {
+            background: var(--bg-tertiary);
+            border-bottom: 2px solid var(--border-color);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-weight: 700;
+            padding: 12px 16px;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        .links-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .links-table tr {
+            transition: background 0.15s ease;
+            cursor: pointer;
+        }
+
+        .links-table tr:hover {
+            background: rgba(36, 43, 61, 0.4);
+        }
+
+        .links-table tr.selected {
+            background: rgba(0, 240, 255, 0.05);
+            border-left: 3px solid var(--accent-cyan);
+        }
+
+        .file-name {
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            font-family: var(--font-display);
+        }
+
+        .file-meta {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            border: 1.5px solid currentColor;
+            border-radius: 4px;
+        }
+
+        .status-badge.active {
+            color: var(--accent-lime);
+            background: rgba(57, 255, 20, 0.1);
+        }
+
+        .status-badge.revoked {
+            color: var(--accent-magenta);
+            background: rgba(255, 0, 122, 0.1);
+        }
+
+        .status-badge.expired {
+            color: var(--accent-orange);
+            background: rgba(255, 92, 0, 0.1);
+        }
+
+        .btn-revoke {
+            background: transparent;
+            color: var(--accent-magenta);
+            border: 2px solid var(--accent-magenta);
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-revoke:hover:not(:disabled) {
+            background: var(--accent-magenta);
+            color: #000;
+            box-shadow: 2px 2px 0px #000;
+        }
+
+        .btn-revoke:disabled {
+            border-color: var(--border-color);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        /* Right Side: Visual Metrics Card & Map Insights */
+        .analytics-right {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .sidebar-panel {
+            background: var(--bg-secondary);
+            border: 3px solid var(--border-color);
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: var(--brutal-shadow);
+        }
+
+        .sidebar-title {
+            font-family: var(--font-display);
+            font-size: 16px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-title-badge {
+            font-size: 11px;
+            color: var(--accent-cyan);
+            border: 1px solid var(--accent-cyan);
+            padding: 2px 6px;
+            font-family: var(--font-sans);
+        }
+
+        /* SVG Bar Graph Visualizer */
+        .bar-chart-container {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .bar-chart-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .bar-chart {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            height: 120px;
+            padding-top: 10px;
+        }
+
+        .bar-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 12%;
+            height: 100%;
+            justify-content: flex-end;
+        }
+
+        .bar {
+            width: 100%;
+            background: var(--accent-cyan);
+            border-top: 2px solid #fff;
+            min-height: 4px;
+            transition: height 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+
+        .bar.inactive {
+            background: var(--border-color) !important;
+            border-top: none !important;
+        }
+
+        .bar-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        /* Hotspot Map List */
+        .geo-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .geo-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-tertiary);
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        .geo-country {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .geo-flag {
+            font-size: 16px;
+        }
+
+        .geo-stats-right {
+            text-align: right;
+        }
+
+        .geo-count {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--accent-orange);
+        }
+
+        .geo-percentage {
+            font-size: 10px;
+            color: var(--text-secondary);
+        }
+
+        /* Live Activity Stream Terminal */
+        .stream-panel {
+            background: #000;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            padding: 14px;
+            font-family: monospace;
+            font-size: 11px;
+            color: var(--accent-lime);
+            height: 140px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .stream-line {
+            line-height: 1.4;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .stream-time {
+            color: var(--text-secondary);
+            margin-right: 8px;
+        }
+
+        /* Action Panel / Quick Security Configuration */
+        .security-config-section {
+            max-width: 1440px;
+            margin: 40px auto 80px auto;
+            padding: 0 40px;
+        }
+
+        @media (max-width: 768px) {
+            .security-config-section {
+                padding: 0 20px;
+                margin: 40px auto;
+            }
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .config-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .config-card {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            padding: 24px;
+            box-shadow: 4px 4px 0px var(--border-color);
+            border-radius: 4px;
+        }
+
+        .config-card h3 {
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .config-card p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .btn-action {
+            background: var(--accent-cyan);
+            color: #000;
+            padding: 16px 32px;
+            border: 3px solid #000;
+            font-weight: 800;
+            font-family: var(--font-display);
+            text-transform: uppercase;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px #000;
+            transition: all 0.1s ease;
+            text-decoration: none;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        .btn-action:hover {
+            box-shadow: 2px 2px 0px #000;
+            transform: translate(2px, 2px);
+            background: #fff;
+        }
+
+        .btn-magenta {
+            background: var(--accent-magenta);
+            color: #000;
+            border-color: #000;
+        }
+
+        .btn-magenta:hover {
+            background: #fff;
+        }
+
+        /* Banner Container */
+        .alert-banner {
+            max-width: 1440px;
+            margin: 0 auto 60px auto;
+            padding: 0 40px;
+        }
+
+        @media (max-width: 768px) {
+            .alert-banner {
+                padding: 0 20px;
+            }
+        }
+
+        .banner-box {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, #1c0e20 100%);
+            border: 3px solid var(--border-color);
+            padding: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            box-shadow: var(--brutal-shadow);
+        }
+
+        .banner-text h2 {
+            font-family: var(--font-display);
+            font-size: 24px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .banner-text p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            max-width: 800px;
+        }
+
+        /* Live Highlight Toast */
+        .toast-notify {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--accent-magenta);
+            padding: 16px 24px;
+            box-shadow: var(--brutal-shadow);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--font-display);
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            transform: translateY(150%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .toast-notify.visible {
+            transform: translateY(0);
+        }
+
+        .toast-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--accent-magenta);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-magenta);
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            100% { transform: scale(1.1); opacity: 1; }
+        }
+
+        /* Footer styling to match Base Component */
+        footer {
+            background: #000000;
+            color: var(--text-primary);
+            border-top: 4px solid var(--border-color);
+            padding: 80px 40px;
+            position: relative;
+        }
+
+        .footer-grid {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 60px;
+        }
+
+        @media (max-width: 1024px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+        }
+
+        .footer-cta h2 {
+            font-family: var(--font-display);
+            font-size: 40px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        .footer-cta h2 span {
+            color: var(--accent-magenta);
+        }
+
+        .footer-cta p {
+            color: var(--text-secondary);
+            font-size: 16px;
+            max-width: 600px;
+            margin-bottom: 30px;
+        }
+
+        .footer-links-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .footer-column {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-width: 160px;
+        }
+
+        .footer-column h4 {
+            font-family: var(--font-display);
+            text-transform: uppercase;
+            font-size: 12px;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            position: relative;
+            padding-bottom: 4px;
+        }
+
+        .footer-column h4::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 30px;
+            height: 2px;
+            background: var(--accent-cyan);
+        }
+
+        .footer-column a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: color 0.15s ease;
+        }
+
+        .footer-column a:hover {
+            color: var(--accent-cyan);
+        }
+
+        .footer-bottom {
+            max-width: 1440px;
+            margin: 60px auto 0 auto;
+            padding-top: 30px;
+            border-top: 1px solid #1a202c;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: var(--text-secondary);
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation -->
+    <nav class="nav-header">
+        <a href="#" class="logo-area">
+            <div class="logo-icon">C</div>
+            CORE FLOW
+        </a>
+        <div class="nav-links">
+            <a href="#monitor" class="nav-link">Active Links</a>
+            <a href="#geographics" class="nav-link">Geographic Metrics</a>
+            <a href="#security" class="nav-link">Security Policies</a>
+        </div>
+        <a href="#monitor" class="btn-action" style="padding: 10px 20px; font-size: 12px; box-shadow: 2px 2px 0px #000;">Terminal Console</a>
+    </nav>
+
+    <!-- Header / Title Stats block -->
+    <header>
+        <div class="hero-left">
+            <div class="hero-badge">Tracking Terminal v4.2</div>
+            <h1>Secure Link <span>Intel Dashboard</span></h1>
+            <p class="hero-sub">Real-time telemetry for generated business funding documents, secure payload attachments, and broker agreements. Trace active client interactions instantly.</p>
+            
+            <div class="hero-stats">
+                <div class="stat-box">
+                    <div class="stat-val text-glow-cyan" id="total-active-count">5</div>
+                    <div class="stat-label">Active Links</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-val text-glow-lime" id="total-downloads-count">284</div>
+                    <div class="stat-label">Total Pulls</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-val text-glow-magenta" id="total-revoked-count">2</div>
+                    <div class="stat-label">Revoked Keys</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-val text-glow-orange">99.8%</div>
+                    <div class="stat-label">Delivery Rate</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Sandbox Container -->
+    <div class="analytics-sandbox" id="monitor">
+        
+        <!-- Left Column: Active monitor list -->
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <div class="terminal-dots">
+                    <div class="dot active-1"></div>
+                    <div class="dot active-2"></div>
+                    <div class="dot active-3"></div>
+                </div>
+                <div class="terminal-title">Secured Attachment Monitor</div>
+                <div class="terminal-badge">LIVE RECOVERY FEED</div>
+            </div>
+
+            <div class="terminal-body">
+                
+                <!-- Internal Filter Bar -->
+                <div class="console-filter-bar">
+                    <div class="console-search-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.637 10.637z" />
+                        </svg>
+                        <input type="text" id="link-search" placeholder="Filter secure attachments by name or hash...">
+                    </div>
+                    
+                    <div class="console-filter-tabs">
+                        <div class="console-tab active" onclick="filterStatus('all')">ALL</div>
+                        <div class="console-tab" onclick="filterStatus('active')">ACTIVE</div>
+                        <div class="console-tab" onclick="filterStatus('revoked')">REVOKED</div>
+                        <div class="console-tab" onclick="filterStatus('expired')">EXPIRED</div>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="links-table-container">
+                    <table class="links-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 40%;">Resource / Link Hash</th>
+                                <th>Clicks</th>
+                                <th>Created</th>
+                                <th>Status</th>
+                                <th style="text-align: right;">Authorization</th>
+                            </tr>
+                        </thead>
+                        <tbody id="links-tbody">
+                            <!-- Populated Dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Right Column: Interactive details visualization panel -->
+        <div class="analytics-right">
+            
+            <!-- Dynamic Chart Visualization -->
+            <div class="sidebar-panel" id="geographics">
+                <div class="sidebar-title">
+                    <span>Pull Demands Stream</span>
+                    <span class="sidebar-title-badge" id="selected-resource-label">ALL RESOURCES</span>
+                </div>
+                
+                <div class="bar-chart-container">
+                    <div class="bar-chart-header">
+                        <span>7-Day Log Frequency</span>
+                        <span id="chart-total-label">284 hits</span>
+                    </div>
+                    <div class="bar-chart" id="chart-bars">
+                        <!-- Bars dynamically loaded with percentages -->
+                        <div class="bar-group">
+                            <div class="bar" style="height: 40%;"></div>
+                            <div class="bar-label">MON</div>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 60%;"></div>
+                            <div class="bar-label">TUE</div>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 35%;"></div>
+                            <div class="bar-label">WED</div>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 90%;"></div>
+                            <div class="bar-label">THU</div>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 75%;"></div>
+                            <div class="bar-label">FRI</div>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 20%;"></div>
+                            <div class="bar-label">SAT</div>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 15%;"></div>
+                            <div class="bar-label">SUN</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 style="font-family: var(--font-display); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); margin-bottom: 12px;">Top Access Geographics</h4>
+                <div class="geo-list" id="geo-list-container">
+                    <!-- Loaded dynamically per selected element -->
+                </div>
+            </div>
+
+            <!-- Log Activity Console -->
+            <div class="sidebar-panel">
+                <div class="sidebar-title">
+                    <span>Diagnostic Audit Feed</span>
+                    <span style="color: var(--accent-lime); font-size: 11px;">● LIVE</span>
+                </div>
+                <div class="stream-panel" id="console-stream">
+                    <!-- Stream elements updated in real-time simulation -->
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Wide Alert Warning Banner -->
+    <section class="alert-banner">
+        <div class="banner-box">
+            <div class="banner-text">
+                <h2>Emergency Revocation Master Switch</h2>
+                <p>Instantly breaks localized encryption endpoints. Revoking keys forces dynamic files into invalid state partitions. Downstream brokers and borrowers lose access within &lt; 2.5 seconds.</p>
+            </div>
+            <div>
+                <button class="btn-action btn-magenta" onclick="revokeAllActive()">Revoke All Active Links</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Operational Policies -->
+    <section class="security-config-section" id="security">
+        <div class="config-grid">
+            <div class="config-card">
+                <h3><span>🔒</span> AES-256 Payload Encryption</h3>
+                <p>Every shared portfolio link utilizes dynamic zero-knowledge handshakes. Intercepted payloads are statistically impossible to reconstitute once an access key is revoked.</p>
+            </div>
+            <div class="config-card">
+                <h3><span>🗺️</span> Geolocated Compliance</h3>
+                <p>Establish secure access blocklists. Prevent document exposure to restricted offshore servers automatically based on localized IP resolution matching.</p>
+            </div>
+            <div class="config-card">
+                <h3><span>⏰</span> Dynamic Ephemeral Lifespans</h3>
+                <p>Configure link lifespans to expire on a sliding micro-schedule matching localized funding team availability windows. Auto-revokes without prompt.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-cta">
+                <h2>Secure your <span>payload pipelines</span></h2>
+                <p>High-security client-side encryption layers. Rest assured your proprietary business details, credit matrices, and broker parameters stay strictly classified.</p>
+                <a href="#monitor" class="btn-action">Return to Monitoring Engine</a>
+            </div>
+            <div class="footer-links-group">
+                <div class="footer-column">
+                    <h4>Core Navigation</h4>
+                    <a href="#monitor">Secure Monitor</a>
+                    <a href="#geographics">Intelligence Maps</a>
+                    <a href="#security">System Protections</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Security Services</h4>
+                    <a href="#">Audit Protocols</a>
+                    <a href="#">Dynamic Zero Trust</a>
+                    <a href="#">GDPR Verification</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div>&copy; 2024 CORE FLOW SECURE LINK MANAGEMENT SYSTEM. PROPRIETARY COMPLIANCE TOOL.</div>
+            <div style="display: flex; gap: 20px;">
+                <span style="color: var(--accent-cyan); font-weight: 700;">PROD SECURITY TERMINAL 9.1</span>
+                <span>LOCAL DECRYPT ONLY</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive Active State / Update Notification Toast -->
+    <div id="toast" class="toast-notify">
+        <div class="toast-dot"></div>
+        <div id="toast-text">Secured attachment state modified</div>
+    </div>
+
+    <script>
+        // Data for links in analytics terminal
+        const linkItems = [
+            {
+                id: "lnk-1",
+                file: "Q3_TermSheet_Executed.pdf",
+                hash: "coreflow-893c830-df329",
+                clicks: 142,
+                created: "2024-11-01",
+                status: "active",
+                size: "4.2 MB",
+                recipient: "Pioneer Holdings",
+                chartData: [42, 60, 35, 90, 75, 20, 15],
+                geoData: [
+                    { country: "United States", code: "🇺🇸", count: 110, percentage: "77%" },
+                    { country: "United Kingdom", code: "🇬🇧", count: 20, percentage: "14%" },
+                    { country: "Canada", code: "🇨🇦", count: 12, percentage: "9%" }
+                ]
+            },
+            {
+                id: "lnk-2",
+                file: "Broker_SplitAgreement_Direct.pdf",
+                hash: "coreflow-0941da2-9bdae",
+                clicks: 89,
+                created: "2024-11-03",
+                status: "active",
+                size: "1.8 MB",
+                recipient: "Nexus Capital Brokers",
+                chartData: [10, 25, 45, 12, 85, 40, 10],
+                geoData: [
+                    { country: "United States", code: "🇺🇸", count: 54, percentage: "61%" },
+                    { country: "Germany", code: "🇩🇪", count: 25, percentage: "28%" },
+                    { country: "France", code: "🇫🇷", count: 10, percentage: "11%" }
+                ]
+            },
+            {
+                id: "lnk-3",
+                file: "Underwriting_Matrix_Confidential.xlsx",
+                hash: "coreflow-11d87a4-ffea1",
+                clicks: 53,
+                created: "2024-10-28",
+                status: "expired",
+                size: "12.4 MB",
+                recipient: "Cascade Underwriters",
+                chartData: [0, 0, 0, 0, 0, 0, 0],
+                geoData: [
+                    { country: "United States", code: "🇺🇸", count: 53, percentage: "100%" }
+                ]
+            },
+            {
+                id: "lnk-4",
+                file: "Borrower_FICO_PaydexSnapshot.pdf",
+                hash: "coreflow-bda7c43-8ca1d",
+                clicks: 12,
+                created: "2024-11-06",
+                status: "active",
+                size: "820 KB",
+                recipient: "Lenders Circle Corp",
+                chartData: [5, 12, 18, 3, 2, 0, 0],
+                geoData: [
+                    { country: "Canada", code: "🇨🇦", count: 10, percentage: "83%" },
+                    { country: "United States", code: "🇺🇸", count: 2, percentage: "17%" }
+                ]
+            },
+            {
+                id: "lnk-5",
+                file: "MCA_FactorComp_Projections.xlsx",
+                hash: "coreflow-a82f3c0-cd21e",
+                clicks: 41,
+                created: "2024-11-02",
+                status: "revoked",
+                size: "3.5 MB",
+                recipient: "Summit Funding Group",
+                chartData: [0, 0, 0, 0, 0, 0, 0],
+                geoData: []
+            },
+            {
+                id: "lnk-6",
+                file: "Corporate_TaxReturns_3Yrs.zip",
+                hash: "coreflow-cd91ef1-f92d4",
+                clicks: 0,
+                created: "2024-11-07",
+                status: "active",
+                size: "48.2 MB",
+                recipient: "SBA Direct Architects",
+                chartData: [0, 0, 0, 0, 0, 0, 0],
+                geoData: []
+            },
+            {
+                id: "lnk-7",
+                file: "RealEstate_DSCR_Model.pdf",
+                hash: "coreflow-e2b2a2a-d99b1",
+                clicks: 0,
+                created: "2024-10-15",
+                status: "revoked",
+                size: "6.1 MB",
+                recipient: "Apex Equity Partners",
+                chartData: [0, 0, 0, 0, 0, 0, 0],
+                geoData: []
+            }
+        ];
+
+        let selectedLinkId = "lnk-1";
+        let activeFilter = "all";
+
+        // DOM elements
+        const linksTbody = document.getElementById("links-tbody");
+        const linkSearch = document.getElementById("link-search");
+        const selectedResourceLabel = document.getElementById("selected-resource-label");
+        const chartTotalLabel = document.getElementById("chart-total-label");
+        const chartBars = document.getElementById("chart-bars");
+        const geoListContainer = document.getElementById("geo-list-container");
+        const consoleStream = document.getElementById("console-stream");
+
+        const toast = document.getElementById('toast');
+        const toastText = document.getElementById('toast-text');
+
+        // Counters
+        const totalActiveCountEl = document.getElementById("total-active-count");
+        const totalDownloadsCountEl = document.getElementById("total-downloads-count");
+        const totalRevokedCountEl = document.getElementById("total-revoked-count");
+
+        // Notification Helper
+        function showNotification(text) {
+            toastText.innerText = text;
+            toast.classList.add('visible');
+            setTimeout(() => {
+                toast.classList.remove('visible');
+            }, 3000);
+        }
+
+        // Initialize lists & logs
+        window.addEventListener("load", () => {
+            renderTable();
+            renderDetails();
+            setupLiveSimulation();
+            updateGlobalStats();
+        });
+
+        // Search action
+        linkSearch.addEventListener("input", () => {
+            renderTable();
+        });
+
+        // Dynamic State Filter Tabs
+        function filterStatus(status) {
+            activeFilter = status;
+            document.querySelectorAll(".console-tab").forEach(tab => {
+                tab.classList.remove("active");
+                if (tab.innerText.toLowerCase() === status) {
+                    tab.classList.add("active");
+                }
+            });
+            renderTable();
+        }
+
+        // Global statistics calculator
+        function updateGlobalStats() {
+            let active = 0;
+            let revoked = 0;
+            let downloads = 0;
+
+            linkItems.forEach(item => {
+                if (item.status === 'active') active++;
+                if (item.status === 'revoked') revoked++;
+                downloads += item.clicks;
+            });
+
+            totalActiveCountEl.innerText = active;
+            totalRevokedCountEl.innerText = revoked;
+            totalDownloadsCountEl.innerText = downloads;
+        }
+
+        // Render main document interactive table
+        function renderTable() {
+            linksTbody.innerHTML = "";
+            const searchQuery = linkSearch.value.toLowerCase();
+
+            linkItems.forEach(item => {
+                const matchesSearch = item.file.toLowerCase().includes(searchQuery) || item.hash.toLowerCase().includes(searchQuery);
+                const matchesFilter = activeFilter === 'all' || item.status === activeFilter;
+
+                if (matchesSearch && matchesFilter) {
+                    const tr = document.createElement("tr");
+                    if (item.id === selectedLinkId) {
+                        tr.className = "selected";
+                    }
+
+                    tr.addEventListener("click", () => {
+                        selectedLinkId = item.id;
+                        renderTable();
+                        renderDetails();
+                    });
+
+                    // Set action configuration for Revoke button
+                    const isRevoked = item.status === 'revoked';
+                    const buttonText = isRevoked ? "Revoked" : "Revoke";
+
+                    tr.innerHTML = `
+                        <td>
+                            <div class="file-name">${item.file}</div>
+                            <div class="file-meta">Key: <span style="color: var(--accent-cyan);">${item.hash}</span> | Size: ${item.size}</div>
+                        </td>
+                        <td style="font-family: var(--font-display); font-weight: 700; color: var(--accent-orange);">${item.clicks}</td>
+                        <td style="color: var(--text-secondary); font-size: 12px;">${item.created}</td>
+                        <td>
+                            <span class="status-badge ${item.status}">${item.status}</span>
+                        </td>
+                        <td style="text-align: right;" onclick="event.stopPropagation();">
+                            <button class="btn-revoke" ${isRevoked ? 'disabled' : ''} onclick="revokeLink('${item.id}')">${buttonText}</button>
+                        </td>
+                    `;
+
+                    linksTbody.appendChild(tr);
+                }
+            });
+        }
+
+        // Render Right Side Detail view (Dynamic charts & Geographic elements)
+        function renderDetails() {
+            const item = linkItems.find(l => l.id === selectedLinkId);
+            if (!item) return;
+
+            selectedResourceLabel.innerText = item.file.toUpperCase();
+            chartTotalLabel.innerText = `${item.clicks} cumulative pulls`;
+
+            // Render Chart
+            chartBars.innerHTML = "";
+            const labels = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
+            
+            // Find max for scaling
+            const maxVal = Math.max(...item.chartData, 1);
+
+            item.chartData.forEach((val, i) => {
+                const heightPercent = val === 0 ? "4px" : `${(val / maxVal) * 100}%`;
+                const barGroup = document.createElement("div");
+                barGroup.className = "bar-group";
+
+                const isInactive = item.status !== 'active';
+                const barClass = isInactive ? 'bar inactive' : 'bar';
+
+                barGroup.innerHTML = `
+                    <div class="${barClass}" style="height: ${heightPercent};" title="${val} pings"></div>
+                    <div class="bar-label">${labels[i]}</div>
+                `;
+                chartBars.appendChild(barGroup);
+            });
+
+            // Render Geographic details
+            geoListContainer.innerHTML = "";
+            if (item.geoData.length === 0) {
+                geoListContainer.innerHTML = `
+                    <div style="font-size: 11px; text-align: center; color: var(--text-secondary); padding: 20px 0; text-transform: uppercase;">
+                        No Geo Intelligence Recorded for Active Key
+                    </div>
+                `;
+            } else {
+                item.geoData.forEach(g => {
+                    const geoItem = document.createElement("div");
+                    geoItem.className = "geo-item";
+                    geoItem.innerHTML = `
+                        <div class="geo-country">
+                            <span class="geo-flag">${g.code}</span>
+                            <span>${g.country}</span>
+                        </div>
+                        <div class="geo-stats-right">
+                            <span class="geo-count">${g.count}</span>
+                            <span class="geo-percentage">(${g.percentage})</span>
+                        </div>
+                    `;
+                    geoListContainer.appendChild(geoItem);
+                });
+            }
+        }
+
+        // Action: Revoke an active security key link
+        function revokeLink(id) {
+            const item = linkItems.find(l => l.id === id);
+            if (item && item.status !== 'revoked') {
+                item.status = 'revoked';
+                item.chartData = [0, 0, 0, 0, 0, 0, 0]; // clear chart visually to show zero flow
+                item.geoData = []; // wipe tracking endpoints
+                
+                // Trigger animation update
+                showNotification(`REVOKED SECURITY SHIELD: ${item.file}`);
+                
+                // Add console report
+                addAuditLog(`SECURITY SHUTDOWN`, `Link [${item.hash}] revoked by master security auth`, `critical`);
+
+                updateGlobalStats();
+                renderTable();
+                renderDetails();
+            }
+        }
+
+        // Emergency Switch: Revoke everything
+        function revokeAllActive() {
+            let activeFound = false;
+            linkItems.forEach(item => {
+                if (item.status === 'active') {
+                    item.status = 'revoked';
+                    item.chartData = [0, 0, 0, 0, 0, 0, 0];
+                    item.geoData = [];
+                    activeFound = true;
+                }
+            });
+
+            if (activeFound) {
+                showNotification(`EMERGENCY SHUTDOWN INSTIGATED. ALL LINKS BROKEN.`);
+                addAuditLog("EMERGENCY KILL", "Master command triggered. Zero access state active.", "critical");
+                updateGlobalStats();
+                renderTable();
+                renderDetails();
+            } else {
+                showNotification("No active links available to terminate.");
+            }
+        }
+
+        // Dynamic System Log Feed
+        function addAuditLog(action, message, type = "normal") {
+            const date = new Date();
+            const timeStr = date.toTimeString().split(' ')[0];
+            const logLine = document.createElement("div");
+            logLine.className = "stream-line";
+            
+            let color = "var(--accent-lime)";
+            if (type === "critical") color = "var(--accent-magenta)";
+            if (type === "warn") color = "var(--accent-orange)";
+
+            logLine.innerHTML = `
+                <div>
+                    <span class="stream-time">[${timeStr}]</span>
+                    <span style="color: ${color}; text-transform: uppercase; font-weight: 700;">${action}</span>
+                    <span style="color: var(--text-primary); margin-left: 6px;">${message}</span>
+                </div>
+            `;
+            consoleStream.appendChild(logLine);
+            consoleStream.scrollTop = consoleStream.scrollHeight;
+        }
+
+        // Fake telemetry feed
+        function setupLiveSimulation() {
+            addAuditLog("INIT", "Secure key validation node operational", "normal");
+            addAuditLog("AUDIT", "Scanning AES encrypt structures", "normal");
+            
+            const randomTriggers = [
+                () => {
+                    // Pull request from USA
+                    const activeLinks = linkItems.filter(l => l.status === 'active');
+                    if (activeLinks.length > 0) {
+                        const randomLink = activeLinks[Math.floor(Math.random() * activeLinks.length)];
+                        randomLink.clicks += 1;
+                        
+                        // Increment day
+                        randomLink.chartData[randomLink.chartData.length - 1] += 1;
+
+                        // Increment US Count
+                        const usGeo = randomLink.geoData.find(g => g.country === "United States");
+                        if (usGeo) {
+                            usGeo.count += 1;
+                        }
+
+                        addAuditLog("PULL REQ", `Authorized decrypt of ${randomLink.file} from US IP`, "normal");
+                        updateGlobalStats();
+                        renderTable();
+                        renderDetails();
+                    }
+                },
+                () => {
+                    addAuditLog("HEARTBEAT", "Validation checks normal. 0 intrusion models detected.", "normal");
+                },
+                () => {
+                    const expiredCount = linkItems.filter(l => l.status === 'expired').length;
+                    addAuditLog("CRON", `Checked expired nodes. ${expiredCount} partitions remain sequestered.`, "normal");
+                }
+            ];
+
+            setInterval(() => {
+                const trigger = randomTriggers[Math.floor(Math.random() * randomTriggers.length)];
+                trigger();
+            }, 5500);
+        }
+    </script>
+</body>
+</html>
+```

@@ -1,0 +1,365 @@
+{
+  "metadata": {
+    "engine_version": "v2.4-auction",
+    "schema_identifier": "valois.term_sheet_templates.v1",
+    "last_updated": "2024-10-24",
+    "network_status": "SEC-256 Compliant // Active Auction Hub"
+  },
+  "templates": [
+    {
+      "template_id": "t_venture_debt_premium",
+      "template_name": "Premium Venture Debt Term Sheet",
+      "facility_type": "Venture Debt Runway Line",
+      "compatible_archetypes": [
+        "saas_series_a"
+      ],
+      "financial_terms": {
+        "principal_limit": {
+          "min": 1000000,
+          "max": 15000000,
+          "currency": "USD"
+        },
+        "pricing_structure": {
+          "rate_type": "SOFR_Floating_Spread",
+          "indicative_spread_bps": {
+            "min": 350,
+            "max": 550
+          },
+          "sofr_floor": "4.50%",
+          "payment_frequency": "Monthly"
+        },
+        "maturity_and_amortization": {
+          "term_months_range": {
+            "min": 24,
+            "max": 48
+          },
+          "interest_only_period_months": {
+            "min": 6,
+            "max": 18
+          },
+          "amortization_style": "Straight-line following I/O period"
+        },
+        "dilution_mechanics": {
+          "warrant_coverage": {
+            "min_bps": 10,
+            "max_bps": 75,
+            "equity_basis": "Fully Diluted"
+          }
+        },
+        "fees_and_penalties": {
+          "commitment_fee_bps": 100,
+          "prepayment_premium": {
+            "year_1": "3.00%",
+            "year_2": "2.00%",
+            "thereafter": "1.00%"
+          },
+          "capped_legal_expense_limit": 25000
+        }
+      },
+      "mandate_filters": {
+        "min_readiness_score": 80,
+        "min_arr_usd": 3000000,
+        "allowed_sectors": [
+          "Enterprise SaaS",
+          "B2B Marketplaces",
+          "Fintech Infrastructure"
+        ],
+        "maximum_leverage_ratio_arr": 0.45,
+        "ebitda_constraint": "Negative cash-flow approved contingent on >15 months runway"
+      },
+      "auction_bidding_variables": [
+        {
+          "variable_id": "v_sofr_spread",
+          "label": "SOFR Spread margin (BPS)",
+          "type": "numeric",
+          "min_value": 300,
+          "max_value": 600,
+          "step_size": 25,
+          "unit": "bps"
+        },
+        {
+          "variable_id": "v_warrant_coverage",
+          "label": "Warrant Cover (%)",
+          "type": "numeric",
+          "min_value": 0.10,
+          "max_value": 1.00,
+          "step_size": 0.05,
+          "unit": "percentage"
+        },
+        {
+          "variable_id": "v_io_months",
+          "label": "Interest Only Duration",
+          "type": "integer",
+          "min_value": 6,
+          "max_value": 18,
+          "step_size": 3,
+          "unit": "months"
+        }
+      ],
+      "underwriting_covenants": [
+        {
+          "category": "financial",
+          "name": "Minimum Cash Requirement",
+          "formula": "Lesser of $500,000 or 3 months net operations burn rate"
+        },
+        {
+          "category": "performance",
+          "name": "Minimum Revenue Maintain",
+          "formula": "Trailing Twelve Month (TTM) ARR must not drop below 80% of current Board-approved budget plan"
+        }
+      ]
+    },
+    {
+      "template_id": "t_revenue_based_dynamic",
+      "template_name": "Dynamic Revenue-Based Capital Agreement",
+      "facility_type": "Revenue-Based Non-Dilutive Bond",
+      "compatible_archetypes": [
+        "ecom_scaleup",
+        "saas_series_a"
+      ],
+      "financial_terms": {
+        "principal_limit": {
+          "min": 500000,
+          "max": 5000000,
+          "currency": "USD"
+        },
+        "pricing_structure": {
+          "rate_type": "Fixed_Multiple_Cost_Of_Capital",
+          "indicative_repayment_multiple": {
+            "min": 1.08,
+            "max": 1.18
+          },
+          "payment_frequency": "Daily/Weekly Revenue Share Split"
+        },
+        "maturity_and_amortization": {
+          "revenue_share_percentage": {
+            "min": "2.50%",
+            "max": "10.00%"
+          },
+          "implied_term_months": {
+            "min": 12,
+            "max": 24
+          }
+        },
+        "dilution_mechanics": {
+          "warrant_coverage": "N/A - 100% Non-Dilutive"
+        },
+        "fees_and_penalties": {
+          "commitment_fee_bps": 50,
+          "prepayment_premium": "No penalties; discount options apply on early lump-sum purchase"
+        }
+      },
+      "mandate_filters": {
+        "min_readiness_score": 70,
+        "min_arr_usd": 1500000,
+        "allowed_sectors": [
+          "E-Commerce Retail",
+          "D2C Brands",
+          "High-Frequency SaaS"
+        ],
+        "maximum_leverage_ratio_arr": 0.30,
+        "ebitda_constraint": "Positive cash flow optional if trailing 3-month store revenue has positive growth"
+      },
+      "auction_bidding_variables": [
+        {
+          "variable_id": "v_repayment_multiple",
+          "label": "Repayment Capital Multiple",
+          "type": "numeric",
+          "min_value": 1.06,
+          "max_value": 1.15,
+          "step_size": 0.01,
+          "unit": "ratio_multiplier"
+        },
+        {
+          "variable_id": "v_rev_share_pct",
+          "label": "Gross Revenue Share Percentage",
+          "type": "numeric",
+          "min_value": 2.00,
+          "max_value": 8.00,
+          "step_size": 0.25,
+          "unit": "percentage"
+        }
+      ],
+      "underwriting_covenants": [
+        {
+          "category": "operational",
+          "name": "Integration Lock",
+          "formula": "Maintain continuous programmatic merchant bank account connections and billing system API integrations"
+        }
+      ]
+    },
+    {
+      "template_id": "t_asset_backed_secured",
+      "template_name": "Asset-Backed Syndicated Credit Line",
+      "facility_type": "Asset-Backed Credit Facility",
+      "compatible_archetypes": [
+        "heavy_logistics",
+        "ecom_scaleup"
+      ],
+      "financial_terms": {
+        "principal_limit": {
+          "min": 2500000,
+          "max": 30000000,
+          "currency": "USD"
+        },
+        "pricing_structure": {
+          "rate_type": "SOFR_Spread_Tiered",
+          "indicative_spread_bps": {
+            "min": 275,
+            "max": 450
+          },
+          "sofr_floor": "4.00%",
+          "payment_frequency": "Monthly on Borrowing Base Outstanding"
+        },
+        "maturity_and_amortization": {
+          "term_months_range": {
+            "min": 36,
+            "max": 60
+          },
+          "advance_rates": {
+            "eligible_accounts_receivable": "85.00%",
+            "eligible_inventory_finished_goods": "60.00%"
+          },
+          "amortization_style": "Revolving Line of Credit with maturity bullet"
+        },
+        "dilution_mechanics": {
+          "warrant_coverage": "N/A"
+        },
+        "fees_and_penalties": {
+          "unused_line_fee_bps": 25,
+          "commitment_fee_bps": 75,
+          "collateral_audit_annual_fee_usd": 15000
+        }
+      },
+      "mandate_filters": {
+        "min_readiness_score": 75,
+        "min_arr_usd": 5000000,
+        "allowed_sectors": [
+          "Logistics & Heavy Transport",
+          "Manufacturing",
+          "High Volume Wholesale Distributors"
+        ],
+        "maximum_leverage_ratio_arr": 0.50,
+        "ebitda_constraint": "EBITDA positive trailing 6 months required"
+      },
+      "auction_bidding_variables": [
+        {
+          "variable_id": "v_ar_advance_rate",
+          "label": "Accounts Receivable Advance Rate",
+          "type": "numeric",
+          "min_value": 80.00,
+          "max_value": 90.00,
+          "step_size": 1.00,
+          "unit": "percentage"
+        },
+        {
+          "variable_id": "v_sofr_spread_revolving",
+          "label": "SOFR Margin Spread",
+          "type": "numeric",
+          "min_value": 250,
+          "max_value": 450,
+          "step_size": 10,
+          "unit": "bps"
+        },
+        {
+          "variable_id": "v_unused_facility_fee",
+          "label": "Unused Facility Charge",
+          "type": "numeric",
+          "min_value": 15,
+          "max_value": 40,
+          "step_size": 5,
+          "unit": "bps"
+        }
+      ],
+      "underwriting_covenants": [
+        {
+          "category": "solvency",
+          "name": "Fixed Charge Coverage Ratio (FCCR)",
+          "formula": "FCCR must be maintained greater than 1.15x assessed quarterly"
+        },
+        {
+          "category": "collateral",
+          "name": "Receivables Aging Guardrail",
+          "formula": "Receivables older than 90 days excluded immediately from borrowing capacity calculation pool"
+        }
+      ]
+    },
+    {
+      "template_id": "t_equipment_leasing_standard",
+      "template_name": "Hard Asset Equipment Lease Term Sheet",
+      "facility_type": "Equipment Financing",
+      "compatible_archetypes": [
+        "heavy_logistics",
+        "mainstreet_med"
+      ],
+      "financial_terms": {
+        "principal_limit": {
+          "min": 500000,
+          "max": 10000000,
+          "currency": "USD"
+        },
+        "pricing_structure": {
+          "rate_type": "Fixed_Imputed_Interest_Rate",
+          "indicative_fixed_apr": {
+            "min": "5.90%",
+            "max": "8.50%"
+          },
+          "payment_frequency": "Monthly"
+        },
+        "maturity_and_amortization": {
+          "term_months_range": {
+            "min": 36,
+            "max": 72
+          },
+          "max_ltv_cost_of_equipment": "100.00%",
+          "amortization_style": "Fully Amortized Straight-Line Lease"
+        },
+        "dilution_mechanics": {
+          "warrant_coverage": "N/A"
+        },
+        "fees_and_penalties": {
+          "documentation_closing_fee_usd": 2500,
+          "origination_fee_bps": 100
+        }
+      },
+      "mandate_filters": {
+        "min_readiness_score": 80,
+        "min_arr_usd": 2000000,
+        "allowed_sectors": [
+          "Clinical Health Care",
+          "Cargo & Industrial Freight",
+          "Advanced Robotics / Assembly"
+        ],
+        "maximum_leverage_ratio_arr": "N/A - Covered via underlying asset collateral valuation",
+        "ebitda_constraint": "DSCR Target > 1.25x based on audited asset cash flow metrics"
+      },
+      "auction_bidding_variables": [
+        {
+          "variable_id": "v_fixed_interest",
+          "label": "Imputed Fixed APR",
+          "type": "numeric",
+          "min_value": 5.50,
+          "max_value": 8.00,
+          "step_size": 0.05,
+          "unit": "percentage"
+        },
+        {
+          "variable_id": "v_lease_term",
+          "label": "Lease Term Duration",
+          "type": "integer",
+          "min_value": 36,
+          "max_value": 72,
+          "step_size": 12,
+          "unit": "months"
+        }
+      ],
+      "underwriting_covenants": [
+        {
+          "category": "asset_security",
+          "name": "Mandatory Maintenance Covenant",
+          "formula": "All financed hardware assets must remain under certified original OEM manufacturer active maintenance service agreements"
+        }
+      ]
+    }
+  ]
+}

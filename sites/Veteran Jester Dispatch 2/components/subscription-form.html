@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supply Drop Requisition | VJD</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Stardos+Stencil:wght@400;700&family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #c5beb1;
+            --olive: #4b5320;
+            --dark-olive: #353b16;
+            --black: #1a1a1a;
+            --stencil-red: #9e1b1b;
+            --paper-white: #e8e4d9;
+            --ink-bleed: rgba(26, 26, 26, 0.8);
+            --texture: url("https://www.transparenttextures.com/patterns/cardboard-flat.png");
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: var(--texture);
+            color: var(--black);
+            font-family: 'Courier Prime', monospace;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .requisition-paper {
+            background: var(--paper-white);
+            max-width: 800px;
+            width: 100%;
+            padding: 50px;
+            border: 1px solid rgba(0,0,0,0.2);
+            box-shadow: 15px 15px 0px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .requisition-paper::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 15px;
+            background: repeating-linear-gradient(90deg, var(--stencil-red), var(--stencil-red) 20px, var(--black) 20px, var(--black) 40px);
+        }
+
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid var(--black);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-id {
+            font-family: 'Special Elite', cursive;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .main-title {
+            font-family: 'Stardos Stencil', cursive;
+            font-size: 2.5rem;
+            line-height: 1;
+            margin-top: 10px;
+        }
+
+        .stamp-urgent {
+            border: 4px double var(--stencil-red);
+            color: var(--stencil-red);
+            padding: 10px 20px;
+            font-family: 'Stardos Stencil', cursive;
+            text-transform: uppercase;
+            font-size: 1.5rem;
+            transform: rotate(-15deg);
+            position: absolute;
+            top: 60px;
+            right: 40px;
+            opacity: 0.7;
+            user-select: none;
+        }
+
+        .instruction-box {
+            background: rgba(75, 83, 32, 0.1);
+            border-left: 5px solid var(--olive);
+            padding: 20px;
+            margin-bottom: 30px;
+            font-family: 'Special Elite', cursive;
+            font-size: 0.95rem;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .form-section {
+            margin-bottom: 25px;
+        }
+
+        .form-section label {
+            display: block;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+            color: var(--dark-olive);
+        }
+
+        .input-field {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid var(--black);
+            padding: 10px 0;
+            font-family: 'Special Elite', cursive;
+            font-size: 1.1rem;
+            color: var(--black);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-bottom-color: var(--stencil-red);
+        }
+
+        .manifest-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .manifest-list li {
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 12px;
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.9rem;
+        }
+
+        .manifest-list li::before {
+            content: "[X]";
+            position: absolute;
+            left: 0;
+            color: var(--stencil-red);
+            font-weight: bold;
+        }
+
+        .checkbox-group {
+            margin-top: 30px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .checkbox-group input {
+            margin-top: 5px;
+        }
+
+        .checkbox-group label {
+            font-size: 0.75rem;
+            font-family: 'Special Elite', cursive;
+            line-height: 1.4;
+        }
+
+        .btn-authorize {
+            display: block;
+            width: 100%;
+            margin-top: 40px;
+            background: var(--black);
+            color: var(--paper-white);
+            border: none;
+            padding: 20px;
+            font-family: 'Stardos Stencil', cursive;
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            box-shadow: 6px 6px 0px var(--stencil-red);
+            text-transform: uppercase;
+        }
+
+        .btn-authorize:hover {
+            background: var(--dark-olive);
+        }
+
+        .coffee-stain {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: rgba(75, 50, 30, 0.05);
+            border-radius: 50%;
+            bottom: -50px;
+            left: -50px;
+            filter: blur(30px);
+            pointer-events: none;
+        }
+
+        @media (max-width: 600px) {
+            .grid-layout { grid-template-columns: 1fr; }
+            .requisition-paper { padding: 30px 20px; }
+            .stamp-urgent { position: static; transform: none; margin-bottom: 20px; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <form class="requisition-paper">
+        <div class="coffee-stain"></div>
+        <div class="stamp-urgent">Immediate Priority</div>
+        
+        <div class="form-header">
+            <div>
+                <div class="form-id">Form VJD-REQ-001 // Supply Drop Requisition</div>
+                <h1 class="main-title">PERSONNEL INTEL ENROLLMENT</h1>
+            </div>
+            <div style="text-align: right;">
+                <div class="form-id">Security Clearance:</div>
+                <div style="font-weight: bold;">UNCLASSIFIED // JESTER</div>
+            </div>
+        </div>
+
+        <div class="instruction-box">
+            COMPLETION OF THIS FORM IS MANDATORY FOR PERSONNEL SEEKING ACCESS TO THE WEEKLY DISPATCH. FAIL TO PROVIDE A VALID INBOX ADDRESS AND YOU WILL BE LEFT TO NAVIGATE THE BUREAUCRATIC BULLSHIT ALONE.
+        </div>
+
+        <div class="grid-layout">
+            <div class="form-section">
+                <label for="email">Primary Communication Channel (Email)</label>
+                <input type="email" id="email" class="input-field" placeholder="CADET@FIELD-MAIL.COM" required>
+            </div>
+            <div class="form-section">
+                <label for="callsign">Designated Callsign (Name)</label>
+                <input type="text" id="callsign" class="input-field" placeholder="e.g. Maverick_76">
+            </div>
+        </div>
+
+        <div class="form-section" style="margin-top: 20px;">
+            <label>Requested Payload Manifest:</label>
+            <ul class="manifest-list">
+                <li><strong>Weekly Intelligence:</strong> High-density essays on leadership, grit, and corporate absurdity.</li>
+                <li><strong>Satirical Rations:</strong> Morale-boosting dark humor to keep the existential dread at bay.</li>
+                <li><strong>Tactical Alerts:</strong> Early access to store drops and limited-edition field gear.</li>
+                <li><strong>Zero-Fluff Policy:</strong> No spam. No HR-approved buzzwords. Just raw truth.</li>
+            </ul>
+        </div>
+
+        <div class="checkbox-group">
+            <input type="checkbox" id="terms" required>
+            <label for="terms">
+                I hereby acknowledge that "The Veteran Jester Dispatch" may contain traces of sarcasm, brutal honesty, and occasional tactical cynicism. I certify that I am not a robot, a bureaucrat with no soul, or anyone who thinks "synergy" is a real word.
+            </label>
+        </div>
+
+        <button type="submit" class="btn-authorize">Authorize Requisition</button>
+
+        <div style="margin-top: 30px; text-align: center; border-top: 1px dashed var(--black); padding-top: 15px;">
+            <p style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7;">
+                Property of VJD Command // 404-INTEL-OPS // Do Not Photocopy
+            </p>
+        </div>
+    </form>
+
+</body>
+</html>

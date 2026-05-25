@@ -1,0 +1,1325 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integration Matrix - Core Flow Admin Settings</title>
+    <!-- Google Fonts & Tailwind-inspired Layout system -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #08090d;
+            --bg-secondary: #0f111a;
+            --bg-tertiary: #161a26;
+            --border-color: #242b3d;
+            --border-hover: #3b4764;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            
+            /* High-voltage Neobrutalist Accents */
+            --accent-cyan: #00f0ff;
+            --accent-orange: #ff5c00;
+            --accent-magenta: #ff007a;
+            --accent-lime: #39ff14;
+            
+            --shadow-cyan: 0px 0px 20px rgba(0, 240, 255, 0.15);
+            --shadow-orange: 0px 0px 20px rgba(255, 92, 0, 0.15);
+            --shadow-magenta: 0px 0px 20px rgba(255, 0, 122, 0.15);
+            --shadow-lime: 0px 0px 20px rgba(57, 255, 20, 0.15);
+            
+            --brutal-shadow: 6px 6px 0px #000000;
+            --brutal-shadow-hover: 2px 2px 0px #000000;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-sans);
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        /* custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-cyan);
+        }
+
+        /* Utility classes */
+        .text-glow-cyan { text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
+        .text-glow-orange { text-shadow: 0 0 10px rgba(255, 92, 0, 0.5); }
+        .text-glow-magenta { text-shadow: 0 0 10px rgba(255, 0, 122, 0.5); }
+        .text-glow-lime { text-shadow: 0 0 10px rgba(57, 255, 20, 0.5); }
+
+        /* Navigation Header */
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: var(--bg-secondary);
+            border-bottom: 3px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 22px;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+            border: 2px solid #000;
+            box-shadow: 2px 2px 0px #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 18px;
+            color: #000;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            padding: 8px 16px;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--accent-cyan);
+            border-bottom: 2px solid var(--accent-cyan);
+        }
+
+        /* Settings Grid Layout */
+        main {
+            max-width: 1440px;
+            margin: 40px auto;
+            padding: 0 40px;
+            display: grid;
+            grid-template-columns: 1.25fr 0.75fr;
+            gap: 40px;
+        }
+
+        @media (max-width: 1024px) {
+            main {
+                grid-template-columns: 1fr;
+                margin: 20px auto;
+                padding: 0 20px;
+            }
+        }
+
+        /* Left Side: Form Configurations */
+        .config-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .section-badge {
+            align-self: flex-start;
+            background: var(--accent-cyan);
+            color: #000;
+            padding: 6px 14px;
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 2px solid #000;
+            box-shadow: var(--brutal-shadow-hover);
+            margin-bottom: 8px;
+        }
+
+        .panel-box {
+            background: var(--bg-secondary);
+            border: 3px solid var(--border-color);
+            box-shadow: var(--brutal-shadow);
+            border-radius: 8px;
+            padding: 32px;
+            position: relative;
+        }
+
+        .panel-title {
+            font-family: var(--font-display);
+            font-size: 24px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 28px;
+            line-height: 1.6;
+            border-left: 3px solid var(--accent-magenta);
+            padding-left: 14px;
+        }
+
+        /* Neobrutalist Form Inputs */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 640px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 640px) {
+            .full-width {
+                grid-column: span 1;
+            }
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-field, .select-field {
+            width: 100%;
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            padding: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            outline: none;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .input-field:focus, .select-field:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+        }
+
+        /* Switch toggle neobrutalist custom look */
+        .switch-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            padding: 16px 20px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+        }
+
+        .switch-label-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .switch-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 15px;
+            text-transform: uppercase;
+            color: var(--text-primary);
+        }
+
+        .switch-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .custom-toggle {
+            position: relative;
+            display: inline-block;
+            width: 58px;
+            height: 30px;
+        }
+
+        .custom-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            transition: .3s cubic-bezier(0.16, 1, 0.3, 1);
+            border-radius: 4px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--text-secondary);
+            border-radius: 2px;
+            transition: .3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        input:checked + .toggle-slider {
+            border-color: var(--accent-lime);
+            background: rgba(57, 255, 20, 0.05);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(28px);
+            background-color: var(--accent-lime);
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+        }
+
+        /* Neobrutalist Range Slider Config */
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .slider-value {
+            font-family: var(--font-display);
+            color: var(--accent-cyan);
+            font-size: 16px;
+        }
+
+        .range-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            border: 2px solid #000;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+            transition: transform 0.1s ease;
+        }
+
+        .range-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        /* Dynamic cloud platform selector cards */
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 640px) {
+            .platform-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .platform-card {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            padding: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .platform-card:hover {
+            border-color: var(--accent-magenta);
+            transform: translateY(-2px);
+        }
+
+        .platform-card.selected {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 240, 255, 0.03);
+            box-shadow: 4px 4px 0px #000000;
+        }
+
+        .platform-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .platform-icon {
+            font-size: 24px;
+        }
+
+        .platform-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .platform-status {
+            font-size: 10px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            padding: 2px 6px;
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-weight: 700;
+        }
+
+        .platform-card.selected .platform-status {
+            color: var(--accent-cyan);
+            border-color: var(--accent-cyan);
+        }
+
+        /* API & Webhook Key Table Listing */
+        .key-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .key-row {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 4px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .key-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .key-label {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            color: var(--text-primary);
+        }
+
+        .key-string-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-primary);
+            padding: 4px 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 2px;
+        }
+
+        .key-string {
+            font-family: monospace;
+            font-size: 12px;
+            color: var(--accent-magenta);
+        }
+
+        .key-meta {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .key-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-mini {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+            padding: 6px 12px;
+            font-family: var(--font-display);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-mini:hover {
+            border-color: var(--accent-magenta);
+            color: var(--accent-magenta);
+        }
+
+        .btn-mini.danger:hover {
+            border-color: var(--accent-orange);
+            color: var(--accent-orange);
+        }
+
+        /* Right Side: Active Terminal Console Visualizer */
+        .terminal-box {
+            background: var(--bg-secondary);
+            border: 3px solid var(--border-color);
+            box-shadow: var(--brutal-shadow);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 100px;
+            align-self: start;
+        }
+
+        .terminal-header {
+            background: var(--bg-tertiary);
+            padding: 12px 20px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--border-color);
+        }
+        .dot.active-1 { background: var(--accent-cyan); }
+        .dot.active-2 { background: var(--accent-orange); }
+        .dot.active-3 { background: var(--accent-magenta); }
+
+        .terminal-title {
+            font-family: var(--font-display);
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .console-tag {
+            background: rgba(57, 255, 20, 0.1);
+            color: var(--accent-lime);
+            padding: 3px 8px;
+            font-size: 10px;
+            text-transform: uppercase;
+            border: 1px solid var(--accent-lime);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .terminal-body {
+            background: #050608;
+            padding: 24px;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-family: monospace;
+        }
+
+        .console-stream {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            font-size: 12px;
+            color: #b0b9c6;
+            max-height: 350px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .console-line {
+            line-height: 1.5;
+            word-break: break-all;
+        }
+
+        .console-line span.timestamp {
+            color: var(--border-hover);
+            margin-right: 8px;
+        }
+
+        .console-line span.tag {
+            color: var(--accent-cyan);
+            font-weight: bold;
+            margin-right: 6px;
+        }
+
+        .console-line span.tag.success {
+            color: var(--accent-lime);
+        }
+
+        .console-line span.tag.warn {
+            color: var(--accent-orange);
+        }
+
+        /* Test trigger section inside sandbox */
+        .terminal-test-panel {
+            border-top: 1px dashed var(--border-color);
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+
+        .test-title {
+            font-family: var(--font-display);
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .test-actions-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Neobrutalist CTAs */
+        .btn-action {
+            background: var(--accent-cyan);
+            color: #000;
+            padding: 16px 32px;
+            border: 3px solid #000;
+            font-weight: 800;
+            font-family: var(--font-display);
+            text-transform: uppercase;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px #000;
+            transition: all 0.1s ease;
+            text-decoration: none;
+            display: inline-block;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .btn-action:hover {
+            box-shadow: 2px 2px 0px #000;
+            transform: translate(2px, 2px);
+            background: #fff;
+        }
+
+        .btn-white {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+            padding: 14px 28px;
+            text-transform: uppercase;
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-white:hover {
+            border-color: var(--accent-magenta);
+            color: var(--accent-magenta);
+        }
+
+        /* Floating live status toast */
+        .toast-notify {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--accent-cyan);
+            padding: 16px 24px;
+            box-shadow: var(--brutal-shadow);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--font-display);
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            transform: translateY(150%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .toast-notify.visible {
+            transform: translateY(0);
+        }
+
+        .toast-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-cyan);
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            100% { transform: scale(1.1); opacity: 1; }
+        }
+
+        /* Footer styles */
+        footer {
+            background: #000000;
+            color: var(--text-primary);
+            border-top: 4px solid var(--border-color);
+            padding: 80px 40px;
+            position: relative;
+            margin-top: 80px;
+        }
+
+        .footer-grid {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 60px;
+        }
+
+        @media (max-width: 1024px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+        }
+
+        .footer-cta h2 {
+            font-family: var(--font-display);
+            font-size: 48px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        .footer-cta h2 span {
+            color: var(--accent-magenta);
+        }
+
+        .footer-cta p {
+            color: var(--text-secondary);
+            font-size: 16px;
+            max-width: 600px;
+            margin-bottom: 30px;
+        }
+
+        .footer-links-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .footer-column {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-width: 160px;
+        }
+
+        .footer-column h4 {
+            font-family: var(--font-display);
+            text-transform: uppercase;
+            font-size: 12px;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            position: relative;
+            padding-bottom: 4px;
+        }
+
+        .footer-column h4::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 30px;
+            height: 2px;
+            background: var(--accent-cyan);
+        }
+
+        .footer-column a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: color 0.15s ease;
+        }
+
+        .footer-column a:hover {
+            color: var(--accent-cyan);
+        }
+
+        .footer-bottom {
+            max-width: 1440px;
+            margin: 60px auto 0 auto;
+            padding-top: 30px;
+            border-top: 1px solid #1a202c;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: var(--text-secondary);
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation -->
+    <nav class="nav-header">
+        <a href="#" class="logo-area">
+            <div class="logo-icon">C</div>
+            CORE FLOW
+        </a>
+        <div class="nav-links">
+            <a href="#" class="nav-link">Calculators</a>
+            <a href="#" class="nav-link active">Integrations</a>
+            <a href="#" class="nav-link">Expert Help</a>
+        </div>
+        <a href="#" class="btn-action" style="padding: 10px 20px; font-size: 12px; box-shadow: 2px 2px 0px #000;">System Console</a>
+    </nav>
+
+    <!-- Main Config Area -->
+    <main>
+        <!-- Left Configurations Side -->
+        <div class="config-wrapper">
+            
+            <!-- Section Title -->
+            <div>
+                <div class="section-badge">Matrix Settings</div>
+                <h1 style="font-family: var(--font-display); font-size: 40px; text-transform: uppercase; line-height: 1.0; margin-bottom: 10px;">Cloud & API <span>Integrations</span></h1>
+                <p style="color: var(--text-secondary); font-size: 16px; max-width: 650px;">Configure backup targets, enforce payload limitation rules, and provision key credentials for external systems webhook synchronizations.</p>
+            </div>
+
+            <!-- Panel: Cloud Backups -->
+            <div class="panel-box">
+                <h2 class="panel-title">1. Cloud Storage Archiving</h2>
+                <p class="panel-desc">Instruct Core Flow to dispatch document bundles and decision matrix logs to decentralized storage targets at custom-defined sync periods.</p>
+                
+                <!-- Cloud Selector -->
+                <div class="platform-grid">
+                    <div class="platform-card selected" id="platform-s3" onclick="selectPlatform('s3')">
+                        <div class="platform-meta">
+                            <span class="platform-icon">🪣</span>
+                            <span class="platform-status">ENABLED</span>
+                        </div>
+                        <span class="platform-title">AWS S3 BUCKETS</span>
+                    </div>
+                    <div class="platform-card" id="platform-onedrive" onclick="selectPlatform('onedrive')">
+                        <div class="platform-meta">
+                            <span class="platform-icon">☁️</span>
+                            <span class="platform-status">OFFLINE</span>
+                        </div>
+                        <span class="platform-title">MS ONEDRIVE</span>
+                    </div>
+                    <div class="platform-card" id="platform-gdrive" onclick="selectPlatform('gdrive')">
+                        <div class="platform-meta">
+                            <span class="platform-icon">📁</span>
+                            <span class="platform-status">OFFLINE</span>
+                        </div>
+                        <span class="platform-title">GOOGLE DRIVE</span>
+                    </div>
+                </div>
+
+                <!-- S3 Form Section -->
+                <div id="credentials-form" class="form-grid">
+                    <div class="input-group full-width">
+                        <label class="input-label" id="field-lbl-1">AWS Access Key / ID</label>
+                        <input type="text" class="input-field" id="field-val-1" value="AKIAIOSFODNN7EXAMPLE">
+                    </div>
+                    <div class="input-group full-width">
+                        <label class="input-label" id="field-lbl-2">AWS Secret Key</label>
+                        <input type="password" class="input-field" id="field-val-2" value="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label" id="field-lbl-3">Bucket Identifier Name</label>
+                        <input type="text" class="input-field" id="field-val-3" value="coreflow-decision-archives">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label" id="field-lbl-4">Storage Region Zone</label>
+                        <input type="text" class="input-field" id="field-val-4" value="us-east-1">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel: File Limitations & Rule Enforcer -->
+            <div class="panel-box">
+                <h2 class="panel-title">2. Payload Capacity Controls</h2>
+                <p class="panel-desc">Restrict outbound sizes to avoid heavy gateway charges and prevent pipeline performance latency on slow clients.</p>
+                
+                <div style="display: flex; flex-direction: column; gap: 24px;">
+                    <!-- Max File Size Range -->
+                    <div>
+                        <div class="slider-header">
+                            <span>Maximum File Size Allocation Limit</span>
+                            <span class="slider-value" id="max-size-display">120 MB</span>
+                        </div>
+                        <input type="range" min="10" max="500" step="5" value="120" class="range-slider" id="max-size-slider">
+                    </div>
+
+                    <!-- Custom Rules Switches -->
+                    <div>
+                        <div class="switch-row">
+                            <div class="switch-label-group">
+                                <span class="switch-title">Encrypt Documents</span>
+                                <span class="switch-desc">Force strong AES-256 binary validation encryption on local outputs before shipping.</span>
+                            </div>
+                            <label class="custom-toggle">
+                                <input type="checkbox" checked id="encrypt-toggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="switch-row">
+                            <div class="switch-label-group">
+                                <span class="switch-title">Allow Guest Uploads</span>
+                                <span class="switch-desc">Permit clients without API credential identification to process sandbox data models.</span>
+                            </div>
+                            <label class="custom-toggle">
+                                <input type="checkbox" id="guest-toggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel: API Keys & Outbound Webhooks -->
+            <div class="panel-box">
+                <h2 class="panel-title">3. Authorization API Credentials</h2>
+                <p class="panel-desc">Produce tokens for external CRM hooks, database ingest lines, and custom calculation pipeline automation scripts.</p>
+
+                <div class="form-grid" style="border-bottom: 1px dashed var(--border-color); padding-bottom: 24px;">
+                    <div class="input-group full-width">
+                        <label class="input-label">Destination Webhook Gateway Endpoint</label>
+                        <input type="text" class="input-field" id="webhook-url" value="https://api.merchantpartners.internal/hooks/coreflow-ingest">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Webhook Trigger Filter Event</label>
+                        <select class="select-field" id="webhook-event">
+                            <option value="all">ALL DEALS PROCESSED</option>
+                            <option value="limits">LIMIT VALUES EXCEEDED ONLY</option>
+                            <option value="ready">HIGH GRADE READY ONLY</option>
+                        </select>
+                    </div>
+                    <div class="input-group" style="align-self: flex-end;">
+                        <button class="btn-white" onclick="triggerWebhookTest()" style="width: 100%; border-width: 2px; padding: 12px 20px;">Deploy Test Ping</button>
+                    </div>
+                </div>
+
+                <!-- API Key Manager List -->
+                <div style="margin-top: 24px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <span class="input-label">Provisioned System Keys</span>
+                        <button class="btn-mini" onclick="generateApiKey()" style="border-color: var(--accent-lime); color: var(--accent-lime);">Create API Key +</button>
+                    </div>
+
+                    <div class="key-list" id="api-keys-container">
+                        <!-- Default keys -->
+                        <div class="key-row" id="key-row-1">
+                            <div class="key-info">
+                                <span class="key-label">PROD_CRM_FLOW</span>
+                                <div class="key-string-wrapper">
+                                    <span class="key-string">sk_core_987x...882a</span>
+                                </div>
+                            </div>
+                            <div class="key-actions">
+                                <span class="key-meta" style="align-self: center; margin-right: 12px;">Created Dec 2023</span>
+                                <button class="btn-mini danger" onclick="revokeKey('key-row-1', 'PROD_CRM_FLOW')">REVOKE</button>
+                            </div>
+                        </div>
+
+                        <div class="key-row" id="key-row-2">
+                            <div class="key-info">
+                                <span class="key-label">STAGE_CALCULATOR_SIMULATOR</span>
+                                <div class="key-string-wrapper">
+                                    <span class="key-string">sk_core_543k...129p</span>
+                                </div>
+                            </div>
+                            <div class="key-actions">
+                                <span class="key-meta" style="align-self: center; margin-right: 12px;">Created Jan 2024</span>
+                                <button class="btn-mini danger" onclick="revokeKey('key-row-2', 'STAGE_CALCULATOR_SIMULATOR')">REVOKE</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submission Area -->
+            <div style="display: flex; gap: 16px; margin-top: 10px;">
+                <button class="btn-action" onclick="saveAllSettings()">Commit Configurations</button>
+                <button class="btn-white" onclick="restoreDefaults()">Restore Baseline Defaults</button>
+            </div>
+
+        </div>
+
+        <!-- Right Visualizer Console Panel -->
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <div class="terminal-dots">
+                    <div class="dot active-1"></div>
+                    <div class="dot active-2"></div>
+                    <div class="dot active-3"></div>
+                </div>
+                <div class="terminal-title">Active Sync Connection Console</div>
+                <div class="console-tag" id="connection-status">CONNECTED</div>
+            </div>
+            
+            <div class="terminal-body">
+                <div class="console-stream" id="console-stream">
+                    <!-- Terminal messages initialized via script -->
+                    <div class="console-line"><span class="timestamp">[14:32:01]</span><span class="tag">SYSTEM</span>System bootstrap finalized successfully.</div>
+                    <div class="console-line"><span class="timestamp">[14:32:02]</span><span class="tag">CONFIG</span>Loaded configuration credentials profiles.</div>
+                    <div class="console-line"><span class="timestamp">[14:32:05]</span><span class="tag success">S3_SYNC</span>Outbound storage driver: Amazon S3 (US-East-1) active.</div>
+                    <div class="console-line"><span class="timestamp">[14:32:06]</span><span class="tag success">WEBHOOK</span>Outbound hook payload gateway online: 200 OK verified.</div>
+                </div>
+
+                <div class="terminal-test-panel">
+                    <div class="test-title">Simulate Client Ingress Activity</div>
+                    <div class="test-actions-row">
+                        <button class="btn-white" onclick="simulateFileUpload()" style="font-size: 11px; padding: 10px 16px; flex: 1;">Trigger Upload</button>
+                        <button class="btn-white" onclick="simulateDecisionFlow()" style="font-size: 11px; padding: 10px 16px; flex: 1;">Trigger Decision</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-cta">
+                <h2>Control your <span>integration matrix</span></h2>
+                <p>Deploy secure system linkages. Feed clean computational outputs into legacy CRMs, direct lenders and custom financial portals cleanly via lightweight webhooks.</p>
+                <a href="#" class="btn-action">Return to Calculators</a>
+            </div>
+            <div class="footer-links-group">
+                <div class="footer-column">
+                    <h4>API Infrastructure</h4>
+                    <a href="#">Developer Documentation</a>
+                    <a href="#">API Status Console</a>
+                    <a href="#">Security Audits</a>
+                    <a href="#">Webhooks Register</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Platform Controls</h4>
+                    <a href="#">System Defaults</a>
+                    <a href="#">Access Control</a>
+                    <a href="#">SLA Assurances</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div>&copy; 2024 CORE FLOW FINTECH UTILITY. CLOUD CONFIGURATION INTERFACE. DATA-BACKED VELOCITY.</div>
+            <div style="display: flex; gap: 20px;">
+                <span style="color: var(--accent-cyan); font-weight: 700;">PROD VERSION 4.2</span>
+                <span>DATA STORED CLIENT-SIDE ONLY</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive Toast Alert -->
+    <div id="toast" class="toast-notify">
+        <div class="toast-dot"></div>
+        <div id="toast-text">Credentials updated successfully</div>
+    </div>
+
+    <!-- Scripting Engine Logic -->
+    <script>
+        // Slider display logic
+        const maxSizeSlider = document.getElementById('max-size-slider');
+        const maxSizeDisplay = document.getElementById('max-size-display');
+
+        maxSizeSlider.addEventListener('input', (e) => {
+            maxSizeDisplay.innerText = `${e.target.value} MB`;
+        });
+
+        // Console logger helper
+        const consoleStream = document.getElementById('console-stream');
+        function addConsoleLine(tag, message, statusType = '') {
+            const now = new Date();
+            const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+            
+            const line = document.createElement('div');
+            line.className = 'console-line';
+            
+            let tagClass = 'tag';
+            if (statusType === 'success') tagClass += ' success';
+            if (statusType === 'warn') tagClass += ' warn';
+            
+            line.innerHTML = `<span class="timestamp">[${timeStr}]</span><span class="${tagClass}">${tag}</span>${message}`;
+            consoleStream.appendChild(line);
+            consoleStream.scrollTop = consoleStream.scrollHeight;
+        }
+
+        // Platform switching configurations
+        const platformProfiles = {
+            s3: {
+                title: "AWS S3 BUCKETS",
+                status: "ENABLED",
+                labels: ["AWS Access Key / ID", "AWS Secret Key", "Bucket Identifier Name", "Storage Region Zone"],
+                values: ["AKIAIOSFODNN7EXAMPLE", "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY", "coreflow-decision-archives", "us-east-1"]
+            },
+            onedrive: {
+                title: "MICROSOFT ONEDRIVE Enterprise",
+                status: "CONNECTED",
+                labels: ["Microsoft Tenant ID", "App Registration Secret", "Drive Folder Scope Path", "User Account Principal ID"],
+                values: ["72f988bf-86f1-41af-91ab-2d7cd011db47", "S_3.8G2Msdmkl9.6fDsnks2s.6m", "/GlobalArchive/CoreFlow/Documents", "admin@coreflow.example.onmicrosoft.com"]
+            },
+            gdrive: {
+                title: "GOOGLE DRIVE Cloud Storage",
+                status: "CONNECTED",
+                labels: ["Google Service Account JSON Creds", "Shared Team Drive Root ID", "Target Subfolder Name", "Auth Verification Grant Key"],
+                values: ["{ \"type\": \"service_account\", \"project_id\": \"coreflow-12\" }", "0AJ8asDsaMmsL19s", "Decision-Flow-Backups", "gauth_key_decisional_0019A"]
+            }
+        };
+
+        let currentPlatform = 's3';
+
+        function selectPlatform(platform) {
+            currentPlatform = platform;
+            
+            // UI Toggle Selected State
+            document.querySelectorAll('.platform-card').forEach(card => {
+                card.classList.remove('selected');
+                const stat = card.querySelector('.platform-status');
+                stat.innerText = 'OFFLINE';
+            });
+            
+            const activeCard = document.getElementById(`platform-${platform}`);
+            activeCard.classList.add('selected');
+            activeCard.querySelector('.platform-status').innerText = 'ENABLED';
+
+            // Swap values out inside credential matrix form
+            const config = platformProfiles[platform];
+            document.getElementById('field-lbl-1').innerText = config.labels[0];
+            document.getElementById('field-lbl-2').innerText = config.labels[1];
+            document.getElementById('field-lbl-3').innerText = config.labels[2];
+            document.getElementById('field-lbl-4').innerText = config.labels[3];
+
+            document.getElementById('field-val-1').value = config.values[0];
+            document.getElementById('field-val-2').value = config.values[1];
+            document.getElementById('field-val-3').value = config.values[2];
+            document.getElementById('field-val-4').value = config.values[3];
+
+            addConsoleLine('CONFIG', `Switched active backend targets to ${config.title}. Drivers compiled.`, 'success');
+            showToast(`Backend Switched: ${platform.toUpperCase()}`);
+        }
+
+        // Generate dynamic API keys
+        function generateApiKey() {
+            const container = document.getElementById('api-keys-container');
+            const randomID = Math.random().toString(36).substring(2, 6).toUpperCase();
+            const keyLabel = `EXTERNAL_INGRESS_${randomID}`;
+            const keyString = `sk_core_${Math.random().toString(36).substring(2, 6)}...${Math.random().toString(36).substring(2, 6)}`;
+            
+            const rowID = `key-row-${Date.now()}`;
+
+            const row = document.createElement('div');
+            row.className = 'key-row';
+            row.id = rowID;
+            row.innerHTML = `
+                <div class="key-info">
+                    <span class="key-label">${keyLabel}</span>
+                    <div class="key-string-wrapper">
+                        <span class="key-string">${keyString}</span>
+                    </div>
+                </div>
+                <div class="key-actions">
+                    <span class="key-meta" style="align-self: center; margin-right: 12px;">Created Live</span>
+                    <button class="btn-mini danger" onclick="revokeKey('${rowID}', '${keyLabel}')">REVOKE</button>
+                </div>
+            `;
+            container.appendChild(row);
+
+            addConsoleLine('AUTH', `Provisioned fresh auth token profile: ${keyLabel}`, 'success');
+            showToast(`Authorized token ${keyLabel}`);
+        }
+
+        // Revoke API Key helper
+        function revokeKey(rowID, label) {
+            const row = document.getElementById(rowID);
+            if (row) {
+                row.remove();
+                addConsoleLine('AUTH', `De-provisioned client system token profile: ${label}`, 'warn');
+                showToast(`Revoked: ${label}`);
+            }
+        }
+
+        // Webhook Deployment Test
+        function triggerWebhookTest() {
+            const url = document.getElementById('webhook-url').value;
+            const filter = document.getElementById('webhook-event').value;
+            
+            addConsoleLine('OUTBOUND', `POST request triggered to target destination: ${url}`);
+            
+            setTimeout(() => {
+                addConsoleLine('WEBHOOK', `Dispatched standard handshake JSON structure [Filter: ${filter.toUpperCase()}]`, 'success');
+                addConsoleLine('WEBHOOK', `Status 200 OK returned in 120ms. Gateway confirmed.`, 'success');
+                showToast('Webhook Test Complete: 200 OK');
+            }, 800);
+        }
+
+        // Commit All Configurations simulation
+        function saveAllSettings() {
+            addConsoleLine('SYSTEM', `Writing persistent settings profile block...`);
+            
+            setTimeout(() => {
+                addConsoleLine('SYSTEM', `Success. Encrypted profile database written locally. All endpoints compiled.`, 'success');
+                showToast('All Settings Committed.');
+            }, 600);
+        }
+
+        // Restore Baseline Default profile
+        function restoreDefaults() {
+            if (confirm("Reset values to system baseline defaults?")) {
+                maxSizeSlider.value = 120;
+                maxSizeDisplay.innerText = "120 MB";
+                document.getElementById('encrypt-toggle').checked = true;
+                document.getElementById('guest-toggle').checked = false;
+                
+                selectPlatform('s3');
+                addConsoleLine('SYSTEM', `Re-applied core baseline settings configuration profiles.`, 'warn');
+                showToast('Defaults Restored.');
+            }
+        }
+
+        // Trigger upload simulation
+        function simulateFileUpload() {
+            const size = Math.floor(Math.random() * 80) + 10;
+            const limit = parseInt(maxSizeSlider.value);
+            
+            addConsoleLine('CLIENT', `Received inbound payload attempt: document_vault_package.pdf (${size}MB)`);
+            
+            setTimeout(() => {
+                if (size > limit) {
+                    addConsoleLine('ENFORCER', `Blocked payload package. Size (${size}MB) exceeds configured limitation cap (${limit}MB).`, 'warn');
+                    showToast('Sync Warning: Payload Blocked', 'warn');
+                } else {
+                    addConsoleLine('ENFORCER', `Approved package size validation checks. Passed limits.`, 'success');
+                    addConsoleLine('S3_SYNC', `Push complete to AWS S3 bucket destination: /coreflow-decision-archives/pdf/2024_deal.pdf`, 'success');
+                }
+            }, 600);
+        }
+
+        // Trigger decision flow simulation
+        function simulateDecisionFlow() {
+            addConsoleLine('PROCESSOR', `Executing simulated client calculations decision package mapping...`);
+            
+            setTimeout(() => {
+                addConsoleLine('PROCESSOR', `Calculations concluded: Estimated Prime Grade verified. Core parameters verified.`, 'success');
+                addConsoleLine('WEBHOOK', `Forwarded decision output payload JSON data to configured partner.`, 'success');
+            }, 800);
+        }
+
+        // Floating Toast Notification system
+        const toast = document.getElementById('toast');
+        const toastText = document.getElementById('toast-text');
+
+        function showToast(text, status = 'info') {
+            toastText.innerText = text;
+            
+            if (status === 'warn') {
+                toast.style.borderColor = 'var(--accent-orange)';
+                toast.querySelector('.toast-dot').style.background = 'var(--accent-orange)';
+                toast.querySelector('.toast-dot').style.boxShadow = '0 0 10px var(--accent-orange)';
+            } else {
+                toast.style.borderColor = 'var(--accent-cyan)';
+                toast.querySelector('.toast-dot').style.background = 'var(--accent-cyan)';
+                toast.querySelector('.toast-dot').style.boxShadow = '0 0 10px var(--accent-cyan)';
+            }
+
+            toast.classList.add('visible');
+            setTimeout(() => {
+                toast.classList.remove('visible');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
+```

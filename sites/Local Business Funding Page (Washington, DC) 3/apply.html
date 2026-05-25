@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Application Portal | District Capital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #0A1629;
+            --navy-light: #162B45;
+            --gold: #C5A059;
+            --gold-hover: #D4AF37;
+            --white: #FFFFFF;
+            --off-white: #F4F7FA;
+            --text-muted: #94A3B8;
+            --success: #10B981;
+            --border: rgba(197, 160, 89, 0.2);
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--navy);
+            color: var(--white);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navigation Minimal */
+        nav {
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+            background: var(--navy);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .nav-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            color: var(--gold);
+            text-decoration: none;
+        }
+
+        .security-badge {
+            display: flex;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .security-badge svg {
+            width: 14px;
+            height: 14px;
+            margin-right: 8px;
+            fill: var(--success);
+        }
+
+        /* Progress Tracker */
+        .progress-container {
+            margin: 40px 0;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: var(--navy-light);
+            border-radius: 2px;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            position: absolute;
+            height: 100%;
+            background: var(--gold);
+            width: 25%;
+            transition: var(--transition);
+        }
+
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+
+        .progress-labels span.active {
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        /* Form Wizard */
+        .form-card {
+            background: var(--white);
+            color: var(--navy);
+            padding: 50px;
+            border-radius: 4px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .step-content {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        p.step-desc {
+            color: #64748b;
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: var(--navy-light);
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.1);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* File Upload Styling */
+        .file-upload {
+            border: 2px dashed #cbd5e1;
+            padding: 30px;
+            text-align: center;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .file-upload:hover {
+            border-color: var(--gold);
+            background: #fffcf5;
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .file-upload-label {
+            display: block;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .dc-tax-note {
+            font-size: 0.8rem;
+            background: #f1f5f9;
+            padding: 12px;
+            border-left: 3px solid var(--gold);
+            margin-top: 15px;
+            color: #475569;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .btn {
+            padding: 15px 35px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--gold);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--navy);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #94a3b8;
+        }
+
+        .btn-secondary:hover {
+            color: var(--navy);
+        }
+
+        /* Footer Minimal */
+        footer {
+            margin-top: auto;
+            padding: 40px 0;
+            text-align: center;
+            border-top: 1px solid var(--border);
+        }
+
+        .encryption-notice {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            .form-card { padding: 30px 20px; }
+            h2 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="container nav-inner">
+            <a href="index.html" class="logo">DISTRICT CAPITAL</a>
+            <div class="security-badge">
+                <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+                Bank-Grade 256-bit Encryption
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+            <div class="progress-labels">
+                <span class="active" id="label1">Business</span>
+                <span id="label2">Financials</span>
+                <span id="label3">Compliance</span>
+                <span id="label4">Review</span>
+            </div>
+        </div>
+
+        <form id="applicationForm" class="form-card">
+            <!-- Step 1: Business Profile -->
+            <div class="step-content active" id="step1">
+                <h2>Business Profile</h2>
+                <p class="step-desc">Tell us about your District presence.</p>
+                
+                <div class="form-group">
+                    <label>Legal Business Name</label>
+                    <input type="text" placeholder="As it appears on tax returns" required>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Business Type</label>
+                        <select>
+                            <option>LLC</option>
+                            <option>Corporation</option>
+                            <option>Sole Proprietorship</option>
+                            <option>Non-Profit</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Years in Business</label>
+                        <input type="number" placeholder="Years" min="0">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Primary DC Ward</label>
+                    <select>
+                        <option>Ward 1 (Adams Morgan, Columbia Heights)</option>
+                        <option>Ward 2 (Downtown, Georgetown)</option>
+                        <option>Ward 3 (Upper NW)</option>
+                        <option>Ward 4 (Petworth, Brightwood)</option>
+                        <option>Ward 5 (Brookland, Eckington)</option>
+                        <option>Ward 6 (Capitol Hill, Navy Yard)</option>
+                        <option>Ward 7 (East of the River)</option>
+                        <option>Ward 8 (Anacostia, Congress Heights)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Step 2: Financial Snapshot -->
+            <div class="step-content" id="step2">
+                <h2>Financial Snapshot</h2>
+                <p class="step-desc">Help us understand your funding requirements.</p>
+                
+                <div class="form-group">
+                    <label>Requested Funding Amount</label>
+                    <input type="text" placeholder="$0.00" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Average Monthly Revenue (Last 3 Months)</label>
+                    <input type="text" placeholder="$0.00" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Purpose of Funds</label>
+                    <select>
+                        <option>Working Capital / Payroll</option>
+                        <option>Equipment Purchase</option>
+                        <option>Expansion / Renovations</option>
+                        <option>Inventory</option>
+                        <option>Debt Consolidation</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Step 3: DC Compliance -->
+            <div class="step-content" id="step3">
+                <h2>DC Tax & Compliance</h2>
+                <p class="step-desc">Required documentation for accelerated District approval.</p>
+                
+                <div class="form-group">
+                    <label>Federal EIN</label>
+                    <input type="text" placeholder="XX-XXXXXXX" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Last 3 Months of Bank Statements</label>
+                    <div class="file-upload">
+                        <input type="file" id="bankStatements" multiple>
+                        <label for="bankStatements" class="file-upload-label">
+                            <strong>Click to upload</strong> or drag and drop<br>
+                            <small>PDF or Images (Max 20MB)</small>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="dc-tax-note">
+                    <strong>District Specific:</strong> Providing your "DC Clean Hands Certification" or proof of DC Business License can speed up approval by 24-48 hours.
+                </div>
+            </div>
+
+            <!-- Step 4: Finalization -->
+            <div class="step-content" id="step4">
+                <h2>Identity Verification</h2>
+                <p class="step-desc">Securely verify your role in the business.</p>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Direct Mobile Number</label>
+                    <input type="text" placeholder="(202) 555-0123" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Work Email Address</label>
+                    <input type="email" placeholder="name@company.com" required>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button type="button" class="btn btn-secondary" id="prevBtn" onclick="nextPrev(-1)" style="visibility: hidden;">Back</button>
+                <button type="button" class="btn btn-primary" id="nextBtn" onclick="nextPrev(1)">Next Step</button>
+            </div>
+        </form>
+
+        <div class="encryption-notice">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#94A3B8"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+            Your data is protected by industry-standard TLS encryption. No credit hard pull until offer acceptance.
+        </div>
+    </div>
+
+    <footer>
+        <p style="color: var(--text-muted); font-size: 0.7rem; letter-spacing: 1px;">© 2024 District Capital Partners | Authorized DC Financial Service Provider</p>
+    </footer>
+
+    <script>
+        let currentStep = 0;
+        const steps = document.getElementsByClassName("step-content");
+        const progressBar = document.getElementById("progressBar");
+        const labels = [
+            document.getElementById("label1"),
+            document.getElementById("label2"),
+            document.getElementById("label3"),
+            document.getElementById("label4")
+        ];
+
+        function showStep(n) {
+            steps[n].className += " active";
+            
+            if (n == 0) {
+                document.getElementById("prevBtn").style.visibility = "hidden";
+            } else {
+                document.getElementById("prevBtn").style.visibility = "visible";
+            }
+            
+            if (n == (steps.length - 1)) {
+                document.getElementById("nextBtn").innerHTML = "Submit Application";
+            } else {
+                document.getElementById("nextBtn").innerHTML = "Next Step";
+            }
+            
+            updateProgress(n);
+        }
+
+        function nextPrev(n) {
+            if (n == 1 && !validateForm()) return false;
+            
+            steps[currentStep].className = steps[currentStep].className.replace(" active", "");
+            currentStep = currentStep + n;
+            
+            if (currentStep >= steps.length) {
+                document.getElementById("applicationForm").innerHTML = `
+                    <div style="text-align:center; padding: 40px 0;">
+                        <div style="font-size: 4rem; color: var(--gold); margin-bottom: 20px;">✓</div>
+                        <h2 style="color: var(--navy)">Application Transmitted</h2>
+                        <p style="color: #64748b; margin-bottom: 30px;">A DC Funding Specialist will review your file and reach out via mobile within 4 hours.</p>
+                        <a href="index.html" class="btn btn-primary" style="display:inline-block; text-decoration:none;">Return Home</a>
+                    </div>
+                `;
+                updateProgress(3, true);
+                return false;
+            }
+            showStep(currentStep);
+        }
+
+        function validateForm() {
+            // Simplified validation for UX
+            return true;
+        }
+
+        function updateProgress(n, complete = false) {
+            let pct = complete ? 100 : ((n) / (steps.length - 1)) * 100;
+            if (pct === 0) pct = 25;
+            progressBar.style.width = pct + "%";
+            
+            labels.forEach((label, index) => {
+                if (index <= n) label.classList.add("active");
+                else label.classList.remove("active");
+            });
+        }
+    </script>
+</body>
+</html>
+```

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLAST RADIUS | Visualizer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #000000;
+            --red: #FF0000;
+            --cream: #FDFCF0;
+            --border: 4px solid #000000;
+            --shadow: 8px 8px 0px #000000;
+            --transition: 0.1s ease-in-out;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--cream);
+            font-family: 'Space Mono', monospace;
+            color: var(--black);
+            line-height: 1.2;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Archivo Black', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* --- Header --- */
+        .marquee {
+            background: var(--black);
+            color: white;
+            padding: 10px 0;
+            font-weight: bold;
+            overflow: hidden;
+            white-space: nowrap;
+            border-bottom: var(--border);
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        header {
+            border-bottom: var(--border);
+            padding: 30px 0;
+            background: var(--black);
+            color: white;
+            text-align: center;
+        }
+
+        /* --- Layout --- */
+        .visualizer-grid {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 40px;
+            margin: 40px 0;
+        }
+
+        /* --- Control Panel --- */
+        .control-panel {
+            background: white;
+            border: var(--border);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            height: fit-content;
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            border: var(--border);
+            padding: 15px;
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1rem;
+            resize: none;
+            background: var(--cream);
+        }
+
+        .theme-selector {
+            display: flex;
+            gap: 10px;
+        }
+
+        .theme-btn {
+            flex: 1;
+            padding: 10px;
+            border: var(--border);
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 0.7rem;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .theme-btn.red { background: var(--red); color: white; }
+        .theme-btn.black { background: var(--black); color: white; }
+        .theme-btn.active { outline: 4px solid var(--black); outline-offset: 2px; }
+
+        input[type="range"] {
+            width: 100%;
+            height: 10px;
+            -webkit-appearance: none;
+            background: var(--black);
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--red);
+            border: 2px solid var(--black);
+            cursor: pointer;
+        }
+
+        /* --- Preview Area --- */
+        .preview-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .blast-radius-canvas {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            max-width: 600px;
+            border: var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            box-shadow: 15px 15px 0px var(--black);
+            transition: all 0.2s ease;
+            overflow: hidden;
+        }
+
+        #preview-text {
+            font-family: 'Archivo Black', sans-serif;
+            text-transform: uppercase;
+            word-wrap: break-word;
+            z-index: 2;
+        }
+
+        /* Themes */
+        .theme-high-alert { background-color: var(--red); color: white; }
+        .theme-deep-state { background-color: var(--black); color: var(--red); }
+
+        .watermark {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            opacity: 0.5;
+        }
+
+        /* --- Actions --- */
+        .actions {
+            margin-top: 40px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .btn {
+            background: var(--cream);
+            border: var(--border);
+            padding: 20px 40px;
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            box-shadow: 6px 6px 0px var(--black);
+            transition: var(--transition);
+            width: 100%;
+        }
+
+        .btn:active {
+            box-shadow: 0px 0px 0px var(--black);
+            transform: translate(6px, 6px);
+        }
+
+        .btn-download {
+            background: var(--red);
+            color: white;
+        }
+
+        canvas#hidden-canvas {
+            display: none;
+        }
+
+        @media (max-width: 900px) {
+            .visualizer-grid { grid-template-columns: 1fr; }
+            .blast-radius-canvas { aspect-ratio: auto; min-height: 400px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="marquee">
+        <div class="marquee-content">
+            VISUALIZE THE IMPACT &nbsp; ● &nbsp; CUSTOMIZE THE SHRAPNEL &nbsp; ● &nbsp; NO BEIGE OPINIONS ALLOWED &nbsp; ● &nbsp; EXPORT THE TRUTH &nbsp; ● &nbsp; VISUALIZE THE IMPACT &nbsp; ● &nbsp; 
+        </div>
+    </div>
+
+    <header>
+        <div class="container">
+            <h1>BLAST RADIUS VISUALIZER</h1>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="visualizer-grid">
+            
+            <aside class="control-panel">
+                <div class="control-group">
+                    <label>Edit Shrapnel</label>
+                    <textarea id="quote-input">PRIVACY IS NOT A LUXURY; IT IS A WEAPON.</textarea>
+                </div>
+
+                <div class="control-group">
+                    <label>Blast Theme</label>
+                    <div class="theme-selector">
+                        <button class="theme-btn red active" onclick="setTheme('high-alert')">High Alert Red</button>
+                        <button class="theme-btn black" onclick="setTheme('deep-state')">Deep State Black</button>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Impact Scale (Font Size)</label>
+                    <input type="range" id="size-slider" min="20" max="80" value="45">
+                </div>
+
+                <div class="control-group" style="margin-top: 40px;">
+                    <button class="btn btn-download" id="download-btn">DOWNLOAD PNG</button>
+                </div>
+                
+                <p style="font-size: 0.7rem; color: #666; margin-top: 20px;">
+                    * All renders are processed client-side. No data leaves your radius.
+                </p>
+            </aside>
+
+            <section class="preview-container">
+                <div class="blast-radius-canvas theme-high-alert" id="visual-box">
+                    <div id="preview-text" style="font-size: 45px;">PRIVACY IS NOT A LUXURY; IT IS A WEAPON.</div>
+                    <div class="watermark">QUOTEGRENADE.SH</div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <canvas id="hidden-canvas" width="1080" height="1080"></canvas>
+
+    <script>
+        const quoteInput = document.getElementById('quote-input');
+        const sizeSlider = document.getElementById('size-slider');
+        const previewText = document.getElementById('preview-text');
+        const visualBox = document.getElementById('visual-box');
+        const themeBtns = document.querySelectorAll('.theme-btn');
+        const downloadBtn = document.getElementById('download-btn');
+        const hiddenCanvas = document.getElementById('hidden-canvas');
+
+        let currentTheme = 'high-alert';
+
+        // Update Text
+        quoteInput.addEventListener('input', (e) => {
+            previewText.innerText = e.target.value.toUpperCase();
+        });
+
+        // Update Size
+        sizeSlider.addEventListener('input', (e) => {
+            previewText.style.fontSize = `${e.target.value}px`;
+        });
+
+        // Update Theme
+        function setTheme(theme) {
+            currentTheme = theme;
+            visualBox.className = `blast-radius-canvas theme-${theme}`;
+            
+            themeBtns.forEach(btn => btn.classList.remove('active'));
+            if(theme === 'high-alert') themeBtns[0].classList.add('active');
+            else themeBtns[1].classList.add('active');
+        }
+
+        // Export to Canvas
+        downloadBtn.addEventListener('click', () => {
+            const ctx = hiddenCanvas.getContext('2d');
+            const size = 1080;
+            
+            // Background
+            ctx.fillStyle = currentTheme === 'high-alert' ? '#FF0000' : '#000000';
+            ctx.fillRect(0, 0, size, size);
+
+            // Text Setup
+            const textColor = currentTheme === 'high-alert' ? '#FFFFFF' : '#FF0000';
+            const fontSize = parseInt(sizeSlider.value) * 2; // Scale for 1080p
+            ctx.fillStyle = textColor;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.font = `900 ${fontSize}px "Archivo Black"`;
+
+            // Draw Wrapped Text
+            const words = quoteInput.value.toUpperCase().split(' ');
+            const lines = [];
+            let currentLine = words[0];
+
+            for (let i = 1; i < words.length; i++) {
+                let testLine = currentLine + ' ' + words[i];
+                let metrics = ctx.measureText(testLine);
+                if (metrics.width > size - 160) {
+                    lines.push(currentLine);
+                    currentLine = words[i];
+                } else {
+                    currentLine = testLine;
+                }
+            }
+            lines.push(currentLine);
+
+            const lineHeight = fontSize * 1.1;
+            const totalHeight = lines.length * lineHeight;
+            let startY = (size / 2) - (totalHeight / 2) + (lineHeight / 2);
+
+            lines.forEach((line) => {
+                ctx.fillText(line, size / 2, startY);
+                startY += lineHeight;
+            });
+
+            // Watermark
+            ctx.font = 'bold 24px "Space Mono"';
+            ctx.globalAlpha = 0.5;
+            ctx.fillText('QUOTEGRENADE.SH', size / 2, size - 60);
+            ctx.globalAlpha = 1.0;
+
+            // Trigger Download
+            const link = document.createElement('a');
+            link.download = 'blast-radius-export.png';
+            link.href = hiddenCanvas.toDataURL('image/png');
+            link.click();
+        });
+
+        // Click visual feedback
+        document.addEventListener('mousedown', () => document.body.style.backgroundColor = "#EEE");
+        document.addEventListener('mouseup', () => document.body.style.backgroundColor = "var(--cream)");
+    </script>
+</body>
+</html>

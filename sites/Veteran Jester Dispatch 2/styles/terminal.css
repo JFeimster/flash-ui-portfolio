@@ -1,0 +1,235 @@
+:root {
+    --terminal-green: #4af626;
+    --terminal-dim: #225522;
+    --terminal-bg: #0d0e0a;
+    --terminal-border: #4b5320;
+    --terminal-text-shadow: 0 0 5px rgba(74, 246, 38, 0.7);
+}
+
+/* Container & Layout */
+.war-room-container {
+    padding: 60px 0;
+}
+
+.terminal-window {
+    background-color: var(--terminal-bg);
+    border: 8px solid var(--terminal-border);
+    border-radius: 4px;
+    position: relative;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), inset 0 0 60px rgba(75, 83, 32, 0.3);
+    overflow: hidden;
+}
+
+/* CRT Scanline Effect */
+.terminal-window::before {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%, 
+        rgba(0, 0, 0, 0.15) 50%
+    );
+    background-size: 100% 4px;
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0.4;
+}
+
+/* Header/Status Bar */
+.terminal-header {
+    background: var(--terminal-border);
+    color: var(--bg-color);
+    padding: 8px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Stardos Stencil', cursive;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    background: var(--terminal-green);
+    border-radius: 50%;
+    box-shadow: var(--terminal-text-shadow);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.3; }
+    100% { opacity: 1; }
+}
+
+/* Main Content Area */
+.terminal-content {
+    padding: 40px;
+    color: var(--terminal-green);
+    font-family: 'Courier Prime', monospace;
+    text-shadow: var(--terminal-text-shadow);
+    position: relative;
+    z-index: 1;
+}
+
+/* SITREP Feed Styling */
+.sitrep-section {
+    margin-bottom: 50px;
+    border-bottom: 1px solid var(--terminal-dim);
+    padding-bottom: 30px;
+}
+
+.sitrep-title {
+    font-family: 'Stardos Stencil', cursive;
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.sitrep-title::after {
+    content: "";
+    height: 2px;
+    flex-grow: 1;
+    background: var(--terminal-dim);
+}
+
+.sitrep-entry {
+    margin-bottom: 20px;
+    padding-left: 20px;
+    border-left: 2px solid var(--terminal-dim);
+}
+
+.sitrep-meta {
+    font-weight: bold;
+    color: #fff;
+    font-family: 'Special Elite', cursive;
+    margin-right: 10px;
+}
+
+.sitrep-msg {
+    line-height: 1.4;
+    opacity: 0.9;
+}
+
+/* Intel Form Styling */
+.intel-form-section {
+    max-width: 800px;
+}
+
+.intel-form-section h2 {
+    font-family: 'Stardos Stencil', cursive;
+    color: var(--stencil-red);
+    margin-bottom: 20px;
+}
+
+.intel-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.intel-field {
+    margin-bottom: 20px;
+}
+
+.intel-field.full {
+    grid-column: span 2;
+}
+
+.intel-field label {
+    display: block;
+    font-family: 'Special Elite', cursive;
+    margin-bottom: 8px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.intel-field input, 
+.intel-field textarea {
+    width: 100%;
+    background: rgba(74, 246, 38, 0.05);
+    border: 1px solid var(--terminal-dim);
+    color: var(--terminal-green);
+    padding: 12px;
+    font-family: 'Courier Prime', monospace;
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.3s;
+}
+
+.intel-field input:focus, 
+.intel-field textarea:focus {
+    border-color: var(--terminal-green);
+    box-shadow: inset 0 0 5px var(--terminal-dim);
+}
+
+.intel-submit {
+    grid-column: span 2;
+    margin-top: 10px;
+}
+
+.terminal-btn {
+    background: var(--terminal-green);
+    color: var(--terminal-bg);
+    border: none;
+    padding: 15px 30px;
+    font-family: 'Stardos Stencil', cursive;
+    font-size: 1.2rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.terminal-btn:hover {
+    background: #fff;
+    box-shadow: 0 0 15px var(--terminal-green);
+    transform: translateY(-2px);
+}
+
+/* Blinking Cursor */
+.cursor {
+    display: inline-block;
+    width: 10px;
+    height: 1.2rem;
+    background: var(--terminal-green);
+    margin-left: 5px;
+    vertical-align: middle;
+    animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+    from, to { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* Utility: Noise Overlay */
+.noise {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url("https://www.transparenttextures.com/patterns/60-lines.png");
+    opacity: 0.05;
+    z-index: 5;
+    pointer-events: none;
+}
+
+@media (max-width: 768px) {
+    .intel-grid {
+        grid-template-columns: 1fr;
+    }
+    .intel-field.full {
+        grid-column: span 1;
+    }
+    .terminal-content {
+        padding: 20px;
+    }
+}

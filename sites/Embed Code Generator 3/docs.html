@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Integration Guide | Moonshine Capital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --bg-surface: #0f0f12;
+            --bg-elevated: #16161a;
+            --border: #26262b;
+            --border-bright: #3f3f46;
+            --neon-blue: #00f0ff;
+            --neon-green: #39ff14;
+            --text-primary: #f4f4f5;
+            --text-secondary: #a1a1aa;
+            --text-muted: #52525b;
+            --accent-gradient: linear-gradient(135deg, #00f0ff 0%, #39ff14 100%);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 10px; }
+
+        .hero {
+            padding: 4rem 2rem 3rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            background: radial-gradient(circle at bottom center, rgba(57, 255, 20, 0.03), transparent 70%);
+        }
+
+        .badge {
+            background: rgba(57, 255, 20, 0.1);
+            color: var(--neon-green);
+            padding: 2px 10px;
+            border-radius: 99px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 4rem;
+        }
+
+        @media (max-width: 968px) {
+            .container { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+        }
+
+        /* Sidebar Nav */
+        .sidebar {
+            position: sticky;
+            top: 2rem;
+            height: fit-content;
+        }
+
+        .nav-group { margin-bottom: 2rem; }
+        .nav-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+
+        .nav-link {
+            display: block;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 0.5rem 0;
+            transition: var(--transition);
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--neon-blue);
+        }
+
+        /* Documentation Content */
+        .doc-section {
+            margin-bottom: 5rem;
+            scroll-margin-top: 2rem;
+        }
+
+        .doc-section h2 {
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .doc-section h2::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: var(--accent-gradient);
+            border-radius: 2px;
+        }
+
+        .doc-section p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+
+        .code-block {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-header {
+            background: rgba(255,255,255,0.03);
+            padding: 0.75rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        pre {
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--neon-blue);
+            overflow-x: auto;
+            line-height: 1.7;
+        }
+
+        .token-keyword { color: #c678dd; }
+        .token-string { color: var(--neon-green); }
+        .token-comment { color: var(--text-muted); }
+        .token-attr { color: #d19a66; }
+
+        .prop-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: var(--bg-surface);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .prop-table th, .prop-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .prop-table th {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            background: rgba(255,255,255,0.02);
+        }
+
+        .prop-table td { font-size: 0.9rem; }
+        .prop-name { font-family: 'JetBrains Mono', monospace; color: var(--neon-blue); }
+        .type-badge {
+            font-size: 0.7rem;
+            background: var(--bg-elevated);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--text-secondary);
+        }
+
+        .info-box {
+            background: rgba(0, 240, 255, 0.05);
+            border-left: 3px solid var(--neon-blue);
+            padding: 1.25rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+
+        .info-box h4 {
+            color: var(--neon-blue);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 4rem 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="hero">
+        <div class="badge">Developer SDK</div>
+        <h1>Advanced Implementation</h1>
+        <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto;">
+            Go beyond standard iframes. Leverage our JavaScript SDK for deep integration, custom event tracking, and seamless styling.
+        </p>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="nav-group">
+                <div class="nav-title">Integration</div>
+                <a href="#js-sdk" class="nav-link active">JavaScript SDK</a>
+                <a href="#styling" class="nav-link">Custom Styling</a>
+                <a href="#events" class="nav-link">Event Callbacks</a>
+            </div>
+            <div class="nav-group">
+                <div class="nav-title">Security</div>
+                <a href="#csp" class="nav-link">CSP Whitelisting</a>
+                <a href="#auth" class="nav-link">JWT Authentication</a>
+            </div>
+            <div class="nav-group">
+                <div class="nav-title">References</div>
+                <a href="#parameters" class="nav-link">URL Parameters</a>
+                <a href="#api" class="nav-link">Webhooks API</a>
+            </div>
+        </aside>
+
+        <main class="content">
+            <!-- JS SDK Section -->
+            <section class="doc-section" id="js-sdk">
+                <h2>JavaScript SDK Loader</h2>
+                <p>The Moonshine Loader provides a more robust way to inject widgets. It automatically handles iframe resizing and passes host-page metadata to our tracking engine.</p>
+                
+                <div class="code-block">
+                    <div class="code-header"><span>HTML / JavaScript</span><span>index.html</span></div>
+                    <pre><span class="token-comment">&lt;!-- 1. Include the loader script --&gt;</span>
+&lt;<span class="token-keyword">script</span> <span class="token-attr">src</span>=<span class="token-string">"https://cdn.moonshine.capital/sdk/v2.js"</span> <span class="token-attr">async</span>&gt;&lt;/<span class="token-keyword">script</span>&gt;
+
+<span class="token-comment">&lt;!-- 2. Define the widget container --&gt;</span>
+&lt;<span class="token-keyword">div</span> 
+  <span class="token-attr">id</span>=<span class="token-string">"ms-widget-container"</span>
+  <span class="token-attr">data-ms-partner</span>=<span class="token-string">"YOUR_PARTNER_ID"</span>
+  <span class="token-attr">data-ms-type</span>=<span class="token-string">"score-card"</span>
+&gt;&lt;/<span class="token-keyword">div</span>&gt;</pre>
+                </div>
+
+                <div class="info-box">
+                    <h4>💡 Pro-Tip</h4>
+                    <p style="margin-bottom:0; font-size: 0.9rem;">The SDK will automatically look for elements with the `data-ms-widget` attribute. You can initialize multiple widgets on a single page.</p>
+                </div>
+            </section>
+
+            <!-- Styling Section -->
+            <section class="doc-section" id="styling">
+                <h2>Custom Styling</h2>
+                <p>Widgets are served in a Shadow DOM or Iframe, but you can pass CSS variables via the loader or URL params to match your brand's identity perfectly.</p>
+                
+                <table class="prop-table">
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Description</th>
+                            <th>Default</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="prop-name">--ms-primary</td>
+                            <td>Main button and accent color</td>
+                            <td><span class="type-badge">#00f0ff</span></td>
+                        </tr>
+                        <tr>
+                            <td class="prop-name">--ms-bg</td>
+                            <td>Widget background color</td>
+                            <td><span class="type-badge">#ffffff</span></td>
+                        </tr>
+                        <tr>
+                            <td class="prop-name">--ms-radius</td>
+                            <td>Border radius for inputs/buttons</td>
+                            <td><span class="type-badge">8px</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Events Section -->
+            <section class="doc-section" id="events">
+                <h2>Event Callbacks</h2>
+                <p>Listen for specific user actions within the widget to trigger your own internal analytics or CRM updates.</p>
+                
+                <div class="code-block">
+                    <div class="code-header"><span>JavaScript</span><span>analytics.js</span></div>
+                    <pre><span class="token-keyword">window</span>.addEventListener(<span class="token-string">'message'</span>, <span class="token-keyword">function</span>(event) {
+    <span class="token-keyword">if</span> (event.origin !== <span class="token-string">'https://widgets.moonshine.capital'</span>) <span class="token-keyword">return</span>;
+    
+    <span class="token-keyword">const</span> { type, payload } = event.data;
+
+    <span class="token-keyword">switch</span>(type) {
+        <span class="token-keyword">case</span> <span class="token-string">'MS_WIDGET_COMPLETED'</span>:
+            console.log(<span class="token-string">'User finished eligibility check'</span>, payload.score);
+            <span class="token-comment">// Trigger Facebook Pixel or Google Analytics here</span>
+            break;
+        <span class="token-keyword">case</span> <span class="token-string">'MS_APPLICATION_START'</span>:
+            trackLead(payload.email);
+            break;
+    }
+});</pre>
+                </div>
+            </section>
+
+            <!-- CSP Section -->
+            <section class="doc-section" id="csp">
+                <h2>Security & CSP</h2>
+                <p>If your site uses a strict Content Security Policy, you must whitelist our domains to ensure the widget loads correctly.</p>
+                
+                <div class="code-block">
+                    <div class="code-header"><span>HTTP Header</span><span>Content-Security-Policy</span></div>
+                    <pre>Content-Security-Policy: 
+  frame-src https://widgets.moonshine.capital;
+  script-src https://cdn.moonshine.capital;
+  connect-src https://api.moonshine.capital;</pre>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>&copy; 2023 Moonshine Capital. For technical support, contact <a href="mailto:dev@moonshine.capital" style="color: var(--neon-blue);">dev@moonshine.capital</a></p>
+    </footer>
+
+    <script>
+        // Simple scroll spy for sidebar links
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('.doc-section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 60) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Integration Guide | Moonshine Capital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --bg-surface: #0f0f12;
+            --bg-elevated: #16161a;
+            --border: #26262b;
+            --border-bright: #3f3f46;
+            --neon-blue: #00f0ff;
+            --neon-green: #39ff14;
+            --text-primary: #f4f4f5;
+            --text-secondary: #a1a1aa;
+            --text-muted: #52525b;
+            --accent-gradient: linear-gradient(135deg, #00f0ff 0%, #39ff14 100%);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 10px; }
+
+        .hero {
+            padding: 4rem 2rem 3rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            background: radial-gradient(circle at bottom center, rgba(57, 255, 20, 0.03), transparent 70%);
+        }
+
+        .badge {
+            background: rgba(57, 255, 20, 0.1);
+            color: var(--neon-green);
+            padding: 2px 10px;
+            border-radius: 99px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 4rem;
+        }
+
+        @media (max-width: 968px) {
+            .container { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+        }
+
+        /* Sidebar Nav */
+        .sidebar {
+            position: sticky;
+            top: 2rem;
+            height: fit-content;
+        }
+
+        .nav-group { margin-bottom: 2rem; }
+        .nav-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+
+        .nav-link {
+            display: block;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 0.5rem 0;
+            transition: var(--transition);
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--neon-blue);
+        }
+
+        /* Documentation Content */
+        .doc-section {
+            margin-bottom: 5rem;
+            scroll-margin-top: 2rem;
+        }
+
+        .doc-section h2 {
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .doc-section h2::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: var(--accent-gradient);
+            border-radius: 2px;
+        }
+
+        .doc-section p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+
+        .code-block {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-header {
+            background: rgba(255,255,255,0.03);
+            padding: 0.75rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        pre {
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--neon-blue);
+            overflow-x: auto;
+            line-height: 1.7;
+        }
+
+        .token-keyword { color: #c678dd; }
+        .token-string { color: var(--neon-green); }
+        .token-comment { color: var(--text-muted); }
+        .token-attr { color: #d19a66; }
+
+        .prop-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: var(--bg-surface);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .prop-table th, .prop-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .prop-table th {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            background: rgba(255,255,255,0.02);
+        }
+
+        .prop-table td { font-size: 0.9rem; }
+        .prop-name { font-family: 'JetBrains Mono', monospace; color: var(--neon-blue); }
+        .type-badge {
+            font-size: 0.7rem;
+            background: var(--bg-elevated);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--text-secondary);
+        }
+
+        .info-box {
+            background: rgba(0, 240, 255, 0.05);
+            border-left: 3px solid var(--neon-blue);
+            padding: 1.25rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+
+        .info-box h4 {
+            color: var(--neon-blue);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 4rem 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="hero">
+        <div class="badge">Developer SDK</div>
+        <h1>Advanced Implementation</h1>
+        <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto;">
+            Go beyond standard iframes. Leverage our JavaScript SDK for deep integration, custom event tracking, and seamless styling.
+        </p>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="nav-group">
+                <div class="nav-title">Integration</div>
+                <a href="#js-sdk" class="nav-link active">JavaScript SDK</a>
+                <a href="#styling" class="nav-link">Custom Styling</a>
+                <a href="#events" class="nav-link">Event Callbacks</a>
+            </div>
+            <div class="nav-group">
+                <div class="nav-title">Security</div>
+                <a href="#csp" class="nav-link">CSP Whitelisting</a>
+                <a href="#auth" class="nav-link">JWT Authentication</a>
+            </div>
+            <div class="nav-group">
+                <div class="nav-title">References</div>
+                <a href="#parameters" class="nav-link">URL Parameters</a>
+                <a href="#api" class="nav-link">Webhooks API</a>
+            </div>
+        </aside>
+
+        <main class="content">
+            <!-- JS SDK Section -->
+            <section class="doc-section" id="js-sdk">
+                <h2>JavaScript SDK Loader</h2>
+                <p>The Moonshine Loader provides a more robust way to inject widgets. It automatically handles iframe resizing and passes host-page metadata to our tracking engine.</p>
+                
+                <div class="code-block">
+                    <div class="code-header"><span>HTML / JavaScript</span><span>index.html</span></div>
+                    <pre><span class="token-comment">&lt;!-- 1. Include the loader script --&gt;</span>
+&lt;<span class="token-keyword">script</span> <span class="token-attr">src</span>=<span class="token-string">"https://cdn.moonshine.capital/sdk/v2.js"</span> <span class="token-attr">async</span>&gt;&lt;/<span class="token-keyword">script</span>&gt;
+
+<span class="token-comment">&lt;!-- 2. Define the widget container --&gt;</span>
+&lt;<span class="token-keyword">div</span> 
+  <span class="token-attr">id</span>=<span class="token-string">"ms-widget-container"</span>
+  <span class="token-attr">data-ms-partner</span>=<span class="token-string">"YOUR_PARTNER_ID"</span>
+  <span class="token-attr">data-ms-type</span>=<span class="token-string">"score-card"</span>
+&gt;&lt;/<span class="token-keyword">div</span>&gt;</pre>
+                </div>
+
+                <div class="info-box">
+                    <h4>💡 Pro-Tip</h4>
+                    <p style="margin-bottom:0; font-size: 0.9rem;">The SDK will automatically look for elements with the `data-ms-widget` attribute. You can initialize multiple widgets on a single page.</p>
+                </div>
+            </section>
+
+            <!-- Styling Section -->
+            <section class="doc-section" id="styling">
+                <h2>Custom Styling</h2>
+                <p>Widgets are served in a Shadow DOM or Iframe, but you can pass CSS variables via the loader or URL params to match your brand's identity perfectly.</p>
+                
+                <table class="prop-table">
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Description</th>
+                            <th>Default</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="prop-name">--ms-primary</td>
+                            <td>Main button and accent color</td>
+                            <td><span class="type-badge">#00f0ff</span></td>
+                        </tr>
+                        <tr>
+                            <td class="prop-name">--ms-bg</td>
+                            <td>Widget background color</td>
+                            <td><span class="type-badge">#ffffff</span></td>
+                        </tr>
+                        <tr>
+                            <td class="prop-name">--ms-radius</td>
+                            <td>Border radius for inputs/buttons</td>
+                            <td><span class="type-badge">8px</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Events Section -->
+            <section class="doc-section" id="events">
+                <h2>Event Callbacks</h2>
+                <p>Listen for specific user actions within the widget to trigger your own internal analytics or CRM updates.</p>
+                
+                <div class="code-block">
+                    <div class="code-header"><span>JavaScript</span><span>analytics.js</span></div>
+                    <pre><span class="token-keyword">window</span>.addEventListener(<span class="token-string">'message'</span>, <span class="token-keyword">function</span>(event) {
+    <span class="token-keyword">if</span> (event.origin !== <span class="token-string">'https://widgets.moonshine.capital'</span>) <span class="token-keyword">return</span>;
+    
+    <span class="token-keyword">const</span> { type, payload } = event.data;
+
+    <span class="token-keyword">switch</span>(type) {
+        <span class="token-keyword">case</span> <span class="token-string">'MS_WIDGET_COMPLETED'</span>:
+            console.log(<span class="token-string">'User finished eligibility check'</span>, payload.score);
+            <span class="token-comment">// Trigger Facebook Pixel or Google Analytics here</span>
+            break;
+        <span class="token-keyword">case</span> <span class="token-string">'MS_APPLICATION_START'</span>:
+            trackLead(payload.email);
+            break;
+    }
+});</pre>
+                </div>
+            </section>
+
+            <!-- CSP Section -->
+            <section class="doc-section" id="csp">
+                <h2>Security & CSP</h2>
+                <p>If your site uses a strict Content Security Policy, you must whitelist our domains to ensure the widget loads correctly.</p>
+                
+                <div class="code-block">
+                    <div class="code-header"><span>HTTP Header</span><span>Content-Security-Policy</span></div>
+                    <pre>Content-Security-Policy: 
+  frame-src https://widgets.moonshine.capital;
+  script-src https://cdn.moonshine.capital;
+  connect-src https://api.moonshine.capital;</pre>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>&copy; 2023 Moonshine Capital. For technical support, contact <a href="mailto:dev@moonshine.capital" style="color: var(--neon-blue);">dev@moonshine.capital</a></p>
+    </footer>
+
+    <script>
+        // Simple scroll spy for sidebar links
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('.doc-section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (window.pageYOffset >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

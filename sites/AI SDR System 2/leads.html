@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead Intelligence Vault - Obsidian AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --glass-bg: rgba(18, 18, 18, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent-glow: rgba(120, 120, 120, 0.15);
+            --text-primary: #e0e0e0;
+            --text-secondary: #888888;
+            --accent-color: #ffffff;
+            --success: #4ade80;
+            --warning: #fbbf24;
+            --danger: #f87171;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 50% -20%, #1a1a1a 0%, transparent 70%),
+                radial-gradient(circle at 0% 100%, #0a0a0a 0%, transparent 50%);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .sdr-container {
+            width: 100%;
+            max-width: 1200px;
+            height: 800px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+        }
+
+        /* Sidebar - Filters */
+        .config-sidebar {
+            padding: 2rem;
+            border-right: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-weight: 600;
+        }
+
+        .filter-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+        }
+
+        .range-slider {
+            width: 100%;
+            accent-color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tag-btn {
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tag-btn.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border-color: var(--accent-color);
+        }
+
+        /* Main Grid Area */
+        .main-canvas {
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .grid-header {
+            padding: 2rem 2rem 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .table-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 2rem 2rem 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        thead th {
+            text-align: left;
+            padding: 1rem;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1rem;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: 0;
+            background: var(--bg-color);
+            z-index: 10;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            transition: background 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        td {
+            padding: 1.25rem 1rem;
+            vertical-align: middle;
+        }
+
+        .prospect-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .prospect-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .prospect-meta {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .research-summary {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            max-width: 300px;
+        }
+
+        .score-pill {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: rgba(74, 222, 128, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(74, 222, 128, 0.2);
+        }
+
+        .score-pill.mid {
+            background: rgba(251, 191, 36, 0.1);
+            color: var(--warning);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-mini {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+        }
+
+        .btn-mini:hover {
+            border-color: var(--accent-color);
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-execute {
+            width: 100%;
+            padding: 1rem;
+            background: var(--accent-color);
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1rem;
+            cursor: pointer;
+            margin-top: auto;
+            transition: opacity 0.2s ease;
+        }
+
+        .breadcrumb {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-badge {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        /* Custom Scrollbar */
+        .table-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        .table-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background: var(--glass-border);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sdr-container">
+        <!-- Sidebar Filters -->
+        <aside class="config-sidebar">
+            <h2 class="header-title">Vault Filters</h2>
+            
+            <div class="filter-group">
+                <label>Min Qualification Score</label>
+                <input type="range" class="range-slider" min="0" max="100" value="75">
+                <div style="display: flex; justify-content: space-between; font-family: 'JetBrains Mono'; font-size: 0.6rem; color: var(--text-secondary);">
+                    <span>0</span>
+                    <span>75+</span>
+                    <span>100</span>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>Industry Segments</label>
+                <div class="tag-list">
+                    <button class="tag-btn active">SaaS</button>
+                    <button class="tag-btn">FinTech</button>
+                    <button class="tag-btn active">AI/ML</button>
+                    <button class="tag-btn">Web3</button>
+                    <button class="tag-btn">HealthTech</button>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>Data Freshness</label>
+                <select style="width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); color: var(--text-primary); font-size: 0.75rem; padding: 0.5rem; border-radius: 4px; outline: none;">
+                    <option>Last 24 Hours</option>
+                    <option>Last 7 Days</option>
+                    <option>All Time</option>
+                </select>
+            </div>
+
+            <button class="btn-execute">Export Verified Leads</button>
+        </aside>
+
+        <!-- Main Display -->
+        <main class="main-canvas">
+            <div class="grid-header">
+                <div>
+                    <div class="breadcrumb">
+                        <span>Engine</span> <span>/</span> <span>Intelligence Vault</span>
+                    </div>
+                    <h1 style="font-size: 1.25rem; font-weight: 400;">Lead Qualification Grid</h1>
+                </div>
+                <div style="text-align: right;">
+                    <span style="font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--text-secondary);">PROCESSED: 1,204 / QUALIFIED: 142</span>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Prospect</th>
+                            <th>Company & Niche</th>
+                            <th>AI Research Insight</th>
+                            <th>Score</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Row 1 -->
+                        <tr>
+                            <td>
+                                <div class="prospect-info">
+                                    <span class="prospect-name">Marcus Chen</span>
+                                    <span class="prospect-meta">Head of Growth</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="prospect-info">
+                                    <span class="prospect-name">Vertex AI</span>
+                                    <span class="prospect-meta">Series B • SF</span>
+                                </div>
+                            </td>
+                            <td>
+                                <p class="research-summary">Recently posted about scaling outbound infra. Scaling team from 10 to 50 this year. High technical overlap.</p>
+                            </td>
+                            <td><span class="score-pill">94/100</span></td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="btn-mini">Research</button>
+                                    <button class="btn-mini">Personalize</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- Row 2 -->
+                        <tr>
+                            <td>
+                                <div class="prospect-info">
+                                    <span class="prospect-name">Sarah Jenkins</span>
+                                    <span class="prospect-meta">Founder</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="prospect-info">
+                                    <span class="prospect-name">CloudFlow</span>
+                                    <span class="prospect-meta">Bootstrapped • NYC</span>
+                                </div>
+                            </td>
+                            <td>
+                                <p class="research-summary">Strong ICP match for workflow automation. Mentioned "efficiency bottlenecks" in recent TechCrunch interview.</p>
+                            </td>
+                            <td><span class="score-pill">88/100</span></td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="btn-mini">Research</button>
+                                    <button class="btn-mini">Personalize</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- Row 3 -->
+                        <tr>
+                            <td>
+                                <div class="prospect-info">
+                                    <span class="prospect-name">David Vargo</span>
+                                    <span class="prospect-meta">VP Sales</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="prospect-info">
+                                    <span class="prospect-name">DataNexus</span>
+                                    <span class="prospect-meta">Seed • Remote</span>
+                                </div>
+                            </td>
+                            <td>
+                                <p class="research-summary">Using legacy stack (Salesforce + Apollo). AI detected signal for "Tool Consolidation" project.</p>
+                            </td>
+                            <td><span class="score-pill mid">72/100</span></td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="btn-mini">Research</button>
+                                    <button class="btn-mini">Personalize</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- Row 4 -->
+                        <tr>
+                            <td>
+                                <div class="prospect-info">
+                                    <span class="prospect-name">Elena Rodriguez</span>
+                                    <span class="prospect-meta">Marketing Director</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="prospect-info">
+                                    <span class="prospect-name">Luminary Health</span>
+                                    <span class="prospect-meta">Public • Austin</span>
+                                </div>
+                            </td>
+                            <td>
+                                <p class="research-summary">Large enterprise scale. Complex decision chain. AI suggests targeting mid-level managers first.</p>
+                            </td>
+                            <td><span class="score-pill mid">65/100</span></td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="btn-mini">Research</button>
+                                    <button class="btn-mini">Personalize</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- Row 5 -->
+                        <tr>
+                            <td>
+                                <div class="prospect-info">
+                                    <span class="prospect-name">Jameson K.</span>
+                                    <span class="prospect-meta">CTO</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="prospect-info">
+                                    <span class="prospect-name">SynthLayer</span>
+                                    <span class="prospect-meta">Series A • London</span>
+                                </div>
+                            </td>
+                            <td>
+                                <p class="research-summary">Building internal SDR tools. Direct competitor signal detected. Proceed with caution or ignore.</p>
+                            </td>
+                            <td><span class="score-pill" style="color: var(--danger); background: rgba(248, 113, 113, 0.1); border-color: rgba(248, 113, 113, 0.2);">12/100</span></td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="btn-mini">Override</button>
+                                    <button class="btn-mini">Discard</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

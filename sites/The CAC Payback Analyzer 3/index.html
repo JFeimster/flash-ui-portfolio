@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash UI Export</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="analyzer-card">
+        <header>
+            <h1>CAC Payback Analyzer</h1>
+            <p class="tagline">IS YOUR MARKETING ENGINE BANKABLE?</p>
+        </header>
+
+        <div class="main-grid">
+            <!-- Inputs -->
+            <div class="input-group">
+                <div class="field">
+                    <label>Monthly Ad Spend</label>
+                    <div class="input-wrapper">
+                        <span>$</span>
+                        <input type="number" id="spend" value="50000" oninput="calculate()">
+                    </div>
+                </div>
+                <div class="field">
+                    <label>New Customers Added</label>
+                    <div class="input-wrapper">
+                        <span>#</span>
+                        <input type="number" id="customers" value="200" oninput="calculate()" style="padding-left: 30px;">
+                    </div>
+                </div>
+                <div class="field">
+                    <label>ARPU (Monthly Rev per User)</label>
+                    <div class="input-wrapper">
+                        <span>$</span>
+                        <input type="number" id="arpu" value="120" oninput="calculate()">
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Gross Margin %</label>
+                    <div class="input-wrapper percentage-input">
+                        <input type="number" id="margin" value="75" oninput="calculate()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visualization -->
+            <div class="output-section">
+                <div class="gauge-container">
+                    <svg class="gauge" viewBox="0 0 200 120">
+                        <path class="gauge-bg" d="M20,100 A80,80 0 0,1 180,100" />
+                        <path id="gaugeFill" class="gauge-fill" d="M20,100 A80,80 0 0,1 180,100" />
+                    </svg>
+                    <div id="needle" class="needle"></div>
+                </div>
+
+                <div class="result-metrics">
+                    <div id="paybackValue" class="payback-val">5.5</div>
+                    <div class="payback-label">MONTHS PAYBACK</div>
+                    <div id="bankabilityStatus" class="bankability-status">MONEY PRINTER DETECTED</div>
+                    <div class="cac-box">BLENDED CAC: <span id="cacValue">$250.00</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="cta-container">
+            <div class="cta-text">You have a money printer. Let us fund your CAC.</div>
+            <button class="cta-button">Apply for Growth Capital</button>
+        </div>
+
+        <button class="pdf-btn" onclick="alert('Generating Bankability Report PDF...')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            EXPORT AS .PDF
+        </button>
+    </div>
+
+    <script>
+        function calculate() {
+            const spend = parseFloat(document.getElementById('spend').value) || 0;
+            const customers = parseFloat(document.getElementById('customers').value) || 0;
+            const arpu = parseFloat(document.getElementById('arpu').value) || 0;
+            const margin = parseFloat(document.getElementById('margin').value) || 0;
+
+            const cac = customers > 0 ? spend / customers : 0;
+            const monthlyContribution = arpu * (margin / 100);
+            const payback = monthlyContribution > 0 ? cac / monthlyContribution : 0;
+
+            // Update UI
+            document.getElementById('cacValue').innerText = `$${cac.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('paybackValue').innerText = payback.toFixed(1);
+
+            // Gauge Logic
+            // Scale: 0 to 24 months. 0 is leftmost, 24 is rightmost.
+            // We want < 6 months to be in the "Good" zone.
+            // Invert the visual: Lower payback = more green (left side).
+            // Actually, let's map 0-24 months to -90 to +90 degrees.
+            let clampedPayback = Math.min(Math.max(payback, 0), 24);
+            let percentage = clampedPayback / 24;
+            
+            // Rotation: -90deg is 0 months, +90deg is 24 months
+            let rotation = -90 + (percentage * 180);
+            document.getElementById('needle').style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+
+            // Path Dashoffset (Full is 282)
+            const fill = document.getElementById('gaugeFill');
+            fill.style.strokeDashoffset = 282 - (percentage * 282);
+
+            // Status Logic
+            const statusEl = document.getElementById('bankabilityStatus');
+            if (payback <= 6) {
+                statusEl.innerText = "MONEY PRINTER DETECTED";
+                statusEl.className = "bankability-status status-bankable";
+                fill.style.stroke = "var(--accent)";
+            } else if (payback <= 12) {
+                statusEl.innerText = "EFFICIENT ENGINE";
+                statusEl.className = "bankability-status status-neutral";
+                fill.style.stroke = "var(--warning)";
+            } else {
+                statusEl.innerText = "HIGH ACQUISITION RISK";
+                statusEl.className = "bankability-status status-risky";
+                fill.style.stroke = "var(--danger)";
+            }
+        }
+
+        // Init
+        calculate();
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campaign Command Center | Obsidian AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --glass-bg: rgba(18, 18, 18, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent-glow: rgba(120, 120, 120, 0.15);
+            --text-primary: #e0e0e0;
+            --text-secondary: #888888;
+            --accent-color: #ffffff;
+            --danger-color: #ff4d4d;
+            --success-color: #4ade80;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 50% -20%, #1a1a1a 0%, transparent 70%),
+                radial-gradient(circle at 100% 100%, #0a0a0a 0%, transparent 50%);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+        }
+
+        .command-container {
+            width: 100%;
+            max-width: 1200px;
+            height: 850px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            overflow: hidden;
+        }
+
+        /* Sidebar Controls */
+        .control-sidebar {
+            padding: 2rem;
+            border-right: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .global-stat {
+            margin-bottom: 2.5rem;
+        }
+
+        .global-stat .val {
+            font-size: 1.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            display: block;
+        }
+
+        .global-stat .lbl {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .action-menu {
+            margin-top: auto;
+        }
+
+        .btn-action {
+            width: 100%;
+            padding: 0.75rem;
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            border-radius: 6px;
+            font-size: 0.75rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .btn-action:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        .btn-action.primary {
+            background: var(--accent-color);
+            color: #000;
+            font-weight: 600;
+        }
+
+        /* Main Dashboard */
+        .dashboard-view {
+            padding: 2rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .view-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 2.5rem;
+        }
+
+        .view-title h1 {
+            font-size: 1.5rem;
+            font-weight: 400;
+            letter-spacing: -0.02em;
+        }
+
+        .view-title p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Campaign Cards */
+        .campaign-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .campaign-row {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            display: grid;
+            grid-template-columns: 220px 1fr 180px;
+            align-items: center;
+            gap: 2rem;
+            transition: background 0.3s ease;
+        }
+
+        .campaign-row:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .campaign-info .loc {
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: block;
+        }
+
+        .campaign-info .niche {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Status Pipeline Bar */
+        .pipeline-status {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .status-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .step-label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+            color: var(--text-secondary);
+        }
+
+        .step-label.active {
+            color: var(--accent-color);
+        }
+
+        .progress-track {
+            height: 4px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 2px;
+            display: flex;
+            gap: 4px;
+        }
+
+        .progress-seg {
+            flex: 1;
+            height: 100%;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+        }
+
+        .progress-seg.complete {
+            background: var(--accent-color);
+            box-shadow: 0 0 8px rgba(255,255,255,0.3);
+        }
+
+        .progress-seg.loading {
+            background: var(--accent-color);
+            animation: pulse-seg 1.5s infinite;
+        }
+
+        @keyframes pulse-seg {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+
+        /* Controls */
+        .campaign-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+
+        .vol-indicator {
+            text-align: right;
+            margin-right: 1rem;
+        }
+
+        .vol-num {
+            display: block;
+            font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .vol-lbl {
+            font-size: 0.6rem;
+            color: var(--text-secondary);
+        }
+
+        .mini-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            border: 1px solid var(--glass-border);
+            background: transparent;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .mini-btn:hover {
+            border-color: var(--text-secondary);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .mini-btn.pause:hover {
+            color: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+
+        /* Utilities */
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .dot-green { background: var(--success-color); box-shadow: 0 0 8px var(--success-color); }
+        .dot-pulse { animation: pulse 2s infinite; }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--glass-border);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="command-container">
+        <aside class="control-sidebar">
+            <h2 class="nav-label">Global Overview</h2>
+            
+            <div class="global-stat">
+                <span class="val">12</span>
+                <span class="lbl">Active Campaigns</span>
+            </div>
+
+            <div class="global-stat">
+                <span class="val">842</span>
+                <span class="lbl">Daily Target</span>
+            </div>
+
+            <div class="global-stat">
+                <span class="val">14.2%</span>
+                <span class="lbl">Avg. Response Rate</span>
+            </div>
+
+            <div class="action-menu">
+                <h2 class="nav-label">System Actions</h2>
+                <button class="btn-action primary">
+                    <span>New Campaign</span>
+                    <span>+</span>
+                </button>
+                <button class="btn-action">
+                    <span>Global Pause</span>
+                    <span>||</span>
+                </button>
+                <button class="btn-action">
+                    <span>Export Reports</span>
+                    <span>↓</span>
+                </button>
+            </div>
+        </aside>
+
+        <main class="dashboard-view">
+            <header class="view-header">
+                <div class="view-title">
+                    <h1>Command Center</h1>
+                    <p>Live Outreach Performance & Pipeline Status</p>
+                </div>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-secondary);">
+                    SYSTEM_CLOCK: 14:22:09 UTC
+                </div>
+            </header>
+
+            <div class="campaign-list">
+                <!-- Campaign 1 -->
+                <div class="campaign-row">
+                    <div class="campaign-info">
+                        <span class="loc"><span class="status-dot dot-green dot-pulse"></span>San Francisco</span>
+                        <span class="niche">SaaS Founders / Series A</span>
+                    </div>
+                    <div class="pipeline-status">
+                        <div class="status-steps">
+                            <span class="step-label">Research</span>
+                            <span class="step-label">Qualify</span>
+                            <span class="step-label active">Personalize</span>
+                            <span class="step-label">Follow-up</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-seg complete"></div>
+                            <div class="progress-seg complete"></div>
+                            <div class="progress-seg loading"></div>
+                            <div class="progress-seg"></div>
+                        </div>
+                    </div>
+                    <div class="campaign-actions">
+                        <div class="vol-indicator">
+                            <span class="vol-num">150/d</span>
+                            <span class="vol-lbl">Outreach</span>
+                        </div>
+                        <button class="mini-btn">↑</button>
+                        <button class="mini-btn">↓</button>
+                        <button class="mini-btn pause">||</button>
+                    </div>
+                </div>
+
+                <!-- Campaign 2 -->
+                <div class="campaign-row">
+                    <div class="campaign-info">
+                        <span class="loc"><span class="status-dot dot-green dot-pulse"></span>Austin, TX</span>
+                        <span class="niche">E-com Directors / $10M+</span>
+                    </div>
+                    <div class="pipeline-status">
+                        <div class="status-steps">
+                            <span class="step-label">Research</span>
+                            <span class="step-label">Qualify</span>
+                            <span class="step-label">Personalize</span>
+                            <span class="step-label active">Follow-up</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-seg complete"></div>
+                            <div class="progress-seg complete"></div>
+                            <div class="progress-seg complete"></div>
+                            <div class="progress-seg loading"></div>
+                        </div>
+                    </div>
+                    <div class="campaign-actions">
+                        <div class="vol-indicator">
+                            <span class="vol-num">85/d</span>
+                            <span class="vol-lbl">Outreach</span>
+                        </div>
+                        <button class="mini-btn">↑</button>
+                        <button class="mini-btn">↓</button>
+                        <button class="mini-btn pause">||</button>
+                    </div>
+                </div>
+
+                <!-- Campaign 3 -->
+                <div class="campaign-row">
+                    <div class="campaign-info">
+                        <span class="loc"><span class="status-dot dot-green dot-pulse"></span>London, UK</span>
+                        <span class="niche">FinTech / CTOs</span>
+                    </div>
+                    <div class="pipeline-status">
+                        <div class="status-steps">
+                            <span class="step-label active">Research</span>
+                            <span class="step-label">Qualify</span>
+                            <span class="step-label">Personalize</span>
+                            <span class="step-label">Follow-up</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-seg loading"></div>
+                            <div class="progress-seg"></div>
+                            <div class="progress-seg"></div>
+                            <div class="progress-seg"></div>
+                        </div>
+                    </div>
+                    <div class="campaign-actions">
+                        <div class="vol-indicator">
+                            <span class="vol-num">200/d</span>
+                            <span class="vol-lbl">Outreach</span>
+                        </div>
+                        <button class="mini-btn">↑</button>
+                        <button class="mini-btn">↓</button>
+                        <button class="mini-btn pause">||</button>
+                    </div>
+                </div>
+
+                <!-- Campaign 4 -->
+                <div class="campaign-row">
+                    <div class="campaign-info">
+                        <span class="loc" style="color: var(--text-secondary);"><span class="status-dot" style="background: #444;"></span>Berlin, DE</span>
+                        <span class="niche">Clean Energy / VP Sales</span>
+                    </div>
+                    <div class="pipeline-status">
+                        <div class="status-steps">
+                            <span class="step-label">System Paused</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-seg" style="background: rgba(255,255,255,0.03);"></div>
+                            <div class="progress-seg" style="background: rgba(255,255,255,0.03);"></div>
+                            <div class="progress-seg" style="background: rgba(255,255,255,0.03);"></div>
+                            <div class="progress-seg" style="background: rgba(255,255,255,0.03);"></div>
+                        </div>
+                    </div>
+                    <div class="campaign-actions">
+                        <div class="vol-indicator">
+                            <span class="vol-num" style="color: var(--text-secondary);">0/d</span>
+                            <span class="vol-lbl">Outreach</span>
+                        </div>
+                        <button class="mini-btn">↑</button>
+                        <button class="mini-btn">↓</button>
+                        <button class="mini-btn" style="color: var(--success-color);">▶</button>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: auto; padding-top: 2rem; display: flex; justify-content: space-between; border-top: 1px solid var(--glass-border);">
+                <div style="font-size: 0.65rem; color: var(--text-secondary); display: flex; gap: 1.5rem;">
+                    <span>LATENCY: 42ms</span>
+                    <span>API_STATUS: OPERATIONAL</span>
+                    <span>NODES: 04 ACTIVE</span>
+                </div>
+                <div style="font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">
+                    Obsidian Engine v2.4.1
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

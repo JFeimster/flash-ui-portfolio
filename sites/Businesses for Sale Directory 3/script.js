@@ -1,0 +1,181 @@
+const listings = [
+            { id: 1, title: "Precision HVAC & Cooling", industry: "Local Service", location: "Austin, TX", price: 1200000, revenue: 3500000, sde: 450000, multiple: 2.6, sellerFin: true, featured: true, status: "Active", risk: "Low", category: "Local Service" },
+            { id: 2, title: "Shopify Home Decor Brand", industry: "Ecommerce", location: "Remote", price: 850000, revenue: 1800000, sde: 280000, multiple: 3.0, sellerFin: false, featured: false, status: "Under Intent", risk: "High", category: "Ecommerce" },
+            { id: 3, title: "Boutique SEO Agency", industry: "Agencies", location: "Remote", price: 450000, revenue: 600000, sde: 180000, multiple: 2.5, sellerFin: true, featured: false, status: "Active", risk: "Medium", category: "Agencies" },
+            { id: 4, title: "Laundromat Portfolio (3 Units)", industry: "Local Service", location: "Phoenix, AZ", price: 950000, revenue: 400000, sde: 220000, multiple: 4.3, sellerFin: true, featured: true, status: "Active", risk: "Low", category: "Local Service" },
+            { id: 5, title: "Logistics SaaS (ERP)", industry: "SaaS", location: "Remote", price: 2400000, revenue: 900000, sde: 600000, multiple: 4.0, sellerFin: false, featured: true, status: "Active", risk: "Low", category: "SaaS" },
+            { id: 6, title: "Medical Cleaning Contract", industry: "Local Service", location: "Miami, FL", price: 325000, revenue: 750000, sde: 120000, multiple: 2.7, sellerFin: true, featured: false, status: "Hot Deal", risk: "Low", category: "Local Service" },
+            { id: 7, title: "Amazon FBA - Pet Supplies", industry: "Ecommerce", location: "Remote", price: 1800000, revenue: 4200000, sde: 550000, multiple: 3.2, sellerFin: false, featured: false, status: "Active", risk: "Medium", category: "Ecommerce" },
+            { id: 8, title: "FedEx Ground Route (5 Trucks)", industry: "Route Businesses", location: "Chicago, IL", price: 650000, revenue: 1200000, sde: 190000, multiple: 3.4, sellerFin: true, featured: false, status: "Active", risk: "Medium", category: "Route Businesses" },
+            { id: 9, title: "Specialty Coffee Roastery", industry: "Local Service", location: "Portland, OR", price: 550000, revenue: 1100000, sde: 140000, multiple: 3.9, sellerFin: true, featured: false, status: "Active", risk: "Low", category: "Local Service" },
+            { id: 10, title: "Mobile Auto Detail Franchise", industry: "Franchises", location: "Dallas, TX", price: 275000, revenue: 450000, sde: 110000, multiple: 2.5, sellerFin: true, featured: false, status: "Active", risk: "Low", category: "Franchises" },
+            { id: 11, title: "Crypto Portfolio Tracker SaaS", industry: "SaaS", location: "Remote", price: 120000, revenue: 45000, sde: 35000, multiple: 3.4, sellerFin: false, featured: false, status: "Active", risk: "High", category: "SaaS" },
+            { id: 12, title: "Concrete Paving & Repair", industry: "Local Service", location: "Denver, CO", price: 3100000, revenue: 8500000, sde: 1100000, multiple: 2.8, sellerFin: true, featured: true, status: "Active", risk: "Low", category: "Local Service" }
+        ];
+
+        const grid = document.getElementById('listingsGrid');
+        const searchInput = document.getElementById('searchInput');
+        const filterPrice = document.getElementById('filterPrice');
+        const filterSDE = document.getElementById('filterSDE');
+        const filterTerms = document.getElementById('filterTerms');
+        const sortOrder = document.getElementById('sortOrder');
+        const categoryRail = document.getElementById('categoryRail');
+
+        function formatCurrency(num) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(num);
+        }
+
+        function renderListings(data) {
+            grid.innerHTML = '';
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'listing-card';
+                card.innerHTML = `
+                    <div class="save-btn" onclick="toggleSave(${item.id}, this)">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    </div>
+                    <span class="industry-tag">${item.industry}</span>
+                    <h3 class="listing-title">${item.title}</h3>
+                    <span class="price-display">${formatCurrency(item.price)}</span>
+                    <div class="metrics-grid">
+                        <div class="metric-box">
+                            <span class="label">Annual Revenue</span>
+                            <span class="value">${formatCurrency(item.revenue)}</span>
+                        </div>
+                        <div class="metric-box">
+                            <span class="label">Annual SDE</span>
+                            <span class="value">${formatCurrency(item.sde)}</span>
+                        </div>
+                        <div class="metric-box">
+                            <span class="label">Multiple</span>
+                            <span class="value">${item.multiple}x</span>
+                        </div>
+                        <div class="metric-box">
+                            <span class="label">Location</span>
+                            <span class="value">${item.location}</span>
+                        </div>
+                    </div>
+                    <div class="badge-row">
+                        ${item.sellerFin ? '<span class="badge badge-green">Seller Financing</span>' : ''}
+                        ${item.featured ? '<span class="badge badge-copper">Premium Asset</span>' : ''}
+                        ${item.status !== 'Active' ? `<span class="badge badge-orange">${item.status}</span>` : ''}
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn btn-primary" onclick="openDeal(${item.id})">View Deal</button>
+                        <button class="btn btn-secondary" onclick="analyzeDeal(${item.id})">Analyze</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterListings() {
+            let filtered = [...listings];
+            const search = searchInput.value.toLowerCase();
+            const price = filterPrice.value;
+            const sde = filterSDE.value;
+            const terms = filterTerms.value;
+            const activeCat = document.querySelector('.cat-pill.active').innerText;
+
+            if (search) {
+                filtered = filtered.filter(l => l.title.toLowerCase().includes(search) || l.industry.toLowerCase().includes(search));
+            }
+            if (price !== 'all') {
+                filtered = filtered.filter(l => l.price <= parseInt(price));
+            }
+            if (sde !== 'all') {
+                filtered = filtered.filter(l => l.sde >= parseInt(sde));
+            }
+            if (terms === 'seller') {
+                filtered = filtered.filter(l => l.sellerFin);
+            }
+            if (activeCat !== 'ALL ASSETS') {
+                filtered = filtered.filter(l => l.category.toUpperCase() === activeCat);
+            }
+
+            // Sorting
+            const sort = sortOrder.value;
+            if (sort === 'price-low') filtered.sort((a,b) => a.price - b.price);
+            if (sort === 'cash-high') filtered.sort((a,b) => b.sde - a.sde);
+            if (sort === 'newest') filtered.sort((a,b) => b.id - a.id);
+
+            renderListings(filtered);
+        }
+
+        function toggleSave(id, el) {
+            el.classList.toggle('active');
+            let saved = JSON.parse(localStorage.getItem('savedDeals') || '[]');
+            if (saved.includes(id)) {
+                saved = saved.filter(x => x !== id);
+            } else {
+                saved.push(id);
+            }
+            localStorage.setItem('savedDeals', JSON.stringify(saved));
+        }
+
+        const modal = document.getElementById('dealModal');
+        const modalBody = document.getElementById('modalBody');
+
+        function openDeal(id) {
+            const deal = listings.find(l => l.id === id);
+            modalBody.innerHTML = `
+                <span class="industry-tag">${deal.industry}</span>
+                <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">${deal.title}</h1>
+                <p class="mono" style="color: var(--acid-green); font-size: 1.5rem; margin-bottom: 2rem;">Asking Price: ${formatCurrency(deal.price)}</p>
+                <div class="metrics-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 2rem;">
+                    <div class="metric-box"><span class="label">Revenue</span><span class="value">${formatCurrency(deal.revenue)}</span></div>
+                    <div class="metric-box"><span class="label">SDE</span><span class="value">${formatCurrency(deal.sde)}</span></div>
+                    <div class="metric-box"><span class="label">Multiple</span><span class="value">${deal.multiple}x</span></div>
+                </div>
+                <div style="background: #111; padding: 2rem; border-left: 4px solid var(--oxidized-copper); margin-bottom: 2rem;">
+                    <h4 class="mono" style="margin-bottom: 1rem;">Executive Summary</h4>
+                    <p style="color: #aaa; font-size: 0.9rem;">This asset represents a high-barrier entry into the ${deal.industry} sector. Significant room for operational optimization and digital transformation. Owner is willing to provide a transition period of 90 days.</p>
+                </div>
+                <button class="btn btn-primary" style="width: 100%;">REQUEST FULL PROSPECTUS (NDA REQUIRED)</button>
+            `;
+            modal.style.display = 'flex';
+        }
+
+        function analyzeDeal(id) {
+            const deal = listings.find(l => l.id === id);
+            const loanAmount = deal.price * 0.8;
+            modalBody.innerHTML = `
+                <h2 class="mono">DEAL ANALYZER: ${deal.title}</h2>
+                <div style="margin-top: 2rem;">
+                    <div class="metric-box" style="margin-bottom: 1rem;">
+                        <span class="label">Estimated Debt Service (SBA 7a @ 11%)</span>
+                        <span class="value" style="color: var(--blood-orange);">${formatCurrency(loanAmount * 0.15)} / Year</span>
+                    </div>
+                    <div class="metric-box" style="margin-bottom: 1rem;">
+                        <span class="label">Post-Debt Cash Flow</span>
+                        <span class="value" style="color: var(--acid-green);">${formatCurrency(deal.sde - (loanAmount * 0.15))} / Year</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="label">ROI on Equity (assuming 10% down)</span>
+                        <span class="value" style="color: var(--bone);">${Math.round(((deal.sde - (loanAmount * 0.15)) / (deal.price * 0.1)) * 100)}%</span>
+                    </div>
+                </div>
+                <p class="mono" style="font-size: 0.7rem; margin-top: 2rem; color: #555;">* Calculations are estimates for initial screening only.</p>
+            `;
+            modal.style.display = 'flex';
+        }
+
+        document.querySelector('.close-modal').onclick = () => modal.style.display = 'none';
+        window.onclick = (e) => { if (e.target == modal) modal.style.display = 'none'; }
+
+        searchInput.oninput = filterListings;
+        filterPrice.onchange = filterListings;
+        filterSDE.onchange = filterListings;
+        filterTerms.onchange = filterListings;
+        sortOrder.onchange = filterListings;
+
+        categoryRail.addEventListener('click', (e) => {
+            if (e.target.classList.contains('cat-pill')) {
+                document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+                e.target.classList.add('active');
+                filterListings();
+            }
+        });
+
+        // Initialize
+        renderListings(listings);

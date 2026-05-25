@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUYER COMMAND CENTER // Acquisition Index</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --obsidian: #050505;
+            --graphite: #141414;
+            --bone: #F5F5F0;
+            --acid-green: #C5FF00;
+            --copper: #8B9D83;
+            --blood-orange: #FF3D00;
+            --cream: #FFFDE7;
+            --border-width: 2px;
+            --grain-opacity: 0.04;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--bone);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.4;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Texture Overlay */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3BaseFilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/feFilter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: var(--grain-opacity);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* Typography */
+        h1, h2, h3 { text-transform: uppercase; letter-spacing: -0.02em; font-weight: 900; }
+        .mono { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; }
+        .editorial { font-family: 'Playfair Display', serif; font-style: italic; text-transform: none; }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 2rem;
+            border-bottom: var(--border-width) solid var(--graphite);
+            background: var(--obsidian);
+            z-index: 100;
+        }
+
+        .logo { font-weight: 900; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+        .logo span { background: var(--acid-green); color: var(--obsidian); padding: 1px 4px; }
+
+        /* Ticker */
+        .ticker-wrap {
+            width: 100%;
+            overflow: hidden;
+            background: var(--graphite);
+            border-bottom: 1px solid var(--acid-green);
+            padding: 0.5rem 0;
+        }
+
+        .ticker {
+            display: flex;
+            white-space: nowrap;
+            animation: ticker 30s linear infinite;
+        }
+
+        .ticker-item {
+            padding: 0 2rem;
+            color: var(--acid-green);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+        }
+
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* Dashboard Layout */
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            flex: 1;
+        }
+
+        /* Sidebar Left */
+        .sidebar-left {
+            border-right: 1px solid var(--graphite);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .user-card {
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--graphite);
+        }
+
+        .user-id { font-size: 1.5rem; font-weight: 900; margin-bottom: 0.5rem; }
+        .status-dot { height: 8px; width: 8px; background: var(--acid-green); border-radius: 50%; display: inline-block; margin-right: 5px; }
+
+        .nav-stack { display: flex; flex-direction: column; gap: 0.75rem; }
+        .nav-stack a {
+            text-decoration: none;
+            color: var(--copper);
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            padding: 0.5rem 0;
+            transition: color 0.2s;
+        }
+        .nav-stack a:hover, .nav-stack a.active { color: var(--acid-green); }
+
+        /* Main Content */
+        .main-feed {
+            padding: 2rem;
+            overflow-y: auto;
+            max-height: calc(100vh - 120px);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 2rem;
+            border-bottom: var(--border-width) solid var(--bone);
+            padding-bottom: 1rem;
+        }
+
+        /* Saved Deals Density Layout */
+        .saved-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .mini-card {
+            background: var(--graphite);
+            padding: 1.5rem;
+            border: 1px solid transparent;
+            transition: border-color 0.2s;
+            position: relative;
+        }
+
+        .mini-card:hover {
+            border-color: var(--acid-green);
+        }
+
+        .mini-card .price-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: var(--acid-green);
+            margin: 0.5rem 0;
+        }
+
+        .alert-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            background: var(--blood-orange);
+            color: var(--bone);
+        }
+
+        /* Outreach CRM Table */
+        .outreach-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        .outreach-table th {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid var(--bone);
+            color: var(--copper);
+            font-family: 'JetBrains Mono';
+        }
+
+        .outreach-table td {
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid var(--graphite);
+        }
+
+        .status-pill {
+            padding: 4px 8px;
+            border: 1px solid currentColor;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-nda { color: var(--acid-green); }
+        .status-loi { color: var(--blood-orange); }
+        .status-review { color: var(--copper); }
+
+        /* Sidebar Right: Market Insights */
+        .sidebar-right {
+            border-left: 1px solid var(--graphite);
+            padding: 2rem;
+            background: rgba(20, 20, 20, 0.3);
+        }
+
+        .metric-block {
+            margin-bottom: 3rem;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #222;
+            width: 100%;
+            position: relative;
+        }
+
+        .progress-fill {
+            position: absolute;
+            height: 100%;
+            background: var(--acid-green);
+        }
+
+        .log-entry {
+            font-family: 'JetBrains Mono';
+            font-size: 0.7rem;
+            margin-bottom: 1rem;
+            padding-left: 10px;
+            border-left: 2px solid var(--graphite);
+        }
+
+        .log-time { color: var(--copper); margin-right: 5px; }
+
+        @media (max-width: 1200px) {
+            .dashboard-container { grid-template-columns: 250px 1fr; }
+            .sidebar-right { display: none; }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container { grid-template-columns: 1fr; }
+            .sidebar-left { display: none; }
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            background: var(--bone);
+            color: var(--obsidian);
+            font-weight: 900;
+            font-size: 0.65rem;
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+
+        .btn-sm:hover { background: var(--acid-green); }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">ACQUISITION <span>INDEX</span></div>
+        <div class="nav-links mono">
+            <span style="color: var(--acid-green)">BUYER_TERMINAL_V.2.04</span>
+        </div>
+    </nav>
+
+    <div class="ticker-wrap">
+        <div class="ticker">
+            <div class="ticker-item">NEW LISTING: SAAS / LOGISTICS // $4.2M ASKING // 3.8X SDE</div>
+            <div class="ticker-item">PRICE DROP: CHICAGO LAUNDROMAT (-15%)</div>
+            <div class="ticker-item">ALERT: OFF-MARKET HVAC PORTFOLIO DETECTED (AUSTIN, TX)</div>
+            <div class="ticker-item">MARKET MULTIPLE AVG: 2.84X [STABLE]</div>
+            <div class="ticker-item">CAPITAL FLOW: +$12M VENTURE DEBT ADDED TO POOL</div>
+            <div class="ticker-item">NEW LISTING: SAAS / LOGISTICS // $4.2M ASKING // 3.8X SDE</div>
+            <div class="ticker-item">PRICE DROP: CHICAGO LAUNDROMAT (-15%)</div>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Sidebar Left -->
+        <aside class="sidebar-left">
+            <div class="user-card">
+                <div class="mono" style="color: var(--copper)">Active Operator</div>
+                <div class="user-id">SEARCHER_774</div>
+                <div class="mono" style="font-size: 0.6rem;"><span class="status-dot"></span> System Online</div>
+            </div>
+
+            <nav class="nav-stack">
+                <a href="#" class="active">Overview</a>
+                <a href="#">Saved Pipeline (12)</a>
+                <a href="#">Outreach Logs</a>
+                <a href="#">Deal Analyzer</a>
+                <a href="#">Financing Vault</a>
+                <a href="#">Settings</a>
+            </nav>
+
+            <div style="margin-top: auto; padding: 1.5rem; background: var(--graphite); border-left: 2px solid var(--blood-orange);">
+                <div class="mono" style="color: var(--blood-orange); margin-bottom: 0.5rem;">Urgent Alert</div>
+                <p style="font-size: 0.75rem;">NDA expiring on "Project Blue Sky" in 48 hours.</p>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-feed">
+            <div class="section-header">
+                <h2>Saved <span class="editorial">Alpha</span></h2>
+                <div class="mono">12 Active Tracks</div>
+            </div>
+
+            <div class="saved-grid">
+                <div class="mini-card">
+                    <div class="alert-badge mono">PRICE DROP</div>
+                    <div class="mono" style="color: var(--copper)">Service // Phoenix, AZ</div>
+                    <h3 style="font-size: 1rem; margin-top: 0.5rem;">Auto Repair Master</h3>
+                    <div class="price-tag">$550,000</div>
+                    <div class="mono" style="font-size: 0.6rem;">SDE: $180k // 3.0x</div>
+                    <div style="margin-top: 1rem;">
+                        <a href="#" class="btn-sm">View Analysis</a>
+                    </div>
+                </div>
+
+                <div class="mini-card">
+                    <div class="mono" style="color: var(--copper)">Tech // Remote</div>
+                    <h3 style="font-size: 1rem; margin-top: 0.5rem;">Shopify SaaS Widget</h3>
+                    <div class="price-tag">$450,000</div>
+                    <div class="mono" style="font-size: 0.6rem;">SDE: $150k // 3.0x</div>
+                    <div style="margin-top: 1rem;">
+                        <a href="#" class="btn-sm">View Analysis</a>
+                    </div>
+                </div>
+
+                <div class="mini-card">
+                    <div class="mono" style="color: var(--copper)">Retail // Portland, OR</div>
+                    <h3 style="font-size: 1rem; margin-top: 0.5rem;">Specialty Coffee Roastery</h3>
+                    <div class="price-tag">$650,000</div>
+                    <div class="mono" style="font-size: 0.6rem;">SDE: $210k // 3.1x</div>
+                    <div style="margin-top: 1rem;">
+                        <a href="#" class="btn-sm">View Analysis</a>
+                    </div>
+                </div>
+
+                <div class="mini-card">
+                    <div class="mono" style="color: var(--copper)">Logistics // Atlanta, GA</div>
+                    <h3 style="font-size: 1rem; margin-top: 0.5rem;">FedEx Route Delivery</h3>
+                    <div class="price-tag">$950,000</div>
+                    <div class="mono" style="font-size: 0.6rem;">SDE: $280k // 3.3x</div>
+                    <div style="margin-top: 1rem;">
+                        <a href="#" class="btn-sm">View Analysis</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-header">
+                <h2>Outreach <span class="editorial">Manager</span></h2>
+                <div class="mono">Broker CRM</div>
+            </div>
+
+            <table class="outreach-table">
+                <thead>
+                    <tr>
+                        <th class="mono">Deal Name</th>
+                        <th class="mono">Broker</th>
+                        <th class="mono">Status</th>
+                        <th class="mono">Last Touch</th>
+                        <th class="mono">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>HVAC Operator Austin</strong></td>
+                        <td>Quiet Light</td>
+                        <td><span class="status-pill status-loi">LOI Submitted</span></td>
+                        <td class="mono">2h ago</td>
+                        <td><a href="#" style="color: var(--acid-green); font-weight: 700;">Ping</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>B2B Content Tool</strong></td>
+                        <td>Empire Flippers</td>
+                        <td><span class="status-pill status-nda">NDA Signed</span></td>
+                        <td class="mono">1d ago</td>
+                        <td><a href="#" style="color: var(--acid-green); font-weight: 700;">Files</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Laundromat Portfolio</strong></td>
+                        <td>Direct Reach</td>
+                        <td><span class="status-pill status-review">Data Room Review</span></td>
+                        <td class="mono">3d ago</td>
+                        <td><a href="#" style="color: var(--acid-green); font-weight: 700;">Ping</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </main>
+
+        <!-- Sidebar Right -->
+        <aside class="sidebar-right">
+            <div class="metric-block">
+                <h4 class="mono" style="margin-bottom: 1.5rem; color: var(--acid-green);">Search Parameters</h4>
+                <div class="metric-row">
+                    <div class="mono">Capital Deployed</div>
+                    <div class="mono">$1.2M / $5.0M</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 24%;"></div>
+                </div>
+                <div class="metric-row" style="margin-top: 1.5rem;">
+                    <div class="mono">Target Multiple</div>
+                    <div class="mono">MAX 3.5x</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 70%;"></div>
+                </div>
+            </div>
+
+            <div class="metric-block">
+                <h4 class="mono" style="margin-bottom: 1.5rem; color: var(--acid-green);">Real-Time Activity</h4>
+                <div class="log-entry">
+                    <span class="log-time">14:22</span> Broker 'Quiet Light' updated files for Project Alpha.
+                </div>
+                <div class="log-entry">
+                    <span class="log-time">12:05</span> Automated crawler found 3 matching SaaS deals on MicroAcquire.
+                </div>
+                <div class="log-entry">
+                    <span class="log-time">09:44</span> LOI draft for 'Auto Repair' generated by system.
+                </div>
+                <div class="log-entry">
+                    <span class="log-time">Yesterday</span> Search criteria 'E-commerce' flagged for high volatility.
+                </div>
+            </div>
+
+            <div style="background: var(--obsidian); border: 1px solid var(--graphite); padding: 1.5rem;">
+                <h4 class="mono" style="margin-bottom: 1rem;">Quick Tools</h4>
+                <button style="width: 100%; padding: 0.75rem; background: transparent; border: 1px solid var(--bone); color: var(--bone); text-transform: uppercase; font-weight: 700; font-size: 0.7rem; margin-bottom: 0.5rem; cursor: pointer;">Generate NDA</button>
+                <button style="width: 100%; padding: 0.75rem; background: var(--acid-green); border: none; color: var(--obsidian); text-transform: uppercase; font-weight: 900; font-size: 0.7rem; cursor: pointer;">Connect Broker API</button>
+            </div>
+        </aside>
+    </div>
+
+    <footer style="padding: 1.5rem 2rem; border-top: 1px solid var(--graphite); background: var(--obsidian); display: flex; justify-content: space-between; align-items: center;">
+        <div class="mono" style="font-size: 0.6rem; color: var(--copper);">
+            LATENCY: 14MS // ENCRYPTION: AES-256 // TERMINAL: STABLE
+        </div>
+        <div class="mono" style="font-size: 0.6rem; color: var(--copper);">
+            &copy; 2024 ACQUISITION INDEX // PRIVATE EQUITY TERMINAL
+        </div>
+    </footer>
+
+    <script>
+        // Subtle interactivity for the dashboard
+        document.querySelectorAll('.mini-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-2px)';
+                card.style.boxShadow = '0 10px 30px rgba(197, 255, 0, 0.05)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+                card.style.boxShadow = 'none';
+            });
+        });
+
+        // Simulating live updates
+        setInterval(() => {
+            const logs = document.querySelector('.metric-block:last-child');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            entry.innerHTML = `<span class="log-time">${time}</span> Pulse check: No new market fluctuations detected.`;
+            logs.insertBefore(entry, logs.children[1]);
+            if (logs.children.length > 6) logs.removeChild(logs.lastChild);
+        }, 15000);
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUYER COMMAND CENTER // Acquisition Index</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --obsidian: #050505;
+            --graphite: #141414;
+            --bone: #F5F5F0;
+            --acid-green: #C5FF00;
+            --copper: #8B9D83;
+            --blood-orange: #FF3D00;
+            --cream: #FFFDE7;
+            --border-width: 2px;
+            --grain-opacity: 0.04;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--bone);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.4;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Texture Overlay */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3BaseFilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/feFilter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: var(--grain-opacity);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* Typography */
+        h1, h2, h3 { text-transform: uppercase; letter-spacing: -0.02em; font-weight: 900; }
+        .mono { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; }
+        .editorial { font-family: 'Playfair Display', serif; font-style: italic; text-transform: none; }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 2rem;
+            border-bottom: var(--border-width) solid var(--graphite);
+            background: var(--obsidian);
+            z-index: 100;
+        }
+
+        .logo { font-weight: 900; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+        .logo span { background: var(--acid-green); color: var(--obsidian); padding: 1px 4px; }
+
+        /* Ticker */
+        .ticker-wrap {
+            width: 100%;
+            overflow: hidden;
+            background: var(--graphite);
+            border-bottom: 1px solid var(--acid-green);
+            padding: 0.5rem 0;
+        }
+
+        .ticker {
+            display: flex;
+            white-space: nowrap;
+            animation: ticker 30s linear infinite;
+        }
+
+        .ticker-item {
+            padding: 0 2rem;
+            color: var(--acid-green);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+        }
+
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* Dashboard Layout */
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            flex: 1;
+        }
+
+        /* Sidebar Left */
+        .sidebar-left {
+            border-right: 1px solid var(--graphite);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .user-card {
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--graphite);
+        }
+
+        .user-id { font-size: 1.5rem; font-weight: 900; margin-bottom: 0.5rem; }
+        .status-dot { height: 8px; width: 8px; background: var(--acid-green); border-radius: 50%; display: inline-block; margin-right: 5px; }
+
+        .nav-stack { display: flex; flex-direction: column; gap: 0.75rem; }
+        .nav-stack a {
+            text-decoration: none;
+            color: var(--copper);
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            padding: 0.5rem 0;
+            transition: color 0.2s;
+        }
+        .nav-stack a:hover, .nav-stack a.active { color: var(--acid-green); }
+
+        /* Main Content */
+        .main-feed {
+            padding: 2rem;
+            overflow-y: auto;
+            max-height: calc(100vh - 120px);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 2rem;
+            border-bottom: var(--border-width) solid var(--bone);
+            padding-bottom: 1rem;
+        }
+
+        /* Saved Deals Density Layout */
+        .saved-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .mini-card {
+            background: var(--graphite);
+            padding: 1.5rem;
+            border: 1px solid transparent;
+            transition: border-color 0.2s;
+            position: relative;
+        }
+
+        .mini-card:hover {
+            border-color: var(--acid-green);
+        }
+
+        .mini-card .price-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: var(--acid-green);
+            margin: 0.5rem 0;
+        }
+
+        .alert-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            background: var(--blood-orange);
+            color: var(--bone);
+        }
+
+        /* Outreach CRM Table */
+        .outreach-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        .outreach-table th {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid var(--bone);
+            color: var(--copper);
+            font-family: 'JetBrains Mono';
+        }
+
+        .outreach-table td {
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid var(--graphite);
+        }
+
+        .status-pill {
+            padding: 4px 8px;
+            border: 1px solid currentColor;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-nda { color: var(--acid-green); }
+        .status-loi { color: var(--blood-orange); }
+        .status-review { color: var(--copper); }
+
+        /* Sidebar Right: Market Insights */
+        .sidebar-right {
+            border-left: 1px solid var(--graphite);
+            padding: 2rem;
+            background: rgba(20, 20, 20, 0.3);
+        }
+
+        .metric-block {
+            margin-bottom: 3rem;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #222;
+            width: 100%;
+            position: relative;
+        }
+
+        .progress-fill {
+            position: absolute;
+            height: 100%;
+            background: var(--acid-green);
+        }
+
+        .log-entry {
+            font-family: 'JetBrains Mono';
+            font-size: 0.7rem;
+            margin-bottom: 1rem;
+            padding-left: 10px;
+            border-left: 2px solid var(--graphite);
+        }
+
+        .log-time { color: var(--copper); margin-right: 5px; }
+
+        @media (max-width: 1200px) {
+            .dashboard-container { grid-template-columns: 250px 1fr; }
+            .sidebar-right { display: none; }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container { grid-template-columns: 1fr; }
+            .sidebar-left { display: none; }
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            background: var(--bone);
+            color: var(--obsidian);
+            font-weight: 900;
+            font-size: 0.65rem;
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+
+        .btn-sm:hover { background: var(--acid-green); }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">ACQUISITION <span>INDEX</span></div>
+        <div class="nav-links mono">
+            <span style="color: var(--acid-green)">BUYER_TERMINAL_V.2.04</span>
+        </div>
+    </nav>
+
+    <div class="ticker-wrap">
+        <div class="ticker">
+            <div class="ticker-item">NEW LISTING: SAAS / LOGISTICS // $4.2M ASKING // 3.8X SDE</div>
+            <div class="ticker-item">PRICE DROP: CHICAGO LAUNDROMAT (-15%)</div>
+            <div class="ticker-item">ALERT: OFF-MARKET HVAC PORTFOLIO DETECTED (AUSTIN, TX)</div>
+            <div class="ticker-item">MARKET MULTIPLE AVG: 2.84X [STABLE]</div>
+            <div class="ticker-item">CAPITAL FLOW: +$12M VENTURE DEBT ADDED TO POOL</div>
+            <div class="ticker-item">NEW LISTING: SAAS / LOGISTICS // $4.2M ASKING // 3.8X SDE</div>
+            <div class="ticker-item">PRICE DROP: CHICAGO LAUNDROMAT (-15%)</div>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Sidebar Left -->
+        <aside class="sidebar-left">
+            <div class="user-card">
+                <div class="mono" style="color: var(--copper)">Active Operator</div>
+                <div class="user-id">SEARCHER_774</div>
+                <div class="mono" style="font-size: 0.6rem;"><span class="status-dot"></span> System Online</div>
+            </div>
+
+            <nav class="nav-stack">
+                <a href="#" class="active">Overview</a>
+                <a href="#">Saved Pipeline (12)</a>
+                <a href="#">Outreach Logs</a>
+                <a href="#">Deal Analyzer</a>
+                <a href="#">Financing Vault</a>
+                <a href="#">Settings</a>
+            </nav>
+
+            <div style="margin-top: auto; padding: 1.5rem; background: var(--graphite); border-left: 2px solid var(--blood-orange);">
+                <div class="mono" style="color: var(--blood-orange); margin-bottom: 0.5rem;">Urgent Alert</div>
+                <p style="font-size: 0.75rem;">NDA expiring on "Project Blue Sky" in 48 hours.</p>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-feed">
+            <div class="section-header">
+                <h2>Saved <span class="editorial">Alpha</span></h2>
+                <div class="mono">12 Active Tracks</div>
+            </div>
+
+            <div class="saved-grid">
+                <div class="mini-card">
+                    <div class="alert-badge mono">PRICE DROP</div>
+                    <div class="mono" style="color: var(--copper)">Service // Phoenix, AZ</div>
+                    <h3 style="font-size: 1rem; margin-top: 0.5rem;">Auto Repair Master</h3>
+                    <div class="price-tag">$550,000</div>
+                    <div class="mono" style="font-size: 0.6rem;">SDE: $180k // 3.0x</div>
+                    <div style="margin-top: 1rem;">
+                        <a href="#" class="btn-sm">View Analysis</a>
+                    </div>
+                </div>
+
+                <div class="mini-card">
+                    <div class="mono" style="color: var(--copper)">Tech // Remote</div>
+                    <h3 style="font-size: 1rem; margin-top: 0.5rem;">Shopify SaaS Widget</h3>
+                    <div class="price-tag">$450,000</div>
+                    <div class="mono" style="font-size: 0.6rem;">SDE: $150k // 3.0x</div>
+                    <div style="margin-top: 1rem;">
+                        <a href="#" class="btn-sm">View Analysis</a>
+                    </div>
+                </div>
+
+                <div class="mini-card">
+                    <div class="mono" style="color: var(--copper)">Retail // Portland, OR</div>
+                    <h3 style="font-size: 1rem; margin-top: 0.5rem;">Specialty Coffee Roastery</h3>
+                    <div class="price-tag">$650,000</div>
+                    <div class="mono" style="font-size: 0.6rem;">SDE: $210k // 3.1x</div>
+                    <div style="margin-top: 1rem;">
+                        <a href="#" class="btn-sm">View Analysis</a>
+                    </div>
+                </div>
+
+                <div class="mini-card">
+                    <div class="mono" style="color: var(--copper)">Logistics // Atlanta, GA</div>
+                    <h3 style="font-size: 1rem; margin-top: 0.5rem;">FedEx Route Delivery</h3>
+                    <div class="price-tag">$950,000</div>
+                    <div class="mono" style="font-size: 0.6rem;">SDE: $280k // 3.3x</div>
+                    <div style="margin-top: 1rem;">
+                        <a href="#" class="btn-sm">View Analysis</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-header">
+                <h2>Outreach <span class="editorial">Manager</span></h2>
+                <div class="mono">Broker CRM</div>
+            </div>
+
+            <table class="outreach-table">
+                <thead>
+                    <tr>
+                        <th class="mono">Deal Name</th>
+                        <th class="mono">Broker</th>
+                        <th class="mono">Status</th>
+                        <th class="mono">Last Touch</th>
+                        <th class="mono">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>HVAC Operator Austin</strong></td>
+                        <td>Quiet Light</td>
+                        <td><span class="status-pill status-loi">LOI Submitted</span></td>
+                        <td class="mono">2h ago</td>
+                        <td><a href="#" style="color: var(--acid-green); font-weight: 700;">Ping</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>B2B Content Tool</strong></td>
+                        <td>Empire Flippers</td>
+                        <td><span class="status-pill status-nda">NDA Signed</span></td>
+                        <td class="mono">1d ago</td>
+                        <td><a href="#" style="color: var(--acid-green); font-weight: 700;">Files</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Laundromat Portfolio</strong></td>
+                        <td>Direct Reach</td>
+                        <td><span class="status-pill status-review">Data Room Review</span></td>
+                        <td class="mono">3d ago</td>
+                        <td><a href="#" style="color: var(--acid-green); font-weight: 700;">Ping</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </main>
+
+        <!-- Sidebar Right -->
+        <aside class="sidebar-right">
+            <div class="metric-block">
+                <h4 class="mono" style="margin-bottom: 1.5rem; color: var(--acid-green);">Search Parameters</h4>
+                <div class="metric-row">
+                    <div class="mono">Capital Deployed</div>
+                    <div class="mono">$1.2M / $5.0M</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 24%;"></div>
+                </div>
+                <div class="metric-row" style="margin-top: 1.5rem;">
+                    <div class="mono">Target Multiple</div>
+                    <div class="mono">MAX 3.5x</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 70%;"></div>
+                </div>
+            </div>
+
+            <div class="metric-block">
+                <h4 class="mono" style="margin-bottom: 1.5rem; color: var(--acid-green);">Real-Time Activity</h4>
+                <div class="log-entry">
+                    <span class="log-time">14:22</span> Broker 'Quiet Light' updated files for Project Alpha.
+                </div>
+                <div class="log-entry">
+                    <span class="log-time">12:05</span> Automated crawler found 3 matching SaaS deals on MicroAcquire.
+                </div>
+                <div class="log-entry">
+                    <span class="log-time">09:44</span> LOI draft for 'Auto Repair' generated by system.
+                </div>
+                <div class="log-entry">
+                    <span class="log-time">Yesterday</span> Search criteria 'E-commerce' flagged for high volatility.
+                </div>
+            </div>
+
+            <div style="background: var(--obsidian); border: 1px solid var(--graphite); padding: 1.5rem;">
+                <h4 class="mono" style="margin-bottom: 1rem;">Quick Tools</h4>
+                <button style="width: 100%; padding: 0.75rem; background: transparent; border: 1px solid var(--bone); color: var(--bone); text-transform: uppercase; font-weight: 700; font-size: 0.7rem; margin-bottom: 0.5rem; cursor: pointer;">Generate NDA</button>
+                <button style="width: 100%; padding: 0.75rem; background: var(--acid-green); border: none; color: var(--obsidian); text-transform: uppercase; font-weight: 900; font-size: 0.7rem; cursor: pointer;">Connect Broker API</button>
+            </div>
+        </aside>
+    </div>
+
+    <footer style="padding: 1.5rem 2rem; border-top: 1px solid var(--graphite); background: var(--obsidian); display: flex; justify-content: space-between; align-items: center;">
+        <div class="mono" style="font-size: 0.6rem; color: var(--copper);">
+            LATENCY: 14MS // ENCRYPTION: AES-256 // TERMINAL: STABLE
+        </div>
+        <div class="mono" style="font-size: 0.6rem; color: var(--copper);">
+            &copy; 2024 ACQUISITION INDEX // PRIVATE EQUITY TERMINAL
+        </div>
+    </footer>
+
+    <script>
+        // Subtle interactivity for the dashboard
+        document.querySelectorAll('.mini-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-2px)';
+                card.style.boxShadow = '0 10px 30px rgba(197, 255, 0, 0.05)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+                card.style.boxShadow = 'none';
+            });
+        });
+
+        // Simulating live updates
+        setInterval(() => {
+            const logs = document.querySelector('.metric-block:last-child');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            entry.innerHTML = `<span class="log-time">${time}</span> Pulse check: No new market fluctuations detected.`;
+            logs.insertBefore(entry, logs.children[1]);
+            if (logs.children.length > 6) logs.removeChild(logs.lastChild);
+        }, 15000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Channel Performance | Emerald Circuit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050807;
+            --bg-card: #0c1210;
+            --emerald: #00ff88;
+            --emerald-dim: rgba(0, 255, 136, 0.2);
+            --emerald-glow: rgba(0, 255, 136, 0.5);
+            --danger: #ff4757;
+            --warning: #ffa502;
+            --text-main: #e0e0e0;
+            --text-dim: #889990;
+            --circuit-line: rgba(0, 255, 136, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at 2px 2px, var(--circuit-line) 1px, transparent 0);
+            background-size: 40px 40px;
+            padding: 40px 20px;
+        }
+
+        .dashboard-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 40px;
+            padding: 0 10px;
+        }
+
+        .brand-zone p {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--emerald);
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .brand-zone h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #fff, var(--emerald));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .global-stats {
+            display: flex;
+            gap: 30px;
+        }
+
+        .global-stat-item {
+            text-align: right;
+        }
+
+        .global-stat-item .label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .global-stat-item .value {
+            display: block;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--emerald);
+        }
+
+        .channel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 24px;
+        }
+
+        .channel-card {
+            background: var(--bg-card);
+            border: 1px solid var(--emerald-dim);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .channel-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 15px var(--emerald-dim);
+            border-color: var(--emerald);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .channel-info h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .channel-info span {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .status-pill {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.6rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+        }
+
+        .pill-elite { background: var(--emerald-dim); color: var(--emerald); border: 1px solid var(--emerald); }
+        .pill-neutral { background: rgba(255, 165, 2, 0.1); color: var(--warning); border: 1px solid var(--warning); }
+        .pill-risky { background: rgba(255, 71, 87, 0.1); color: var(--danger); border: 1px solid var(--danger); }
+
+        .performance-visual {
+            margin: 20px 0;
+        }
+
+        .bar-container {
+            height: 6px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 3px;
+            margin-top: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 1s ease;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .metric-box {
+            background: rgba(0,0,0,0.2);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .metric-box .m-label {
+            display: block;
+            font-size: 0.6rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .metric-box .m-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .payback-tag {
+            margin-top: 15px;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 15px;
+        }
+
+        .payback-tag .p-months {
+            font-size: 1.8rem;
+            font-weight: 800;
+            display: block;
+        }
+
+        .payback-tag .p-label {
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .circuit-accent {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 40px;
+            height: 40px;
+            border-bottom: 1px solid var(--emerald-dim);
+            border-right: 1px solid var(--emerald-dim);
+            opacity: 0.3;
+        }
+
+        @media (max-width: 768px) {
+            .header-nav {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+            .global-stats {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-wrapper">
+        <nav class="header-nav">
+            <div class="brand-zone">
+                <p>Performance Console v2.4</p>
+                <h1>Channel Bankability</h1>
+            </div>
+            <div class="global-stats">
+                <div class="global-stat-item">
+                    <span class="label">Total Ad Spend</span>
+                    <span class="value">$142.5k</span>
+                </div>
+                <div class="global-stat-item">
+                    <span class="label">Avg Payback</span>
+                    <span class="value">7.2m</span>
+                </div>
+            </div>
+        </nav>
+
+        <div class="channel-grid">
+            <!-- Google Ads -->
+            <div class="channel-card">
+                <div class="card-header">
+                    <div class="channel-info">
+                        <h2>Google Search</h2>
+                        <span>SEM / High Intent</span>
+                    </div>
+                    <div class="status-pill pill-elite">Elite</div>
+                </div>
+                <div class="performance-visual">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-dim);">
+                        <span>Efficiency Score</span>
+                        <span style="color: var(--emerald)">94%</span>
+                    </div>
+                    <div class="bar-container">
+                        <div class="bar-fill" style="width: 94%; background: var(--emerald); box-shadow: 0 0 10px var(--emerald-dim);"></div>
+                    </div>
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric-box">
+                        <span class="m-label">CAC</span>
+                        <span class="m-value">$42.10</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="m-label">LTV/CAC</span>
+                        <span class="m-value">5.2x</span>
+                    </div>
+                </div>
+                <div class="payback-tag">
+                    <span class="p-months" style="color: var(--emerald)">3.8</span>
+                    <span class="p-label">Month Payback</span>
+                </div>
+                <div class="circuit-accent"></div>
+            </div>
+
+            <!-- Meta Ads -->
+            <div class="channel-card">
+                <div class="card-header">
+                    <div class="channel-info">
+                        <h2>Meta Ads</h2>
+                        <span>Social / Retargeting</span>
+                    </div>
+                    <div class="status-pill pill-neutral">Stable</div>
+                </div>
+                <div class="performance-visual">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-dim);">
+                        <span>Efficiency Score</span>
+                        <span style="color: var(--warning)">68%</span>
+                    </div>
+                    <div class="bar-container">
+                        <div class="bar-fill" style="width: 68%; background: var(--warning);"></div>
+                    </div>
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric-box">
+                        <span class="m-label">CAC</span>
+                        <span class="m-value">$88.50</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="m-label">LTV/CAC</span>
+                        <span class="m-value">2.9x</span>
+                    </div>
+                </div>
+                <div class="payback-tag">
+                    <span class="p-months" style="color: var(--warning)">8.1</span>
+                    <span class="p-label">Month Payback</span>
+                </div>
+                <div class="circuit-accent"></div>
+            </div>
+
+            <!-- TikTok Ads -->
+            <div class="channel-card">
+                <div class="card-header">
+                    <div class="channel-info">
+                        <h2>TikTok Shop</h2>
+                        <span>Viral / Content</span>
+                    </div>
+                    <div class="status-pill pill-risky">High Risk</div>
+                </div>
+                <div class="performance-visual">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-dim);">
+                        <span>Efficiency Score</span>
+                        <span style="color: var(--danger)">32%</span>
+                    </div>
+                    <div class="bar-container">
+                        <div class="bar-fill" style="width: 32%; background: var(--danger);"></div>
+                    </div>
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric-box">
+                        <span class="m-label">CAC</span>
+                        <span class="m-value">$156.00</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="m-label">LTV/CAC</span>
+                        <span class="m-value">1.4x</span>
+                    </div>
+                </div>
+                <div class="payback-tag">
+                    <span class="p-months" style="color: var(--danger)">16.4</span>
+                    <span class="p-label">Month Payback</span>
+                </div>
+                <div class="circuit-accent"></div>
+            </div>
+
+            <!-- LinkedIn Ads -->
+            <div class="channel-card">
+                <div class="card-header">
+                    <div class="channel-info">
+                        <h2>LinkedIn Ads</h2>
+                        <span>B2B / Account Based</span>
+                    </div>
+                    <div class="status-pill pill-neutral">Stable</div>
+                </div>
+                <div class="performance-visual">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-dim);">
+                        <span>Efficiency Score</span>
+                        <span style="color: var(--warning)">55%</span>
+                    </div>
+                    <div class="bar-container">
+                        <div class="bar-fill" style="width: 55%; background: var(--warning);"></div>
+                    </div>
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric-box">
+                        <span class="m-label">CAC</span>
+                        <span class="m-value">$210.00</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="m-label">LTV/CAC</span>
+                        <span class="m-value">3.1x</span>
+                    </div>
+                </div>
+                <div class="payback-tag">
+                    <span class="p-months" style="color: var(--warning)">11.2</span>
+                    <span class="p-label">Month Payback</span>
+                </div>
+                <div class="circuit-accent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Static component - Logic for potential real-time simulation
+        document.querySelectorAll('.channel-card').forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 100 * index);
+        });
+    </script>
+</body>
+</html>

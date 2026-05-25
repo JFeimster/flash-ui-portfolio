@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supply Drop | Veteran Jester Dispatch</title>
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:wght@400;700&family=Roboto+Slab:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --olive: #4B5320;
+            --olive-dark: #353b16;
+            --tan: #d2c5a7;
+            --paper: #e4dec7;
+            --ink: #1a1a1b;
+            --stamp-red: rgba(169, 29, 17, 0.85);
+            --tape: rgba(210, 195, 140, 0.5);
+            --stencil-gray: #555;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--tan);
+            background-image: radial-gradient(circle at 2px 2px, rgba(0,0,0,0.05) 1px, transparent 0);
+            background-size: 40px 40px;
+            color: var(--ink);
+            font-family: 'Courier Prime', monospace;
+            line-height: 1.5;
+            padding: 20px;
+        }
+
+        .dossier-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: var(--paper);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            border: 1px solid rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dossier-container::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
+            pointer-events: none;
+            opacity: 0.4;
+            z-index: 10;
+        }
+
+        header {
+            padding: 60px 40px 40px;
+            border-bottom: 2px solid var(--ink);
+            position: relative;
+        }
+
+        .stamp-requisition {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            border: 4px double var(--stamp-red);
+            color: var(--stamp-red);
+            padding: 10px 20px;
+            font-family: 'Special Elite', cursive;
+            font-size: 1.2rem;
+            transform: rotate(-5deg);
+            text-transform: uppercase;
+            z-index: 20;
+        }
+
+        .brand-logo {
+            font-family: 'Special Elite', cursive;
+            font-size: 3.5rem;
+            line-height: 1;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            color: var(--olive-dark);
+        }
+
+        .nav-back {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--ink);
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .nav-back:hover { text-decoration: underline; }
+
+        .catalog-header {
+            background: var(--ink);
+            color: var(--paper);
+            padding: 10px 20px;
+            font-family: 'Roboto Slab', serif;
+            font-weight: 900;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        section {
+            padding: 40px;
+            border-bottom: 1px dashed rgba(0,0,0,0.2);
+        }
+
+        .section-title {
+            font-family: 'Special Elite', cursive;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        /* Product Grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .product-card {
+            border: 1px solid #ccc;
+            padding: 20px;
+            background: rgba(255,255,255,0.3);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            background: rgba(255,255,255,0.6);
+            border-color: var(--ink);
+        }
+
+        .product-id {
+            font-size: 0.7rem;
+            opacity: 0.6;
+            margin-bottom: 10px;
+        }
+
+        .product-img {
+            width: 100%;
+            height: 200px;
+            background: #ddd;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Special Elite', cursive;
+            color: #999;
+            border: 1px inset rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-img::after {
+            content: "IMAGE REDACTED";
+            font-size: 0.8rem;
+        }
+
+        .product-title {
+            font-family: 'Roboto Slab', serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            height: 3em;
+            line-height: 1.2;
+        }
+
+        .product-price {
+            font-family: 'Special Elite', cursive;
+            font-size: 1.4rem;
+            color: var(--stamp-red);
+            margin-bottom: 15px;
+        }
+
+        .product-desc {
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .btn-acquire {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: var(--olive);
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            border: 2px solid var(--ink);
+            transition: all 0.1s;
+        }
+
+        .btn-acquire:hover {
+            background: var(--ink);
+        }
+
+        .out-of-stock {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            border: 3px solid var(--stamp-red);
+            color: var(--stamp-red);
+            padding: 5px 10px;
+            font-family: 'Special Elite', cursive;
+            font-weight: bold;
+            background: var(--paper);
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        /* Filter Sidebar Mockup */
+        .shop-layout {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 40px;
+        }
+
+        .sidebar h4 {
+            font-family: 'Special Elite', cursive;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--ink);
+        }
+
+        .sidebar ul {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .sidebar li {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .sidebar li:hover {
+            text-decoration: underline;
+        }
+
+        .sidebar li.active {
+            font-weight: bold;
+            color: var(--olive);
+        }
+
+        /* Inventory Summary */
+        .manifest-footer {
+            background: #d9d2be;
+            padding: 20px 40px;
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            border-top: 2px solid var(--ink);
+        }
+
+        footer {
+            padding: 40px;
+            text-align: center;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .ink-smudge {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(0,0,0,0.06) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .shop-layout { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+            header { padding: 40px 20px; }
+            .brand-logo { font-size: 2.2rem; }
+            section { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dossier-container">
+        <div class="ink-smudge" style="top: -50px; left: 10%;"></div>
+        <div class="ink-smudge" style="bottom: 50px; right: 5%;"></div>
+
+        <header>
+            <a href="index.html" class="nav-back">← RETURN TO DISPATCH CENTER</a>
+            <div class="stamp-requisition">Approved for Distribution</div>
+            <h1 class="brand-logo">SUPPLY DROP</h1>
+            <p style="max-width: 600px; font-style: italic;">
+                The Quartermaster's curated selection of tools, attire, and intellectual ammunition for the modern civilian insurgent. No refunds on damaged feelings.
+            </p>
+        </header>
+
+        <div class="catalog-header">
+            <span>INVENTORY CATALOG // FY-2024</span>
+            <span>CURRENT MANIFEST: 0 ITEMS</span>
+        </div>
+
+        <section class="shop-layout">
+            <aside class="sidebar">
+                <h4>CATEGORIES</h4>
+                <ul>
+                    <li class="active">All Assets</li>
+                    <li>Tactical Threads</li>
+                    <li>Digital Field Guides</li>
+                    <li>Morale Patches</li>
+                    <li>Analog Tools</li>
+                </ul>
+
+                <h4>PRIORITY</h4>
+                <ul>
+                    <li>Essential</li>
+                    <li>Restricted</li>
+                    <li>Satirical</li>
+                </ul>
+            </aside>
+
+            <main>
+                <div class="product-grid">
+                    <!-- Item 1 -->
+                    <div class="product-card">
+                        <div class="product-id">REF: VJ-992-T</div>
+                        <div class="product-img"></div>
+                        <h3 class="product-title">"Consultant" Tactical T-Shirt</h3>
+                        <div class="product-price">$32.00</div>
+                        <p class="product-desc">Black cotton. Features the 'Tactical Shrug' logo on back. Perfect for blending into meetings you don't want to be in.</p>
+                        <a href="#" class="btn-acquire">Requisition</a>
+                    </div>
+
+                    <!-- Item 2 -->
+                    <div class="product-card">
+                        <div class="product-id">REF: VJ-004-D</div>
+                        <div class="product-img"></div>
+                        <h3 class="product-title">The Bullshit Detector (PDF Guide)</h3>
+                        <div class="product-price">$12.00</div>
+                        <p class="product-desc">A 40-page technical manual on identifying corporate linguistic camouflage and gaslighting maneuvers.</p>
+                        <a href="#" class="btn-acquire">Download Intel</a>
+                    </div>
+
+                    <!-- Item 3 -->
+                    <div class="product-card">
+                        <div class="product-id">REF: VJ-771-P</div>
+                        <div class="product-img"></div>
+                        <div class="out-of-stock">DEPLETED</div>
+                        <h3 class="product-title">Gallows Humor Morale Patch</h3>
+                        <div class="product-price">$15.00</div>
+                        <p class="product-desc">Hook-and-loop backing. Subdued olive drab. Warning: May cause HR to ask questions.</p>
+                        <a href="#" class="btn-acquire" style="opacity: 0.5; cursor: not-allowed;">Awaiting Resupply</a>
+                    </div>
+
+                    <!-- Item 4 -->
+                    <div class="product-card">
+                        <div class="product-id">REF: VJ-105-B</div>
+                        <div class="product-img"></div>
+                        <h3 class="product-title">The "Hard Truths" Notebook</h3>
+                        <div class="product-price">$24.00</div>
+                        <p class="product-desc">Rugged waterproof pages. For recording the things you can't say on Slack. Ink-resistant cover.</p>
+                        <a href="#" class="btn-acquire">Requisition</a>
+                    </div>
+
+                    <!-- Item 5 -->
+                    <div class="product-card">
+                        <div class="product-id">REF: VJ-882-C</div>
+                        <div class="product-img"></div>
+                        <h3 class="product-title">Dark Roast 'Fuel Injection'</h3>
+                        <div class="product-price">$19.00</div>
+                        <p class="product-desc">12oz of beans roasted in the dark. Guaranteed to make you see through time and corporate agendas.</p>
+                        <a href="#" class="btn-acquire">Requisition</a>
+                    </div>
+
+                    <!-- Item 6 -->
+                    <div class="product-card">
+                        <div class="product-id">REF: VJ-223-S</div>
+                        <div class="product-img"></div>
+                        <h3 class="product-title">Freedom-Tech Faraday Pouch</h3>
+                        <div class="product-price">$45.00</div>
+                        <p class="product-desc">Signal-blocking sleeve for your tracking device (phone). For when you need to be off the grid.</p>
+                        <a href="#" class="btn-acquire">Requisition</a>
+                    </div>
+                </div>
+            </main>
+        </section>
+
+        <div class="manifest-footer">
+            <div>SHIPPING TO: CONTINENTAL US & ALLIED TERRITORIES ONLY</div>
+            <div>ESTIMATED DELIVERY: 5-7 BUSINESS DAYS (UNLESS INTERCEPTED)</div>
+        </div>
+
+        <footer>
+            <p>© 19XX-2024 VETERAN JESTER // SUPPLY DIVISION // <span style="text-decoration: line-through;">NOT FOR RESALE</span></p>
+            <p style="margin-top: 10px; opacity: 0.6;">Secure transaction guaranteed via low-orbit satellite link.</p>
+        </footer>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,1743 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Core Flow - Document & Attachment Vault</title>
+    <!-- Google Fonts & Tailwind-inspired Layout system -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #08090d;
+            --bg-secondary: #0f111a;
+            --bg-tertiary: #161a26;
+            --border-color: #242b3d;
+            --border-hover: #3b4764;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            
+            /* High-voltage Neobrutalist Accents */
+            --accent-cyan: #00f0ff;
+            --accent-orange: #ff5c00;
+            --accent-magenta: #ff007a;
+            --accent-lime: #39ff14;
+            
+            --shadow-cyan: 0px 0px 20px rgba(0, 240, 255, 0.15);
+            --shadow-orange: 0px 0px 20px rgba(255, 92, 0, 0.15);
+            --shadow-magenta: 0px 0px 20px rgba(255, 0, 122, 0.15);
+            --shadow-lime: 0px 0px 20px rgba(57, 255, 20, 0.15);
+            
+            --brutal-shadow: 6px 6px 0px #000000;
+            --brutal-shadow-hover: 2px 2px 0px #000000;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-sans);
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        /* custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-cyan);
+        }
+
+        /* Utility classes */
+        .text-glow-cyan { text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
+        .text-glow-orange { text-shadow: 0 0 10px rgba(255, 92, 0, 0.5); }
+        .text-glow-magenta { text-shadow: 0 0 10px rgba(255, 0, 122, 0.5); }
+        .text-glow-lime { text-shadow: 0 0 10px rgba(57, 255, 20, 0.5); }
+
+        /* Navigation Header */
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: var(--bg-secondary);
+            border-bottom: 3px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 22px;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+            border: 2px solid #000;
+            box-shadow: 2px 2px 0px #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 18px;
+            color: #000;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            padding: 8px 16px;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--accent-cyan);
+            border-bottom: 2px solid var(--accent-cyan);
+        }
+
+        /* Vault Banner Statistics */
+        .vault-hero {
+            max-width: 1440px;
+            margin: 40px auto;
+            padding: 0 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+            .vault-hero {
+                grid-template-columns: 1fr;
+                margin: 20px auto;
+                padding: 0 20px;
+            }
+        }
+
+        .vault-welcome {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .vault-badge {
+            align-self: flex-start;
+            background: var(--accent-lime);
+            color: #000;
+            padding: 6px 14px;
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 2px solid #000;
+            box-shadow: var(--brutal-shadow-hover);
+            transform: rotate(-1deg);
+        }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: clamp(36px, 5vw, 56px);
+            font-weight: 800;
+            line-height: 1.0;
+            text-transform: uppercase;
+            color: var(--text-primary);
+            letter-spacing: -2px;
+        }
+
+        h1 span {
+            color: transparent;
+            -webkit-text-stroke: 1.5px var(--accent-lime);
+            text-stroke: 1.5px var(--accent-lime);
+        }
+
+        .vault-sub {
+            font-size: 16px;
+            color: var(--text-secondary);
+            max-width: 620px;
+            line-height: 1.6;
+            border-left: 4px solid var(--accent-lime);
+            padding-left: 20px;
+        }
+
+        /* Dynamic metrics panel */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+        }
+
+        .metric-card {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            padding: 20px;
+            box-shadow: var(--brutal-shadow-hover);
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--border-color);
+        }
+
+        .metric-card.accent-lime::before { background: var(--accent-lime); }
+        .metric-card.accent-cyan::before { background: var(--accent-cyan); }
+        .metric-card.accent-magenta::before { background: var(--accent-magenta); }
+
+        .metric-val {
+            font-family: var(--font-display);
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .metric-meta {
+            font-size: 11px;
+            color: var(--accent-lime);
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Upload area brutalist design */
+        .upload-terminal {
+            background: var(--bg-secondary);
+            border: 3px solid var(--border-color);
+            box-shadow: var(--brutal-shadow);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal-header {
+            background: var(--bg-tertiary);
+            padding: 12px 20px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--border-color);
+        }
+        .dot.active-1 { background: var(--accent-cyan); }
+        .dot.active-2 { background: var(--accent-orange); }
+        .dot.active-3 { background: var(--accent-magenta); }
+
+        .terminal-title {
+            font-family: var(--font-display);
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .upload-body {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .drag-drop-zone {
+            border: 2px dashed var(--border-color);
+            background: var(--bg-primary);
+            padding: 40px 20px;
+            border-radius: 4px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .drag-drop-zone:hover, .drag-drop-zone.dragging {
+            border-color: var(--accent-lime);
+            background: rgba(57, 255, 20, 0.02);
+        }
+
+        .upload-icon {
+            font-size: 36px;
+            transition: transform 0.2s ease;
+        }
+
+        .drag-drop-zone:hover .upload-icon {
+            transform: translateY(-4px);
+        }
+
+        .upload-primary-text {
+            font-family: var(--font-display);
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .upload-secondary-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .file-select-btn {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+            padding: 8px 16px;
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .file-select-btn:hover {
+            border-color: var(--accent-lime);
+            color: var(--accent-lime);
+        }
+
+        /* Active Upload Progress bar list */
+        .active-uploads {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .progress-item {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .progress-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .progress-bar-bg {
+            height: 6px;
+            background: var(--bg-primary);
+            border-radius: 3px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--accent-lime);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Interactive Filter Area */
+        .vault-workspace {
+            max-width: 1440px;
+            margin: 60px auto;
+            padding: 0 40px;
+        }
+
+        @media (max-width: 768px) {
+            .vault-workspace {
+                padding: 0 20px;
+                margin: 40px auto;
+            }
+        }
+
+        .filter-header-bar {
+            background: var(--bg-secondary);
+            border: 3px solid var(--border-color);
+            padding: 24px;
+            box-shadow: var(--brutal-shadow);
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            padding: 14px 14px 14px 44px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-lime);
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+
+        .view-toggle-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .view-btn {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+
+        .view-btn:hover {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        .view-btn.active {
+            background: var(--accent-cyan);
+            color: #000;
+            border-color: #000;
+            box-shadow: 2px 2px 0px #000;
+        }
+
+        /* Detailed Filters Grid (Categories, Extensions, Sizes) */
+        .filter-controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-group-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: var(--text-secondary);
+            letter-spacing: 1.5px;
+            margin-bottom: 4px;
+        }
+
+        .filter-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .filter-chip {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 6px 12px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .filter-chip:hover {
+            border-color: var(--accent-lime);
+            color: var(--text-primary);
+        }
+
+        .filter-chip.active {
+            background: var(--accent-lime);
+            color: #000;
+            border-color: #000;
+            font-weight: 800;
+        }
+
+        .filter-select {
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            outline: none;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            border-color: var(--accent-lime);
+        }
+
+        /* Batch Action Bar (Sticky floating indicator when items are selected) */
+        .batch-action-bar {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translate(-50%, 150%);
+            background: var(--bg-tertiary);
+            border: 3px solid #000;
+            box-shadow: 8px 8px 0px #000;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 32px;
+            z-index: 99;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            width: 90%;
+            max-width: 800px;
+        }
+
+        .batch-action-bar.visible {
+            transform: translate(-50%, 0);
+        }
+
+        .selected-count {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 15px;
+            text-transform: uppercase;
+            color: var(--accent-lime);
+        }
+
+        .selected-count-badge {
+            background: var(--accent-lime);
+            color: #000;
+            padding: 4px 10px;
+            border-radius: 2px;
+            font-size: 14px;
+        }
+
+        .batch-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Document Table/List & Grid Views */
+        .vault-content {
+            min-height: 400px;
+            position: relative;
+        }
+
+        /* Table/List Styling */
+        .file-list-view {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+
+        .file-list-view th {
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            color: var(--text-secondary);
+            font-weight: 800;
+            text-align: left;
+            padding: 12px 16px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .file-list-row {
+            background: var(--bg-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .file-list-row:hover {
+            background: var(--bg-tertiary);
+            transform: scale(1.005);
+        }
+
+        .file-list-row.selected {
+            background: rgba(57, 255, 20, 0.05);
+            border-color: var(--accent-lime);
+        }
+
+        .file-list-row td {
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        .file-list-row td:first-child {
+            border-left: 2px solid var(--border-color);
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+        }
+
+        .file-list-row td:last-child {
+            border-right: 2px solid var(--border-color);
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+
+        .file-list-row.selected td {
+            border-color: var(--accent-lime);
+        }
+
+        /* Checkbox styling */
+        .brutal-checkbox {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-primary);
+            cursor: pointer;
+            position: relative;
+            outline: none;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .brutal-checkbox:checked {
+            background: var(--accent-lime);
+            border-color: #000;
+        }
+
+        .brutal-checkbox:checked::after {
+            content: '✓';
+            color: #000;
+            position: absolute;
+            font-size: 13px;
+            font-weight: 900;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* File Information & Icons */
+        .file-info-cell {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .file-icon {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 800;
+            font-family: var(--font-display);
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            background: var(--bg-primary);
+        }
+
+        .file-icon.pdf { color: var(--accent-magenta); border-color: rgba(255, 0, 122, 0.4); }
+        .file-icon.xlsx { color: var(--accent-lime); border-color: rgba(57, 255, 20, 0.4); }
+        .file-icon.docx { color: var(--accent-cyan); border-color: rgba(0, 240, 255, 0.4); }
+        .file-icon.image { color: var(--accent-orange); border-color: rgba(255, 92, 0, 0.4); }
+
+        .file-title-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .file-name {
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+        }
+
+        .file-name:hover {
+            color: var(--accent-lime);
+            text-decoration: underline;
+        }
+
+        .file-meta-sub {
+            display: flex;
+            gap: 12px;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .file-tag {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            background: rgba(255, 92, 0, 0.1);
+            color: var(--accent-orange);
+            padding: 2px 8px;
+            border: 1px solid var(--accent-orange);
+            border-radius: 2px;
+            letter-spacing: 0.5px;
+        }
+
+        .file-tag.underwriting { background: rgba(0, 240, 255, 0.1); color: var(--accent-cyan); border-color: var(--accent-cyan); }
+        .file-tag.financials { background: rgba(57, 255, 20, 0.1); color: var(--accent-lime); border-color: var(--accent-lime); }
+        .file-tag.legal { background: rgba(255, 0, 122, 0.1); color: var(--accent-magenta); border-color: var(--accent-magenta); }
+        .file-tag.identity { background: rgba(255, 255, 255, 0.1); color: #fff; border-color: #fff; }
+
+        .file-action-btn {
+            background: transparent;
+            border: 2px solid var(--border-color);
+            color: var(--text-secondary);
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.15s ease;
+        }
+
+        .file-action-btn:hover {
+            border-color: var(--accent-lime);
+            color: var(--accent-lime);
+            background: var(--bg-primary);
+        }
+
+        /* Grid View Layout Option */
+        .file-grid-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .file-grid-card {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            padding: 20px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .file-grid-card:hover {
+            transform: translate(-2px, -2px);
+            border-color: var(--accent-lime);
+            box-shadow: var(--brutal-shadow-hover);
+        }
+
+        .file-grid-card.selected {
+            background: rgba(57, 255, 20, 0.05);
+            border-color: var(--accent-lime);
+        }
+
+        .card-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-details {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .card-meta-line {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-secondary);
+            border-top: 1px dashed var(--border-color);
+            padding-top: 6px;
+        }
+
+        /* Neobrutalist CTAs */
+        .btn-action {
+            background: var(--accent-cyan);
+            color: #000;
+            padding: 12px 24px;
+            border: 3px solid #000;
+            font-weight: 800;
+            font-family: var(--font-display);
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px #000;
+            transition: all 0.1s ease;
+            text-decoration: none;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        .btn-action:hover {
+            box-shadow: 2px 2px 0px #000;
+            transform: translate(2px, 2px);
+            background: #fff;
+        }
+
+        .btn-action.btn-lime {
+            background: var(--accent-lime);
+        }
+
+        .btn-action.btn-magenta {
+            background: var(--accent-magenta);
+            color: #fff;
+        }
+
+        .btn-action.btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+            box-shadow: 4px 4px 0px var(--border-color);
+        }
+
+        .btn-action.btn-secondary:hover {
+            box-shadow: 2px 2px 0px var(--border-color);
+            border-color: var(--accent-lime);
+            color: var(--accent-lime);
+        }
+
+        /* Empty State */
+        .empty-state {
+            padding: 80px 20px;
+            text-align: center;
+            background: var(--bg-secondary);
+            border: 2px dashed var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+        }
+
+        /* Live Highlight Toast for updates */
+        .toast-notify {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--accent-lime);
+            padding: 16px 24px;
+            box-shadow: var(--brutal-shadow);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--font-display);
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            transform: translateY(150%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .toast-notify.visible {
+            transform: translateY(0);
+        }
+
+        .toast-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--accent-lime);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-lime);
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            100% { transform: scale(1.1); opacity: 1; }
+        }
+
+        /* Detail Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(8, 9, 13, 0.85);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-box {
+            background: var(--bg-secondary);
+            border: 3px solid var(--border-color);
+            box-shadow: var(--brutal-shadow);
+            border-radius: 8px;
+            width: 100%;
+            max-width: 600px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-body {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .modal-details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .modal-detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .modal-detail-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        .modal-detail-val {
+            font-size: 14px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation -->
+    <nav class="nav-header">
+        <a href="#" class="logo-area">
+            <div class="logo-icon">C</div>
+            CORE FLOW
+        </a>
+        <div class="nav-links">
+            <a href="vault.html" class="nav-link active">Doc Vault</a>
+            <a href="#strategy" class="nav-link">Expert Help</a>
+        </div>
+        <a href="#drag-zone" class="btn-action btn-lime" style="padding: 10px 20px; font-size: 12px; box-shadow: 2px 2px 0px #000;">Upload File</a>
+    </nav>
+
+    <!-- Document Vault Hero Section -->
+    <section class="vault-hero">
+        <div class="vault-welcome">
+            <div class="vault-badge">Document Crypt</div>
+            <h1>Encrypted <span>Attachment</span> Storage Matrix</h1>
+            <p class="vault-sub">A central workspace securely logging, indexing, and archiving files submitted across funding processes. Instantly scan underwriting metrics, verify compliance signatures, and prepare audit records.</p>
+            
+            <div class="metrics-grid">
+                <div class="metric-card accent-lime">
+                    <div class="metric-val text-glow-lime" id="total-storage">14.8 MB</div>
+                    <div class="metric-label">Total Storage Used</div>
+                    <div class="metric-meta">▲ 1.2 MB today</div>
+                </div>
+                <div class="metric-card accent-cyan">
+                    <div class="metric-val text-glow-cyan" id="total-docs">8 Files</div>
+                    <div class="metric-label">Indexed Documents</div>
+                    <div class="metric-meta">Active Verification</div>
+                </div>
+                <div class="metric-card accent-magenta">
+                    <div class="metric-val text-glow-magenta">100%</div>
+                    <div class="metric-label">Client-Side Encryption</div>
+                    <div class="metric-meta">SOC2 Grade Vault</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Terminal Upload Sandbox -->
+        <div class="upload-terminal" id="drag-zone">
+            <div class="terminal-header">
+                <div class="terminal-dots">
+                    <div class="dot active-1"></div>
+                    <div class="dot active-2"></div>
+                    <div class="dot active-3"></div>
+                </div>
+                <div class="terminal-title">Secured Uplink Sandbox</div>
+                <div class="file-tag identity" style="font-size: 9px;">ACTIVE PORT</div>
+            </div>
+            
+            <div class="upload-body">
+                <div class="drag-drop-zone" id="drop-zone" onclick="triggerFileInput()">
+                    <span class="upload-icon">📁</span>
+                    <div class="upload-primary-text">Drag files here or tap to select</div>
+                    <div class="upload-secondary-text">Supported: PDF, XLSX, DOCX, JPG (Max 50MB)</div>
+                    <button class="file-select-btn">Choose Document</button>
+                    <input type="file" id="real-file-input" style="display: none;" onchange="handleFileSelect(event)">
+                </div>
+
+                <div class="active-uploads" id="active-uploads-container">
+                    <!-- Dynamic Progress Items appear here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Workspace Container (Search, Filters, Data Table) -->
+    <section class="vault-workspace">
+        <div class="filter-header-bar">
+            <!-- First Row: Search input and view toggles -->
+            <div class="search-row">
+                <div class="search-wrapper">
+                    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.637 10.637z" />
+                    </svg>
+                    <input type="text" id="vault-search" class="search-input" placeholder="Find document by filename, size, tag details..." oninput="applyFilters()">
+                </div>
+                
+                <div class="view-toggle-group">
+                    <button class="view-btn active" id="view-list" onclick="setViewMode('list')" title="List View">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                    </button>
+                    <button class="view-btn" id="view-grid" onclick="setViewMode('grid')" title="Grid View">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Second Row: Detailed Filters -->
+            <div class="filter-controls-grid">
+                <!-- Document Categories -->
+                <div class="filter-group">
+                    <span class="filter-group-title">Category Scope</span>
+                    <div class="filter-chips" id="category-chips">
+                        <button class="filter-chip active" onclick="setCategoryFilter('all')">All</button>
+                        <button class="filter-chip" onclick="setCategoryFilter('financials')">Financials</button>
+                        <button class="filter-chip" onclick="setCategoryFilter('underwriting')">Underwriting</button>
+                        <button class="filter-chip" onclick="setCategoryFilter('legal')">Legal</button>
+                        <button class="filter-chip" onclick="setCategoryFilter('identity')">Identity</button>
+                    </div>
+                </div>
+
+                <!-- Document Extensions -->
+                <div class="filter-group">
+                    <span class="filter-group-title">File Format</span>
+                    <div class="filter-chips" id="extension-chips">
+                        <button class="filter-chip active" onclick="setExtensionFilter('all')">All Format</button>
+                        <button class="filter-chip" onclick="setExtensionFilter('pdf')">PDF</button>
+                        <button class="filter-chip" onclick="setExtensionFilter('xlsx')">XLSX</button>
+                        <button class="filter-chip" onclick="setExtensionFilter('docx')">DOCX</button>
+                        <button class="filter-chip" onclick="setExtensionFilter('jpg')">IMG</button>
+                    </div>
+                </div>
+
+                <!-- Sort Selection -->
+                <div class="filter-group">
+                    <span class="filter-group-title">Arrangement Sequence</span>
+                    <select id="sort-select" class="filter-select" onchange="applyFilters()">
+                        <option value="newest">Upload Date: Newest First</option>
+                        <option value="oldest">Upload Date: Oldest First</option>
+                        <option value="size-desc">File Size: Largest First</option>
+                        <option value="size-asc">File Size: Smallest First</option>
+                        <option value="name">Filename: A to Z</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Directory Render State Container -->
+        <div class="vault-content" id="vault-content-area">
+            <!-- Dynamic Table or Grid generated by JavaScript -->
+        </div>
+    </section>
+
+    <!-- Floating Batch Operations Overlay Menu -->
+    <div class="batch-action-bar" id="batch-menu">
+        <div class="selected-count">
+            <span class="selected-count-badge" id="batch-count">0</span>
+            <span>Files Flagged For Batch Processing</span>
+        </div>
+        <div class="batch-buttons">
+            <button class="btn-action btn-secondary" onclick="clearBatchSelection()">Cancel</button>
+            <button class="btn-action btn-lime" onclick="triggerBatchDownload()">Download Zip</button>
+            <button class="btn-action btn-magenta" onclick="triggerBatchDelete()">Secure Purge</button>
+        </div>
+    </div>
+
+    <!-- Details View Modal -->
+    <div class="modal-overlay" id="file-modal">
+        <div class="modal-box">
+            <div class="terminal-header">
+                <div class="terminal-dots">
+                    <div class="dot active-1"></div>
+                    <div class="dot active-2"></div>
+                </div>
+                <div class="terminal-title">Document Metadata Matrix</div>
+                <button onclick="closeFileModal()" style="background: none; border: none; color: #fff; cursor: pointer; font-size: 16px; font-weight: bold;">✕</button>
+            </div>
+            <div class="modal-body">
+                <div style="display: flex; gap: 16px; align-items: center;">
+                    <div class="file-icon pdf" id="modal-file-icon">PDF</div>
+                    <div>
+                        <h3 id="modal-file-name" style="font-family: var(--font-display); text-transform: uppercase;">document_preview.pdf</h3>
+                        <p id="modal-file-category" class="file-tag underwriting" style="display: inline-block; margin-top: 4px;">Underwriting</p>
+                    </div>
+                </div>
+
+                <div class="modal-details-grid" style="margin-top: 10px;">
+                    <div class="modal-detail-item">
+                        <span class="modal-detail-label">File Signature (SHA256)</span>
+                        <span class="modal-detail-val" id="modal-file-hash" style="font-family: monospace; font-size: 11px; word-break: break-all; color: var(--text-secondary);">e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</span>
+                    </div>
+                    <div class="modal-detail-item">
+                        <span class="modal-detail-label">Byte Volume</span>
+                        <span class="modal-detail-val" id="modal-file-size">4.2 MB</span>
+                    </div>
+                    <div class="modal-detail-item">
+                        <span class="modal-detail-label">Upload Sequence Timestamp</span>
+                        <span class="modal-detail-val" id="modal-file-date">2024-03-12 14:24</span>
+                    </div>
+                    <div class="modal-detail-item">
+                        <span class="modal-detail-label">Storage Allocation Status</span>
+                        <span class="modal-detail-val" style="color: var(--accent-lime);" id="modal-file-status">✓ ENCRYPTED & VERIFIED</span>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-top: 20px;">
+                    <button class="btn-action btn-lime" style="flex: 1;" onclick="downloadSingleFromModal()">Download Resource</button>
+                    <button class="btn-action btn-secondary" onclick="closeFileModal()">Exit Inspector</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active State Update Toast -->
+    <div id="toast" class="toast-notify">
+        <div class="toast-dot"></div>
+        <div id="toast-text">Action Applied Successfully</div>
+    </div>
+
+    <!-- Footer -->
+    <footer style="background: #000000; color: var(--text-primary); border-top: 4px solid var(--border-color); padding: 80px 40px;">
+        <div style="max-width: 1440px; margin: 0 auto; display: grid; grid-template-columns: 1.5fr 1fr; gap: 60px;">
+            <div>
+                <h2 style="font-family: var(--font-display); font-size: 48px; font-weight: 800; text-transform: uppercase; margin-bottom: 20px; line-height: 1.1;">Secure <span>Fintech Vault</span></h2>
+                <p style="color: var(--text-secondary); font-size: 16px; max-width: 600px; margin-bottom: 30px;">Zero-knowledge document storage sandbox built for sensitive financial statements, banking credentials, identity archives, and broker calculations.</p>
+            </div>
+            <div style="display: flex; gap: 40px; flex-wrap: wrap;">
+                <div style="display: flex; flex-direction: column; gap: 16px; min-width: 160px;">
+                    <h4 style="font-family: var(--font-display); text-transform: uppercase; font-size: 12px; color: var(--text-secondary); letter-spacing: 1px; margin-bottom: 8px;">Integrations</h4>
+                    <a href="index.html" style="color: var(--text-primary); text-decoration: none; font-size: 14px; font-weight: 600;">Core Calculators</a>
+                    <a href="#" style="color: var(--text-primary); text-decoration: none; font-size: 14px; font-weight: 600;">Secure Portal</a>
+                </div>
+            </div>
+        </div>
+        <div style="max-width: 1440px; margin: 60px auto 0 auto; padding-top: 30px; border-top: 1px solid #1a202c; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-secondary); flex-wrap: wrap; gap: 20px;">
+            <div>&copy; 2024 CORE FLOW SECURE VAULT ENGINE. DATA PRIVACY COMPLIANT.</div>
+            <div style="display: flex; gap: 20px;">
+                <span style="color: var(--accent-lime); font-weight: 700;">ENCRYPTION ACTIVE</span>
+                <span>SOC-2 CERTIFIED</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Database of existing files
+        let documentsData = [
+            { id: 1, name: 'Bank_Statements_Q4_2023.pdf', type: 'pdf', category: 'financials', size: 4500000, date: '2024-03-01', selected: false, hash: 'ae3829dc7301faefbc11099238e4a9081e2cc4a9b934ca49599ef855' },
+            { id: 2, name: 'P_and_L_Statement_2023.xlsx', type: 'xlsx', category: 'financials', size: 1800000, date: '2024-02-28', selected: false, hash: 'f3a9e2230aefdc554e12988cb738a9018e2cc4a9b934ca495992a013' },
+            { id: 3, name: 'Articles_of_Incorporation_Signed.pdf', type: 'pdf', category: 'legal', size: 3200000, date: '2024-03-05', selected: false, hash: 'c92a83bd7a02ecf09ab93081ce4c90538e1cc4a9b934ca495994269d' },
+            { id: 4, name: 'Driver_License_CEO_ID.jpg', type: 'jpg', category: 'identity', size: 950000, date: '2024-03-10', selected: false, hash: '9b3a72df8901eb20fca5662198ed60438e1cc4a9b934ca495991c01e' },
+            { id: 5, name: 'Underwriting_Calculations_v2.xlsx', type: 'xlsx', category: 'underwriting', size: 1200000, date: '2024-03-11', selected: false, hash: '12ef89ba6280dbf15cf82390be4a92348e1cc4a9b934ca49599bc513' },
+            { id: 6, name: 'Debt_Schedule_CoreFlow.docx', type: 'docx', category: 'financials', size: 850000, date: '2024-02-15', selected: false, hash: '56ab83bc89a0ebf15cf7190de4a901848e1cc4a9b934ca49599bc019' },
+            { id: 7, name: 'Merchant_MCA_Agreement_Execute.pdf', type: 'pdf', category: 'legal', size: 2100000, date: '2024-03-08', selected: false, hash: '09da83bc2290ebf15cf7198de4a919428e1cc4a9b934ca49599bc119' },
+            { id: 8, name: 'Experian_Credit_Report_Summary.pdf', type: 'pdf', category: 'underwriting', size: 1400000, date: '2024-03-12', selected: false, hash: 'bc0218da2290ebf15cf7198de4a919428e1cc4a9b934ca49599bc220' }
+        ];
+
+        // Active State Filter settings
+        let viewMode = 'list'; // list or grid
+        let activeCategoryFilter = 'all';
+        let activeExtensionFilter = 'all';
+        let selectedModalFileId = null;
+
+        // Toast Notification System
+        const toast = document.getElementById('toast');
+        const toastText = document.getElementById('toast-text');
+
+        function showNotification(text, duration = 3000) {
+            toastText.innerText = text;
+            toast.classList.add('visible');
+            setTimeout(() => {
+                toast.classList.remove('visible');
+            }, duration);
+        }
+
+        // Initialize App State
+        window.addEventListener('DOMContentLoaded', () => {
+            renderVaultContent();
+            updateGlobalStats();
+            setupDragAndDrop();
+        });
+
+        // Set View Mode
+        function setViewMode(mode) {
+            viewMode = mode;
+            document.getElementById('view-list').classList.toggle('active', mode === 'list');
+            document.getElementById('view-grid').classList.toggle('active', mode === 'grid');
+            renderVaultContent();
+        }
+
+        // Category Filter handler
+        function setCategoryFilter(category) {
+            activeCategoryFilter = category;
+            const buttons = document.querySelectorAll('#category-chips .filter-chip');
+            buttons.forEach(btn => {
+                const btnCategory = btn.innerText.toLowerCase() === 'all' ? 'all' : btn.innerText.toLowerCase();
+                btn.classList.toggle('active', btnCategory === category);
+            });
+            applyFilters();
+        }
+
+        // Extension Filter handler
+        function setExtensionFilter(ext) {
+            activeExtensionFilter = ext;
+            const buttons = document.querySelectorAll('#extension-chips .filter-chip');
+            buttons.forEach(btn => {
+                let btnExt = btn.innerText.toLowerCase();
+                if (btnExt.includes('all')) btnExt = 'all';
+                if (btnExt.includes('img')) btnExt = 'jpg';
+                btn.classList.toggle('active', btnExt === ext);
+            });
+            applyFilters();
+        }
+
+        // Compute Format Byte size
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        // Process dynamic file rendering based on filters and sorting
+        function applyFilters() {
+            renderVaultContent();
+            updateBatchMenuState();
+        }
+
+        function getFilteredDocuments() {
+            const searchQuery = document.getElementById('vault-search').value.toLowerCase();
+            const sortSelection = document.getElementById('sort-select').value;
+
+            let result = documentsData.filter(doc => {
+                const matchesSearch = doc.name.toLowerCase().includes(searchQuery) || doc.category.toLowerCase().includes(searchQuery);
+                const matchesCategory = activeCategoryFilter === 'all' || doc.category === activeCategoryFilter;
+                const matchesExtension = activeExtensionFilter === 'all' || doc.type === activeExtensionFilter;
+                
+                return matchesSearch && matchesCategory && matchesExtension;
+            });
+
+            // Perform sorting
+            if (sortSelection === 'newest') {
+                result.sort((a, b) => new Date(b.date) - new Date(a.date));
+            } else if (sortSelection === 'oldest') {
+                result.sort((a, b) => new Date(a.date) - new Date(b.date));
+            } else if (sortSelection === 'size-desc') {
+                result.sort((a, b) => b.size - a.size);
+            } else if (sortSelection === 'size-asc') {
+                result.sort((a, b) => a.size - b.size);
+            } else if (sortSelection === 'name') {
+                result.sort((a, b) => a.name.localeCompare(b.name));
+            }
+
+            return result;
+        }
+
+        // Dynamic State Metrics
+        function updateGlobalStats() {
+            const totalBytes = documentsData.reduce((acc, doc) => acc + doc.size, 0);
+            document.getElementById('total-storage').innerText = formatBytes(totalBytes);
+            document.getElementById('total-docs').innerText = `${documentsData.length} Files`;
+        }
+
+        // Main Directory Render Strategy
+        function renderVaultContent() {
+            const filtered = getFilteredDocuments();
+            const container = document.getElementById('vault-content-area');
+            container.innerHTML = '';
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <span class="empty-icon">📂</span>
+                        <h3 style="font-family: var(--font-display); text-transform: uppercase;">No documents matched search criteria</h3>
+                        <p style="color: var(--text-secondary); font-size: 14px;">Try modifying active filters or clear search query to view complete system archive.</p>
+                        <button class="btn-action btn-secondary" onclick="clearAllFilters()">Reset Workspace Filters</button>
+                    </div>
+                `;
+                return;
+            }
+
+            if (viewMode === 'list') {
+                renderListView(filtered, container);
+            } else {
+                renderGridView(filtered, container);
+            }
+        }
+
+        // List View Table Markup
+        function renderListView(documents, container) {
+            const table = document.createElement('table');
+            table.className = 'file-list-view';
+            
+            // Build table header
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">
+                            <input type="checkbox" class="brutal-checkbox" id="master-select" onchange="toggleSelectAll(event)">
+                        </th>
+                        <th>Document Reference Title</th>
+                        <th>Category</th>
+                        <th>File Size</th>
+                        <th>Timestamp</th>
+                        <th style="text-align: right; width: 120px;">Operations</th>
+                    </tr>
+                </thead>
+                <tbody id="file-table-body">
+                </tbody>
+            `;
+
+            const tbody = table.querySelector('#file-table-body');
+            
+            documents.forEach(doc => {
+                const row = document.createElement('tr');
+                row.className = `file-list-row ${doc.selected ? 'selected' : ''}`;
+                
+                row.innerHTML = `
+                    <td>
+                        <input type="checkbox" class="brutal-checkbox" ${doc.selected ? 'checked' : ''} onchange="toggleFileSelection(${doc.id}, event)">
+                    </td>
+                    <td>
+                        <div class="file-info-cell">
+                            <div class="file-icon ${doc.type}">${doc.type.toUpperCase()}</div>
+                            <div class="file-title-wrapper">
+                                <a href="#" class="file-name" onclick="openFileInspector(${doc.id}); event.preventDefault();">${doc.name}</a>
+                                <div class="file-meta-sub">
+                                    <span>SHA256: ${doc.hash.slice(0, 10)}...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="file-tag ${doc.category}">${doc.category}</span>
+                    </td>
+                    <td style="font-weight: 700;">${formatBytes(doc.size)}</td>
+                    <td style="color: var(--text-secondary); font-size: 13px;">${doc.date}</td>
+                    <td>
+                        <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                            <button class="file-action-btn" onclick="openFileInspector(${doc.id})" title="Inspect Metadata">🔍</button>
+                            <button class="file-action-btn" onclick="triggerDownloadSingle('${doc.name}')" title="Download Resource">💾</button>
+                            <button class="file-action-btn" onclick="triggerPurgeSingle(${doc.id})" title="Secure Purge">🗑️</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            container.appendChild(table);
+
+            // Sync master checkbox state
+            const allSelected = documents.every(d => d.selected);
+            const masterCheckbox = document.getElementById('master-select');
+            if (masterCheckbox) masterCheckbox.checked = allSelected && documents.length > 0;
+        }
+
+        // Grid View Cards Markup
+        function renderGridView(documents, container) {
+            const grid = document.createElement('div');
+            grid.className = 'file-grid-layout';
+
+            documents.forEach(doc => {
+                const card = document.createElement('div');
+                card.className = `file-grid-card ${doc.selected ? 'selected' : ''}`;
+                
+                card.innerHTML = `
+                    <div class="card-top-row">
+                        <input type="checkbox" class="brutal-checkbox" ${doc.selected ? 'checked' : ''} onchange="toggleFileSelection(${doc.id}, event)">
+                        <span class="file-tag ${doc.category}">${doc.category}</span>
+                    </div>
+                    
+                    <div class="file-info-cell" style="margin-top: 10px;">
+                        <div class="file-icon ${doc.type}">${doc.type.toUpperCase()}</div>
+                        <div class="file-title-wrapper" style="overflow: hidden;">
+                            <a href="#" class="file-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" onclick="openFileInspector(${doc.id}); event.preventDefault();">${doc.name}</a>
+                            <span style="font-size: 11px; color: var(--text-secondary);">SHA256: ${doc.hash.slice(0, 12)}...</span>
+                        </div>
+                    </div>
+
+                    <div class="card-details">
+                        <div class="card-meta-line">
+                            <span>Vol Size:</span>
+                            <span style="font-weight: 700; color: var(--text-primary);">${formatBytes(doc.size)}</span>
+                        </div>
+                        <div class="card-meta-line">
+                            <span>Stamped:</span>
+                            <span style="color: var(--text-primary); font-weight: 600;">${doc.date}</span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 8px; margin-top: auto; border-top: 1px solid var(--border-color); padding-top: 14px;">
+                        <button class="btn-action btn-secondary" style="padding: 6px 12px; font-size: 11px; flex: 1;" onclick="openFileInspector(${doc.id})">Inspect</button>
+                        <button class="btn-action btn-lime" style="padding: 6px 12px; font-size: 11px; flex: 1; box-shadow: 2px 2px 0px #000;" onclick="triggerDownloadSingle('${doc.name}')">Download</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            container.appendChild(grid);
+        }
+
+        // Selection Handlers
+        function toggleFileSelection(id, event) {
+            const doc = documentsData.find(d => d.id === id);
+            if (doc) {
+                doc.selected = event.target.checked;
+            }
+            renderVaultContent();
+            updateBatchMenuState();
+        }
+
+        function toggleSelectAll(event) {
+            const checked = event.target.checked;
+            const filtered = getFilteredDocuments();
+            filtered.forEach(doc => {
+                doc.selected = checked;
+            });
+            renderVaultContent();
+            updateBatchMenuState();
+        }
+
+        function clearBatchSelection() {
+            documentsData.forEach(d => d.selected = false);
+            renderVaultContent();
+            updateBatchMenuState();
+        }
+
+        function updateBatchMenuState() {
+            const selectedDocs = documentsData.filter(d => d.selected);
+            const menu = document.getElementById('batch-menu');
+            const countLabel = document.getElementById('batch-count');
+            
+            if (selectedDocs.length > 0) {
+                countLabel.innerText = selectedDocs.length;
+                menu.classList.add('visible');
+            } else {
+                menu.classList.remove('visible');
+            }
+        }
+
+        // File Drag & Drop Simulation Engine
+        function setupDragAndDrop() {
+            const dropZone = document.getElementById('drop-zone');
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add('dragging');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('dragging');
+                }, false);
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                handleSimulatedUpload(files);
+            }, false);
+        }
+
+        function triggerFileInput() {
+            document.getElementById('real-file-input').click();
+        }
+
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            handleSimulatedUpload(files);
+        }
+
+        // Simulate secure decentralized file upload matrix progress
+        function handleSimulatedUpload(files) {
+            if (files.length === 0) return;
+
+            const uploadContainer = document.getElementById('active-uploads-container');
+            
+            Array.from(files).forEach((file, index) => {
+                const progressId = 'upload-prog-' + Date.now() + '-' + index;
+                const progressItem = document.createElement('div');
+                progressItem.className = 'progress-item';
+                progressItem.id = progressId;
+
+                progressItem.innerHTML = `
+                    <div class="progress-meta">
+                        <span style="text-transform: uppercase; font-weight: 700;">Uploading: ${file.name}</span>
+                        <span id="${progressId}-pct" style="color: var(--accent-lime);">0%</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="${progressId}-bar"></div>
+                    </div>
+                `;
+
+                uploadContainer.appendChild(progressItem);
+
+                // Simulate progress intervals
+                let pct = 0;
+                const interval = setInterval(() => {
+                    pct += Math.floor(Math.random() * 15) + 5;
+                    if (pct >= 100) {
+                        pct = 100;
+                        clearInterval(interval);
+                        
+                        // complete upload state update
+                        setTimeout(() => {
+                            progressItem.remove();
+                            finalizeUploadInArray(file);
+                        }, 500);
+                    }
+                    document.getElementById(`${progressId}-pct`).innerText = pct + '%';
+                    document.getElementById(`${progressId}-bar`).style.width = pct + '%';
+                }, 150);
+            });
+        }
+
+        // Commit file metadata array on terminal completion
+        function finalizeUploadInArray(file) {
+            // guess category based on name keywords
+            let category = 'underwriting';
+            const nameLower = file.name.toLowerCase();
+            if (nameLower.includes('statement') || nameLower.includes('tax') || nameLower.includes('financial') || nameLower.includes('p_and_l')) {
+                category = 'financials';
+            } else if (nameLower.includes('agree') || nameLower.includes('contract') || nameLower.includes('incorporation')) {
+                category = 'legal';
+            } else if (nameLower.includes('id') || nameLower.includes('license') || nameLower.includes('passport')) {
+                category = 'identity';
+            }
+
+            const ext = file.name.split('.').pop().toLowerCase() || 'pdf';
+            const size = file.size || (Math.floor(Math.random() * 3000000) + 500000);
+            
+            // Generate mock hash
+            const hash = Array.from({length: 56}, () => Math.floor(Math.random()*16).toString(16)).join('');
+
+            const newDoc = {
+                id: Date.now(),
+                name: file.name,
+                type: ['pdf','xlsx','docx','jpg','png'].includes(ext) ? ext : 'pdf',
+                category: category,
+                size: size,
+                date: new Date().toISOString().split('T')[0],
+                selected: false,
+                hash: hash
+            };
+
+            documentsData.unshift(newDoc);
+            updateGlobalStats();
+            renderVaultContent();
+            showNotification(`SECURE RESOURCE UPLOADED: ${file.name}`);
+        }
+
+        // Inspector Modal Controller
+        function openFileInspector(id) {
+            const doc = documentsData.find(d => d.id === id);
+            if (!doc) return;
+
+            selectedModalFileId = id;
+            document.getElementById('modal-file-name').innerText = doc.name;
+            document.getElementById('modal-file-size').innerText = formatBytes(doc.size);
+            document.getElementById('modal-file-date').innerText = doc.date + ' (SECURE STAMP)';
+            document.getElementById('modal-file-hash').innerText = doc.hash;
+
+            const badge = document.getElementById('modal-file-category');
+            badge.innerText = doc.category.toUpperCase();
+            badge.className = `file-tag ${doc.category}`;
+
+            const icon = document.getElementById('modal-file-icon');
+            icon.innerText = doc.type.toUpperCase();
+            icon.className = `file-icon ${doc.type}`;
+
+            document.getElementById('file-modal').style.display = 'flex';
+        }
+
+        function closeFileModal() {
+            document.getElementById('file-modal').style.display = 'none';
+            selectedModalFileId = null;
+        }
+
+        function downloadSingleFromModal() {
+            if (selectedModalFileId) {
+                const doc = documentsData.find(d => d.id === selectedModalFileId);
+                if (doc) {
+                    triggerDownloadSingle(doc.name);
+                }
+            }
+            closeFileModal();
+        }
+
+        // Single Actions
+        function triggerDownloadSingle(name) {
+            showNotification(`PREPARING DECRYPTED ARCHIVE: ${name}`);
+            setTimeout(() => {
+                showNotification(`DOWNLOADED: ${name}`);
+            }, 1000);
+        }
+
+        function triggerPurgeSingle(id) {
+            const index = documentsData.findIndex(d => d.id === id);
+            if (index > -1) {
+                const name = documentsData[index].name;
+                documentsData.splice(index, 1);
+                updateGlobalStats();
+                renderVaultContent();
+                updateBatchMenuState();
+                showNotification(`PURGED: ${name}`);
+            }
+        }
+
+        // Batch Action Operations
+        function triggerBatchDownload() {
+            const selected = documentsData.filter(d => d.selected);
+            if (selected.length === 0) return;
+
+            showNotification(`DECRYPTING ${selected.length} ARCHIVES...`);
+            setTimeout(() => {
+                showNotification(`DOWNLOADED: core_flow_vault_batch_${Date.now()}.zip`);
+                clearBatchSelection();
+            }, 1500);
+        }
+
+        function triggerBatchDelete() {
+            const selectedIds = documentsData.filter(d => d.selected).map(d => d.id);
+            if (selectedIds.length === 0) return;
+
+            documentsData = documentsData.filter(d => !selectedIds.includes(d.id));
+            updateGlobalStats();
+            renderVaultContent();
+            updateBatchMenuState();
+            showNotification(`SECURE CRYPT PURGED ${selectedIds.length} FILES`);
+        }
+
+        function clearAllFilters() {
+            document.getElementById('vault-search').value = '';
+            setCategoryFilter('all');
+            setExtensionFilter('all');
+            document.getElementById('sort-select').value = 'newest';
+            applyFilters();
+        }
+    </script>
+</body>
+</html>
+```

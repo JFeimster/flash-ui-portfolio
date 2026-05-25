@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE ARMORY | MEME PROPAGANDA DEPT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #000000;
+            --white: #ffffff;
+            --red: #ff0000;
+            --yellow: #ffff00;
+            --border-width: 4px;
+            --shadow: 8px 8px 0px var(--black);
+            --shadow-small: 4px 4px 0px var(--black);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--white);
+            color: var(--black);
+            font-family: 'Space Mono', monospace;
+            overflow-x: hidden;
+            border: var(--border-width) solid var(--black);
+        }
+
+        .glitch {
+            position: relative;
+            text-shadow: 2px 0 var(--red), -2px 0 var(--yellow);
+        }
+
+        .marquee {
+            background: var(--red);
+            color: var(--white);
+            padding: 10px 0;
+            border-bottom: var(--border-width) solid var(--black);
+            overflow: hidden;
+            white-space: nowrap;
+            font-weight: bold;
+            font-family: 'Archivo Black', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .marquee span {
+            display: inline-block;
+            animation: scroll 20s linear infinite;
+        }
+
+        @keyframes scroll {
+            from { transform: translateX(100%); }
+            to { transform: translateX(-100%); }
+        }
+
+        header {
+            padding: 60px 20px;
+            background: var(--black);
+            color: var(--white);
+            border-bottom: var(--border-width) solid var(--black);
+            text-align: center;
+        }
+
+        .hero-title {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: clamp(3rem, 12vw, 10rem);
+            line-height: 0.85;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .nav-bar {
+            background: var(--yellow);
+            padding: 10px;
+            border-bottom: var(--border-width) solid var(--black);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .cart-status {
+            background: var(--black);
+            color: var(--white);
+            padding: 5px 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .filter-section {
+            padding: 20px;
+            background: var(--white);
+            border-bottom: var(--border-width) solid var(--black);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            background: var(--white);
+            border: var(--border-width) solid var(--black);
+            padding: 10px 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .filter-btn.active {
+            background: var(--red);
+            color: var(--white);
+            box-shadow: var(--shadow-small);
+            transform: translate(-2px, -2px);
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 40px;
+            padding: 40px;
+            background: #f0f0f0;
+            background-image: 
+                linear-gradient(45deg, #ddd 25%, transparent 25%), 
+                linear-gradient(-45deg, #ddd 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #ddd 75%), 
+                linear-gradient(-45deg, transparent 75%, #ddd 75%);
+            background-size: 40px 40px;
+        }
+
+        .product-card {
+            background: var(--white);
+            border: var(--border-width) solid var(--black);
+            padding: 0;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 12px 12px 0px var(--black);
+        }
+
+        .product-img {
+            width: 100%;
+            aspect-ratio: 1/1;
+            background: var(--white);
+            border-bottom: var(--border-width) solid var(--black);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .product-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: contrast(1.1) grayscale(0.2);
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-price {
+            background: var(--yellow);
+            color: var(--black);
+            padding: 5px 10px;
+            font-weight: 900;
+            font-size: 1.2rem;
+            border: 2px solid var(--black);
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .product-title {
+            font-family: 'Archivo Black', sans-serif;
+            text-transform: uppercase;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+
+        .buy-btn {
+            width: 100%;
+            background: var(--black);
+            color: var(--white);
+            border: none;
+            border-top: var(--border-width) solid var(--black);
+            padding: 20px;
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .buy-btn:hover {
+            background: var(--red);
+        }
+
+        .sticker-label {
+            position: absolute;
+            top: 20px;
+            right: -10px;
+            background: var(--red);
+            color: white;
+            padding: 5px 15px;
+            font-family: 'Archivo Black', sans-serif;
+            transform: rotate(15deg);
+            border: 3px solid var(--black);
+            z-index: 2;
+        }
+
+        .inventory-warning {
+            color: var(--red);
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        footer {
+            padding: 60px 20px;
+            background: var(--black);
+            color: var(--white);
+            text-align: center;
+            border-top: var(--border-width) solid var(--black);
+        }
+
+        .checkout-bar {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 2000;
+        }
+
+        .deploy-btn {
+            background: var(--yellow);
+            color: var(--black);
+            padding: 20px 40px;
+            font-family: 'Archivo Black', sans-serif;
+            border: var(--border-width) solid var(--black);
+            box-shadow: var(--shadow);
+            text-decoration: none;
+            display: block;
+            font-size: 1.5rem;
+        }
+
+        .hidden { display: none !important; }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 4rem; }
+            .product-grid { padding: 20px; gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="marquee">
+        <span> ⚡ LIMITED RUN SHIPMENT ⚡ WORLDWIDE DEPLOYMENT ⚡ EQUIP THE FRONT LINES ⚡ NO TAX ON PROPAGANDA ⚡ SHIPMENT INBOUND ⚡ ⚡ LIMITED RUN SHIPMENT ⚡ WORLDWIDE DEPLOYMENT ⚡ EQUIP THE FRONT LINES ⚡ NO TAX ON PROPAGANDA ⚡ SHIPMENT INBOUND ⚡ </span>
+    </div>
+
+    <div class="nav-bar">
+        <div style="font-weight: 900; font-size: 1.2rem;">PROPAGANDA DEPT // ARMORY</div>
+        <div class="cart-status">CART: [<span id="cart-count">0</span>] UNITS</div>
+    </div>
+
+    <header>
+        <h1 class="hero-title glitch">THE ARMORY</h1>
+        <p style="font-size: 1.5rem; background: var(--red); display: inline-block; padding: 5px 20px; transform: rotate(-2deg);">PHYSICAL ASSETS FOR PSYCHOLOGICAL WARFARE</p>
+    </header>
+
+    <div class="filter-section">
+        <button class="filter-btn active" onclick="filterShop('all')">All Gear</button>
+        <button class="filter-btn" onclick="filterShop('apparel')">Heavy Apparel</button>
+        <button class="filter-btn" onclick="filterShop('stickers')">High-Density Stickers</button>
+        <button class="filter-btn" onclick="filterShop('patches')">Tactical Patches</button>
+        <button class="filter-btn" onclick="filterShop('hardware')">Analog Hardware</button>
+    </div>
+
+    <main class="product-grid" id="productGrid">
+        <!-- PRODUCT 1 -->
+        <div class="product-card" data-category="apparel">
+            <div class="sticker-label">MANDATORY</div>
+            <div class="product-img">
+                <img src="https://picsum.photos/seed/hoodie1/600/600" alt="Apparel">
+            </div>
+            <div class="product-info">
+                <div class="product-price">$65.00</div>
+                <h3 class="product-title">Founder Pain Hoodie</h3>
+                <p>Heavyweight 450GSM cotton. Screen-printed with the tears of failed pivots. Pre-shrunk like your runway.</p>
+                <div class="inventory-warning">RUNWAY: 12 UNITS LEFT</div>
+            </div>
+            <button class="buy-btn" onclick="addToCart()">ADD TO LOADOUT</button>
+        </div>
+
+        <!-- PRODUCT 2 -->
+        <div class="product-card" data-category="stickers">
+            <div class="product-img">
+                <img src="https://picsum.photos/seed/stickers/600/600" alt="Stickers">
+            </div>
+            <div class="product-info">
+                <div class="product-price">$15.00</div>
+                <h3 class="product-title">Psych-Op Sticker Pack</h3>
+                <p>12 High-density vinyl decals. UV resistant. Guaranteed to cause office controversy or your money back.</p>
+            </div>
+            <button class="buy-btn" onclick="addToCart()">ADD TO LOADOUT</button>
+        </div>
+
+        <!-- PRODUCT 3 -->
+        <div class="product-card" data-category="patches">
+            <div class="product-img">
+                <img src="https://picsum.photos/seed/patch/600/600" alt="Patch">
+            </div>
+            <div class="product-info">
+                <div class="product-price">$12.00</div>
+                <h3 class="product-title">"I'm Just the LLM" Patch</h3>
+                <p>Embroidered tactical patch with hook-and-loop backing. For when you need plausible deniability.</p>
+            </div>
+            <button class="buy-btn" onclick="addToCart()">ADD TO LOADOUT</button>
+        </div>
+
+        <!-- PRODUCT 4 -->
+        <div class="product-card" data-category="apparel">
+            <div class="sticker-label">SOLD OUT</div>
+            <div class="product-img">
+                <img src="https://picsum.photos/seed/shirt1/600/600" alt="T-Shirt">
+            </div>
+            <div class="product-info">
+                <div class="product-price">$35.00</div>
+                <h3 class="product-title">Algorithm Burner Tee</h3>
+                <p>Oversized fit. Features "The algorithm never sleeps" in 14 languages on the back.</p>
+            </div>
+            <button class="buy-btn" style="background: #444; cursor: not-allowed;">REPLENISHING...</button>
+        </div>
+
+        <!-- PRODUCT 5 -->
+        <div class="product-card" data-category="hardware">
+            <div class="product-img">
+                <img src="https://picsum.photos/seed/usb/600/600" alt="USB">
+            </div>
+            <div class="product-info">
+                <div class="product-price">$45.00</div>
+                <h3 class="product-title">The Dead-Drop Drive</h3>
+                <p>64GB encrypted hardware. Ruggedized zinc alloy. Pre-loaded with 5GB of unreleased meme templates.</p>
+            </div>
+            <button class="buy-btn" onclick="addToCart()">ADD TO LOADOUT</button>
+        </div>
+
+        <!-- PRODUCT 6 -->
+        <div class="product-card" data-category="patches">
+            <div class="product-img">
+                <img src="https://picsum.photos/seed/patch2/600/600" alt="Patch">
+            </div>
+            <div class="product-info">
+                <div class="product-price">$12.00</div>
+                <h3 class="product-title">"Terminal Online" Tab</h3>
+                <p>Woven shoulder tab. Signals that you haven't seen sunlight in 72+ hours. Wear with pride.</p>
+            </div>
+            <button class="buy-btn" onclick="addToCart()">ADD TO LOADOUT</button>
+        </div>
+    </main>
+
+    <div class="checkout-bar">
+        <a href="#" class="deploy-btn" id="deploy-btn">DEPLOY LOADOUT →</a>
+    </div>
+
+    <footer>
+        <h2 class="glitch" style="font-family: 'Archivo Black'; margin-bottom: 20px;">GEAR UP OR SHUT UP</h2>
+        <p>All items are limited edition. No reprints. No regrets.</p>
+        <div style="margin-top: 40px; font-size: 0.8rem; opacity: 0.7;">
+            MEME PROPAGANDA DEPT // LOGISTICS DIVISION // &copy; 2024
+        </div>
+    </footer>
+
+    <script>
+        let cartCount = 0;
+        const countDisplay = document.getElementById('cart-count');
+        const deployBtn = document.getElementById('deploy-btn');
+
+        function addToCart() {
+            cartCount++;
+            countDisplay.innerText = cartCount;
+            
+            // Visual feedback
+            countDisplay.parentElement.style.background = '#ff0000';
+            setTimeout(() => {
+                countDisplay.parentElement.style.background = '#000000';
+            }, 200);
+
+            if (cartCount > 0) {
+                deployBtn.style.display = 'block';
+            }
+        }
+
+        function filterShop(category) {
+            const cards = document.querySelectorAll('.product-card');
+            const buttons = document.querySelectorAll('.filter-btn');
+
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.innerText.toLowerCase().includes(category.toLowerCase())) {
+                    btn.classList.add('active');
+                }
+                if(category === 'all' && btn.innerText === 'ALL GEAR') {
+                    btn.classList.add('active');
+                }
+            });
+
+            cards.forEach(card => {
+                if (category === 'all' || card.getAttribute('data-category') === category) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+
+        // Glitch effect randomizer
+        setInterval(() => {
+            const glitches = document.querySelectorAll('.glitch');
+            glitches.forEach(g => {
+                g.style.transform = `translate(${Math.random() * 2 - 1}px, ${Math.random() * 2 - 1}px)`;
+            });
+            setTimeout(() => {
+                glitches.forEach(g => g.style.transform = `translate(0,0)`);
+            }, 50);
+        }, 2000);
+    </script>
+</body>
+</html>

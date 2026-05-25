@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funding Calculator | District Capital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #0A1629;
+            --navy-light: #162B45;
+            --gold: #C5A059;
+            --gold-hover: #D4AF37;
+            --white: #FFFFFF;
+            --off-white: #F4F7FA;
+            --text-muted: #94A3B8;
+            --border: rgba(197, 160, 89, 0.2);
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--navy);
+            color: var(--white);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        /* Navigation */
+        nav {
+            padding: 30px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+            color: var(--gold);
+            text-decoration: none;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            margin-left: 30px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--gold);
+        }
+
+        /* Calculator Section */
+        .calc-header {
+            padding: 80px 0 40px;
+            text-align: center;
+        }
+
+        .calc-header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 40px;
+            margin-bottom: 100px;
+            align-items: start;
+        }
+
+        .calc-card {
+            background: var(--navy-light);
+            padding: 50px;
+            border-top: 4px solid var(--gold);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .input-group {
+            margin-bottom: 40px;
+        }
+
+        .input-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .input-header label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+
+        .input-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--gold);
+        }
+
+        /* Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            background: rgba(197, 160, 89, 0.2);
+            border-radius: 2px;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: var(--gold);
+            cursor: pointer;
+            margin-top: -10px;
+            box-shadow: 0 0 10px rgba(197, 160, 89, 0.4);
+            transition: var(--transition);
+        }
+
+        input[type=range]:hover::-webkit-slider-thumb {
+            transform: scale(1.1);
+            background: var(--gold-hover);
+        }
+
+        /* Results Display */
+        .results-card {
+            background: var(--white);
+            color: var(--navy);
+            padding: 50px;
+            position: sticky;
+            top: 40px;
+        }
+
+        .results-card h3 {
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 30px;
+            color: var(--navy-light);
+        }
+
+        .funding-estimate {
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 10px;
+            color: var(--navy);
+        }
+
+        .estimate-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            display: block;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .metric-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .metric-value {
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        .cta-button {
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            background-color: var(--gold);
+            color: var(--navy);
+            text-decoration: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 30px;
+            border: 1px solid var(--gold);
+            transition: var(--transition);
+        }
+
+        .cta-button:hover {
+            background-color: var(--navy);
+            color: var(--gold);
+        }
+
+        .disclaimer {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 20px;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 992px) {
+            .calc-grid { grid-template-columns: 1fr; }
+            .calc-header h1 { font-size: 2.5rem; }
+            .results-card { position: static; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="container">
+        <a href="index.html" class="logo">DISTRICT CAPITAL</a>
+        <div class="nav-links">
+            <a href="index.html#funding">Funding</a>
+            <a href="index.html#how-it-works">Process</a>
+            <a href="#" class="cta-button" style="padding: 10px 20px; font-size: 0.7rem; margin-top: 0;">Get Funded</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header class="calc-header">
+            <span style="color: var(--gold); text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem;">Eligibility Engine</span>
+            <h1>Funding Estimate</h1>
+            <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto;">Calculate your potential capital injection based on your District business performance.</p>
+        </header>
+
+        <div class="calc-grid">
+            <div class="calc-card">
+                <div class="input-group">
+                    <div class="input-header">
+                        <label>Monthly Gross Revenue</label>
+                        <div class="input-value" id="revenue-display">$50,000</div>
+                    </div>
+                    <input type="range" id="revenue-range" min="5000" max="500000" step="5000" value="50000">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-header">
+                        <label>Time in Business</label>
+                        <div class="input-value" id="time-display">2 Years</div>
+                    </div>
+                    <input type="range" id="time-range" min="0" max="10" step="1" value="2">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-header">
+                        <label>Credit Profile</label>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                        <button class="profile-btn active" data-mult="1.2" style="padding: 15px; background: var(--navy); border: 1px solid var(--gold); color: var(--gold); cursor: pointer; font-weight: 600;">EXCELLENT</button>
+                        <button class="profile-btn" data-mult="1.0" style="padding: 15px; background: transparent; border: 1px solid var(--border); color: var(--white); cursor: pointer; font-weight: 600;">AVERAGE</button>
+                        <button class="profile-btn" data-mult="0.8" style="padding: 15px; background: transparent; border: 1px solid var(--border); color: var(--white); cursor: pointer; font-weight: 600;">FAIR</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-card">
+                <h3>Estimated Capital</h3>
+                <div class="funding-estimate" id="total-funding">$75,000</div>
+                <span class="estimate-label">Maximum potential funding amount</span>
+
+                <div class="metric-row">
+                    <span class="metric-label">Estimated Term</span>
+                    <span class="metric-value" id="term-val">12 - 24 Months</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Approval Odds</span>
+                    <span class="metric-value" id="odds-val">High</span>
+                </div>
+                <div class="metric-row" style="border-bottom: none;">
+                    <span class="metric-label">Speed to Wire</span>
+                    <span class="metric-value">24-48 Hours</span>
+                </div>
+
+                <a href="#" class="cta-button">Finalize My Offer</a>
+                <p class="disclaimer">Estimates are based on historical District data. Actual rates and terms are determined after a soft credit pull and bank verification.</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <span class="footer-logo">DISTRICT CAPITAL</span>
+            <div style="width: 60px; height: 2px; background: var(--gold); margin: 20px auto;"></div>
+            <p style="color: var(--text-muted); font-size: 0.8rem; letter-spacing: 1px;">Serving Washington DC, Maryland, and Virginia</p>
+            <p style="margin-top: 40px; font-size: 0.75rem; color: rgba(255,255,255,0.1);">© 2024 District Capital Partners. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const revSlider = document.getElementById('revenue-range');
+        const timeSlider = document.getElementById('time-range');
+        const revDisplay = document.getElementById('revenue-display');
+        const timeDisplay = document.getElementById('time-display');
+        const fundingDisplay = document.getElementById('total-funding');
+        const oddsVal = document.getElementById('odds-val');
+        const termVal = document.getElementById('term-val');
+        const profileBtns = document.querySelectorAll('.profile-btn');
+
+        let multiplier = 1.2;
+
+        function formatCurrency(num) {
+            return '$' + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function updateCalculator() {
+            const rev = parseInt(revSlider.value);
+            const time = parseInt(timeSlider.value);
+            
+            // Display updates
+            revDisplay.innerText = formatCurrency(rev);
+            timeDisplay.innerText = time === 10 ? '10+ Years' : time + (time === 1 ? ' Year' : ' Years');
+
+            // Logic: 1.5x monthly revenue adjusted by profile and time
+            let timeFactor = time < 1 ? 0.7 : (time < 2 ? 1.0 : 1.3);
+            let estimatedFunding = rev * 1.5 * multiplier * timeFactor;
+            
+            // Cap logic
+            if (estimatedFunding > 2000000) estimatedFunding = 2000000;
+            
+            fundingDisplay.innerText = formatCurrency(Math.round(estimatedFunding / 1000) * 1000);
+
+            // Odds and Terms
+            if (time < 1 || multiplier < 1) {
+                oddsVal.innerText = "Medium";
+                termVal.innerText = "6 - 12 Months";
+            } else {
+                oddsVal.innerText = "High";
+                termVal.innerText = "12 - 36 Months";
+            }
+        }
+
+        revSlider.addEventListener('input', updateCalculator);
+        timeSlider.addEventListener('input', updateCalculator);
+
+        profileBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                profileBtns.forEach(b => {
+                    b.classList.remove('active');
+                    b.style.background = 'transparent';
+                    b.style.color = 'var(--white)';
+                    b.style.borderColor = 'var(--border)';
+                });
+                btn.classList.add('active');
+                btn.style.background = 'var(--navy)';
+                btn.style.color = 'var(--gold)';
+                btn.style.borderColor = 'var(--gold)';
+                multiplier = parseFloat(btn.dataset.mult);
+                updateCalculator();
+            });
+        });
+
+        // Init
+        updateCalculator();
+    </script>
+</body>
+</html>

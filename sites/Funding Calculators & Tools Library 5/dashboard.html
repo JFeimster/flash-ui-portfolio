@@ -1,0 +1,1426 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Edge - Fintech Document & Case Dashboard</title>
+    <!-- Google Fonts for Ultra-Modern High-Contrast Look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0c10;
+            --surface: #14161f;
+            --surface-card: #1a1d29;
+            --text-raw: #ffffff;
+            --text-muted: #8e95ad;
+            --accent-cyan: #00f3ff;
+            --accent-magenta: #ff0055;
+            --accent-yellow: #ffee00;
+            --accent-green: #00ff66;
+            --border-width: 3px;
+            --brutal-shadow-cyan: 6px 6px 0px var(--accent-cyan);
+            --brutal-shadow-magenta: 6px 6px 0px var(--accent-magenta);
+            --brutal-shadow-yellow: 6px 6px 0px var(--accent-yellow);
+            --brutal-shadow-green: 6px 6px 0px var(--accent-green);
+            --transition-speed: 0.15s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-raw);
+            line-height: 1.4;
+            padding: 20px;
+            overflow-x: hidden;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* Container Limit */
+        .wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Navigation Header */
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: var(--border-width) solid #fff;
+            background: var(--surface);
+            padding: 20px 40px;
+            margin-bottom: 40px;
+            box-shadow: var(--brutal-shadow-yellow);
+        }
+
+        .nav-logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 900;
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-logo span {
+            color: var(--accent-cyan);
+        }
+
+        .user-badge {
+            background: var(--surface-card);
+            border: 2px solid #fff;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-status-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-green);
+        }
+
+        /* Header Section */
+        header {
+            position: relative;
+            padding: 60px 40px;
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            box-shadow: var(--brutal-shadow-cyan);
+            margin-bottom: 40px;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 0, 85, 0.06) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--accent-magenta);
+            color: #fff;
+            border: 2px solid #fff;
+            font-weight: 900;
+            font-size: 14px;
+            letter-spacing: 1.5px;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            transform: rotate(-1.5deg);
+            box-shadow: 4px 4px 0px #fff;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        h1 {
+            font-size: clamp(32px, 5vw, 64px);
+            font-weight: 900;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            line-height: 0.95;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        h1 span {
+            color: transparent;
+            -webkit-text-stroke: 1.5px #fff;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-magenta));
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .hero-sub {
+            font-size: 18px;
+            color: var(--text-muted);
+            max-width: 850px;
+            line-height: 1.6;
+        }
+
+        /* Statistics Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            padding: 30px;
+            position: relative;
+            box-shadow: var(--brutal-shadow-cyan);
+            transition: transform var(--transition-speed);
+        }
+
+        .stat-card:nth-child(2) { box-shadow: var(--brutal-shadow-magenta); }
+        .stat-card:nth-child(3) { box-shadow: var(--brutal-shadow-yellow); }
+        .stat-card:nth-child(4) { box-shadow: var(--brutal-shadow-green); }
+
+        .stat-card:hover {
+            transform: translate(-4px, -4px);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            text-transform: uppercase;
+            font-weight: 900;
+            color: var(--text-muted);
+            letter-spacing: 1.5px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-icon {
+            font-size: 24px;
+        }
+
+        .stat-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 40px;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+
+        .stat-footer {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent-green);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-footer.warning {
+            color: var(--accent-magenta);
+        }
+
+        /* Layout Controls */
+        .controls-wrapper {
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            padding: 24px;
+            box-shadow: var(--brutal-shadow-magenta);
+            margin-bottom: 40px;
+        }
+
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-container {
+            position: relative;
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--surface-card);
+            border: var(--border-width) solid #fff;
+            padding: 16px 20px 16px 50px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            box-shadow: inset 4px 4px 0px rgba(0, 0, 0, 0.5);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-container::before {
+            content: '🔍';
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            pointer-events: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-cyan);
+        }
+
+        .filter-btn {
+            background: var(--surface-card);
+            border: var(--border-width) solid #fff;
+            color: #fff;
+            padding: 14px 24px;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 14px;
+            text-transform: uppercase;
+            transition: all var(--transition-speed);
+            box-shadow: 4px 4px 0px rgba(255,255,255,0.15);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .filter-btn:hover {
+            background: #fff;
+            color: #000;
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active {
+            background: var(--accent-cyan);
+            color: #000;
+            box-shadow: 4px 4px 0px #fff;
+        }
+
+        /* Two-Column Dashboard Content */
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        @media (max-width: 1200px) {
+            .dashboard-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Cases Grid & List */
+        .cases-section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 32px;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .cases-section-title span {
+            color: var(--accent-cyan);
+        }
+
+        .case-list {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .case-card {
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            padding: 30px;
+            box-shadow: var(--brutal-shadow-yellow);
+            position: relative;
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+        }
+
+        .case-card:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 10px 10px 0px var(--accent-yellow);
+        }
+
+        .case-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            border-bottom: 2px dashed rgba(255, 255, 255, 0.1);
+            padding-bottom: 20px;
+        }
+
+        .case-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .case-id {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+            font-weight: 900;
+            color: var(--accent-cyan);
+            letter-spacing: 1px;
+        }
+
+        .case-title {
+            font-size: 24px;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .case-amount {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--accent-yellow);
+            font-family: 'Space Grotesk', sans-serif;
+            text-align: right;
+        }
+
+        .case-status-badge {
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 900;
+            background: #fff;
+            color: #000;
+            padding: 6px 12px;
+            border: 2px solid #000;
+            display: inline-block;
+            letter-spacing: 1px;
+            box-shadow: 3px 3px 0px #000;
+        }
+
+        .case-status-badge.active { background: var(--accent-cyan); }
+        .case-status-badge.pending { background: var(--accent-yellow); }
+        .case-status-badge.action { background: var(--accent-magenta); color: #fff; }
+        .case-status-badge.verified { background: var(--accent-green); }
+
+        .case-details-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .detail-label {
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        .detail-value {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .document-progress {
+            margin-bottom: 25px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-bg {
+            background: var(--surface-card);
+            border: 2px solid #fff;
+            height: 18px;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            background: var(--accent-cyan);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease-out;
+        }
+
+        .case-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            background: var(--surface-card);
+            border: 2px solid #fff;
+            color: #fff;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 14px;
+            text-transform: uppercase;
+            font-family: 'Space Grotesk', sans-serif;
+            transition: all var(--transition-speed);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-action:hover {
+            background: #fff;
+            color: #000;
+            box-shadow: 4px 4px 0px var(--accent-cyan);
+        }
+
+        .btn-action.primary {
+            background: var(--accent-magenta);
+            color: #fff;
+            box-shadow: 3px 3px 0px #fff;
+        }
+
+        .btn-action.primary:hover {
+            background: var(--accent-magenta);
+            color: #fff;
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0px #fff;
+        }
+
+        /* Sidebar Column: Verification Centre & Timeline */
+        .sidebar-section {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .sidebar-panel {
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            padding: 30px;
+            box-shadow: var(--brutal-shadow-magenta);
+        }
+
+        .sidebar-panel.green {
+            box-shadow: var(--brutal-shadow-green);
+        }
+
+        .sidebar-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 22px;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            border-bottom: var(--border-width) solid #fff;
+            padding-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Task & Checklist System */
+        .pending-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .pending-item {
+            background: var(--surface-card);
+            border: 2px solid #fff;
+            padding: 15px;
+            position: relative;
+            cursor: pointer;
+            transition: border-color var(--transition-speed);
+        }
+
+        .pending-item:hover {
+            border-color: var(--accent-yellow);
+        }
+
+        .pending-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .pending-label {
+            font-size: 11px;
+            font-weight: 900;
+            background: var(--accent-magenta);
+            color: #fff;
+            padding: 2px 8px;
+            border: 1px solid #000;
+            text-transform: uppercase;
+        }
+
+        .pending-label.soft {
+            background: var(--accent-yellow);
+            color: #000;
+        }
+
+        .pending-case {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--text-muted);
+        }
+
+        .pending-title {
+            font-size: 16px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .pending-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        /* Timeline / Activity System */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 4px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .timeline-item {
+            position: relative;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -20px;
+            top: 4px;
+            width: 11px;
+            height: 11px;
+            background: var(--accent-cyan);
+            border: 2px solid #fff;
+            border-radius: 50%;
+        }
+
+        .timeline-item:nth-child(2) .timeline-marker { background: var(--accent-magenta); }
+        .timeline-item:nth-child(3) .timeline-marker { background: var(--accent-yellow); }
+
+        .timeline-content {
+            background: var(--surface-card);
+            border: 2px solid #fff;
+            padding: 12px 16px;
+        }
+
+        .timeline-time {
+            font-size: 11px;
+            font-weight: 900;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .timeline-text {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .timeline-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Dynamic Interaction Drawer (Mock Document upload panel) */
+        .calculator-overlay {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            max-width: 580px;
+            height: 100vh;
+            background: var(--surface);
+            border-left: var(--border-width) solid #fff;
+            box-shadow: -20px 0px 0px rgba(0,0,0,0.8);
+            z-index: 1000;
+            transform: translateX(110%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
+            padding: 40px;
+        }
+
+        .calculator-overlay.active {
+            transform: translateX(0);
+        }
+
+        .overlay-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay-backdrop.active {
+            display: block;
+        }
+
+        .calc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: var(--border-width) solid #fff;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .calc-title {
+            font-size: 24px;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--accent-cyan);
+        }
+
+        .close-calc {
+            background: var(--accent-magenta);
+            color: #fff;
+            border: 2px solid #fff;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-weight: 900;
+            font-size: 14px;
+            text-transform: uppercase;
+            box-shadow: 3px 3px 0px #fff;
+        }
+
+        .close-calc:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px;
+        }
+
+        /* Custom Interactive Dropzone UI */
+        .dropzone-container {
+            border: 3px dashed #fff;
+            background: var(--surface-card);
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 25px;
+        }
+
+        .dropzone-container:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 243, 255, 0.05);
+        }
+
+        .dropzone-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .dropzone-text h4 {
+            font-size: 16px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .dropzone-text p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .selected-file-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .selected-file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface);
+            border: 2px solid #fff;
+            padding: 10px 15px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .selected-file-remove {
+            color: var(--accent-magenta);
+            cursor: pointer;
+            font-weight: 900;
+        }
+
+        /* Custom Checklist inside side panel */
+        .checklist-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 15px;
+            background: var(--surface-card);
+            border: 2px solid #fff;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .checklist-item.checked {
+            border-color: var(--accent-green);
+            background: rgba(0, 255, 102, 0.05);
+        }
+
+        .checklist-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .checklist-item.checked .checklist-checkbox {
+            background: var(--accent-green);
+            color: #000;
+            border-color: var(--accent-green);
+        }
+
+        .checklist-text h4 {
+            font-size: 15px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .checklist-text p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Success screen overlay inside dynamic builder */
+        .success-overlay {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+            background: var(--surface);
+            border: 3px solid var(--accent-green);
+            box-shadow: var(--brutal-shadow-green);
+            margin-top: 20px;
+        }
+
+        .success-overlay.active {
+            display: flex;
+        }
+
+        .success-icon {
+            font-size: 48px;
+            color: var(--accent-green);
+            margin-bottom: 15px;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 80px;
+            padding: 60px 40px;
+            border: var(--border-width) solid #fff;
+            background: #000;
+            color: #fff;
+            box-shadow: var(--brutal-shadow-magenta);
+            text-align: center;
+            position: relative;
+        }
+
+        .footer-copyright {
+            font-weight: 900;
+            color: var(--accent-cyan);
+            letter-spacing: 2px;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        /* Responsiveness adjustments */
+        @media (max-width: 900px) {
+            .nav-bar {
+                flex-direction: column;
+                gap: 15px;
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            header {
+                padding: 30px 20px;
+            }
+            .controls-wrapper {
+                padding: 20px;
+            }
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-btn {
+                width: 100%;
+                text-align: center;
+            }
+            .calculator-overlay {
+                padding: 20px;
+            }
+            .case-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .case-amount {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <!-- GLOBAL NAVIGATION -->
+        <nav class="nav-bar">
+            <div class="nav-logo">⚡ DYNAMIC <span>EDGE</span></div>
+            <div class="user-badge">
+                <span class="user-status-dot"></span>
+                Partner Portal: Enterprise Broker
+            </div>
+        </nav>
+
+        <!-- DASHBOARD HEADER -->
+        <header>
+            <div class="hero-badge">⚡ Submissions Verification Hub</div>
+            <h1>Document & <span>Case tracking</span></h1>
+            <p class="hero-sub">Monitor live credit requests, view exact verification progress across financial and bank metrics, fulfill outstanding item schedules instantly, and review timeline indicators for active deals.</p>
+        </header>
+
+        <!-- DASHBOARD ANALYTICS STATS -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">
+                    Active Submissions
+                    <span class="stat-icon">📂</span>
+                </div>
+                <div class="stat-value">5</div>
+                <div class="stat-footer">2 Assigned Underwriting</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">
+                    Pending Attachments
+                    <span class="stat-icon">📎</span>
+                </div>
+                <div class="stat-value" style="color: var(--accent-magenta);">3</div>
+                <div class="stat-footer warning">Action Required Instantly</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">
+                    Documents Verified
+                    <span class="stat-icon">✔</span>
+                </div>
+                <div class="stat-value" style="color: var(--accent-yellow);">14</div>
+                <div class="stat-footer">82% Success Ratio</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">
+                    Funded This Month
+                    <span class="stat-icon">💰</span>
+                </div>
+                <div class="stat-value" style="color: var(--accent-green);">$840K</div>
+                <div class="stat-footer">+$120K commissions</div>
+            </div>
+        </div>
+
+        <!-- SEARCH / FILTER CONTROL BOARD -->
+        <div class="controls-wrapper">
+            <div class="filter-bar">
+                <div class="search-container">
+                    <input type="text" id="caseSearch" class="search-input" placeholder="SEARCH ACTIVE CASE FILES, IDs, BUSINESS NAMES...">
+                </div>
+                <button class="filter-btn active" data-filter="all">All Cases</button>
+                <button class="filter-btn" data-filter="action">Action Required</button>
+                <button class="filter-btn" data-filter="pending">Under Review</button>
+                <button class="filter-btn" data-filter="completed">Verified</button>
+            </div>
+        </div>
+
+        <!-- TWO-COLUMN DASHBOARD LAYOUT -->
+        <div class="dashboard-layout">
+            <!-- LEFT COLUMN: CASES TRACKING -->
+            <div class="cases-area">
+                <h2 class="cases-section-title">Active Funding <span>Cases</span></h2>
+                
+                <div class="case-list" id="caseGrid">
+                    <!-- Case 1 -->
+                    <div class="case-card" data-status="action">
+                        <div class="case-header">
+                            <div class="case-meta">
+                                <span class="case-id">CASE-8942-NY</span>
+                                <h3 class="case-title">Apex Logistics Group</h3>
+                            </div>
+                            <div style="display:flex; flex-direction:column; align-items:flex-end;">
+                                <span class="case-amount">$180,000</span>
+                                <span class="case-status-badge action">Needs Attention</span>
+                            </div>
+                        </div>
+                        <div class="case-details-row">
+                            <div class="detail-item">
+                                <span class="detail-label">Product Class</span>
+                                <span class="detail-value">Equipment Lease</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Underwriter Assigned</span>
+                                <span class="detail-value">Niels Bohr</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Last Modified</span>
+                                <span class="detail-value">Today, 10:45 AM</span>
+                            </div>
+                        </div>
+                        <div class="document-progress">
+                            <div class="progress-header">
+                                <span>Verification Completion</span>
+                                <span>60%</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: 60%; background: var(--accent-magenta);"></div>
+                            </div>
+                        </div>
+                        <div class="case-actions">
+                            <button class="btn-action primary" onclick="openDrawer('Apex Logistics Group', 'CASE-8942-NY', 'lease')">Upload Bank Specs ↗</button>
+                            <button class="btn-action" onclick="openDrawer('Apex Logistics Group', 'CASE-8942-NY', 'checklist')">View Checklist</button>
+                        </div>
+                    </div>
+
+                    <!-- Case 2 -->
+                    <div class="case-card" data-status="pending">
+                        <div class="case-header">
+                            <div class="case-meta">
+                                <span class="case-id">CASE-1256-CA</span>
+                                <h3 class="case-title">Vanguard Biotech Corp</h3>
+                            </div>
+                            <div style="display:flex; flex-direction:column; align-items:flex-end;">
+                                <span class="case-amount">$450,000</span>
+                                <span class="case-status-badge pending">Under Review</span>
+                            </div>
+                        </div>
+                        <div class="case-details-row">
+                            <div class="detail-item">
+                                <span class="detail-label">Product Class</span>
+                                <span class="detail-value">Revenue Financing</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Underwriter Assigned</span>
+                                <span class="detail-value">Marie Curie</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Last Modified</span>
+                                <span class="detail-value">Yesterday</span>
+                            </div>
+                        </div>
+                        <div class="document-progress">
+                            <div class="progress-header">
+                                <span>Verification Completion</span>
+                                <span>85%</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: 85%; background: var(--accent-yellow);"></div>
+                            </div>
+                        </div>
+                        <div class="case-actions">
+                            <button class="btn-action" onclick="openDrawer('Vanguard Biotech Corp', 'CASE-1256-CA', 'lease')">Manage Files</button>
+                            <button class="btn-action" onclick="openDrawer('Vanguard Biotech Corp', 'CASE-1256-CA', 'checklist')">Review Terms</button>
+                        </div>
+                    </div>
+
+                    <!-- Case 3 -->
+                    <div class="case-card" data-status="completed">
+                        <div class="case-header">
+                            <div class="case-meta">
+                                <span class="case-id">CASE-5541-TX</span>
+                                <h3 class="case-title">Starlight Retail Partners</h3>
+                            </div>
+                            <div style="display:flex; flex-direction:column; align-items:flex-end;">
+                                <span class="case-amount">$75,000</span>
+                                <span class="case-status-badge verified">Verified</span>
+                            </div>
+                        </div>
+                        <div class="case-details-row">
+                            <div class="detail-item">
+                                <span class="detail-label">Product Class</span>
+                                <span class="detail-value">Invoice Factoring</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Underwriter Assigned</span>
+                                <span class="detail-value">Albert Einstein</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Last Modified</span>
+                                <span class="detail-value">3 days ago</span>
+                            </div>
+                        </div>
+                        <div class="document-progress">
+                            <div class="progress-header">
+                                <span>Verification Completion</span>
+                                <span>100%</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: 100%; background: var(--accent-green);"></div>
+                            </div>
+                        </div>
+                        <div class="case-actions">
+                            <button class="btn-action" onclick="openDrawer('Starlight Retail Partners', 'CASE-5541-TX', 'checklist')">Audit History</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: VERIFICATION CENTRE & TIMELINE -->
+            <div class="sidebar-section">
+                <!-- Action Required items list -->
+                <div class="sidebar-panel">
+                    <h3 class="sidebar-title">
+                        Verification Centre
+                        <span style="font-size: 14px; background: var(--accent-magenta); color: #fff; padding: 2px 8px; border: 1px solid #fff;">3 TODO</span>
+                    </h3>
+                    <div class="pending-list">
+                        <!-- Task 1 -->
+                        <div class="pending-item" onclick="openDrawer('Apex Logistics Group', 'CASE-8942-NY', 'lease')">
+                            <div class="pending-meta">
+                                <span class="pending-label">CRITICAL</span>
+                                <span class="pending-case">CASE-8942-NY</span>
+                            </div>
+                            <div class="pending-title">Latest 3 Months Banks</div>
+                            <div class="pending-desc">Requires high-resolution PDF exports with security signatures intact.</div>
+                            <div style="display:flex; align-items:center; gap: 5px; color: var(--accent-cyan); font-size:11px; font-weight:800;">
+                                UPLOAD NOW ↗
+                            </div>
+                        </div>
+
+                        <!-- Task 2 -->
+                        <div class="pending-item" onclick="openDrawer('Vanguard Biotech Corp', 'CASE-1256-CA', 'checklist')">
+                            <div class="pending-meta">
+                                <span class="pending-label soft">SECONDARY</span>
+                                <span class="pending-case">CASE-1256-CA</span>
+                            </div>
+                            <div class="pending-title">Tax Return Sign-Off</div>
+                            <div class="pending-desc">Form 4506-C signature required for processing validation step.</div>
+                            <div style="display:flex; align-items:center; gap: 5px; color: var(--accent-yellow); font-size:11px; font-weight:800;">
+                                SIGN DOC ↗
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activities timeline -->
+                <div class="sidebar-panel green">
+                    <h3 class="sidebar-title">Recent Activity Log</h3>
+                    <div class="timeline">
+                        <!-- item 1 -->
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-time">Today, 2:14 PM</div>
+                                <div class="timeline-text">Corporate Tax Audit Form Verified</div>
+                                <div class="timeline-sub">Underwriter verified Vanguard Biotech tax profiles</div>
+                            </div>
+                        </div>
+                        <!-- item 2 -->
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-time">Yesterday, 4:51 PM</div>
+                                <div class="timeline-text">Case 8942-NY Flagged Action</div>
+                                <div class="timeline-sub">Missing transactional pages on bank export statements</div>
+                            </div>
+                        </div>
+                        <!-- item 3 -->
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-time">Jan 23, 11:30 AM</div>
+                                <div class="timeline-text">Broker Commissions Disbursed</div>
+                                <div class="timeline-sub">Payout of $8,400 finalized on Case 4431-TX</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <footer>
+            <p class="footer-copyright">&copy; 2024 FINTECH DYNAMIC EDGE PORTAL. SECURED BY MULTI-SIGNATURE CREDENTIAL LAYERS.</p>
+        </footer>
+    </div>
+
+    <!-- FLOATING DRAWER PANEL FOR CASE DOCUMENTS & UPDATING (DYNAMIC SYSTEM) -->
+    <div class="overlay-backdrop" id="backdrop" onclick="closeDrawer()"></div>
+    
+    <div class="calculator-overlay" id="drawerOverlay">
+        <div class="calc-header">
+            <div>
+                <div class="calc-title" id="drawerCaseName">Case Document Desk</div>
+                <div style="font-size: 13px; color: var(--text-muted); font-weight: 800; margin-top: 4px;" id="drawerCaseId">CASE-ID</div>
+            </div>
+            <button class="close-calc" onclick="closeDrawer()">CLOSE [X]</button>
+        </div>
+        
+        <!-- DRAWER CONTENT TARGETS -->
+        <div id="drawerBody">
+            <!-- Dynamic Form injection base -->
+        </div>
+    </div>
+
+    <script>
+        /* Filtering Logic for Case Submissions */
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const caseCards = document.querySelectorAll('.case-card');
+        const searchInput = document.getElementById('caseSearch');
+
+        function filterCases() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+
+            caseCards.forEach(card => {
+                const title = card.querySelector('.case-title').innerText.toLowerCase();
+                const id = card.querySelector('.case-id').innerText.toLowerCase();
+                const status = card.dataset.status;
+
+                const matchesSearch = title.includes(searchTerm) || id.includes(searchTerm);
+                const matchesFilter = activeFilter === 'all' || status === activeFilter;
+                
+                if (matchesSearch && matchesFilter) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                filterCases();
+            });
+        });
+
+        searchInput.addEventListener('input', filterCases);
+
+
+        /* Floating Interaction Drawer / Modal System */
+        const overlay = document.getElementById('drawerOverlay');
+        const backdrop = document.getElementById('backdrop');
+        const drawerCaseName = document.getElementById('drawerCaseName');
+        const drawerCaseId = document.getElementById('drawerCaseId');
+        const drawerBody = document.getElementById('drawerBody');
+
+        function openDrawer(clientName, caseId, mode) {
+            overlay.classList.add('active');
+            backdrop.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            drawerCaseName.innerText = clientName;
+            drawerCaseId.innerText = caseId;
+
+            if (mode === 'lease') {
+                setupUploadCenter(clientName, caseId);
+            } else {
+                setupVerificationChecklist(clientName, caseId);
+            }
+        }
+
+        function closeDrawer() {
+            overlay.classList.remove('active');
+            backdrop.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        /* Mode A: Upload Center Dynamic HTML */
+        function setupUploadCenter(client, id) {
+            drawerBody.innerHTML = `
+                <div class="calc-group">
+                    <label class="calc-label">Required Document Standard</label>
+                    <div style="background: var(--surface-card); padding: 15px; border: 2px solid #fff; font-size:13px; font-weight:700; margin-bottom: 20px;">
+                        📂 Requested: <strong style="color: var(--accent-magenta);">3 Months Consolidated Bank Statements</strong><br>
+                        Format: PDF exports only. Scanner copies subject to auto-delay audit steps.
+                    </div>
+                </div>
+
+                <div class="dropzone-container" onclick="triggerFileInput()" id="dropzone">
+                    <div class="dropzone-icon">📥</div>
+                    <div class="dropzone-text">
+                        <h4>Drag & Drop Financial Statement PDF</h4>
+                        <p>or click here to search local directory files (Max 30MB)</p>
+                    </div>
+                    <input type="file" id="fileSelector" style="display:none;" onchange="handleFileSelect(event)">
+                </div>
+
+                <div id="selectedFileList" class="selected-file-list"></div>
+
+                <div style="margin-top: 30px;">
+                    <button class="btn-action primary" style="width:100%; justify-content:center; padding: 18px;" onclick="simulateSubmit()">
+                        Submit Documents For Verification ↗
+                    </button>
+                </div>
+
+                <div class="success-overlay" id="successScreen">
+                    <div class="success-icon">✔</div>
+                    <h3 style="text-transform: uppercase; font-family: 'Space Grotesk'; font-size: 20px; margin-bottom: 10px;">Submission Processed</h3>
+                    <p style="font-size:13px; color: var(--text-muted);">Parsing engines scanning pages instantly. File has been appended to ${id}.</p>
+                </div>
+            `;
+        }
+
+        /* Trigger Mock File Explorer clicks */
+        function triggerFileInput() {
+            document.getElementById('fileSelector').click();
+        }
+
+        function handleFileSelect(event) {
+            const list = document.getElementById('selectedFileList');
+            list.innerHTML = '';
+            
+            const files = event.target.files;
+            if (files.length > 0) {
+                const file = files[0];
+                const fileItem = document.createElement('div');
+                fileItem.className = 'selected-file-item';
+                fileItem.innerHTML = `
+                    <span>📄 ${file.name} (${Math.round(file.size / 1024)} KB)</span>
+                    <span class="selected-file-remove" onclick="removeSelectedFile()">[REMOVE]</span>
+                `;
+                list.appendChild(fileItem);
+            }
+        }
+
+        function removeSelectedFile() {
+            document.getElementById('selectedFileList').innerHTML = '';
+            document.getElementById('fileSelector').value = '';
+        }
+
+        /* Mock Submit Pipeline UI feedback loops */
+        function simulateSubmit() {
+            const list = document.getElementById('selectedFileList');
+            if(list.children.length === 0) {
+                alert("Please drop or select a file before sending to underwriting systems.");
+                return;
+            }
+
+            const success = document.getElementById('successScreen');
+            success.classList.add('active');
+            
+            setTimeout(() => {
+                closeDrawer();
+            }, 3000);
+        }
+
+        /* Mode B: Detailed Multi-Point Checklist UI Panel */
+        function setupVerificationChecklist(client, id) {
+            drawerBody.innerHTML = `
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Toggle and review institutional criteria targets completed by the underwriter team.</p>
+                <div class="checklist-wrapper">
+                    <div class="checklist-item checked" onclick="toggleChecklistItem(this)">
+                        <div class="checklist-checkbox">✔</div>
+                        <div class="checklist-text">
+                            <h4>Corporate Identity Check</h4>
+                            <p>KYC/AML verified against Secretary of State register engines.</p>
+                        </div>
+                    </div>
+                    <div class="checklist-item checked" onclick="toggleChecklistItem(this)">
+                        <div class="checklist-checkbox">✔</div>
+                        <div class="checklist-text">
+                            <h4>Standard Credit Ledger Pull</h4>
+                            <p>Commercial indices matched: score satisfies pricing parameter models.</p>
+                        </div>
+                    </div>
+                    <div class="checklist-item" onclick="toggleChecklistItem(this)">
+                        <div class="checklist-checkbox"></div>
+                        <div class="checklist-text">
+                            <h4>Underwriting Bank Transaction Audit</h4>
+                            <p>Verification of daily liquidity counts and non-sufficient charge audits.</p>
+                        </div>
+                    </div>
+                    <div class="checklist-item" onclick="toggleChecklistItem(this)">
+                        <div class="checklist-checkbox"></div>
+                        <div class="checklist-text">
+                            <h4>Legal UCC File Scan</h4>
+                            <p>Ensuring no higher priorities holds existing business lines assets.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="calc-results" style="box-shadow: 6px 6px 0px var(--accent-yellow); margin-top: 30px; background: var(--surface-card); border: 2px solid #fff; padding: 20px;">
+                    <h4 style="margin-bottom:10px; text-transform:uppercase;">Status Report</h4>
+                    <div style="font-size:14px; font-weight:700; display:flex; justify-content:space-between; align-items:center;">
+                        <span>Target Capital Fit:</span>
+                        <span style="color: var(--accent-cyan);">A-TIER COMMERCIAL</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleChecklistItem(elem) {
+            elem.classList.toggle('checked');
+            const box = elem.querySelector('.checklist-checkbox');
+            if(elem.classList.contains('checked')) {
+                box.innerText = "✔";
+            } else {
+                box.innerText = "";
+            }
+        }
+    </script>
+</body>
+</html>
+```

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funding Portal | Emerald Circuit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050807;
+            --bg-card: #0c1210;
+            --emerald: #00ff88;
+            --emerald-dim: rgba(0, 255, 136, 0.2);
+            --emerald-glow: rgba(0, 255, 136, 0.5);
+            --danger: #ff4757;
+            --warning: #ffa502;
+            --text-main: #e0e0e0;
+            --text-dim: #889990;
+            --circuit-line: rgba(0, 255, 136, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at 2px 2px, var(--circuit-line) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+
+        .portal-container {
+            width: 100%;
+            max-width: 1100px;
+            padding: 40px;
+        }
+
+        .main-card {
+            background: var(--bg-card);
+            border: 1px solid var(--emerald-dim);
+            border-radius: 24px;
+            padding: 48px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 30px rgba(0, 255, 136, 0.05);
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            border-top: 2px solid var(--emerald);
+            border-right: 2px solid var(--emerald);
+            border-radius: 0 24px 0 0;
+            opacity: 0.3;
+        }
+
+        .portal-header {
+            grid-column: span 2;
+            border-bottom: 1px solid var(--circuit-line);
+            padding-bottom: 24px;
+            margin-bottom: 10px;
+        }
+
+        .portal-header span {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--emerald);
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+        }
+
+        .portal-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-top: 8px;
+        }
+
+        /* Offer Display Section */
+        .offer-details {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .offer-hero {
+            background: rgba(0, 255, 136, 0.03);
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid var(--emerald-dim);
+        }
+
+        .offer-hero .label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .offer-amount {
+            font-size: 4rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1;
+            margin: 10px 0;
+            background: linear-gradient(to bottom, #fff, var(--emerald));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .terms-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .term-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .term-item .val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--emerald);
+        }
+
+        .term-item .lbl {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Verification Side */
+        .verification-panel {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .verification-panel h3 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--emerald);
+            margin-bottom: 10px;
+        }
+
+        .upload-zone {
+            border: 1px dashed rgba(136, 153, 144, 0.4);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--emerald);
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        .upload-zone .icon {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .upload-zone span {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .upload-zone input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #333;
+        }
+
+        .status-dot.active {
+            background: var(--emerald);
+            box-shadow: 0 0 8px var(--emerald);
+        }
+
+        .footer-actions {
+            grid-column: span 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 30px;
+            border-top: 1px solid var(--circuit-line);
+        }
+
+        .btn-primary {
+            background: var(--emerald);
+            color: #050807;
+            padding: 18px 48px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+            text-transform: uppercase;
+        }
+
+        .btn-primary:disabled {
+            background: #1a2521;
+            color: #444;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .legal-notice {
+            max-width: 400px;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            line-height: 1.5;
+        }
+
+        .badge-verified {
+            display: inline-flex;
+            align-items: center;
+            background: var(--emerald-dim);
+            color: var(--emerald);
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 12px;
+        }
+
+        @media (max-width: 850px) {
+            .main-card {
+                grid-template-columns: 1fr;
+            }
+            .portal-header, .footer-actions {
+                grid-column: span 1;
+            }
+            .footer-actions {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            .offer-amount {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="portal-container">
+        <div class="main-card">
+            <header class="portal-header">
+                <span>VERIFICATION STAGE // 02</span>
+                <h1>Finalize Your Funding</h1>
+            </header>
+
+            <div class="offer-details">
+                <div class="offer-hero">
+                    <div class="badge-verified">ECONOMICS VERIFIED</div>
+                    <div class="label">Approved Credit Line</div>
+                    <div class="offer-amount" id="funding-amount">$250,000</div>
+                    
+                    <div class="terms-grid">
+                        <div class="term-item">
+                            <span class="lbl">Capital Cost</span>
+                            <span class="val">6.2%</span>
+                        </div>
+                        <div class="term-item">
+                            <span class="lbl">Repayment Cap</span>
+                            <span class="val">1.2x</span>
+                        </div>
+                        <div class="term-item">
+                            <span class="lbl">Funding Speed</span>
+                            <span class="val">48 HRS</span>
+                        </div>
+                        <div class="term-item">
+                            <span class="lbl">Security</span>
+                            <span class="val">Unsecured</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-block">
+                    <p style="font-size: 0.9rem; color: var(--text-dim);">
+                        Based on your <strong>4.2 month CAC payback</strong>, you qualify for our 
+                        "Infinite Engine" tier. This capital is restricted to ad-spend and 
+                        customer acquisition activities only.
+                    </p>
+                </div>
+            </div>
+
+            <div class="verification-panel">
+                <h3>Verification Documents</h3>
+                
+                <div class="upload-zone" id="upload-pl">
+                    <span class="icon">📄</span>
+                    <p>Last 6 Months P&L</p>
+                    <span>Click or drag PDF/CSV</span>
+                    <input type="file" id="file-pl">
+                </div>
+
+                <div class="upload-zone" id="upload-ads">
+                    <span class="icon">📊</span>
+                    <p>Ad Platform Export</p>
+                    <span>Verification of CAC metrics</span>
+                    <input type="file" id="file-ads">
+                </div>
+
+                <div class="file-checklist">
+                    <div class="file-status">
+                        <div class="status-dot" id="dot-pl"></div>
+                        <span>P&L Statement</span>
+                    </div>
+                    <div class="file-status" style="margin-top: 8px;">
+                        <div class="status-dot" id="dot-ads"></div>
+                        <span>Marketing Audit Trail</span>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="footer-actions">
+                <div class="legal-notice">
+                    By clicking "Execute Funding Agreement", you agree to the Emerald Circuit liquidity terms. 
+                    This offer is valid for 72 hours based on current network volatility and your risk profile.
+                </div>
+                <button class="btn-primary" id="submit-btn" disabled>Execute Funding</button>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        const filePl = document.getElementById('file-pl');
+        const fileAds = document.getElementById('file-ads');
+        const dotPl = document.getElementById('dot-pl');
+        const dotAds = document.getElementById('dot-ads');
+        const submitBtn = document.getElementById('submit-btn');
+
+        let plUploaded = false;
+        let adsUploaded = false;
+
+        function checkCompletion() {
+            if (plUploaded && adsUploaded) {
+                submitBtn.disabled = false;
+                submitBtn.style.boxShadow = "0 0 20px var(--emerald-glow)";
+            }
+        }
+
+        filePl.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                plUploaded = true;
+                dotPl.classList.add('active');
+                document.getElementById('upload-pl').style.borderColor = 'var(--emerald)';
+                document.getElementById('upload-pl').querySelector('p').textContent = e.target.files[0].name;
+                checkCompletion();
+            }
+        });
+
+        fileAds.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                adsUploaded = true;
+                dotAds.classList.add('active');
+                document.getElementById('upload-ads').style.borderColor = 'var(--emerald)';
+                document.getElementById('upload-ads').querySelector('p').textContent = e.target.files[0].name;
+                checkCompletion();
+            }
+        });
+
+        submitBtn.addEventListener('click', () => {
+            submitBtn.textContent = "TRANSMITTING...";
+            submitBtn.style.opacity = "0.7";
+            setTimeout(() => {
+                alert("Application Transmitted to Circuit. Awaiting Node Validation.");
+                window.location.reload();
+            }, 2000);
+        });
+
+        // Parse URL params for dynamic offer (simulated)
+        const urlParams = new URLSearchParams(window.location.search);
+        const spend = urlParams.get('spend');
+        if (spend) {
+            const calculatedOffer = Math.floor(parseInt(spend) * 4.5);
+            document.getElementById('funding-amount').textContent = `$${calculatedOffer.toLocaleString()}`;
+        }
+    </script>
+</body>
+</html>

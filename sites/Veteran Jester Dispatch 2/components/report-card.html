@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mission Logbook | Dispatch Archive</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Stardos+Stencil:wght@400;700&family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #c5beb1;
+            --olive: #4b5320;
+            --dark-olive: #353b16;
+            --black: #1a1a1a;
+            --stencil-red: #9e1b1b;
+            --paper-white: #e8e4d9;
+            --ink-bleed: rgba(26, 26, 26, 0.8);
+            --texture: url("https://www.transparenttextures.com/patterns/cardboard-flat.png");
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: var(--texture);
+            color: var(--black);
+            font-family: 'Courier Prime', monospace;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: var(--paper-white);
+            border: 1px solid #a39d91;
+            box-shadow: 15px 15px 30px rgba(0,0,0,0.2);
+            min-height: 100vh;
+            position: relative;
+            padding: 60px;
+        }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        /* Top Secret Branding */
+        .folder-tab {
+            position: absolute;
+            top: -20px;
+            right: 100px;
+            background: #8b8375;
+            color: white;
+            padding: 5px 30px;
+            font-family: 'Stardos Stencil', cursive;
+            text-transform: uppercase;
+            clip-path: polygon(10% 0, 90% 0, 100% 100%, 0% 100%);
+        }
+
+        .classified-stamp {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            border: 5px solid var(--stencil-red);
+            color: var(--stencil-red);
+            font-family: 'Stardos Stencil', cursive;
+            padding: 10px 20px;
+            font-size: 1.5rem;
+            transform: rotate(15deg);
+            opacity: 0.7;
+            text-transform: uppercase;
+        }
+
+        /* Navigation Header */
+        header {
+            border-bottom: 3px double var(--black);
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .archive-title h1 {
+            font-family: 'Stardos Stencil', cursive;
+            font-size: 3rem;
+            line-height: 0.8;
+        }
+
+        .archive-title span {
+            font-family: 'Special Elite', cursive;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .return-link {
+            text-decoration: none;
+            color: var(--black);
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--stencil-red);
+        }
+
+        /* Filter Controls */
+        .tactical-controls {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin-bottom: 40px;
+            background: rgba(0,0,0,0.03);
+            padding: 20px;
+            border: 1px dashed var(--black);
+        }
+
+        .search-wrap label {
+            display: block;
+            font-family: 'Stardos Stencil', cursive;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+
+        .search-wrap input {
+            width: 100%;
+            padding: 10px;
+            background: transparent;
+            border: 2px solid var(--black);
+            font-family: 'Courier Prime', monospace;
+            font-weight: bold;
+        }
+
+        .filter-tags {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            padding: 5px 15px;
+            border: 1px solid var(--black);
+            cursor: pointer;
+            font-family: 'Special Elite', cursive;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .tag:hover, .tag.active {
+            background: var(--black);
+            color: var(--paper-white);
+        }
+
+        /* Log Table */
+        .mission-log {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .mission-log thead th {
+            text-align: left;
+            font-family: 'Stardos Stencil', cursive;
+            border-bottom: 2px solid var(--black);
+            padding: 10px;
+            font-size: 1.1rem;
+        }
+
+        .mission-log tbody tr {
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            transition: background 0.1s;
+        }
+
+        .mission-log tbody tr:hover {
+            background: rgba(75, 83, 32, 0.05);
+        }
+
+        .mission-log td {
+            padding: 15px 10px;
+            vertical-align: middle;
+        }
+
+        .serial {
+            font-family: 'Special Elite', cursive;
+            color: var(--stencil-red);
+            font-weight: bold;
+        }
+
+        .subject {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .subject a {
+            color: var(--black);
+            text-decoration: none;
+        }
+
+        .subject a:hover {
+            text-decoration: underline;
+        }
+
+        .category {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            background: var(--olive);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 3px;
+            white-space: nowrap;
+        }
+
+        .status-dot {
+            height: 8px;
+            width: 8px;
+            background: var(--stencil-red);
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        /* Coffee Stains */
+        .stain {
+            position: absolute;
+            background: rgba(75, 50, 30, 0.07);
+            border-radius: 50%;
+            filter: blur(15px);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        @media (max-width: 768px) {
+            .tactical-controls { grid-template-columns: 1fr; }
+            .container { padding: 30px 15px; }
+            .mission-log thead { display: none; }
+            .mission-log td { display: block; padding: 5px 10px; }
+            .mission-log tr { padding: 15px 0; display: block; }
+            .classified-stamp { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="folder-tab">FILE_REF: ARCHIVE_01</div>
+        <div class="classified-stamp">Declassified</div>
+        
+        <!-- Coffee Stains for texture -->
+        <div class="stain" style="width: 200px; height: 180px; top: 10%; left: -50px;"></div>
+        <div class="stain" style="width: 120px; height: 120px; bottom: 5%; right: 20px;"></div>
+
+        <header>
+            <div class="archive-title">
+                <span>Central Intelligence Hub</span>
+                <h1>Mission Logbook</h1>
+            </div>
+            <a href="#" class="return-link">Return to Command &rarr;</a>
+        </header>
+
+        <section class="tactical-controls">
+            <div class="search-wrap">
+                <label>Keyword Search</label>
+                <input type="text" placeholder="ENTER SEARCH PARAMETERS...">
+            </div>
+            <div class="filter-tags">
+                <label style="display: block; width: 100%; font-family: 'Stardos Stencil', cursive; font-size: 0.8rem; margin-bottom: 5px;">Filter by Intel Type</label>
+                <div class="tag active">ALL_REPORTS</div>
+                <div class="tag">SATIRE</div>
+                <div class="tag">LEADERSHIP</div>
+                <div class="tag">FREEDOM</div>
+                <div class="tag">GRUNT_LIFE</div>
+            </div>
+        </section>
+
+        <table class="mission-log">
+            <thead>
+                <tr>
+                    <th width="15%">Serial #</th>
+                    <th width="15%">Date</th>
+                    <th width="45%">Subject / Mission Title</th>
+                    <th width="15%">Category</th>
+                    <th width="10%">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="serial">DS-084</td>
+                    <td>15 OCT 23</td>
+                    <td class="subject"><a href="#">The General's Guide to PowerPoint Warfare</a></td>
+                    <td><span class="category">Satire</span></td>
+                    <td><span class="status-dot"></span> OPEN</td>
+                </tr>
+                <tr>
+                    <td class="serial">DS-083</td>
+                    <td>12 OCT 23</td>
+                    <td class="subject"><a href="#">Leading from the Bottom of a Mud Hole</a></td>
+                    <td><span class="category" style="background: var(--dark-olive);">Leadership</span></td>
+                    <td><span class="status-dot"></span> OPEN</td>
+                </tr>
+                <tr>
+                    <td class="serial">DS-082</td>
+                    <td>05 OCT 23</td>
+                    <td class="subject"><a href="#">Post-Combat Capitalism: Tactical Startups</a></td>
+                    <td><span class="category" style="background: #6b705c;">Business</span></td>
+                    <td><span class="status-dot"></span> OPEN</td>
+                </tr>
+                <tr>
+                    <td class="serial">DS-081</td>
+                    <td>28 SEP 23</td>
+                    <td class="subject"><a href="#">Why "Safe Spaces" Don't Exist in the Wild</a></td>
+                    <td><span class="category" style="background: var(--stencil-red);">Freedom</span></td>
+                    <td><span class="status-dot"></span> OPEN</td>
+                </tr>
+                <tr>
+                    <td class="serial">DS-080</td>
+                    <td>20 SEP 23</td>
+                    <td class="subject"><a href="#">The Art of the Strategic Middle Finger</a></td>
+                    <td><span class="category">Satire</span></td>
+                    <td><span class="status-dot"></span> OPEN</td>
+                </tr>
+                <tr>
+                    <td class="serial">DS-079</td>
+                    <td>14 SEP 23</td>
+                    <td class="subject"><a href="#">Stoicism for the Modern Insomniac</a></td>
+                    <td><span class="category" style="background: #4a4e69;">Philosophy</span></td>
+                    <td><span class="status-dot"></span> OPEN</td>
+                </tr>
+                <tr>
+                    <td class="serial">DS-078</td>
+                    <td>07 SEP 23</td>
+                    <td class="subject"><a href="#">Supply Chain Chaos: A Grunt's Perspective</a></td>
+                    <td><span class="category" style="background: #6b705c;">Business</span></td>
+                    <td><span class="status-dot"></span> OPEN</td>
+                </tr>
+                <tr>
+                    <td class="serial">DS-077</td>
+                    <td>01 SEP 23</td>
+                    <td class="subject"><a href="#">The Whiskey Manifesto: Vol. 1</a></td>
+                    <td><span class="category">Grunt_Life</span></td>
+                    <td><span class="status-dot"></span> OPEN</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="margin-top: 50px; text-align: center;">
+            <p style="font-family: 'Special Elite', cursive; font-size: 0.8rem; opacity: 0.6;">--- END OF LOG PAGE 01 ---</p>
+            <div style="margin-top: 20px;">
+                <button style="background: transparent; border: 1px solid var(--black); padding: 10px 20px; font-family: 'Stardos Stencil', cursive; cursor: pointer;">Load Previous Records</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mission Logbook | Dispatch Archive</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Stardos+Stencil:wght@400;700&family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #c5beb1;
+            --olive: #4b5320;
+            --dark-olive: #353b16;
+            --black: #1a1a1a;
+            --stencil-red: #9e1b1b;
+            --paper-white: #e8e4d9;
+            --ink-bleed: rgba(26, 26, 26, 0.8);
+            --texture: url("https://www.transparenttextures.com/patterns/cardboard-flat.png");
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: var(--texture);
+            color: var(--black);
+            font-family: 'Courier Prime', monospace;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: var(--paper-white);
+            border: 1px solid #a39d91;
+            box-shadow: 15px 15px 30px rgba(0,0,0,0.2);
+            min-height: 100vh;
+            position: relative;
+            padding: 60px;
+        }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        /* Top Secret Branding */
+        .folder-tab {
+            position: absolute;
+            top: -20px;
+            right: 100px;
+            background: #8b8375;
+            color: white;
+            padding: 5px 30px;
+            font-family: 'Stardos Stencil', cursive;
+            text-transform: uppercase;
+            clip-path: polygon(10% 0, 90% 0, 100% 100%, 0% 100%);
+        }
+
+        .classified-stamp {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            border: 5px solid var(--stencil-red);
+            color: var(--stencil-red);
+            font-family: 'Stardos Stencil', cursive;
+            padding: 10px 20px;
+            font-size: 1.5rem;
+            transform: rotate(15deg);
+            opacity: 0.7;
+            text-transform: uppercase;
+        }
+
+        /* Navigation Header */
+        header {
+            border-bottom: 3px double var(--black);
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .archive-title h1 {
+            font-family: 'Stardos Stencil', cursive;
+            font-size: 3rem;
+            line-height: 0.8;
+        }
+
+        .archive-title span {
+            font-family: 'Special Elite', cursive;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .return-link {
+            text-decoration: none;
+            color: var(--black);
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--stencil-red);
+        }
+
+        /* Filter Controls */
+        .tactical-controls {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin-bottom: 40px;
+            background: rgba(0,0,0,0.03);
+            padding: 20px;
+            border: 1px dashed var(--black);
+        }
+
+        .search-wrap label {
+            display: block;
+            font-family: 'Stardos Stencil', cursive;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+
+        .search-wrap input {
+            width: 100%;
+            padding: 10px;
+            background: transparent;
+            border: 2px solid var(--black);
+            font-family: 'Courier Prime', monospace;
+            font-weight: bold;
+        }
+
+        .filter-tags {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            padding: 5px 15px;
+            border: 1px solid var(--black);
+            cursor: pointer;
+            font-family: 'Special Elite', cursive;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .tag:hover, .tag.active {
+            background: var(--black);
+            color: var(--paper-white);
+        }
+
+        /* Log Table */
+        .mission-log {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .mission-log thead th {
+            text-align: left;
+            font-family: 'Stardos Stencil', cursive;
+            border-bottom: 2px solid var(--black);
+            padding: 10px;
+            font-size: 1.1rem;
+        }
+
+        .mission-log tbody tr {
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            transition: background 0.1s;
+        }
+
+        .mission-log tbody tr:hover {
+            background: rgba(75, 83, 32, 0.05);
+        }
+
+        .mission-log td {
+            padding: 15px 10px;
+            vertical-align: middle;
+        }
+
+        .serial {
+            font-family: 'Special Elite', cursive;
+            color: var(--stencil-red);
+            font-weight: bold;
+        }
+
+        .subject {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .subject a {
+            color: var(--black);
+            text-decoration: none;
+        }
+
+        .subject a:hover {
+            text-decoration: underline;
+        }
+
+        .category {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            background: var(--olive);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 3px;
+            white-space: nowrap;
+        }
+
+        .status-dot {
+            height: 8px;
+            width: 8px;
+            background: var(--stencil-red);
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        /* Coffee Stains */
+        .stain {
+            position: absolute;
+            background: rgba(75, 50, 30, 0.07);
+            border-radius: 50%;
+            filter: blur(15px);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        @media (max-width: 768px) {
+            .tactical-controls { grid-template-columns: 1fr; }
+            .container { padding: 30px 15px; }
+            .mission-log thead { display: none; }
+            .mission-log td { display: block; padding: 5px 10px; }
+            .mission-log tr { padding: 15px 0; display: block; }
+            .classified-stamp { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="folder-tab">FILE_REF: ARCHIVE_01</div>
+        <div class="classified-stamp">Declassified</div>
+        
+        <!-- Coffee Stains for texture -->
+        <div class="stain" style="width: 200px; height: 180px; top: 10%; left: -50px;"></div>
+        <div class="stain" style="width: 120px; height: 120px; bottom: 5%; right: 20px;"></div>
+
+        <header>
+            <div class="archive-title">
+                <span>Central Intelligence Hub</span>
+                <h1>Mission Logbook</h1>
+            </div>
+            <a href="#" class="return-link">Return to Command &rarr;</a>
+        </header>
+
+        <section class="tactical-controls">
+            <div class="search-wrap">
+                <label>Keyword Search</label>
+                <input type="text" placeholder="ENTER SEARCH PARAMETERS...">
+            </div>
+            <div class="filter-tags">
+                <label style="display: block; width: 100%; font-family: 'Stardos Stencil', cursive; font-size: 0.8rem; margin-bottom: 5px;">Filter by Intel Type</label>
+                <div class="tag active">ALL_REPORTS</div>
+                <div class="tag">SATIRE</div>
+                <div class="tag">LEADERSHIP</div>
+                <div class="tag">FREEDOM</div>
+                <div class="tag">GRUNT_LIFE</div>
+            </div>
+        </section>
+
+        <table class="mission-log">
+            <thead>
+                <tr>
+                    <th width="15%">Serial #</th>
+                    <th width="15%">Date</th>
+                    <th width="45%">Subject / Mission Title</th>
+                    <th width="15%">Category</th>
+                    <th width="10%">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="serial">DS-084</td>
+                    <td>15 OCT 23</td>
+                    <td class="subject"><a href="#">The General's Guide to PowerPoint Warfare</a></td>
+                    <td><span class="category">Satire</span></td>
+                    <td><span class="status-dot"></span> OPEN</td>
+                </tr>
+                <tr>
+                    <td class="serial">DS-083</td>
+                    <td>12 OCT 23</td>
+                    <td class="subject"><a href="#">Leading from the Bottom of a Mud Hole</a></td>
+                    <td><span class="category" style="background: var(--dark-olive);">Leadership</span></td>
+                    <td><span class="status-dot"></span> OPEN</td>
+                </tr>
+                <tr>
+                    <td class="serial">DS-082</td>
+                    <td>05 OCT 23</td>
+                    <td class="subject"><a href="#">Post-Combat Capitalism: Tactical Startups</a></td>
+                    <td><span class="category" style="background: #6b705c;">Business</span></td>
+                    <td><span class="status-dot"></span> OPEN</td>
+                </tr>
+                <tr>
+                    <td class="serial">DS-081</td>
+                    <td>28 SEP 23</td>
+                    <td class="subject"><a href="#">Why "Safe Spaces" Don't Exist in the Wild</a></td>
+                    <td><span class="category" style="background: var(--stencil-red);">Freedom</span></td>
+                    <td><span class="status-dot"></span> OPEN</td>
+                </tr>
+                <tr>
+                    <td class="serial">DS-080</td>
+                    <td>20 SEP 23</td>
+                    <td class="subject"><a href="#">The Art of the Strategic Middle Finger</a></td>
+                    <td><span class="category">Satire</span></td>
+                    <td><span class="status-dot"></span> OPEN</td>
+                </tr>
+                <tr>
+                    <td class="serial">DS-079</td>
+                    <td>14 SEP 23</td>
+                    <td class="subject"><a href="#">Stoicism for the Modern Insomniac</a></td>
+                    <td><span class="category" style="background: #4a4e69;">Philosophy</span></td>
+                    <td><span class="status-dot"></span> OPEN</td>
+                </tr>
+                <tr>
+                    <td class="serial">DS-078</td>
+                    <td>07 SEP 23</td>
+                    <td class="subject"><a href="#">Supply Chain Chaos: A Grunt's Perspective</a></td>
+                    <td><span class="category" style="background: #6b705c;">Business</span></td>
+                    <td><span class="status-dot"></span> OPEN</td>
+                </tr>
+                <tr>
+                    <td class="serial">DS-077</td>
+                    <td>01 SEP 23</td>
+                    <td class="subject"><a href="#">The Whiskey Manifesto: Vol. 1</a></td>
+                    <td><span class="category">Grunt_Life</span></td>
+                    <td><span class="status-dot"></span> OPEN</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="margin-top: 50px; text-align: center;">
+            <p style="font-family: 'Special Elite', cursive; font-size: 0.8rem; opacity: 0.6;">--- END OF LOG PAGE 01 ---</p>
+            <div style="margin-top: 20px;">
+                <button style="background: transparent; border: 1px solid var(--black); padding: 10px 20px; font-family: 'Stardos Stencil', cursive; cursor: pointer;">Load Previous Records</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

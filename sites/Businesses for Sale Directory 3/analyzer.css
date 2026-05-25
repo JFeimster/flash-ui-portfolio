@@ -1,0 +1,258 @@
+:root {
+    --obsidian: #050505;
+    --bone: #F5F5F0;
+    --acid-green: #C1FF00;
+    --oxidized-copper: #8E593E;
+    --blood-orange: #FF3D00;
+    --graphite: #1A1A1A;
+    --panel: #0F0F0F;
+    --border-width: 2px;
+}
+
+.analyzer-wrapper {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 0;
+    min-height: calc(100vh - 76px);
+    background: var(--obsidian);
+}
+
+/* Sidebar Inputs */
+.input-sidebar {
+    border-right: var(--border-width) solid var(--graphite);
+    padding: 2rem;
+    background: #080808;
+    overflow-y: auto;
+}
+
+.input-section {
+    margin-bottom: 2.5rem;
+}
+
+.input-section h3 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--oxidized-copper);
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--graphite);
+    padding-bottom: 0.5rem;
+}
+
+.field-group {
+    margin-bottom: 1.25rem;
+}
+
+.field-group label {
+    display: block;
+    font-size: 0.65rem;
+    color: #666;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.terminal-input {
+    width: 100%;
+    background: var(--obsidian);
+    border: 1px solid var(--graphite);
+    color: var(--bone);
+    padding: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.terminal-input:focus {
+    border-color: var(--acid-green);
+}
+
+/* Main Dashboard */
+.analyzer-main {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+.kpi-card {
+    background: var(--panel);
+    border: var(--border-width) solid var(--graphite);
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.kpi-card::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; width: 4px; height: 100%;
+    background: var(--acid-green);
+}
+
+.kpi-card.risk-high::after {
+    background: var(--blood-orange);
+}
+
+.kpi-label {
+    display: block;
+    font-size: 0.65rem;
+    color: #888;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+}
+
+.kpi-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+/* Sensitivity Table */
+.data-module {
+    border: var(--border-width) solid var(--graphite);
+    background: var(--panel);
+}
+
+.module-header {
+    padding: 1rem 1.5rem;
+    background: var(--graphite);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.module-title {
+    font-size: 0.75rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.sensitivity-grid {
+    display: grid;
+    grid-template-columns: 100px repeat(5, 1fr);
+    width: 100%;
+}
+
+.cell {
+    padding: 1rem;
+    border: 0.5px solid var(--graphite);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    text-align: center;
+}
+
+.cell.header {
+    background: #111;
+    color: #666;
+    font-weight: 700;
+}
+
+.cell.positive { color: var(--acid-green); }
+.cell.negative { color: var(--blood-orange); }
+
+/* Terminal Charts */
+.chart-container {
+    height: 300px;
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    padding: 2rem;
+    position: relative;
+}
+
+.chart-bar {
+    flex: 1;
+    background: var(--graphite);
+    position: relative;
+    transition: height 0.5s ease;
+}
+
+.chart-bar:hover {
+    background: var(--oxidized-copper);
+}
+
+.chart-bar::before {
+    content: attr(data-value);
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.6rem;
+    color: #555;
+    font-family: 'JetBrains Mono';
+}
+
+.chart-bar.fill-green { background: var(--acid-green); }
+.chart-bar.fill-orange { background: var(--blood-orange); }
+
+/* Risk Threshold Indicators */
+.risk-meter-wrap {
+    margin-top: 1rem;
+}
+
+.meter-track {
+    height: 8px;
+    background: var(--graphite);
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.meter-fill {
+    height: 100%;
+    background: linear-gradient(to right, var(--acid-green), var(--blood-orange));
+    width: 65%;
+}
+
+.warning-glitch {
+    color: var(--blood-orange);
+    font-size: 0.7rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    animation: flicker 2s infinite;
+}
+
+@keyframes flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+/* Responsive Overrides */
+@media (max-width: 1100px) {
+    .analyzer-wrapper { grid-template-columns: 1fr; }
+    .input-sidebar { border-right: none; border-bottom: var(--border-width) solid var(--graphite); }
+    .kpi-row { grid-template-columns: 1fr 1fr; }
+}
+
+/* Utility UI */
+.btn-calculate {
+    width: 100%;
+    background: var(--bone);
+    color: var(--obsidian);
+    border: none;
+    padding: 1rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+
+.btn-calculate:hover {
+    background: var(--acid-green);
+}
+
+.terminal-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: #444;
+}

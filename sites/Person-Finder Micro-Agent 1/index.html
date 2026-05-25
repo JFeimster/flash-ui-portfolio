@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Person-Finder | Discovery Workspace</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0c10;
+            --bg-card: #11141b;
+            --border: #1f242d;
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.5);
+            --text-main: #e2e8f0;
+            --text-dim: #94a3b8;
+            --accent: #10b981;
+            --warning: #f59e0b;
+            --input-bg: #07090d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .agent-container {
+            width: 100%;
+            max-width: 1200px;
+            height: 800px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Sidebar / Search Inputs */
+        .sidebar {
+            background: rgba(0, 0, 0, 0.25);
+            border-right: 1px solid var(--border);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            overflow-y: auto;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .logo-box {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        .logo-box svg {
+            width: 22px;
+            height: 22px;
+            stroke: white;
+            fill: none;
+        }
+
+        .brand-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: -0.5px;
+        }
+
+        .workspace-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-dim);
+            margin-bottom: 4px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-group label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-dim);
+        }
+
+        .input-group input, .input-group select {
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            padding: 10px 12px;
+            border-radius: 6px;
+            color: white;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+
+        .advanced-toggle {
+            font-size: 0.75rem;
+            color: var(--primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 4px;
+        }
+
+        .btn-initialize {
+            margin-top: auto;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-initialize:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        /* Main Workspace */
+        .main-panel {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.03), transparent);
+        }
+
+        .status-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 12, 16, 0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        .agent-id {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-chip {
+            padding: 4px 10px;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .workspace-body {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            overflow: hidden;
+        }
+
+        /* Sequence/Progress Tracker */
+        .discovery-flow {
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .step-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            gap: 16px;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .step-card.active {
+            border-color: var(--primary);
+            background: rgba(59, 130, 246, 0.04);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .step-card.complete {
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .step-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .active .step-icon {
+            background: var(--primary);
+            color: white;
+        }
+
+        .complete .step-icon {
+            background: var(--accent);
+            color: white;
+        }
+
+        .step-info {
+            flex-grow: 1;
+        }
+
+        .step-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .step-status-text {
+            font-size: 0.7rem;
+            font-weight: 400;
+            color: var(--text-dim);
+        }
+
+        .step-desc {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            line-height: 1.4;
+        }
+
+        .progress-bar-mini {
+            height: 3px;
+            background: var(--border);
+            border-radius: 2px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+        .active .progress-fill {
+            width: 65%;
+            animation: shimmer 2s infinite linear;
+            background: linear-gradient(90deg, var(--primary) 0%, #60a5fa 50%, var(--primary) 100%);
+            background-size: 200% 100%;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Console & Results Panel */
+        .output-sidebar {
+            border-left: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-section {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .section-header {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .terminal-box {
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: #4ade80;
+            flex-grow: 1;
+            overflow-y: auto;
+            line-height: 1.5;
+        }
+
+        .log-entry { margin-bottom: 4px; }
+        .log-entry.cmd { color: #3b82f6; }
+        .log-entry.warn { color: var(--warning); }
+        .log-entry.ts { color: #475569; margin-right: 6px; }
+
+        .results-scroll {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: auto;
+            max-height: 280px;
+        }
+
+        .mini-card {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar-placeholder {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            background: var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+
+        .mini-card-info h4 {
+            font-size: 0.8rem;
+            margin-bottom: 2px;
+        }
+
+        .mini-card-info p {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="agent-container">
+        <!-- Sidebar Search Config -->
+        <aside class="sidebar">
+            <div class="header-brand">
+                <div class="logo-box">
+                    <svg viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                    </svg>
+                </div>
+                <div>
+                    <div class="brand-title">Person-Finder</div>
+                    <div style="font-size: 0.65rem; color: var(--primary); font-weight: 600; opacity: 0.8;">DISCOVERY WORKSPACE</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 10px;">
+                <div class="workspace-label">Search Parameters</div>
+                <div class="input-group">
+                    <label>Business Entity Name</label>
+                    <input type="text" placeholder="e.g. Nexus Venture Partners">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Target Domain/URL</label>
+                <input type="text" placeholder="https://nexusvp.com">
+            </div>
+
+            <div class="input-group">
+                <label>Geographic Focus</label>
+                <input type="text" placeholder="San Francisco, CA">
+            </div>
+
+            <div class="input-group">
+                <label>Depth of Search</label>
+                <select>
+                    <option>Standard Discovery (Fast)</option>
+                    <option selected>Deep Scraping (Full SOS)</option>
+                    <option>Recursive Intelligence (Slow)</option>
+                </select>
+            </div>
+
+            <div class="advanced-toggle">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                Advanced Search Filters
+            </div>
+
+            <button class="btn-initialize">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                Run Search Agent
+            </button>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-panel">
+            <header class="status-header">
+                <div class="agent-id">
+                    <div class="status-chip">
+                        <div class="pulse-dot"></div>
+                        AGENT_SCANNING
+                    </div>
+                    <span style="font-family: 'JetBrains Mono'; font-size: 0.75rem; color: var(--text-dim)">TASK_ID: <span style="color: white">#FF-992-04</span></span>
+                </div>
+                <div style="display: flex; gap: 15px;">
+                    <button style="background: transparent; border: 1px solid var(--border); color: var(--text-dim); padding: 6px 12px; border-radius: 4px; font-size: 0.7rem; cursor: pointer;">Pause</button>
+                    <button style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #ef4444; padding: 6px 12px; border-radius: 4px; font-size: 0.7rem; cursor: pointer;">Abort</button>
+                </div>
+            </header>
+
+            <div class="workspace-body">
+                <!-- Progress Tracker / Sequence -->
+                <div class="discovery-flow">
+                    <div class="step-card complete">
+                        <div class="step-icon">01</div>
+                        <div class="step-info">
+                            <div class="step-title">
+                                Domain Fingerprinting
+                                <span class="step-status-text" style="color: var(--accent)">Done</span>
+                            </div>
+                            <div class="step-desc">Identifying CMS, tech stack, and DNS records for leadership clues.</div>
+                        </div>
+                    </div>
+
+                    <div class="step-card active">
+                        <div class="step-icon">02</div>
+                        <div class="step-info">
+                            <div class="step-title">
+                                LinkedIn Graph Mapping
+                                <span class="step-status-text" style="color: var(--primary)">65% Scanned</span>
+                            </div>
+                            <div class="step-desc">Parsing 42 employees. Filtering for "Managing Director" and "Partner" roles.</div>
+                            <div class="progress-bar-mini"><div class="progress-fill"></div></div>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-icon">03</div>
+                        <div class="step-info">
+                            <div class="step-title">
+                                SOS Registry Retrieval
+                                <span class="step-status-text">Queued</span>
+                            </div>
+                            <div class="step-desc">Official Secretary of State business filings for registered agents.</div>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-icon">04</div>
+                        <div class="step-info">
+                            <div class="step-title">
+                                Cross-Platform Verification
+                                <span class="step-status-text">Pending</span>
+                            </div>
+                            <div class="step-desc">Matching names across Twitter, BBB, and news articles.</div>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-icon">05</div>
+                        <div class="step-info">
+                            <div class="step-title">
+                                Contact Information Extraction
+                                <span class="step-status-text">Pending</span>
+                            </div>
+                            <div class="step-desc">Discovering professional emails and verified phone extensions.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Output Panel -->
+                <div class="output-sidebar">
+                    <div class="panel-section" style="border-bottom: 1px solid var(--border)">
+                        <div class="section-header">Live Discovery Log</div>
+                        <div class="terminal-box">
+                            <div class="log-entry"><span class="log-ts">[14:22:01]</span> <span class="cmd">INIT</span> agent_v2.4_discovery...</div>
+                            <div class="log-entry"><span class="log-ts">[14:22:03]</span> Connecting to LinkedIn API Gateway...</div>
+                            <div class="log-entry"><span class="log-ts">[14:22:05]</span> <span class="warn">NOTICE</span> Rate-limit detected, rotating proxies...</div>
+                            <div class="log-entry"><span class="log-ts">[14:22:08]</span> Proxy rotation successful (Node_049).</div>
+                            <div class="log-entry"><span class="log-ts">[14:22:10]</span> Found match: "A. Thompson" (Managing Partner)</div>
+                            <div class="log-entry"><span class="log-ts">[14:22:12]</span> Found match: "L. Kincaid" (Director)</div>
+                            <div class="log-entry"><span class="log-ts">[14:22:14]</span> Parsing profile headlines... <span style="display:inline-block; width:8px; height:12px; background:var(--accent); animation: blink 1s infinite; vertical-align:middle;"></span></div>
+                        </div>
+                    </div>
+
+                    <div class="panel-section">
+                        <div class="section-header">
+                            Extracted Entities
+                            <span style="color: var(--primary)">2 Found</span>
+                        </div>
+                        <div class="results-scroll">
+                            <div class="mini-card">
+                                <div class="avatar-placeholder">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                                </div>
+                                <div class="mini-card-info">
+                                    <h4>Alexander Thompson</h4>
+                                    <p>Managing Partner • LinkedIn Verified</p>
+                                </div>
+                            </div>
+                            <div class="mini-card">
+                                <div class="avatar-placeholder">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                                </div>
+                                <div class="mini-card-info">
+                                    <h4>Laura Kincaid</h4>
+                                    <p>Director of Operations • Web Extract</p>
+                                </div>
+                            </div>
+                            <div class="mini-card" style="opacity: 0.4; border-style: dashed;">
+                                <div class="avatar-placeholder" style="background: transparent">
+                                    <div class="pulse-dot" style="background: var(--text-dim)"></div>
+                                </div>
+                                <div class="mini-card-info">
+                                    <h4>Scanning...</h4>
+                                    <p>Pending SOS verification</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <style>
+        @keyframes blink { 50% { opacity: 0; } }
+    </style>
+</body>
+</html>

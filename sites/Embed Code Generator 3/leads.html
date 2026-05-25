@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonshine Capital | Lead Analytics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --bg-surface: #0f0f12;
+            --bg-elevated: #16161a;
+            --border: #26262b;
+            --border-bright: #3f3f46;
+            --neon-blue: #00f0ff;
+            --neon-green: #39ff14;
+            --text-primary: #f4f4f5;
+            --text-secondary: #a1a1aa;
+            --text-muted: #52525b;
+            --accent-gradient: linear-gradient(135deg, #00f0ff 0%, #39ff14 100%);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 10px; }
+
+        .hero {
+            padding: 3rem 2rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            background: radial-gradient(circle at top center, rgba(57, 255, 20, 0.05), transparent 70%);
+        }
+
+        .hero h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            border-radius: 12px;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-trend {
+            font-size: 0.75rem;
+            color: var(--neon-green);
+            margin-top: 0.25rem;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+
+        .search-input {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            width: 300px;
+            outline: none;
+        }
+
+        .search-input:focus { border-color: var(--neon-blue); }
+
+        .btn-export {
+            background: var(--text-primary);
+            color: var(--bg-deep);
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .btn-export:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* Leads Table */
+        .table-container {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 1rem 1.5rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 1rem 1.5rem;
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .source-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            background: var(--bg-elevated);
+            color: var(--neon-blue);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .score-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .score-bar {
+            width: 60px;
+            height: 6px;
+            background: var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .score-fill {
+            height: 100%;
+            background: var(--neon-green);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .badge {
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--neon-blue);
+            padding: 2px 8px;
+            border-radius: 99px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1024px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .toolbar { flex-direction: column; align-items: flex-start; }
+            .search-input { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="hero">
+        <div class="badge">ANALYTICS ENGINE</div>
+        <h1>Partner Lead Manager</h1>
+        <p>Monitor real-time conversions and funding readiness metrics from your embedded widgets.</p>
+    </header>
+
+    <div class="container">
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Leads (30d)</div>
+                <div class="stat-value">1,284</div>
+                <div class="stat-trend">+12.5% vs last month</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Avg. Readiness Score</div>
+                <div class="stat-value">74/100</div>
+                <div class="stat-trend" style="color: var(--neon-blue);">Target: >70</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Conversion Rate</div>
+                <div class="stat-value">18.2%</div>
+                <div class="stat-trend">+2.1% improvement</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Top Source</div>
+                <div class="stat-value" style="font-size: 1.1rem; color: var(--neon-blue);">blog_footer_cta</div>
+                <div class="stat-trend">42% of total volume</div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="toolbar">
+            <input type="text" class="search-input" id="tableSearch" placeholder="Search leads by name or email..." onkeyup="filterLeads()">
+            <button class="btn-export" onclick="exportToCSV()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export CSV
+            </button>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+            <table id="leadsTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>User / Email</th>
+                        <th>Source Page</th>
+                        <th>Readiness Score</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="leadsBody">
+                    <!-- Data injected via JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const leadsData = [
+            { date: "2023-10-24 14:22", name: "Alex Rivera", email: "alex@riveratech.io", source: "homepage_hero", score: 85, status: "Qualified" },
+            { date: "2023-10-24 12:05", name: "Sarah Jenkins", email: "s.jenkins@growthlabs.com", source: "blog_footer_cta", score: 42, status: "Review" },
+            { date: "2023-10-23 18:45", name: "Marcus Thorne", email: "marcus@thorne.digital", source: "wix_sidebar", score: 91, status: "Contacted" },
+            { date: "2023-10-23 15:10", name: "Elena Rodriguez", email: "elena@vivid-agency.com", source: "partner_portal", score: 68, status: "Qualified" },
+            { date: "2023-10-23 09:30", name: "David Chen", email: "dchen@saasflow.io", source: "blog_footer_cta", score: 25, status: "Unqualified" },
+            { date: "2023-10-22 16:20", name: "Jessica Wu", email: "jess@pixelperfect.com", source: "homepage_hero", score: 77, status: "Qualified" },
+            { date: "2023-10-22 11:15", name: "Tom Baker", email: "tom@bakercreative.uk", source: "framer_embed", score: 59, status: "Review" }
+        ];
+
+        function renderLeads(data) {
+            const body = document.getElementById('leadsBody');
+            body.innerHTML = data.map(lead => `
+                <tr>
+                    <td>${lead.date}</td>
+                    <td>
+                        <div style="color: var(--text-primary); font-weight: 500;">${lead.name}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">${lead.email}</div>
+                    </td>
+                    <td><span class="source-tag">${lead.source}</span></td>
+                    <td>
+                        <div class="score-badge">
+                            <div class="score-bar">
+                                <div class="score-fill" style="width: ${lead.score}%; background: ${lead.score > 70 ? 'var(--neon-green)' : lead.score > 40 ? 'var(--neon-blue)' : '#ff5f56'};"></div>
+                            </div>
+                            <span style="font-family: 'JetBrains Mono';">${lead.score}%</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="status-dot" style="background: ${getStatusColor(lead.status)};"></span>
+                        ${lead.status}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getStatusColor(status) {
+            switch(status) {
+                case 'Qualified': return 'var(--neon-green)';
+                case 'Contacted': return 'var(--neon-blue)';
+                case 'Review': return '#ffbd2e';
+                default: return 'var(--text-muted)';
+            }
+        }
+
+        function filterLeads() {
+            const query = document.getElementById('tableSearch').value.toLowerCase();
+            const filtered = leadsData.filter(l => 
+                l.name.toLowerCase().includes(query) || 
+                l.email.toLowerCase().includes(query) ||
+                l.source.toLowerCase().includes(query)
+            );
+            renderLeads(filtered);
+        }
+
+        function exportToCSV() {
+            const headers = ["Date", "Name", "Email", "Source", "Score", "Status"];
+            const rows = leadsData.map(l => [l.date, l.name, l.email, l.source, l.score, l.status]);
+            
+            let csvContent = "data:text/csv;charset=utf-8," 
+                + headers.join(",") + "\n"
+                + rows.map(e => e.join(",")).join("\n");
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `moonshine_leads_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Init
+        renderLeads(leadsData);
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonshine Capital | Lead Analytics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --bg-surface: #0f0f12;
+            --bg-elevated: #16161a;
+            --border: #26262b;
+            --border-bright: #3f3f46;
+            --neon-blue: #00f0ff;
+            --neon-green: #39ff14;
+            --text-primary: #f4f4f5;
+            --text-secondary: #a1a1aa;
+            --text-muted: #52525b;
+            --accent-gradient: linear-gradient(135deg, #00f0ff 0%, #39ff14 100%);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 10px; }
+
+        .hero {
+            padding: 3rem 2rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            background: radial-gradient(circle at top center, rgba(57, 255, 20, 0.05), transparent 70%);
+        }
+
+        .hero h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            border-radius: 12px;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-trend {
+            font-size: 0.75rem;
+            color: var(--neon-green);
+            margin-top: 0.25rem;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+
+        .search-input {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            width: 300px;
+            outline: none;
+        }
+
+        .search-input:focus { border-color: var(--neon-blue); }
+
+        .btn-export {
+            background: var(--text-primary);
+            color: var(--bg-deep);
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .btn-export:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* Leads Table */
+        .table-container {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 1rem 1.5rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 1rem 1.5rem;
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .source-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            background: var(--bg-elevated);
+            color: var(--neon-blue);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .score-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .score-bar {
+            width: 60px;
+            height: 6px;
+            background: var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .score-fill {
+            height: 100%;
+            background: var(--neon-green);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .badge {
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--neon-blue);
+            padding: 2px 8px;
+            border-radius: 99px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1024px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .toolbar { flex-direction: column; align-items: flex-start; }
+            .search-input { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="hero">
+        <div class="badge">ANALYTICS ENGINE</div>
+        <h1>Partner Lead Manager</h1>
+        <p>Monitor real-time conversions and funding readiness metrics from your embedded widgets.</p>
+    </header>
+
+    <div class="container">
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Leads (30d)</div>
+                <div class="stat-value">1,284</div>
+                <div class="stat-trend">+12.5% vs last month</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Avg. Readiness Score</div>
+                <div class="stat-value">74/100</div>
+                <div class="stat-trend" style="color: var(--neon-blue);">Target: >70</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Conversion Rate</div>
+                <div class="stat-value">18.2%</div>
+                <div class="stat-trend">+2.1% improvement</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Top Source</div>
+                <div class="stat-value" style="font-size: 1.1rem; color: var(--neon-blue);">blog_footer_cta</div>
+                <div class="stat-trend">42% of total volume</div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="toolbar">
+            <input type="text" class="search-input" id="tableSearch" placeholder="Search leads by name or email..." onkeyup="filterLeads()">
+            <button class="btn-export" onclick="exportToCSV()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export CSV
+            </button>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+            <table id="leadsTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>User / Email</th>
+                        <th>Source Page</th>
+                        <th>Readiness Score</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="leadsBody">
+                    <!-- Data injected via JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const leadsData = [
+            { date: "2023-10-24 14:22", name: "Alex Rivera", email: "alex@riveratech.io", source: "homepage_hero", score: 85, status: "Qualified" },
+            { date: "2023-10-24 12:05", name: "Sarah Jenkins", email: "s.jenkins@growthlabs.com", source: "blog_footer_cta", score: 42, status: "Review" },
+            { date: "2023-10-23 18:45", name: "Marcus Thorne", email: "marcus@thorne.digital", source: "wix_sidebar", score: 91, status: "Contacted" },
+            { date: "2023-10-23 15:10", name: "Elena Rodriguez", email: "elena@vivid-agency.com", source: "partner_portal", score: 68, status: "Qualified" },
+            { date: "2023-10-23 09:30", name: "David Chen", email: "dchen@saasflow.io", source: "blog_footer_cta", score: 25, status: "Unqualified" },
+            { date: "2023-10-22 16:20", name: "Jessica Wu", email: "jess@pixelperfect.com", source: "homepage_hero", score: 77, status: "Qualified" },
+            { date: "2023-10-22 11:15", name: "Tom Baker", email: "tom@bakercreative.uk", source: "framer_embed", score: 59, status: "Review" }
+        ];
+
+        function renderLeads(data) {
+            const body = document.getElementById('leadsBody');
+            body.innerHTML = data.map(lead => `
+                <tr>
+                    <td>${lead.date}</td>
+                    <td>
+                        <div style="color: var(--text-primary); font-weight: 500;">${lead.name}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">${lead.email}</div>
+                    </td>
+                    <td><span class="source-tag">${lead.source}</span></td>
+                    <td>
+                        <div class="score-badge">
+                            <div class="score-bar">
+                                <div class="score-fill" style="width: ${lead.score}%; background: ${lead.score > 70 ? 'var(--neon-green)' : lead.score > 40 ? 'var(--neon-blue)' : '#ff5f56'};"></div>
+                            </div>
+                            <span style="font-family: 'JetBrains Mono';">${lead.score}%</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="status-dot" style="background: ${getStatusColor(lead.status)};"></span>
+                        ${lead.status}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getStatusColor(status) {
+            switch(status) {
+                case 'Qualified': return 'var(--neon-green)';
+                case 'Contacted': return 'var(--neon-blue)';
+                case 'Review': return '#ffbd2e';
+                default: return 'var(--text-muted)';
+            }
+        }
+
+        function filterLeads() {
+            const query = document.getElementById('tableSearch').value.toLowerCase();
+            const filtered = leadsData.filter(l => 
+                l.name.toLowerCase().includes(query) || 
+                l.email.toLowerCase().includes(query) ||
+                l.source.toLowerCase().includes(query)
+            );
+            renderLeads(filtered);
+        }
+
+        function exportToCSV() {
+            const headers = ["Date", "Name", "Email", "Source", "Score", "Status"];
+            const rows = leadsData.map(l => [l.date, l.name, l.email, l.source, l.score, l.status]);
+            
+            let csvContent = "data:text/csv;charset=utf-8," 
+                + headers.join(",") + "\n"
+                + rows.map(e => e.join(",")).join("\n");
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `moonshine_leads_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Init
+        renderLeads(leadsData);
+    </script>
+</body>
+</html>

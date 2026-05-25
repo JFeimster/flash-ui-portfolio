@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLAST RADIUS | Quote Grenade Leaderboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=Syne:wght@800&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #000000;
+            --white: #ffffff;
+            --cream: #f4f1ea;
+            --red: #ff3c00;
+            --border: 4px solid #000000;
+            --shadow: 8px 8px 0px #000000;
+            --shadow-hover: 4px 4px 0px #000000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--cream);
+            color: var(--black);
+            font-family: 'Space Grotesk', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            border-bottom: var(--border);
+            padding: 20px 0;
+            background: var(--black);
+            color: var(--white);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .marquee {
+            overflow: hidden;
+            white-space: nowrap;
+            background: var(--red);
+            border-bottom: var(--border);
+            padding: 10px 0;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .marquee-inner {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .hero {
+            padding: 60px 0;
+            text-align: left;
+            border-bottom: var(--border);
+            background: var(--white);
+        }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(3rem, 10vw, 7rem);
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            margin-bottom: 10px;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            border-top: var(--border);
+            border-bottom: var(--border);
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .stat-item {
+            padding: 20px;
+            border-right: 2px solid var(--white);
+            text-align: center;
+        }
+
+        .stat-item:last-child { border-right: none; }
+
+        .stat-val {
+            display: block;
+            font-size: 2rem;
+            font-family: 'Syne', sans-serif;
+            color: var(--red);
+        }
+
+        .stat-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+
+        .leaderboard {
+            padding: 60px 0;
+        }
+
+        .rank-card {
+            background: var(--white);
+            border: var(--border);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: 120px 1fr 200px;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+
+        .rank-card:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 12px 12px 0px var(--red);
+        }
+
+        .rank-num {
+            font-family: 'Syne', sans-serif;
+            font-size: 4rem;
+            background: var(--black);
+            color: var(--white);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .rank-content {
+            padding: 30px;
+        }
+
+        .rank-quote {
+            font-size: 1.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .rank-meta {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .rank-impact {
+            padding: 30px;
+            text-align: right;
+            border-left: var(--border);
+        }
+
+        .impact-score {
+            font-family: 'Syne', sans-serif;
+            font-size: 2rem;
+            display: block;
+        }
+
+        @media (max-width: 800px) {
+            .rank-card {
+                grid-template-columns: 1fr;
+            }
+            .rank-num { height: 80px; }
+            .rank-impact { text-align: left; border-left: none; border-top: var(--border); }
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            text-transform: uppercase;
+            border: var(--border);
+            background: var(--red);
+            color: var(--white);
+            box-shadow: var(--shadow);
+            text-decoration: none;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            transform: translate(2px, 2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        footer {
+            background: var(--black);
+            color: var(--white);
+            padding: 60px 0;
+            text-align: center;
+            border-top: var(--border);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="marquee">
+        <div class="marquee-inner">
+            MOST SHARED GRENADES &nbsp; • &nbsp; MAXIMUM FRICTION DETECTED &nbsp; • &nbsp; TRENDING IMPACT RADIALS &nbsp; • &nbsp; NO BEIGE OPINIONS ALLOWED &nbsp; • &nbsp; 
+        </div>
+    </div>
+
+    <header>
+        <div class="container" style="display:flex; justify-content: space-between; align-items: center;">
+            <div style="font-weight: 900; font-size: 1.5rem; letter-spacing: -1px;">QUOTE GRENADE / / BLAST RADIUS</div>
+            <nav class="nav-links">
+                <a href="index.html">GENERATOR</a>
+                <a href="#" style="color: var(--red);">LEADERBOARD</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>BLAST RADIUS.</h1>
+            <p style="font-size: 1.5rem; max-width: 600px; font-weight: bold; text-transform: uppercase;">Tracking the highest-velocity insights currently detonating across the digital landscape.</p>
+        </div>
+    </section>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-val">12.4k</span>
+            <span class="stat-label">Total Detonations</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-val">892</span>
+            <span class="stat-label">Active Glitches</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-val">CRITICAL</span>
+            <span class="stat-label">Network Tension</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-val">99%</span>
+            <span class="stat-label">Boredom Neutralized</span>
+        </div>
+    </div>
+
+    <main class="container leaderboard">
+        <div id="leaderboard-target">
+            <!-- Rank 1 -->
+            <div class="rank-card">
+                <div class="rank-num">01</div>
+                <div class="rank-content">
+                    <div class="rank-quote">The state is a hallucination with a budget.</div>
+                    <div class="rank-meta">CAT: LIBERTY // ARM-CODE: 4492-X</div>
+                </div>
+                <div class="rank-impact">
+                    <span class="stat-label">SHRAPNEL COUNT</span>
+                    <span class="impact-score">4,821</span>
+                </div>
+            </div>
+
+            <!-- Rank 2 -->
+            <div class="rank-card">
+                <div class="rank-num">02</div>
+                <div class="rank-content">
+                    <div class="rank-quote">Sovereignty is a skill, not a right.</div>
+                    <div class="rank-meta">CAT: LIBERTY // ARM-CODE: 1102-Y</div>
+                </div>
+                <div class="rank-impact">
+                    <span class="stat-label">SHRAPNEL COUNT</span>
+                    <span class="impact-score">3,119</span>
+                </div>
+            </div>
+
+            <!-- Rank 3 -->
+            <div class="rank-card">
+                <div class="rank-num">03</div>
+                <div class="rank-content">
+                    <div class="rank-quote">Protocol is greater than politics.</div>
+                    <div class="rank-meta">CAT: CONTRARIAN // ARM-CODE: 8832-Z</div>
+                </div>
+                <div class="rank-impact">
+                    <span class="stat-label">SHRAPNEL COUNT</span>
+                    <span class="impact-score">2,845</span>
+                </div>
+            </div>
+
+            <!-- Rank 4 -->
+            <div class="rank-card">
+                <div class="rank-num">04</div>
+                <div class="rank-content">
+                    <div class="rank-quote">Permission is for people who don't have code.</div>
+                    <div class="rank-meta">CAT: FOUNDER // ARM-CODE: 3321-A</div>
+                </div>
+                <div class="rank-impact">
+                    <span class="stat-label">SHRAPNEL COUNT</span>
+                    <span class="impact-score">1,902</span>
+                </div>
+            </div>
+
+            <!-- Rank 5 -->
+            <div class="rank-card">
+                <div class="rank-num">05</div>
+                <div class="rank-content">
+                    <div class="rank-quote">Exit is the only real voice.</div>
+                    <div class="rank-meta">CAT: LIBERTY // ARM-CODE: 9004-B</div>
+                </div>
+                <div class="rank-impact">
+                    <span class="stat-label">SHRAPNEL COUNT</span>
+                    <span class="impact-score">1,440</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="index.html" class="btn">GO BACK & ARM MORE</a>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p style="font-family: 'IBM Plex Mono', monospace; font-weight: bold; text-transform: uppercase;">
+                Data based on simulated network friction. <br>
+                Updated every 60 seconds (Not really).
+            </p>
+            <p style="margin-top: 20px; opacity: 0.5;">© 2024 RADICAL LIBERTARIAN LABS.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Simple logic to randomize scores slightly on refresh to simulate "Live" data
+        document.addEventListener('DOMContentLoaded', () => {
+            const scores = document.querySelectorAll('.impact-score');
+            scores.forEach(score => {
+                let val = parseInt(score.innerText.replace(',', ''));
+                val += Math.floor(Math.random() * 50);
+                score.innerText = val.toLocaleString();
+            });
+        });
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLAST RADIUS | Quote Grenade Leaderboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=Syne:wght@800&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #000000;
+            --white: #ffffff;
+            --cream: #f4f1ea;
+            --red: #ff3c00;
+            --border: 4px solid #000000;
+            --shadow: 8px 8px 0px #000000;
+            --shadow-hover: 4px 4px 0px #000000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--cream);
+            color: var(--black);
+            font-family: 'Space Grotesk', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            border-bottom: var(--border);
+            padding: 20px 0;
+            background: var(--black);
+            color: var(--white);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .marquee {
+            overflow: hidden;
+            white-space: nowrap;
+            background: var(--red);
+            border-bottom: var(--border);
+            padding: 10px 0;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .marquee-inner {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .hero {
+            padding: 60px 0;
+            text-align: left;
+            border-bottom: var(--border);
+            background: var(--white);
+        }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(3rem, 10vw, 7rem);
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            margin-bottom: 10px;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            border-top: var(--border);
+            border-bottom: var(--border);
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .stat-item {
+            padding: 20px;
+            border-right: 2px solid var(--white);
+            text-align: center;
+        }
+
+        .stat-item:last-child { border-right: none; }
+
+        .stat-val {
+            display: block;
+            font-size: 2rem;
+            font-family: 'Syne', sans-serif;
+            color: var(--red);
+        }
+
+        .stat-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+
+        .leaderboard {
+            padding: 60px 0;
+        }
+
+        .rank-card {
+            background: var(--white);
+            border: var(--border);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: 120px 1fr 200px;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+
+        .rank-card:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 12px 12px 0px var(--red);
+        }
+
+        .rank-num {
+            font-family: 'Syne', sans-serif;
+            font-size: 4rem;
+            background: var(--black);
+            color: var(--white);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .rank-content {
+            padding: 30px;
+        }
+
+        .rank-quote {
+            font-size: 1.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .rank-meta {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .rank-impact {
+            padding: 30px;
+            text-align: right;
+            border-left: var(--border);
+        }
+
+        .impact-score {
+            font-family: 'Syne', sans-serif;
+            font-size: 2rem;
+            display: block;
+        }
+
+        @media (max-width: 800px) {
+            .rank-card {
+                grid-template-columns: 1fr;
+            }
+            .rank-num { height: 80px; }
+            .rank-impact { text-align: left; border-left: none; border-top: var(--border); }
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            text-transform: uppercase;
+            border: var(--border);
+            background: var(--red);
+            color: var(--white);
+            box-shadow: var(--shadow);
+            text-decoration: none;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            transform: translate(2px, 2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        footer {
+            background: var(--black);
+            color: var(--white);
+            padding: 60px 0;
+            text-align: center;
+            border-top: var(--border);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="marquee">
+        <div class="marquee-inner">
+            MOST SHARED GRENADES &nbsp; • &nbsp; MAXIMUM FRICTION DETECTED &nbsp; • &nbsp; TRENDING IMPACT RADIALS &nbsp; • &nbsp; NO BEIGE OPINIONS ALLOWED &nbsp; • &nbsp; 
+        </div>
+    </div>
+
+    <header>
+        <div class="container" style="display:flex; justify-content: space-between; align-items: center;">
+            <div style="font-weight: 900; font-size: 1.5rem; letter-spacing: -1px;">QUOTE GRENADE / / BLAST RADIUS</div>
+            <nav class="nav-links">
+                <a href="index.html">GENERATOR</a>
+                <a href="#" style="color: var(--red);">LEADERBOARD</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>BLAST RADIUS.</h1>
+            <p style="font-size: 1.5rem; max-width: 600px; font-weight: bold; text-transform: uppercase;">Tracking the highest-velocity insights currently detonating across the digital landscape.</p>
+        </div>
+    </section>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-val">12.4k</span>
+            <span class="stat-label">Total Detonations</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-val">892</span>
+            <span class="stat-label">Active Glitches</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-val">CRITICAL</span>
+            <span class="stat-label">Network Tension</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-val">99%</span>
+            <span class="stat-label">Boredom Neutralized</span>
+        </div>
+    </div>
+
+    <main class="container leaderboard">
+        <div id="leaderboard-target">
+            <!-- Rank 1 -->
+            <div class="rank-card">
+                <div class="rank-num">01</div>
+                <div class="rank-content">
+                    <div class="rank-quote">The state is a hallucination with a budget.</div>
+                    <div class="rank-meta">CAT: LIBERTY // ARM-CODE: 4492-X</div>
+                </div>
+                <div class="rank-impact">
+                    <span class="stat-label">SHRAPNEL COUNT</span>
+                    <span class="impact-score">4,821</span>
+                </div>
+            </div>
+
+            <!-- Rank 2 -->
+            <div class="rank-card">
+                <div class="rank-num">02</div>
+                <div class="rank-content">
+                    <div class="rank-quote">Sovereignty is a skill, not a right.</div>
+                    <div class="rank-meta">CAT: LIBERTY // ARM-CODE: 1102-Y</div>
+                </div>
+                <div class="rank-impact">
+                    <span class="stat-label">SHRAPNEL COUNT</span>
+                    <span class="impact-score">3,119</span>
+                </div>
+            </div>
+
+            <!-- Rank 3 -->
+            <div class="rank-card">
+                <div class="rank-num">03</div>
+                <div class="rank-content">
+                    <div class="rank-quote">Protocol is greater than politics.</div>
+                    <div class="rank-meta">CAT: CONTRARIAN // ARM-CODE: 8832-Z</div>
+                </div>
+                <div class="rank-impact">
+                    <span class="stat-label">SHRAPNEL COUNT</span>
+                    <span class="impact-score">2,845</span>
+                </div>
+            </div>
+
+            <!-- Rank 4 -->
+            <div class="rank-card">
+                <div class="rank-num">04</div>
+                <div class="rank-content">
+                    <div class="rank-quote">Permission is for people who don't have code.</div>
+                    <div class="rank-meta">CAT: FOUNDER // ARM-CODE: 3321-A</div>
+                </div>
+                <div class="rank-impact">
+                    <span class="stat-label">SHRAPNEL COUNT</span>
+                    <span class="impact-score">1,902</span>
+                </div>
+            </div>
+
+            <!-- Rank 5 -->
+            <div class="rank-card">
+                <div class="rank-num">05</div>
+                <div class="rank-content">
+                    <div class="rank-quote">Exit is the only real voice.</div>
+                    <div class="rank-meta">CAT: LIBERTY // ARM-CODE: 9004-B</div>
+                </div>
+                <div class="rank-impact">
+                    <span class="stat-label">SHRAPNEL COUNT</span>
+                    <span class="impact-score">1,440</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="#" class="btn" onclick="window.location.reload();">REFRESH RADAR</a>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p style="font-family: 'IBM Plex Mono', monospace; font-weight: bold; text-transform: uppercase;">
+                Data based on simulated network friction. <br>
+                Updated every 60 seconds.
+            </p>
+            <p style="margin-top: 20px; opacity: 0.5;">© 2024 RADICAL LIBERTARIAN LABS.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Simple logic to randomize scores slightly on refresh to simulate "Live" data
+        document.addEventListener('DOMContentLoaded', () => {
+            const scores = document.querySelectorAll('.impact-score');
+            scores.forEach(score => {
+                let val = parseInt(score.innerText.replace(',', ''));
+                val += Math.floor(Math.random() * 50);
+                score.innerText = val.toLocaleString();
+            });
+        });
+    </script>
+</body>
+</html>

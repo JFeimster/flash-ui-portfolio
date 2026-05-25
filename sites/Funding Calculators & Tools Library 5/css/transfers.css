@@ -1,0 +1,426 @@
+:root {
+    --bg-transfers: #0b0c10;
+    --surface-transfers: #14161f;
+    --surface-card-transfers: #1a1d29;
+    --border-brutal: 3px solid #ffffff;
+    --border-brutal-thin: 2px solid #ffffff;
+    --font-header: 'Space Grotesk', sans-serif;
+    --font-body: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Transfers Dashboard Layout */
+.transfers-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+    margin: 40px auto;
+    max-width: 1400px;
+}
+
+@media (min-width: 1024px) {
+    .transfers-container {
+        grid-template-columns: 2fr 1fr;
+    }
+}
+
+/* Section Headers */
+.section-header-brutal {
+    border: var(--border-brutal);
+    background: var(--accent-cyan);
+    color: #000000;
+    padding: 15px 25px;
+    font-family: var(--font-header);
+    font-size: 22px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+    box-shadow: 6px 6px 0px #ffffff;
+    margin-bottom: 30px;
+    display: inline-block;
+    transform: rotate(-0.5deg);
+}
+
+/* Active Transfers List */
+.transfers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* Transfer Card */
+.transfer-card {
+    background: var(--surface-transfers);
+    border: var(--border-brutal);
+    padding: 30px;
+    position: relative;
+    box-shadow: var(--brutal-shadow-cyan);
+    transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+}
+
+.transfer-card:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 10px 10px 0px var(--accent-cyan);
+}
+
+/* Transfer Header Card Styling */
+.transfer-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 15px;
+    border-bottom: var(--border-brutal-thin) dashed rgba(255, 255, 255, 0.2);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.transfer-title {
+    font-family: var(--font-header);
+    font-size: 24px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #ffffff;
+    line-height: 1.2;
+}
+
+/* Brutal Badges */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    font-family: var(--font-header);
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 1px;
+    border: var(--border-brutal-thin);
+    box-shadow: 3px 3px 0px #ffffff;
+}
+
+.status-badge.active {
+    background: var(--accent-cyan);
+    color: #000000;
+}
+
+.status-badge.expired {
+    background: var(--accent-magenta);
+    color: #ffffff;
+}
+
+.status-badge.revoked {
+    background: #555555;
+    color: #ffffff;
+    box-shadow: 3px 3px 0px rgba(255, 255, 255, 0.3);
+}
+
+/* Link Box / Clipboard Element */
+.share-link-wrapper {
+    margin: 20px 0;
+}
+
+.share-link-label {
+    font-family: var(--font-header);
+    font-size: 13px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.share-link-box {
+    display: flex;
+    background: var(--surface-card-transfers);
+    border: var(--border-brutal-thin);
+    overflow: hidden;
+}
+
+.share-link-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--accent-cyan);
+    font-family: monospace;
+    font-size: 14px;
+    padding: 14px 18px;
+    outline: none;
+    width: 100%;
+}
+
+.btn-copy-link {
+    background: #ffffff;
+    color: #000000;
+    border: none;
+    border-left: var(--border-brutal-thin);
+    padding: 0 25px;
+    font-family: var(--font-header);
+    font-weight: 900;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.15s, color 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-copy-link:hover {
+    background: var(--accent-yellow);
+    color: #000000;
+}
+
+/* Configuration Panel (Interactive Controls) */
+.transfer-config-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: var(--border-brutal-thin) solid rgba(255, 255, 255, 0.1);
+}
+
+/* Custom Brutal Toggle Switches */
+.config-control-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.config-control-label {
+    font-family: var(--font-header);
+    font-size: 12px;
+    text-transform: uppercase;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+}
+
+/* Brutalist Block Switch */
+.brutal-switch-label {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    font-family: var(--font-header);
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.brutal-switch-input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.brutal-switch-visual {
+    width: 60px;
+    height: 32px;
+    background: var(--surface-card-transfers);
+    border: var(--border-brutal-thin);
+    position: relative;
+    margin-right: 12px;
+    transition: background-color 0.15s;
+    box-shadow: 2px 2px 0px rgba(255, 255, 255, 0.2);
+}
+
+.brutal-switch-visual::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 22px;
+    height: 22px;
+    background: #ffffff;
+    border: 2px solid #000000;
+    transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.brutal-switch-input:checked + .brutal-switch-visual {
+    background: var(--accent-cyan);
+}
+
+.brutal-switch-input:checked + .brutal-switch-visual::after {
+    transform: translateX(28px);
+    background: #ffffff;
+}
+
+/* Secure Inputs for Expiry & Passwords */
+.brutal-input-secure {
+    background: var(--surface-card-transfers);
+    border: var(--border-brutal-thin);
+    padding: 10px 14px;
+    color: #ffffff;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 700;
+    width: 100%;
+    outline: none;
+    box-shadow: inset 2px 2px 0px rgba(0,0,0,0.5);
+    transition: border-color 0.15s;
+}
+
+.brutal-input-secure:focus {
+    border-color: var(--accent-yellow);
+}
+
+/* Quick Actions Strip */
+.transfer-actions-strip {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+.btn-action-brutal {
+    font-family: var(--font-header);
+    font-weight: 900;
+    font-size: 13px;
+    text-transform: uppercase;
+    padding: 10px 18px;
+    cursor: pointer;
+    border: var(--border-brutal-thin);
+    background: transparent;
+    color: #ffffff;
+    transition: all 0.15s;
+    box-shadow: 3px 3px 0px rgba(255, 255, 255, 0.15);
+}
+
+.btn-action-brutal:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0px #ffffff;
+    background: #ffffff;
+    color: #000000;
+}
+
+.btn-action-brutal.danger {
+    color: var(--accent-magenta);
+}
+
+.btn-action-brutal.danger:hover {
+    background: var(--accent-magenta);
+    color: #ffffff;
+    box-shadow: 5px 5px 0px #ffffff;
+    border-color: #ffffff;
+}
+
+/* Stats / Performance Panel (Sidebar) */
+.transfers-stats-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.stats-card-brutal {
+    background: var(--surface-transfers);
+    border: var(--border-brutal);
+    padding: 30px;
+    box-shadow: var(--brutal-shadow-yellow);
+    position: relative;
+}
+
+.stats-card-title {
+    font-family: var(--font-header);
+    font-size: 20px;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 25px;
+    color: #ffffff;
+    border-bottom: var(--border-brutal-thin) solid #ffffff;
+    padding-bottom: 10px;
+}
+
+.stat-row-brutal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+}
+
+.stat-row-brutal:last-child {
+    border-bottom: none;
+}
+
+.stat-label {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-family: var(--font-header);
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--accent-yellow);
+}
+
+/* Quick Creator Section */
+.quick-creator-card {
+    background: var(--surface-transfers);
+    border: var(--border-brutal);
+    padding: 30px;
+    box-shadow: var(--brutal-shadow-magenta);
+}
+
+.creator-form-group {
+    margin-bottom: 20px;
+}
+
+.creator-form-group label {
+    display: block;
+    font-family: var(--font-header);
+    font-weight: 900;
+    font-size: 13px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    color: #ffffff;
+}
+
+.creator-input {
+    background: var(--surface-card-transfers);
+    border: var(--border-brutal-thin);
+    padding: 14px;
+    color: #ffffff;
+    width: 100%;
+    outline: none;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.creator-input:focus {
+    border-color: var(--accent-magenta);
+}
+
+.btn-generate-transfer {
+    background: var(--accent-magenta);
+    color: #ffffff;
+    font-family: var(--font-header);
+    font-weight: 900;
+    font-size: 16px;
+    text-transform: uppercase;
+    padding: 16px;
+    border: var(--border-brutal-thin);
+    width: 100%;
+    cursor: pointer;
+    box-shadow: 4px 4px 0px #ffffff;
+    transition: all var(--transition-speed);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-generate-transfer:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 7px 7px 0px #ffffff;
+}
+
+.btn-generate-transfer:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0px 0px 0px;
+}

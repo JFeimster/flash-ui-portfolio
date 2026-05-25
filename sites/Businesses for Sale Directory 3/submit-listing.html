@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUBMIT ASSET | OXIDIZED LEDGER</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --obsidian: #050505;
+            --bone: #F5F5F0;
+            --acid-green: #C1FF00;
+            --oxidized-copper: #8E593E;
+            --blood-orange: #FF3D00;
+            --graphite: #1A1A1A;
+            --panel: #0F0F0F;
+            --border-width: 2px;
+            --noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--obsidian);
+            color: var(--bone);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.4;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--noise);
+            opacity: 0.04;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: var(--border-width) solid var(--graphite);
+            background: var(--obsidian);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-weight: 900;
+            font-size: 1.5rem;
+            letter-spacing: -1px;
+            color: var(--bone);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span { color: var(--oxidized-copper); }
+
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a {
+            color: var(--bone);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Layout */
+        .onboarding-grid {
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            min-height: calc(100vh - 80px);
+            border-bottom: var(--border-width) solid var(--graphite);
+        }
+
+        /* Form Area */
+        .form-section {
+            padding: 4rem 2rem;
+            border-right: var(--border-width) solid var(--graphite);
+            max-width: 800px;
+            margin-left: auto;
+            width: 100%;
+        }
+
+        .step-indicator {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .step-dot {
+            width: 40px;
+            height: 6px;
+            background: var(--graphite);
+        }
+
+        .step-dot.active { background: var(--acid-green); }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-subtext {
+            color: #888;
+            margin-bottom: 3rem;
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-family: 'JetBrains Mono';
+            font-size: 0.7rem;
+            color: var(--oxidized-copper);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            background: var(--panel);
+            border: 1px solid var(--graphite);
+            color: var(--bone);
+            padding: 1.2rem;
+            font-family: 'JetBrains Mono';
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus {
+            border-color: var(--acid-green);
+        }
+
+        .dual-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        /* Preview Sidebar */
+        .preview-sidebar {
+            background: #080808;
+            padding: 4rem 2rem;
+            position: sticky;
+            top: 76px;
+            height: fit-content;
+        }
+
+        .preview-label {
+            font-family: 'JetBrains Mono';
+            font-size: 0.6rem;
+            color: #555;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .preview-label::after {
+            content: "";
+            height: 1px;
+            background: #222;
+            flex-grow: 1;
+        }
+
+        /* Card Styling (Sync with Base) */
+        .listing-card {
+            background: var(--panel);
+            border: var(--border-width) solid var(--bone);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 10px 10px 0px var(--oxidized-copper);
+        }
+
+        .industry-tag {
+            font-size: 0.65rem;
+            color: var(--oxidized-copper);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .listing-title {
+            font-size: 1.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+
+        .price-display {
+            font-family: 'JetBrains Mono';
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--acid-green);
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px;
+            background: var(--graphite);
+            border: 1px solid var(--graphite);
+            margin-bottom: 1.5rem;
+        }
+
+        .metric-box {
+            background: var(--panel);
+            padding: 1rem;
+        }
+
+        .metric-box .label {
+            display: block;
+            font-size: 0.6rem;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-box .value {
+            font-family: 'JetBrains Mono';
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .badge-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            font-size: 0.6rem;
+            padding: 0.3rem 0.6rem;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .badge-green { background: var(--acid-green); color: var(--obsidian); }
+        .badge-copper { background: var(--oxidized-copper); color: var(--bone); }
+
+        .btn-nav {
+            display: flex;
+            gap: 1rem;
+            margin-top: 3rem;
+        }
+
+        .btn {
+            text-align: center;
+            padding: 1.2rem 2.5rem;
+            text-transform: uppercase;
+            font-weight: 900;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-decoration: none;
+            border: var(--border-width) solid var(--bone);
+            transition: all 0.2s;
+        }
+
+        .btn-primary { background: var(--bone); color: var(--obsidian); }
+        .btn-secondary { background: transparent; color: var(--bone); }
+        .btn-primary:hover { background: var(--acid-green); border-color: var(--acid-green); }
+
+        .form-step { display: none; }
+        .form-step.active { display: block; }
+
+        @media (max-width: 1000px) {
+            .onboarding-grid { grid-template-columns: 1fr; }
+            .form-section { border-right: none; margin-left: 0; padding: 2rem; }
+            .preview-sidebar { position: static; height: auto; border-top: var(--border-width) solid var(--graphite); }
+        }
+
+        footer {
+            padding: 4rem 2rem;
+            border-top: var(--border-width) solid var(--graphite);
+            font-family: 'JetBrains Mono';
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">OXIDIZED<span>LEDGER</span></a>
+        <div class="nav-links">
+            <a href="#">Deal Portal</a>
+            <a href="#" style="color: var(--acid-green);">Onboarding</a>
+        </div>
+        <div class="mono" style="font-size: 0.7rem; color: var(--acid-green);">System Status: Secure</div>
+    </nav>
+
+    <div class="onboarding-grid">
+        <section class="form-section">
+            <div class="step-indicator">
+                <div class="step-dot active" data-step="1"></div>
+                <div class="step-dot" data-step="2"></div>
+                <div class="step-dot" data-step="3"></div>
+            </div>
+
+            <form id="onboardingForm">
+                <!-- STEP 1: IDENTITY -->
+                <div class="form-step active" id="step1">
+                    <h1>ASSET IDENTITY</h1>
+                    <p class="form-subtext">Define the core profile of the business. Be concise.</p>
+                    
+                    <div class="form-group">
+                        <label>OFFICIAL LISTING TITLE</label>
+                        <input type="text" id="in-title" placeholder="e.g., PRECISION HVAC & COOLING" maxlength="40">
+                    </div>
+
+                    <div class="dual-inputs">
+                        <div class="form-group">
+                            <label>INDUSTRY CATEGORY</label>
+                            <select id="in-industry">
+                                <option value="LOCAL SERVICE">Local Service</option>
+                                <option value="SAAS">SaaS</option>
+                                <option value="ECOMMERCE">Ecommerce</option>
+                                <option value="AGENCIES">Agencies</option>
+                                <option value="FRANCHISES">Franchises</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>PRIMARY LOCATION</label>
+                            <input type="text" id="in-location" placeholder="e.g., AUSTIN, TX">
+                        </div>
+                    </div>
+
+                    <div class="btn-nav">
+                        <button type="button" class="btn btn-primary" onclick="nextStep(2)">Proceed to Financials</button>
+                    </div>
+                </div>
+
+                <!-- STEP 2: FINANCIALS -->
+                <div class="form-step" id="step2">
+                    <h1>METRIC VALIDATION</h1>
+                    <p class="form-subtext">Verified trailing twelve-month (TTM) figures required for listing.</p>
+                    
+                    <div class="form-group">
+                        <label>ASKING PRICE ($)</label>
+                        <input type="number" id="in-price" placeholder="1200000">
+                    </div>
+
+                    <div class="dual-inputs">
+                        <div class="form-group">
+                            <label>ANNUAL REVENUE ($)</label>
+                            <input type="number" id="in-revenue" placeholder="3500000">
+                        </div>
+                        <div class="form-group">
+                            <label>ANNUAL SDE / CASH FLOW ($)</label>
+                            <input type="number" id="in-sde" placeholder="450000">
+                        </div>
+                    </div>
+
+                    <div class="btn-nav">
+                        <button type="button" class="btn btn-secondary" onclick="nextStep(1)">Back</button>
+                        <button type="button" class="btn btn-primary" onclick="nextStep(3)">Set Terms</button>
+                    </div>
+                </div>
+
+                <!-- STEP 3: TERMS -->
+                <div class="form-step" id="step3">
+                    <h1>DEAL ARCHITECTURE</h1>
+                    <p class="form-subtext">Finalize the listing status and incentive structures.</p>
+                    
+                    <div class="form-group">
+                        <label>SELLER FINANCING AVAILABLE?</label>
+                        <select id="in-seller-fin">
+                            <option value="yes">Yes, Available</option>
+                            <option value="no">Cash Only Deal</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>LISTING STATUS</label>
+                        <select id="in-status">
+                            <option value="ACTIVE">Standard Active</option>
+                            <option value="PREMIUM">Premium / Featured</option>
+                            <option value="HOT">Hot Deal (High Velocity)</option>
+                        </select>
+                    </div>
+
+                    <div class="btn-nav">
+                        <button type="button" class="btn btn-secondary" onclick="nextStep(2)">Back</button>
+                        <button type="submit" class="btn btn-primary" style="background: var(--acid-green);">SUBMIT TO LEDGER</button>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <section class="preview-sidebar">
+            <div class="preview-label mono">LIVE LEDGER PREVIEW</div>
+
+            <div class="listing-card" id="previewCard">
+                <span class="industry-tag" id="pre-industry">LOCAL SERVICE</span>
+                <h3 class="listing-title" id="pre-title">NEW ASSET LISTING</h3>
+                <span class="price-display" id="pre-price">$0</span>
+                
+                <div class="metrics-grid">
+                    <div class="metric-box">
+                        <span class="label">Annual Revenue</span>
+                        <span class="value" id="pre-revenue">$0</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="label">Annual SDE</span>
+                        <span class="value" id="pre-sde">$0</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="label">Multiple</span>
+                        <span class="value" id="pre-multiple">0.0x</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="label">Location</span>
+                        <span class="value" id="pre-location">N/A</span>
+                    </div>
+                </div>
+                
+                <div class="badge-row" id="pre-badges">
+                    <span class="badge badge-green" id="pre-tag-fin">Seller Financing</span>
+                </div>
+
+                <div style="margin-top: auto; border-top: 1px solid #222; padding-top: 1rem; color: #444;" class="mono">
+                    <p style="font-size: 0.5rem;">LISTING_ID: OX-PENDING-2024</p>
+                </div>
+            </div>
+
+            <div style="margin-top: 2rem; padding: 1.5rem; border: 1px dashed #333; font-size: 0.75rem; color: #666;">
+                <p class="mono">Note: All listings are subject to algorithmic verification and manual review by the Oxidized Ledger risk desk.</p>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 2rem;">
+            <div>
+                <a href="#" class="logo">OXIDIZED<span>LEDGER</span></a>
+                <p style="margin-top: 1rem; color: #666; font-size: 0.8rem;">Submit your asset for high-intent exposure.</p>
+            </div>
+            <div style="text-align: right;">
+                <p class="mono" style="font-size: 0.8rem; color: #444;">&copy; 2024 Oxidized Ledger Inc. | Broker Portal</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function nextStep(step) {
+            document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step' + step).classList.add('active');
+            
+            document.querySelectorAll('.step-dot').forEach((dot, idx) => {
+                if (idx < step) dot.classList.add('active');
+                else dot.classList.remove('active');
+            });
+            window.scrollTo(0, 0);
+        }
+
+        function formatCurrency(num) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(num || 0);
+        }
+
+        const inputs = [
+            'in-title', 'in-industry', 'in-location', 
+            'in-price', 'in-revenue', 'in-sde', 
+            'in-seller-fin', 'in-status'
+        ];
+
+        function updatePreview() {
+            const title = document.getElementById('in-title').value || "NEW ASSET LISTING";
+            const industry = document.getElementById('in-industry').value;
+            const location = document.getElementById('in-location').value || "N/A";
+            const price = parseFloat(document.getElementById('in-price').value) || 0;
+            const revenue = parseFloat(document.getElementById('in-revenue').value) || 0;
+            const sde = parseFloat(document.getElementById('in-sde').value) || 0;
+            const sellerFin = document.getElementById('in-seller-fin').value;
+            const status = document.getElementById('in-status').value;
+
+            document.getElementById('pre-title').innerText = title;
+            document.getElementById('pre-industry').innerText = industry;
+            document.getElementById('pre-location').innerText = location;
+            document.getElementById('pre-price').innerText = formatCurrency(price);
+            document.getElementById('pre-revenue').innerText = formatCurrency(revenue);
+            document.getElementById('pre-sde').innerText = formatCurrency(sde);
+            
+            const multiple = sde > 0 ? (price / sde).toFixed(1) : "0.0";
+            document.getElementById('pre-multiple').innerText = multiple + 'x';
+
+            const badgeContainer = document.getElementById('pre-badges');
+            badgeContainer.innerHTML = '';
+            
+            if (sellerFin === 'yes') {
+                badgeContainer.innerHTML += `<span class="badge badge-green">Seller Financing</span>`;
+            }
+            if (status === 'PREMIUM') {
+                badgeContainer.innerHTML += `<span class="badge badge-copper">Premium Asset</span>`;
+            }
+            if (status === 'HOT') {
+                badgeContainer.innerHTML += `<span class="badge" style="background: var(--blood-orange); color: white;">Hot Deal</span>`;
+            }
+        }
+
+        inputs.forEach(id => {
+            document.getElementById(id).addEventListener('input', updatePreview);
+        });
+
+        document.getElementById('onboardingForm').onsubmit = (e) => {
+            e.preventDefault();
+            alert("ASSET TRANSMITTED. Pending verification.");
+        };
+
+        // Init
+        updatePreview();
+    </script>
+</body>
+</html></html>

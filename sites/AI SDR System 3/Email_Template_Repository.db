@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Template Repository | Vector Aura</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #030303;
+            --card-bg: rgba(15, 15, 20, 0.7);
+            --border: rgba(255, 255, 255, 0.08);
+            --primary: #8b5cf6;
+            --secondary: #ec4899;
+            --accent: #06b6d4;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --aura-1: rgba(139, 92, 246, 0.15);
+            --aura-2: rgba(236, 72, 153, 0.15);
+            --code-bg: #0f172a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .aura-blob {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: -1;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        .aura-1 { top: -100px; left: -100px; background: var(--aura-1); animation: drift 20s infinite alternate; }
+        .aura-2 { bottom: -100px; right: -100px; background: var(--aura-2); animation: drift 25s infinite alternate-reverse; }
+
+        @keyframes drift {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(100px, 50px) scale(1.1); }
+        }
+
+        .sdr-container {
+            width: 100%;
+            max-width: 1100px;
+            background: var(--card-bg);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 32px;
+        }
+
+        .header-title h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-title p {
+            color: var(--text-dim);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .lab-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 32px;
+        }
+
+        /* Sidebar Templates */
+        .template-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .sidebar-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+        }
+
+        .template-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            padding: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .template-card:hover {
+            border-color: var(--primary);
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .template-card.active {
+            border-color: var(--primary);
+            background: rgba(139, 92, 246, 0.1);
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.1);
+        }
+
+        .template-card h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .template-card span {
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        /* Main Editor */
+        .editor-container {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .editor-section {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .section-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .prompt-area {
+            width: 100%;
+            min-height: 180px;
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            color: #e2e8f0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            resize: vertical;
+        }
+
+        .prompt-area:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Variable Tags */
+        .variable-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .var-tag {
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            color: var(--accent);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .var-tag:hover {
+            background: rgba(6, 182, 212, 0.2);
+        }
+
+        /* Tone Controls */
+        .tone-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .control-group label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: var(--border);
+            outline: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+        }
+
+        .footer-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            color: white;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="aura-blob aura-1"></div>
+    <div class="aura-blob aura-2"></div>
+
+    <main class="sdr-container">
+        <header class="header">
+            <div class="header-title">
+                <h1>Messaging & Prompt Lab</h1>
+                <p>Configure LLM reasoning and email generation logic</p>
+            </div>
+            <div style="font-family: 'JetBrains Mono'; font-size: 12px; color: var(--accent);">
+                DB_ST_049 // ACTIVE_SYNC
+            </div>
+        </header>
+
+        <div class="lab-layout">
+            <aside class="template-sidebar">
+                <div class="sidebar-label">Template Repository</div>
+                <div class="template-list">
+                    <div class="template-card active">
+                        <h4>Cold Outreach Alpha</h4>
+                        <span>Primary B2B / SaaS</span>
+                    </div>
+                    <div class="template-card">
+                        <h4>Investor Soft Launch</h4>
+                        <span>Funding / Pitching</span>
+                    </div>
+                    <div class="template-card">
+                        <h4>Post-Meeting Followup</h4>
+                        <span>Closing / Nurturing</span>
+                    </div>
+                    <div class="template-card">
+                        <h4>Conference Re-connect</h4>
+                        <span>Event Networking</span>
+                    </div>
+                </div>
+
+                <div class="sidebar-label" style="margin-top: 32px;">Persona Mapping</div>
+                <div class="editor-section" style="padding: 16px; background: rgba(255,255,255,0.02);">
+                    <div class="control-group" style="margin-bottom: 16px;">
+                        <label>Professionalism <span>85%</span></label>
+                        <input type="range" class="slider" value="85">
+                    </div>
+                    <div class="control-group">
+                        <label>Creativity <span>40%</span></label>
+                        <input type="range" class="slider" value="40">
+                    </div>
+                </div>
+            </aside>
+
+            <div class="editor-container">
+                <section class="editor-section">
+                    <div class="section-header">
+                        <h3>System Prompt (ChatGPT-4 Context)</h3>
+                        <div class="var-tag" style="color: var(--secondary); border-color: var(--secondary);">v2.4.1-stable</div>
+                    </div>
+                    <textarea class="prompt-area">You are a world-class SDR. Your goal is to write a high-converting email to {{prospect_name}} at {{company_name}}. 
+
+Research shows they recently: {{recent_news}}. 
+Use a {{tone}} tone. Focus on solving their {{pain_point}}. 
+
+Constraint: Keep it under 75 words. End with a low-friction call to action.</textarea>
+                    
+                    <div class="variable-grid">
+                        <div class="var-tag">{{prospect_name}}</div>
+                        <div class="var-tag">{{company_name}}</div>
+                        <div class="var-tag">{{pain_point}}</div>
+                        <div class="var-tag">{{recent_news}}</div>
+                        <div class="var-tag">{{my_calendar_link}}</div>
+                    </div>
+                </section>
+
+                <section class="editor-section">
+                    <div class="section-header">
+                        <h3>Draft Preview</h3>
+                        <span style="font-size: 11px; color: var(--text-dim);">Auto-generated with Gemini Pro</span>
+                    </div>
+                    <div class="prompt-area" style="min-height: 120px; background: rgba(255,255,255,0.02); border-style: dashed;">
+                        Subject: Quick thought on {{company_name}}'s scaling strategy<br><br>
+                        Hi {{prospect_name}},<br><br>
+                        Noticed your recent expansion into {{city}}. Most teams struggle with {{pain_point}} during this phase. We helped [Competitor] reduce overhead by 30% using Vector Aura.<br><br>
+                        Worth a 5-minute chat?
+                    </div>
+                </section>
+
+                <div class="footer-actions">
+                    <button class="btn btn-secondary">Discard Changes</button>
+                    <button class="btn btn-primary">Update Repository</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Interactive UI logic
+        const cards = document.querySelectorAll('.template-card');
+        cards.forEach(card => {
+            card.addEventListener('click', () => {
+                cards.forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+            });
+        });
+
+        const sliders = document.querySelectorAll('.slider');
+        sliders.forEach(slider => {
+            slider.addEventListener('input', (e) => {
+                const span = e.target.previousElementSibling.querySelector('span');
+                span.textContent = e.target.value + '%';
+            });
+        });
+    </script>
+</body>
+</html>

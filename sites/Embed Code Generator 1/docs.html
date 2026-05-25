@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonshine Capital | Developer Documentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #05070a;
+            --bg-card: #0d1117;
+            --bg-input: #161b22;
+            --neon-blue: #00f2ff;
+            --neon-green: #00ff9d;
+            --text-main: #e6edf3;
+            --text-dim: #8b949e;
+            --border: #30363d;
+            --accent-glow: rgba(0, 242, 255, 0.15);
+            --font-mono: 'Fira Code', monospace;
+            --font-sans: 'Inter', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            margin-bottom: 3rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .subheadline {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            max-width: 700px;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 3rem;
+            align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Sidebar Nav */
+        .side-nav {
+            position: sticky;
+            top: 2rem;
+        }
+
+        .nav-group {
+            margin-bottom: 2rem;
+        }
+
+        .nav-header {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-dim);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .nav-link {
+            display: block;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 0.5rem 0;
+            transition: color 0.2s;
+            border-left: 2px solid transparent;
+            padding-left: 1rem;
+        }
+
+        .nav-link:hover {
+            color: var(--neon-blue);
+        }
+
+        .nav-link.active {
+            color: var(--neon-blue);
+            border-left-color: var(--neon-blue);
+            background: linear-gradient(90deg, rgba(0, 242, 255, 0.05), transparent);
+        }
+
+        /* Content Sections */
+        .doc-section {
+            margin-bottom: 4rem;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        h2::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: var(--neon-green);
+            border-radius: 2px;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            color: var(--text-dim);
+        }
+
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .panel-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--neon-blue);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .panel-title::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--neon-blue);
+            box-shadow: 0 0 10px var(--neon-blue);
+            border-radius: 50%;
+        }
+
+        /* Code Styling */
+        .code-block {
+            background: #010409;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-top: 1rem;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .code-block pre {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: #d1d5db;
+        }
+
+        .token-keyword { color: #ff7b72; }
+        .token-string { color: #a5d6ff; }
+        .token-comment { color: #8b949e; }
+        .token-attr { color: #79c0ff; }
+        .token-val { color: var(--neon-green); }
+
+        /* API Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        th {
+            text-align: left;
+            color: var(--text-main);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-dim);
+            vertical-align: top;
+        }
+
+        .type-tag {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            background: var(--bg-input);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--neon-blue);
+        }
+
+        .req-tag {
+            color: #f85149;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            background: rgba(0, 255, 157, 0.1);
+            color: var(--neon-green);
+            border: 1px solid rgba(0, 255, 157, 0.2);
+        }
+
+        .btn-back {
+            color: var(--neon-blue);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        code {
+            font-family: var(--font-mono);
+            color: var(--neon-green);
+            background: rgba(0, 255, 157, 0.05);
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div>
+            <h1>Advanced Integration</h1>
+            <p class="subheadline">Technical reference for deep-linking, custom CSS overrides, and headless API implementations.</p>
+        </div>
+        <a href="index.html" class="btn-back">← Back to Generator</a>
+    </header>
+
+    <main class="main-grid">
+        <aside class="side-nav">
+            <div class="nav-group">
+                <div class="nav-header">Integration</div>
+                <a href="#iframe-params" class="nav-link active">iFrame Parameters</a>
+                <a href="#post-message" class="nav-link">JS PostMessage API</a>
+                <a href="#styling" class="nav-link">CSS Custom Properties</a>
+            </div>
+            <div class="nav-group">
+                <div class="nav-header">Headless API</div>
+                <a href="#rest-api" class="nav-link">REST Endpoints</a>
+                <a href="#authentication" class="nav-link">Authentication</a>
+            </div>
+            <div class="nav-group">
+                <div class="nav-header">Webhooks</div>
+                <a href="#webhooks" class="nav-link">Event payloads</a>
+            </div>
+        </aside>
+
+        <section class="content">
+            <!-- iFrame Parameters -->
+            <div id="iframe-params" class="doc-section">
+                <h2>iFrame Parameters</h2>
+                <p>Customize the behavior of the Moonshine widgets by appending query strings to the <code>src</code> attribute. These parameters allow for dynamic configuration without modifying the embed script.</p>
+                
+                <div class="panel">
+                    <div class="panel-title">Parameter Reference</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>pid</code> <span class="req-tag">Required</span></td>
+                                <td><span class="type-tag">string</span></td>
+                                <td>Your unique Partner ID (e.g., MS-9982).</td>
+                            </tr>
+                            <tr>
+                                <td><code>source</code></td>
+                                <td><span class="type-tag">string</span></td>
+                                <td>Tracking source for attribution (slugified).</td>
+                            </tr>
+                            <tr>
+                                <td><code>accent</code></td>
+                                <td><span class="type-tag">hex</span></td>
+                                <td>Primary brand color. Omit the '#'.</td>
+                            </tr>
+                            <tr>
+                                <td><code>mode</code></td>
+                                <td><span class="type-tag">enum</span></td>
+                                <td><code>dark</code>, <code>light</code>, or <code>glass</code>.</td>
+                            </tr>
+                            <tr>
+                                <td><code>lang</code></td>
+                                <td><span class="type-tag">string</span></td>
+                                <td>ISO 639-1 language code. Default: <code>en</code>.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- JS PostMessage -->
+            <div id="post-message" class="doc-section">
+                <h2>JS PostMessage API</h2>
+                <p>The widgets emit cross-origin events that your parent site can listen for. This is essential for triggering conversions or updating your local UI state.</p>
+                
+                <div class="code-block">
+<pre><span class="token-comment">// Listen for widget events</span>
+window.<span class="token-keyword">addEventListener</span>(<span class="token-string">'message'</span>, <span class="token-keyword">function</span>(event) {
+    <span class="token-keyword">if</span> (event.origin !== <span class="token-string">'https://widgets.moonshine.cap'</span>) <span class="token-keyword">return</span>;
+    
+    <span class="token-keyword">const</span> { type, payload } = event.data;
+    
+    <span class="token-keyword">if</span> (type === <span class="token-string">'MS_APPLICATION_SUBMITTED'</span>) {
+        console.log(<span class="token-string">'Lead captured:'</span>, payload.lead_id);
+        <span class="token-comment">// Trigger your local analytics pixel here</span>
+    }
+});</pre>
+                </div>
+            </div>
+
+            <!-- CSS Styling -->
+            <div id="styling" class="doc-section">
+                <h2>CSS Custom Properties</h2>
+                <p>For deep UI integration, you can override the internal CSS variables of the widget by passing a <code>data-theme</code> attribute or using the <code>style</code> parameter in the URL.</p>
+                
+                <div class="panel">
+                    <div class="panel-title">Available Variables</div>
+                    <div class="code-block">
+<pre><span class="token-comment">/* Example: Customizing typography and borders */</span>
+<span class="token-attr">--ms-font-family</span>: <span class="token-val">'Geist'</span>, sans-serif;
+<span class="token-attr">--ms-border-radius</span>: <span class="token-val">2px</span>;
+<span class="token-attr">--ms-widget-bg</span>: <span class="token-val">transparent</span>;
+<span class="token-attr">--ms-primary-glow</span>: <span class="token-val">0 0 20px rgba(0, 242, 255, 0.4)</span>;</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REST API -->
+            <div id="rest-api" class="doc-section">
+                <h2>REST API (Headless)</h2>
+                <p>If you prefer to build your own UI, you can interact directly with our backend via JSON endpoints. This requires a <code>Partner-Secret-Key</code>.</p>
+                
+                <div class="panel">
+                    <div class="panel-title">Endpoint: Fetch Matcher Logic</div>
+                    <p style="font-size: 0.85rem; margin-top: -10px;"><code>GET /v1/partners/{pid}/matcher-logic</code> <span class="status-badge">v1.2 Stable</span></p>
+                    
+                    <div class="code-block">
+<pre>{
+  <span class="token-attr">"status"</span>: <span class="token-string">"success"</span>,
+  <span class="token-attr">"data"</span>: {
+    <span class="token-attr">"minimum_revenue"</span>: <span class="token-val">50000</span>,
+    <span class="token-attr">"eligible_industries"</span>: [<span class="token-string">"SaaS"</span>, <span class="token-string">"eCommerce"</span>, <span class="token-string">"AI"</span>],
+    <span class="token-attr">"max_funding_cap"</span>: <span class="token-val">2500000</span>
+  }
+}</pre>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+</div>
+
+<script>
+    // Simple scroll spy for side nav
+    window.addEventListener('scroll', () => {
+        let current = '';
+        const sections = document.querySelectorAll('.doc-section');
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (pageYOffset >= sectionTop - 100) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href').includes(current)) {
+                link.classList.add('active');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

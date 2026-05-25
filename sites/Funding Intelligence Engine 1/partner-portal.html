@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partner Integration &amp; Embed API Console | Prism Debt Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #03050a;
+            --bg-surface: rgba(10, 15, 30, 0.75);
+            --bg-surface-elevated: rgba(18, 25, 47, 0.9);
+            --border-glow-primary: rgba(37, 99, 235, 0.25);
+            --border-glow-accent: rgba(124, 58, 237, 0.2);
+            --accent-cobalt: #2563eb;
+            --accent-prism-violet: #7c3aed;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-rose: #f43f5e;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #475569;
+            --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .white-label-mode {
+            --bg-base: #fafaf9;
+            --bg-surface: rgba(255, 255, 255, 0.9);
+            --bg-surface-elevated: #ffffff;
+            --border-glow-primary: rgba(120, 113, 108, 0.15);
+            --border-glow-accent: rgba(120, 113, 108, 0.1);
+            --accent-cobalt: #1c1917;
+            --accent-prism-violet: #44403c;
+            --accent-cyan: #0f766e;
+            --text-primary: #1c1917;
+            --text-secondary: #57534e;
+            --text-muted: #a8a29e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(124, 58, 237, 0.08) 0%, transparent 40%);
+            background-attachment: fixed;
+            transition: background-color 0.5s ease;
+        }
+
+        .app-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            background: var(--bg-surface);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            transition: var(--transition-smooth);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-prism {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-cobalt), var(--accent-prism-violet), var(--accent-cyan));
+            border-radius: 8px;
+            transform: rotate(45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.4);
+            transition: var(--transition-smooth);
+        }
+
+        .logo-prism::after {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: var(--bg-base);
+            border-radius: 3px;
+            transform: rotate(-45deg);
+        }
+
+        .logo-text h1 {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text p {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .global-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .environment-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 4px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .environment-wrap span {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+        }
+
+        select.env-dropdown {
+            background: transparent;
+            border: none;
+            color: var(--accent-cyan);
+            font-family: var(--font-sans);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            outline: none;
+            padding-right: 8px;
+        }
+
+        select.env-dropdown option {
+            background-color: #0d1326;
+            color: #fff;
+        }
+
+        .btn-toggle-view {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-toggle-view:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--accent-cobalt);
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-toggle-view svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--accent-cyan);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+        }
+
+        .bento-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-glow-primary);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+            transition: var(--transition-smooth);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .bento-card:hover {
+            border-color: var(--accent-cobalt);
+            box-shadow: 0 8px 32px rgba(37, 99, 235, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .bento-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+            opacity: 0;
+            transition: var(--transition-smooth);
+        }
+
+        .bento-card:hover::before {
+            opacity: 1;
+        }
+
+        .col-4 { grid-column: span 4; }
+        .col-5 { grid-column: span 5; }
+        .col-7 { grid-column: span 7; }
+        .col-8 { grid-column: span 8; }
+        .col-12 { grid-column: span 12; }
+
+        @media (max-width: 1024px) {
+            .col-4, .col-5, .col-7, .col-8 {
+                grid-column: span 12 !important;
+            }
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .card-title-group h2 {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title-group p {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: var(--font-mono);
+            margin-top: 2px;
+        }
+
+        .badge-status {
+            font-size: 11px;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .badge-status-prime {
+            background: rgba(6, 182, 212, 0.1);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+        }
+
+        .badge-status-accent {
+            background: rgba(124, 58, 237, 0.1);
+            color: var(--accent-prism-violet);
+            border: 1px solid rgba(124, 58, 237, 0.2);
+        }
+
+        .badge-status-emerald {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-emerald);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .credential-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            height: 100%;
+            justify-content: space-between;
+        }
+
+        .key-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .key-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .key-field-wrap {
+            display: flex;
+            position: relative;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .key-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            padding: 12px 48px 12px 14px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-primary);
+            outline: none;
+            text-overflow: ellipsis;
+        }
+
+        .key-toggle-btn {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 44px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-smooth);
+        }
+
+        .key-toggle-btn:hover {
+            color: var(--accent-cyan);
+        }
+
+        .key-toggle-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .action-button {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-button:hover {
+            background: var(--accent-cobalt);
+            border-color: var(--accent-cobalt);
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-prism {
+            background: linear-gradient(90deg, var(--accent-cobalt), var(--accent-cyan));
+            border: none;
+        }
+
+        .btn-prism:hover {
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .customizer-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .customizer-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .config-form {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 11px;
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+        .select-input, .text-input {
+            width: 100%;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-family: var(--font-sans);
+            outline: none;
+            transition: var(--transition-smooth);
+        }
+
+        .select-input:focus, .text-input:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.15);
+        }
+
+        .select-input option {
+            background-color: #0d1326;
+            color: #fff;
+        }
+
+        .color-pickers-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .color-picker-wrap {
+            display: flex;
+            align-items: center;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 6px 10px;
+            gap: 8px;
+        }
+
+        .color-picker-wrap input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            background: none;
+        }
+
+        .color-picker-wrap input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        .color-picker-wrap input[type="color"]::-webkit-color-swatch {
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+        }
+
+        .color-picker-wrap span {
+            font-size: 12px;
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+        }
+
+        .embed-preview-pane {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .embed-widget-mockup {
+            background: rgba(0,0,0,0.4);
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            position: relative;
+            min-height: 190px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .widget-canvas {
+            width: 100%;
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--embed-theme-color, var(--accent-cobalt));
+            border-radius: var(--embed-border-radius, 8px);
+            padding: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: var(--transition-smooth);
+        }
+
+        .widget-canvas-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 8px;
+        }
+
+        .widget-canvas-logo {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--text-primary);
+        }
+
+        .widget-canvas-badge {
+            font-size: 9px;
+            font-family: var(--font-mono);
+            padding: 2px 6px;
+            background: var(--embed-theme-color, var(--accent-cobalt));
+            border-radius: 4px;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .widget-canvas-body {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .widget-canvas-score {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--embed-theme-color, var(--accent-cobalt));
+        }
+
+        .widget-canvas-meta {
+            text-align: right;
+        }
+
+        .widget-canvas-meta div {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .widget-canvas-meta strong {
+            font-size: 12px;
+            color: var(--text-primary);
+        }
+
+        .code-container-pre {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 12px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: #cbd5e1;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .copy-embed-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            color: var(--text-secondary);
+            padding: 4px 8px;
+            font-size: 10px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            font-family: var(--font-sans);
+            font-weight: 600;
+        }
+
+        .copy-embed-btn:hover {
+            color: var(--accent-cyan);
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Documentation & Sandbox Panels */
+        .api-sandbox-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .api-sandbox-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .endpoint-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .endpoint-pill {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 11px;
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .endpoint-pill.active {
+            background: rgba(37, 99, 235, 0.1);
+            border-color: var(--accent-cobalt);
+            color: var(--text-primary);
+        }
+
+        .method-badge {
+            font-size: 9px;
+            font-weight: 800;
+            padding: 2px 4px;
+            border-radius: 3px;
+            margin-right: 4px;
+            display: inline-block;
+        }
+
+        .method-post { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); }
+        .method-get { background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); }
+
+        .sandbox-body-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .payload-textarea {
+            width: 100%;
+            height: 150px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 12px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: #a8b2c2;
+            outline: none;
+            resize: none;
+            transition: var(--transition-smooth);
+        }
+
+        .payload-textarea:focus {
+            border-color: var(--accent-prism-violet);
+        }
+
+        .response-pane-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .response-status {
+            color: var(--accent-emerald);
+            font-weight: 700;
+        }
+
+        /* Webhook Event Stream Log */
+        .terminal-shell {
+            background: #020306;
+            border-radius: 12px;
+            padding: 16px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: #a8b2c2;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            height: 250px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .terminal-line {
+            line-height: 1.5;
+            display: block;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+            padding-bottom: 4px;
+        }
+
+        .terminal-line .stamp { color: var(--accent-cyan); margin-right: 6px; }
+        .terminal-line .event-tag { 
+            background: rgba(124, 58, 237, 0.15); 
+            color: var(--accent-prism-violet); 
+            padding: 1px 4px; 
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-right: 6px;
+        }
+        .terminal-line .success { color: var(--accent-emerald); }
+        .terminal-line .details { color: var(--text-secondary); margin-left: 12px; display: block; font-size: 11px; }
+
+        .webhook-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+        }
+
+        .stream-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        .indicator-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-emerald);
+            border-radius: 50%;
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+
+        footer {
+            margin-top: 32px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 24px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .compliance-wrapper {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .compliance-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .compliance-footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            border-top: 1px solid rgba(255,255,255,0.02);
+            padding-top: 16px;
+        }
+
+        .compliance-badges {
+            display: flex;
+            gap: 12px;
+        }
+
+        .compliance-badges span {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    
+    <!-- Top Interactive Header -->
+    <header>
+        <div class="logo-area">
+            <div class="logo-prism"></div>
+            <div class="logo-text">
+                <h1>PRISM INTEGRATION LABS</h1>
+                <p>API Console &amp; Embed Embedders</p>
+            </div>
+        </div>
+
+        <div class="global-controls">
+            <!-- Active Environment Swapper -->
+            <div class="environment-wrap">
+                <span>API ENV:</span>
+                <select class="env-dropdown" id="envSelect" onchange="changeEnvironment(this.value)">
+                    <option value="sandbox">Sandbox (Mock Data)</option>
+                    <option value="production">Production Gateway</option>
+                </select>
+            </div>
+
+            <!-- White-label Switcher -->
+            <button class="btn-toggle-view" onclick="toggleWhiteLabelView()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2.25a.75.75 0 0 0-1.137-.65l-8.25 4.75A1.5 1.5 0 0 0 2 7.65v8.7a1.5 1.5 0 0 0 .613 1.3l8.25 4.75a.75.75 0 0 0 .774 0l8.25-4.75a1.5 1.5 0 0 0 .613-1.3v-8.7a1.5 1.5 0 0 0-.613-1.3l-8.25-4.75Z"/>
+                </svg>
+                <span id="toggleText">Switch to White-Label View</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Developer Bento Grid -->
+    <main class="dashboard-grid">
+
+        <!-- Credentials Manager -->
+        <div class="bento-card col-4">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <h2>API Credentials</h2>
+                    <p>Manage Keys &amp; Gateways</p>
+                </div>
+                <span class="badge-status badge-status-prime" id="credsEnvBadge">Sandbox Active</span>
+            </div>
+
+            <div class="credential-container">
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <!-- Client ID -->
+                    <div class="key-row">
+                        <div class="key-label">
+                            <span>Client ID</span>
+                        </div>
+                        <div class="key-field-wrap">
+                            <input type="text" class="key-input" id="clientIdInput" readonly value="cid_prism_sb_44901abdf8">
+                            <button class="key-toggle-btn" onclick="copyValue('clientIdInput')" title="Copy Client ID">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Client Secret -->
+                    <div class="key-row">
+                        <div class="key-label">
+                            <span>API Token / Secret</span>
+                        </div>
+                        <div class="key-field-wrap">
+                            <input type="password" class="key-input" id="clientSecretInput" readonly value="sk_prism_sb_99017ae7a80b1c0994f2d31a5">
+                            <button class="key-toggle-btn" style="right: 36px;" onclick="toggleMask('clientSecretInput')" title="Reveal Token">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            </button>
+                            <button class="key-toggle-btn" onclick="copyValue('clientSecretInput')" title="Copy Token">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Webhook Secret -->
+                    <div class="key-row">
+                        <div class="key-label">
+                            <span>Webhook Secret Key</span>
+                        </div>
+                        <div class="key-field-wrap">
+                            <input type="password" class="key-input" id="webhookSecretInput" readonly value="whsec_prism_sb_881907cbffea">
+                            <button class="key-toggle-btn" style="right: 36px;" onclick="toggleMask('webhookSecretInput')" title="Reveal Token">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            </button>
+                            <button class="key-toggle-btn" onclick="copyValue('webhookSecretInput')" title="Copy Token">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 8px;">
+                    <button class="action-button btn-prism" onclick="regenerateKeys()">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                        Regenerate API Keys
+                    </button>
+                    <p style="font-size: 10px; color: var(--text-muted); text-align: center; font-family: var(--font-mono)">Key rollover triggers an immediate 12-hour grace period.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Embed Customizer & Preview Studio -->
+        <div class="bento-card col-8">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <h2>Embeddable Iframe Widget Studio</h2>
+                    <p>Low-Code Dynamic Portal Builder</p>
+                </div>
+                <span class="badge-status badge-status-accent">Configurator Active</span>
+            </div>
+
+            <div class="customizer-layout">
+                <!-- UI Controls left -->
+                <div class="config-form">
+                    <div class="form-group">
+                        <label for="embedArchetype">Default Archetype</label>
+                        <select class="select-input" id="embedArchetype" onchange="updateWidgetEmbed()">
+                            <option value="saas">SaaS Scaleup (High Velocity MRR)</option>
+                            <option value="ecom">E-Commerce Titan (High Inventory Turn)</option>
+                            <option value="industrial">Heavy Manufacturing (Asset Rich)</option>
+                            <option value="realestate">Commercial RE Asset Class</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Accent Styling</label>
+                        <div class="color-pickers-row">
+                            <div class="color-picker-wrap">
+                                <input type="color" id="embedThemeColor" value="#06b6d4" oninput="updateWidgetEmbed()">
+                                <span id="themeColorHex">#06B6D4</span>
+                            </div>
+                            <div class="color-picker-wrap">
+                                <input type="color" id="embedBgColor" value="#12192f" oninput="updateWidgetEmbed()">
+                                <span id="bgColorHex">#12192F</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="embedCornerRadius">Border Corner Radius</label>
+                        <select class="select-input" id="embedCornerRadius" onchange="updateWidgetEmbed()">
+                            <option value="0px">Sharp (0px)</option>
+                            <option value="8px" selected>Rounded (8px)</option>
+                            <option value="16px">Pill / Elevated (16px)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="display: flex; justify-content: space-between;">
+                            <span>White-Label Headers</span>
+                            <input type="checkbox" id="embedWhiteLabelCheck" checked onchange="updateWidgetEmbed()" style="cursor: pointer;">
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Preview Display Right -->
+                <div class="embed-preview-pane">
+                    <h4 style="font-size: 11px; text-transform: uppercase; font-family: var(--font-mono); color: var(--text-muted)">Real-Time Simulated Render</h4>
+                    
+                    <div class="embed-widget-mockup">
+                        <div class="widget-canvas" id="mockWidgetCanvas">
+                            <div class="widget-canvas-header">
+                                <div class="widget-canvas-logo" id="mockWidgetBrand">Prism Engine Portal</div>
+                                <span class="widget-canvas-badge" id="mockWidgetBadge">SaaS Active</span>
+                            </div>
+                            <div class="widget-canvas-body">
+                                <div>
+                                    <span style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-family: var(--font-mono)">Target Readiness</span>
+                                    <div class="widget-canvas-score" id="mockWidgetScore">825</div>
+                                </div>
+                                <div class="widget-canvas-meta">
+                                    <div>Optimal Route</div>
+                                    <strong id="mockWidgetRoute">SaaS Revenue Bridge</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Embed Code Copy Block -->
+                    <div style="position: relative;">
+                        <pre class="code-container-pre"><code id="embedCodeSnippet">&lt;iframe src="https://engine.prismdebt.com/embed?archetype=saas&color=%2306b6d4" width="100%" height="450" frameborder="0"&gt;&lt;/iframe&gt;</code></pre>
+                        <button class="copy-embed-btn" onclick="copyEmbedSnippet()">Copy Code</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive API Query Console Sandbox -->
+        <div class="bento-card col-8">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <h2>API Query Sandbox</h2>
+                    <p>Live endpoint request simulation matrix</p>
+                </div>
+                <span class="badge-status badge-status-emerald">Interactive Docs</span>
+            </div>
+
+            <div class="endpoint-selector">
+                <div class="endpoint-pill active" id="pill-post-route" onclick="selectEndpoint('POST_ROUTE')">
+                    <span class="method-badge method-post">POST</span>/v1/routing/calculate
+                </div>
+                <div class="endpoint-pill" id="pill-get-archetypes" onclick="selectEndpoint('GET_ARCHETYPES')">
+                    <span class="method-badge method-get">GET</span>/v1/archetypes
+                </div>
+                <div class="endpoint-pill" id="pill-post-risk" onclick="selectEndpoint('POST_RISK')">
+                    <span class="method-badge method-post">POST</span>/v1/risk/preflight
+                </div>
+            </div>
+
+            <div class="api-sandbox-grid">
+                <!-- Left: Request details -->
+                <div class="sandbox-body-wrap">
+                    <h4 style="font-size: 12px; font-weight: 700; color: var(--text-primary);" id="endpointDesc">Dynamic Allocator calculation endpoint</h4>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                        <span style="font-size: 10px; font-family: var(--font-mono); color: var(--text-muted)">Request Body Schema (JSON)</span>
+                        <textarea class="payload-textarea" id="sandboxRequestPayload">{
+  "archetype": "saas",
+  "weights": {
+    "liquidity": 1.0,
+    "growth": 1.2,
+    "collateral": 0.8
+  },
+  "financials": {
+    "mrr": 350000,
+    "cash_on_hand": 1200000,
+    "total_debt": 400000
+  }
+}</textarea>
+                    </div>
+
+                    <button class="action-button btn-prism" onclick="executeSandboxQuery()">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg>
+                        Execute Request
+                    </button>
+                </div>
+
+                <!-- Right: Response code block -->
+                <div>
+                    <div class="response-pane-header">
+                        <span>API RESPONSE LOG</span>
+                        <span class="response-status" id="responseStatusText">HTTP 200 OK</span>
+                    </div>
+                    <pre class="code-container-pre" style="height: calc(100% - 24px); max-height: 250px; overflow-y: auto;"><code id="sandboxResponseSnippet">{
+  "status": "success",
+  "data": {
+    "calculated_score": 834,
+    "tier": "Super Prime",
+    "optimal_pathway": "SaaS Recurring Revenue Bridge",
+    "maximum_capital_sizing": 4200000,
+    "base_rate_apr": "8.15%"
+  }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Conversion Webhook Log Stream -->
+        <div class="bento-card col-4">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <h2>Live Conversion Webhook Stream</h2>
+                    <p>Real-Time Referral Events &amp; Tracking</p>
+                </div>
+                <span class="badge-status badge-status-prime" id="streamStatusBadge">Online</span>
+            </div>
+
+            <!-- Terminal event view -->
+            <div class="terminal-shell" id="webhookTerminal">
+                <div class="terminal-line">
+                    <span class="stamp">[INIT]</span>
+                    <span class="event-tag">SYSTEM</span>
+                    <span>Monitoring live endpoint registrations...</span>
+                </div>
+                <div class="terminal-line">
+                    <span class="stamp">10:44:12</span>
+                    <span class="event-tag">referral.created</span>
+                    <span class="success">New borrower registration successful</span>
+                    <span class="details">"Apex Growth Ltd" matched with Working Capital Revolver</span>
+                </div>
+            </div>
+
+            <div class="webhook-controls">
+                <div class="stream-indicator">
+                    <div class="indicator-dot" id="liveDot"></div>
+                    <span id="liveStatusText">Dynamic Event Feed active</span>
+                </div>
+                <button class="btn-toggle-view" id="toggleStreamBtn" onclick="toggleStream()" style="padding: 4px 10px; font-size: 11px;">
+                    Pause Stream
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Compliance Regulatory Footer -->
+    <footer>
+        <div class="compliance-wrapper">
+            <div>
+                <p style="font-weight: 700; margin-bottom: 6px; color: var(--text-secondary);">DEVELOPER SECURITY STANDARDS</p>
+                All dynamic endpoints secure authorization through JWT Bearer schemes in tandem with static credential headers. Testing in the sandbox environment carries strict structural isolation boundaries. Production routes access live institutional routing pools conforming instantly to SEC validations.
+            </div>
+            <div>
+                <p style="font-weight: 700; margin-bottom: 6px; color: var(--text-secondary);">IFRAME &amp; EMBED INTEGRATION POLICIES</p>
+                Embed elements implement postMessage APIs allowing real-time host validation. Partner sites must maintain CORS exceptions matching their host domain origins mapped inside the Developer console. White-label systems strip physical branding signatures completely.
+            </div>
+            <div>
+                <p style="font-weight: 700; margin-bottom: 6px; color: var(--text-secondary);">WEBHOOK RETRY PROTOCOLS</p>
+                Prism routing engines maintain guaranteed Delivery-at-Least-Once standards. Retries are fired with exponential backoffs over 72-hour limits on receiving endpoint failures. Signatures are encoded via SHA256 HMAC protocols, verifiable via partner client secrets.
+            </div>
+        </div>
+
+        <div class="compliance-footer-bottom">
+            <span>© 2026 PRISM DEBT INTELLIGENCE SYSTEMS INC. INTEGRATION PORTAL v4.2.2</span>
+            <div class="compliance-badges">
+                <span>AES-GCM 256 Key Encryption</span>
+                <span>HTTPS-Enforced Only</span>
+                <span>PCI-DSS Compliant</span>
+            </div>
+        </div>
+    </footer>
+
+</div>
+
+<!-- Interactive UI Operations -->
+<script>
+    // Shared Memory Archetypes Mockups
+    const widgetArchetypeConfig = {
+        saas: { score: 825, route: "SaaS Revenue Bridge", badge: "SaaS Active", label: "Super Prime" },
+        ecom: { score: 715, route: "E-Commerce Stock & Ads", badge: "E-Com Active", label: "Prime Tier" },
+        industrial: { score: 690, route: "Equipment Financing", badge: "Industrial Active", label: "Standard Tier" },
+        realestate: { score: 790, route: "Commercial Prop Debt", badge: "RE Class Active", label: "Prime Tier" }
+    };
+
+    const endpointPayloads = {
+        POST_ROUTE: {
+            desc: "Submit borrower dynamics to identify dynamic capital pricing pathways",
+            method: "POST",
+            url: "/v1/routing/calculate",
+            body: `{
+  "archetype": "saas",
+  "weights": {
+    "liquidity": 1.0,
+    "growth": 1.2,
+    "collateral": 0.8
+  },
+  "financials": {
+    "mrr": 350000,
+    "cash_on_hand": 1200000,
+    "total_debt": 400000
+  }
+}`,
+            response: `{
+  "status": "success",
+  "data": {
+    "calculated_score": 834,
+    "tier": "Super Prime",
+    "optimal_pathway": "SaaS Recurring Revenue Bridge",
+    "maximum_capital_sizing": 4200000,
+    "base_rate_apr": "8.15%"
+  }
+}`
+        },
+        GET_ARCHETYPES: {
+            desc: "Retrieve standard pre-configured industry profiles schema maps",
+            method: "GET",
+            url: "/v1/archetypes",
+            body: `{}`,
+            response: `{
+  "status": "success",
+  "archetypes": [
+    { "id": "saas", "label": "SaaS Scaleup", "baseline_score": 825 },
+    { "id": "ecom", "label": "E-Commerce Titan", "baseline_score": 715 },
+    { "id": "industrial", "label": "Heavy Manufacturing", "baseline_score": 690 }
+  ]
+}`
+        },
+        POST_RISK: {
+            desc: "Check prospective entity variables against validation rules",
+            method: "POST",
+            url: "/v1/risk/preflight",
+            body: `{
+  "leverage_multiplier": 5.2,
+  "net_liquidity_ratio": 0.35,
+  "insolvency_warnings": false
+}`,
+            response: `{
+  "status": "success",
+  "risk_assessment": {
+    "passed": true,
+    "flagged_exceptions": [],
+    "audit_reference": "ref_risk_339aef018892"
+  }
+}`
+        }
+    };
+
+    let selectedEndpointKey = "POST_ROUTE";
+    let isWhiteLabelActive = false;
+    let isStreamActive = true;
+    let streamInterval = null;
+
+    // Environment swapper
+    function changeEnvironment(env) {
+        const credsBadge = document.getElementById("credsEnvBadge");
+        const clientInput = document.getElementById("clientIdInput");
+        const secretInput = document.getElementById("clientSecretInput");
+        const webhookInput = document.getElementById("webhookSecretInput");
+        
+        if (env === "production") {
+            credsBadge.innerText = "Production Active";
+            credsBadge.className = "badge-status badge-status-accent";
+            clientInput.value = "cid_prism_prod_77810ecdf2";
+            secretInput.value = "sk_prism_prod_32014ac2431b99480bc1a81f33f";
+            webhookInput.value = "whsec_prism_prod_0091aa0122ff1b";
+            logTerminalEvent("SYSTEM", "Production environments verified. TLS encryption active.");
+        } else {
+            credsBadge.innerText = "Sandbox Active";
+            credsBadge.className = "badge-status badge-status-prime";
+            clientInput.value = "cid_prism_sb_44901abdf8";
+            secretInput.value = "sk_prism_sb_99017ae7a80b1c0994f2d31a5";
+            webhookInput.value = "whsec_prism_sb_881907cbffea";
+            logTerminalEvent("SYSTEM", "Reverted credentials cache memory back to structural sandbox bounds.");
+        }
+    }
+
+    // Toggle Masking on API credentials
+    function toggleMask(id) {
+        const input = document.getElementById(id);
+        if (input.type === "password") {
+            input.type = "text";
+        } else {
+            input.type = "password";
+        }
+    }
+
+    // Copy Utility
+    function copyValue(id) {
+        const input = document.getElementById(id);
+        input.select();
+        document.execCommand("copy");
+        alert("Copied parameter directly to clipboard.");
+    }
+
+    // Regenerate Keys Mock
+    function regenerateKeys() {
+        const secretInput = document.getElementById("clientSecretInput");
+        const envSelect = document.getElementById("envSelect").value;
+        const randHex = Array.from({length: 24}, () => Math.floor(Math.random()*16).toString(16)).join('');
+        
+        if (envSelect === "production") {
+            secretInput.value = "sk_prism_prod_" + randHex;
+        } else {
+            secretInput.value = "sk_prism_sb_" + randHex;
+        }
+        
+        logTerminalEvent("SYSTEM", "Key generation script executed. Active key state updated successfully.");
+        alert("Success! Re-generated client authorization tokens.");
+    }
+
+    // Update Live Embed Preview Code
+    function updateWidgetEmbed() {
+        const archetype = document.getElementById("embedArchetype").value;
+        const color = document.getElementById("embedThemeColor").value;
+        const bg = document.getElementById("embedBgColor").value;
+        const radius = document.getElementById("embedCornerRadius").value;
+        const isWLChecked = document.getElementById("embedWhiteLabelCheck").checked;
+
+        // Sync Hex label displays
+        document.getElementById("themeColorHex").innerText = color.toUpperCase();
+        document.getElementById("bgColorHex").innerText = bg.toUpperCase();
+
+        // Update Mock Widget visuals
+        const canvas = document.getElementById("mockWidgetCanvas");
+        const brand = document.getElementById("mockWidgetBrand");
+        const badge = document.getElementById("mockWidgetBadge");
+        const score = document.getElementById("mockWidgetScore");
+        const route = document.getElementById("mockWidgetRoute");
+
+        const details = widgetArchetypeConfig[archetype];
+        
+        // CSS properties simulation
+        canvas.style.setProperty("--embed-theme-color", color);
+        canvas.style.setProperty("--embed-border-radius", radius);
+        canvas.style.background = bg;
+
+        brand.innerText = isWLChecked ? "Unified Capital Routing" : "Prism Engine Portal";
+        badge.innerText = details.badge;
+        badge.style.background = color;
+        score.innerText = details.score;
+        score.style.color = color;
+        route.innerText = details.route;
+
+        // Sync Code Box content snippet
+        const encodedColor = encodeURIComponent(color);
+        const encodedBg = encodeURIComponent(bg);
+        const snippet = `<iframe src="https://engine.prismdebt.com/embed?archetype=${archetype}&color=${encodedColor}&bg=${encodedBg}&radius=${radius}&wl=${isWLChecked}" width="100%" height="220" frameborder="0" style="border-radius: ${radius};"></iframe>`;
+        document.getElementById("embedCodeSnippet").innerText = snippet;
+    }
+
+    function copyEmbedSnippet() {
+        const codeElement = document.getElementById("embedCodeSnippet");
+        const range = document.createRange();
+        range.selectNode(codeElement);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        document.execCommand("copy");
+        window.getSelection().removeAllRanges();
+        alert("Iframe embedding script copied to clipboard!");
+    }
+
+    // Endpoint selection dynamics
+    function selectEndpoint(key) {
+        selectedEndpointKey = key;
+        const config = endpointPayloads[key];
+
+        // Reset pills styling
+        document.getElementById("pill-post-route").className = "endpoint-pill";
+        document.getElementById("pill-get-archetypes").className = "endpoint-pill";
+        document.getElementById("pill-post-risk").className = "endpoint-pill";
+
+        let currentPillId = "pill-post-route";
+        if (key === "GET_ARCHETYPES") currentPillId = "pill-get-archetypes";
+        if (key === "POST_RISK") currentPillId = "pill-post-risk";
+        document.getElementById(currentPillId).className = "endpoint-pill active";
+
+        // Fill descriptions
+        document.getElementById("endpointDesc").innerText = config.desc;
+        document.getElementById("sandboxRequestPayload").value = config.body;
+        document.getElementById("sandboxResponseSnippet").innerText = config.response;
+        document.getElementById("responseStatusText").innerText = "AWAITING EXECUTION";
+        document.getElementById("responseStatusText").style.color = "var(--text-muted)";
+    }
+
+    // Execute Sandbox request simulator
+    function executeSandboxQuery() {
+        const payloadInput = document.getElementById("sandboxRequestPayload").value;
+        const statusText = document.getElementById("responseStatusText");
+        const responseBox = document.getElementById("sandboxResponseSnippet");
+
+        try {
+            // Attempt structural parsing as JSON sanity check
+            JSON.parse(payloadInput);
+            
+            statusText.innerText = "HTTP 200 OK";
+            statusText.style.color = "var(--accent-emerald)";
+            
+            // Re-render mock payload structure matching active selection with structural modifications
+            const config = endpointPayloads[selectedEndpointKey];
+            responseBox.innerText = config.response;
+            logTerminalEvent("SANDBOX", `Executed ${config.method} requesting key paths at API endpoint...`);
+        } catch (e) {
+            statusText.innerText = "HTTP 400 Bad Request";
+            statusText.style.color = "var(--accent-rose)";
+            responseBox.innerText = JSON.stringify({
+                status: "error",
+                message: "Payload validation failure. Invalid syntax schema mapping.",
+                expected_format: "JSON"
+            }, null, 2);
+        }
+    }
+
+    // Dynamic Live Webhook Terminal Trace log logic
+    function logTerminalEvent(eventTag, message, details = "") {
+        const term = document.getElementById("webhookTerminal");
+        const timestamp = new Date().toLocaleTimeString();
+        
+        const line = document.createElement("div");
+        line.className = "terminal-line";
+        
+        let tagClass = "event-tag";
+        if (eventTag === "SYSTEM") {
+            tagClass = "event-tag";
+        } else if (eventTag === "SANDBOX") {
+            tagClass = "event-tag";
+        }
+
+        let detailsBlock = details ? `<span class="details">${details}</span>` : "";
+
+        line.innerHTML = `
+            <span class="stamp">${timestamp}</span>
+            <span class="${tagClass}">${eventTag.toLowerCase()}</span>
+            <span>${message}</span>
+            ${detailsBlock}
+        `;
+        term.appendChild(line);
+        term.scrollTop = term.scrollHeight;
+    }
+
+    // Automated periodic mockup generator simulation matching real transactions
+    const mockCompanies = ["Bolt Commerce Ltd", "Stripe Bridge Inc", "Solar Nexus Org", "Prism Flow Assets", "Alpha Ledger Systems"];
+    const mockEvents = ["referral.created", "readiness.calculated", "terms.signed", "payout.initiated"];
+    const mockRoutes = ["Working Capital Revolver", "SaaS Revenue Bridge", "Equipment Lease", "Commercial RE Allocation"];
+
+    function generateWebhookTick() {
+        if (!isStreamActive) return;
+
+        const randCompany = mockCompanies[Math.floor(Math.random() * mockCompanies.length)];
+        const randEvent = mockEvents[Math.floor(Math.random() * mockEvents.length)];
+        const randRoute = mockRoutes[Math.floor(Math.random() * mockRoutes.length)];
+        const volume = (Math.random() * 8 + 1).toFixed(1) + "M";
+
+        let eventDesc = "";
+        let detailsVal = "";
+
+        if (randEvent === "referral.created") {
+            eventDesc = `New prospective referral registered: "${randCompany}"`;
+            detailsVal = `Mapping allocations against structural models...`;
+        } else if (randEvent === "readiness.calculated") {
+            eventDesc = `Scoring calculations finalized for "${randCompany}"`;
+            detailsVal = `Generated dynamic underwriting score matching model limits`;
+        } else if (randEvent === "terms.signed") {
+            eventDesc = `Capital terms signed for "${randCompany}" on ${randRoute}`;
+            detailsVal = `Referral fee triggered: matching variables with partner metrics`;
+        } else {
+            eventDesc = `Funding payout pipeline initialized for "${randCompany}"`;
+            detailsVal = `Allocating $${volume} dynamic funds across secure networks`;
+        }
+
+        logTerminalEvent(randEvent, eventDesc, detailsVal);
+    }
+
+    function toggleStream() {
+        isStreamActive = !isStreamActive;
+        const indicator = document.getElementById("liveDot");
+        const statusText = document.getElementById("liveStatusText");
+        const toggleBtn = document.getElementById("toggleStreamBtn");
+        const badge = document.getElementById("streamStatusBadge");
+
+        if (isStreamActive) {
+            indicator.style.background = "var(--accent-emerald)";
+            statusText.innerText = "Dynamic Event Feed active";
+            toggleBtn.innerText = "Pause Stream";
+            badge.innerText = "Online";
+            badge.className = "badge-status badge-status-prime";
+            logTerminalEvent("SYSTEM", "Webhook real-time dynamic stream listener resumed.");
+        } else {
+            indicator.style.background = "var(--text-muted)";
+            statusText.innerText = "Webhook telemetry stream suspended";
+            toggleBtn.innerText = "Resume Stream";
+            badge.innerText = "Suspended";
+            badge.className = "badge-status";
+            logTerminalEvent("SYSTEM", "Paused webhook stream listener cache variables.");
+        }
+    }
+
+    // Toggle White-Label Styling variables across document
+    function toggleWhiteLabelView() {
+        isWhiteLabelActive = !isWhiteLabelActive;
+        const bodyEl = document.body;
+        const toggleText = document.getElementById("toggleText");
+
+        if (isWhiteLabelActive) {
+            bodyEl.classList.add("white-label-mode");
+            toggleText.innerText = "Switch to Operator Terminal";
+            logTerminalEvent("SYSTEM", "White-label system styles applied across dynamic interfaces.");
+        } else {
+            bodyEl.classList.remove("white-label-mode");
+            toggleText.innerText = "Switch to White-Label View";
+            logTerminalEvent("SYSTEM", "Reverted custom corporate stylesheet styles to raw operator console parameters.");
+        }
+        updateWidgetEmbed();
+    }
+
+    window.onload = function() {
+        updateWidgetEmbed();
+        // Fire log simulation ticks periodically
+        streamInterval = setInterval(generateWebhookTick, 4200);
+    }
+</script>
+
+</body>
+</html>

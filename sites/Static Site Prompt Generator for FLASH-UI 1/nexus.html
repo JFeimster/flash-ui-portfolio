@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLASH-UI // Prompt Nexus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050505;
+            --card-bg: #0d0d0d;
+            --border: #222;
+            --accent: #00f2ff;
+            --accent-glow: rgba(0, 242, 255, 0.3);
+            --text-main: #e0e0e0;
+            --text-dim: #888;
+            --glass: rgba(255, 255, 255, 0.03);
+            --font-main: 'Space Grotesk', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+            --tag-purple: #7000ff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 50% -20%, #111 0%, transparent 50%),
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 60px;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .logo span {
+            background: linear-gradient(90deg, var(--accent), var(--tag-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-link {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--accent);
+        }
+
+        .hero-nexus {
+            margin-bottom: 60px;
+        }
+
+        .hero-nexus h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            letter-spacing: -1.5px;
+            margin-bottom: 15px;
+        }
+
+        .nexus-controls {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 20px;
+            margin-bottom: 40px;
+            background: var(--glass);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+
+        .search-bar {
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            background: #000;
+            border: 1px solid var(--border);
+            padding: 12px 12px 12px 40px;
+            border-radius: 8px;
+            color: white;
+            font-family: var(--font-main);
+        }
+
+        .search-bar::before {
+            content: '⌕';
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-dim);
+            font-size: 1.2rem;
+        }
+
+        .filter-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            padding: 6px 14px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-dim);
+        }
+
+        .tag:hover, .tag.active {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--accent-glow);
+        }
+
+        .nexus-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .nexus-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nexus-card:hover {
+            transform: translateY(-5px);
+            border-color: #444;
+        }
+
+        .nexus-card::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, transparent 50%, var(--border) 50%);
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .author-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(45deg, var(--accent), var(--tag-purple));
+            border-radius: 50%;
+        }
+
+        .username {
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+            color: var(--text-dim);
+        }
+
+        .card-category {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            padding: 2px 8px;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            border-radius: 4px;
+        }
+
+        .nexus-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .nexus-card p {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-bottom: 20px;
+            flex-grow: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-stats {
+            display: flex;
+            gap: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-dim);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-fork {
+            margin-top: 20px;
+            width: 100%;
+            padding: 10px;
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .btn-fork:hover {
+            background: var(--accent);
+            color: #000;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        @media (max-width: 768px) {
+            .nexus-controls {
+                grid-template-columns: 1fr;
+            }
+            .hero-nexus h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <a href="index.html" class="logo">⚡ FLASH-<span>UI</span></a>
+            <nav class="nav-links">
+                <a href="#" class="nav-link">Lab</a>
+                <a href="#" class="nav-link active">Nexus</a>
+                <a href="#" class="nav-link">Docs</a>
+            </nav>
+        </header>
+
+        <section class="hero-nexus">
+            <h1>Prompt Nexus</h1>
+            <p style="color: var(--text-dim); font-size: 1.1rem; max-width: 700px;">
+                The public repository for the architects of the future. Browse, fork, and deploy high-fidelity FLASH-UI configurations built by the community.
+            </p>
+        </section>
+
+        <div class="nexus-controls">
+            <div class="search-bar">
+                <input type="text" placeholder="Search the repository (e.g. 'SaaS', 'Brutalist', 'Auth')...">
+            </div>
+            <div class="filter-tags">
+                <div class="tag active">All Blueprints</div>
+                <div class="tag">High-Conversion</div>
+                <div class="tag">SaaS Minimalist</div>
+                <div class="tag">Brutalist</div>
+                <div class="tag">Web3 Terminal</div>
+                <div class="tag">Data Visualizer</div>
+            </div>
+        </div>
+
+        <main class="nexus-grid" id="nexusGrid">
+            <!-- Card 1 -->
+            <div class="nexus-card">
+                <div class="card-meta">
+                    <div class="author-info">
+                        <div class="avatar"></div>
+                        <span class="username">0x_Vector</span>
+                    </div>
+                    <span class="card-category">Brutalist</span>
+                </div>
+                <h3>Neural-Link Dashboard</h3>
+                <p>A high-contrast, data-heavy dashboard designed for bio-metric monitoring. Features raw SVG pathways and custom mono-spaced grid overlays.</p>
+                <div class="card-stats">
+                    <span class="stat-item">⚡ 1.2k Forks</span>
+                    <span class="stat-item">👁️ 4.5k</span>
+                </div>
+                <button class="btn-fork">Fork to Lab</button>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="nexus-card">
+                <div class="card-meta">
+                    <div class="author-info">
+                        <div class="avatar" style="background: #00f2ff"></div>
+                        <span class="username">GlassMaster</span>
+                    </div>
+                    <span class="card-category">SaaS Minimalist</span>
+                </div>
+                <h3>Arctic SaaS Landing</h3>
+                <p>Maximum transparency glassmorphism. Optimized for high-ticket software sales with smooth scroll triggers and frosted UI components.</p>
+                <div class="card-stats">
+                    <span class="stat-item">⚡ 842 Forks</span>
+                    <span class="stat-item">👁️ 2.1k</span>
+                </div>
+                <button class="btn-fork">Fork to Lab</button>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="nexus-card">
+                <div class="card-meta">
+                    <div class="author-info">
+                        <div class="avatar" style="background: var(--tag-purple)"></div>
+                        <span class="username">Synth_Wave</span>
+                    </div>
+                    <span class="card-category">High-Conversion</span>
+                </div>
+                <h3>Dark-Mode Funnel V4</h3>
+                <p>Psychologically optimized sales funnel for digital products. Uses neon directional cues and high-urgency component layouts.</p>
+                <div class="card-stats">
+                    <span class="stat-item">⚡ 2.4k Forks</span>
+                    <span class="stat-item">👁️ 8.9k</span>
+                </div>
+                <button class="btn-fork">Fork to Lab</button>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="nexus-card">
+                <div class="card-meta">
+                    <div class="author-info">
+                        <div class="avatar" style="background: #fff"></div>
+                        <span class="username">Swiss_Dev</span>
+                    </div>
+                    <span class="card-category">Swiss Minimal</span>
+                </div>
+                <h3>Helvetica Enterprise</h3>
+                <p>Clean, type-driven corporate interface. Strips away the noise to focus on information architecture and hierarchy.</p>
+                <div class="card-stats">
+                    <span class="stat-item">⚡ 310 Forks</span>
+                    <span class="stat-item">👁️ 1.2k</span>
+                </div>
+                <button class="btn-fork">Fork to Lab</button>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="nexus-card">
+                <div class="card-meta">
+                    <div class="author-info">
+                        <div class="avatar" style="background: #f0f"></div>
+                        <span class="username">CyberArc</span>
+                    </div>
+                    <span class="card-category">Web3 Terminal</span>
+                </div>
+                <h3>DEX Aggregator UI</h3>
+                <p>The "Onyx Command" at its peak. Real-time ticker components, bento-grid swap modules, and neon-pulse connectivity indicators.</p>
+                <div class="card-stats">
+                    <span class="stat-item">⚡ 1.1k Forks</span>
+                    <span class="stat-item">👁️ 3.7k</span>
+                </div>
+                <button class="btn-fork">Fork to Lab</button>
+            </div>
+
+            <!-- Card 6 -->
+            <div class="nexus-card">
+                <div class="card-meta">
+                    <div class="author-info">
+                        <div class="avatar" style="background: #ffaa00"></div>
+                        <span class="username">BentoKing</span>
+                    </div>
+                    <span class="card-category">Modern Glass</span>
+                </div>
+                <h3>Personal Portfolio Hub</h3>
+                <p>A modular bento-box portfolio for creatives. Easy-to-swap components for case studies, social links, and tech stacks.</p>
+                <div class="card-stats">
+                    <span class="stat-item">⚡ 956 Forks</span>
+                    <span class="stat-item">👁️ 2.8k</span>
+                </div>
+                <button class="btn-fork">Fork to Lab</button>
+            </div>
+        </main>
+
+        <div style="text-align: center; margin-top: 60px;">
+            <button class="tag" style="padding: 12px 30px; font-size: 0.9rem;">Initialize Next Sequence (Load More)</button>
+        </div>
+    </div>
+
+    <script>
+        // Simple filter interaction
+        const tags = document.querySelectorAll('.tag');
+        tags.forEach(tag => {
+            tag.addEventListener('click', () => {
+                tags.forEach(t => t.classList.remove('active'));
+                tag.classList.add('active');
+            });
+        });
+
+        // Simple button feedback
+        document.querySelectorAll('.btn-fork').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const original = this.innerText;
+                this.innerText = "CLONING TO LAB...";
+                this.style.borderColor = "#fff";
+                this.style.color = "#fff";
+                
+                setTimeout(() => {
+                    this.innerText = "SUCCESS // VIEW LAB";
+                    this.style.borderColor = "var(--accent)";
+                    this.style.color = "var(--accent)";
+                }, 1500);
+            });
+        });
+    </script>
+</body>
+</html>

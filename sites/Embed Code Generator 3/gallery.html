@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonshine Capital | Widget Gallery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --bg-surface: #0f0f12;
+            --bg-elevated: #16161a;
+            --border: #26262b;
+            --border-bright: #3f3f46;
+            --neon-blue: #00f0ff;
+            --neon-green: #39ff14;
+            --text-primary: #f4f4f5;
+            --text-secondary: #a1a1aa;
+            --text-muted: #52525b;
+            --accent-gradient: linear-gradient(135deg, #00f0ff 0%, #39ff14 100%);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 10px; }
+
+        /* Hero */
+        .hero {
+            padding: 5rem 2rem 4rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            background: radial-gradient(circle at top center, rgba(57, 255, 20, 0.05), transparent 70%);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 1rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            color: var(--text-secondary);
+            max-width: 650px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+        }
+
+        /* Nav/Filters */
+        .nav-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .filter-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            color: var(--neon-blue);
+        }
+
+        /* Gallery Grid */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 2.5rem;
+        }
+
+        /* Template Card */
+        .template-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .template-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--border-bright);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .preview-area {
+            height: 240px;
+            background: var(--bg-deep);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-image: 
+                linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 15px 15px;
+        }
+
+        /* Mockup Elements */
+        .mock-widget {
+            width: 240px;
+            background: #fff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        .mock-widget.dark {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-bright);
+        }
+
+        .mock-line { height: 6px; border-radius: 3px; background: #eee; margin: 8px auto; width: 80%; }
+        .mock-line.short { width: 50%; }
+        .mock-btn { height: 24px; width: 100px; border-radius: 4px; margin-top: 12px; display: inline-block; }
+
+        /* Card Content */
+        .card-body {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-tag {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--neon-blue);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .card-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .card-footer {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .customize-btn {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid var(--border-bright);
+            transition: var(--transition);
+        }
+
+        .customize-btn:hover {
+            background: var(--text-primary);
+            color: var(--bg-deep);
+        }
+
+        .badge {
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--neon-blue);
+            padding: 2px 8px;
+            border-radius: 99px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .badge.green { background: rgba(57, 255, 20, 0.1); color: var(--neon-green); }
+
+        footer {
+            text-align: center;
+            padding: 4rem 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.2rem; }
+            .nav-bar { gap: 1rem; overflow-x: auto; justify-content: flex-start; }
+            .gallery-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="hero">
+        <div class="badge">PRE-BUILT TEMPLATES</div>
+        <h1>Widget Gallery</h1>
+        <p>Choose a base template to jumpstart your integration. Every template is fully responsive and tracking-ready.</p>
+    </header>
+
+    <nav class="nav-bar">
+        <button class="filter-btn active">All Templates</button>
+        <button class="filter-btn">Calculators</button>
+        <button class="filter-btn">Lead Gen</button>
+        <button class="filter-btn">Support</button>
+        <button class="filter-btn">Conversion</button>
+    </nav>
+
+    <div class="container">
+        <div class="gallery-grid">
+            
+            <!-- Template 1 -->
+            <div class="template-card">
+                <div class="preview-area">
+                    <div class="mock-widget">
+                        <div style="width: 40px; height: 40px; background: var(--neon-blue); border-radius: 50%; margin: 0 auto 1rem;"></div>
+                        <div class="mock-line"></div>
+                        <div class="mock-line short"></div>
+                        <div class="mock-btn" style="background: #000;"></div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-tag">Lead Generation</div>
+                    <h3 class="card-title">Modern Readiness Score</h3>
+                    <p class="card-desc">The classic Moonshine calculator. High contrast with circular progress indicators. Perfect for sidebars.</p>
+                    <div class="card-footer">
+                        <span class="badge">Popular</span>
+                        <a href="index.html?type=score&color=00f0ff" class="customize-btn">Customize</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 2 -->
+            <div class="template-card">
+                <div class="preview-area">
+                    <div class="mock-widget dark">
+                        <div style="text-align: left;">
+                            <div class="mock-line" style="margin: 4px 0; width: 90%; background: var(--border-bright);"></div>
+                            <div class="mock-line" style="margin: 4px 0; width: 70%; background: var(--border-bright);"></div>
+                            <div class="mock-btn" style="background: var(--neon-green); width: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-tag">Conversion</div>
+                    <h3 class="card-title">Midnight CTA Banner</h3>
+                    <p class="card-desc">Optimized for dark-mode websites. Uses neon accents to draw attention to the application funnel.</p>
+                    <div class="card-footer">
+                        <span class="badge green">New</span>
+                        <a href="index.html?type=cta&color=39ff14" class="customize-btn">Customize</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 3 -->
+            <div class="template-card">
+                <div class="preview-area">
+                    <div class="mock-widget" style="border-top: 4px solid var(--neon-blue);">
+                        <div class="mock-line" style="width: 30%; height: 10px; background: #eee;"></div>
+                        <div class="mock-line"></div>
+                        <div class="mock-line"></div>
+                        <div class="mock-line short"></div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-tag">Support</div>
+                    <h3 class="card-title">Minimalist FAQ Accordion</h3>
+                    <p class="card-desc">Reduce support overhead by embedding common funding questions directly into your resource center.</p>
+                    <div class="card-footer">
+                        <span class="badge">Utility</span>
+                        <a href="index.html?type=faq&color=00f0ff" class="customize-btn">Customize</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 4 -->
+            <div class="template-card">
+                <div class="preview-area">
+                    <div class="mock-widget" style="background: linear-gradient(180deg, #fff 0%, #f8f8f8 100%);">
+                        <div style="display: flex; gap: 8px; margin-bottom: 1rem; justify-content: center;">
+                            <div style="width: 30px; height: 30px; background: #ddd; border-radius: 4px;"></div>
+                            <div style="width: 30px; height: 30px; background: #ddd; border-radius: 4px;"></div>
+                            <div style="width: 30px; height: 30px; background: #ddd; border-radius: 4px;"></div>
+                        </div>
+                        <div class="mock-line"></div>
+                        <div class="mock-btn" style="background: #000;"></div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-tag">Lead Generation</div>
+                    <h3 class="card-title">Route Matcher Pro</h3>
+                    <p class="card-desc">Multi-step quiz format that matches users to specific funding products based on their revenue profile.</p>
+                    <div class="card-footer">
+                        <span class="badge">High Conv.</span>
+                        <a href="index.html?type=matcher&color=000000" class="customize-btn">Customize</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 5 -->
+            <div class="template-card">
+                <div class="preview-area">
+                    <div class="mock-widget dark" style="border: 2px solid var(--neon-blue);">
+                        <div style="font-family: 'JetBrains Mono'; color: var(--neon-blue); font-size: 1.5rem; margin-bottom: 0.5rem;">80%</div>
+                        <div class="mock-line" style="background: var(--border-bright);"></div>
+                        <div class="mock-btn" style="background: var(--neon-blue); height: 30px;"></div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-tag">Calculators</div>
+                    <h3 class="card-title">Commission Estimator</h3>
+                    <p class="card-desc">A tool for partners to show their sub-affiliates or clients potential earnings through the Moonshine program.</p>
+                    <div class="card-footer">
+                        <span class="badge">Partner Tool</span>
+                        <a href="index.html?type=calc&color=00f0ff" class="customize-btn">Customize</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 6 -->
+            <div class="template-card">
+                <div class="preview-area">
+                    <div class="mock-widget" style="padding: 1rem;">
+                        <div style="height: 80px; background: #f0f0f0; border-radius: 4px; margin-bottom: 1rem;"></div>
+                        <div class="mock-line" style="width: 100%;"></div>
+                        <div class="mock-line" style="width: 100%;"></div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-tag">Support</div>
+                    <h3 class="card-title">Document Checklist</h3>
+                    <p class="card-desc">Help your clients prepare for their application with a dynamic, interactive document requirements list.</p>
+                    <div class="card-footer">
+                        <span class="badge">Efficiency</span>
+                        <a href="index.html?type=docs&color=52525b" class="customize-btn">Customize</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Moonshine Capital. For technical support, visit the Developer Hub.</p>
+    </footer>
+
+    <script>
+        // Simple filter logic
+        const buttons = document.querySelectorAll('.filter-btn');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                buttons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // In a real app, logic to filter cards would go here
+                const cards = document.querySelectorAll('.template-card');
+                cards.forEach(card => {
+                    card.style.opacity = '0.5';
+                    setTimeout(() => card.style.opacity = '1', 200);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

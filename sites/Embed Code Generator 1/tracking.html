@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonshine Capital | Tracking Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #05070a;
+            --bg-card: #0d1117;
+            --bg-input: #161b22;
+            --neon-blue: #00f2ff;
+            --neon-green: #00ff9d;
+            --neon-purple: #bd00ff;
+            --text-main: #e6edf3;
+            --text-dim: #8b949e;
+            --border: #30363d;
+            --accent-glow: rgba(0, 242, 255, 0.15);
+            --font-mono: 'Fira Code', monospace;
+            --font-sans: 'Inter', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            margin-bottom: 3rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .subheadline {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            max-width: 800px;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 450px 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid { grid-template-columns: 1fr; }
+        }
+
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .panel-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--neon-purple);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .panel-title::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--neon-purple);
+            box-shadow: 0 0 10px var(--neon-purple);
+            border-radius: 50%;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(48, 54, 61, 0.5);
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .section-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-dim);
+            margin-bottom: 1rem;
+            display: block;
+            text-transform: uppercase;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 0.4rem;
+        }
+
+        input {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 0.6rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: var(--font-mono);
+        }
+
+        input:focus {
+            border-color: var(--neon-purple);
+        }
+
+        .grid-2-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .code-output {
+            background: #010409;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .code-header span {
+            font-size: 0.8rem;
+            color: var(--neon-purple);
+            font-family: var(--font-mono);
+            font-weight: 600;
+        }
+
+        pre {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: #d2a8ff;
+            white-space: pre-wrap;
+            word-break: break-all;
+            background: rgba(0,0,0,0.3);
+            padding: 1.25rem;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            line-height: 1.5;
+        }
+
+        .btn-copy {
+            background: transparent;
+            border: 1px solid var(--neon-purple);
+            color: var(--neon-purple);
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .btn-copy:hover {
+            background: var(--neon-purple);
+            color: #000;
+            box-shadow: 0 0 15px rgba(189, 0, 255, 0.3);
+        }
+
+        .instruction-card {
+            background: rgba(189, 0, 255, 0.03);
+            border-left: 3px solid var(--neon-purple);
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+            margin-top: 1rem;
+        }
+
+        .instruction-card h4 {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        .instruction-card p {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--neon-purple);
+            color: #000;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 700;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            background: rgba(0, 255, 157, 0.1);
+            color: var(--neon-green);
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>UTM & Attribution Lab</h1>
+        <p class="subheadline">Advanced campaign configuration for partners. Define granular tracking parameters, Sub-IDs, and postback webhooks to perfectly align Moonshine Capital widgets with your internal CRM or analytics stack.</p>
+    </header>
+
+    <main class="main-grid">
+        <section class="panel">
+            <div class="panel-title">Tracking Parameters</div>
+            
+            <div class="form-section">
+                <span class="section-label">Standard UTM Suite</span>
+                <div class="form-group">
+                    <label>UTM Source</label>
+                    <input type="text" id="utm_source" placeholder="google, newsletter, twitter">
+                </div>
+                <div class="grid-2-col">
+                    <div class="form-group">
+                        <label>UTM Medium</label>
+                        <input type="text" id="utm_medium" placeholder="cpc, email, social">
+                    </div>
+                    <div class="form-group">
+                        <label>UTM Campaign</label>
+                        <input type="text" id="utm_campaign" placeholder="spring_sale_2024">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <span class="section-label">Partner Specific Attribution</span>
+                <div class="grid-2-col">
+                    <div class="form-group">
+                        <label>Sub-ID 1 (Affiliate)</label>
+                        <input type="text" id="sub_id_1" placeholder="aff_001">
+                    </div>
+                    <div class="form-group">
+                        <label>Sub-ID 2 (Ad Set)</label>
+                        <input type="text" id="sub_id_2" placeholder="group_b">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>External Click ID</label>
+                    <input type="text" id="click_id" placeholder="{gclid} or {fbclid}">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <span class="section-label">Advanced Callbacks</span>
+                <div class="form-group">
+                    <label>Success Webhook URL</label>
+                    <input type="text" id="webhook_url" placeholder="https://your-api.com/postback">
+                </div>
+                <div class="form-group">
+                    <label>Custom Reference Tag</label>
+                    <input type="text" id="ref_tag" placeholder="internal-tracking-uuid">
+                </div>
+            </div>
+        </section>
+
+        <section class="results">
+            <div class="panel">
+                <div class="panel-title">Generated Configuration <span class="status-badge">AUTO-SYNC ACTIVE</span></div>
+                
+                <div class="code-output">
+                    <div class="code-header">
+                        <span>Widget Config Object (JSON)</span>
+                        <button class="btn-copy" onclick="copyCode('json-output')">Copy JSON</button>
+                    </div>
+                    <pre id="json-output"></pre>
+                </div>
+
+                <div class="code-output">
+                    <div class="code-header">
+                        <span>Resulting Query String</span>
+                        <button class="btn-copy" onclick="copyCode('query-output')">Copy String</button>
+                    </div>
+                    <pre id="query-output"></pre>
+                </div>
+
+                <div class="instruction-card">
+                    <h4>How to use this config</h4>
+                    <p>Copy the JSON object above and pass it into the <code>msConfig</code> initialization script on your page. This ensures that every lead generated through the widget contains your specific tracking metadata.</p>
+                </div>
+
+                <div style="margin-top: 2rem; font-size: 0.8rem; color: var(--text-dim); border-top: 1px solid var(--border); padding-top: 1.5rem;">
+                    <p><strong>Pro Tip:</strong> Use the <code>click_id</code> field to pass dynamic macros from Google Ads or Facebook Ads. Our system will automatically store these and pass them back via your webhook on conversion.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<div id="toast">Copied to Clipboard</div>
+
+<script>
+    const fields = [
+        'utm_source', 'utm_medium', 'utm_campaign', 
+        'sub_id_1', 'sub_id_2', 'click_id', 
+        'webhook_url', 'ref_tag'
+    ];
+
+    function updateTracking() {
+        const config = {};
+        let queryParts = [];
+
+        fields.forEach(id => {
+            const val = document.getElementById(id).value;
+            if (val) {
+                config[id] = val;
+                queryParts.push(`${id}=${encodeURIComponent(val)}`);
+            }
+        });
+
+        // Update JSON
+        const jsonString = JSON.stringify({
+            tracking: config,
+            timestamp: new Date().toISOString(),
+            version: "2.0"
+        }, null, 4);
+        document.getElementById('json-output').textContent = jsonString;
+
+        // Update Query String
+        document.getElementById('query-output').textContent = queryParts.length > 0 ? '?' + queryParts.join('&') : '(Waiting for input...)';
+    }
+
+    function copyCode(id) {
+        const text = document.getElementById(id).textContent;
+        if (text.startsWith('(')) return;
+        
+        navigator.clipboard.writeText(text).then(() => {
+            const toast = document.getElementById('toast');
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 2000);
+        });
+    }
+
+    // Initialize listeners
+    fields.forEach(id => {
+        document.getElementById(id).addEventListener('input', updateTracking);
+    });
+
+    // Run once on load
+    window.onload = updateTracking;
+</script>
+
+</body>
+</html>

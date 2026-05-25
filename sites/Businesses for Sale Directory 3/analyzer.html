@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEAL ANALYZER | OXIDIZED LEDGER</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --obsidian: #050505;
+            --bone: #F5F5F0;
+            --acid-green: #C1FF00;
+            --oxidized-copper: #8E593E;
+            --blood-orange: #FF3D00;
+            --graphite: #1A1A1A;
+            --panel: #0F0F0F;
+            --border-width: 2px;
+            --noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--obsidian);
+            color: var(--bone);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.4;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--noise);
+            opacity: 0.04;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: var(--border-width) solid var(--graphite);
+            background: var(--obsidian);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-weight: 900;
+            font-size: 1.5rem;
+            letter-spacing: -1px;
+            color: var(--bone);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span { color: var(--oxidized-copper); }
+
+        /* Analyzer Layout */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+        }
+
+        .terminal-header {
+            grid-column: 1 / -1;
+            margin-bottom: 2rem;
+            border-bottom: 4px solid var(--bone);
+            padding-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .terminal-header h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            letter-spacing: -2px;
+        }
+
+        /* Sidebar Inputs */
+        .input-panel {
+            background: var(--panel);
+            border: var(--border-width) solid var(--graphite);
+            padding: 1.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.65rem;
+            font-weight: 900;
+            color: var(--oxidized-copper);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .input-group input {
+            width: 100%;
+            background: #111;
+            border: 1px solid var(--graphite);
+            color: var(--bone);
+            padding: 0.8rem;
+            font-family: 'JetBrains Mono';
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: var(--acid-green);
+        }
+
+        /* Dashboard Outputs */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: auto auto 1fr;
+            gap: 1.5rem;
+        }
+
+        .metric-card {
+            background: var(--panel);
+            border: var(--border-width) solid var(--graphite);
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card.highlight {
+            border-color: var(--acid-green);
+        }
+
+        .metric-card.warning {
+            border-color: var(--blood-orange);
+        }
+
+        .metric-card .label {
+            font-size: 0.7rem;
+            font-weight: 900;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .metric-card .value {
+            font-family: 'JetBrains Mono';
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .metric-card .sub-value {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 0.5rem;
+            display: block;
+        }
+
+        /* DSCR Gauge placeholder */
+        .dscr-status {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            background: var(--graphite);
+            margin-top: 1rem;
+            display: inline-block;
+        }
+
+        .status-danger { color: var(--blood-orange); }
+        .status-optimal { color: var(--acid-green); }
+
+        /* Sensitivity Table */
+        .sensitivity-container {
+            grid-column: 1 / -1;
+            background: var(--panel);
+            border: var(--border-width) solid var(--graphite);
+            padding: 2rem;
+        }
+
+        .sensitivity-container h3 {
+            font-size: 0.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--bone);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'JetBrains Mono';
+            font-size: 0.8rem;
+        }
+
+        th {
+            text-align: left;
+            color: var(--oxidized-copper);
+            padding: 1rem;
+            border-bottom: 1px solid var(--graphite);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--graphite);
+        }
+
+        .risk-high { background: rgba(255, 61, 0, 0.1); color: var(--blood-orange); }
+        .risk-low { background: rgba(193, 255, 0, 0.05); color: var(--acid-green); }
+
+        /* Chart Section */
+        .chart-box {
+            grid-column: span 2;
+            background: #000;
+            border: 1px solid var(--graphite);
+            height: 300px;
+            display: flex;
+            align-items: flex-end;
+            padding: 2rem;
+            gap: 2rem;
+        }
+
+        .chart-bar-wrap {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .bar {
+            width: 100%;
+            background: var(--oxidized-copper);
+            transition: height 0.5s ease;
+            position: relative;
+        }
+
+        .bar::after {
+            content: attr(data-label);
+            position: absolute;
+            top: -20px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 0.6rem;
+            color: #666;
+        }
+
+        .bar.debt { background: var(--blood-orange); }
+        .bar.sde { background: var(--acid-green); }
+
+        footer {
+            padding: 4rem 2rem;
+            border-top: var(--border-width) solid var(--graphite);
+            font-family: 'JetBrains Mono';
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 1000px) {
+            .container { grid-template-columns: 1fr; }
+            .dashboard { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">OXIDIZED<span>LEDGER</span></a>
+        <div class="mono" style="font-size: 0.7rem; color: var(--oxidized-copper);">FINANCIAL_ENGINE_v1.04.2</div>
+    </nav>
+
+    <div class="container">
+        <header class="terminal-header">
+            <div>
+                <span class="mono" style="color: var(--oxidized-copper)">/ / Analysis Module</span>
+                <h1>DEAL INTELLIGENCE</h1>
+            </div>
+            <div class="mono" style="font-size: 0.8rem; text-align: right;">
+                Session: <span id="timestamp"></span><br>
+                Status: Calculating
+            </div>
+        </header>
+
+        <!-- Left: Control Panel -->
+        <aside class="input-panel">
+            <h2 class="mono" style="font-size: 0.8rem; margin-bottom: 2rem; border-bottom: 1px solid var(--graphite); padding-bottom: 0.5rem;">Purchase Assumptions</h2>
+            
+            <div class="input-group">
+                <label>Asking Price ($)</label>
+                <input type="number" id="askPrice" value="1200000">
+            </div>
+            <div class="input-group">
+                <label>Seller Discr. Earnings ($)</label>
+                <input type="number" id="sde" value="450000">
+            </div>
+            <div class="input-group">
+                <label>Down Payment (%)</label>
+                <input type="number" id="downPercent" value="10">
+            </div>
+
+            <h2 class="mono" style="font-size: 0.8rem; margin-top: 3rem; margin-bottom: 2rem; border-bottom: 1px solid var(--graphite); padding-bottom: 0.5rem;">Financing Terms</h2>
+
+            <div class="input-group">
+                <label>Interest Rate (%)</label>
+                <input type="number" id="interestRate" value="11.5" step="0.1">
+            </div>
+            <div class="input-group">
+                <label>Loan Term (Years)</label>
+                <input type="number" id="loanTerm" value="10">
+            </div>
+            
+            <div class="input-group" style="margin-top: 2rem;">
+                <button id="resetBtn" class="mono" style="width: 100%; padding: 1rem; background: transparent; border: 1px solid var(--oxidized-copper); color: var(--oxidized-copper); cursor: pointer;">Reset Terminal</button>
+            </div>
+        </aside>
+
+        <!-- Right: Real-time Terminal -->
+        <main class="dashboard">
+            
+            <div class="metric-card highlight">
+                <span class="label">Valuation Multiple</span>
+                <span class="value" id="outMultiple">2.67x</span>
+                <span class="sub-value">Price / SDE</span>
+            </div>
+
+            <div class="metric-card" id="dscrCard">
+                <span class="label">DSCR</span>
+                <span class="value" id="outDSCR">2.14</span>
+                <div class="dscr-status mono" id="dscrStatus">Safe Zone</div>
+                <span class="sub-value" style="margin-top: 10px;">Min required: 1.25</span>
+            </div>
+
+            <div class="metric-card">
+                <span class="label">Annual Debt Service</span>
+                <span class="value" id="outDebt" style="color: var(--blood-orange);">$182,400</span>
+                <span class="sub-value">Principal + Interest</span>
+            </div>
+
+            <div class="chart-box">
+                <div class="chart-bar-wrap">
+                    <div class="bar sde" id="barSDE" style="height: 80%;" data-label="Annual SDE"></div>
+                </div>
+                <div class="chart-bar-wrap">
+                    <div class="bar debt" id="barDebt" style="height: 40%;" data-label="Debt Service"></div>
+                </div>
+                <div class="chart-bar-wrap">
+                    <div class="bar" id="barCash" style="height: 40%; background: var(--bone);" data-label="Net Cash Flow"></div>
+                </div>
+            </div>
+
+            <div class="metric-card highlight">
+                <span class="label">Post-Debt Cash Flow</span>
+                <span class="value" id="outNetCash">$267,600</span>
+                <span class="sub-value">Free cash after financing</span>
+            </div>
+
+            <div class="metric-card">
+                <span class="label">ROI (Cash-on-Cash)</span>
+                <span class="value" id="outROI">223%</span>
+                <span class="sub-value">Yield on $120k equity</span>
+            </div>
+
+            <!-- Sensitivity Analysis Matrix -->
+            <section class="sensitivity-container">
+                <h3 class="mono">// Risk Sensitivity Matrix (SDE Variance)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Performance Scenario</th>
+                            <th>SDE Projection</th>
+                            <th>Post-Debt Cash Flow</th>
+                            <th>DSCR</th>
+                            <th>Risk Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sensitivityBody">
+                        <!-- Generated by JS -->
+                    </tbody>
+                </table>
+            </section>
+
+        </main>
+    </div>
+
+    <footer>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <p class="mono">OXIDIZED LEDGER // ANALYZER TOOL</p>
+                <p style="font-size: 0.7rem; color: #444; margin-top: 1rem; max-width: 500px;">
+                    This tool provides mathematical projections based on user inputs. It does not constitute financial advice. Accuracy of SBA 7a modeling depends on current SOP guidelines and lender-specific overlays.
+                </p>
+            </div>
+            <div style="text-align: right;">
+                <p class="mono" style="color: var(--blood-orange);">SECURITY: ENCRYPTED</p>
+                <p class="mono" style="font-size: 0.7rem; color: #444;">&copy; 2024 SYSTEM ID: 992-X-33</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const inputs = ['askPrice', 'sde', 'downPercent', 'interestRate', 'loanTerm'];
+        
+        function formatCurrency(num) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(num);
+        }
+
+        function calculate() {
+            const price = parseFloat(document.getElementById('askPrice').value) || 0;
+            const sde = parseFloat(document.getElementById('sde').value) || 0;
+            const downP = parseFloat(document.getElementById('downPercent').value) / 100;
+            const rate = parseFloat(document.getElementById('interestRate').value) / 100 / 12;
+            const term = parseFloat(document.getElementById('loanTerm').value) * 12;
+
+            const loanAmount = price * (1 - downP);
+            const equity = price * downP;
+            
+            // Monthly PMT formula: P [ i(1 + i)^n ] / [ (1 + i)^n – 1 ]
+            let monthlyDebt = 0;
+            if (rate > 0) {
+                monthlyDebt = loanAmount * (rate * Math.pow(1 + rate, term)) / (Math.pow(1 + rate, term) - 1);
+            } else {
+                monthlyDebt = loanAmount / term;
+            }
+
+            const annualDebt = monthlyDebt * 12;
+            const dscr = sde / annualDebt;
+            const netCash = sde - annualDebt;
+            const roi = (netCash / equity) * 100;
+            const multiple = price / sde;
+
+            // Update DOM
+            document.getElementById('outMultiple').innerText = multiple.toFixed(2) + 'x';
+            document.getElementById('outDSCR').innerText = dscr.toFixed(2);
+            document.getElementById('outDebt').innerText = formatCurrency(annualDebt);
+            document.getElementById('outNetCash').innerText = formatCurrency(netCash);
+            document.getElementById('outROI').innerText = roi.toFixed(0) + '%';
+
+            // Visual Statuses
+            const dscrCard = document.getElementById('dscrCard');
+            const dscrStatus = document.getElementById('dscrStatus');
+            if (dscr < 1.25) {
+                dscrCard.className = 'metric-card warning';
+                dscrStatus.innerText = 'CRITICAL RISK';
+                dscrStatus.className = 'dscr-status mono status-danger';
+            } else if (dscr < 1.5) {
+                dscrCard.className = 'metric-card';
+                dscrStatus.innerText = 'MARGINAL';
+                dscrStatus.className = 'dscr-status mono';
+                dscrStatus.style.color = 'var(--oxidized-copper)';
+            } else {
+                dscrCard.className = 'metric-card highlight';
+                dscrStatus.innerText = 'SAFE ZONE';
+                dscrStatus.className = 'dscr-status mono status-optimal';
+            }
+
+            // Charts
+            const maxVal = Math.max(sde, annualDebt) * 1.2;
+            document.getElementById('barSDE').style.height = (sde / maxVal * 100) + '%';
+            document.getElementById('barDebt').style.height = (annualDebt / maxVal * 100) + '%';
+            document.getElementById('barCash').style.height = (Math.max(0, netCash) / maxVal * 100) + '%';
+
+            updateSensitivity(sde, annualDebt);
+        }
+
+        function updateSensitivity(baseSDE, debt) {
+            const scenarios = [
+                { lbl: 'Outperform (+15%)', mod: 1.15 },
+                { lbl: 'Target Performance', mod: 1.0 },
+                { lbl: 'Underperform (-15%)', mod: 0.85 },
+                { lbl: 'Breakeven / Distress (-30%)', mod: 0.70 }
+            ];
+
+            const tbody = document.getElementById('sensitivityBody');
+            tbody.innerHTML = '';
+
+            scenarios.forEach(sc => {
+                const curSDE = baseSDE * sc.mod;
+                const curNet = curSDE - debt;
+                const curDSCR = curSDE / debt;
+                const riskClass = curDSCR < 1.25 ? 'risk-high' : 'risk-low';
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="mono">${sc.lbl}</td>
+                    <td>${formatCurrency(curSDE)}</td>
+                    <td style="color: ${curNet < 0 ? 'var(--blood-orange)' : 'inherit'}">${formatCurrency(curNet)}</td>
+                    <td class="mono">${curDSCR.toFixed(2)}</td>
+                    <td class="mono ${riskClass}">${curDSCR < 1.25 ? 'HIGH RISK' : 'STABLE'}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Event Listeners
+        inputs.forEach(id => {
+            document.getElementById(id).addEventListener('input', calculate);
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            document.getElementById('askPrice').value = 1200000;
+            document.getElementById('sde').value = 450000;
+            document.getElementById('downPercent').value = 10;
+            calculate();
+        });
+
+        document.getElementById('timestamp').innerText = new Date().toISOString().substring(11, 19) + " UTC";
+
+        // Init
+        calculate();
+    </script>
+</body>
+</html>

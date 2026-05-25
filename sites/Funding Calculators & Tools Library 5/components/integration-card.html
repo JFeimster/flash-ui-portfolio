@@ -1,0 +1,703 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Edge - Integration Settings</title>
+    <!-- Google Fonts for Ultra-Modern High-Contrast Look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0c10;
+            --surface: #14161f;
+            --surface-card: #1a1d29;
+            --text-raw: #ffffff;
+            --text-muted: #8e95ad;
+            --accent-cyan: #00f3ff;
+            --accent-magenta: #ff0055;
+            --accent-yellow: #ffee00;
+            --accent-green: #00ff66;
+            --border-width: 3px;
+            --brutal-shadow-cyan: 6px 6px 0px var(--accent-cyan);
+            --brutal-shadow-magenta: 6px 6px 0px var(--accent-magenta);
+            --brutal-shadow-yellow: 6px 6px 0px var(--accent-yellow);
+            --brutal-shadow-green: 6px 6px 0px var(--accent-green);
+            --transition-speed: 0.15s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-raw);
+            line-height: 1.4;
+            padding: 40px 20px;
+            overflow-x: hidden;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        .wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Section Header */
+        .section-header {
+            position: relative;
+            padding: 40px;
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            box-shadow: var(--brutal-shadow-cyan);
+            margin-bottom: 40px;
+            overflow: hidden;
+        }
+
+        .section-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--accent-magenta);
+            color: #fff;
+            border: 2px solid #fff;
+            font-weight: 900;
+            font-size: 12px;
+            letter-spacing: 1.5px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            transform: rotate(-1deg);
+            box-shadow: 3px 3px 0px #fff;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        h1 {
+            font-size: clamp(28px, 4vw, 48px);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -1.5px;
+            line-height: 1;
+            font-family: 'Space Grotesk', sans-serif;
+            margin-bottom: 12px;
+        }
+
+        h1 span {
+            color: transparent;
+            -webkit-text-stroke: 1px #fff;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-magenta));
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .section-sub {
+            font-size: 16px;
+            color: var(--text-muted);
+            max-width: 700px;
+        }
+
+        /* Grid Layout */
+        .config-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 40px;
+        }
+
+        @media (min-width: 900px) {
+            .config-grid {
+                grid-template-columns: 1fr 1.2fr;
+            }
+        }
+
+        /* Panels */
+        .panel {
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            padding: 30px;
+            position: relative;
+        }
+
+        .panel-providers {
+            box-shadow: var(--brutal-shadow-yellow);
+        }
+
+        .panel-rules {
+            box-shadow: var(--brutal-shadow-magenta);
+        }
+
+        .panel-title {
+            font-size: 24px;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-family: 'Space Grotesk', sans-serif;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+        }
+
+        .panel-title span {
+            color: var(--accent-cyan);
+        }
+
+        /* Storage Providers List */
+        .provider-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .provider-card {
+            background: var(--surface-card);
+            border: var(--border-width) solid #fff;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            transition: transform var(--transition-speed);
+        }
+
+        .provider-card:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: 6px 6px 0px #fff;
+        }
+
+        .provider-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .provider-icon {
+            font-size: 28px;
+            width: 50px;
+            height: 50px;
+            background: var(--surface);
+            border: 2px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 3px 3px 0px rgba(255,255,255,0.1);
+        }
+
+        .provider-details h3 {
+            font-size: 18px;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-family: 'Space Grotesk', sans-serif;
+            margin-bottom: 2px;
+        }
+
+        .provider-status {
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--text-muted);
+            border-radius: 50%;
+        }
+
+        .status-connected {
+            color: var(--accent-green);
+        }
+        .status-connected .status-dot {
+            background: var(--accent-green);
+            box-shadow: 0 0 8px var(--accent-green);
+        }
+
+        .status-disconnected {
+            color: var(--accent-magenta);
+        }
+        .status-disconnected .status-dot {
+            background: var(--accent-magenta);
+            box-shadow: 0 0 8px var(--accent-magenta);
+        }
+
+        /* Brutalist Toggle Buttons */
+        .btn-action {
+            background: var(--surface);
+            border: 2px solid #fff;
+            color: #fff;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 12px;
+            text-transform: uppercase;
+            font-family: 'Space Grotesk', sans-serif;
+            transition: all var(--transition-speed);
+            box-shadow: 3px 3px 0px #fff;
+        }
+
+        .btn-action:hover {
+            background: #fff;
+            color: #000;
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0px #fff;
+        }
+
+        .btn-action:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px;
+        }
+
+        .btn-action.connected {
+            background: var(--accent-magenta);
+            color: #fff;
+            border-color: #fff;
+        }
+
+        .btn-action.connected:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        /* Rules Configuration Form */
+        .rule-form {
+            background: var(--surface-card);
+            border: var(--border-width) solid #fff;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 4px 4px 0px rgba(255,255,255,0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        @media (min-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        .form-select, .form-input {
+            background: var(--surface);
+            border: 2px solid #fff;
+            color: #fff;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            outline: none;
+            width: 100%;
+        }
+
+        .form-select:focus, .form-input:focus {
+            border-color: var(--accent-cyan);
+        }
+
+        .form-select option {
+            background: var(--surface-card);
+            color: #fff;
+        }
+
+        .btn-add-rule {
+            width: 100%;
+            background: var(--accent-cyan);
+            color: #000;
+            border: 2px solid #fff;
+            padding: 14px;
+            font-weight: 900;
+            font-size: 14px;
+            text-transform: uppercase;
+            font-family: 'Space Grotesk', sans-serif;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            box-shadow: 4px 4px 0px #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-add-rule:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: 7px 7px 0px #fff;
+        }
+
+        .btn-add-rule:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px;
+        }
+
+        /* Rules List */
+        .rules-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .rule-item {
+            background: var(--surface-card);
+            border: 2px solid #fff;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            box-shadow: 3px 3px 0px rgba(255,255,255,0.05);
+        }
+
+        .rule-details {
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.5;
+        }
+
+        .rule-details mark {
+            background: var(--accent-yellow);
+            color: #000;
+            padding: 1px 6px;
+            font-weight: 800;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin: 0 4px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .rule-details .tag-badge {
+            background: var(--accent-cyan);
+            color: #000;
+            padding: 2px 8px;
+            border: 1px solid #000;
+            font-weight: 900;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-left: 6px;
+        }
+
+        .btn-delete {
+            background: transparent;
+            border: none;
+            color: var(--accent-magenta);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s;
+        }
+
+        .btn-delete:hover {
+            transform: scale(1.2);
+        }
+
+        /* Empty state styling */
+        .rules-empty {
+            text-align: center;
+            padding: 30px;
+            border: 2px dashed rgba(255,255,255,0.15);
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* Notification Toast */
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--surface);
+            border: 3px solid #fff;
+            box-shadow: 6px 6px 0px var(--accent-green);
+            padding: 15px 25px;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+            font-size: 14px;
+            transform: translateY(150%);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .toast-notification.active {
+            transform: translateY(0);
+        }
+
+        .toast-icon {
+            color: var(--accent-green);
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <!-- HEADER -->
+        <div class="section-header">
+            <div class="section-badge">☁️ System Configuration</div>
+            <h1>Cloud Storage <span>Integrations</span></h1>
+            <p class="section-sub">Connect secure document repositories and manage classification engines to automatically route and tag incoming commercial underwriting documents.</p>
+        </div>
+
+        <!-- MAIN LAYOUT -->
+        <div class="config-grid">
+            
+            <!-- LEFT PANEL: STORAGE PROVIDERS -->
+            <div class="panel panel-providers">
+                <h2 class="panel-title"><span>01 /</span> Storage Providers</h2>
+                
+                <div class="provider-list">
+                    
+                    <!-- Google Drive -->
+                    <div class="provider-card" id="prov-gdrive">
+                        <div class="provider-info">
+                            <div class="provider-icon">📁</div>
+                            <div class="provider-details">
+                                <h3>Google Drive</h3>
+                                <div class="provider-status status-connected" id="status-gdrive">
+                                    <span class="status-dot"></span> <span class="status-text">Connected</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn-action connected" id="btn-gdrive" onclick="toggleProvider('gdrive')">Disconnect</button>
+                    </div>
+
+                    <!-- Dropbox -->
+                    <div class="provider-card" id="prov-dropbox">
+                        <div class="provider-info">
+                            <div class="provider-icon">📦</div>
+                            <div class="provider-details">
+                                <h3>Dropbox</h3>
+                                <div class="provider-status status-disconnected" id="status-dropbox">
+                                    <span class="status-dot"></span> <span class="status-text">Disconnected</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn-action" id="btn-dropbox" onclick="toggleProvider('dropbox')">Link Account</button>
+                    </div>
+
+                    <!-- AWS S3 Bucket -->
+                    <div class="provider-card" id="prov-s3">
+                        <div class="provider-info">
+                            <div class="provider-icon">☁️</div>
+                            <div class="provider-details">
+                                <h3>AWS S3 Secure</h3>
+                                <div class="provider-status status-connected" id="status-s3">
+                                    <span class="status-dot"></span> <span class="status-text">Connected</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn-action connected" id="btn-s3" onclick="toggleProvider('s3')">Disconnect</button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: AUTOMATIC CLASSIFICATION RULES -->
+            <div class="panel panel-rules">
+                <h2 class="panel-title"><span>02 /</span> Auto-Classification Rules</h2>
+                
+                <!-- Rule Creation Form -->
+                <div class="rule-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">If document matches</label>
+                            <select class="form-select" id="rule-type">
+                                <option value="name">File name contains</option>
+                                <option value="ext">File extension is</option>
+                                <option value="size">Size greater than</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Evaluation Metric</label>
+                            <input type="text" class="form-input" id="rule-value" placeholder="e.g. Tax, bank, PDF">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="grid-column: span 1;">
+                            <label class="form-label">Automatically classify as</label>
+                            <select class="form-select" id="rule-tag">
+                                <option value="MCA Statements">MCA Statements</option>
+                                <option value="Tax Return">Tax Returns</option>
+                                <option value="Corporate Legal">Corporate Legal</option>
+                                <option value="Broker Agreement">Broker Agreement</option>
+                                <option value="Credit Memo">Credit Memo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn-add-rule" onclick="addNewRule()">
+                        Create Automation Rule 
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    </button>
+                </div>
+
+                <!-- Rules List -->
+                <div class="rules-container" id="rulesList">
+                    <!-- Default Rule 1 -->
+                    <div class="rule-item" id="rule-1">
+                        <div class="rule-details">
+                            If file name contains <mark>bank</mark> then tag as <span class="tag-badge">MCA Statements</span>
+                        </div>
+                        <button class="btn-delete" onclick="deleteRule('rule-1')">❌</button>
+                    </div>
+                    
+                    <!-- Default Rule 2 -->
+                    <div class="rule-item" id="rule-2">
+                        <div class="rule-details">
+                            If file extension is <mark>PDF</mark> then tag as <span class="tag-badge">Corporate Legal</span>
+                        </div>
+                        <button class="btn-delete" onclick="deleteRule('rule-2')">❌</button>
+                    </div>
+                </div>
+
+                <!-- Empty State Placeholder -->
+                <div class="rules-empty" id="rulesEmptyState" style="display: none;">
+                    No automation rules defined. Create your first rule above.
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div class="toast-notification" id="toast">
+        <span class="toast-icon">⚡</span> <span id="toast-message">Configuration Updated</span>
+    </div>
+
+    <script>
+        // Trigger Toast Notification
+        function showToast(message, isSuccess = true) {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toast-message');
+            msgEl.innerText = message;
+            
+            if(isSuccess) {
+                toast.style.boxShadow = '6px 6px 0px var(--accent-green)';
+            } else {
+                toast.style.boxShadow = '6px 6px 0px var(--accent-magenta)';
+            }
+
+            toast.classList.add('active');
+            setTimeout(() => {
+                toast.classList.remove('active');
+            }, 3000);
+        }
+
+        // Toggle Integration Provider state
+        function toggleProvider(id) {
+            const btn = document.getElementById(`btn-${id}`);
+            const status = document.getElementById(`status-${id}`);
+            const isConnected = btn.classList.contains('connected');
+
+            if (isConnected) {
+                // Disconnect
+                btn.classList.remove('connected');
+                btn.innerText = "Link Account";
+                status.className = "provider-status status-disconnected";
+                status.querySelector('.status-text').innerText = "Disconnected";
+                showToast(`${id.toUpperCase()} connection terminated`, false);
+            } else {
+                // Connect
+                btn.classList.add('connected');
+                btn.innerText = "Disconnect";
+                status.className = "provider-status status-connected";
+                status.querySelector('.status-text').innerText = "Connected";
+                showToast(`${id.toUpperCase()} successfully linked`);
+            }
+        }
+
+        // Add automated classification rules
+        let ruleCounter = 3;
+        function addNewRule() {
+            const typeSelect = document.getElementById('rule-type');
+            const valInput = document.getElementById('rule-value');
+            const tagSelect = document.getElementById('rule-tag');
+
+            const criteriaType = typeSelect.options[typeSelect.selectedIndex].text.toLowerCase();
+            const criteriaVal = valInput.value.trim();
+            const tagVal = tagSelect.options[tagSelect.selectedIndex].text;
+
+            if (!criteriaVal) {
+                showToast("Please enter a valuation metric", false);
+                valInput.focus();
+                return;
+            }
+
+            const list = document.getElementById('rulesList');
+            const ruleId = `rule-${ruleCounter++}`;
+
+            const newRuleHtml = `
+                <div class="rule-item" id="${ruleId}">
+                    <div class="rule-details">
+                        If ${criteriaType} <mark>${criteriaVal}</mark> then tag as <span class="tag-badge">${tagVal}</span>
+                    </div>
+                    <button class="btn-delete" onclick="deleteRule('${ruleId}')">❌</button>
+                </div>
+            `;
+
+            // Append new rule markup
+            list.insertAdjacentHTML('beforeend', newRuleHtml);
+            valInput.value = ''; // Reset input
+            
+            // Manage UI states
+            checkEmptyState();
+            showToast("Classification automation added");
+        }
+
+        // Delete rules
+        function deleteRule(id) {
+            const rule = document.getElementById(id);
+            if (rule) {
+                rule.remove();
+                checkEmptyState();
+                showToast("Classification automation removed", false);
+            }
+        }
+
+        // Verify if list is empty
+        function checkEmptyState() {
+            const list = document.getElementById('rulesList');
+            const emptyState = document.getElementById('rulesEmptyState');
+            if (list.children.length === 0) {
+                emptyState.style.display = 'block';
+            } else {
+                emptyState.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
+```

@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LTV & Unit Economics | Emerald Circuit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050807;
+            --bg-card: #0c1210;
+            --emerald: #00ff88;
+            --emerald-dim: rgba(0, 255, 136, 0.2);
+            --emerald-glow: rgba(0, 255, 136, 0.5);
+            --danger: #ff4757;
+            --warning: #ffa502;
+            --text-main: #e0e0e0;
+            --text-dim: #889990;
+            --circuit-line: rgba(0, 255, 136, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 2px 2px, var(--circuit-line) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+
+        .analyzer-container {
+            width: 100%;
+            max-width: 1100px;
+            padding: 40px;
+            position: relative;
+        }
+
+        .main-card {
+            background: var(--bg-card);
+            border: 1px solid var(--emerald-dim);
+            border-radius: 20px;
+            padding: 48px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 20px var(--emerald-dim);
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 50px;
+            position: relative;
+        }
+
+        .main-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 80px;
+            height: 80px;
+            border-bottom: 2px solid var(--emerald);
+            border-right: 2px solid var(--emerald);
+            border-radius: 0 0 20px 0;
+            opacity: 0.3;
+        }
+
+        .header {
+            grid-column: span 2;
+            text-align: left;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--emerald);
+            padding-left: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+            background: linear-gradient(to right, #fff, var(--emerald));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .input-group label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--emerald);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper span.unit {
+            position: absolute;
+            left: 16px;
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        input {
+            width: 100%;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 14px 14px 14px 40px;
+            color: #fff;
+            font-size: 1rem;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--emerald);
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        .visual-section {
+            background: rgba(0,0,0,0.3);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .ltv-hero {
+            text-align: center;
+        }
+
+        .ltv-hero .value {
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--emerald);
+            text-shadow: 0 0 20px var(--emerald-dim);
+            line-height: 1;
+        }
+
+        .ltv-hero .label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        .metrics-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+
+        .metric-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .metric-value {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .ratio-badge {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .ratio-good { background: var(--emerald-dim); color: var(--emerald); }
+        .ratio-bad { background: rgba(255, 71, 87, 0.2); color: var(--danger); }
+
+        .projection-bar-container {
+            margin-top: 10px;
+            height: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .bar-segment {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+
+        .bar-cac { background: var(--danger); width: 30%; }
+        .bar-profit { background: var(--emerald); width: 70%; }
+
+        .cta-footer {
+            grid-column: span 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .analysis-note {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            max-width: 60%;
+        }
+
+        .analysis-note strong {
+            color: #fff;
+        }
+
+        .btn-nav {
+            background: transparent;
+            border: 1px solid var(--emerald);
+            color: var(--emerald);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .btn-nav:hover {
+            background: var(--emerald-dim);
+            box-shadow: 0 0 15px var(--emerald-dim);
+        }
+
+        @media (max-width: 850px) {
+            .main-card { grid-template-columns: 1fr; }
+            .header, .cta-footer { grid-column: span 1; }
+            .cta-footer { flex-direction: column; gap: 20px; text-align: center; }
+            .analysis-note { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="analyzer-container">
+        <div class="main-card">
+            <header class="header">
+                <p>UNIT ECONOMICS ENGINE // CORE_MODULE</p>
+                <h1>LTV & Unit Economics</h1>
+                <p>Deconstruct your revenue per user and project lifetime scalability.</p>
+            </header>
+
+            <div class="input-section">
+                <div class="input-group">
+                    <label>Avg Order Value (AOV)</label>
+                    <div class="input-wrapper">
+                        <span class="unit">$</span>
+                        <input type="number" id="aov" value="150" placeholder="0">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Frequency (Per Mo)</label>
+                    <div class="input-wrapper">
+                        <span class="unit">#</span>
+                        <input type="number" id="freq" value="1.2" step="0.1" placeholder="0">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Gross Margin %</label>
+                    <div class="input-wrapper">
+                        <span class="unit">%</span>
+                        <input type="number" id="margin" value="70" placeholder="0">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Monthly Churn Rate %</label>
+                    <div class="input-wrapper">
+                        <span class="unit">%</span>
+                        <input type="number" id="churn" value="5" step="0.1" placeholder="0">
+                    </div>
+                </div>
+
+                <div class="input-group full-width">
+                    <label>Current CAC (Acquisition Cost)</label>
+                    <div class="input-wrapper">
+                        <span class="unit">$</span>
+                        <input type="number" id="cac" value="450" placeholder="0">
+                    </div>
+                </div>
+            </div>
+
+            <div class="visual-section">
+                <div class="ltv-hero">
+                    <div id="ltv-val" class="value">$0</div>
+                    <div class="label">Gross Profit LTV</div>
+                </div>
+
+                <div class="metrics-stack">
+                    <div class="metric-row">
+                        <span class="metric-name">ARPU (Monthly Rev)</span>
+                        <span id="arpu-val" class="metric-value">$0</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-name">Avg Customer Lifespan</span>
+                        <span id="lifespan-val" class="metric-value">0 Mo</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-name">LTV : CAC Ratio</span>
+                        <span id="ratio-val" class="ratio-badge ratio-good">0.0x</span>
+                    </div>
+                </div>
+
+                <div class="projection-wrap">
+                    <span class="metric-name" style="font-size: 0.6rem; display: block; margin-bottom: 5px;">CAC vs PROFIT DISTRIBUTION</span>
+                    <div class="projection-bar-container">
+                        <div id="bar-cac" class="bar-cac"></div>
+                        <div id="bar-profit" class="bar-profit"></div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="cta-footer">
+                <div class="analysis-note">
+                    <span id="verdict-text">Your LTV is <strong>3.4x</strong> your CAC. This indicates a sustainable engine ready for aggressive scaling.</span>
+                </div>
+                <button class="btn-nav" onclick="location.reload()">Refresh Model</button>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        const inputs = ['aov', 'freq', 'margin', 'churn', 'cac'];
+        
+        function calculate() {
+            const aov = parseFloat(document.getElementById('aov').value) || 0;
+            const freq = parseFloat(document.getElementById('freq').value) || 0;
+            const margin = parseFloat(document.getElementById('margin').value) / 100 || 0;
+            const churn = parseFloat(document.getElementById('churn').value) / 100 || 0;
+            const cac = parseFloat(document.getElementById('cac').value) || 1;
+
+            const arpu = aov * freq;
+            const contributionMargin = arpu * margin;
+            
+            // LTV = (ARPU * Margin) / Churn
+            const ltv = churn > 0 ? (contributionMargin / churn) : 0;
+            const lifespan = churn > 0 ? (1 / churn) : 0;
+            const ratio = ltv / cac;
+
+            // UI Updates
+            document.getElementById('ltv-val').textContent = `$${Math.round(ltv).toLocaleString()}`;
+            document.getElementById('arpu-val').textContent = `$${arpu.toFixed(2)}`;
+            document.getElementById('lifespan-val').textContent = `${lifespan.toFixed(1)} Months`;
+            
+            const ratioEl = document.getElementById('ratio-val');
+            ratioEl.textContent = `${ratio.toFixed(1)}x`;
+            ratioEl.className = `ratio-badge ${ratio >= 3 ? 'ratio-good' : 'ratio-bad'}`;
+
+            // Bar update
+            const total = ltv;
+            const cacWidth = Math.min((cac / total) * 100, 100);
+            const profitWidth = 100 - cacWidth;
+            document.getElementById('bar-cac').style.width = `${cacWidth}%`;
+            document.getElementById('bar-profit').style.width = `${profitWidth}%`;
+
+            // Verdict text
+            const verdict = document.getElementById('verdict-text');
+            if (ratio >= 3) {
+                verdict.innerHTML = `Your LTV is <strong>${ratio.toFixed(1)}x</strong> your CAC. This indicates a sustainable engine ready for aggressive scaling.`;
+            } else if (ratio >= 1) {
+                verdict.innerHTML = `Your LTV:CAC is <strong>${ratio.toFixed(1)}x</strong>. You are profitable but efficiency is tight. Optimize churn or AOV.`;
+            } else {
+                verdict.innerHTML = `<span style="color:var(--danger)">WARNING:</span> Your LTV is lower than your CAC. You are losing money on every customer acquired.`;
+            }
+        }
+
+        inputs.forEach(id => {
+            document.getElementById(id).addEventListener('input', calculate);
+        });
+
+        // Initialize
+        calculate();
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LTV & Unit Economics | Emerald Circuit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050807;
+            --bg-card: #0c1210;
+            --emerald: #00ff88;
+            --emerald-dim: rgba(0, 255, 136, 0.2);
+            --emerald-glow: rgba(0, 255, 136, 0.5);
+            --danger: #ff4757;
+            --warning: #ffa502;
+            --text-main: #e0e0e0;
+            --text-dim: #889990;
+            --circuit-line: rgba(0, 255, 136, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 2px 2px, var(--circuit-line) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+
+        .analyzer-container {
+            width: 100%;
+            max-width: 1100px;
+            padding: 40px;
+            position: relative;
+        }
+
+        .main-card {
+            background: var(--bg-card);
+            border: 1px solid var(--emerald-dim);
+            border-radius: 20px;
+            padding: 48px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 20px var(--emerald-dim);
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 50px;
+            position: relative;
+        }
+
+        .main-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 80px;
+            height: 80px;
+            border-bottom: 2px solid var(--emerald);
+            border-right: 2px solid var(--emerald);
+            border-radius: 0 0 20px 0;
+            opacity: 0.3;
+        }
+
+        .header {
+            grid-column: span 2;
+            text-align: left;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--emerald);
+            padding-left: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+            background: linear-gradient(to right, #fff, var(--emerald));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .input-group label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--emerald);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper span.unit {
+            position: absolute;
+            left: 16px;
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        input {
+            width: 100%;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 14px 14px 14px 40px;
+            color: #fff;
+            font-size: 1rem;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--emerald);
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        .visual-section {
+            background: rgba(0,0,0,0.3);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .ltv-hero {
+            text-align: center;
+        }
+
+        .ltv-hero .value {
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--emerald);
+            text-shadow: 0 0 20px var(--emerald-dim);
+            line-height: 1;
+        }
+
+        .ltv-hero .label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        .metrics-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+
+        .metric-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .metric-value {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .ratio-badge {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .ratio-good { background: var(--emerald-dim); color: var(--emerald); }
+        .ratio-bad { background: rgba(255, 71, 87, 0.2); color: var(--danger); }
+
+        .projection-bar-container {
+            margin-top: 10px;
+            height: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .bar-segment {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+
+        .bar-cac { background: var(--danger); width: 30%; }
+        .bar-profit { background: var(--emerald); width: 70%; }
+
+        .cta-footer {
+            grid-column: span 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .analysis-note {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            max-width: 60%;
+        }
+
+        .analysis-note strong {
+            color: #fff;
+        }
+
+        .btn-nav {
+            background: transparent;
+            border: 1px solid var(--emerald);
+            color: var(--emerald);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .btn-nav:hover {
+            background: var(--emerald-dim);
+            box-shadow: 0 0 15px var(--emerald-dim);
+        }
+
+        @media (max-width: 850px) {
+            .main-card { grid-template-columns: 1fr; }
+            .header, .cta-footer { grid-column: span 1; }
+            .cta-footer { flex-direction: column; gap: 20px; text-align: center; }
+            .analysis-note { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="analyzer-container">
+        <div class="main-card">
+            <header class="header">
+                <p>UNIT ECONOMICS ENGINE // CORE_MODULE</p>
+                <h1>LTV & Unit Economics</h1>
+                <p>Deconstruct your revenue per user and project lifetime scalability.</p>
+            </header>
+
+            <div class="input-section">
+                <div class="input-group">
+                    <label>Avg Order Value (AOV)</label>
+                    <div class="input-wrapper">
+                        <span class="unit">$</span>
+                        <input type="number" id="aov" value="150" placeholder="0">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Frequency (Per Mo)</label>
+                    <div class="input-wrapper">
+                        <span class="unit">#</span>
+                        <input type="number" id="freq" value="1.2" step="0.1" placeholder="0">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Gross Margin %</label>
+                    <div class="input-wrapper">
+                        <span class="unit">%</span>
+                        <input type="number" id="margin" value="70" placeholder="0">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Monthly Churn Rate %</label>
+                    <div class="input-wrapper">
+                        <span class="unit">%</span>
+                        <input type="number" id="churn" value="5" step="0.1" placeholder="0">
+                    </div>
+                </div>
+
+                <div class="input-group full-width">
+                    <label>Current CAC (Acquisition Cost)</label>
+                    <div class="input-wrapper">
+                        <span class="unit">$</span>
+                        <input type="number" id="cac" value="450" placeholder="0">
+                    </div>
+                </div>
+            </div>
+
+            <div class="visual-section">
+                <div class="ltv-hero">
+                    <div id="ltv-val" class="value">$0</div>
+                    <div class="label">Gross Profit LTV</div>
+                </div>
+
+                <div class="metrics-stack">
+                    <div class="metric-row">
+                        <span class="metric-name">ARPU (Monthly Rev)</span>
+                        <span id="arpu-val" class="metric-value">$0</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-name">Avg Customer Lifespan</span>
+                        <span id="lifespan-val" class="metric-value">0 Mo</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-name">LTV : CAC Ratio</span>
+                        <span id="ratio-val" class="ratio-badge ratio-good">0.0x</span>
+                    </div>
+                </div>
+
+                <div class="projection-wrap">
+                    <span class="metric-name" style="font-size: 0.6rem; display: block; margin-bottom: 5px;">CAC vs PROFIT DISTRIBUTION</span>
+                    <div class="projection-bar-container">
+                        <div id="bar-cac" class="bar-cac"></div>
+                        <div id="bar-profit" class="bar-profit"></div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="cta-footer">
+                <div class="analysis-note">
+                    <span id="verdict-text">Your LTV is <strong>3.4x</strong> your CAC. This indicates a sustainable engine ready for aggressive scaling.</span>
+                </div>
+                <button class="btn-nav" onclick="location.reload()">Refresh Model</button>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        const inputs = ['aov', 'freq', 'margin', 'churn', 'cac'];
+        
+        function calculate() {
+            const aov = parseFloat(document.getElementById('aov').value) || 0;
+            const freq = parseFloat(document.getElementById('freq').value) || 0;
+            const margin = parseFloat(document.getElementById('margin').value) / 100 || 0;
+            const churn = parseFloat(document.getElementById('churn').value) / 100 || 0;
+            const cac = parseFloat(document.getElementById('cac').value) || 1;
+
+            const arpu = aov * freq;
+            const contributionMargin = arpu * margin;
+            
+            // LTV = (ARPU * Margin) / Churn
+            const ltv = churn > 0 ? (contributionMargin / churn) : 0;
+            const lifespan = churn > 0 ? (1 / churn) : 0;
+            const ratio = ltv / cac;
+
+            // UI Updates
+            document.getElementById('ltv-val').textContent = `$${Math.round(ltv).toLocaleString()}`;
+            document.getElementById('arpu-val').textContent = `$${arpu.toFixed(2)}`;
+            document.getElementById('lifespan-val').textContent = `${lifespan.toFixed(1)} Months`;
+            
+            const ratioEl = document.getElementById('ratio-val');
+            ratioEl.textContent = `${ratio.toFixed(1)}x`;
+            ratioEl.className = `ratio-badge ${ratio >= 3 ? 'ratio-good' : 'ratio-bad'}`;
+
+            // Bar update
+            const total = ltv;
+            const cacWidth = Math.min((cac / total) * 100, 100);
+            const profitWidth = 100 - cacWidth;
+            document.getElementById('bar-cac').style.width = `${cacWidth}%`;
+            document.getElementById('bar-profit').style.width = `${profitWidth}%`;
+
+            // Verdict text
+            const verdict = document.getElementById('verdict-text');
+            if (ratio >= 3) {
+                verdict.innerHTML = `Your LTV is <strong>${ratio.toFixed(1)}x</strong> your CAC. This indicates a sustainable engine ready for aggressive scaling.`;
+            } else if (ratio >= 1) {
+                verdict.innerHTML = `Your LTV:CAC is <strong>${ratio.toFixed(1)}x</strong>. You are profitable but efficiency is tight. Optimize churn or AOV.`;
+            } else {
+                verdict.innerHTML = `<span style="color:var(--danger)">WARNING:</span> Your LTV is lower than your CAC. You are losing money on every customer acquired.`;
+            }
+        }
+
+        inputs.forEach(id => {
+            document.getElementById(id).addEventListener('input', calculate);
+        });
+
+        // Initialize
+        calculate();
+    </script>
+</body>
+</html>

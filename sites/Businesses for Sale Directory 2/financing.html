@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAPITAL STACK // Acquisition Index Financing</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --obsidian: #050505;
+            --graphite: #141414;
+            --panel-bg: #0A0A0A;
+            --bone: #F5F5F0;
+            --acid-green: #C5FF00;
+            --copper: #8B9D83;
+            --blood-orange: #FF3D00;
+            --border-width: 2px;
+            --grain-opacity: 0.04;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--bone);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.4;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3BaseFilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/feFilter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: var(--grain-opacity);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        h1, h2, h3 { text-transform: uppercase; letter-spacing: -0.02em; font-weight: 900; }
+        .mono { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; }
+        .editorial { font-family: 'Playfair Display', serif; font-style: italic; text-transform: none; }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: var(--border-width) solid var(--graphite);
+            background: var(--obsidian);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo { font-weight: 900; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+        .logo span { background: var(--acid-green); color: var(--obsidian); padding: 2px 6px; }
+
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { text-decoration: none; color: var(--bone); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; transition: color 0.2s; }
+        .nav-links a:hover { color: var(--acid-green); }
+        .nav-links a.active { color: var(--acid-green); }
+
+        .financing-hero {
+            padding: 6rem 2rem;
+            border-bottom: var(--border-width) solid var(--bone);
+            background: linear-gradient(to bottom, #0a0a0a, #050505);
+        }
+
+        .financing-hero h1 { font-size: clamp(2.5rem, 8vw, 5rem); line-height: 1; margin-bottom: 1.5rem; }
+        .hero-desc { max-width: 650px; color: var(--copper); font-size: 1.1rem; }
+
+        .market-controls {
+            position: sticky;
+            top: 72px;
+            z-index: 90;
+            background: var(--obsidian);
+            padding: 1rem 2rem;
+            border-bottom: var(--border-width) solid var(--graphite);
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .filter-chip {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--graphite);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-chip:hover, .filter-chip.active {
+            background: var(--bone);
+            color: var(--obsidian);
+            border-color: var(--bone);
+        }
+
+        .lender-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 0;
+            border-bottom: var(--border-width) solid var(--bone);
+        }
+
+        .lender-card {
+            background: var(--panel-bg);
+            border-right: 1px solid var(--graphite);
+            border-bottom: 1px solid var(--graphite);
+            padding: 3rem 2rem;
+            transition: background 0.3s;
+            position: relative;
+        }
+
+        .lender-card:hover {
+            background: #0f0f0f;
+        }
+
+        .lender-type {
+            color: var(--acid-green);
+            font-family: 'JetBrains Mono';
+            font-size: 0.7rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .lender-type::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            background: var(--acid-green);
+            border-radius: 50%;
+        }
+
+        .lender-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            height: 3.6rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .loan-specs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .spec {
+            border-left: 1px solid var(--graphite);
+            padding-left: 1rem;
+        }
+
+        .spec-label {
+            font-family: 'JetBrains Mono';
+            font-size: 0.6rem;
+            color: var(--copper);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .spec-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .action-area {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-apply {
+            flex: 1;
+            background: transparent;
+            border: 1px solid var(--bone);
+            color: var(--bone);
+            padding: 1rem;
+            text-transform: uppercase;
+            font-weight: 900;
+            font-size: 0.75rem;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-apply:hover {
+            background: var(--acid-green);
+            color: var(--obsidian);
+            border-color: var(--acid-green);
+        }
+
+        .trust-badge {
+            position: absolute;
+            top: 3rem;
+            right: 2rem;
+            opacity: 0.2;
+        }
+
+        footer {
+            padding: 4rem 2rem;
+            background: var(--obsidian);
+            color: var(--copper);
+            border-top: var(--border-width) solid var(--graphite);
+        }
+
+        @media (max-width: 768px) {
+            .market-controls { overflow-x: auto; white-space: nowrap; }
+            .lender-grid { grid-template-columns: 1fr; }
+            .financing-hero { padding: 4rem 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">ACQUISITION <span>INDEX</span></a>
+        <div class="nav-links">
+            <a href="#">Browse Deals</a>
+            <a href="#">Analyzer</a>
+            <a href="#" class="active">Financing</a>
+            <a href="#">Resources</a>
+        </div>
+    </nav>
+
+    <header class="financing-hero">
+        <div class="mono" style="color: var(--copper); margin-bottom: 1rem;">// Capital Markets Division</div>
+        <h1>THE <span class="editorial">Capital</span> STACK.</h1>
+        <p class="hero-desc">Vetted institutional financing for small business acquisitions. Access SBA 7(a) preferred lenders, mezzanine debt, and private equity partners on a single terminal.</p>
+    </header>
+
+    <div class="market-controls">
+        <div class="mono">Filter by vehicle:</div>
+        <div class="filter-chip active">All Capital</div>
+        <div class="filter-chip">SBA Preferred</div>
+        <div class="filter-chip">Private Debt</div>
+        <div class="filter-chip">Equity Partners</div>
+        <div class="filter-chip">Bridge/Gap</div>
+    </div>
+
+    <main class="lender-grid" id="lender-container">
+        <!-- Card 1 -->
+        <article class="lender-card">
+            <div class="lender-type">SBA Preferred Lender</div>
+            <h3>National Acquisition Capital</h3>
+            <div class="loan-specs">
+                <div class="spec">
+                    <div class="spec-label">Indicative Rate</div>
+                    <div class="spec-value">P + 2.75%</div>
+                </div>
+                <div class="spec">
+                    <div class="spec-label">Max LTV</div>
+                    <div class="spec-value">90%</div>
+                </div>
+                <div class="spec">
+                    <div class="spec-label">Closing Time</div>
+                    <div class="spec-value">45-60 Days</div>
+                </div>
+                <div class="spec">
+                    <div class="spec-label">Min SDE</div>
+                    <div class="spec-value">$200K</div>
+                </div>
+            </div>
+            <div class="action-area">
+                <a href="#" class="btn-apply">Request Terms</a>
+            </div>
+        </article>
+
+        <!-- Card 2 -->
+        <article class="lender-card">
+            <div class="lender-type">Mezzanine Debt</div>
+            <h3>Greyrock Mezzanine Fund IV</h3>
+            <div class="loan-specs">
+                <div class="spec">
+                    <div class="spec-label">Indicative Rate</div>
+                    <div class="spec-value">12% - 15%</div>
+                </div>
+                <div class="spec">
+                    <div class="spec-label">Ticket Size</div>
+                    <div class="spec-value">$1M - $5M</div>
+                </div>
+                <div class="spec">
+                    <div class="spec-label">Closing Time</div>
+                    <div class="spec-value">30 Days</div>
+                </div>
+                <div class="spec">
+                    <div class="spec-label">Warrants</div>
+                    <div class="spec-value">Required</div>
+                </div>
+            </div>
+            <div class="action-area">
+                <a href="#" class="btn-apply">Inquire Fund</a>
+            </div>
+        </article>
+
+        <!-- Card 3 -->
+        <article class="lender-card">
+            <div class="lender-type">Equity Partner</div>
+            <h3>Blue Chip Search Capital</h3>
+            <div class="loan-specs">
+                <div class="spec">
+                    <div class="spec-label">Check Size</div>
+                    <div class="spec-value">$500K - $2M</div>
+                </div>
+                <div class="spec">
+                    <div class="spec-label">Type</div>
+                    <div class="spec-value">Co-Invest</div>
+                </div>
+                <div class="spec">
+                    <div class="spec-label">Industry</div>
+                    <div class="spec-value">B2B Service</div>
+                </div>
+                <div class="spec">
+                    <div class="spec-label">Geography</div>
+                    <div class="spec-value">USA Only</div>
+                </div>
+            </div>
+            <div class="action-area">
+                <a href="#" class="btn-apply">Submit Deck</a>
+            </div>
+        </article>
+
+        <!-- Card 4 -->
+        <article class="lender-card">
+            <div class="lender-type">Bridge Financing</div>
+            <h3>SwiftBridge Capital Group</h3>
+            <div class="loan-specs">
+                <div class="spec">
+                    <div class="spec-label">Indicative Rate</div>
+                    <div class="spec-value">18% APR</div>
+                </div>
+                <div class="spec">
+                    <div class="spec-label">Max Term</div>
+                    <div class="spec-value">12 Months</div>
+                </div>
+                <div class="spec">
+                    <div class="spec-label">Closing Time</div>
+                    <div class="spec-value">7 Days</div>
+                </div>
+                <div class="spec">
+                    <div class="spec-label">Security</div>
+                    <div class="spec-value">1st Lien</div>
+                </div>
+            </div>
+            <div class="action-area">
+                <a href="#" class="btn-apply">Rapid Quote</a>
+            </div>
+        </article>
+
+        <!-- Card 5 -->
+        <article class="lender-card">
+            <div class="lender-type">SBA Specialized</div>
+            <h3>Community First Credit Union</h3>
+            <div class="loan-specs">
+                <div class="spec">
+                    <div class="spec-label">Indicative Rate</div>
+                    <div class="spec-value">P + 1.5%</div>
+                </div>
+                <div class="spec">
+                    <div class="spec-label">Focus</div>
+                    <div class="spec-value">Home Service</div>
+                </div>
+                <div class="spec">
+                    <div class="spec-label">Closing Time</div>
+                    <div class="spec-value">75 Days</div>
+                </div>
+                <div class="spec">
+                    <div class="spec-label">Appraisal</div>
+                    <div class="spec-value">In-House</div>
+                </div>
+            </div>
+            <div class="action-area">
+                <a href="#" class="btn-apply">Check Eligibility</a>
+            </div>
+        </article>
+
+        <!-- Card 6 -->
+        <article class="lender-card">
+            <div class="lender-type">Revenue Based</div>
+            <h3>Flowstate Alpha Debt</h3>
+            <div class="loan-specs">
+                <div class="spec">
+                    <div class="spec-label">Cap Cost</div>
+                    <div class="spec-value">1.4x Factor</div>
+                </div>
+                <div class="spec">
+                    <div class="spec-label">Max Loan</div>
+                    <div class="spec-value">2x MRR</div>
+                </div>
+                <div class="spec">
+                    <div class="spec-label">Closing Time</div>
+                    <div class="spec-value">14 Days</div>
+                </div>
+                <div class="spec">
+                    <div class="spec-label">Repayment</div>
+                    <div class="spec-value">% of Rev</div>
+                </div>
+            </div>
+            <div class="action-area">
+                <a href="#" class="btn-apply">Connect Bank</a>
+            </div>
+        </article>
+    </main>
+
+    <section style="padding: 6rem 2rem; background: var(--bone); color: var(--obsidian);">
+        <div style="max-width: 1000px;">
+            <div class="mono" style="margin-bottom: 2rem;">Disclosure & Compliance</div>
+            <h2 style="font-size: 3rem; margin-bottom: 2rem;">Acquisition Index is not a <span class="editorial">Broker-Dealer.</span></h2>
+            <p style="font-size: 1.2rem; line-height: 1.6; color: #333;">We provide a directory of institutional financing sources to streamline the capital assembly process for searchers and operators. All interest rates, loan-to-value (LTV) ratios, and closing timelines are indicative only and subject to rigorous underwriting by the respective lenders. Acquisition Index does not guarantee funding or provide financial advice.</p>
+        </div>
+    </section>
+
+    <footer>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 4rem;">
+            <div>
+                <div class="logo" style="color: var(--bone); margin-bottom: 2rem;">ACQUISITION <span>INDEX</span></div>
+                <p>Connecting operators with the capital to scale.</p>
+            </div>
+            <div>
+                <h4 class="mono" style="color: var(--bone); margin-bottom: 1.5rem;">Marketplace</h4>
+                <p>Deal Feed</p>
+                <p>Lender Network</p>
+                <p>Equity Partners</p>
+            </div>
+            <div>
+                <h4 class="mono" style="color: var(--bone); margin-bottom: 1.5rem;">Support</h4>
+                <p>Compliance</p>
+                <p>Listing Guide</p>
+                <p>Contact Desk</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Simple filter interaction logic
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

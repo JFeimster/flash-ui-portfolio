@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prism Analytics | Search Performance Dashboard</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Inter:wght@300;400;600&display=swap');
+
+        :root {
+            --bg-deep: #05070a;
+            --glass: rgba(15, 20, 28, 0.85);
+            --accent-cyan: #00f2ff;
+            --accent-magenta: #ff00ea;
+            --accent-lime: #bcff00;
+            --border-glow: rgba(0, 242, 255, 0.1);
+            --text-main: #e0e6ed;
+            --text-dim: #7a869a;
+            --prism-gradient: linear-gradient(135deg, #00f2ff 0%, #ff00ea 50%, #bcff00 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg-deep);
+            background-image: 
+                radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 32px 32px;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            width: 1100px;
+            max-width: 95vw;
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 4px;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .dashboard-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--prism-gradient);
+            z-index: 10;
+        }
+
+        /* Header */
+        .header {
+            padding: 24px 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 20px;
+            height: 20px;
+            background: var(--prism-gradient);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+
+        .brand-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .nav-item {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-dim);
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--accent-cyan);
+        }
+
+        /* Metrics Row */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .metric-card {
+            background: var(--bg-deep);
+            padding: 24px 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .metric-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metric-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .metric-trend {
+            font-size: 11px;
+            color: var(--accent-lime);
+        }
+
+        /* Main Content */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            height: 580px;
+        }
+
+        .sidebar {
+            padding: 32px;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .section-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 4px;
+            background: var(--accent-cyan);
+            display: inline-block;
+        }
+
+        /* Role Chart */
+        .role-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .role-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .role-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .role-name { color: var(--text-main); }
+        .role-count { color: var(--text-dim); }
+
+        .progress-bar-bg {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            width: 100%;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--accent-magenta);
+            box-shadow: 0 0 10px rgba(255, 0, 234, 0.3);
+        }
+
+        /* Feed */
+        .feed-panel {
+            padding: 32px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .feed-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .feed-table th {
+            text-align: left;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .feed-table td {
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .feed-row:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .entity-cell {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .role-cell {
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+        }
+
+        .timestamp-cell {
+            color: var(--text-dim);
+            font-size: 11px;
+        }
+
+        .action-cell {
+            text-align: right;
+        }
+
+        .btn-view {
+            padding: 6px 12px;
+            background: transparent;
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-view:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-deep);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            background: var(--accent-lime);
+            box-shadow: 0 0 8px var(--accent-lime);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <header class="header">
+            <div class="brand">
+                <div class="brand-logo"></div>
+                <h1 class="brand-name">Prism Analytics</h1>
+            </div>
+            <nav class="nav-links">
+                <a href="#" class="nav-item">Scanner</a>
+                <a href="#" class="nav-item active">Dashboard</a>
+                <a href="#" class="nav-item">Logs</a>
+                <a href="#" class="nav-item">API</a>
+            </nav>
+        </header>
+
+        <section class="metrics-grid">
+            <div class="metric-card">
+                <span class="metric-label">Success Rate</span>
+                <span class="metric-value">92.4%</span>
+                <span class="metric-trend">↑ 1.2% vs prev week</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-label">Total Extractions</span>
+                <span class="metric-value">1,284</span>
+                <span class="metric-trend" style="color: var(--accent-cyan);">Total agent cycles</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-label">Avg Lead Time</span>
+                <span class="metric-value">14.2s</span>
+                <span class="metric-trend">↓ 2.4s optimization</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-label">Node Efficiency</span>
+                <span class="metric-value">0.98</span>
+                <span class="metric-trend">Stable throughput</span>
+            </div>
+        </section>
+
+        <main class="main-layout">
+            <aside class="sidebar">
+                <div>
+                    <h2 class="section-title">Common Roles Found</h2>
+                    <div class="role-list">
+                        <div class="role-item">
+                            <div class="role-info">
+                                <span class="role-name">Director / VP</span>
+                                <span class="role-count">422</span>
+                            </div>
+                            <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 85%;"></div></div>
+                        </div>
+                        <div class="role-item">
+                            <div class="role-info">
+                                <span class="role-name">Operations Lead</span>
+                                <span class="role-count">318</span>
+                            </div>
+                            <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 65%;"></div></div>
+                        </div>
+                        <div class="role-item">
+                            <div class="role-info">
+                                <span class="role-name">General Counsel</span>
+                                <span class="role-count">194</span>
+                            </div>
+                            <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 40%;"></div></div>
+                        </div>
+                        <div class="role-item">
+                            <div class="role-info">
+                                <span class="role-name">HR Manager</span>
+                                <span class="role-count">112</span>
+                            </div>
+                            <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 25%;"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: auto; padding: 16px; background: rgba(188, 255, 0, 0.05); border: 1px solid rgba(188, 255, 0, 0.2);">
+                    <span class="metric-label" style="color: var(--accent-lime);">System Health</span>
+                    <div style="font-size: 12px; margin-top: 8px;">All nodes operational. API latency: 42ms.</div>
+                </div>
+            </aside>
+
+            <section class="feed-panel">
+                <h2 class="section-title">Recent Successful Lookups</h2>
+                <table class="feed-table">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Identity / Entity</th>
+                            <th>Role Found</th>
+                            <th>Timestamp</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="feed-row">
+                            <td><span class="status-dot"></span></td>
+                            <td>
+                                <div class="entity-cell">Sarah Jenkins</div>
+                                <div style="font-size: 11px; color: var(--text-dim);">Acme Dynamics Corp</div>
+                            </td>
+                            <td class="role-cell">Director of Operations</td>
+                            <td class="timestamp-cell">14:02:44</td>
+                            <td class="action-cell"><button class="btn-view">Access Node</button></td>
+                        </tr>
+                        <tr class="feed-row">
+                            <td><span class="status-dot"></span></td>
+                            <td>
+                                <div class="entity-cell">Marcus Vane</div>
+                                <div style="font-size: 11px; color: var(--text-dim);">Vanguard Logistics</div>
+                            </td>
+                            <td class="role-cell">Chief Strategy Officer</td>
+                            <td class="timestamp-cell">13:58:12</td>
+                            <td class="action-cell"><button class="btn-view">Access Node</button></td>
+                        </tr>
+                        <tr class="feed-row">
+                            <td><span class="status-dot"></span></td>
+                            <td>
+                                <div class="entity-cell">Elena Rodriguez</div>
+                                <div style="font-size: 11px; color: var(--text-dim);">Nebula Systems</div>
+                            </td>
+                            <td class="role-cell">VP of Engineering</td>
+                            <td class="timestamp-cell">13:44:05</td>
+                            <td class="action-cell"><button class="btn-view">Access Node</button></td>
+                        </tr>
+                        <tr class="feed-row">
+                            <td><span class="status-dot"></span></td>
+                            <td>
+                                <div class="entity-cell">Julian Thorne</div>
+                                <div style="font-size: 11px; color: var(--text-dim);">Thorne & Associates</div>
+                            </td>
+                            <td class="role-cell">Founding Partner</td>
+                            <td class="timestamp-cell">13:12:33</td>
+                            <td class="action-cell"><button class="btn-view">Access Node</button></td>
+                        </tr>
+                        <tr class="feed-row">
+                            <td><span class="status-dot"></span></td>
+                            <td>
+                                <div class="entity-cell">Linda Chen</div>
+                                <div style="font-size: 11px; color: var(--text-dim);">Global Retail Link</div>
+                            </td>
+                            <td class="role-cell">Supply Chain Manager</td>
+                            <td class="timestamp-cell">12:55:19</td>
+                            <td class="action-cell"><button class="btn-view">Access Node</button></td>
+                        </tr>
+                        <tr class="feed-row">
+                            <td><span class="status-dot"></span></td>
+                            <td>
+                                <div class="entity-cell">David Wu</div>
+                                <div style="font-size: 11px; color: var(--text-dim);">Quantum Bio-Tech</div>
+                            </td>
+                            <td class="role-cell">Head of Compliance</td>
+                            <td class="timestamp-cell">12:30:02</td>
+                            <td class="action-cell"><button class="btn-view">Access Node</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+</body>
+</html>

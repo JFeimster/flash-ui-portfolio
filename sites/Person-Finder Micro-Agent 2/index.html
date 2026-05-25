@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Analytics - Person-Finder Micro-Agent</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #050505;
+            --bg-surface: #0d0d0d;
+            --bg-card: #141414;
+            --border-muted: #222222;
+            --accent-primary: #00ff88;
+            --accent-glow: rgba(0, 255, 136, 0.15);
+            --text-main: #e0e0e0;
+            --text-muted: #707070;
+            --text-dim: #404040;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-sans: 'Inter', sans-serif;
+            --radius: 8px;
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            letter-spacing: -0.01em;
+        }
+
+        .dashboard-container {
+            width: 100%;
+            max-width: 1100px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-muted);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+        .dashboard-header {
+            padding: 32px;
+            border-bottom: 1px solid var(--border-muted);
+            background: linear-gradient(180deg, var(--bg-surface) 0%, #0a0a0a 100%);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .badge {
+            display: inline-block;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            padding: 4px 8px;
+            border: 1px solid var(--accent-primary);
+            color: var(--accent-primary);
+            border-radius: 4px;
+            margin-bottom: 12px;
+            letter-spacing: 0.1em;
+            background: var(--accent-glow);
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        p.subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* METRICS GRID */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--border-muted);
+            border-bottom: 1px solid var(--border-muted);
+        }
+
+        .metric-card {
+            background: var(--bg-surface);
+            padding: 24px 32px;
+        }
+
+        .metric-label {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+            font-family: var(--font-mono);
+        }
+
+        .metric-trend {
+            font-size: 11px;
+            margin-top: 4px;
+            color: var(--accent-primary);
+        }
+
+        /* MAIN CONTENT AREA */
+        .dashboard-main {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            min-height: 500px;
+        }
+
+        /* LEFT: SOURCE ANALYTICS */
+        .source-analytics {
+            padding: 32px;
+            border-right: 1px solid var(--border-muted);
+            background: #090909;
+        }
+
+        .section-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .source-item {
+            margin-bottom: 24px;
+        }
+
+        .source-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .source-name { color: var(--text-main); font-family: var(--font-mono); }
+        .source-percent { color: var(--accent-primary); font-family: var(--font-mono); }
+
+        .progress-bg {
+            height: 4px;
+            background: var(--bg-card);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-primary);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* RIGHT: RECENT SUCCESS FEED */
+        .success-feed {
+            padding: 32px;
+            background: var(--bg-base);
+            overflow-y: auto;
+        }
+
+        .feed-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-muted);
+            border-radius: var(--radius);
+            margin-bottom: 12px;
+            transition: var(--transition);
+        }
+
+        .feed-item:hover {
+            border-color: var(--text-dim);
+            transform: translateX(4px);
+        }
+
+        .feed-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-glow);
+            border: 1px solid var(--accent-primary);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-primary);
+            margin-right: 16px;
+        }
+
+        .feed-details {
+            flex-grow: 1;
+        }
+
+        .feed-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .feed-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .feed-source-tag {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            padding: 2px 6px;
+            background: #1a1a1a;
+            border-radius: 3px;
+            color: var(--text-dim);
+            margin-left: 8px;
+        }
+
+        .feed-time {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        /* CUSTOM SCROLLBAR */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-muted); border-radius: 10px; }
+
+        @media (max-width: 900px) {
+            .dashboard-main { grid-template-columns: 1fr; }
+            .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+            .source-analytics { border-right: none; border-bottom: 1px solid var(--border-muted); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div>
+                <span class="badge">Analytics Engine v2.0</span>
+                <h1>Performance Dashboard</h1>
+                <p class="subtitle">Real-time intelligence mapping and source reliability tracking.</p>
+            </div>
+            <div style="text-align: right;">
+                <div class="feed-time" style="margin-bottom: 4px;">LAST UPDATED</div>
+                <div style="font-family: var(--font-mono); font-size: 14px; color: var(--accent-primary);">14:22:09 UTC</div>
+            </div>
+        </header>
+
+        <!-- Stats -->
+        <section class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Total Searches</div>
+                <div class="metric-value">12,842</div>
+                <div class="metric-trend">+14% vs last week</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Success Rate</div>
+                <div class="metric-value">94.2%</div>
+                <div class="metric-trend" style="color: #00ff88">Optimal Range</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Contacts Found</div>
+                <div class="metric-value">8,103</div>
+                <div class="metric-trend">+2.4k this month</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Avg. Latency</div>
+                <div class="metric-value">4.2s</div>
+                <div class="metric-trend" style="color: var(--text-muted)">-0.8s optimization</div>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Left Side: Source Distribution -->
+            <aside class="source-analytics">
+                <div class="section-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+                    Source Reliability
+                </div>
+
+                <div class="source-item">
+                    <div class="source-info">
+                        <span class="source-name">LinkedIn Graph</span>
+                        <span class="source-percent">42%</span>
+                    </div>
+                    <div class="progress-bg">
+                        <div class="progress-fill" style="width: 42%;"></div>
+                    </div>
+                </div>
+
+                <div class="source-item">
+                    <div class="source-info">
+                        <span class="source-name">Public Registries (SOS)</span>
+                        <span class="source-percent">28%</span>
+                    </div>
+                    <div class="progress-bg">
+                        <div class="progress-fill" style="width: 28%;"></div>
+                    </div>
+                </div>
+
+                <div class="source-item">
+                    <div class="source-info">
+                        <span class="source-name">Website Metadata Scrape</span>
+                        <span class="source-percent">18%</span>
+                    </div>
+                    <div class="progress-bg">
+                        <div class="progress-fill" style="width: 18%;"></div>
+                    </div>
+                </div>
+
+                <div class="source-item">
+                    <div class="source-info">
+                        <span class="source-name">Google Dorking</span>
+                        <span class="source-percent">12%</span>
+                    </div>
+                    <div class="progress-bg">
+                        <div class="progress-fill" style="width: 12%;"></div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 48px; padding: 20px; border: 1px dashed var(--text-dim); border-radius: 8px;">
+                    <div class="metric-label" style="margin-bottom: 12px;">Top Performing Keyword</div>
+                    <div style="font-family: var(--font-mono); color: #fff; font-size: 14px;">"Chief Executive Officer"</div>
+                    <div class="feed-meta">Yielding 88% verification rate in SaaS industry sectors.</div>
+                </div>
+            </aside>
+
+            <!-- Right Side: Recent Activity -->
+            <section class="success-feed">
+                <div class="section-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                    Recent Successful Extractions
+                </div>
+
+                <div class="feed-item">
+                    <div class="feed-icon">✓</div>
+                    <div class="feed-details">
+                        <div class="feed-name">Marcus Thorne <span class="feed-source-tag">LinkedIn</span></div>
+                        <div class="feed-meta">Managing Director @ Helios Robotics</div>
+                    </div>
+                    <div class="feed-time">2m ago</div>
+                </div>
+
+                <div class="feed-item">
+                    <div class="feed-icon">✓</div>
+                    <div class="feed-details">
+                        <div class="feed-name">Elena Rodriguez <span class="feed-source-tag">SOS Registry</span></div>
+                        <div class="feed-meta">Registered Agent @ Blue Basin Logistics</div>
+                    </div>
+                    <div class="feed-time">14m ago</div>
+                </div>
+
+                <div class="feed-item">
+                    <div class="feed-icon">✓</div>
+                    <div class="feed-details">
+                        <div class="feed-name">Sarah Jenkins <span class="feed-source-tag">Website</span></div>
+                        <div class="feed-meta">Lead Designer @ Aura Design Studio</div>
+                    </div>
+                    <div class="feed-time">28m ago</div>
+                </div>
+
+                <div class="feed-item">
+                    <div class="feed-icon">✓</div>
+                    <div class="feed-details">
+                        <div class="feed-name">David Chen <span class="feed-source-tag">LinkedIn</span></div>
+                        <div class="feed-meta">Founder @ Vertex Solutions</div>
+                    </div>
+                    <div class="feed-time">41m ago</div>
+                </div>
+
+                <div class="feed-item" style="opacity: 0.5;">
+                    <div class="feed-icon">✓</div>
+                    <div class="feed-details">
+                        <div class="feed-name">Julian Voss <span class="feed-source-tag">Google Search</span></div>
+                        <div class="feed-meta">Operations Head @ Nord Stream Tech</div>
+                    </div>
+                    <div class="feed-time">1h ago</div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+</body>
+</html>

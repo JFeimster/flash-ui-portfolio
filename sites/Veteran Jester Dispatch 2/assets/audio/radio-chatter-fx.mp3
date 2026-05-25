@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The War Room | Secure Communication Terminal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Stardos+Stencil:wght@400;700&family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --terminal-green: #4b5320;
+            --text-gold: #c5beb1;
+            --stencil-red: #9e1b1b;
+            --paper-white: #e8e4d9;
+            --glow: 0 0 10px rgba(75, 83, 32, 0.5);
+            --texture: url("https://www.transparenttextures.com/patterns/carbon-fibre.png");
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: var(--texture);
+            color: var(--text-gold);
+            font-family: 'Courier Prime', monospace;
+            line-height: 1.4;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .terminal-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            border: 2px solid var(--terminal-green);
+            background: rgba(0, 0, 0, 0.8);
+            box-shadow: var(--glow);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .terminal-container::before {
+            content: " ";
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        header {
+            border-bottom: 2px solid var(--terminal-green);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Stardos Stencil', cursive;
+            font-size: 1.8rem;
+            color: var(--terminal-green);
+            text-shadow: var(--glow);
+        }
+
+        .status-bar {
+            text-align: right;
+            font-size: 0.8rem;
+            color: var(--terminal-green);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 40px;
+        }
+
+        h2 {
+            font-family: 'Stardos Stencil', cursive;
+            margin-bottom: 20px;
+            color: var(--paper-white);
+            border-left: 5px solid var(--stencil-red);
+            padding-left: 15px;
+            text-transform: uppercase;
+        }
+
+        /* SITREP Section */
+        .sitrep-feed {
+            height: 500px;
+            overflow-y: auto;
+            padding-right: 15px;
+        }
+
+        .sitrep-item {
+            border-bottom: 1px solid rgba(75, 83, 32, 0.3);
+            padding: 15px 0;
+            animation: flicker 5s infinite;
+        }
+
+        .sitrep-meta {
+            font-size: 0.75rem;
+            color: var(--stencil-red);
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .sitrep-content {
+            font-family: 'Special Elite', cursive;
+            font-size: 0.95rem;
+        }
+
+        /* Submit Intel Form */
+        .intel-form {
+            background: rgba(75, 83, 32, 0.1);
+            padding: 30px;
+            border: 1px solid var(--terminal-green);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+            color: var(--terminal-green);
+            text-transform: uppercase;
+        }
+
+        input, textarea {
+            width: 100%;
+            background: transparent;
+            border: 1px solid var(--terminal-green);
+            padding: 10px;
+            color: var(--paper-white);
+            font-family: 'Courier Prime', monospace;
+            outline: none;
+        }
+
+        input:focus, textarea:focus {
+            box-shadow: var(--glow);
+        }
+
+        .submit-btn {
+            background: var(--stencil-red);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-family: 'Stardos Stencil', cursive;
+            font-size: 1.2rem;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: white;
+            color: var(--stencil-red);
+        }
+
+        .stamp {
+            display: inline-block;
+            border: 2px solid var(--stencil-red);
+            color: var(--stencil-red);
+            padding: 2px 10px;
+            font-family: 'Stardos Stencil', cursive;
+            transform: rotate(-5deg);
+            font-size: 0.7rem;
+            margin-top: 10px;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 1; }
+            5% { opacity: 0.9; }
+            10% { opacity: 1; }
+            15% { opacity: 0.95; }
+            25% { opacity: 1; }
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--terminal-green);
+        }
+
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+            .sitrep-feed { height: 300px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="terminal-container">
+        <header>
+            <div class="logo">WAR ROOM // COMM-LINK</div>
+            <div class="status-bar">
+                ENCRYPTION: AES-256 <br>
+                CONNECTION: SECURE [STABLE] <br>
+                LOC: [REDACTED]
+            </div>
+        </header>
+
+        <div class="grid">
+            <section class="sitreps">
+                <h2>Active Sitreps</h2>
+                <div class="sitrep-feed">
+                    <div class="sitrep-item">
+                        <span class="sitrep-meta">08 NOV 23 // 1422 HRS</span>
+                        <p class="sitrep-content">The newsletter is now live on the dark web mirrors. Verification successful. No casualties reported in the comment section... yet.</p>
+                    </div>
+                    <div class="sitrep-item">
+                        <span class="sitrep-meta">07 NOV 23 // 0900 HRS</span>
+                        <p class="sitrep-content">Logistics update: Coffee supply chain restored. Operations back to 100% capacity. The "PowerPoint Warfare" dispatch is trending with the disgruntled colonel crowd.</p>
+                    </div>
+                    <div class="sitrep-item">
+                        <span class="sitrep-meta">05 NOV 23 // 2315 HRS</span>
+                        <p class="sitrep-content">Strategic Middle Finger technique deployed against corporate HR memo. Immediate results observed: confusion and fear. Mission success.</p>
+                    </div>
+                    <div class="sitrep-item" style="border: none;">
+                        <span class="sitrep-meta">01 NOV 23 // 1200 HRS</span>
+                        <p class="sitrep-content">System initialization. Terminal online. Eyes open, mouths shut, ears to the ground.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="contact">
+                <h2>Submit Intel</h2>
+                <div class="intel-form">
+                    <form action="#" method="POST">
+                        <div class="form-group">
+                            <label>Source Identifier (Name/Alias)</label>
+                            <input type="text" placeholder="GHOST_RIDER_99" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Secure Response Channel (Email)</label>
+                            <input type="email" placeholder="ENCRYPTED_ID@SECURE.NET" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Subject Classification</label>
+                            <input type="text" placeholder="LEADERSHIP FAILURE / RANT / SUGGESTION">
+                        </div>
+                        <div class="form-group">
+                            <label>Intel Payload (Message Content)</label>
+                            <textarea rows="6" placeholder="TYPE YOUR MESSAGE HERE. AVOID SENSITIVE COORDINATES..."></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn">TRANSMIT ENCRYPTED DATA</button>
+                    </form>
+                    <div class="stamp">DIRECT LINE TO COMMAND</div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px; font-size: 0.7rem; color: var(--terminal-green); opacity: 0.5; font-family: 'Courier Prime', monospace;">
+        WARNING: ALL COMMUNICATIONS ARE LOGGED. UNAUTHORIZED ACCESS TO THE WAR ROOM IS PUNISHABLE BY 1,000 PUSHUPS.
+    </div>
+
+</body>
+</html>

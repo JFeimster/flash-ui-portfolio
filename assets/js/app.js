@@ -60,6 +60,7 @@ function isNestedApp(item) {
 }
 
 function isArchive(item) {
+  if (["static-site-extracted", "static-site-existing", "skipped-existing-index"].includes(item.extractionStatus)) return false;
   return item.status === "archive-needs-review" || item.type === "zip-archive" || item.type === "docs-archive" || item.hasZip || item.hasMarkdown;
 }
 
@@ -292,6 +293,33 @@ function expandBatch5Manifest(manifest) {
   ];
 }
 
+function normalizeStaticExtractionEntry(item) {
+  const title = item.title || item.slug || item.path || "Untitled static extraction";
+  const extractionStatus = item.extractionStatus || "unknown-needs-manual-review";
+  const isStatic = ["static-site-extracted", "static-site-existing", "skipped-existing-index"].includes(extractionStatus);
+  const isStandalone = extractionStatus === "nextjs-app-needs-standalone-deploy" || Boolean(item.needsStandaloneDeploy);
+  const status = isStatic
+    ? "portfolio-site"
+    : isStandalone
+      ? "nested-app-needs-standalone-deploy"
+      : "archive-needs-review";
+
+  return {
+    ...item,
+    title,
+    slug: item.slug || slugify(title),
+    category: item.category || guessCategory(title),
+    type: item.type || (isStatic ? "static-site" : isStandalone ? "nextjs-app" : "zip-archive"),
+    status: item.status || status,
+    source: item.source || "static-zip-extraction",
+    livePath: isStatic ? item.livePath : "",
+    hasMarkdown: Boolean(item.hasMarkdown),
+    needsNormalization: Boolean(item.needsNormalization),
+    needsStandaloneDeploy: isStandalone,
+    notes: Array.isArray(item.notes) ? item.notes.join(" ") : (item.notes || item.recommendedAction || "")
+  };
+}
+
 async function fetchJson(path) {
   const response = await fetch(path, { cache: "no-store" });
   if (!response.ok) throw new Error(`Registry request failed for ${path}: ${response.status}`);
@@ -303,6 +331,7 @@ async function init() {
   try {
     const baseRegistry = await fetchJson("/data/site-registry.json");
     let batch5Registry = [];
+    let staticExtractionRegistry = [];
 
     try {
       const manifest = await fetchJson("/data/site-registry-batch-5-additions.json");
@@ -311,8 +340,20 @@ async function init() {
       console.warn(batchError);
     }
 
+    try {
+      const staticExtractions = await fetchJson("/data/site-registry-static-extractions.json");
+      staticExtractionRegistry = Array.isArray(staticExtractions)
+        ? staticExtractions.map(normalizeStaticExtractionEntry)
+        : [];
+      if (!Array.isArray(staticExtractions)) {
+        console.warn(new Error("Static extraction registry is not an array."));
+      }
+    } catch (staticExtractionError) {
+      console.warn(staticExtractionError);
+    }
+
     const merged = new Map();
-    [...baseRegistry, ...batch5Registry].forEach(item => {
+    [...baseRegistry, ...batch5Registry, ...staticExtractionRegistry].forEach(item => {
       const key = item.path || item.slug || item.title;
       if (!key) return;
       merged.set(key, item);

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Growth Engine Sensitivity Lab</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        :root {
+            --bg: #050505;
+            --card-bg: #0d0d0d;
+            --border: #222222;
+            --accent: #ffffff;
+            --text-dim: #888888;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff4444;
+            --font-main: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--accent);
+            font-family: var(--font-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .diagnostic-card {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .diagnostic-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0.2;
+        }
+
+        header {
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            color: var(--accent);
+        }
+
+        p.subtitle {
+            font-size: 12px;
+            color: var(--text-dim);
+            letter-spacing: 0.02em;
+        }
+
+        .section-label {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-label::after {
+            content: "";
+            flex-grow: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .inputs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-group label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+        }
+
+        .input-group input {
+            background: #151515;
+            border: 1px solid var(--border);
+            color: var(--accent);
+            padding: 10px;
+            font-family: var(--font-mono);
+            font-size: 14px;
+            outline: none;
+        }
+
+        .lever-container {
+            background: #111;
+            padding: 20px;
+            border: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+
+        .slider-group {
+            margin-bottom: 20px;
+        }
+
+        .slider-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .slider-header span.val {
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            background: #222;
+            border-radius: 2px;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            background: var(--accent);
+            cursor: pointer;
+            margin-top: -6px;
+            border-radius: 0;
+        }
+
+        .gauge-container {
+            position: relative;
+            height: 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gauge-svg {
+            transform: rotate(-180deg);
+            width: 200px;
+            height: 100px;
+        }
+
+        .gauge-bg {
+            fill: none;
+            stroke: #1a1a1a;
+            stroke-width: 10;
+            stroke-linecap: square;
+        }
+
+        .gauge-fill {
+            fill: none;
+            stroke: var(--success);
+            stroke-width: 10;
+            stroke-linecap: square;
+            stroke-dasharray: 314;
+            stroke-dashoffset: 314;
+            transition: stroke-dashoffset 0.8s cubic-bezier(0.16, 1, 0.3, 1), stroke 0.5s ease;
+        }
+
+        .gauge-value {
+            position: absolute;
+            top: 55%;
+            text-align: center;
+        }
+
+        .ratio-num {
+            font-size: 42px;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -0.05em;
+        }
+
+        .ratio-label {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+        }
+
+        .comparison-tray {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border-top: 1px solid var(--border);
+            margin-top: 20px;
+            padding-top: 20px;
+            text-align: center;
+        }
+
+        .comp-stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .comp-stat label {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .comp-stat span {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .comp-stat.delta span {
+            color: var(--success);
+        }
+
+        .glow {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, var(--success) 0%, transparent 70%);
+            filter: blur(50px);
+            opacity: 0.05;
+            z-index: 0;
+            pointer-events: none;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .infinite-badge {
+            background: var(--success);
+            color: var(--bg);
+            font-size: 9px;
+            font-family: var(--font-mono);
+            padding: 2px 6px;
+            font-weight: 800;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="diagnostic-card">
+        <div class="glow" id="status-glow"></div>
+        <header>
+            <h1>Sensitivity Lab</h1>
+            <p class="subtitle">Stress-test your unit economics levers.</p>
+        </header>
+
+        <div class="section-label">Baseline Metrics</div>
+        <div class="inputs-grid">
+            <div class="input-group">
+                <label>Avg ARPU ($)</label>
+                <input type="number" id="base-arpu" value="200">
+            </div>
+            <div class="input-group">
+                <label>CAC ($)</label>
+                <input type="number" id="base-cac" value="1500">
+            </div>
+        </div>
+
+        <div class="section-label">Growth Levers</div>
+        <div class="lever-container">
+            <div class="slider-group">
+                <div class="slider-header">
+                    <span>Base Churn Rate</span>
+                    <span class="val" id="churn-val">5.0%</span>
+                </div>
+                <input type="range" id="lever-churn" min="0.1" max="15" step="0.1" value="5">
+            </div>
+            <div class="slider-group">
+                <div class="slider-header">
+                    <span>Expansion Revenue (MRR %)</span>
+                    <span class="val" id="expansion-val">0.0%</span>
+                </div>
+                <input type="range" id="lever-expansion" min="0" max="10" step="0.1" value="0">
+            </div>
+        </div>
+
+        <div class="gauge-container">
+            <svg class="gauge-svg" viewBox="0 0 120 60">
+                <path class="gauge-bg" d="M10,50 A40,40 0 0,1 110,50" />
+                <path id="gauge-path" class="gauge-fill" d="M10,50 A40,40 0 0,1 110,50" />
+            </svg>
+            <div class="gauge-value">
+                <div class="ratio-num" id="ratio-display">2.7</div>
+                <div class="ratio-label">Simulated LTV : CAC</div>
+                <div id="infinity-label" class="infinite-badge">INFINITY ENGINE</div>
+            </div>
+        </div>
+
+        <div class="comparison-tray">
+            <div class="comp-stat">
+                <label>Net Churn</label>
+                <span id="net-churn-stat">5.0%</span>
+            </div>
+            <div class="comp-stat delta">
+                <label>LTV Shift</label>
+                <span id="ltv-delta">+$0</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const arpuIn = document.getElementById('base-arpu');
+        const cacIn = document.getElementById('base-cac');
+        const churnLever = document.getElementById('lever-churn');
+        const expansionLever = document.getElementById('lever-expansion');
+        
+        const churnValDisp = document.getElementById('churn-val');
+        const expansionValDisp = document.getElementById('expansion-val');
+        const ratioDisp = document.getElementById('ratio-display');
+        const netChurnStat = document.getElementById('net-churn-stat');
+        const ltvDeltaDisp = document.getElementById('ltv-delta');
+        const gaugePath = document.getElementById('gauge-path');
+        const infinityLabel = document.getElementById('infinity-label');
+        const glow = document.getElementById('status-glow');
+
+        function updateLab() {
+            const arpu = parseFloat(arpuIn.value) || 0;
+            const cac = parseFloat(cacIn.value) || 1;
+            const churnBase = parseFloat(churnLever.value);
+            const expansion = parseFloat(expansionLever.value);
+
+            churnValDisp.textContent = `${churnBase.toFixed(1)}%`;
+            expansionValDisp.textContent = `${expansion.toFixed(1)}%`;
+
+            const netChurn = churnBase - expansion;
+            netChurnStat.textContent = `${netChurn.toFixed(1)}%`;
+
+            // Calculate Base LTV (assuming 0 expansion for baseline delta)
+            const baseLtv = arpu / (churnBase / 100);
+            
+            let simLtv, ratio;
+            
+            if (netChurn <= 0) {
+                simLtv = 999999; // Visual representation of infinity
+                ratio = 99;
+                ratioDisp.textContent = "∞";
+                infinityLabel.style.display = "inline-block";
+                ltvDeltaDisp.textContent = "MAX";
+            } else {
+                simLtv = arpu / (netChurn / 100);
+                ratio = simLtv / cac;
+                ratioDisp.textContent = ratio.toFixed(1);
+                infinityLabel.style.display = "none";
+                
+                const delta = simLtv - baseLtv;
+                ltvDeltaDisp.textContent = (delta >= 0 ? "+" : "") + "$" + Math.round(delta).toLocaleString();
+            }
+
+            // Gauge (0-10 ratio mapping)
+            const maxGauge = 10;
+            const percentage = Math.min(ratio / maxGauge, 1);
+            const offset = 314 - (percentage * 314);
+            gaugePath.style.strokeDashoffset = offset;
+
+            // Color logic
+            if (ratio > 5) {
+                gaugePath.style.stroke = 'var(--success)';
+                glow.style.background = 'radial-gradient(circle, var(--success) 0%, transparent 70%)';
+            } else if (ratio > 2) {
+                gaugePath.style.stroke = 'var(--warning)';
+                glow.style.background = 'radial-gradient(circle, var(--warning) 0%, transparent 70%)';
+            } else {
+                gaugePath.style.stroke = 'var(--danger)';
+                glow.style.background = 'radial-gradient(circle, var(--danger) 0%, transparent 70%)';
+            }
+        }
+
+        [arpuIn, cacIn, churnLever, expansionLever].forEach(el => {
+            el.addEventListener('input', updateLab);
+        });
+
+        updateLab();
+    </script>
+</body>
+</html>
+```

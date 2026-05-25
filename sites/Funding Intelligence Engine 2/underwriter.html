@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VALOIS // Risk & Underwriting Calibration Command Center</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #030207;
+            --bg-surface: #0a0813;
+            --bg-surface-elevated: #110e20;
+            --border-subtle: rgba(255, 255, 255, 0.04);
+            --border-muted: rgba(255, 255, 255, 0.08);
+            --border-active: rgba(139, 92, 246, 0.3);
+            
+            --text-primary: #f4f4f7;
+            --text-secondary: #a1a1aa;
+            --text-muted: #52525b;
+            
+            --accent-purple: #8b5cf6;
+            --accent-purple-glow: rgba(139, 92, 246, 0.15);
+            --accent-velvet: #311042;
+            --accent-emerald: #10b981;
+            --accent-emerald-glow: rgba(16, 185, 129, 0.1);
+            --accent-amber: #f59e0b;
+            --accent-rose: #ef4444;
+            --accent-rose-glow: rgba(239, 68, 68, 0.1);
+
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            --transition-smooth: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* White Label Alternative Theme override */
+        body.white-label-mode {
+            --bg-base: #fafafa;
+            --bg-surface: #ffffff;
+            --bg-surface-elevated: #f4f4f5;
+            --border-subtle: rgba(0, 0, 0, 0.05);
+            --border-muted: rgba(0, 0, 0, 0.1);
+            --border-active: rgba(79, 70, 229, 0.4);
+            --text-primary: #09090b;
+            --text-secondary: #71717a;
+            --text-muted: #a1a1aa;
+            --accent-purple: #4f46e5;
+            --accent-purple-glow: rgba(79, 70, 229, 0.08);
+            --accent-velvet: #eef2ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+            transition: var(--transition-smooth);
+            background-image: radial-gradient(circle at 50% 0%, var(--accent-velvet) 0%, transparent 70%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        /* Clean Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-base);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-muted);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-purple);
+        }
+
+        /* Shell & Containers */
+        .app-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Top Bar Navigation */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: rgba(10, 8, 19, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 8px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-purple), #ec4899);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #fff;
+            font-size: 14px;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-title {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: linear-gradient(to right, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-tag {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--accent-rose);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 2px 8px;
+            border-radius: 20px;
+            background: var(--accent-rose-glow);
+        }
+
+        .controls-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-toggle {
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-muted);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-toggle:hover {
+            border-color: var(--accent-purple);
+            background: var(--accent-purple-glow);
+        }
+
+        /* Bento Grid Architecture */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+        }
+
+        .bento-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-muted);
+            border-radius: 16px;
+            padding: 24px;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bento-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-active), transparent);
+            opacity: 0;
+            transition: var(--transition-smooth);
+        }
+
+        .bento-card:hover::before {
+            opacity: 1;
+        }
+
+        .bento-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Card Headers */
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .card-title-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .card-label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--accent-purple);
+            font-weight: 600;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .preview-badge {
+            font-size: 11px;
+            font-weight: 500;
+            background: var(--border-muted);
+            padding: 4px 10px;
+            border-radius: 20px;
+            color: var(--text-secondary);
+        }
+
+        /* Dynamic Controls Sliders & Switches */
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .slider-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .slider-label-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .slider-lbl {
+            color: var(--text-secondary);
+        }
+
+        .slider-val {
+            font-family: var(--font-mono);
+            color: var(--accent-purple);
+            font-weight: 700;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border-muted);
+            outline: none;
+            transition: var(--transition-smooth);
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent-purple);
+            cursor: pointer;
+            box-shadow: 0 0 8px var(--accent-purple);
+            transition: var(--transition-smooth);
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        /* Underwriting Override Toggles */
+        .risk-toggle-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .risk-toggle-table th {
+            text-align: left;
+            padding: 8px 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-muted);
+        }
+
+        .risk-toggle-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-subtle);
+            vertical-align: middle;
+        }
+
+        .risk-info-col {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .risk-title-lbl {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .risk-desc-lbl {
+            font-size: 10px;
+            color: var(--text-secondary);
+        }
+
+        .risk-status-pill {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .pill-strict {
+            background: var(--accent-rose-glow);
+            color: var(--accent-rose);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .pill-bypass {
+            background: var(--accent-emerald-glow);
+            color: var(--accent-emerald);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        /* Compact custom switch button */
+        .toggle-switch-btn {
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-muted);
+            color: var(--text-secondary);
+            font-size: 10px;
+            font-family: var(--font-mono);
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .toggle-switch-btn.active-bypass {
+            background: var(--accent-emerald-glow);
+            border-color: var(--accent-emerald);
+            color: var(--accent-emerald);
+        }
+
+        /* 1. Stress Test Parameters Block (Size 4) */
+        .col-stress-test {
+            grid-column: span 4;
+        }
+
+        /* 2. Weight Calibration & Polar Chart (Size 4) */
+        .col-weights-cal {
+            grid-column: span 4;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* SVG dynamic weight chart */
+        .radar-svg-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 16px 0;
+            position: relative;
+        }
+
+        .radar-svg {
+            width: 160px;
+            height: 160px;
+        }
+
+        .radar-poly-bg {
+            fill: rgba(255, 255, 255, 0.01);
+            stroke: var(--border-muted);
+            stroke-width: 1;
+        }
+
+        .radar-poly-val {
+            fill: var(--accent-purple-glow);
+            stroke: var(--accent-purple);
+            stroke-width: 2;
+            transition: var(--transition-smooth);
+        }
+
+        /* 3. Underwriting Override Logic (Size 4) */
+        .col-overrides {
+            grid-column: span 4;
+        }
+
+        /* 4. Interactive Simulation Sandbox & Decision Auditor (Size 12) */
+        .col-sim-sandbox {
+            grid-column: span 12;
+        }
+
+        .sandbox-table-wrapper {
+            overflow-x: auto;
+            margin-top: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border-muted);
+            background: var(--bg-surface-elevated);
+        }
+
+        .sandbox-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .sandbox-table th {
+            background: rgba(10, 8, 19, 0.6);
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 1px;
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-muted);
+        }
+
+        .sandbox-table td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-subtle);
+            vertical-align: middle;
+        }
+
+        .sandbox-table tr:hover {
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .score-trend-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .score-pill-badge {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 6px;
+            min-width: 44px;
+            text-align: center;
+        }
+
+        .score-down {
+            color: var(--accent-rose);
+            background: var(--accent-rose-glow);
+            border: 1px solid rgba(239, 68, 68, 0.15);
+        }
+
+        .score-stable {
+            color: var(--accent-emerald);
+            background: var(--accent-emerald-glow);
+            border: 1px solid rgba(16, 185, 129, 0.15);
+        }
+
+        .pathways-cell {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .pathway-tag {
+            font-size: 11px;
+            font-weight: 500;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-muted);
+            padding: 4px 8px;
+            border-radius: 6px;
+            color: var(--text-primary);
+        }
+
+        /* 5. Live Policy Auditor Logs (Size 12) */
+        .col-audit-log {
+            grid-column: span 12;
+        }
+
+        .audit-terminal-wrapper {
+            background: #020104;
+            border: 1px solid var(--border-muted);
+            border-radius: 12px;
+            padding: 16px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: #34d399; /* Terminal green */
+            max-height: 250px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .audit-line {
+            line-height: 1.5;
+            display: flex;
+            gap: 12px;
+        }
+
+        .audit-timestamp {
+            color: var(--text-muted);
+            min-width: 80px;
+        }
+
+        .audit-tag-success {
+            color: var(--accent-emerald);
+        }
+
+        .audit-tag-warn {
+            color: var(--accent-amber);
+        }
+
+        .audit-tag-fail {
+            color: var(--accent-rose);
+        }
+
+        /* Internal Debug Drawer Button & Panel */
+        .debug-trigger-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #000;
+            color: #fff;
+            border: 1px solid #222;
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            cursor: pointer;
+            z-index: 999;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .debug-drawer {
+            position: fixed;
+            bottom: -600px;
+            left: 0;
+            right: 0;
+            height: 500px;
+            background: #06050a;
+            border-top: 1px solid #1c1830;
+            z-index: 1000;
+            box-shadow: 0 -12px 40px rgba(0,0,0,0.8);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            font-family: var(--font-mono);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .debug-drawer.open {
+            transform: translateY(-600px);
+        }
+
+        .debug-header {
+            padding: 16px 24px;
+            background: #0d0b16;
+            border-bottom: 1px solid #1c1830;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .debug-title {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--accent-purple);
+        }
+
+        .debug-body {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            font-size: 11px;
+            color: #10b981; /* Terminal green */
+            background: #020104;
+        }
+
+        .close-debug-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* Layout & Utilities */
+        .flex-btn-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .btn-primary {
+            background: var(--accent-purple);
+            color: #fff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-family: var(--font-sans);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 4px 15px var(--accent-purple-glow);
+            filter: brightness(1.1);
+        }
+
+        .btn-secondary {
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-muted);
+            color: var(--text-primary);
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-family: var(--font-sans);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-purple);
+        }
+
+        /* SVG Glow */
+        .glow-purple {
+            filter: drop-shadow(0px 0px 4px var(--accent-purple));
+        }
+
+        /* Footnotes Compliance */
+        footer {
+            margin-top: 24px;
+            border-top: 1px solid var(--border-subtle);
+            padding: 24px 0 60px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .compliance-text {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 1024px) {
+            .col-stress-test, .col-weights-cal, .col-overrides {
+                grid-column: span 12;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Navigation Header -->
+    <header>
+        <div class="brand">
+            <div class="brand-logo">V</div>
+            <div class="brand-title">Valois Risk</div>
+            <div class="brand-tag">Risk Sandbox // Mode Active</div>
+        </div>
+        <div class="controls-group">
+            <button class="btn-toggle" onclick="resetCalibration()">
+                <span>🔄</span> Reset Calibration
+            </button>
+            <button class="btn-toggle" onclick="goToSystemWorkspace()">
+                <span>←</span> Back to Live Portal
+            </button>
+        </div>
+    </header>
+
+    <!-- Bento Analytics View Grid -->
+    <div class="bento-grid">
+        
+        <!-- Bento Card 1: Macro Stress Test Engine -->
+        <div class="bento-card col-stress-test">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <div class="card-label">Portfolio Stress Testing</div>
+                    <div class="card-title">Macroeconomic Shock Engine</div>
+                </div>
+                <span class="preview-badge" style="color: var(--accent-rose);">Simulation Node</span>
+            </div>
+
+            <p class="risk-desc-lbl" style="margin-bottom: 16px; color: var(--text-secondary);">
+                Introduce simulated macroeconomic headwinds and stress events directly into the underwriting score logic to gauge portfolio default resistance.
+            </p>
+
+            <div class="slider-group">
+                <!-- Stress Variable 1: Interest Rate Shift -->
+                <div class="slider-item">
+                    <div class="slider-label-row">
+                        <span class="slider-lbl">Base Rate Tightening (Bps)</span>
+                        <span class="slider-val" id="rateShiftVal">+0 Bps</span>
+                    </div>
+                    <input type="range" id="rateShiftSlider" min="0" max="600" step="50" value="0" oninput="runRecalculation()">
+                </div>
+
+                <!-- Stress Variable 2: Revenue Compression Haircut -->
+                <div class="slider-item">
+                    <div class="slider-label-row">
+                        <span class="slider-lbl">Systemic Revenue Haircut</span>
+                        <span class="slider-val" id="revCompressionVal">0% Drop</span>
+                    </div>
+                    <input type="range" id="revCompressionSlider" min="0" max="40" step="5" value="0" oninput="runRecalculation()">
+                </div>
+
+                <!-- Stress Variable 3: Collateral Discount Factor -->
+                <div class="slider-item">
+                    <div class="slider-label-row">
+                        <span class="slider-lbl">Collateral Valuation Discount</span>
+                        <span class="slider-val" id="collateralDiscountVal">0% Cut</span>
+                    </div>
+                    <input type="range" id="collateralDiscountSlider" min="0" max="50" step="5" value="0" oninput="runRecalculation()">
+                </div>
+            </div>
+        </div>
+
+        <!-- Bento Card 2: Recommendation Weight Tuning -->
+        <div class="bento-card col-weights-cal">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <div class="card-label">Weight Calibration</div>
+                    <div class="card-title">The Five Cs of Credit</div>
+                </div>
+                <span class="preview-badge">Total: 100%</span>
+            </div>
+
+            <div class="radar-svg-container">
+                <svg class="radar-svg" viewBox="0 0 200 200">
+                    <!-- Background polar grid circles -->
+                    <circle cx="100" cy="100" r="80" stroke="var(--border-muted)" stroke-width="1" fill="none"></circle>
+                    <circle cx="100" cy="100" r="50" stroke="var(--border-subtle)" stroke-width="1" fill="none"></circle>
+                    <circle cx="100" cy="100" r="20" stroke="var(--border-subtle)" stroke-width="1" fill="none"></circle>
+                    
+                    <!-- Star-burst structural lines from center to outer points -->
+                    <!-- Points at: (100, 20), (176, 75), (147, 165), (53, 165), (24, 75) -->
+                    <line x1="100" y1="100" x2="100" y2="20" stroke="var(--border-subtle)" stroke-width="1"></line>
+                    <line x1="100" y1="100" x2="176" y2="75" stroke="var(--border-subtle)" stroke-width="1"></line>
+                    <line x1="100" y1="100" x2="147" y2="165" stroke="var(--border-subtle)" stroke-width="1"></line>
+                    <line x1="100" y1="100" x2="53" y2="165" stroke="var(--border-subtle)" stroke-width="1"></line>
+                    <line x1="100" y1="100" x2="24" y2="75" stroke="var(--border-subtle)" stroke-width="1"></line>
+
+                    <!-- Real-time updated weights path polygon shape -->
+                    <polygon class="radar-poly-val" id="radarPolygon" points=""></polygon>
+                </svg>
+            </div>
+
+            <div class="slider-group" style="margin-bottom: 0;">
+                <!-- Capital Slider -->
+                <div class="slider-item">
+                    <div class="slider-label-row">
+                        <span class="slider-lbl">Capital (Cap Struct)</span>
+                        <span class="slider-val" id="weightCapitalVal">20%</span>
+                    </div>
+                    <input type="range" id="weightCapitalSlider" min="5" max="45" step="1" value="20" oninput="balanceWeights('capital')">
+                </div>
+
+                <!-- Capacity Slider -->
+                <div class="slider-item">
+                    <div class="slider-label-row">
+                        <span class="slider-lbl">Capacity (DSCR & Burn)</span>
+                        <span class="slider-val" id="weightCapacityVal">20%</span>
+                    </div>
+                    <input type="range" id="weightCapacitySlider" min="5" max="45" step="1" value="20" oninput="balanceWeights('capacity')">
+                </div>
+            </div>
+        </div>
+
+        <!-- Bento Card 3: Systemic Underwriting Risk Overrides -->
+        <div class="bento-card col-overrides">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <div class="card-label">Risk Overrides</div>
+                    <div class="card-title">Trigger Bypass Panel</div>
+                </div>
+                <span class="preview-badge" style="color: var(--accent-amber);">Compliance Strict</span>
+            </div>
+
+            <p class="risk-desc-lbl" style="margin-bottom: 12px; color: var(--text-secondary);">
+                Calibrate strict compliance flags. Force engine to bypass or apply strict penalties on custom risk indicators.
+            </p>
+
+            <table class="risk-toggle-table">
+                <thead>
+                    <tr>
+                        <th>Risk Variable Name</th>
+                        <th style="width: 80px; text-align: center;">Status</th>
+                        <th style="width: 80px; text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="riskOverrideTbody">
+                    <!-- Dynamic Rows mapped from risk config variables -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Bento Card 4: Interactive Calibration Simulation Sandbox Matrix -->
+        <div class="bento-card col-sim-sandbox">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <div class="card-label">Simulated Live Portfolio</div>
+                    <div class="card-title">Real-time Sandbox Calibration Matrix</div>
+                </div>
+                <span class="preview-badge" style="background: var(--accent-purple-glow); color: var(--accent-purple);">Audit Stream Active</span>
+            </div>
+
+            <p class="vertical-desc">
+                The matrix shows how borrower archetypes re-rate and clear the matched institutional products under current custom weighting, macro stresses, and risk trigger override models.
+            </p>
+
+            <div class="sandbox-table-wrapper">
+                <table class="sandbox-table">
+                    <thead>
+                        <tr>
+                            <th>Borrower Persona Profile</th>
+                            <th style="width: 130px; text-align: center;">Baseline Score</th>
+                            <th style="width: 140px; text-align: center;">Simulated Score</th>
+                            <th style="width: 140px; text-align: right;">Max Cap. Impact</th>
+                            <th>Matched Pathways Under Stress</th>
+                            <th style="width: 120px; text-align: right;">Policy Route</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sandboxMatrixBody">
+                        <!-- Dynamic generated rows based on recalculations -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="flex-btn-row">
+                <button class="btn-primary" onclick="exportConfig()">Generate Export Configuration Payload</button>
+                <button class="btn-secondary" onclick="simulateAutomatedStressRun()">Run Monte Carlo Wave</button>
+            </div>
+        </div>
+
+        <!-- Bento Card 5: Decision Tree Logic Auditor Logs -->
+        <div class="bento-card col-audit-log">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <div class="card-label">Policy Trace Engine</div>
+                    <div class="card-title">Underwriting Logic Execution Trace & Core Audit Stream</div>
+                </div>
+                <button class="btn-toggle" style="padding: 4px 10px;" onclick="clearAuditTerminal()">Clear Console</button>
+            </div>
+
+            <div class="audit-terminal-wrapper" id="terminalLog">
+                <!-- Simulated audit lines -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footnotes Compliance Area -->
+    <footer>
+        <p class="compliance-text">
+            * VALOIS Calibration Sandboxes run mathematical simulations on localized client environments. Overrides, macro weight revisions, and systemic trigger bypasses represent model assumptions and stress calculations built to evaluate institutional debt structures under Basel IV stress benchmarks. Configuration payload outputs do not modify real-time institutional lines without direct master auditor approval.
+        </p>
+        <div class="compliance-row" style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted);">
+            <span>© Valois Risk Systems. Secured Terminal Node. Private & Compliance Officer Access Only.</span>
+            <span>Decision Node Hash ID: TLS-v1.3-SEC-BYPASS-NODE</span>
+        </div>
+    </footer>
+</div>
+
+<!-- Analyst Drawer Toggle -->
+<button class="debug-trigger-btn" onclick="toggleDebugDrawer()">
+    <span>⚡</span> VIEW JSON CONFIG & POLICY FILE
+</button>
+
+<!-- Bottom Analyst Drawer (Debug Interface) -->
+<div class="debug-drawer" id="analystDrawer">
+    <div class="debug-header">
+        <div class="debug-title">Policy Deployment Configurations Payload</div>
+        <button class="close-debug-btn" onclick="toggleDebugDrawer()">✕</button>
+    </div>
+    <div class="debug-body" id="debugContent">
+        <!-- Renders current policy file dynamically -->
+    </div>
+</div>
+
+<script>
+    // System Data Models mirroring the base component data architecture to preserve exact functional integrity
+    const base_borrower_archetypes = {
+        "saas_series_a": {
+            "name": "SaaS Platform (Series A)",
+            "arr": 4500000,
+            "mrr": 375000,
+            "runway_months": 18,
+            "dscr": 1.45,
+            "ebitda": -250000,
+            "baseScore": 84,
+            "risk_triggers": ["negative_ebitda", "elevated_cac_payback"],
+            "dimensions": {
+                "capital": 88,
+                "capacity": 79,
+                "collateral": 55,
+                "character": 92,
+                "conditions": 85
+            }
+        },
+        "ecom_scaleup": {
+            "name": "E-Commerce Velocity Scaleup",
+            "arr": 8200000,
+            "mrr": 680000,
+            "runway_months": 24,
+            "dscr": 1.20,
+            "ebitda": 150000,
+            "baseScore": 76,
+            "risk_triggers": ["inventory_concentration", "supply_chain_exposure"],
+            "dimensions": {
+                "capital": 65,
+                "capacity": 85,
+                "collateral": 70,
+                "character": 80,
+                "conditions": 75
+            }
+        },
+        "heavy_logistics": {
+            "name": "Apex Cargo & Logistics",
+            "arr": 15400000,
+            "mrr": 1280000,
+            "runway_months": 48,
+            "dscr": 2.15,
+            "ebitda": 1250000,
+            "baseScore": 92,
+            "risk_triggers": ["high_asset_maintenance"],
+            "dimensions": {
+                "capital": 95,
+                "capacity": 94,
+                "collateral": 98,
+                "character": 90,
+                "conditions": 82
+            }
+        },
+        "mainstreet_med": {
+            "name": "Core-Surgical Care Group",
+            "arr": 3200000,
+            "mrr": 266000,
+            "runway_months": 60,
+            "dscr": 1.80,
+            "ebitda": 450000,
+            "baseScore": 88,
+            "risk_triggers": [],
+            "dimensions": {
+                "capital": 85,
+                "capacity": 90,
+                "collateral": 80,
+                "character": 95,
+                "conditions": 90
+            }
+        }
+    };
+
+    // Keep active state clone of base archetypes to calculate stresses
+    let borrower_archetypes = JSON.parse(JSON.stringify(base_borrower_archetypes));
+
+    // Institutional Pathways definitions
+    const routing_products = [
+        { "id": "prod_venture_line", "name": "Venture Debt Runway Line", "min_score": 80, "min_arr": 3000000, "leverage_ratio": 0.45, "base_apr": 8.5 },
+        { "id": "prod_loc_secured", "name": "Asset-Backed Credit Facility", "min_score": 75, "min_arr": 1000000, "leverage_ratio": 0.35, "base_apr": 6.9 },
+        { "id": "prod_rev_debt", "name": "Revenue-Based Non-Dilutive Bond", "min_score": 70, "min_arr": 1500000, "leverage_ratio": 0.30, "base_apr": 9.2 },
+        { "id": "prod_growth_cash", "name": "Dynamic Working Capital Advance", "min_score": 65, "min_arr": 1000000, "leverage_ratio": 0.25, "base_apr": 11.0 }
+    ];
+
+    // Underwriting bypass variables state
+    let risk_overrides = {
+        "negative_ebitda": { "name": "Negative EBITDA Penalties", "desc": "Bypasses high risk scores triggers for cash-burn startup profiles.", "bypass": false },
+        "elevated_cac_payback": { "name": "Elevated CAC Playback Threshold", "desc": "Relaxes metrics bounds on Customer Acquisition costs.", "bypass": false },
+        "inventory_concentration": { "name": "Inventory Node Concentration", "desc": "Allows routing matches despite physical asset concentration levels.", "bypass": false },
+        "supply_chain_exposure": { "name": "Customs Supply Exposure", "desc": "Safeguards against ocean freight bottlenecks rules constraint.", "bypass": false },
+        "high_asset_maintenance": { "name": "CAPEX Forecast Triggers", "desc": "Prevents maintenance overhead forecast limits from penalizing scoring models.", "bypass": false }
+    };
+
+    // Five Cs Weights configuration (default 20% flat)
+    let credit_weights = {
+        "capital": 20,
+        "capacity": 20,
+        "collateral": 20,
+        "character": 20,
+        "conditions": 20
+    };
+
+    // System Startup
+    window.onload = () => {
+        renderRiskOverridePanel();
+        runRecalculation();
+        addTerminalLog("SYSTEM INITIALIZED", "Loaded risk calibration profiles successfully. Ready for Stress execution.", "success");
+    };
+
+    // Function: Balanced Adjusting Weights (The 5 weights must perfectly aggregate to 100%)
+    function balanceWeights(changedKey) {
+        const changedValue = parseInt(document.getElementById(`weightCapitalSlider`).value);
+        
+        // If changed capital, dynamically re-estimate remaining weights
+        if (changedKey === 'capital') {
+            credit_weights.capital = changedValue;
+            document.getElementById("weightCapitalVal").textContent = `${changedValue}%`;
+        } else if (changedKey === 'capacity') {
+            const changedCapValue = parseInt(document.getElementById(`weightCapacitySlider`).value);
+            credit_weights.capacity = changedCapValue;
+            document.getElementById("weightCapacityVal").textContent = `${changedCapValue}%`;
+        }
+
+        // Re-scale variables smoothly so summary perfectly reaches 100%
+        const currentSumOfFixed = credit_weights.capital + credit_weights.capacity;
+        const remainingToDistribute = 100 - currentSumOfFixed;
+
+        // Distribute remainder equally over collateral, character, conditions
+        const countRemainingKeys = 3;
+        const equalPart = Math.floor(remainingToDistribute / countRemainingKeys);
+        
+        credit_weights.collateral = equalPart;
+        credit_weights.character = equalPart;
+        credit_weights.conditions = remainingToDistribute - (equalPart * 2); // Handles absolute alignment remainder
+
+        updateRadarPolygon();
+        runRecalculation();
+    }
+
+    // Update Radar Graph Coordinates Dynamic Vector Drawing
+    function updateRadarPolygon() {
+        // Base center coordinate (100, 100), scale size factor = 0.8
+        const cx = 100;
+        const cy = 100;
+        const maxRadius = 80;
+
+        // Five axis angles in radians: Capital, Capacity, Collateral, Character, Conditions
+        const angles = [
+            -Math.PI / 2,                // Top (Capital)
+            -Math.PI / 2 + (2 * Math.PI) / 5, // Top-Right (Capacity)
+            -Math.PI / 2 + (4 * Math.PI) / 5, // Bottom-Right (Collateral)
+            -Math.PI / 2 + (6 * Math.PI) / 5, // Bottom-Left (Character)
+            -Math.PI / 2 + (8 * Math.PI) / 5  // Top-Left (Conditions)
+        ];
+
+        const wKeys = ["capital", "capacity", "collateral", "character", "conditions"];
+        let pointsString = "";
+
+        angles.forEach((angle, idx) => {
+            const weightVal = credit_weights[wKeys[idx]];
+            // Max value assumed is 45% for radius rendering
+            const ratio = Math.min(Math.max(weightVal / 45, 0.1), 1.0);
+            const r = ratio * maxRadius;
+            const px = cx + r * Math.cos(angle);
+            const py = cy + r * Math.sin(angle);
+            pointsString += `${px.toFixed(1)},${py.toFixed(1)} `;
+        });
+
+        document.getElementById("radarPolygon").setAttribute("points", pointsString.trim());
+    }
+
+    // Render Risk Override Settings List View
+    function renderRiskOverridePanel() {
+        const tbody = document.getElementById("riskOverrideTbody");
+        tbody.innerHTML = "";
+
+        for (const [key, item] of Object.entries(risk_overrides)) {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>
+                    <div class="risk-info-col">
+                        <span class="risk-title-lbl">${item.name}</span>
+                        <span class="risk-desc-lbl">${item.desc}</span>
+                    </div>
+                </td>
+                <td style="text-align: center;">
+                    <span class="risk-status-pill ${item.bypass ? 'pill-bypass' : 'pill-strict'}" id="riskPill-${key}">
+                        ${item.bypass ? 'Bypassed' : 'Strict'}
+                    </span>
+                </td>
+                <td style="text-align: right;">
+                    <button class="toggle-switch-btn ${item.bypass ? 'active-bypass' : ''}" 
+                            id="riskBtn-${key}" 
+                            onclick="toggleRiskBypass('${key}')">
+                        ${item.bypass ? 'Disable Bypass' : 'Force Bypass'}
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        }
+    }
+
+    // Toggle specific systemic trigger
+    function toggleRiskBypass(key) {
+        risk_overrides[key].bypass = !risk_overrides[key].bypass;
+        
+        // Update styling instantly
+        const btn = document.getElementById(`riskBtn-${key}`);
+        const pill = document.getElementById(`riskPill-${key}`);
+        
+        if (risk_overrides[key].bypass) {
+            btn.classList.add("active-bypass");
+            btn.textContent = "Disable Bypass";
+            pill.className = "risk-status-pill pill-bypass";
+            pill.textContent = "Bypassed";
+            addTerminalLog("POLICY REVISED", `Audit Route Flag [${key.toUpperCase()}] status: BYPASSED. Matching bounds relaxed.`, "warn");
+        } else {
+            btn.classList.remove("active-bypass");
+            btn.textContent = "Force Bypass";
+            pill.className = "risk-status-pill pill-strict";
+            pill.textContent = "Strict";
+            addTerminalLog("POLICY REVISED", `Audit Route Flag [${key.toUpperCase()}] status: RESTORED TO STRICT COMPLIANCE.`, "success");
+        }
+        
+        runRecalculation();
+    }
+
+    // Dynamic Stress Core Engine
+    function runRecalculation() {
+        // Collect slider inputs
+        const rateBpsShift = parseInt(document.getElementById("rateShiftSlider").value);
+        document.getElementById("rateShiftVal").textContent = `+${rateBpsShift} Bps`;
+
+        const revDropPct = parseInt(document.getElementById("revCompressionSlider").value);
+        document.getElementById("revCompressionVal").textContent = `${revDropPct}% Drop`;
+
+        const collateralCutPct = parseInt(document.getElementById("collateralDiscountSlider").value);
+        document.getElementById("collateralDiscountVal").textContent = `${collateralCutPct}% Cut`;
+
+        const tbody = document.getElementById("sandboxMatrixBody");
+        tbody.innerHTML = "";
+
+        // Reset system structures
+        borrower_archetypes = JSON.parse(JSON.stringify(base_borrower_archetypes));
+
+        // Process stress impacts across every active archetype
+        for (const [key, arc] of Object.entries(borrower_archetypes)) {
+            // Apply structural revenue stress drop directly to dimensions & limits
+            const scaleFactor = (100 - revDropPct) / 100;
+            arc.arr = Math.round(arc.arr * scaleFactor);
+            arc.mrr = Math.round(arc.mrr * scaleFactor);
+            arc.dscr = Math.max(arc.dscr * scaleFactor, 0.4).toFixed(2);
+            
+            // Adjust credit score dimensions based on weighted matrix
+            // Dynamic calculations factoring custom user weights
+            let rawDimScoreSum = 0;
+            const currentDimensions = arc.dimensions;
+
+            // Apply macro constraints directly into individual dimensions
+            currentDimensions.capacity = Math.max(currentDimensions.capacity - Math.round(revDropPct * 0.8), 20);
+            currentDimensions.collateral = Math.max(currentDimensions.collateral - Math.round(collateralCutPct * 0.9), 10);
+            
+            // Conditions dimension takes severe impact from Interest Rate Shifting
+            const rateImpactPoints = Math.round(rateBpsShift / 100) * 3;
+            currentDimensions.conditions = Math.max(currentDimensions.conditions - rateImpactPoints, 15);
+
+            // Compute weighted mathematical baseline
+            let finalWeightedScore = 0;
+            for (const [dimKey, dimVal] of Object.entries(currentDimensions)) {
+                finalWeightedScore += (dimVal * (credit_weights[dimKey] / 100));
+            }
+            
+            finalWeightedScore = Math.round(finalWeightedScore);
+
+            // Apply compliance logic deduction for active risks
+            let activePenaltiesCount = 0;
+            arc.risk_triggers.forEach(riskKey => {
+                if (risk_overrides[riskKey] && !risk_overrides[riskKey].bypass) {
+                    // Penalty assessed if compliance flag is unbypassed
+                    activePenaltiesCount++;
+                }
+            });
+
+            // Penalty of 5 points deducted per active strict risk flag
+            finalWeightedScore = Math.max(finalWeightedScore - (activePenaltiesCount * 5), 10);
+
+            // Process route pathways and determine matching compatibility options
+            const matchedList = [];
+            routing_products.forEach(prod => {
+                let routeAllowed = true;
+
+                // Threshold 1: Score compliance checks
+                if (finalWeightedScore < prod.min_score) routeAllowed = false;
+                // Threshold 2: Size capability
+                if (arc.arr < prod.min_arr) routeAllowed = false;
+
+                if (routeAllowed) {
+                    // Cost scaling: dynamic interest adjustments
+                    const dynamicAprVal = (prod.base_apr + (rateBpsShift / 100)).toFixed(2);
+                    matchedList.push({
+                        name: prod.name,
+                        capacity: `$${((arc.arr * prod.leverage_ratio) / 1000000).toFixed(2)}M`,
+                        apr: `${dynamicAprVal}%`
+                    });
+                }
+            });
+
+            // Calculate max leverage baseline capacity
+            const baseAggregateMax = Math.round(base_borrower_archetypes[key].arr * 0.45);
+            const stressAggregateMax = Math.round(arc.arr * 0.45);
+            const capacityDiff = stressAggregateMax - baseAggregateMax;
+            const capacityDiffText = capacityDiff < 0 
+                ? `-$${Math.abs(capacityDiff / 1000).toLocaleString()}k` 
+                : `$0`;
+
+            const scoreDiff = finalWeightedScore - arc.baseScore;
+            const scoreClass = scoreDiff < 0 ? "score-down" : "score-stable";
+            const scoreIcon = scoreDiff < 0 ? "▼" : "✓";
+
+            // Populate calibration matrix row
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td style="font-weight: 600;">${arc.name}</td>
+                <td style="text-align: center; font-family: var(--font-mono); color: var(--text-secondary);">${arc.baseScore}</td>
+                <td style="text-align: center;">
+                    <div class="score-trend-indicator" style="justify-content: center;">
+                        <span class="score-pill-badge ${scoreClass}">${finalWeightedScore}</span>
+                        <span style="font-size: 11px; font-weight:700;" class="${scoreClass}">${scoreIcon} ${scoreDiff}</span>
+                    </div>
+                </td>
+                <td style="text-align: right; font-family: var(--font-mono); font-weight:600; color: ${capacityDiff < 0 ? 'var(--accent-rose)' : 'var(--accent-emerald)'};">
+                    ${capacityDiffText}
+                </td>
+                <td>
+                    <div class="pathways-cell" id="paths-${key}">
+                        <!-- Dynamically generated paths indicators -->
+                    </div>
+                </td>
+                <td style="text-align: right;">
+                    <span class="risk-status-pill ${finalWeightedScore >= 80 ? 'pill-bypass' : 'pill-strict'}">
+                        ${finalWeightedScore >= 80 ? 'Approved Fast-Track' : 'Manual Underwrite'}
+                    </span>
+                </td>
+            `;
+
+            tbody.appendChild(tr);
+
+            // Populate tags inside pathways container
+            const pathsCell = document.getElementById(`paths-${key}`);
+            if (matchedList.length === 0) {
+                pathsCell.innerHTML = `<span style="font-size: 11px; color: var(--accent-rose); font-weight:500;">❌ Hard Fail: Zero Route Matches</span>`;
+            } else {
+                matchedList.forEach(m => {
+                    pathsCell.innerHTML += `<span class="pathway-tag" title="APR Cost: ${m.apr}">${m.name} (${m.capacity})</span>`;
+                });
+            }
+        }
+
+        // Output current policy state to debug panel
+        updatePolicyPayloadOutput();
+    }
+
+    // Terminal Logger Utilities
+    function addTerminalLog(title, msg, type = "success") {
+        const terminal = document.getElementById("terminalLog");
+        const date = new Date();
+        const timeStr = date.toTimeString().split(' ')[0] + '.' + String(date.getMilliseconds()).padStart(3, '0');
+
+        let tagClass = "audit-tag-success";
+        if (type === "warn") tagClass = "audit-tag-warn";
+        if (type === "fail") tagClass = "audit-tag-fail";
+
+        const line = document.createElement("div");
+        line.className = "audit-line";
+        line.innerHTML = `
+            <span class="audit-timestamp">[${timeStr}]</span>
+            <span class="${tagClass}">[${title}]</span>
+            <span>${msg}</span>
+        `;
+        terminal.appendChild(line);
+        terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    function clearAuditTerminal() {
+        document.getElementById("terminalLog").innerHTML = "";
+    }
+
+    // Reset System sandbox variables to standard defaults
+    function resetCalibration() {
+        document.getElementById("rateShiftSlider").value = 0;
+        document.getElementById("revCompressionSlider").value = 0;
+        document.getElementById("collateralDiscountSlider").value = 0;
+
+        document.getElementById("weightCapitalSlider").value = 20;
+        document.getElementById("weightCapacitySlider").value = 20;
+
+        credit_weights = {
+            "capital": 20,
+            "capacity": 20,
+            "collateral": 20,
+            "character": 20,
+            "conditions": 20
+        };
+
+        // Reset Risk Overrides bypass values back to strict
+        for (const key of Object.keys(risk_overrides)) {
+            risk_overrides[key].bypass = false;
+        }
+
+        renderRiskOverridePanel();
+        updateRadarPolygon();
+        runRecalculation();
+
+        addTerminalLog("SYSTEM CALIBRATION", "Restored global weights to flat 20%. Macro stress sliders cleared.", "success");
+    }
+
+    // Simulate Automated Iterative Stressing Runs
+    function simulateAutomatedStressRun() {
+        addTerminalLog("MONTE CARLO EXEC", "Deploying dynamic iterative portfolio stress sweeps on base models...", "warn");
+        
+        let cycle = 0;
+        const interval = setInterval(() => {
+            if (cycle >= 5) {
+                clearInterval(interval);
+                addTerminalLog("MONTE CARLO COMPLETE", "Simulations sweeps finalized. Risk variables stabilized successfully.", "success");
+            } else {
+                // Set randomized parameters
+                document.getElementById("rateShiftSlider").value = Math.floor(Math.random() * 8) * 50;
+                document.getElementById("revCompressionSlider").value = Math.floor(Math.random() * 5) * 5;
+                document.getElementById("collateralDiscountSlider").value = Math.floor(Math.random() * 4) * 10;
+                runRecalculation();
+                cycle++;
+            }
+        }, 300);
+    }
+
+    // Navigation fallback
+    function goToSystemWorkspace() {
+        window.history.back();
+    }
+
+    // Policy JSON compiler & output view
+    function updatePolicyPayloadOutput() {
+        const payload = {
+            "policy_id": `VALOIS-CONF-POL-${Math.random().toString(36).substr(2, 6).toUpperCase()}`,
+            "timestamp": new Date().toISOString(),
+            "underwriting_rules_state": {
+                "active_weights": credit_weights,
+                "bypassed_strict_risk_flags": Object.keys(risk_overrides).filter(k => risk_overrides[k].bypass)
+            },
+            "macro_stresses_calibrated": {
+                "system_rate_shift_bps": parseInt(document.getElementById("rateShiftSlider").value),
+                "revenue_stress_haircut_pct": parseInt(document.getElementById("revCompressionSlider").value),
+                "collateral_discount_pct": parseInt(document.getElementById("collateralDiscountSlider").value)
+            }
+        };
+
+        const debugContainer = document.getElementById("debugContent");
+        debugContainer.innerHTML = `
+            <div style="color: #a1a1aa; margin-bottom: 12px;">// Compiled Calibration Policy File Payload Ready for Deployment</div>
+            <pre style="color: #c084fc;">${JSON.stringify(payload, null, 2)}</pre>
+        `;
+    }
+
+    // Trigger explicit alert / copy functionality
+    function exportConfig() {
+        const payloadText = document.getElementById("debugContent").innerText;
+        alert("Configuration payload generated successfully!\n\nCheck bottom JSON console for master deployment payload block.");
+        toggleDebugDrawer();
+    }
+
+    // UI Drawer state management
+    function toggleDebugDrawer() {
+        const drawer = document.getElementById("analystDrawer");
+        drawer.classList.toggle("open");
+    }
+</script>
+
+</body>
+</html>

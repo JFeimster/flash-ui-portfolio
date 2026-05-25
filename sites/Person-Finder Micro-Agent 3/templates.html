@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prism Architect | Template Engine</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Inter:wght@300;400;600&display=swap');
+
+        :root {
+            --bg-deep: #05070a;
+            --glass: rgba(15, 20, 28, 0.85);
+            --accent-cyan: #00f2ff;
+            --accent-magenta: #ff00ea;
+            --accent-lime: #bcff00;
+            --border-glow: rgba(0, 242, 255, 0.2);
+            --text-main: #e0e6ed;
+            --text-dim: #7a869a;
+            --prism-gradient: linear-gradient(135deg, #00f2ff 0%, #ff00ea 50%, #bcff00 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg-deep);
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 32px 32px;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .prism-container {
+            width: 1000px;
+            max-width: 95vw;
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 4px;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .prism-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--prism-gradient);
+            z-index: 10;
+        }
+
+        .header {
+            padding: 24px 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 24px;
+            height: 24px;
+            background: var(--prism-gradient);
+            clip-path: polygon(0% 15%, 15% 0%, 100% 0%, 100% 85%, 85% 100%, 0% 100%);
+        }
+
+        .brand-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        .persona-selector {
+            display: flex;
+            gap: 8px;
+        }
+
+        .persona-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-dim);
+            padding: 6px 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .persona-btn.active {
+            border-color: var(--accent-magenta);
+            color: var(--accent-magenta);
+            background: rgba(255, 0, 234, 0.05);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            height: 580px;
+        }
+
+        .sidebar {
+            padding: 32px;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .editor-panel {
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        .panel-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .variable-chip {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 2px solid var(--accent-cyan);
+            margin-bottom: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+        }
+
+        .variable-val {
+            color: var(--accent-cyan);
+        }
+
+        .template-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 24px;
+            flex-grow: 1;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-main);
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .placeholder {
+            color: var(--accent-lime);
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(188, 255, 0, 0.1);
+            padding: 0 4px;
+            border-radius: 2px;
+        }
+
+        .source-tag {
+            display: inline-block;
+            margin-top: 16px;
+            padding: 4px 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            background: rgba(0, 242, 255, 0.1);
+            color: var(--accent-cyan);
+            border: 1px solid var(--accent-cyan);
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 16px;
+        }
+
+        .btn-primary {
+            flex: 1;
+            background: transparent;
+            border: 1px solid var(--accent-magenta);
+            color: var(--accent-magenta);
+            padding: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-magenta);
+            color: white;
+            box-shadow: 0 0 20px rgba(255, 0, 234, 0.3);
+        }
+
+        .btn-secondary {
+            flex: 1;
+            background: transparent;
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-deep);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+        }
+
+        .subject-line {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--accent-cyan);
+            margin-bottom: 12px;
+        }
+
+        .subject-line::before {
+            content: 'SUBJECT: ';
+            color: var(--text-dim);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body>
+
+    <div class="prism-container">
+        <header class="header">
+            <div class="brand">
+                <div class="brand-logo"></div>
+                <h1 class="brand-name">Template Architect</h1>
+            </div>
+            <div class="persona-selector">
+                <button class="persona-btn active" onclick="switchPersona('founder', this)">Founder / C-Level</button>
+                <button class="persona-btn" onclick="switchPersona('manager', this)">Mid-Management</button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <aside class="sidebar">
+                <div>
+                    <label class="panel-label">Target Metadata</label>
+                    <div class="variable-chip">
+                        <span>NAME</span>
+                        <span class="variable-val" id="varName">Sarah Jenkins</span>
+                    </div>
+                    <div class="variable-chip">
+                        <span>ENTITY</span>
+                        <span class="variable-val" id="varComp">Acme Dynamics</span>
+                    </div>
+                    <div class="variable-chip">
+                        <span>SOURCE</span>
+                        <span class="variable-val" id="varSource">LinkedIn / SOS</span>
+                    </div>
+                    <div class="variable-chip">
+                        <span>LOCUS</span>
+                        <span class="variable-val">Austin, TX</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: auto;">
+                    <label class="panel-label">Instructional Prompt</label>
+                    <p style="font-size: 11px; color: var(--text-dim); line-height: 1.4;">
+                        Architecting sequence based on organizational hierarchy. 
+                        Adjusting tone for authority-level: <span style="color: var(--accent-magenta)">HIGH</span>.
+                    </p>
+                </div>
+            </aside>
+
+            <section class="editor-panel">
+                <div class="subject-line" id="emailSubject">Strategic Growth Inquiry: <span class="placeholder">Acme Dynamics</span></div>
+                
+                <div class="template-card" id="templateBody">
+                    Hi <span class="placeholder">Sarah</span>,<br><br>
+                    I was tracking recent activity regarding <span class="placeholder">Acme Dynamics</span> and noticed your profile via <span class="placeholder">LinkedIn / SOS</span>. <br><br>
+                    As a Founder, you're likely focused on the macro-level efficiency of your operations in Austin. I’ve developed a specialized framework that aligns specifically with the logistics sector you’re currently dominating.<br><br>
+                    Would you be open to a brief brief sync on how we can optimize your current contact node extraction processes?<br><br>
+                    Best regards,<br>
+                    [Agent Prism]
+                </div>
+
+                <div class="source-tag">ALGORITHM: NEURAL PERSONA MATCH v4.2</div>
+
+                <div class="action-bar">
+                    <button class="btn-secondary" onclick="copyTemplate()">Copy to Clipboard</button>
+                    <button class="btn-primary">Push to CRM</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const templates = {
+            founder: {
+                subject: "Strategic Growth Inquiry: {{company}}",
+                body: "Hi <span class='placeholder'>{{name}}</span>,<br><br>I was tracking recent activity regarding <span class='placeholder'>{{company}}</span> and noticed your profile via <span class='placeholder'>{{source}}</span>.<br><br>As a Founder, you're likely focused on the macro-level efficiency of your operations. I’ve developed a specialized framework that aligns specifically with the industry sector you’re currently dominating.<br><br>Would you be open to a brief sync on how we can optimize your current contact node extraction processes?<br><br>Best regards,<br>[Agent Prism]"
+            },
+            manager: {
+                subject: "Operational Efficiency // {{company}}",
+                body: "Hello <span class='placeholder'>{{name}}</span>,<br><br>I'm reaching out because I saw your work leading the team at <span class='placeholder'>{{company}}</span>. My system identified your contact details through <span class='placeholder'>{{source}}</span> while analyzing regional industry leaders.<br><br>I noticed you're managing complex workflows, and I wanted to share a tool specifically designed to reduce the friction in your team's current directory parsing.<br><br>Do you have 5 minutes this week to look at some data-driven improvements for your department?<br><br>Cheers,<br>[Agent Prism]"
+            }
+        };
+
+        function switchPersona(type, btn) {
+            // Update UI
+            document.querySelectorAll('.persona-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const data = templates[type];
+            const name = document.getElementById('varName').innerText;
+            const comp = document.getElementById('varComp').innerText;
+            const source = document.getElementById('varSource').innerText;
+
+            let bodyHtml = data.body
+                .replace(/{{name}}/g, name)
+                .replace(/{{company}}/g, comp)
+                .replace(/{{source}}/g, source);
+            
+            let subjectHtml = data.subject
+                .replace(/{{company}}/g, `<span class="placeholder">${comp}</span>`);
+
+            document.getElementById('emailSubject').innerHTML = subjectHtml;
+            document.getElementById('templateBody').innerHTML = bodyHtml;
+        }
+
+        function copyTemplate() {
+            const body = document.getElementById('templateBody').innerText;
+            navigator.clipboard.writeText(body);
+            
+            const originalText = event.target.innerText;
+            event.target.innerText = "COPIED!";
+            event.target.style.borderColor = "var(--accent-lime)";
+            event.target.style.color = "var(--accent-lime)";
+            
+            setTimeout(() => {
+                event.target.innerText = originalText;
+                event.target.style.borderColor = "var(--accent-cyan)";
+                event.target.style.color = "var(--accent-cyan)";
+            }, 2000);
+        }
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prism Architect | Template Engine</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Inter:wght@300;400;600&display=swap');
+
+        :root {
+            --bg-deep: #05070a;
+            --glass: rgba(15, 20, 28, 0.85);
+            --accent-cyan: #00f2ff;
+            --accent-magenta: #ff00ea;
+            --accent-lime: #bcff00;
+            --border-glow: rgba(0, 242, 255, 0.2);
+            --text-main: #e0e6ed;
+            --text-dim: #7a869a;
+            --prism-gradient: linear-gradient(135deg, #00f2ff 0%, #ff00ea 50%, #bcff00 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg-deep);
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 32px 32px;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .prism-container {
+            width: 1000px;
+            max-width: 95vw;
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 4px;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .prism-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--prism-gradient);
+            z-index: 10;
+        }
+
+        .header {
+            padding: 24px 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 24px;
+            height: 24px;
+            background: var(--prism-gradient);
+            clip-path: polygon(0% 15%, 15% 0%, 100% 0%, 100% 85%, 85% 100%, 0% 100%);
+        }
+
+        .brand-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        .persona-selector {
+            display: flex;
+            gap: 8px;
+        }
+
+        .persona-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-dim);
+            padding: 6px 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .persona-btn.active {
+            border-color: var(--accent-magenta);
+            color: var(--accent-magenta);
+            background: rgba(255, 0, 234, 0.05);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            height: 580px;
+        }
+
+        .sidebar {
+            padding: 32px;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .editor-panel {
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        .panel-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .variable-chip {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 2px solid var(--accent-cyan);
+            margin-bottom: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+        }
+
+        .variable-val {
+            color: var(--accent-cyan);
+        }
+
+        .template-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 24px;
+            flex-grow: 1;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-main);
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .placeholder {
+            color: var(--accent-lime);
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(188, 255, 0, 0.1);
+            padding: 0 4px;
+            border-radius: 2px;
+        }
+
+        .source-tag {
+            display: inline-block;
+            margin-top: 16px;
+            padding: 4px 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            background: rgba(0, 242, 255, 0.1);
+            color: var(--accent-cyan);
+            border: 1px solid var(--accent-cyan);
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 16px;
+        }
+
+        .btn-primary {
+            flex: 1;
+            background: transparent;
+            border: 1px solid var(--accent-magenta);
+            color: var(--accent-magenta);
+            padding: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-magenta);
+            color: white;
+            box-shadow: 0 0 20px rgba(255, 0, 234, 0.3);
+        }
+
+        .btn-secondary {
+            flex: 1;
+            background: transparent;
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-deep);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+        }
+
+        .subject-line {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--accent-cyan);
+            margin-bottom: 12px;
+        }
+
+        .subject-line::before {
+            content: 'SUBJECT: ';
+            color: var(--text-dim);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body>
+
+    <div class="prism-container">
+        <header class="header">
+            <div class="brand">
+                <div class="brand-logo"></div>
+                <h1 class="brand-name">Template Architect</h1>
+            </div>
+            <div class="persona-selector">
+                <button class="persona-btn active" onclick="switchPersona('founder', this)">Founder / C-Level</button>
+                <button class="persona-btn" onclick="switchPersona('manager', this)">Mid-Management</button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <aside class="sidebar">
+                <div>
+                    <label class="panel-label">Target Metadata</label>
+                    <div class="variable-chip">
+                        <span>NAME</span>
+                        <span class="variable-val" id="varName">Sarah Jenkins</span>
+                    </div>
+                    <div class="variable-chip">
+                        <span>ENTITY</span>
+                        <span class="variable-val" id="varComp">Acme Dynamics</span>
+                    </div>
+                    <div class="variable-chip">
+                        <span>SOURCE</span>
+                        <span class="variable-val" id="varSource">LinkedIn / SOS</span>
+                    </div>
+                    <div class="variable-chip">
+                        <span>LOCUS</span>
+                        <span class="variable-val">Austin, TX</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: auto;">
+                    <label class="panel-label">Instructional Prompt</label>
+                    <p style="font-size: 11px; color: var(--text-dim); line-height: 1.4;">
+                        Architecting sequence based on organizational hierarchy. 
+                        Adjusting tone for authority-level: <span style="color: var(--accent-magenta)">HIGH</span>.
+                    </p>
+                </div>
+            </aside>
+
+            <section class="editor-panel">
+                <div class="subject-line" id="emailSubject">Strategic Growth Inquiry: <span class="placeholder">Acme Dynamics</span></div>
+                
+                <div class="template-card" id="templateBody">
+                    Hi <span class="placeholder">Sarah</span>,<br><br>
+                    I was tracking recent activity regarding <span class="placeholder">Acme Dynamics</span> and noticed your profile via <span class="placeholder">LinkedIn / SOS</span>. <br><br>
+                    As a Founder, you're likely focused on the macro-level efficiency of your operations in Austin. I’ve developed a specialized framework that aligns specifically with the logistics sector you’re currently dominating.<br><br>
+                    Would you be open to a brief brief sync on how we can optimize your current contact node extraction processes?<br><br>
+                    Best regards,<br>
+                    [Agent Prism]
+                </div>
+
+                <div class="source-tag">ALGORITHM: NEURAL PERSONA MATCH v4.2</div>
+
+                <div class="action-bar">
+                    <button class="btn-secondary" onclick="copyTemplate()">Copy to Clipboard</button>
+                    <button class="btn-primary">Push to CRM</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const templates = {
+            founder: {
+                subject: "Strategic Growth Inquiry: {{company}}",
+                body: "Hi <span class='placeholder'>{{name}}</span>,<br><br>I was tracking recent activity regarding <span class='placeholder'>{{company}}</span> and noticed your profile via <span class='placeholder'>{{source}}</span>.<br><br>As a Founder, you're likely focused on the macro-level efficiency of your operations. I’ve developed a specialized framework that aligns specifically with the industry sector you’re currently dominating.<br><br>Would you be open to a brief sync on how we can optimize your current contact node extraction processes?<br><br>Best regards,<br>[Agent Prism]"
+            },
+            manager: {
+                subject: "Operational Efficiency // {{company}}",
+                body: "Hello <span class='placeholder'>{{name}}</span>,<br><br>I'm reaching out because I saw your work leading the team at <span class='placeholder'>{{company}}</span>. My system identified your contact details through <span class='placeholder'>{{source}}</span> while analyzing regional industry leaders.<br><br>I noticed you're managing complex workflows, and I wanted to share a tool specifically designed to reduce the friction in your team's current directory parsing.<br><br>Do you have 5 minutes this week to look at some data-driven improvements for your department?<br><br>Cheers,<br>[Agent Prism]"
+            }
+        };
+
+        function switchPersona(type, btn) {
+            // Update UI
+            document.querySelectorAll('.persona-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const data = templates[type];
+            const name = document.getElementById('varName').innerText;
+            const comp = document.getElementById('varComp').innerText;
+            const source = document.getElementById('varSource').innerText;
+
+            let bodyHtml = data.body
+                .replace(/{{name}}/g, name)
+                .replace(/{{company}}/g, comp)
+                .replace(/{{source}}/g, source);
+            
+            let subjectHtml = data.subject
+                .replace(/{{company}}/g, `<span class="placeholder">${comp}</span>`);
+
+            document.getElementById('emailSubject').innerHTML = subjectHtml;
+            document.getElementById('templateBody').innerHTML = bodyHtml;
+        }
+
+        function copyTemplate() {
+            const body = document.getElementById('templateBody').innerText;
+            navigator.clipboard.writeText(body);
+            
+            const originalText = event.target.innerText;
+            event.target.innerText = "COPIED!";
+            event.target.style.borderColor = "var(--accent-lime)";
+            event.target.style.color = "var(--accent-lime)";
+            
+            setTimeout(() => {
+                event.target.innerText = originalText;
+                event.target.style.borderColor = "var(--accent-cyan)";
+                event.target.style.color = "var(--accent-cyan)";
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash UI Export</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="prism-container">
+        <header class="header">
+            <div class="brand">
+                <div class="brand-logo"></div>
+                <h1 class="brand-name">Prism Person-Finder</h1>
+            </div>
+            <div class="status-badge" id="status">System Idle</div>
+        </header>
+
+        <main class="main-content">
+            <div class="input-panel">
+                <div class="input-group">
+                    <label class="panel-label">Business Entity Name</label>
+                    <input type="text" id="bizName" placeholder="e.g. Acme Dynamics Corp">
+                </div>
+                <div class="input-group">
+                    <label class="panel-label">Target Domain / Website</label>
+                    <input type="text" id="bizWeb" placeholder="www.acme-dynamics.com">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="input-group">
+                        <label class="panel-label">Location</label>
+                        <input type="text" id="bizLoc" placeholder="City, State">
+                    </div>
+                    <div class="input-group">
+                        <label class="panel-label">Phone Prefix</label>
+                        <input type="text" id="bizPhone" placeholder="+1 (555) ...">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label class="panel-label">Industry Sector</label>
+                    <input type="text" id="bizInd" placeholder="Logistics, Finance, etc.">
+                </div>
+
+                <button class="search-btn" onclick="startScan()">Initiate Deep Scan</button>
+            </div>
+
+            <div class="sequence-panel">
+                <div class="scanline" id="scanline"></div>
+                <label class="panel-label">Active Search Sequence</label>
+                <ul class="sequence-list" id="seqList">
+                    <li class="sequence-item"><div class="step-dot"></div><div class="sequence-text">WEBSITE ABOUT PAGE PARSING</div></li>
+                    <li class="sequence-item"><div class="step-dot"></div><div class="sequence-text">TEAM DIRECTORY SCRAPE</div></li>
+                    <li class="sequence-item"><div class="step-dot"></div><div class="sequence-text">CONTACT NODE EXTRACTION</div></li>
+                    <li class="sequence-item"><div class="step-dot"></div><div class="sequence-text">LINKEDIN COMPANY DATA AGGREGATION</div></li>
+                    <li class="sequence-item"><div class="step-dot"></div><div class="sequence-text">GOOGLE DORKING: EXECUTIVE MATCH</div></li>
+                    <li class="sequence-item"><div class="step-dot"></div><div class="sequence-text">SECRETARY OF STATE REGISTRY SEARCH</div></li>
+                    <li class="sequence-item"><div class="step-dot"></div><div class="sequence-text">FACEBOOK BUSINESS META-DATA</div></li>
+                    <li class="sequence-item"><div class="step-dot"></div><div class="sequence-text">LOCAL CHAMBER DIRECTORY LOOKUP</div></li>
+                    <li class="sequence-item"><div class="step-dot"></div><div class="sequence-text">BBB / YELP / THIRD-PARTY VERIFICATION</div></li>
+                </ul>
+
+                <div class="terminal-output" id="terminal">Initializing terminal... Ready for target input.</div>
+
+                <div class="result-found" id="resultCard">
+                    <span class="result-title">Contact Identified</span>
+                    <span class="result-name" id="foundName">Sarah Jenkins</span>
+                    <span class="result-title" id="foundRole" style="color: var(--text-dim);">Director of Operations</span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const terminal = document.getElementById('terminal');
+        const items = document.querySelectorAll('.sequence-item');
+        const status = document.getElementById('status');
+        const scanline = document.getElementById('scanline');
+        const resultCard = document.getElementById('resultCard');
+
+        function log(msg) {
+            const time = new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            terminal.innerHTML += `\n[${time}] ${msg}`;
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        async function startScan() {
+            const name = document.getElementById('bizName').value || "TARGET_ENTITY";
+            
+            // Reset
+            items.forEach(i => i.className = 'sequence-item');
+            resultCard.style.display = 'none';
+            terminal.innerHTML = '';
+            
+            status.innerText = "Scanning...";
+            status.style.color = "var(--accent-cyan)";
+            status.style.borderColor = "var(--accent-cyan)";
+            status.style.background = "rgba(0, 242, 255, 0.1)";
+            scanline.style.display = "block";
+
+            log(`Starting micro-agent for: ${name}`);
+            
+            for(let i=0; i < items.length; i++) {
+                items[i].classList.add('active');
+                log(`Querying: ${items[i].innerText}...`);
+                
+                await new Promise(r => setTimeout(r, 800 + Math.random() * 1200));
+                
+                items[i].classList.remove('active');
+                items[i].classList.add('complete');
+                
+                if(i === 2) log(`> Found possible email pattern: first.last@domain.com`);
+                if(i === 4) log(`> Found LinkedIn Profile: /in/sjenkins-ops-lead`);
+                if(i === 5) log(`> Verified via SOS: Registered Agent matches search.`);
+            }
+
+            status.innerText = "Scan Complete";
+            status.style.color = "var(--accent-lime)";
+            status.style.borderColor = "var(--accent-lime)";
+            status.style.background = "rgba(188, 255, 0, 0.1)";
+            scanline.style.display = "none";
+            
+            log(`Search complete. Decision engine selected high-probability contact.`);
+            
+            resultCard.style.display = 'block';
+            document.getElementById('foundName').innerText = "Sarah Jenkins";
+            document.getElementById('foundRole').innerText = "Director of Operations • Acme Dynamics";
+        }
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
