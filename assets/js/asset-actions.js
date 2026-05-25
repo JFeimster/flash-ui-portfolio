@@ -45,6 +45,15 @@ function actionSourceUrl(path = "") {
   return `${ACTION_REPO_URL}/${looksFile ? "blob" : "tree"}/main/${encoded}`;
 }
 
+function loadGroupingEnhancements() {
+  if (window.__flashGroupingEnhancementsRequested) return;
+  window.__flashGroupingEnhancementsRequested = true;
+  const script = document.createElement("script");
+  script.src = "/assets/js/grouping-enhancements.js";
+  script.defer = true;
+  document.body.appendChild(script);
+}
+
 function actionCardTitle(card) {
   return card.querySelector("h2")?.textContent?.trim() || "Flash UI asset";
 }
@@ -228,4 +237,5 @@ document.addEventListener("click", async event => {
   }
 });
 
+loadGroupingEnhancements();
 initAssetActions();
