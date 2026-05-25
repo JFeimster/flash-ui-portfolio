@@ -18,12 +18,18 @@ const DEFAULT_DISPLAY_RULES = {
   descriptionRules: []
 };
 
+const params = new URLSearchParams(window.location.search);
+const viewMode = params.get("view") === "public" ? "public" : "internal";
+const isPublicView = viewMode === "public";
+
 const state = {
   items: [],
   query: "",
   category: "All",
   status: "All",
-  rules: DEFAULT_DISPLAY_RULES
+  rules: DEFAULT_DISPLAY_RULES,
+  curationBySlug: new Map(),
+  viewMode
 };
 
 const REPO_URL = "https://github.com/JFeimster/flash-ui-portfolio";
@@ -137,7 +143,27 @@ function getAssetTypeLabel(item) {
   return "Website";
 }
 
+function curationKeys(item, displayTitle = "") {
+  return [
+    item.slug,
+    item.title,
+    displayTitle,
+    String(item.path || "").replace(/^sites\//, "").replace(/\/index\.html$/i, "")
+  ]
+    .filter(Boolean)
+    .flatMap(value => [String(value), slugify(value)]);
+}
+
+function getCuration(item, displayTitle = cleanDisplayTitle(item)) {
+  for (const key of curationKeys(item, displayTitle)) {
+    if (state.curationBySlug.has(key)) return state.curationBySlug.get(key);
+  }
+  return null;
+}
+
 function getRecommendedUse(item, displayTitle) {
+  const curation = getCuration(item, displayTitle);
+  if (curation?.recommendedUse) return curation.recommendedUse.replaceAll("-", " ");
   const text = [displayTitle, item.category, item.type, item.path].join(" ");
 
   if (/(Partner|Referral|Affiliate|Darwin|Attorney)/i.test(text)) return "Partner enablement";
@@ -153,6 +179,10 @@ function getRecommendedUse(item, displayTitle) {
 }
 
 function getDescription(item, displayTitle) {
+  const curation = getCuration(item, displayTitle);
+  if (isPublicView && curation?.recommendedNextAction) {
+    return curation.recommendedNextAction;
+  }
   if (item.description) return item.description;
 
   const haystack = [displayTitle, item.category, item.type, item.path].join(" ");
@@ -167,6 +197,10 @@ function getDescription(item, displayTitle) {
 }
 
 function getReadiness(item, deployable, nested, archive) {
+  const curation = getCuration(item);
+  if (isPublicView) {
+    return { label: curation?.readyForPublicDirectory ? "Public Ready" : "Shareable Preview", tone: "ready" };
+  }
   if (deployable) {
     return { label: "Ready to Share", tone: "ready" };
   }
@@ -202,10 +236,14 @@ function getBadgeDefinitions() {
 function getViewerBadges(item, displayTitle, nested, archive) {
   const defs = getBadgeDefinitions();
   const haystack = [displayTitle, item.category, item.type, item.path].join(" ");
+  const curation = getCuration(item, displayTitle);
   const badges = [];
   const add = id => {
     const badge = defs.get(id);
     if (badge && !badges.some(entry => entry.id === id)) badges.push(badge);
+  };
+  const addText = (id, text) => {
+    if (!badges.some(entry => entry.id === id)) badges.push({ id, label: text, text });
   };
 
   if (item.livePath && !archive && !nested) add("live-site");
@@ -220,6 +258,9 @@ function getViewerBadges(item, displayTitle, nested, archive) {
   if (item.needsStandaloneDeploy || item.type === "nextjs-app") add("standalone-app");
   if (hasVariantName(displayTitle, item.path)) add("variant");
   if (item.featured) add("featured");
+
+  if (isPublicView && curation?.businessValue === "high") addText("high-value", "High Value");
+  if (isPublicView && curation?.monetizationPotential === "high") addText("lead-ready", "Lead Ready");
 
   return badges;
 }
@@ -239,7 +280,7 @@ function getCardActions(item, detailsId, deployable, nested, archive) {
     actions.push(`<button class="btn" type="button" data-open-details="${escapeHtml(detailsId)}">${escapeHtml(archive ? labels.reviewNotesLabel : labels.detailsCtaLabel)}</button>`);
   }
 
-  if (state.rules.defaultCardRules?.showAdvancedDetailsToggle) {
+  if (!isPublicView && state.rules.defaultCardRules?.showAdvancedDetailsToggle) {
     actions.push(`<button class="btn subtle" type="button" data-open-details="${escapeHtml(detailsId)}">Advanced / Dev Details</button>`);
   }
 
@@ -298,6 +339,31 @@ function getDisplayMeta(item) {
   };
 }
 
+function publicEligible(item) {
+  const meta = item.displayMeta || getDisplayMeta(item);
+  const curation = getCuration(item, meta.displayTitle);
+  const recommendedUse = curation?.recommendedUse || "";
+  if (!meta.deployable) return false;
+  if (meta.nested || meta.archive) return false;
+  if (["archive", "manual-review", "standalone-app-candidate"].includes(recommendedUse)) return false;
+  return true;
+}
+
+function viewItems() {
+  return isPublicView ? state.items.filter(publicEligible) : state.items;
+}
+
+function renderViewModeNotice() {
+  const existing = document.querySelector(".view-mode-notice");
+  if (existing) existing.remove();
+  const notice = document.createElement("section");
+  notice.className = `wrap view-mode-notice ${isPublicView ? "public" : "internal"}`;
+  notice.innerHTML = isPublicView
+    ? `<strong>Public Directory Mode</strong><span>Showing live, shareable assets only. Internal archives, source details, and standalone app candidates are hidden.</span><a class="btn subtle" href="/">Internal View</a>`
+    : `<strong>Internal Command Mode</strong><span>Showing all indexed assets, including archives, source details, and deployment candidates.</span><a class="btn subtle" href="/?view=public">Public View</a>`;
+  document.querySelector(".deployment-status")?.after(notice);
+}
+
 function renderSelect(container, values, key, label) {
   container.innerHTML = `
     <select data-filter-key="${key}" aria-label="${escapeHtml(label)}">
@@ -308,6 +374,7 @@ function renderSelect(container, values, key, label) {
 
 function itemMatches(item) {
   const meta = item.displayMeta || getDisplayMeta(item);
+  const curation = getCuration(item, meta.displayTitle);
   const haystack = [
     item.title,
     item.category,
@@ -321,6 +388,10 @@ function itemMatches(item) {
     meta.assetType,
     meta.recommendedUse,
     meta.readiness.label,
+    curation?.recommendedUse,
+    curation?.targetAudience,
+    curation?.businessValue,
+    curation?.monetizationPotential,
     meta.badges.map(badge => badge.label).join(" ")
   ].join(" ").toLowerCase();
   const matchesQuery = !state.query || haystack.includes(state.query.toLowerCase());
@@ -330,14 +401,15 @@ function itemMatches(item) {
 }
 
 function renderCards() {
-  const visible = state.items.filter(itemMatches);
+  const pool = viewItems();
+  const visible = pool.filter(itemMatches);
   els.visibleCount.textContent = String(visible.length);
 
-  if (!state.items.length) {
+  if (!pool.length) {
     els.grid.innerHTML = `
       <section class="empty">
-        <h2>The vault is empty. Time to stop admiring the shelf and load the ammo.</h2>
-        <p>Run the indexing batch again and rebuild <code>data/site-registry.json</code>.</p>
+        <h2>${isPublicView ? "No public assets are available yet." : "The vault is empty. Time to stop admiring the shelf and load the ammo."}</h2>
+        <p>${isPublicView ? "Curate assets and mark the strongest candidates for public sharing." : "Run the indexing batch again and rebuild <code>data/site-registry.json</code>."}</p>
       </section>
     `;
     return;
@@ -391,7 +463,7 @@ function renderCards() {
         <div class="card-actions">
           ${getCardActions(item, detailsId, deployable, nested, archive)}
         </div>
-        ${state.rules.defaultCardRules?.showAdvancedDetailsToggle ? `
+        ${!isPublicView && state.rules.defaultCardRules?.showAdvancedDetailsToggle ? `
           <details class="details-panel" id="${detailsId}">
             <summary>Advanced / Dev Details</summary>
             <dl class="detail-grid">${detailRows}</dl>
@@ -403,16 +475,19 @@ function renderCards() {
 }
 
 function renderShell() {
-  const categories = unique(state.items.map(item => item.category));
-  const statuses = unique(state.items.map(item => item.status));
+  const pool = viewItems();
+  const categories = unique(pool.map(item => item.category));
+  const statuses = unique(pool.map(item => item.status));
 
-  els.assetCount.textContent = String(state.items.length);
-  els.deployableCount.textContent = String(state.items.filter(isDeployable).length);
-  els.legacyCount.textContent = String(state.items.filter(isLegacy).length);
-  els.sitesCount.textContent = String(state.items.filter(isSitesAsset).length);
-  els.nestedAppCount.textContent = String(state.items.filter(isNestedApp).length);
-  els.archiveCount.textContent = String(state.items.filter(isArchive).length);
+  els.assetCount.textContent = String(pool.length);
+  els.deployableCount.textContent = String(pool.filter(isDeployable).length);
+  els.legacyCount.textContent = String(pool.filter(isLegacy).length);
+  els.sitesCount.textContent = String(pool.filter(isSitesAsset).length);
+  els.nestedAppCount.textContent = String(isPublicView ? 0 : pool.filter(isNestedApp).length);
+  els.archiveCount.textContent = String(isPublicView ? 0 : pool.filter(isArchive).length);
 
+  document.body.classList.toggle("public-view", isPublicView);
+  renderViewModeNotice();
   renderSelect(els.categoryFilters, categories, "category", "Category filter");
   renderSelect(els.statusFilters, statuses, "status", "Status filter");
   renderCards();
@@ -583,13 +658,26 @@ async function fetchJson(path) {
   return response.json();
 }
 
+function buildCurationIndex(curationData) {
+  const entries = Array.isArray(curationData?.assetCuration) ? curationData.assetCuration : [];
+  const index = new Map();
+  entries.forEach(entry => {
+    [entry.slug, entry.title, slugify(entry.slug || ""), slugify(entry.title || "")]
+      .filter(Boolean)
+      .forEach(key => index.set(key, entry));
+  });
+  return index;
+}
+
 async function init() {
   bindEvents();
   try {
-    const [baseRegistry, displayRules] = await Promise.all([
+    const [baseRegistry, displayRules, curationData] = await Promise.all([
       fetchJson("/data/site-registry.json"),
-      fetchJson("/data/card-display-rules.json").catch(() => DEFAULT_DISPLAY_RULES)
+      fetchJson("/data/card-display-rules.json").catch(() => DEFAULT_DISPLAY_RULES),
+      fetchJson("/data/asset-curation.json").catch(() => ({ assetCuration: [] }))
     ]);
+    state.curationBySlug = buildCurationIndex(curationData);
     state.rules = {
       ...DEFAULT_DISPLAY_RULES,
       ...displayRules,
@@ -639,6 +727,7 @@ async function init() {
 }
 
 function loadAssetActionHelper() {
+  if (isPublicView) return;
   const script = document.createElement("script");
   script.src = "/assets/js/asset-actions.js";
   script.defer = true;
