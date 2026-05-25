@@ -1,8 +1,8 @@
-# AI Lab Variant Consolidation Report
+# High-Converting Lead Magnet Variant Consolidation Report
 
-- Group ID: `ai-lab`
+- Group ID: `high-converting-lead-magnet`
 - Status: `pending`
-- Hub path: `sites/ai-lab/index.html`
+- Hub path: `sites/high-converting-lead-magnet/index.html`
 - Dry run: `false`
 - Hub links updated: `true`
 
@@ -10,8 +10,8 @@
 
 ### Variant 1
 
-- From: `sites/AI Lab 1`
-- To: `sites/ai-lab/variant-1`
+- From: `sites/High-Converting Lead Magnet 1`
+- To: `sites/high-converting-lead-magnet/variant-1`
 - Files moved/copied: 2
 - Old path removed: `true`
 - Hub links updated: `true`
@@ -21,9 +21,9 @@
 
 ### Variant 2
 
-- From: `sites/AI Lab 2`
-- To: `sites/ai-lab/variant-2`
-- Files moved/copied: 3
+- From: `sites/High-Converting Lead Magnet 2`
+- To: `sites/high-converting-lead-magnet/variant-2`
+- Files moved/copied: 2
 - Old path removed: `true`
 - Hub links updated: `true`
 - Skipped items: none
@@ -32,8 +32,8 @@
 
 ### Variant 3
 
-- From: `sites/AI Lab 3`
-- To: `sites/ai-lab/variant-3`
+- From: `sites/High-Converting Lead Magnet 3`
+- To: `sites/high-converting-lead-magnet/variant-3`
 - Files moved/copied: 2
 - Old path removed: `true`
 - Hub links updated: `true`
