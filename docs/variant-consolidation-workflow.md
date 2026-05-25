@@ -77,7 +77,7 @@ node scripts/consolidate-variant-group.mjs --all --apply
 - `vercel.json`
 - `data/site-registry.json`
 - Root-level folders
-- ZIP archives and source assets inside site folders
+- The script must not delete, extract, modify, or rewrite ZIP archives, source packages, or standalone app source files. If these files live inside a mapped `/sites` variant folder, they may be preserved by moving the entire folder into its canonical `variant-n` destination.
 - Standalone app candidates
 - Canonical hub `index.html` files except for link updates from old encoded variant paths to new `variant-n` paths
 
