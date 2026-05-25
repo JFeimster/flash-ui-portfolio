@@ -1,0 +1,1494 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VALOIS // Lender Matchmaker & Term Sheet Auction</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #030207;
+            --bg-surface: #0a0813;
+            --bg-surface-elevated: #110e20;
+            --border-subtle: rgba(255, 255, 255, 0.04);
+            --border-muted: rgba(255, 255, 255, 0.08);
+            --border-active: rgba(139, 92, 246, 0.3);
+            
+            --text-primary: #f4f4f7;
+            --text-secondary: #a1a1aa;
+            --text-muted: #52525b;
+            
+            --accent-purple: #8b5cf6;
+            --accent-purple-glow: rgba(139, 92, 246, 0.15);
+            --accent-velvet: #311042;
+            --accent-emerald: #10b981;
+            --accent-emerald-glow: rgba(16, 185, 129, 0.1);
+            --accent-amber: #f59e0b;
+            --accent-rose: #ef4444;
+
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            --transition-smooth: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* White Label Alternative Theme override */
+        body.white-label-mode {
+            --bg-base: #fafafa;
+            --bg-surface: #ffffff;
+            --bg-surface-elevated: #f4f4f5;
+            --border-subtle: rgba(0, 0, 0, 0.05);
+            --border-muted: rgba(0, 0, 0, 0.1);
+            --border-active: rgba(79, 70, 229, 0.4);
+            --text-primary: #09090b;
+            --text-secondary: #71717a;
+            --text-muted: #a1a1aa;
+            --accent-purple: #4f46e5;
+            --accent-purple-glow: rgba(79, 70, 229, 0.08);
+            --accent-velvet: #eef2ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+            transition: var(--transition-smooth);
+            background-image: radial-gradient(circle at 50% 0%, var(--accent-velvet) 0%, transparent 70%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        /* Clean Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-base);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-muted);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-purple);
+        }
+
+        /* Shell & Containers */
+        .app-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Top Bar Navigation */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: rgba(10, 8, 19, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 8px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-purple), #ec4899);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #fff;
+            font-size: 14px;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-title {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: linear-gradient(to right, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-tag {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--accent-purple);
+            border: 1px solid var(--border-active);
+            padding: 2px 8px;
+            border-radius: 20px;
+            background: var(--accent-purple-glow);
+        }
+
+        .controls-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .select-archetype {
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-muted);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 13px;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            outline: none;
+            transition: var(--transition-smooth);
+        }
+
+        .select-archetype:hover {
+            border-color: var(--accent-purple);
+        }
+
+        .btn-toggle {
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-muted);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-toggle:hover {
+            border-color: var(--accent-purple);
+            background: var(--accent-purple-glow);
+        }
+
+        .btn-toggle .indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-purple);
+            box-shadow: 0 0 8px var(--accent-purple);
+        }
+
+        /* Bento Grid Architecture */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+        }
+
+        .bento-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-muted);
+            border-radius: 16px;
+            padding: 24px;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bento-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-active), transparent);
+            opacity: 0;
+            transition: var(--transition-smooth);
+        }
+
+        .bento-card:hover::before {
+            opacity: 1;
+        }
+
+        .bento-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Card Headers */
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .card-title-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .card-label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--accent-purple);
+            font-weight: 600;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        /* Columns Spans */
+        .col-4 { grid-column: span 4; }
+        .col-5 { grid-column: span 5; }
+        .col-7 { grid-column: span 7; }
+        .col-8 { grid-column: span 8; }
+        .col-12 { grid-column: span 12; }
+
+        /* Left Side: Mandate Filters & Allocation Gauge */
+        .allocation-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .allocation-svg {
+            transform: rotate(-90deg);
+            width: 160px;
+            height: 160px;
+        }
+
+        .allocation-svg-bg {
+            fill: none;
+            stroke: var(--border-muted);
+            stroke-width: 10;
+        }
+
+        .allocation-svg-val {
+            fill: none;
+            stroke: url(#allocGradient);
+            stroke-width: 10;
+            stroke-linecap: round;
+            stroke-dasharray: 440;
+            stroke-dashoffset: 132; /* 70% occupied default */
+            transition: stroke-dashoffset 1s var(--transition-smooth);
+        }
+
+        .allocation-absolute {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .allocation-num {
+            font-family: var(--font-mono);
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .allocation-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-purple);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        /* Filter Controls */
+        .filter-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-label-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .filter-lbl {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .filter-val-lbl {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--accent-purple);
+            font-weight: 600;
+        }
+
+        .range-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            background: var(--border-muted);
+            border-radius: 2px;
+            outline: none;
+            transition: var(--transition-smooth);
+        }
+
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent-purple);
+            cursor: pointer;
+            border: 2px solid var(--bg-surface);
+            box-shadow: 0 0 10px var(--accent-purple-glow);
+            transition: var(--transition-smooth);
+        }
+
+        .range-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        /* Pipeline List */
+        .pipeline-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 380px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .pipeline-row {
+            display: grid;
+            grid-template-columns: 2.2fr 1fr 1fr 1fr 1fr;
+            align-items: center;
+            padding: 14px 18px;
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .pipeline-row:hover {
+            border-color: var(--accent-purple);
+            transform: translateX(2px);
+        }
+
+        .pipeline-row.selected {
+            border-color: var(--accent-purple);
+            background: linear-gradient(90deg, rgba(139, 92, 246, 0.05) 0%, var(--bg-surface-elevated) 100%);
+            box-shadow: inset 3px 0 0 var(--accent-purple);
+        }
+
+        .borrower-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .borrower-id {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .borrower-industry {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .pipeline-metric {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .pipeline-lbl {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .pipeline-val {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-readiness {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 20px;
+            width: fit-content;
+            text-align: center;
+        }
+
+        .readiness-high {
+            background: var(--accent-emerald-glow);
+            color: var(--accent-emerald);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .readiness-med {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--accent-amber);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        /* Interactive Term Sheet Tool */
+        .bidding-workspace {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 24px;
+        }
+
+        .bidding-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .bidding-summary {
+            background: var(--bg-surface-elevated);
+            border: 1px dashed var(--border-muted);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .summary-header {
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .summary-lbl {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .summary-val {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .yield-index-banner {
+            background: rgba(16, 185, 129, 0.05);
+            border: 1px solid rgba(16, 185, 129, 0.15);
+            padding: 12px 16px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+
+        .yield-val {
+            font-family: var(--font-mono);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent-emerald);
+        }
+
+        .btn-submit {
+            background: var(--accent-purple);
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-family: var(--font-sans);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            text-align: center;
+            width: 100%;
+            margin-top: 16px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px var(--accent-purple-glow);
+            filter: brightness(1.1);
+        }
+
+        /* Live Bid/Auction Ledger */
+        .ledger-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .ledger-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            font-size: 12px;
+        }
+
+        .ledger-item.new-bid {
+            animation: highlightBid 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes highlightBid {
+            0% {
+                border-color: var(--accent-purple);
+                background: rgba(139, 92, 246, 0.2);
+            }
+            100% {
+                border-color: var(--border-subtle);
+                background: var(--bg-surface-elevated);
+            }
+        }
+
+        .ledger-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .ledger-provider {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .ledger-details {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .ledger-status {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .status-accepted {
+            background: var(--accent-emerald-glow);
+            color: var(--accent-emerald);
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--accent-amber);
+        }
+
+        /* Whitelabel Preview Adjustments */
+        .wl-input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .select-input {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-muted);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            outline: none;
+            width: 100%;
+        }
+
+        .select-input:focus {
+            border-color: var(--accent-purple);
+        }
+
+        /* Footer Compliance Area */
+        footer {
+            margin-top: 24px;
+            border-top: 1px solid var(--border-subtle);
+            padding: 24px 0 60px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .compliance-text {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .compliance-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Debug / Analyst Console */
+        .debug-trigger-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #000;
+            color: #fff;
+            border: 1px solid #222;
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            cursor: pointer;
+            z-index: 999;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .debug-drawer {
+            position: fixed;
+            bottom: -600px;
+            left: 0;
+            right: 0;
+            height: 500px;
+            background: #06050a;
+            border-top: 1px solid #1c1830;
+            z-index: 1000;
+            box-shadow: 0 -12px 40px rgba(0,0,0,0.8);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            font-family: var(--font-mono);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .debug-drawer.open {
+            transform: translateY(-600px);
+        }
+
+        .debug-header {
+            padding: 16px 24px;
+            background: #0d0b16;
+            border-bottom: 1px solid #1c1830;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .debug-title {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--accent-purple);
+        }
+
+        .debug-tabs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .debug-tab {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            padding: 4px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .debug-tab.active {
+            background: var(--bg-surface-elevated);
+            color: var(--text-primary);
+            border-color: var(--border-muted);
+        }
+
+        .debug-body {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            font-size: 11px;
+            color: #10b981; /* Terminal green */
+            background: #020104;
+        }
+
+        .close-debug-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .code-block {
+            background: #110e20;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-muted);
+            color: var(--text-primary);
+            margin: 8px 0;
+            display: block;
+            white-space: pre-wrap;
+        }
+
+        .glow-purple {
+            filter: drop-shadow(0px 0px 4px var(--accent-purple));
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .col-4, .col-8, .col-5, .col-7 {
+                grid-column: span 12;
+            }
+            .bidding-workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+            .controls-group {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .pipeline-row {
+                grid-template-columns: 1.5fr 1fr 1fr;
+                gap: 8px;
+            }
+            .pipeline-row .pipeline-metric:nth-child(4),
+            .pipeline-row .pipeline-metric:nth-child(5) {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Top Nav Header -->
+    <header>
+        <div class="brand">
+            <div class="brand-logo">V</div>
+            <div class="brand-title">Valois</div>
+            <div class="brand-tag">LENDER MATCHMAKER v2.4</div>
+        </div>
+        <div class="controls-group">
+            <select class="select-archetype" id="mandatePresetSelect" onchange="applyMandatePreset(this.value)">
+                <option value="all">Global Mandate Preset</option>
+                <option value="conservative">Sovereign Debt Fund (Low Yield)</option>
+                <option value="growth">Apex High-Yield Growth</option>
+                <option value="venture">Venture Credit Syndicate</option>
+            </select>
+            <button class="btn-toggle" onclick="toggleWhiteLabel()">
+                <div class="indicator" id="whiteLabelIndicator"></div>
+                <span id="whiteLabelText">White-Label Delivery</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Bento Core Grid -->
+    <div class="bento-grid">
+        
+        <!-- Bento Card 1: Investment Mandate Controls (Left - Col 4) -->
+        <div class="bento-card col-4">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <div class="card-label">Mandate Controls</div>
+                    <div class="card-title">Investment Profile</div>
+                </div>
+                <span class="preview-badge" style="color: var(--accent-emerald);">Active</span>
+            </div>
+
+            <!-- Capital Allocation Gauge -->
+            <div class="allocation-container">
+                <svg class="allocation-svg" viewBox="0 0 160 160">
+                    <defs>
+                        <linearGradient id="allocGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#8b5cf6" />
+                            <stop offset="100%" stop-color="#ec4899" />
+                        </linearGradient>
+                    </defs>
+                    <circle class="allocation-svg-bg" cx="80" cy="80" r="70"></circle>
+                    <circle class="allocation-svg-val glow-purple" id="allocationArc" cx="80" cy="80" r="70"></circle>
+                </svg>
+                <div class="allocation-absolute">
+                    <div class="allocation-num" id="allocationNumDisplay">70%</div>
+                    <div class="allocation-label">Pool Utilized</div>
+                </div>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="filter-grid">
+                <div class="filter-item">
+                    <div class="filter-label-group">
+                        <span class="filter-lbl">Minimum Readiness Score</span>
+                        <span class="filter-val-lbl" id="minScoreVal">75</span>
+                    </div>
+                    <input type="range" class="range-slider" id="minScoreSlider" min="50" max="95" value="75" oninput="updateFilters()">
+                </div>
+
+                <div class="filter-item">
+                    <div class="filter-label-group">
+                        <span class="filter-lbl">Max Target Leverage</span>
+                        <span class="filter-val-lbl" id="maxLeverageVal">3.5x</span>
+                    </div>
+                    <input type="range" class="range-slider" id="maxLeverageSlider" min="1" max="6" step="0.5" value="3.5" oninput="updateFilters()">
+                </div>
+
+                <div class="filter-item">
+                    <div class="filter-label-group">
+                        <span class="filter-lbl">Allocated Pool Size</span>
+                        <span class="filter-val-lbl" id="capitalPoolVal">$45M</span>
+                    </div>
+                    <input type="range" class="range-slider" id="capitalPoolSlider" min="10" max="100" value="45" oninput="updateFilters()">
+                </div>
+            </div>
+        </div>
+
+        <!-- Bento Card 2: Borrower Matchmaker Pipeline (Right - Col 8) -->
+        <div class="bento-card col-8">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <div class="card-label">Anonymized Capital Pools</div>
+                    <div class="card-title">Matched Borrowers Auction Pipeline</div>
+                </div>
+                <span class="preview-badge" style="background: rgba(16, 185, 129, 0.1); color: var(--accent-emerald);" id="matchCounter">4 Matched</span>
+            </div>
+
+            <!-- Live Matches List -->
+            <div class="pipeline-list" id="pipelineContainer">
+                <!-- Dynamically generated profiles matching criteria -->
+            </div>
+        </div>
+
+        <!-- Bento Card 3: Interactive Term Sheet Proposal Creator (Col 8) -->
+        <div class="bento-card col-8">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <div class="card-label">Deal Room Auction Node</div>
+                    <div class="card-title">Bespoke Proposal & Term Sheet Workspace</div>
+                </div>
+                <span class="preview-badge" style="color: var(--accent-amber);" id="wlSelectedBorrower">No borrower selected</span>
+            </div>
+
+            <div class="bidding-workspace">
+                <div class="bidding-form">
+                    <div class="filter-item">
+                        <div class="filter-label-group">
+                            <span class="filter-lbl">Facility Size (USD)</span>
+                            <span class="filter-val-lbl" id="bidAmtVal">$1,200,000</span>
+                        </div>
+                        <input type="range" class="range-slider" id="bidAmtSlider" min="200000" max="5000000" step="50000" value="1200000" oninput="recalcCost()">
+                    </div>
+
+                    <div class="filter-item">
+                        <div class="filter-label-group">
+                            <span class="filter-lbl">Target Interest Rate (APR)</span>
+                            <span class="filter-val-lbl" id="bidAprVal">8.50%</span>
+                        </div>
+                        <input type="range" class="range-slider" id="bidAprSlider" min="4" max="18" step="0.05" value="8.50" oninput="recalcCost()">
+                    </div>
+
+                    <div class="wl-input-grid">
+                        <div class="filter-item">
+                            <span class="filter-lbl">Amortization Method</span>
+                            <select class="select-input" id="amortSelect" onchange="recalcCost()">
+                                <option value="straight">Straight Line Amortization</option>
+                                <option value="declining">Declining Balance</option>
+                                <option value="bullet">Bullet Maturity</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-lbl">Warrant Coverage</span>
+                            <select class="select-input" id="warrantSelect" onchange="recalcCost()">
+                                <option value="0.00">Zero warrants (Clean Debt)</option>
+                                <option value="0.10">0.10% warrant equity kicker</option>
+                                <option value="0.25">0.25% warrant equity kicker</option>
+                                <option value="0.50">0.50% warrant equity kicker</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button class="btn-submit" onclick="submitTermSheet()">Submit Bid to Term Sheet Auction Pool</button>
+                </div>
+
+                <div class="bidding-summary">
+                    <div class="summary-header">
+                        <div class="card-label">Yield Assessment Profile</div>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-lbl">Intermediary Management Fee</span>
+                        <span class="summary-val">0.45%</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-lbl">Simulated Covenant Risks</span>
+                        <span class="summary-val" id="covenantComplexity" style="color: var(--accent-emerald);">Minimal Safeguards</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-lbl">Expected Principal Run</span>
+                        <span class="summary-val" id="princRun">24 Months</span>
+                    </div>
+                    <div class="yield-index-banner">
+                        <span class="filter-lbl" style="color: var(--accent-emerald); font-weight: 600;">System Implied Yield</span>
+                        <span class="yield-val" id="impliedYieldDisplay">9.05%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bento Card 4: Live Competitive Bid Ledger (Col 4) -->
+        <div class="bento-card col-4">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <div class="card-label">Syndicated Bid Tracker</div>
+                    <div class="card-title">Live Underwriter Bids</div>
+                </div>
+            </div>
+            
+            <div class="ledger-list" id="bidsLedger">
+                <!-- Dynamically populated live concurrent bidder array -->
+            </div>
+        </div>
+
+        <!-- Bento Card 5: Whitelabel Shared Workspace (Col 12) -->
+        <div class="bento-card col-12" id="whiteLabelComponent">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <div class="card-label" id="wlBrandSubtitle">Public Access Syndicate Interface</div>
+                    <div class="card-title" id="wlBrandTitle">VALOIS Capital Partner Node</div>
+                </div>
+                <span class="preview-badge" id="wlModeLabel">Secure Syndicate Vault</span>
+            </div>
+
+            <div class="bidding-workspace" style="grid-template-columns: 1.5fr 1fr;">
+                <div>
+                    <p class="vertical-desc" style="color: var(--text-secondary); font-size: 13px; line-height: 1.6; margin-bottom: 12px;">
+                        This workspace delivers pre-vetted credit analysis securely packaged for LP delivery or compliance assessment. The internal yield optimization algorithms, pricing controls, and matching filters are abstracted safely.
+                    </p>
+                    <div class="wl-input-grid" style="margin-top: 16px;">
+                        <div class="val-block" style="background: var(--bg-surface-elevated); padding: 14px; border-radius: 8px;">
+                            <div class="v-stat-lbl" style="font-size: 10px; text-transform: uppercase; color: var(--text-muted);">Allocated Pool Capacity</div>
+                            <div class="v-stat-val" style="font-size: 18px; font-weight: 600; margin-top: 4px;" id="wlAllocatedCapacity">$45.00M</div>
+                        </div>
+                        <div class="val-block" style="background: var(--bg-surface-elevated); padding: 14px; border-radius: 8px;">
+                            <div class="v-stat-lbl" style="font-size: 10px; text-transform: uppercase; color: var(--text-muted);">Syndicate Status</div>
+                            <div class="v-stat-val" style="font-size: 18px; font-weight: 600; margin-top: 4px; color: var(--accent-emerald);" id="wlSyndicateStatus">Approved Partner Node</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bidding-summary" style="border-style: solid; border-color: var(--border-active);">
+                    <div class="summary-header" style="margin-bottom: 10px;">
+                        <div class="card-label">Secure Compliance Verification</div>
+                    </div>
+                    <p style="font-size: 11px; line-height: 1.5; color: var(--text-secondary);">
+                        Payload verified under institutional cryptographic hashes. Safe-harbor provisions and private borrower credentials strictly sanitized. 
+                    </p>
+                    <div style="font-family: var(--font-mono); font-size: 10px; color: var(--accent-purple); margin-top: 12px; font-weight: 600;">
+                        MD5-HASH: VL-SYND-7718A-SEC
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footnotes Compliance Component -->
+    <footer>
+        <p class="compliance-text">
+            * Institutional matching is executed via simulated underwriting algorithms conforming to traditional asset-backed credit metrics. Real-time transaction placement occurs at the discrete instruction of certified credit intermediaries. Securities rules require secure sandbox validation before committing live allocations.
+        </p>
+        <div class="compliance-row">
+            <span>© Valois Underwriting System. Private & Partner Syndicate Use Only.</span>
+            <span>SEC Safe Harbor Compliant SEC-v2 Protocol</span>
+        </div>
+    </footer>
+</div>
+
+<!-- Analyst / Debug Drawer Button -->
+<button class="debug-trigger-btn" onclick="toggleDebugDrawer()">
+    <span>⚡</span> LENDER SYSTEM CONFIG FILES
+</button>
+
+<!-- Bottom Analyst Drawer (Debug Interface) -->
+<div class="debug-drawer" id="analystDrawer">
+    <div class="debug-header">
+        <div class="debug-title">Analyst Engine & Simulation Configs Panel</div>
+        <div class="debug-tabs">
+            <button class="debug-tab active" onclick="switchDebugTab('mandates')">lender_mandates.json</button>
+            <button class="debug-tab" onclick="switchDebugTab('active_deals')">active_deals.json</button>
+            <button class="debug-tab" onclick="switchDebugTab('term_sheet')">term_sheet_template.json</button>
+            <button class="debug-tab" onclick="switchDebugTab('vercel')">Vercel Deployment Guide</button>
+        </div>
+        <button class="close-debug-btn" onclick="toggleDebugDrawer()">✕</button>
+    </div>
+    <div class="debug-body" id="debugContent">
+        <!-- Will display selected configuration contents dynamically -->
+    </div>
+</div>
+
+<script>
+    // Config files mock DB matching Valois' format
+    const lender_mandates = {
+        "conservative": {
+            "name": "Sovereign Debt Fund (Low Yield)",
+            "min_readiness_score": 85,
+            "max_leverage_ratio": 2.5,
+            "allocated_pool_m": 75,
+            "amortization_preference": "straight"
+        },
+        "growth": {
+            "name": "Apex High-Yield Growth",
+            "min_readiness_score": 70,
+            "max_leverage_ratio": 4.5,
+            "allocated_pool_m": 50,
+            "amortization_preference": "declining"
+        },
+        "venture": {
+            "name": "Venture Credit Syndicate",
+            "min_readiness_score": 80,
+            "max_leverage_ratio": 3.5,
+            "allocated_pool_m": 35,
+            "amortization_preference": "bullet"
+        }
+    };
+
+    const active_borrowers = [
+        {
+            "id": "B-7712a-SaaS",
+            "industry": "SaaS Platform (Series A)",
+            "readinessScore": 84,
+            "arr": "$4.50M",
+            "ask": 1500000,
+            "leverage": "3.0x",
+            "dscr": "1.45x"
+        },
+        {
+            "id": "B-2993k-Ecom",
+            "industry": "E-Commerce Scaleup",
+            "readinessScore": 76,
+            "arr": "$8.20M",
+            "ask": 2000000,
+            "leverage": "2.4x",
+            "dscr": "1.20x"
+        },
+        {
+            "id": "B-4411p-Heavy",
+            "industry": "Apex Cargo & Logistics",
+            "readinessScore": 92,
+            "arr": "$15.40M",
+            "ask": 3500000,
+            "leverage": "2.2x",
+            "dscr": "2.15x"
+        },
+        {
+            "id": "B-1192d-Med",
+            "industry": "Core-Surgical Group",
+            "readinessScore": 88,
+            "arr": "$3.20M",
+            "ask": 800000,
+            "leverage": "2.5x",
+            "dscr": "1.80x"
+        },
+        {
+            "id": "B-5561a-Seed",
+            "industry": "Emerging AI Dev",
+            "readinessScore": 68,
+            "arr": "$1.20M",
+            "ask": 500000,
+            "leverage": "4.2x",
+            "dscr": "0.95x"
+        }
+    ];
+
+    const current_bids = [
+        { "provider": "Valois Credit Opps", "amount": "$1.50M", "apr": "8.40%", "status": "Accepted" },
+        { "provider": "Vanguard Secured Lending", "amount": "$2.00M", "apr": "7.20%", "status": "Pending" },
+        { "provider": "Apex Velocity Finance", "amount": "$3.50M", "apr": "9.10%", "status": "Pending" }
+    ];
+
+    const term_sheet_template = {
+        "$schema": "https://valois.tech/schemas/term_sheet_v2.json",
+        "instrument": "Asset-Backed / Revenue-Based Hybrid Notes",
+        "amortization_types_supported": ["straight", "declining", "bullet"],
+        "covenants": {
+            "min_dscr": 1.15,
+            "reporting_interval": "monthly"
+        }
+    };
+
+    // State
+    let currentBorrowerId = "B-7712a-SaaS";
+    let whiteLabelModeActive = false;
+    let activeDebugTab = "mandates";
+
+    window.onload = () => {
+        applyFilters();
+        switchDebugTab('mandates');
+        selectBorrower(currentBorrowerId);
+        renderBidLedger();
+    };
+
+    // Preset Applicator
+    function applyMandatePreset(presetKey) {
+        if (presetKey === "all") {
+            document.getElementById("minScoreSlider").value = 75;
+            document.getElementById("maxLeverageSlider").value = 3.5;
+            document.getElementById("capitalPoolSlider").value = 45;
+        } else {
+            const data = lender_mandates[presetKey];
+            document.getElementById("minScoreSlider").value = data.min_readiness_score;
+            document.getElementById("maxLeverageSlider").value = data.max_leverage_ratio;
+            document.getElementById("capitalPoolSlider").value = data.allocated_pool_m;
+            document.getElementById("amortSelect").value = data.amortization_preference;
+        }
+        updateFilters();
+    }
+
+    // Dynamic Filter Core
+    function updateFilters() {
+        const minScore = parseInt(document.getElementById("minScoreSlider").value);
+        const maxLeverage = parseFloat(document.getElementById("maxLeverageSlider").value);
+        const capitalPool = parseInt(document.getElementById("capitalPoolSlider").value);
+
+        document.getElementById("minScoreVal").textContent = minScore;
+        document.getElementById("maxLeverageVal").textContent = maxLeverage.toFixed(1) + "x";
+        document.getElementById("capitalPoolVal").textContent = "$" + capitalPool + "M";
+
+        // Update Pool allocation graphics dynamically
+        const arc = document.getElementById("allocationArc");
+        const capPercentage = Math.round((capitalPool / 100) * 100);
+        const radius = arc.r.baseVal.value;
+        const circumference = 2 * Math.PI * radius;
+        const offset = circumference - (capPercentage / 100) * circumference;
+        arc.style.strokeDashoffset = offset;
+        document.getElementById("allocationNumDisplay").textContent = capPercentage + "%";
+
+        // Update public components also
+        document.getElementById("wlAllocatedCapacity").textContent = "$" + capitalPool.toFixed(2) + "M";
+
+        applyFilters(minScore, maxLeverage);
+    }
+
+    function applyFilters(minScore = 75, maxLeverage = 3.5) {
+        const listContainer = document.getElementById("pipelineContainer");
+        listContainer.innerHTML = "";
+
+        let matchCount = 0;
+
+        active_borrowers.forEach(borrower => {
+            const bLeverage = parseFloat(borrower.leverage);
+            const matchesScore = borrower.readinessScore >= minScore;
+            const matchesLeverage = bLeverage <= maxLeverage;
+
+            if (matchesScore && matchesLeverage) {
+                matchCount++;
+                const isSelected = borrower.id === currentBorrowerId;
+                const rClass = borrower.readinessScore >= 85 ? "readiness-high" : "readiness-med";
+
+                listContainer.innerHTML += `
+                    <div class="pipeline-row ${isSelected ? 'selected' : ''}" onclick="selectBorrower('${borrower.id}')">
+                        <div class="borrower-meta">
+                            <span class="borrower-id">${borrower.id}</span>
+                            <span class="borrower-industry">${borrower.industry}</span>
+                        </div>
+                        <div class="pipeline-metric">
+                            <span class="pipeline-lbl">Scale ARR</span>
+                            <span class="pipeline-val">${borrower.arr}</span>
+                        </div>
+                        <div class="pipeline-metric">
+                            <span class="pipeline-lbl">Target Ask</span>
+                            <span class="pipeline-val">$${(borrower.ask / 1000000).toFixed(2)}M</span>
+                        </div>
+                        <div class="pipeline-metric">
+                            <span class="pipeline-lbl">Leverage</span>
+                            <span class="pipeline-val">${borrower.leverage}</span>
+                        </div>
+                        <div class="pipeline-metric">
+                            <span class="badge-readiness ${rClass}">${borrower.readinessScore}% Index</span>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+
+        document.getElementById("matchCounter").textContent = `${matchCount} Matched`;
+        if (matchCount === 0) {
+            listContainer.innerHTML = `<div class="pipeline-row"><div class="borrower-id" style="color:var(--accent-rose);">No active targets conform to active mandate parameters. Try adjusting min score.</div></div>`;
+        }
+    }
+
+    function selectBorrower(id) {
+        currentBorrowerId = id;
+        const b = active_borrowers.find(x => x.id === id);
+        if (!b) return;
+
+        // Apply visual class change
+        const rows = document.querySelectorAll(".pipeline-row");
+        rows.forEach(r => r.classList.remove("selected"));
+        
+        // Match row elements
+        const selectedRow = Array.from(rows).find(row => row.querySelector(".borrower-id").textContent === id);
+        if (selectedRow) selectedRow.classList.add("selected");
+
+        // Update Bidding UI
+        document.getElementById("wlSelectedBorrower").textContent = `Target Pool ID: ${b.id}`;
+        
+        // Set dynamic slider defaults based on borrower size ask
+        const bidSlider = document.getElementById("bidAmtSlider");
+        bidSlider.min = Math.round(b.ask * 0.5);
+        bidSlider.max = Math.round(b.ask * 1.5);
+        bidSlider.value = b.ask;
+        
+        recalcCost();
+        updateFilters();
+    }
+
+    function recalcCost() {
+        const val = parseInt(document.getElementById("bidAmtSlider").value);
+        document.getElementById("bidAmtVal").textContent = "$" + val.toLocaleString();
+
+        const apr = parseFloat(document.getElementById("bidAprSlider").value);
+        document.getElementById("bidAprVal").textContent = apr.toFixed(2) + "%";
+
+        const warrantVal = parseFloat(document.getElementById("warrantSelect").value);
+        const amort = document.getElementById("amortSelect").value;
+
+        // Implied yield simple calculations
+        let impliedYield = apr + (warrantVal * 10);
+        if (amort === "bullet") impliedYield += 0.5; // Bullet maturity increases risk premium
+        if (amort === "declining") impliedYield -= 0.15; // Declining balance lowers risk
+
+        document.getElementById("impliedYieldDisplay").textContent = impliedYield.toFixed(2) + "%";
+
+        // Set simulated metrics
+        const covenants = document.getElementById("covenantComplexity");
+        if (impliedYield > 12) {
+            covenants.textContent = "Stringent Sweep (Covenants Active)";
+            covenants.style.color = "var(--accent-rose)";
+        } else if (impliedYield > 8.5) {
+            covenants.textContent = "Standard DSCR Reporting Safeties";
+            covenants.style.color = "var(--accent-amber)";
+        } else {
+            covenants.textContent = "Minimal Safeguards (Issuer Friendly)";
+            covenants.style.color = "var(--accent-emerald)";
+        }
+
+        const runMonths = amort === "bullet" ? "36 Month Bullet" : "24 Month Straight";
+        document.getElementById("princRun").textContent = runMonths;
+
+        updateConsoleOutput();
+    }
+
+    function renderBidLedger() {
+        const ledger = document.getElementById("bidsLedger");
+        ledger.innerHTML = "";
+        current_bids.forEach(b => {
+            const isAccepted = b.status === "Accepted";
+            ledger.innerHTML += `
+                <div class="ledger-item">
+                    <div class="ledger-meta">
+                        <span class="ledger-provider">${b.provider}</span>
+                        <span class="ledger-details">${b.amount} Match @ ${b.apr} APR</span>
+                    </div>
+                    <span class="ledger-status ${isAccepted ? 'status-accepted' : 'status-pending'}">${b.status}</span>
+                </div>
+            `;
+        });
+    }
+
+    function submitTermSheet() {
+        const amount = document.getElementById("bidAmtVal").textContent;
+        const apr = document.getElementById("bidAprVal").textContent;
+        const target = currentBorrowerId;
+
+        // Add to mock bids list
+        const newBid = {
+            "provider": "Your Sovereign Debt Fund Node",
+            "amount": amount,
+            "apr": apr,
+            "status": "Pending"
+        };
+
+        current_bids.unshift(newBid);
+
+        const ledger = document.getElementById("bidsLedger");
+        const element = document.createElement("div");
+        element.className = "ledger-item new-bid";
+        element.innerHTML = `
+            <div class="ledger-meta">
+                <span class="ledger-provider">${newBid.provider}</span>
+                <span class="ledger-details">${newBid.amount} Match @ ${newBid.apr} APR</span>
+            </div>
+            <span class="ledger-status status-pending">${newBid.status}</span>
+        `;
+        ledger.insertBefore(element, ledger.firstChild);
+
+        alert(`Term Sheet Payload Successfully Syndicated!\n\nBorrower ID: ${target}\nFacility: ${amount}\nAPR: ${apr}\nRegistered to secure system ledger nodes.`);
+        
+        updateConsoleOutput();
+    }
+
+    // Toggle White-Label View
+    function toggleWhiteLabel() {
+        whiteLabelModeActive = !whiteLabelModeActive;
+        const body = document.body;
+        const indicator = document.getElementById("whiteLabelIndicator");
+        const wlComponent = document.getElementById("whiteLabelComponent");
+
+        if (whiteLabelModeActive) {
+            body.classList.add("white-label-mode");
+            indicator.style.background = "var(--accent-emerald)";
+            indicator.style.boxShadow = "0 0 8px var(--accent-emerald)";
+            document.getElementById("whiteLabelText").textContent = "Public Syndicate Active";
+            
+            document.getElementById("wlBrandTitle").textContent = "Beside Capital - Syndicate Vault";
+            document.getElementById("wlBrandSubtitle").textContent = "LP Distributed Verification Platform";
+            document.getElementById("wlModeLabel").textContent = "LP Node Live";
+            wlComponent.style.border = "1px solid var(--accent-emerald)";
+        } else {
+            body.classList.remove("white-label-mode");
+            indicator.style.background = "var(--accent-purple)";
+            indicator.style.boxShadow = "0 0 8px var(--accent-purple)";
+            document.getElementById("whiteLabelText").textContent = "White-Label Delivery";
+
+            document.getElementById("wlBrandTitle").textContent = "VALOIS Capital Partner Node";
+            document.getElementById("wlBrandSubtitle").textContent = "Public Access Syndicate Interface";
+            document.getElementById("wlModeLabel").textContent = "Secure Syndicate Vault";
+            wlComponent.style.border = "1px dashed var(--border-muted)";
+        }
+    }
+
+    // Analyst Drawer Tabs
+    function toggleDebugDrawer() {
+        const drawer = document.getElementById("analystDrawer");
+        drawer.classList.toggle("open");
+    }
+
+    function switchDebugTab(tabName) {
+        activeDebugTab = tabName;
+        const tabs = document.querySelectorAll(".debug-tab");
+        tabs.forEach(tab => {
+            tab.classList.remove("active");
+            if (tab.innerText.includes(tabName) || (tabName === 'vercel' && tab.innerText.includes('Vercel'))) {
+                tab.classList.add("active");
+            }
+        });
+        updateConsoleOutput();
+    }
+
+    function updateConsoleOutput() {
+        const output = document.getElementById("debugContent");
+        if (activeDebugTab === "mandates") {
+            output.innerHTML = `
+                <div style="color: #a1a1aa; margin-bottom: 12px;">// Loaded: lender_mandates.json - Representing global credit investment mandate files</div>
+                <pre style="color: #c084fc;">${JSON.stringify(lender_mandates, null, 2)}</pre>
+            `;
+        } else if (activeDebugTab === "active_deals") {
+            output.innerHTML = `
+                <div style="color: #a1a1aa; margin-bottom: 12px;">// Loaded: active_deals.json - Borrowers matched and submitted on pool database</div>
+                <pre style="color: #22d3ee;">${JSON.stringify({ active_borrowers, current_bids }, null, 2)}</pre>
+            `;
+        } else if (activeDebugTab === "term_sheet") {
+            output.innerHTML = `
+                <div style="color: #a1a1aa; margin-bottom: 12px;">// Loaded: term_sheet_template.json - Rules schema for dynamic proposal verification</div>
+                <pre style="color: #34d399;">${JSON.stringify(term_sheet_template, null, 2)}</pre>
+            `;
+        } else if (activeDebugTab === "vercel") {
+            output.innerHTML = `
+                <div class="deployment-guide">
+                    <h3 style="color: #f4f4f7; font-size: 14px; margin-bottom: 12px;">Deploy Valois Underwriting Node to Vercel instantly</h3>
+                    <p>Static deployment requires identical config payloads to standard Vercel environments:</p>
+                    
+                    <div class="code-block">
+.
+├── lender.html       (Copy the entirety of this dynamic unified template)
+├── package.json     (Project definitions)
+└── vercel.json      (Static rules configurations)
+                    </div>
+
+                    <h4 style="color: #f4f4f7; font-size: 12px; margin: 16px 0 8px 0;">Step 1: package.json Setup</h4>
+                    <pre class="code-block">{
+  "name": "valois-underwriting-syndicate",
+  "version": "2.0.0",
+  "scripts": {
+    "start": "serve ."
+  }
+}</pre>
+                    <p style="color: var(--accent-emerald);">✔ Live system processes fully optimized inside user runtime client boundaries.</p>
+                </div>
+            `;
+        }
+    }
+</script>
+
+</body>
+</html>
+```

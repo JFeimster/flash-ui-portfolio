@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global SDR Command Center | Active Campaigns</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #030303;
+            --card-bg: rgba(15, 15, 20, 0.7);
+            --border: rgba(255, 255, 255, 0.08);
+            --primary: #8b5cf6;
+            --secondary: #ec4899;
+            --accent: #06b6d4;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            padding: 24px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .command-center {
+            width: 100%;
+            max-width: 1100px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        /* Database Header */
+        .db-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .db-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .db-title h2 {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .db-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Table Style */
+        .db-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .db-table th {
+            text-align: left;
+            padding: 12px 20px;
+            color: var(--text-dim);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .db-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        .db-table tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Status Pills */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-running { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .status-paused { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .status-cooldown { background: rgba(139, 92, 246, 0.1); color: var(--primary); }
+
+        .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+        /* Campaign Cell */
+        .campaign-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .campaign-name {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .campaign-sub {
+            color: var(--text-dim);
+            font-size: 11px;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 120px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+        }
+
+        .progress-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        /* Action Buttons */
+        .btn-icon {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 6px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-icon:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border-color: var(--text-dim);
+        }
+
+        /* Quick Entry Footer */
+        .quick-entry {
+            padding: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 16px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .input-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-wrap label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .db-input {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .db-input:focus {
+            border-color: var(--primary);
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .btn-add {
+            align-self: flex-end;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            height: 38px;
+        }
+
+        .btn-add:hover {
+            filter: brightness(1.1);
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+    </style>
+</head>
+<body>
+
+    <div class="command-center">
+        <header class="db-header">
+            <div class="db-title">
+                <div style="background: var(--primary); width: 8px; height: 18px; border-radius: 2px;"></div>
+                <h2>Active Campaigns</h2>
+            </div>
+            <div class="db-controls">
+                <button class="btn-icon">🔍</button>
+                <button class="btn-icon">⚙️</button>
+                <button class="btn-icon">⟳</button>
+            </div>
+        </header>
+
+        <table class="db-table">
+            <thead>
+                <tr>
+                    <th>Status</th>
+                    <th>Campaign / Market</th>
+                    <th>Business Type</th>
+                    <th>Daily Quota</th>
+                    <th>Conversion</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="status-pill status-running">
+                            <div class="dot" style="animation: pulse 2s infinite;"></div>
+                            RUNNING
+                        </div>
+                    </td>
+                    <td>
+                        <div class="campaign-info">
+                            <span class="campaign-name">San Francisco — SaaS Founders</span>
+                            <span class="campaign-sub">Vector DB Infrastructure</span>
+                        </div>
+                    </td>
+                    <td><span class="mono">B2B Fintech</span></td>
+                    <td>
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: 78%;"></div>
+                        </div>
+                        <span class="progress-text">312 / 400</span>
+                    </td>
+                    <td><span class="mono" style="color: var(--success);">4.2%</span></td>
+                    <td>
+                        <button class="btn-icon">⏸</button>
+                        <button class="btn-icon">✏️</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="status-pill status-paused">
+                            <div class="dot"></div>
+                            PAUSED
+                        </div>
+                    </td>
+                    <td>
+                        <div class="campaign-info">
+                            <span class="campaign-name">Austin — E-commerce</span>
+                            <span class="campaign-sub">Shopify Plus Owners</span>
+                        </div>
+                    </td>
+                    <td><span class="mono">DTC Agency</span></td>
+                    <td>
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: 45%; background: var(--text-dim);"></div>
+                        </div>
+                        <span class="progress-text">90 / 200</span>
+                    </td>
+                    <td><span class="mono">1.8%</span></td>
+                    <td>
+                        <button class="btn-icon">▶</button>
+                        <button class="btn-icon">✏️</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="status-pill status-cooldown">
+                            <div class="dot"></div>
+                            COOLDOWN
+                        </div>
+                    </td>
+                    <td>
+                        <div class="campaign-info">
+                            <span class="campaign-name">London — Web3 Devs</span>
+                            <span class="campaign-sub">Series A Startups</span>
+                        </div>
+                    </td>
+                    <td><span class="mono">Dev Tools</span></td>
+                    <td>
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: 100%;"></div>
+                        </div>
+                        <span class="progress-text">500 / 500</span>
+                    </td>
+                    <td><span class="mono" style="color: var(--success);">6.1%</span></td>
+                    <td>
+                        <button class="btn-icon">🔒</button>
+                        <button class="btn-icon">✏️</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="quick-entry">
+            <div class="input-wrap">
+                <label>Target City</label>
+                <input type="text" class="db-input" placeholder="e.g. New York">
+            </div>
+            <div class="input-wrap">
+                <label>Market Niche</label>
+                <input type="text" class="db-input" placeholder="e.g. AI Engineers">
+            </div>
+            <div class="input-wrap">
+                <label>Business Type</label>
+                <input type="text" class="db-input" placeholder="e.g. Cyber Security">
+            </div>
+            <button class="btn-add">Launch Campaign</button>
+        </div>
+    </div>
+
+    <style>
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+    </style>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global SDR Command Center | Active Campaigns</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #030303;
+            --card-bg: rgba(15, 15, 20, 0.7);
+            --border: rgba(255, 255, 255, 0.08);
+            --primary: #8b5cf6;
+            --secondary: #ec4899;
+            --accent: #06b6d4;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            padding: 24px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .command-center {
+            width: 100%;
+            max-width: 1100px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        /* Database Header */
+        .db-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .db-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .db-title h2 {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .db-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Table Style */
+        .db-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .db-table th {
+            text-align: left;
+            padding: 12px 20px;
+            color: var(--text-dim);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .db-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        .db-table tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Status Pills */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-running { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .status-paused { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .status-cooldown { background: rgba(139, 92, 246, 0.1); color: var(--primary); }
+
+        .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+        /* Campaign Cell */
+        .campaign-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .campaign-name {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .campaign-sub {
+            color: var(--text-dim);
+            font-size: 11px;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 120px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+        }
+
+        .progress-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        /* Action Buttons */
+        .btn-icon {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 6px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-icon:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border-color: var(--text-dim);
+        }
+
+        /* Quick Entry Footer */
+        .quick-entry {
+            padding: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 16px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .input-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-wrap label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .db-input {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .db-input:focus {
+            border-color: var(--primary);
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .btn-add {
+            align-self: flex-end;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            height: 38px;
+        }
+
+        .btn-add:hover {
+            filter: brightness(1.1);
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+    </style>
+</head>
+<body>
+
+    <div class="command-center">
+        <header class="db-header">
+            <div class="db-title">
+                <div style="background: var(--primary); width: 8px; height: 18px; border-radius: 2px;"></div>
+                <h2>Active Campaigns</h2>
+            </div>
+            <div class="db-controls">
+                <button class="btn-icon">🔍</button>
+                <button class="btn-icon">⚙️</button>
+                <button class="btn-icon">⟳</button>
+            </div>
+        </header>
+
+        <table class="db-table">
+            <thead>
+                <tr>
+                    <th>Status</th>
+                    <th>Campaign / Market</th>
+                    <th>Business Type</th>
+                    <th>Daily Quota</th>
+                    <th>Conversion</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="status-pill status-running">
+                            <div class="dot" style="animation: pulse 2s infinite;"></div>
+                            RUNNING
+                        </div>
+                    </td>
+                    <td>
+                        <div class="campaign-info">
+                            <span class="campaign-name">San Francisco — SaaS Founders</span>
+                            <span class="campaign-sub">Vector DB Infrastructure</span>
+                        </div>
+                    </td>
+                    <td><span class="mono">B2B Fintech</span></td>
+                    <td>
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: 78%;"></div>
+                        </div>
+                        <span class="progress-text">312 / 400</span>
+                    </td>
+                    <td><span class="mono" style="color: var(--success);">4.2%</span></td>
+                    <td>
+                        <button class="btn-icon">⏸</button>
+                        <button class="btn-icon">✏️</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="status-pill status-paused">
+                            <div class="dot"></div>
+                            PAUSED
+                        </div>
+                    </td>
+                    <td>
+                        <div class="campaign-info">
+                            <span class="campaign-name">Austin — E-commerce</span>
+                            <span class="campaign-sub">Shopify Plus Owners</span>
+                        </div>
+                    </td>
+                    <td><span class="mono">DTC Agency</span></td>
+                    <td>
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: 45%; background: var(--text-dim);"></div>
+                        </div>
+                        <span class="progress-text">90 / 200</span>
+                    </td>
+                    <td><span class="mono">1.8%</span></td>
+                    <td>
+                        <button class="btn-icon">▶</button>
+                        <button class="btn-icon">✏️</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="status-pill status-cooldown">
+                            <div class="dot"></div>
+                            COOLDOWN
+                        </div>
+                    </td>
+                    <td>
+                        <div class="campaign-info">
+                            <span class="campaign-name">London — Web3 Devs</span>
+                            <span class="campaign-sub">Series A Startups</span>
+                        </div>
+                    </td>
+                    <td><span class="mono">Dev Tools</span></td>
+                    <td>
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: 100%;"></div>
+                        </div>
+                        <span class="progress-text">500 / 500</span>
+                    </td>
+                    <td><span class="mono" style="color: var(--success);">6.1%</span></td>
+                    <td>
+                        <button class="btn-icon">🔒</button>
+                        <button class="btn-icon">✏️</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="quick-entry">
+            <div class="input-wrap">
+                <label>Target City</label>
+                <input type="text" class="db-input" placeholder="e.g. New York">
+            </div>
+            <div class="input-wrap">
+                <label>Market Niche</label>
+                <input type="text" class="db-input" placeholder="e.g. AI Engineers">
+            </div>
+            <div class="input-wrap">
+                <label>Business Type</label>
+                <input type="text" class="db-input" placeholder="e.g. Cyber Security">
+            </div>
+            <button class="btn-add">Launch Campaign</button>
+        </div>
+    </div>
+
+    <style>
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+    </style>
+
+</body>
+</html>

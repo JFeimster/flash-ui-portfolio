@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Make Webhook Endpoints | Vector Aura</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #030303;
+            --card-bg: rgba(15, 15, 20, 0.7);
+            --border: rgba(255, 255, 255, 0.08);
+            --primary: #8b5cf6;
+            --secondary: #ec4899;
+            --accent: #06b6d4;
+            --error: #ef4444;
+            --success: #10b981;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --aura-1: rgba(139, 92, 246, 0.1);
+            --aura-2: rgba(6, 182, 212, 0.1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .aura-blob {
+            position: fixed;
+            width: 800px;
+            height: 800px;
+            border-radius: 50%;
+            filter: blur(140px);
+            z-index: -1;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        .aura-1 { top: -200px; right: -100px; background: var(--aura-1); animation: drift 25s infinite alternate; }
+        .aura-2 { bottom: -200px; left: -100px; background: var(--aura-2); animation: drift 30s infinite alternate-reverse; }
+
+        @keyframes drift {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(-50px, 80px) scale(1.1); }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            background: var(--card-bg);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .header-title h2 {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(to right, #fff, var(--text-dim));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-title p {
+            color: var(--text-dim);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .stats-strip {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            padding: 16px;
+            border-radius: 12px;
+        }
+
+        .stat-box label {
+            display: block;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+
+        .stat-box .val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        /* Endpoints Table */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(0,0,0,0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 16px;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        tr:last-child td { border-bottom: none; }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent);
+            font-size: 12px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-pill.success { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .status-pill.warning { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+        .status-pill.error { background: rgba(239, 68, 68, 0.1); color: var(--error); }
+
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            box-shadow: 0 0 8px currentColor;
+        }
+
+        .tag {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+        }
+
+        /* Console Log Footer */
+        .console-log {
+            margin-top: 32px;
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #7dd3fc;
+            height: 180px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            margin-bottom: 6px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .log-time { color: var(--text-dim); min-width: 80px; }
+        .log-msg { color: #f8fafc; }
+        .log-msg.err { color: var(--error); }
+        .log-msg.ok { color: var(--success); }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="aura-blob aura-1"></div>
+    <div class="aura-blob aura-2"></div>
+
+    <div class="container">
+        <header class="header">
+            <div class="header-title">
+                <h2>Make_Webhook_Endpoints.db</h2>
+                <p>Real-time technical bridge & monitoring logs</p>
+            </div>
+            <div class="tag">BACKEND V4.0</div>
+        </header>
+
+        <section class="stats-strip">
+            <div class="stat-box">
+                <label>Active Scenarios</label>
+                <div class="val">12</div>
+            </div>
+            <div class="stat-box">
+                <label>Avg. Latency</label>
+                <div class="val" style="color: var(--accent);">342ms</div>
+            </div>
+            <div class="stat-box">
+                <label>24h Success Rate</label>
+                <div class="val" style="color: var(--success);">99.8%</div>
+            </div>
+            <div class="stat-box">
+                <label>Payload Count</label>
+                <div class="val">14.2k</div>
+            </div>
+        </section>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Source / Target</th>
+                        <th>Webhook Endpoint</th>
+                        <th>Operation</th>
+                        <th>Last Run</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="tag">MAKE.COM</span></td>
+                        <td class="mono">hook.make.com/xf82...p9w</td>
+                        <td>Lead_Send_Dispatch</td>
+                        <td>2 mins ago</td>
+                        <td>
+                            <div class="status-pill success">
+                                <div class="pulse-dot"></div> ACTIVE
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag">APPS_SCRIPT</span></td>
+                        <td class="mono">script.google.com/macros/s/...</td>
+                        <td>FollowUp_Automation</td>
+                        <td>14 mins ago</td>
+                        <td>
+                            <div class="status-pill success">
+                                <div class="pulse-dot"></div> ACTIVE
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag">MAKE.COM</span></td>
+                        <td class="mono">hook.make.com/a771...z0x</td>
+                        <td>CRM_Sync_Worker</td>
+                        <td>1 hour ago</td>
+                        <td>
+                            <div class="status-pill warning">
+                                <div class="pulse-dot"></div> LATENCY
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag">MAKE.COM</span></td>
+                        <td class="mono">hook.make.com/k921...m2q</td>
+                        <td>Email_Enrichment_API</td>
+                        <td>6 mins ago</td>
+                        <td>
+                            <div class="status-pill error">
+                                <div class="pulse-dot"></div> FAILED
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="console-log" id="console">
+            <div class="log-entry">
+                <span class="log-time">[14:22:01]</span>
+                <span class="log-msg ok">POST /Lead_Send_Dispatch - HTTP 200 OK (312ms)</span>
+            </div>
+            <div class="log-entry">
+                <span class="log-time">[14:21:55]</span>
+                <span class="log-msg">GET /CRM_Sync_Worker - Triggered by user_admin</span>
+            </div>
+            <div class="log-entry">
+                <span class="log-time">[14:20:12]</span>
+                <span class="log-msg err">POST /Email_Enrichment_API - 429 Too Many Requests (Rate Limit)</span>
+            </div>
+            <div class="log-entry">
+                <span class="log-time">[14:18:44]</span>
+                <span class="log-msg ok">APPS_SCRIPT: FollowUp_Automation - Script finished successfully</span>
+            </div>
+            <div class="log-entry">
+                <span class="log-time">[14:15:02]</span>
+                <span class="log-msg">SYS: Database garbage collection completed</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const consoleEl = document.getElementById('console');
+        const operations = [
+            { t: 'Lead_Send_Dispatch', s: 'POST', h: '200 OK' },
+            { t: 'FollowUp_Automation', s: 'GAS', h: 'Executed' },
+            { t: 'CRM_Sync_Worker', s: 'SYNC', h: '12 records' }
+        ];
+
+        function addLog() {
+            const now = new Date();
+            const timeStr = `[${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}]`;
+            const op = operations[Math.floor(Math.random() * operations.length)];
+            
+            const div = document.createElement('div');
+            div.className = 'log-entry';
+            div.innerHTML = `
+                <span class="log-time">${timeStr}</span>
+                <span class="log-msg ok">${op.s} /${op.t} - ${op.h}</span>
+            `;
+            
+            consoleEl.prepend(div);
+            if (consoleEl.children.length > 15) consoleEl.lastElementChild.remove();
+        }
+
+        setInterval(addLog, 4500);
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Make Webhook Endpoints | Vector Aura</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #030303;
+            --card-bg: rgba(15, 15, 20, 0.7);
+            --border: rgba(255, 255, 255, 0.08);
+            --primary: #8b5cf6;
+            --secondary: #ec4899;
+            --accent: #06b6d4;
+            --error: #ef4444;
+            --success: #10b981;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --aura-1: rgba(139, 92, 246, 0.1);
+            --aura-2: rgba(6, 182, 212, 0.1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .aura-blob {
+            position: fixed;
+            width: 800px;
+            height: 800px;
+            border-radius: 50%;
+            filter: blur(140px);
+            z-index: -1;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        .aura-1 { top: -200px; right: -100px; background: var(--aura-1); animation: drift 25s infinite alternate; }
+        .aura-2 { bottom: -200px; left: -100px; background: var(--aura-2); animation: drift 30s infinite alternate-reverse; }
+
+        @keyframes drift {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(-50px, 80px) scale(1.1); }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            background: var(--card-bg);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .header-title h2 {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(to right, #fff, var(--text-dim));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-title p {
+            color: var(--text-dim);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .stats-strip {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            padding: 16px;
+            border-radius: 12px;
+        }
+
+        .stat-box label {
+            display: block;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+
+        .stat-box .val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(0,0,0,0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 16px;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        tr:last-child td { border-bottom: none; }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent);
+            font-size: 12px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-pill.success { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .status-pill.warning { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+        .status-pill.error { background: rgba(239, 68, 68, 0.1); color: var(--error); }
+
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            box-shadow: 0 0 8px currentColor;
+        }
+
+        .tag {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+        }
+
+        .console-log {
+            margin-top: 32px;
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #7dd3fc;
+            height: 180px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            margin-bottom: 6px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .log-time { color: var(--text-dim); min-width: 80px; }
+        .log-msg { color: #f8fafc; }
+        .log-msg.err { color: var(--error); }
+        .log-msg.ok { color: var(--success); }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="aura-blob aura-1"></div>
+    <div class="aura-blob aura-2"></div>
+
+    <div class="container">
+        <header class="header">
+            <div class="header-title">
+                <h2>Make_Webhook_Endpoints.db</h2>
+                <p>Real-time technical bridge & monitoring logs</p>
+            </div>
+            <div class="tag">BACKEND V4.0</div>
+        </header>
+
+        <section class="stats-strip">
+            <div class="stat-box">
+                <label>Active Scenarios</label>
+                <div class="val">12</div>
+            </div>
+            <div class="stat-box">
+                <label>Avg. Latency</label>
+                <div class="val" style="color: var(--accent);">342ms</div>
+            </div>
+            <div class="stat-box">
+                <label>24h Success Rate</label>
+                <div class="val" style="color: var(--success);">99.8%</div>
+            </div>
+            <div class="stat-box">
+                <label>Payload Count</label>
+                <div class="val">14,281</div>
+            </div>
+        </section>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Source / Target</th>
+                        <th>Webhook Endpoint</th>
+                        <th>Operation</th>
+                        <th>Last Run</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="tag">MAKE.COM</span></td>
+                        <td class="mono">hook.make.com/xf82...p9w</td>
+                        <td>Lead_Send_Dispatch</td>
+                        <td>2 mins ago</td>
+                        <td>
+                            <div class="status-pill success">
+                                <div class="pulse-dot"></div> ACTIVE
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag">APPS_SCRIPT</span></td>
+                        <td class="mono">script.google.com/macros/s/...</td>
+                        <td>FollowUp_Automation</td>
+                        <td>14 mins ago</td>
+                        <td>
+                            <div class="status-pill success">
+                                <div class="pulse-dot"></div> ACTIVE
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag">MAKE.COM</span></td>
+                        <td class="mono">hook.make.com/a771...z0x</td>
+                        <td>CRM_Sync_Worker</td>
+                        <td>1 hour ago</td>
+                        <td>
+                            <div class="status-pill warning">
+                                <div class="pulse-dot"></div> LATENCY
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag">MAKE.COM</span></td>
+                        <td class="mono">hook.make.com/k921...m2q</td>
+                        <td>Email_Enrichment_API</td>
+                        <td>6 mins ago</td>
+                        <td>
+                            <div class="status-pill error">
+                                <div class="pulse-dot"></div> FAILED
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="console-log" id="console">
+            <div class="log-entry">
+                <span class="log-time">[14:22:01]</span>
+                <span class="log-msg ok">POST /Lead_Send_Dispatch - HTTP 200 OK (312ms)</span>
+            </div>
+            <div class="log-entry">
+                <span class="log-time">[14:21:55]</span>
+                <span class="log-msg">GET /CRM_Sync_Worker - Triggered by user_admin</span>
+            </div>
+            <div class="log-entry">
+                <span class="log-time">[14:20:12]</span>
+                <span class="log-msg err">POST /Email_Enrichment_API - 429 Too Many Requests (Rate Limit)</span>
+            </div>
+            <div class="log-entry">
+                <span class="log-time">[14:18:44]</span>
+                <span class="log-msg ok">APPS_SCRIPT: FollowUp_Automation - Script finished successfully</span>
+            </div>
+            <div class="log-entry">
+                <span class="log-time">[14:15:02]</span>
+                <span class="log-msg">SYS: Database garbage collection completed</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const consoleEl = document.getElementById('console');
+        const operations = [
+            { t: 'Lead_Send_Dispatch', s: 'POST', h: '200 OK', c: 'ok' },
+            { t: 'FollowUp_Automation', s: 'GAS', h: 'Executed', c: 'ok' },
+            { t: 'Email_Enrichment_API', s: 'GET', h: '429 Rate Limit', c: 'err' },
+            { t: 'CRM_Sync_Worker', s: 'SYNC', h: 'Processed', c: 'ok' }
+        ];
+
+        function addLog() {
+            const now = new Date();
+            const timeStr = `[${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}]`;
+            const op = operations[Math.floor(Math.random() * operations.length)];
+            
+            const div = document.createElement('div');
+            div.className = 'log-entry';
+            div.innerHTML = `
+                <span class="log-time">${timeStr}</span>
+                <span class="log-msg ${op.c}">${op.s} /${op.t} - ${op.h}</span>
+            `;
+            
+            consoleEl.prepend(div);
+            if (consoleEl.children.length > 20) consoleEl.lastElementChild.remove();
+        }
+
+        setInterval(addLog, 3500);
+    </script>
+</body>
+</html>

@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WAR ROOM | Buyer Dashboard | EQUITY TERMINAL</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --obsidian: #050505;
+            --graphite: #121212;
+            --graphite-light: #1A1A1A;
+            --bone: #F5F5F0;
+            --acid-green: #C1FF00;
+            --oxidized-copper: #8E522F;
+            --copper-glow: #D97706;
+            --blood-orange: #FF4500;
+            --cream: #FFFDD0;
+            --border-thick: 2px;
+            --grain-opacity: 0.04;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--bone);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.5;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: var(--grain-opacity);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: -0.02em; }
+        
+        /* Layout */
+        .app-container {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        aside {
+            background: var(--graphite);
+            border-right: var(--border-thick) solid var(--graphite-light);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo { font-size: 1.2rem; font-weight: 800; margin-bottom: 3rem; color: var(--bone); text-decoration: none; display: block; }
+        
+        .side-nav { list-style: none; flex: 1; }
+        .side-nav li { margin-bottom: 1rem; }
+        .side-nav a { 
+            color: #777; 
+            text-decoration: none; 
+            font-size: 0.8rem; 
+            font-family: 'JetBrains Mono', monospace; 
+            display: flex; 
+            align-items: center;
+            gap: 0.75rem;
+            transition: color 0.2s;
+        }
+        .side-nav a.active, .side-nav a:hover { color: var(--acid-green); }
+
+        /* Main Content */
+        main { padding: 2rem; overflow-y: auto; }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--graphite-light);
+        }
+
+        .page-title { font-size: 3rem; font-weight: 800; line-height: 0.9; }
+
+        .top-stats {
+            display: flex;
+            gap: 3rem;
+        }
+
+        .stat-item .label { font-size: 0.65rem; color: #666; margin-bottom: 0.25rem; }
+        .stat-item .val { font-size: 1.5rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+
+        /* Kanban Board */
+        .kanban-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        .kanban-column {
+            background: rgba(18,18,18,0.5);
+            border: 1px solid var(--graphite-light);
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .column-header {
+            padding: 1rem;
+            background: var(--graphite-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--bone);
+        }
+
+        .column-title { font-size: 0.7rem; font-weight: 800; }
+        .column-count { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; opacity: 0.5; }
+
+        .column-cards {
+            padding: 1rem;
+            flex: 1;
+        }
+
+        .deal-card {
+            background: var(--obsidian);
+            border: 1px solid var(--graphite-light);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: grab;
+            transition: all 0.2s;
+        }
+
+        .deal-card:hover {
+            border-color: var(--bone);
+            transform: translateX(4px);
+        }
+
+        .deal-card:active { cursor: grabbing; }
+
+        .deal-card-industry { font-size: 0.6rem; color: var(--oxidized-copper); margin-bottom: 0.5rem; }
+        .deal-card-title { font-size: 0.9rem; font-weight: 800; margin-bottom: 1rem; line-height: 1.2; }
+        
+        .deal-card-meta {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--graphite-light);
+        }
+
+        .progress-bar {
+            height: 2px;
+            background: var(--graphite-light);
+            width: 100%;
+            margin-top: 1rem;
+        }
+        .progress-fill { height: 100%; background: var(--acid-green); }
+
+        /* Communications Sidebar */
+        .comms-panel {
+            position: fixed;
+            right: 0; top: 0; bottom: 0;
+            width: 350px;
+            background: var(--obsidian);
+            border-left: var(--border-thick) solid var(--bone);
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .comms-panel.open { transform: translateX(0); }
+
+        .comms-header {
+            padding: 2rem;
+            border-bottom: 1px solid var(--graphite-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .comms-body { padding: 2rem; flex: 1; overflow-y: auto; }
+
+        .msg-bubble {
+            background: var(--graphite);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.8rem;
+            border-left: 2px solid var(--acid-green);
+        }
+
+        .msg-meta { font-size: 0.6rem; color: #555; margin-bottom: 0.25rem; }
+
+        .btn-comms {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--blood-orange);
+            color: var(--bone);
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        .status-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 4px;
+        }
+        .status-active { background: var(--acid-green); }
+
+        @media (max-width: 1200px) {
+            .kanban-container { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <aside>
+            <a href="index.html" class="logo mono">EQUITY.TERMINAL</a>
+            
+            <ul class="side-nav">
+                <li class="mono"><a href="#" class="active"><span>01</span> Dashboard</a></li>
+                <li class="mono"><a href="#"><span>02</span> Deal Pipeline</a></li>
+                <li class="mono"><a href="#"><span>03</span> Document Vault</a></li>
+                <li class="mono"><a href="#"><span>04</span> Verified Lenders</a></li>
+                <li class="mono"><a href="#"><span>05</span> Deal Analyzer</a></li>
+            </ul>
+
+            <div style="margin-top: auto; padding-top: 2rem; border-top: 1px solid var(--graphite-light);">
+                <div class="stat-item" style="margin-bottom: 1rem;">
+                    <div class="label mono">ACCOUNT STATUS</div>
+                    <div class="val" style="font-size: 0.8rem; color: var(--acid-green);">VERIFIED BUYER</div>
+                </div>
+                <div class="stat-item">
+                    <div class="label mono">BUY-SIDE POWER</div>
+                    <div class="val" style="font-size: 0.8rem;">$2.4M USD</div>
+                </div>
+            </div>
+        </aside>
+
+        <main>
+            <header class="dashboard-header">
+                <div>
+                    <div class="mono" style="color: var(--oxidized-copper); font-size: 0.7rem; margin-bottom: 0.5rem;">MISSION CONTROL / BUYER_092</div>
+                    <h1 class="page-title">THE WAR ROOM</h1>
+                </div>
+                <div class="top-stats">
+                    <div class="stat-item">
+                        <div class="label mono">ACTIVE DEALS</div>
+                        <div class="val">08</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="label mono">LOIs ISSUED</div>
+                        <div class="val">02</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="label mono">CLOSED VALUE</div>
+                        <div class="val">$0.00</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="kanban-container">
+                <!-- Initial Review -->
+                <div class="kanban-column" ondrop="drop(event)" ondragover="allowDrop(event)" id="col-1">
+                    <div class="column-header">
+                        <span class="column-title mono">INITIAL REVIEW</span>
+                        <span class="column-count">3</span>
+                    </div>
+                    <div class="column-cards">
+                        <div class="deal-card" draggable="true" ondragstart="drag(event)" id="deal-1">
+                            <div class="deal-card-industry mono">E-COMMERCE</div>
+                            <div class="deal-card-title">Niche Shopify Subscription Box</div>
+                            <div class="deal-card-meta">
+                                <span>SDE: $180K</span>
+                                <span>3.2x</span>
+                            </div>
+                            <div class="progress-bar"><div class="progress-fill" style="width: 20%"></div></div>
+                        </div>
+                        <div class="deal-card" draggable="true" ondragstart="drag(event)" id="deal-2">
+                            <div class="deal-card-industry mono">INDUSTRIAL</div>
+                            <div class="deal-card-title">Precision CNC Machine Shop</div>
+                            <div class="deal-card-meta">
+                                <span>SDE: $950K</span>
+                                <span>3.5x</span>
+                            </div>
+                            <div class="progress-bar"><div class="progress-fill" style="width: 10%"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Due Diligence -->
+                <div class="kanban-column" ondrop="drop(event)" ondragover="allowDrop(event)" id="col-2">
+                    <div class="column-header">
+                        <span class="column-title mono">DUE DILIGENCE</span>
+                        <span class="column-count">2</span>
+                    </div>
+                    <div class="column-cards">
+                        <div class="deal-card" draggable="true" ondragstart="drag(event)" id="deal-3">
+                            <div class="deal-card-industry mono">HOME SERVICES</div>
+                            <div class="deal-card-title">High-Margin HVAC & Cooling</div>
+                            <div class="deal-card-meta">
+                                <span>SDE: $450K</span>
+                                <span>2.7x</span>
+                            </div>
+                            <div class="progress-bar"><div class="progress-fill" style="width: 65%"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LOI Sent -->
+                <div class="kanban-column" ondrop="drop(event)" ondragover="allowDrop(event)" id="col-3">
+                    <div class="column-header">
+                        <span class="column-title mono">LOI SENT</span>
+                        <span class="column-count">1</span>
+                    </div>
+                    <div class="column-cards">
+                        <div class="deal-card" draggable="true" ondragstart="drag(event)" id="deal-4">
+                            <div class="deal-card-industry mono">SAAS</div>
+                            <div class="deal-card-title">SEO Automation Tool</div>
+                            <div class="deal-card-meta">
+                                <span>SDE: $310K</span>
+                                <span>2.7x</span>
+                            </div>
+                            <div class="progress-bar"><div class="progress-fill" style="width: 90%"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Closed -->
+                <div class="kanban-column" ondrop="drop(event)" ondragover="allowDrop(event)" id="col-4">
+                    <div class="column-header" style="border-bottom-color: var(--acid-green);">
+                        <span class="column-title mono">CLOSED / ACQUIRED</span>
+                        <span class="column-count">0</span>
+                    </div>
+                    <div class="column-cards">
+                        <!-- Empty State -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Broker Comms -->
+    <div class="btn-comms" onclick="toggleComms()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    </div>
+
+    <div class="comms-panel" id="commsPanel">
+        <div class="comms-header">
+            <h3 class="mono">BROKER COMMS</h3>
+            <span style="cursor:pointer; font-size: 1.5rem;" onclick="toggleComms()">&times;</span>
+        </div>
+        <div class="comms-body">
+            <div class="msg-bubble">
+                <div class="msg-meta mono">FROM: MARK R. (Apex M&A)</div>
+                <p>The CIM for the CNC shop is uploaded. Note: Seller is firm on the 3.5x multiple due to recent contracts.</p>
+            </div>
+            <div class="msg-bubble">
+                <div class="msg-meta mono">FROM: SARAH L. (Digital Exit)</div>
+                <p>Have you reviewed the Shopify trailing 12 months? We have another LOI coming in on Friday.</p>
+            </div>
+            <div class="msg-bubble" style="background: transparent; border: 1px dashed #444; border-left: 2px solid #444;">
+                <p style="color: #666; font-style: italic;">No new messages from SBA Lender...</p>
+            </div>
+        </div>
+        <div style="padding: 1.5rem; border-top: 1px solid var(--graphite-light);">
+            <textarea placeholder="Direct message broker..." style="width: 100%; background: var(--graphite); border: 1px solid var(--graphite-light); padding: 1rem; color: white; font-family: inherit; margin-bottom: 1rem; height: 80px;"></textarea>
+            <button style="width: 100%; background: var(--acid-green); color: var(--obsidian); border: none; padding: 0.75rem; font-weight: 800; cursor: pointer;" class="mono">SEND INTEL</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleComms() {
+            document.getElementById('commsPanel').classList.toggle('open');
+        }
+
+        // Simple Drag and Drop implementation
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            var data = ev.dataTransfer.getData("text");
+            var column = ev.target.closest('.kanban-column');
+            if (column) {
+                column.querySelector('.column-cards').appendChild(document.getElementById(data));
+                updateCounts();
+            }
+        }
+
+        function updateCounts() {
+            document.querySelectorAll('.kanban-column').forEach(col => {
+                const count = col.querySelector('.column-cards').children.length;
+                col.querySelector('.column-count').innerText = count;
+            });
+        }
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WAR ROOM | Buyer Dashboard | EQUITY TERMINAL</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --obsidian: #050505;
+            --graphite: #121212;
+            --graphite-light: #1A1A1A;
+            --bone: #F5F5F0;
+            --acid-green: #C1FF00;
+            --oxidized-copper: #8E522F;
+            --copper-glow: #D97706;
+            --blood-orange: #FF4500;
+            --cream: #FFFDD0;
+            --border-thick: 2px;
+            --grain-opacity: 0.04;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--bone);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.5;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: var(--grain-opacity);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: -0.02em; }
+        
+        /* Layout */
+        .app-container {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        aside {
+            background: var(--graphite);
+            border-right: var(--border-thick) solid var(--graphite-light);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo { font-size: 1.2rem; font-weight: 800; margin-bottom: 3rem; color: var(--bone); text-decoration: none; display: block; }
+        
+        .side-nav { list-style: none; flex: 1; }
+        .side-nav li { margin-bottom: 1rem; }
+        .side-nav a { 
+            color: #777; 
+            text-decoration: none; 
+            font-size: 0.8rem; 
+            font-family: 'JetBrains Mono', monospace; 
+            display: flex; 
+            align-items: center;
+            gap: 0.75rem;
+            transition: color 0.2s;
+        }
+        .side-nav a.active, .side-nav a:hover { color: var(--acid-green); }
+
+        /* Main Content */
+        main { padding: 2rem; overflow-y: auto; }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--graphite-light);
+        }
+
+        .page-title { font-size: 3rem; font-weight: 800; line-height: 0.9; }
+
+        .top-stats {
+            display: flex;
+            gap: 3rem;
+        }
+
+        .stat-item .label { font-size: 0.65rem; color: #666; margin-bottom: 0.25rem; }
+        .stat-item .val { font-size: 1.5rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+
+        /* Kanban Board */
+        .kanban-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        .kanban-column {
+            background: rgba(18,18,18,0.5);
+            border: 1px solid var(--graphite-light);
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .column-header {
+            padding: 1rem;
+            background: var(--graphite-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--bone);
+        }
+
+        .column-title { font-size: 0.7rem; font-weight: 800; }
+        .column-count { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; opacity: 0.5; }
+
+        .column-cards {
+            padding: 1rem;
+            flex: 1;
+        }
+
+        .deal-card {
+            background: var(--obsidian);
+            border: 1px solid var(--graphite-light);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: grab;
+            transition: all 0.2s;
+        }
+
+        .deal-card:hover {
+            border-color: var(--bone);
+            transform: translateX(4px);
+        }
+
+        .deal-card:active { cursor: grabbing; }
+
+        .deal-card-industry { font-size: 0.6rem; color: var(--oxidized-copper); margin-bottom: 0.5rem; }
+        .deal-card-title { font-size: 0.9rem; font-weight: 800; margin-bottom: 1rem; line-height: 1.2; }
+        
+        .deal-card-meta {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--graphite-light);
+        }
+
+        .progress-bar {
+            height: 2px;
+            background: var(--graphite-light);
+            width: 100%;
+            margin-top: 1rem;
+        }
+        .progress-fill { height: 100%; background: var(--acid-green); }
+
+        /* Communications Sidebar */
+        .comms-panel {
+            position: fixed;
+            right: 0; top: 0; bottom: 0;
+            width: 350px;
+            background: var(--obsidian);
+            border-left: var(--border-thick) solid var(--bone);
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .comms-panel.open { transform: translateX(0); }
+
+        .comms-header {
+            padding: 2rem;
+            border-bottom: 1px solid var(--graphite-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .comms-body { padding: 2rem; flex: 1; overflow-y: auto; }
+
+        .msg-bubble {
+            background: var(--graphite);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.8rem;
+            border-left: 2px solid var(--acid-green);
+        }
+
+        .msg-meta { font-size: 0.6rem; color: #555; margin-bottom: 0.25rem; }
+
+        .btn-comms {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--blood-orange);
+            color: var(--bone);
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        .status-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 4px;
+        }
+        .status-active { background: var(--acid-green); }
+
+        @media (max-width: 1200px) {
+            .kanban-container { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <aside>
+            <a href="#" class="logo mono">EQUITY.TERMINAL</a>
+            
+            <ul class="side-nav">
+                <li class="mono"><a href="#" class="active"><span>01</span> Dashboard</a></li>
+                <li class="mono"><a href="#"><span>02</span> Deal Pipeline</a></li>
+                <li class="mono"><a href="#"><span>03</span> Document Vault</a></li>
+                <li class="mono"><a href="#"><span>04</span> Verified Lenders</a></li>
+                <li class="mono"><a href="#"><span>05</span> Deal Analyzer</a></li>
+            </ul>
+
+            <div style="margin-top: auto; padding-top: 2rem; border-top: 1px solid var(--graphite-light);">
+                <div class="stat-item" style="margin-bottom: 1rem;">
+                    <div class="label mono">ACCOUNT STATUS</div>
+                    <div class="val" style="font-size: 0.8rem; color: var(--acid-green);">VERIFIED BUYER</div>
+                </div>
+                <div class="stat-item">
+                    <div class="label mono">BUY-SIDE POWER</div>
+                    <div class="val" style="font-size: 0.8rem;">$2.4M USD</div>
+                </div>
+            </div>
+        </aside>
+
+        <main>
+            <header class="dashboard-header">
+                <div>
+                    <div class="mono" style="color: var(--oxidized-copper); font-size: 0.7rem; margin-bottom: 0.5rem;">MISSION CONTROL / BUYER_092</div>
+                    <h1 class="page-title">THE WAR ROOM</h1>
+                </div>
+                <div class="top-stats">
+                    <div class="stat-item">
+                        <div class="label mono">ACTIVE DEALS</div>
+                        <div class="val">08</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="label mono">LOIs ISSUED</div>
+                        <div class="val">02</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="label mono">CLOSED VALUE</div>
+                        <div class="val">$0.00</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="kanban-container">
+                <!-- Initial Review -->
+                <div class="kanban-column" ondrop="drop(event)" ondragover="allowDrop(event)" id="col-1">
+                    <div class="column-header">
+                        <span class="column-title mono">INITIAL REVIEW</span>
+                        <span class="column-count">3</span>
+                    </div>
+                    <div class="column-cards">
+                        <div class="deal-card" draggable="true" ondragstart="drag(event)" id="deal-1">
+                            <div class="deal-card-industry mono">E-COMMERCE</div>
+                            <div class="deal-card-title">Niche Shopify Subscription Box</div>
+                            <div class="deal-card-meta">
+                                <span>SDE: $180K</span>
+                                <span>3.2x</span>
+                            </div>
+                            <div class="progress-bar"><div class="progress-fill" style="width: 20%"></div></div>
+                        </div>
+                        <div class="deal-card" draggable="true" ondragstart="drag(event)" id="deal-2">
+                            <div class="deal-card-industry mono">INDUSTRIAL</div>
+                            <div class="deal-card-title">Precision CNC Machine Shop</div>
+                            <div class="deal-card-meta">
+                                <span>SDE: $950K</span>
+                                <span>3.5x</span>
+                            </div>
+                            <div class="progress-bar"><div class="progress-fill" style="width: 10%"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Due Diligence -->
+                <div class="kanban-column" ondrop="drop(event)" ondragover="allowDrop(event)" id="col-2">
+                    <div class="column-header">
+                        <span class="column-title mono">DUE DILIGENCE</span>
+                        <span class="column-count">2</span>
+                    </div>
+                    <div class="column-cards">
+                        <div class="deal-card" draggable="true" ondragstart="drag(event)" id="deal-3">
+                            <div class="deal-card-industry mono">HOME SERVICES</div>
+                            <div class="deal-card-title">High-Margin HVAC & Cooling</div>
+                            <div class="deal-card-meta">
+                                <span>SDE: $450K</span>
+                                <span>2.7x</span>
+                            </div>
+                            <div class="progress-bar"><div class="progress-fill" style="width: 65%"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LOI Sent -->
+                <div class="kanban-column" ondrop="drop(event)" ondragover="allowDrop(event)" id="col-3">
+                    <div class="column-header">
+                        <span class="column-title mono">LOI SENT</span>
+                        <span class="column-count">1</span>
+                    </div>
+                    <div class="column-cards">
+                        <div class="deal-card" draggable="true" ondragstart="drag(event)" id="deal-4">
+                            <div class="deal-card-industry mono">SAAS</div>
+                            <div class="deal-card-title">SEO Automation Tool</div>
+                            <div class="deal-card-meta">
+                                <span>SDE: $310K</span>
+                                <span>2.7x</span>
+                            </div>
+                            <div class="progress-bar"><div class="progress-fill" style="width: 90%"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Closed -->
+                <div class="kanban-column" ondrop="drop(event)" ondragover="allowDrop(event)" id="col-4">
+                    <div class="column-header" style="border-bottom-color: var(--acid-green);">
+                        <span class="column-title mono">CLOSED / ACQUIRED</span>
+                        <span class="column-count">0</span>
+                    </div>
+                    <div class="column-cards">
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Broker Comms Button -->
+    <div class="btn-comms" onclick="toggleComms()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    </div>
+
+    <!-- Comms Panel Overlay -->
+    <div class="comms-panel" id="commsPanel">
+        <div class="comms-header">
+            <h3 class="mono">BROKER COMMS</h3>
+            <span style="cursor:pointer; font-size: 1.5rem;" onclick="toggleComms()">&times;</span>
+        </div>
+        <div class="comms-body">
+            <div class="msg-bubble">
+                <div class="msg-meta mono">FROM: MARK R. (Apex M&A)</div>
+                <p>The CIM for the CNC shop is uploaded to the vault. Note: Seller is firm on the 3.5x multiple due to recent contracts.</p>
+            </div>
+            <div class="msg-bubble">
+                <div class="msg-meta mono">FROM: SARAH L. (Digital Exit)</div>
+                <p>Have you reviewed the Shopify trailing 12 months? We have another LOI coming in on Friday from a PE group.</p>
+            </div>
+            <div class="msg-bubble" style="background: transparent; border: 1px dashed #444; border-left: 2px solid #444;">
+                <p style="color: #666; font-style: italic;">No new messages from SBA Lender regarding HVAC deal.</p>
+            </div>
+        </div>
+        <div style="padding: 1.5rem; border-top: 1px solid var(--graphite-light);">
+            <textarea placeholder="Direct message broker..." style="width: 100%; background: var(--graphite); border: 1px solid var(--graphite-light); padding: 1rem; color: white; font-family: inherit; margin-bottom: 1rem; height: 80px; resize: none;"></textarea>
+            <button style="width: 100%; background: var(--acid-green); color: var(--obsidian); border: none; padding: 0.75rem; font-weight: 800; cursor: pointer;" class="mono">SEND INTEL</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleComms() {
+            document.getElementById('commsPanel').classList.toggle('open');
+        }
+
+        // Native HTML5 Drag and Drop logic
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+            ev.target.style.opacity = "0.4";
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            var data = ev.dataTransfer.getData("text");
+            var targetCardContainer = ev.target.closest('.kanban-column');
+            
+            if (targetCardContainer) {
+                var droppedElement = document.getElementById(data);
+                droppedElement.style.opacity = "1";
+                targetCardContainer.querySelector('.column-cards').appendChild(droppedElement);
+                updateCounts();
+            }
+        }
+
+        function updateCounts() {
+            document.querySelectorAll('.kanban-column').forEach(col => {
+                const count = col.querySelector('.column-cards').children.length;
+                col.querySelector('.column-count').innerText = count;
+            });
+        }
+
+        // Reset opacity if drop is cancelled
+        document.addEventListener("dragend", function(event) {
+            event.target.style.opacity = "1";
+        });
+    </script>
+</body>
+</html>

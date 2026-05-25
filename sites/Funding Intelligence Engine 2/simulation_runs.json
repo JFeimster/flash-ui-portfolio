@@ -1,0 +1,147 @@
+{
+  "underwriter_calibration": {
+    "engine_version": "F.I.E. v2.4-RiskCal",
+    "last_synchronized": "2024-10-24T18:42:00Z",
+    "recommendation_weights": {
+      "capital_weight": 0.20,
+      "capacity_weight": 0.30,
+      "collateral_weight": 0.15,
+      "character_weight": 0.15,
+      "conditions_weight": 0.20
+    }
+  },
+  "simulation_scenarios": [
+    {
+      "id": "scenario_baseline",
+      "name": "Steady State (Baseline)",
+      "description": "Standard underwriting constraints adhering to FDIC macroguidelines under optimal conditions.",
+      "multipliers": {
+        "arr_multiplier": 1.0,
+        "dscr_modifier": 0.0,
+        "risk_trigger_sensitivity": 1.0,
+        "apr_offset_bps": 0
+      },
+      "expected_outcomes": {
+        "saas_series_a": { "score": 84, "tier": "Premium Index" },
+        "ecom_scaleup": { "score": 76, "tier": "Optimal Match" },
+        "heavy_logistics": { "score": 92, "tier": "Excellent Index" },
+        "mainstreet_med": { "score": 88, "tier": "Premium Index" }
+      }
+    },
+    {
+      "id": "scenario_credit_crunch",
+      "name": "Sustained SaaS & Capital Contraction",
+      "description": "Drastic drop in venture availability, multiplying risk triggers on negative cash flows, requiring higher runway parameters.",
+      "multipliers": {
+        "arr_multiplier": 0.85,
+        "dscr_modifier": -0.25,
+        "risk_trigger_sensitivity": 1.5,
+        "apr_offset_bps": 150
+      },
+      "expected_outcomes": {
+        "saas_series_a": { "score": 62, "tier": "Sub-Optimal" },
+        "ecom_scaleup": { "score": 69, "tier": "Sub-Optimal" },
+        "heavy_logistics": { "score": 85, "tier": "Premium Index" },
+        "mainstreet_med": { "score": 81, "tier": "Premium Index" }
+      }
+    },
+    {
+      "id": "scenario_supply_chain_crisis",
+      "name": "Supply Chain & Import Shocks",
+      "description": "Simulates customs bottlenecks, shipping rate hikes, and inventory depreciation targeting heavy cargo and e-commerce models.",
+      "multipliers": {
+        "arr_multiplier": 0.90,
+        "dscr_modifier": -0.15,
+        "risk_trigger_sensitivity": 1.8,
+        "apr_offset_bps": 75
+      },
+      "expected_outcomes": {
+        "saas_series_a": { "score": 82, "tier": "Premium Index" },
+        "ecom_scaleup": { "score": 58, "tier": "Sub-Optimal" },
+        "heavy_logistics": { "score": 74, "tier": "Optimal Match" },
+        "mainstreet_med": { "score": 86, "tier": "Premium Index" }
+      }
+    },
+    {
+      "id": "scenario_hyperinflation_yield_spike",
+      "name": "Hyperinflationary Yield Curve Shift",
+      "description": "Macroeconomic shift driving high-interest environment, elevating debt servicing requirements.",
+      "multipliers": {
+        "arr_multiplier": 0.95,
+        "dscr_modifier": -0.40,
+        "risk_trigger_sensitivity": 1.2,
+        "apr_offset_bps": 300
+      },
+      "expected_outcomes": {
+        "saas_series_a": { "score": 71, "tier": "Optimal Match" },
+        "ecom_scaleup": { "score": 64, "tier": "Sub-Optimal" },
+        "heavy_logistics": { "score": 80, "tier": "Premium Index" },
+        "mainstreet_med": { "score": 78, "tier": "Optimal Match" }
+      }
+    }
+  ],
+  "simulation_runs": [
+    {
+      "run_id": "sim_run_90812",
+      "timestamp": "2024-10-24T14:15:33Z",
+      "analyst_id": "an_mercer_k",
+      "archetype_id": "saas_series_a",
+      "scenario_id": "scenario_credit_crunch",
+      "pre_score": 84,
+      "post_score": 62,
+      "risk_override_applied": true,
+      "override_details": {
+        "authorized_by": "underwriting_committee_lvl2",
+        "override_reason": "Strategic SaaS customer retention program. Retained 'Venture Debt Runway Line' pre-qualification on override index.",
+        "original_action": "Reject",
+        "override_action": "Approve under covenant"
+      },
+      "decision_tree_audit_trail": [
+        "Read borrower_archetypes: saas_series_a [ARR: $4.50M]",
+        "Apply Scenario 'scenario_credit_crunch' [SaaS Contraction]",
+        "Recalculate dimensions: character (92 -> 82), capacity (79 -> 54), conditions (85 -> 45)",
+        "Inject custom risk trigger: high_burn_rate_warning",
+        "Target Readiness Index calculated at 62",
+        "Route matching executed: Minimum score 80 required for prod_venture_line. Pre-qualification failed.",
+        "Manual Override triggered by Mercer K. with authorization token."
+      ]
+    },
+    {
+      "run_id": "sim_run_90813",
+      "timestamp": "2024-10-24T16:30:12Z",
+      "analyst_id": "an_vance_j",
+      "archetype_id": "heavy_logistics",
+      "scenario_id": "scenario_supply_chain_crisis",
+      "pre_score": 92,
+      "post_score": 74,
+      "risk_override_applied": false,
+      "override_details": null,
+      "decision_tree_audit_trail": [
+        "Read borrower_archetypes: heavy_logistics [ARR: $15.40M]",
+        "Apply Scenario 'scenario_supply_chain_crisis' [Customs Shocks]",
+        "Recalculate dimensions: collateral (98 -> 80), capacity (94 -> 72)",
+        "Inject custom risk trigger: freight_volatility_buffer",
+        "Target Readiness Index calculated at 74",
+        "Route matching executed: Pre-qualified for prod_loc_secured ($5.39M max capacity)."
+      ]
+    },
+    {
+      "run_id": "sim_run_90814",
+      "timestamp": "2024-10-24T17:55:00Z",
+      "analyst_id": "an_vance_j",
+      "archetype_id": "ecom_scaleup",
+      "scenario_id": "scenario_supply_chain_crisis",
+      "pre_score": 76,
+      "post_score": 58,
+      "risk_override_applied": false,
+      "override_details": null,
+      "decision_tree_audit_trail": [
+        "Read borrower_archetypes: ecom_scaleup [ARR: $8.20M]",
+        "Apply Scenario 'scenario_supply_chain_crisis' [Import Shocks]",
+        "Recalculate dimensions: capital (65 -> 50), capacity (85 -> 60), conditions (75 -> 40)",
+        "Target Readiness Index drops to 58",
+        "Route matching executed: zero pre-qualified facilities found (score below 65 baseline)."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEAL COMMAND | OXIDIZED LEDGER</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --obsidian: #050505;
+            --bone: #F5F5F0;
+            --acid-green: #C1FF00;
+            --oxidized-copper: #8E593E;
+            --blood-orange: #FF3D00;
+            --graphite: #1A1A1A;
+            --panel: #0F0F0F;
+            --border-width: 2px;
+            --noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--obsidian);
+            color: var(--bone);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.4;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--noise);
+            opacity: 0.04;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            border-bottom: var(--border-width) solid var(--graphite);
+            background: var(--obsidian);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-weight: 900;
+            font-size: 1.2rem;
+            letter-spacing: -1px;
+            color: var(--bone);
+            text-decoration: none;
+        }
+        .logo span { color: var(--oxidized-copper); }
+
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a {
+            color: var(--bone);
+            text-decoration: none;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .nav-links a.active { color: var(--acid-green); }
+
+        /* Dashboard Header */
+        .dash-header {
+            padding: 2rem;
+            border-bottom: var(--border-width) solid var(--graphite);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            line-height: 0.8;
+        }
+
+        /* Layout Grid */
+        .dash-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            min-height: calc(100vh - 160px);
+        }
+
+        /* Sidebar: Saved Filters */
+        .saved-filters {
+            border-right: var(--border-width) solid var(--graphite);
+            padding: 2rem;
+        }
+
+        .sidebar-label {
+            font-size: 0.65rem;
+            color: #555;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            display: block;
+            letter-spacing: 2px;
+        }
+
+        .filter-alert-card {
+            background: var(--panel);
+            border: 1px solid var(--graphite);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .filter-alert-card.new::after {
+            content: "NEW MATCH";
+            position: absolute;
+            top: -5px; right: -5px;
+            background: var(--blood-orange);
+            color: white;
+            font-size: 0.5rem;
+            padding: 2px 5px;
+            font-weight: 900;
+        }
+
+        .filter-alert-card h4 {
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .filter-alert-card p {
+            font-size: 0.7rem;
+            color: #777;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Pipeline Kanban */
+        .pipeline-container {
+            padding: 2rem;
+            background-image: radial-gradient(circle at 50% 50%, #0a0a0a 0%, transparent 100%);
+        }
+
+        .pipeline-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            height: 100%;
+        }
+
+        .pipeline-col {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .col-header {
+            border-bottom: 1px solid var(--bone);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .col-title {
+            font-size: 0.75rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+        }
+
+        .col-count {
+            font-family: 'JetBrains Mono';
+            font-size: 0.75rem;
+            color: var(--acid-green);
+        }
+
+        .deal-card {
+            background: var(--panel);
+            border: 1px solid var(--graphite);
+            padding: 1.25rem;
+            cursor: grab;
+            transition: border-color 0.2s;
+        }
+
+        .deal-card:hover {
+            border-color: var(--oxidized-copper);
+        }
+
+        .deal-card .industry {
+            font-size: 0.55rem;
+            color: var(--oxidized-copper);
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .deal-card h5 {
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            line-height: 1.1;
+        }
+
+        .deal-card .price {
+            font-family: 'JetBrains Mono';
+            color: var(--acid-green);
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        /* Terminal Section */
+        .terminal-container {
+            border-left: var(--border-width) solid var(--graphite);
+            background: #000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal-header {
+            padding: 1rem;
+            background: var(--graphite);
+            font-size: 0.6rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .terminal-body {
+            flex-grow: 1;
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            overflow-y: auto;
+            color: #00FF41; /* Classic Matrix/Terminal Green */
+            text-transform: none;
+        }
+
+        .log-entry {
+            margin-bottom: 1rem;
+            border-left: 2px solid #333;
+            padding-left: 0.75rem;
+        }
+
+        .log-timestamp {
+            color: #666;
+            font-size: 0.65rem;
+            margin-bottom: 0.25rem;
+            display: block;
+        }
+
+        .terminal-input-wrapper {
+            padding: 1rem;
+            border-top: 1px solid var(--graphite);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .terminal-input-wrapper span {
+            color: var(--acid-green);
+            font-family: 'JetBrains Mono';
+        }
+
+        .terminal-input {
+            background: transparent;
+            border: none;
+            color: var(--bone);
+            font-family: 'JetBrains Mono';
+            font-size: 0.75rem;
+            width: 100%;
+            outline: none;
+        }
+
+        /* Utility */
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            font-weight: 900;
+            background: var(--bone);
+            color: var(--obsidian);
+            border: none;
+            cursor: pointer;
+        }
+
+        @media (max-width: 1200px) {
+            .dash-grid { grid-template-columns: 1fr; }
+            .saved-filters, .terminal-container { border: none; border-bottom: var(--border-width) solid var(--graphite); }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">OXIDIZED<span>LEDGER</span></a>
+        <div class="nav-links">
+            <a href="index.html">Marketplace</a>
+            <a href="#" class="active">Command Center</a>
+            <a href="#">Analyzer</a>
+            <a href="#">Network</a>
+        </div>
+        <div class="mono" style="font-size: 0.7rem; color: var(--oxidized-copper);">Operator: ADM_SESSION_882</div>
+    </nav>
+
+    <header class="dash-header">
+        <div>
+            <span class="sidebar-label mono">/ / PERSONAL DEAL FLOW</span>
+            <h1>Command Center</h1>
+        </div>
+        <div class="mono" style="font-size: 0.8rem; text-align: right;">
+            <div style="color: var(--acid-green);">Active Pursuits: 07</div>
+            <div style="color: #444;">Last Sync: Just Now</div>
+        </div>
+    </header>
+
+    <div class="dash-grid">
+        <!-- Sidebar: Saved Filters -->
+        <aside class="saved-filters">
+            <span class="sidebar-label">WATCHED FILTERS</span>
+            
+            <div class="filter-alert-card new">
+                <span class="log-timestamp mono">Criteria: SaaS | < 3.5x SDE</span>
+                <h4>Project 'Aether'</h4>
+                <p>New listing detected in Pacific NW. $450k SDE, Asking $1.4M.</p>
+                <button class="btn-small">Inspect</button>
+            </div>
+
+            <div class="filter-alert-card">
+                <span class="log-timestamp mono">Criteria: HVAC | Texas</span>
+                <h4>Austin HVAC Portfolio</h4>
+                <p>Price dropped 10%. Now within target range.</p>
+                <button class="btn-small">Inspect</button>
+            </div>
+
+            <div class="filter-alert-card">
+                <span class="log-timestamp mono">Criteria: EB-5 Eligible</span>
+                <h4>No New Matches</h4>
+                <p style="font-style: italic;">Monitoring 14 sources...</p>
+            </div>
+        </aside>
+
+        <!-- Main: Pipeline -->
+        <main class="pipeline-container">
+            <div class="pipeline-board">
+                <!-- Column 1 -->
+                <div class="pipeline-col">
+                    <div class="col-header">
+                        <span class="col-title mono">Reviewing</span>
+                        <span class="col-count">[03]</span>
+                    </div>
+                    
+                    <div class="deal-card">
+                        <span class="industry">Ecommerce</span>
+                        <h5>Pet Nutrition Subscription</h5>
+                        <div class="price">$1,200,000</div>
+                    </div>
+
+                    <div class="deal-card">
+                        <span class="industry">Service</span>
+                        <h5>Precision Machine Shop</h5>
+                        <div class="price">$3,450,000</div>
+                    </div>
+
+                    <div class="deal-card">
+                        <span class="industry">SaaS</span>
+                        <h5>Legal-Tech API Tool</h5>
+                        <div class="price">$850,000</div>
+                    </div>
+                </div>
+
+                <!-- Column 2 -->
+                <div class="pipeline-col">
+                    <div class="col-header">
+                        <span class="col-title mono">Due Diligence</span>
+                        <span class="col-count">[02]</span>
+                    </div>
+
+                    <div class="deal-card" style="border-left: 3px solid var(--acid-green);">
+                        <span class="industry">Route Business</span>
+                        <h5>FedEx Ground Portfolio</h5>
+                        <div class="price">$980,000</div>
+                    </div>
+
+                    <div class="deal-card">
+                        <span class="industry">Agencies</span>
+                        <h5>Creative Studio (NYC)</h5>
+                        <div class="price">$2,100,000</div>
+                    </div>
+                </div>
+
+                <!-- Column 3 -->
+                <div class="pipeline-col">
+                    <div class="col-header">
+                        <span class="col-title mono">LOI / Closing</span>
+                        <span class="col-count">[02]</span>
+                    </div>
+
+                    <div class="deal-card" style="border-left: 3px solid var(--blood-orange);">
+                        <span class="industry">Franchise</span>
+                        <h5>Mobile Auto Detail</h5>
+                        <div class="price">$425,000</div>
+                    </div>
+
+                    <div class="deal-card">
+                        <span class="industry">Real Estate</span>
+                        <h5>Self-Storage (120 Units)</h5>
+                        <div class="price">$5,200,000</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Terminal: Deal Notes -->
+        <section class="terminal-container">
+            <div class="terminal-header">
+                <span class="mono">DEAL_NOTES_TERMINAL.EXE</span>
+                <span>CONNECTED // SECURE</span>
+            </div>
+            <div class="terminal-body" id="terminalBody">
+                <div class="log-entry">
+                    <span class="log-timestamp">2023-11-20 14:02:11</span>
+                    > CALL NOTES: FedEx Route Seller. 
+                    > Seller is burnt out. 5 trucks, 2 spares included. 
+                    > P&L shows $220k EBITDA but includes personal SUV. 
+                    > Adjusting multiple to 3.8x.
+                </div>
+                <div class="log-entry">
+                    <span class="log-timestamp">2023-11-21 09:45:00</span>
+                    > ALERT: Legal-Tech SaaS deal. 
+                    > Churn rate is 8% MoM. High. 
+                    > Need to verify customer concentration in diligence.
+                </div>
+                <div class="log-entry">
+                    <span class="log-timestamp">2023-11-22 16:20:44</span>
+                    > SYSTEM: Data room access granted for 'Project Aether'.
+                    > Downloading files... [DONE]
+                </div>
+            </div>
+            <div class="terminal-input-wrapper">
+                <span>&gt;</span>
+                <input type="text" class="terminal-input" id="terminalInput" placeholder="Add finding or log entry..." autocomplete="off">
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const termInput = document.getElementById('terminalInput');
+        const termBody = document.getElementById('terminalBody');
+
+        termInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter' && this.value.trim() !== '') {
+                const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                entry.innerHTML = `
+                    <span class="log-timestamp">${now}</span>
+                    > ${this.value.toUpperCase()}
+                `;
+                termBody.appendChild(entry);
+                termBody.scrollTop = termBody.scrollHeight;
+                this.value = '';
+            }
+        });
+
+        // Simple interaction for Kanban cards
+        document.querySelectorAll('.deal-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const title = card.querySelector('h5').innerText;
+                termInput.value = `INSPECTING ${title}: `;
+                termInput.focus();
+            });
+        });
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEAL COMMAND | OXIDIZED LEDGER</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --obsidian: #050505;
+            --bone: #F5F5F0;
+            --acid-green: #C1FF00;
+            --oxidized-copper: #8E593E;
+            --blood-orange: #FF3D00;
+            --graphite: #1A1A1A;
+            --panel: #0F0F0F;
+            --border-width: 2px;
+            --noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--obsidian);
+            color: var(--bone);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.4;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--noise);
+            opacity: 0.04;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            border-bottom: var(--border-width) solid var(--graphite);
+            background: var(--obsidian);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-weight: 900;
+            font-size: 1.2rem;
+            letter-spacing: -1px;
+            color: var(--bone);
+            text-decoration: none;
+        }
+        .logo span { color: var(--oxidized-copper); }
+
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a {
+            color: var(--bone);
+            text-decoration: none;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .nav-links a.active { color: var(--acid-green); }
+
+        /* Dashboard Header */
+        .dash-header {
+            padding: 2rem;
+            border-bottom: var(--border-width) solid var(--graphite);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            line-height: 0.8;
+        }
+
+        /* Layout Grid */
+        .dash-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            min-height: calc(100vh - 160px);
+        }
+
+        /* Sidebar: Saved Filters */
+        .saved-filters {
+            border-right: var(--border-width) solid var(--graphite);
+            padding: 2rem;
+        }
+
+        .sidebar-label {
+            font-size: 0.65rem;
+            color: #555;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            display: block;
+            letter-spacing: 2px;
+        }
+
+        .filter-alert-card {
+            background: var(--panel);
+            border: 1px solid var(--graphite);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .filter-alert-card.new::after {
+            content: "NEW MATCH";
+            position: absolute;
+            top: -5px; right: -5px;
+            background: var(--blood-orange);
+            color: white;
+            font-size: 0.5rem;
+            padding: 2px 5px;
+            font-weight: 900;
+        }
+
+        .filter-alert-card h4 {
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .filter-alert-card p {
+            font-size: 0.7rem;
+            color: #777;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Pipeline Kanban */
+        .pipeline-container {
+            padding: 2rem;
+            background-image: radial-gradient(circle at 50% 50%, #0a0a0a 0%, transparent 100%);
+        }
+
+        .pipeline-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            height: 100%;
+        }
+
+        .pipeline-col {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .col-header {
+            border-bottom: 1px solid var(--bone);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .col-title {
+            font-size: 0.75rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+        }
+
+        .col-count {
+            font-family: 'JetBrains Mono';
+            font-size: 0.75rem;
+            color: var(--acid-green);
+        }
+
+        .deal-card {
+            background: var(--panel);
+            border: 1px solid var(--graphite);
+            padding: 1.25rem;
+            cursor: grab;
+            transition: border-color 0.2s;
+        }
+
+        .deal-card:hover {
+            border-color: var(--oxidized-copper);
+        }
+
+        .deal-card .industry {
+            font-size: 0.55rem;
+            color: var(--oxidized-copper);
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .deal-card h5 {
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            line-height: 1.1;
+        }
+
+        .deal-card .price {
+            font-family: 'JetBrains Mono';
+            color: var(--acid-green);
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        /* Terminal Section */
+        .terminal-container {
+            border-left: var(--border-width) solid var(--graphite);
+            background: #000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal-header {
+            padding: 1rem;
+            background: var(--graphite);
+            font-size: 0.6rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .terminal-body {
+            flex-grow: 1;
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            overflow-y: auto;
+            color: #00FF41; /* Classic Matrix/Terminal Green */
+            text-transform: none;
+        }
+
+        .log-entry {
+            margin-bottom: 1rem;
+            border-left: 2px solid #333;
+            padding-left: 0.75rem;
+        }
+
+        .log-timestamp {
+            color: #666;
+            font-size: 0.65rem;
+            margin-bottom: 0.25rem;
+            display: block;
+        }
+
+        .terminal-input-wrapper {
+            padding: 1rem;
+            border-top: 1px solid var(--graphite);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .terminal-input-wrapper span {
+            color: var(--acid-green);
+            font-family: 'JetBrains Mono';
+        }
+
+        .terminal-input {
+            background: transparent;
+            border: none;
+            color: var(--bone);
+            font-family: 'JetBrains Mono';
+            font-size: 0.75rem;
+            width: 100%;
+            outline: none;
+        }
+
+        /* Utility */
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            font-weight: 900;
+            background: var(--bone);
+            color: var(--obsidian);
+            border: none;
+            cursor: pointer;
+        }
+
+        @media (max-width: 1200px) {
+            .dash-grid { grid-template-columns: 1fr; }
+            .saved-filters, .terminal-container { border: none; border-bottom: var(--border-width) solid var(--graphite); }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">OXIDIZED<span>LEDGER</span></a>
+        <div class="nav-links">
+            <a href="index.html">Marketplace</a>
+            <a href="#" class="active">Command Center</a>
+            <a href="#">Analyzer</a>
+            <a href="#">Network</a>
+        </div>
+        <div class="mono" style="font-size: 0.7rem; color: var(--oxidized-copper);">Operator: ADM_SESSION_882</div>
+    </nav>
+
+    <header class="dash-header">
+        <div>
+            <span class="sidebar-label mono">/ / PERSONAL DEAL FLOW</span>
+            <h1>Command Center</h1>
+        </div>
+        <div class="mono" style="font-size: 0.8rem; text-align: right;">
+            <div style="color: var(--acid-green);">Active Pursuits: 07</div>
+            <div style="color: #444;">Last Sync: Just Now</div>
+        </div>
+    </header>
+
+    <div class="dash-grid">
+        <!-- Sidebar: Saved Filters -->
+        <aside class="saved-filters">
+            <span class="sidebar-label">WATCHED FILTERS</span>
+            
+            <div class="filter-alert-card new">
+                <span class="log-timestamp mono">Criteria: SaaS | < 3.5x SDE</span>
+                <h4>Project 'Aether'</h4>
+                <p>New listing detected in Pacific NW. $450k SDE, Asking $1.4M.</p>
+                <button class="btn-small">Inspect</button>
+            </div>
+
+            <div class="filter-alert-card">
+                <span class="log-timestamp mono">Criteria: HVAC | Texas</span>
+                <h4>Austin HVAC Portfolio</h4>
+                <p>Price dropped 10%. Now within target range.</p>
+                <button class="btn-small">Inspect</button>
+            </div>
+
+            <div class="filter-alert-card">
+                <span class="log-timestamp mono">Criteria: EB-5 Eligible</span>
+                <h4>No New Matches</h4>
+                <p style="font-style: italic;">Monitoring 14 sources...</p>
+            </div>
+        </aside>
+
+        <!-- Main: Pipeline -->
+        <main class="pipeline-container">
+            <div class="pipeline-board">
+                <!-- Column 1 -->
+                <div class="pipeline-col">
+                    <div class="col-header">
+                        <span class="col-title mono">Reviewing</span>
+                        <span class="col-count">[03]</span>
+                    </div>
+                    
+                    <div class="deal-card">
+                        <span class="industry">Ecommerce</span>
+                        <h5>Pet Nutrition Subscription</h5>
+                        <div class="price">$1,200,000</div>
+                    </div>
+
+                    <div class="deal-card">
+                        <span class="industry">Service</span>
+                        <h5>Precision Machine Shop</h5>
+                        <div class="price">$3,450,000</div>
+                    </div>
+
+                    <div class="deal-card">
+                        <span class="industry">SaaS</span>
+                        <h5>Legal-Tech API Tool</h5>
+                        <div class="price">$850,000</div>
+                    </div>
+                </div>
+
+                <!-- Column 2 -->
+                <div class="pipeline-col">
+                    <div class="col-header">
+                        <span class="col-title mono">Due Diligence</span>
+                        <span class="col-count">[02]</span>
+                    </div>
+
+                    <div class="deal-card" style="border-left: 3px solid var(--acid-green);">
+                        <span class="industry">Route Business</span>
+                        <h5>FedEx Ground Portfolio</h5>
+                        <div class="price">$980,000</div>
+                    </div>
+
+                    <div class="deal-card">
+                        <span class="industry">Agencies</span>
+                        <h5>Creative Studio (NYC)</h5>
+                        <div class="price">$2,100,000</div>
+                    </div>
+                </div>
+
+                <!-- Column 3 -->
+                <div class="pipeline-col">
+                    <div class="col-header">
+                        <span class="col-title mono">LOI / Closing</span>
+                        <span class="col-count">[02]</span>
+                    </div>
+
+                    <div class="deal-card" style="border-left: 3px solid var(--blood-orange);">
+                        <span class="industry">Franchise</span>
+                        <h5>Mobile Auto Detail</h5>
+                        <div class="price">$425,000</div>
+                    </div>
+
+                    <div class="deal-card">
+                        <span class="industry">Real Estate</span>
+                        <h5>Self-Storage (120 Units)</h5>
+                        <div class="price">$5,200,000</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Terminal: Deal Notes -->
+        <section class="terminal-container">
+            <div class="terminal-header">
+                <span class="mono">DEAL_NOTES_TERMINAL.EXE</span>
+                <span>CONNECTED // SECURE</span>
+            </div>
+            <div class="terminal-body" id="terminalBody">
+                <div class="log-entry">
+                    <span class="log-timestamp">2023-11-20 14:02:11</span>
+                    > CALL NOTES: FedEx Route Seller. 
+                    > Seller is burnt out. 5 trucks, 2 spares included. 
+                    > P&L shows $220k EBITDA but includes personal SUV. 
+                    > Adjusting multiple to 3.8x.
+                </div>
+                <div class="log-entry">
+                    <span class="log-timestamp">2023-11-21 09:45:00</span>
+                    > ALERT: Legal-Tech SaaS deal. 
+                    > Churn rate is 8% MoM. High. 
+                    > Need to verify customer concentration in diligence.
+                </div>
+                <div class="log-entry">
+                    <span class="log-timestamp">2023-11-22 16:20:44</span>
+                    > SYSTEM: Data room access granted for 'Project Aether'.
+                    > Downloading files... [DONE]
+                </div>
+            </div>
+            <div class="terminal-input-wrapper">
+                <span>&gt;</span>
+                <input type="text" class="terminal-input" id="terminalInput" placeholder="Add finding or log entry..." autocomplete="off">
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const termInput = document.getElementById('terminalInput');
+        const termBody = document.getElementById('terminalBody');
+
+        termInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter' && this.value.trim() !== '') {
+                const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                entry.innerHTML = `
+                    <span class="log-timestamp">${now}</span>
+                    > ${this.value.toUpperCase()}
+                `;
+                termBody.appendChild(entry);
+                termBody.scrollTop = termBody.scrollHeight;
+                this.value = '';
+            }
+        });
+
+        // Simple interaction for Kanban cards
+        document.querySelectorAll('.deal-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const title = card.querySelector('h5').innerText;
+                termInput.value = `INSPECTING ${title}: `;
+                termInput.focus();
+            });
+        });
+    </script>
+</body>
+</html>

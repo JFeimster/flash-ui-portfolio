@@ -1,0 +1,352 @@
+:root {
+            --bg-deep: #050807;
+            --bg-card: #0c1210;
+            --emerald: #00ff88;
+            --emerald-dim: rgba(0, 255, 136, 0.2);
+            --emerald-glow: rgba(0, 255, 136, 0.5);
+            --danger: #ff4757;
+            --warning: #ffa502;
+            --text-main: #e0e0e0;
+            --text-dim: #889990;
+            --circuit-line: rgba(0, 255, 136, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 2px 2px, var(--circuit-line) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+
+        .circuit-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .analyzer-container {
+            width: 100%;
+            max-width: 1000px;
+            padding: 40px;
+            position: relative;
+        }
+
+        .main-card {
+            background: var(--bg-card);
+            border: 1px solid var(--emerald-dim);
+            border-radius: 20px;
+            padding: 48px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 20px var(--emerald-dim);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Circuit Corner Accents */
+        .main-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100px;
+            height: 100px;
+            border-top: 2px solid var(--emerald);
+            border-left: 2px solid var(--emerald);
+            border-radius: 20px 0 0 0;
+            opacity: 0.5;
+        }
+
+        .header {
+            grid-column: span 2;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+            background: linear-gradient(to right, #fff, var(--emerald));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--emerald);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper span.unit {
+            position: absolute;
+            left: 16px;
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        input {
+            width: 100%;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 16px 16px 16px 40px;
+            color: #fff;
+            font-size: 1.1rem;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--emerald);
+            background: rgba(0, 255, 136, 0.05);
+            box-shadow: 0 0 15px var(--emerald-dim);
+        }
+
+        .visual-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.2);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px dashed rgba(0, 255, 136, 0.2);
+        }
+
+        /* Gauge Styling */
+        .gauge-container {
+            width: 300px;
+            height: 180px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gauge-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .gauge-bg {
+            fill: none;
+            stroke: #1a2521;
+            stroke-width: 20;
+            stroke-linecap: round;
+        }
+
+        .gauge-track {
+            fill: none;
+            stroke-width: 20;
+            stroke-linecap: round;
+            stroke-dasharray: 440; /* Circumference logic */
+            stroke-dashoffset: 440;
+            transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.5s ease;
+        }
+
+        .needle {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            width: 4px;
+            height: 100px;
+            background: #fff;
+            border-radius: 4px;
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(-90deg);
+            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+            z-index: 10;
+        }
+
+        .gauge-labels {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+        }
+
+        .score-display {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .payback-value {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .payback-label {
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+        }
+
+        .status-badge {
+            margin-top: 20px;
+            padding: 8px 20px;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-block;
+        }
+
+        .status-bankable {
+            background: var(--emerald-dim);
+            color: var(--emerald);
+            border: 1px solid var(--emerald);
+            box-shadow: 0 0 20px var(--emerald-dim);
+        }
+
+        .status-neutral {
+            background: rgba(255, 165, 2, 0.1);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+
+        .status-risky {
+            background: rgba(255, 71, 87, 0.1);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .cta-container {
+            grid-column: span 2;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .money-printer-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--text-main);
+        }
+
+        .btn-primary {
+            background: var(--emerald);
+            color: #050807;
+            padding: 18px 40px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 1.1rem;
+            display: inline-block;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 255, 136, 0.5);
+            background: #00ffaa;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.02);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .stat-box .val {
+            display: block;
+            font-size: 1.2rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-box .lbl {
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 850px) {
+            .main-card {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                padding: 30px;
+            }
+            .header, .cta-container {
+                grid-column: span 1;
+            }
+        }
+
+        /* Animation for values */
+        @keyframes pulse-emerald {
+            0% { text-shadow: 0 0 0px var(--emerald); }
+            50% { text-shadow: 0 0 15px var(--emerald); }
+            100% { text-shadow: 0 0 0px var(--emerald); }
+        }
+
+        .bankable-glow {
+            animation: pulse-emerald 2s infinite;
+        }

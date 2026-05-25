@@ -1,0 +1,1258 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VALOIS // Borrower Intake & Document Safe</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #030207;
+            --bg-surface: #0a0813;
+            --bg-surface-elevated: #110e20;
+            --border-subtle: rgba(255, 255, 255, 0.04);
+            --border-muted: rgba(255, 255, 255, 0.08);
+            --border-active: rgba(139, 92, 246, 0.3);
+            
+            --text-primary: #f4f4f7;
+            --text-secondary: #a1a1aa;
+            --text-muted: #52525b;
+            
+            --accent-purple: #8b5cf6;
+            --accent-purple-glow: rgba(139, 92, 246, 0.15);
+            --accent-velvet: #311042;
+            --accent-emerald: #10b981;
+            --accent-emerald-glow: rgba(16, 185, 129, 0.1);
+            --accent-amber: #f59e0b;
+            --accent-rose: #ef4444;
+
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            --transition-smooth: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Support for White Label Mode toggled via parent compatibility */
+        body.white-label-mode {
+            --bg-base: #fafafa;
+            --bg-surface: #ffffff;
+            --bg-surface-elevated: #f4f4f5;
+            --border-subtle: rgba(0, 0, 0, 0.05);
+            --border-muted: rgba(0, 0, 0, 0.1);
+            --border-active: rgba(79, 70, 229, 0.4);
+            --text-primary: #09090b;
+            --text-secondary: #71717a;
+            --text-muted: #a1a1aa;
+            --accent-purple: #4f46e5;
+            --accent-purple-glow: rgba(79, 70, 229, 0.08);
+            --accent-velvet: #eef2ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+            transition: var(--transition-smooth);
+            background-image: radial-gradient(circle at 50% 0%, var(--accent-velvet) 0%, transparent 70%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        /* Clean Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-base);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-muted);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-purple);
+        }
+
+        .app-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Top Header Area matching base UI layout */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: rgba(10, 8, 19, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-purple), #ec4899);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #fff;
+            font-size: 14px;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-title {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: linear-gradient(to right, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-tag {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--accent-purple);
+            border: 1px solid var(--border-active);
+            padding: 2px 8px;
+            border-radius: 20px;
+            background: var(--accent-purple-glow);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-secondary {
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-muted);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-purple);
+            background: var(--accent-purple-glow);
+        }
+
+        /* Form Wizard Steps Header */
+        .wizard-steps {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-muted);
+            border-radius: 16px;
+            padding: 20px;
+            gap: 12px;
+        }
+
+        .step-pill {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            transition: var(--transition-smooth);
+        }
+
+        .step-pill.active {
+            border-color: var(--accent-purple);
+            background: var(--accent-purple-glow);
+        }
+
+        .step-pill.completed {
+            border-color: var(--accent-emerald);
+            background: var(--accent-emerald-glow);
+        }
+
+        .step-number {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 700;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--border-muted);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-smooth);
+        }
+
+        .step-pill.active .step-number {
+            background: var(--accent-purple);
+            color: #ffffff;
+            box-shadow: 0 0 8px var(--accent-purple);
+        }
+
+        .step-pill.completed .step-number {
+            background: var(--accent-emerald);
+            color: #ffffff;
+        }
+
+        .step-label {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .step-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .step-desc {
+            font-size: 10px;
+            color: var(--text-secondary);
+        }
+
+        /* Bento Grid Layout Split */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+        }
+
+        .col-main {
+            grid-column: span 8;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .col-sidebar {
+            grid-column: span 4;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .bento-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-muted);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition-smooth);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .card-title-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .card-label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--accent-purple);
+            font-weight: 600;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .preview-badge {
+            font-size: 11px;
+            font-weight: 500;
+            background: var(--border-muted);
+            padding: 4px 10px;
+            border-radius: 20px;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+        }
+
+        /* Forms Styling */
+        .wizard-view {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .wizard-view.active {
+            display: flex;
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .form-full-width {
+            grid-column: span 2;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .form-input, .form-select {
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-muted);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 14px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            outline: none;
+            transition: var(--transition-smooth);
+        }
+
+        .form-input:focus, .form-select:focus {
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 0 2px var(--accent-purple-glow);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Plaid Integrations Mock */
+        .integration-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .bank-card {
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            text-align: center;
+        }
+
+        .bank-card:hover {
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+        }
+
+        .bank-card.connected {
+            border-color: var(--accent-emerald);
+            background: var(--accent-emerald-glow);
+        }
+
+        .bank-logo-placeholder {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--bg-surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--accent-purple);
+            border: 1px solid var(--border-muted);
+        }
+
+        .bank-name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .bank-status {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .bank-card.connected .bank-status {
+            color: var(--accent-emerald);
+        }
+
+        /* Drag & Drop Area */
+        .dropzone-container {
+            border: 2px dashed var(--border-muted);
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            background: var(--bg-surface-elevated);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .dropzone-container:hover {
+            border-color: var(--accent-purple);
+            background: var(--accent-purple-glow);
+        }
+
+        .dropzone-icon {
+            font-size: 32px;
+            color: var(--accent-purple);
+        }
+
+        /* Real-time uploading items list */
+        .uploaded-docs-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .uploaded-doc-item {
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .doc-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .doc-icon {
+            font-size: 18px;
+            color: var(--accent-purple);
+        }
+
+        .doc-name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .doc-size {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .ocr-status {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .status-processing {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--accent-amber);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            animation: pulse 1.5s infinite;
+        }
+
+        .status-validated {
+            background: var(--accent-emerald-glow);
+            color: var(--accent-emerald);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        /* Action bar for steps */
+        .wizard-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            border-top: 1px solid var(--border-subtle);
+            padding-top: 20px;
+        }
+
+        .btn-primary {
+            background: var(--accent-purple);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-family: var(--font-sans);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px var(--accent-purple-glow);
+            filter: brightness(1.1);
+        }
+
+        /* OCR Console Logging Panel (Sidebar) */
+        .ocr-console {
+            background: #020104;
+            border: 1px solid #1c1830;
+            border-radius: 12px;
+            padding: 16px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-secondary);
+            height: 320px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border-left: 2px solid var(--accent-purple);
+        }
+
+        .console-line {
+            line-height: 1.5;
+            word-break: break-all;
+        }
+
+        .console-line.success {
+            color: var(--accent-emerald);
+        }
+
+        .console-line.warning {
+            color: var(--accent-amber);
+        }
+
+        .console-line.system {
+            color: var(--accent-purple);
+        }
+
+        .console-line.input {
+            color: #ec4899;
+        }
+
+        /* Vault Security Widget */
+        .security-badge-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .sec-item {
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .sec-title {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-family: var(--font-mono);
+        }
+
+        .sec-val {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Floating Interactive Status Portal */
+        .realtime-stats-card {
+            background: radial-gradient(circle at 100% 0%, var(--accent-purple-glow) 0%, var(--bg-surface) 100%);
+            border: 1px solid var(--border-active);
+        }
+
+        /* Direct Plaid Flow overlay simulator */
+        .plaid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(3, 2, 7, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .plaid-modal {
+            background: #ffffff;
+            color: #111827;
+            border-radius: 16px;
+            padding: 24px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes scaleUp {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .plaid-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f3f4f6;
+            padding-bottom: 12px;
+        }
+
+        .plaid-title {
+            font-weight: 700;
+            font-size: 16px;
+            color: #111827;
+        }
+
+        .plaid-body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            text-align: center;
+        }
+
+        .plaid-btn {
+            background: #000000;
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-family: var(--font-sans);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+        }
+
+        .plaid-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Success screen and dynamic indicators */
+        .success-illustration {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            text-align: center;
+            padding: 24px 0;
+        }
+
+        .success-circle {
+            width: 64px;
+            height: 64px;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-emerald);
+            font-size: 32px;
+        }
+
+        /* Footer Compliance Area */
+        footer {
+            margin-top: 24px;
+            border-top: 1px solid var(--border-subtle);
+            padding: 24px 0 60px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .compliance-text {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .compliance-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Responsive design rules */
+        @media (max-width: 1024px) {
+            .col-main, .col-sidebar {
+                grid-column: span 12;
+            }
+            .wizard-steps {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-full-width {
+                grid-column: span 1;
+            }
+            .integration-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Top Bar Navigation with Brand Heritage alignment -->
+    <header>
+        <div class="brand">
+            <div class="brand-logo">V</div>
+            <div class="brand-title">Valois</div>
+            <div class="brand-tag">SECURE SAFE v2.4</div>
+        </div>
+        <div class="header-actions">
+            <a href="index.html" class="btn-secondary">
+                <span>←</span> Return to Intelligence Engine
+            </a>
+        </div>
+    </header>
+
+    <!-- Multi-Step Navigation Wizard -->
+    <div class="wizard-steps">
+        <div class="step-pill active" id="stepPill1">
+            <div class="step-number">1</div>
+            <div class="step-label">
+                <span class="step-title">Entity Configuration</span>
+                <span class="step-desc">Company Core Profile</span>
+            </div>
+        </div>
+        <div class="step-pill" id="stepPill2">
+            <div class="step-number">2</div>
+            <div class="step-label">
+                <span class="step-title">Financial Sync</span>
+                <span class="step-desc">Plaid Banking Nodes</span>
+            </div>
+        </div>
+        <div class="step-pill" id="stepPill3">
+            <div class="step-number">3</div>
+            <div class="step-label">
+                <span class="step-title">Document Safe</span>
+                <span class="step-desc">Secure File Transmittal</span>
+            </div>
+        </div>
+        <div class="step-pill" id="stepPill4">
+            <div class="step-number">4</div>
+            <div class="step-label">
+                <span class="step-title">Automated Review</span>
+                <span class="step-desc">OCR Parse Verification</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bento Grid Container -->
+    <div class="bento-grid">
+        
+        <!-- Left Column: Step-by-Step Forms -->
+        <div class="col-main">
+            <div class="bento-card">
+                
+                <!-- STEP 1: ENTITY CONFIGURATION -->
+                <div class="wizard-view active" id="view1">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <div class="card-label">Step 1 of 4</div>
+                            <div class="card-title">Borrower Corporate Registry</div>
+                        </div>
+                        <span class="preview-badge" style="color: var(--accent-purple);">Entity Verification</span>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label class="input-label">Legal Entity Name</label>
+                            <input type="text" class="form-input" id="inp-entityName" placeholder="e.g. Apex Logistical Corp">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Jurisdiction State</label>
+                            <select class="form-select" id="inp-juris">
+                                <option value="DE">Delaware (C-Corp)</option>
+                                <option value="NY">New York (LLC)</option>
+                                <option value="CA">California (C-Corp)</option>
+                                <option value="TX">Texas (LLC)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Federal Employer ID (EIN)</label>
+                            <input type="text" class="form-input" id="inp-ein" placeholder="XX-XXXXXXX" value="12-3456789">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Current Trailing 12-Month Revenue</label>
+                            <select class="form-select" id="inp-arr-band">
+                                <option value="1M-5M">$1,000,000 – $5,000,000</option>
+                                <option value="5M-15M">$5,000,000 – $15,000,000</option>
+                                <option value="15M+">$15,000,000+</option>
+                            </select>
+                        </div>
+                        <div class="input-group form-full-width">
+                            <label class="input-label">Primary Business Activity & Funding Purpose</label>
+                            <input type="text" class="form-input" id="inp-purpose" placeholder="Describe the deployment of growth facilities (e.g. equipment expansion)">
+                        </div>
+                    </div>
+
+                    <div class="wizard-actions">
+                        <span></span>
+                        <button class="btn-primary" onclick="goToStep(2)">
+                            Proceed to Financial Sync <span>→</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 2: PLAID BANK SYNC -->
+                <div class="wizard-view" id="view2">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <div class="card-label">Step 2 of 4</div>
+                            <div class="card-title">Plaid Financial Integrations</div>
+                        </div>
+                        <span class="preview-badge" style="color: var(--accent-purple);">Direct Read Connection</span>
+                    </div>
+
+                    <p class="vertical-desc" style="color: var(--text-secondary); font-size: 13px; margin-bottom: 12px;">
+                        Connect your core operating accounts via Plaid's microservice node layer. This authorizes read-only automated cash-flow verification matching FDIC compliant safe harbors.
+                    </p>
+
+                    <div class="integration-grid">
+                        <div class="bank-card" id="bank-chase" onclick="openPlaidMock('Chase Operational Bank', 'bank-chase')">
+                            <div class="bank-logo-placeholder">🏦</div>
+                            <span class="bank-name">Chase Bank</span>
+                            <span class="bank-status" id="status-bank-chase">Ready to Connect</span>
+                        </div>
+                        <div class="bank-card" id="bank-svb" onclick="openPlaidMock('Silicon Valley Bank', 'bank-svb')">
+                            <div class="bank-logo-placeholder">🦁</div>
+                            <span class="bank-name">Silicon Valley Bank</span>
+                            <span class="bank-status" id="status-bank-svb">Ready to Connect</span>
+                        </div>
+                        <div class="bank-card" id="bank-boa" onclick="openPlaidMock('Bank of America', 'bank-boa')">
+                            <div class="bank-logo-placeholder">🇺🇸</div>
+                            <span class="bank-name">Bank of America</span>
+                            <span class="bank-status" id="status-bank-boa">Ready to Connect</span>
+                        </div>
+                    </div>
+
+                    <div class="wizard-actions">
+                        <button class="btn-secondary" onclick="goToStep(1)">← Back</button>
+                        <button class="btn-primary" onclick="goToStep(3)">
+                            Proceed to Document Safe <span>→</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 3: DOCUMENT SAFE UPLOAD -->
+                <div class="wizard-view" id="view3">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <div class="card-label">Step 3 of 4</div>
+                            <div class="card-title">Secure Vault Dropzone</div>
+                        </div>
+                        <span class="preview-badge" style="color: var(--accent-emerald);">AES-256 Secured Vault</span>
+                    </div>
+
+                    <p class="vertical-desc" style="color: var(--text-secondary); font-size: 13px; margin-bottom: 12px;">
+                        Upload formal legal & corporate records. File hashes are generated locally on-the-fly and checked through automated OCR logic for metadata alignment.
+                    </p>
+
+                    <!-- Trigger Hidden Input -->
+                    <input type="file" id="realFileInput" style="display: none;" onchange="simulateFileUpload(this.files)">
+                    
+                    <div class="dropzone-container" onclick="document.getElementById('realFileInput').click()">
+                        <div class="dropzone-icon">📥</div>
+                        <div style="font-size: 14px; font-weight: 600;">Drag and drop file packets here, or browse system files</div>
+                        <div style="font-size: 11px; color: var(--text-muted);">Supports PDF, PNG, JPG or ZIP (Max file size 50MB) // Tax Returns, Operating Agreements & Financial Statements</div>
+                    </div>
+
+                    <div class="uploaded-docs-list" id="docsList">
+                        <!-- Simulated Files and Active OCR State Elements will appear here -->
+                    </div>
+
+                    <div class="wizard-actions">
+                        <button class="btn-secondary" onclick="goToStep(2)">← Back</button>
+                        <button class="btn-primary" onclick="goToStep(4)">
+                            Proceed to Review <span>→</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 4: AUTOMATED REVIEW -->
+                <div class="wizard-view" id="view4">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <div class="card-label">Step 4 of 4</div>
+                            <div class="card-title">Automated Underwriting Summary</div>
+                        </div>
+                        <span class="preview-badge" style="color: var(--accent-emerald);">Pre-Verified Registry</span>
+                    </div>
+
+                    <div class="preview-pane" style="background: var(--bg-surface-elevated); padding: 20px; border-radius: 12px; border: 1px dashed var(--border-muted);">
+                        
+                        <!-- Initializing Engine State -->
+                        <div id="processingSummaryState" style="text-align: center; padding: 20px 0;">
+                            <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                                Please review your completed company record data nodes. Processing compliance checks.
+                            </p>
+                        </div>
+
+                        <!-- Final Success Screen Mock -->
+                        <div class="success-illustration" id="summaryVerificationPass">
+                            <div class="success-circle">✓</div>
+                            <h3 style="font-size: 18px; font-weight: 600; color: #fff;">Underwriting Verification Passed</h3>
+                            <p style="font-size: 13px; color: var(--text-secondary); max-width: 480px; margin: 0 auto 16px auto;">
+                                File authenticity verification complete. All tax returns, corporate identity nodes, and linked bank operational records match automated validation safeguards.
+                            </p>
+                            
+                            <div class="security-badge-grid" style="width: 100%; max-width: 500px; margin: 0 auto; text-align: left;">
+                                <div class="sec-item">
+                                    <span class="sec-title">Aggregate Verified Status</span>
+                                    <span class="sec-val" style="color: var(--accent-emerald);">Pre-Approved (Tier-A)</span>
+                                </div>
+                                <div class="sec-item">
+                                    <span class="sec-title">Calculated Global LTV</span>
+                                    <span class="sec-val" id="summaryLtv">82.4%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="wizard-actions">
+                        <button class="btn-secondary" onclick="goToStep(3)">← Back</button>
+                        <button class="btn-primary" style="background: linear-gradient(135deg, var(--accent-purple), #ec4899);" onclick="submitFinalPayload()">
+                            ⚡ Generate Verified Capital Payload
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Right Column: OCR Terminal & Security Infrastructure Widgets -->
+        <div class="col-sidebar">
+            
+            <!-- Real-time Validation Log Panel -->
+            <div class="bento-card">
+                <div class="card-header" style="margin-bottom: 12px;">
+                    <div class="card-title-group">
+                        <div class="card-label">Validation Engine</div>
+                        <div class="card-title" style="font-size: 15px;">Automated OCR Console</div>
+                    </div>
+                    <span class="preview-badge" style="color: var(--accent-emerald);">Live Audit</span>
+                </div>
+                
+                <!-- Terminal Output Screen -->
+                <div class="ocr-console" id="terminalConsole">
+                    <div class="console-line system">[SYSTEM] VALOIS secure microservice listening on secure socket...</div>
+                    <div class="console-line system">[SECURITY] Safe harbor protocol established (SSL-v2 SEC-256).</div>
+                    <div class="console-line">[LOG] Pending borrower session interactions...</div>
+                </div>
+            </div>
+
+            <!-- Security Infrastructure Widgets -->
+            <div class="bento-card">
+                <div class="card-header" style="margin-bottom: 12px;">
+                    <div class="card-title-group">
+                        <div class="card-label">Encrypted Storage</div>
+                        <div class="card-title" style="font-size: 15px;">Compliance Framework</div>
+                    </div>
+                </div>
+                <p class="vertical-desc" style="font-size: 11px; margin-bottom: 16px;">
+                    Valois utilizes Zero-Knowledge encryption algorithms. Your sensitive banking passwords, statements, and tax IDs are fully encrypted before persisting to storage volumes.
+                </p>
+
+                <div class="security-badge-grid">
+                    <div class="sec-item">
+                        <span class="sec-title">Encryption Key</span>
+                        <span class="sec-val">AES-256-GCM</span>
+                    </div>
+                    <div class="sec-item">
+                        <span class="sec-title">Data Policy</span>
+                        <span class="sec-val">SOC-2 Audit</span>
+                    </div>
+                    <div class="sec-item">
+                        <span class="sec-title">Compliance</span>
+                        <span class="sec-val">PCI Level 1</span>
+                    </div>
+                    <div class="sec-item">
+                        <span class="sec-title">FCRA Guard</span>
+                        <span class="sec-val">Safe Harbor</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Direct Plaid Simulator Modal -->
+    <div class="plaid-overlay" id="plaidOverlay">
+        <div class="plaid-modal">
+            <div class="plaid-header">
+                <span class="plaid-title" id="plaidBankName">Plaid Link Interface</span>
+                <span style="font-size: 12px; color: #6b7280; font-family: var(--font-mono);">SECURE CONDUIT</span>
+            </div>
+            <div class="plaid-body">
+                <p style="font-size: 13px; color: #374151; line-height: 1.5;">
+                    Authorize <span style="font-weight:600;">Valois F.I.E.</span> to access real-time deposits, average balances, and transactions history.
+                </p>
+                <div style="width: 100%; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; background: #f9fafb;">
+                    <span style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 6px;">Permitted Data Reads:</span>
+                    <ul style="font-size: 11px; text-align: left; list-style-type: disc; padding-left: 20px; color: #4b5563; line-height: 1.6;">
+                        <li>Account Balances & Asset Confirmations</li>
+                        <li>Dynamic Cash-Flow Transactions Logs</li>
+                        <li>Underwriting Verification Metadata</li>
+                    </ul>
+                </div>
+                <button class="plaid-btn" id="plaidAuthBtn" onclick="completePlaidMock()">Authorize Link Session</button>
+                <button class="btn-secondary" style="color:#000; background:transparent; width:100%; justify-content:center;" onclick="closePlaidMock()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footnotes Compliance Component matching base template style -->
+    <footer>
+        <p class="compliance-text">
+            * VALOIS Secure Vault protocols maintain military-grade cryptography safeguards. Uploading verified document components authorizes our matching engines to run heuristics against pre-set underwrite routing logic constraints. Institutional capital commitments remain subject to formal validation rules.
+        </p>
+        <div class="compliance-row">
+            <span>© Valois Technology Group. All Rights Reserved. SEC Private Network Node Node-v4.</span>
+            <span>FCRA Safe Harbor Secured // SSL-v2 Protocol</span>
+        </div>
+    </footer>
+</div>
+
+<script>
+    // System Form Wizards State Management
+    let currentStep = 1;
+    let selectedActiveBankNode = '';
+    let uploadedDocumentsCount = 0;
+
+    // Terminal Emulator Helper
+    function printTerminalLine(text, level = 'normal') {
+        const consoleElem = document.getElementById("terminalConsole");
+        const div = document.createElement("div");
+        div.className = `console-line ${level}`;
+        
+        // Include system timestamp
+        const time = new Date().toLocaleTimeString();
+        div.textContent = `[${time}] ${text}`;
+        
+        consoleElem.appendChild(div);
+        consoleElem.scrollTop = consoleElem.scrollHeight;
+    }
+
+    // Interactive Step Changer Controls
+    function goToStep(stepNum) {
+        // Enforce validations before proceeding
+        if (stepNum > 1 && document.getElementById("inp-entityName").value.trim() === "") {
+            alert("Please specify your company's Legal Entity Name to initialize the compliance registry profile.");
+            return;
+        }
+
+        // Deactivate all steps and views
+        for (let i = 1; i <= 4; i++) {
+            document.getElementById(`stepPill${i}`).classList.remove("active");
+            document.getElementById(`view${i}`).classList.remove("active");
+        }
+
+        // Set completed classes
+        for (let i = 1; i < stepNum; i++) {
+            document.getElementById(`stepPill${i}`).classList.add("completed");
+        }
+
+        currentStep = stepNum;
+        
+        // Activate target views
+        document.getElementById(`stepPill${stepNum}`).classList.add("active");
+        document.getElementById(`view${stepNum}`).classList.add("active");
+
+        printTerminalLine(`Navigating to Step ${stepNum} context views.`, 'system');
+
+        // Dynamic State configurations
+        if (stepNum === 4) {
+            triggerFinalAutomatedAudit();
+        }
+    }
+
+    // Dynamic Plaid Overlay Controllers
+    function openPlaidMock(bankName, cardId) {
+        selectedActiveBankNode = cardId;
+        document.getElementById("plaidBankName").textContent = `Connect: ${bankName}`;
+        document.getElementById("plaidOverlay").style.display = "flex";
+        printTerminalLine(`Initiating Plaid secure microservices routing for ${bankName}...`, 'input');
+    }
+
+    function closePlaidMock() {
+        document.getElementById("plaidOverlay").style.display = "none";
+        printTerminalLine("Plaid authentication conduit dismissed.", "warning");
+    }
+
+    function completePlaidMock() {
+        document.getElementById("plaidOverlay").style.display = "none";
+        
+        const card = document.getElementById(selectedActiveBankNode);
+        card.classList.add("connected");
+        
+        const statusLbl = document.getElementById(`status-${selectedActiveBankNode}`);
+        statusLbl.textContent = "CONNECTED (SEC-READ)";
+
+        printTerminalLine(`Plaid OAuth session successfully completed.`, "success");
+        printTerminalLine(`Parsed operating cash balances for selected institution. DSCR Verified: 1.45x average.`, "success");
+    }
+
+    // Simulated Document Upload Process with Dynamic OCR Console updates
+    function simulateFileUpload(files) {
+        if (files.length === 0) return;
+        const file = files[0];
+        
+        uploadedDocumentsCount++;
+        const targetContainer = document.getElementById("docsList");
+
+        // Format File Name safely
+        const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+        const elementId = `doc-node-${uploadedDocumentsCount}`;
+
+        targetContainer.innerHTML += `
+            <div class="uploaded-doc-item" id="${elementId}">
+                <div class="doc-meta">
+                    <span class="doc-icon">📄</span>
+                    <div>
+                        <div class="doc-name">${file.name}</div>
+                        <div class="doc-size">${sizeMb} MB // SHA256-Local</div>
+                    </div>
+                </div>
+                <div class="ocr-status status-processing" id="ocr-lbl-${elementId}">Processing OCR</div>
+            </div>
+        `;
+
+        printTerminalLine(`Vault Safe incoming payload received: ${file.name} (${sizeMb} MB). Local hash key created.`, 'input');
+
+        // Emulate Server-Side OCR Processing
+        setTimeout(() => {
+            const statusLabel = document.getElementById(`ocr-lbl-${elementId}`);
+            if (statusLabel) {
+                statusLabel.textContent = "OCR Validated";
+                statusLabel.className = "ocr-status status-validated";
+            }
+            printTerminalLine(`OCR Parse Complete: ${file.name} matched corporate registry parameters. Signature node confirmed valid.`, 'success');
+        }, 2200);
+    }
+
+    // Trigger Final Simulated Automated Underwriting checks
+    function triggerFinalAutomatedAudit() {
+        printTerminalLine("Synthesizing compiled bank account metadata & file artifacts...", 'system');
+        
+        const processingBlock = document.getElementById("processingSummaryState");
+        const verificationBlock = document.getElementById("summaryVerificationPass");
+
+        processingBlock.style.display = "block";
+        verificationBlock.style.display = "none";
+
+        setTimeout(() => {
+            processingBlock.style.display = "none";
+            verificationBlock.style.display = "flex";
+            
+            // Push some variables matching selection metrics
+            const entName = document.getElementById("inp-entityName").value;
+            printTerminalLine(`Global compliance verification finished for registry owner ${entName}.`, 'success');
+        }, 1800);
+    }
+
+    // Final Payload Generator Token Alert
+    function submitFinalPayload() {
+        const entName = document.getElementById("inp-entityName").value;
+        const uuidToken = "VALOIS-COMPLIANT-" + Math.random().toString(36).substring(2, 8).toUpperCase() + "-SECURE";
+        alert(`Payload Transmission Completed!\n\nReference ID: ${uuidToken}\nEntity Registry: ${entName}\n\nThis compiled verification token is now locked within the Secure Vault and accessible inside the main dashboard.`);
+        printTerminalLine(`Capital payload package securely integrated into backend nodes. Token Reference: ${uuidToken}`, 'success');
+    }
+</script>
+
+</body>
+</html>
+```

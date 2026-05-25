@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archive Manifest | Veteran Jester Dispatch</title>
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:wght@400;700&family=Roboto+Slab:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --olive: #4B5320;
+            --olive-dark: #353b16;
+            --tan: #d2c5a7;
+            --paper: #e4dec7;
+            --ink: #1a1a1b;
+            --stamp-red: rgba(169, 29, 17, 0.85);
+            --tape: rgba(210, 195, 140, 0.5);
+            --redacted: #1a1a1b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--tan);
+            background-image: radial-gradient(circle at 2px 2px, rgba(0,0,0,0.05) 1px, transparent 0);
+            background-size: 40px 40px;
+            color: var(--ink);
+            font-family: 'Courier Prime', monospace;
+            line-height: 1.5;
+            padding: 20px;
+        }
+
+        .dossier-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: var(--paper);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            border: 1px solid rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            min-height: 100vh;
+        }
+
+        .dossier-container::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
+            pointer-events: none;
+            opacity: 0.4;
+            z-index: 10;
+        }
+
+        header {
+            padding: 50px 40px 30px;
+            border-bottom: 3px double var(--ink);
+            position: relative;
+        }
+
+        .stamp-archive {
+            position: absolute;
+            top: 30px;
+            right: 50px;
+            border: 3px solid var(--stamp-red);
+            color: var(--stamp-red);
+            padding: 5px 20px;
+            font-family: 'Special Elite', cursive;
+            font-size: 1.8rem;
+            transform: rotate(-5deg);
+            text-transform: uppercase;
+            opacity: 0.8;
+            z-index: 20;
+        }
+
+        .breadcrumb {
+            font-family: 'Special Elite', cursive;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            display: block;
+            text-decoration: none;
+            color: var(--olive);
+        }
+
+        .page-title {
+            font-family: 'Special Elite', cursive;
+            font-size: 3rem;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+
+        /* Search and Filter Section */
+        .manifest-controls {
+            padding: 30px 40px;
+            background: rgba(0,0,0,0.03);
+            border-bottom: 1px solid var(--ink);
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .search-input, .filter-select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--ink);
+            background: var(--paper);
+            font-family: 'Courier Prime', monospace;
+            outline: none;
+        }
+
+        /* Logbook Table */
+        .archive-table-container {
+            padding: 40px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        thead th {
+            text-align: left;
+            padding: 15px 10px;
+            border-bottom: 2px solid var(--ink);
+            font-family: 'Roboto Slab', serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        tbody tr {
+            border-bottom: 1px dashed rgba(0,0,0,0.2);
+            transition: background 0.2s;
+        }
+
+        tbody tr:hover {
+            background: rgba(255,255,255,0.4);
+        }
+
+        td {
+            padding: 20px 10px;
+            vertical-align: middle;
+        }
+
+        .file-id {
+            font-weight: bold;
+            color: var(--olive);
+            white-space: nowrap;
+        }
+
+        .file-title {
+            font-family: 'Roboto Slab', serif;
+            font-weight: 700;
+            color: var(--ink);
+            text-decoration: none;
+        }
+
+        .file-title:hover {
+            text-decoration: underline;
+        }
+
+        .intel-level {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            border: 1px solid currentColor;
+        }
+
+        .level-restricted { color: #888; border-color: #888; }
+        .level-confidential { color: var(--olive); border-color: var(--olive); }
+        .level-secret { color: #d35400; border-color: #d35400; }
+        .level-topsecret { color: var(--stamp-red); border-color: var(--stamp-red); background: rgba(169, 29, 17, 0.05); }
+
+        .conflict-zone {
+            font-size: 0.85rem;
+            font-style: italic;
+            opacity: 0.8;
+        }
+
+        .redacted {
+            background: var(--redacted);
+            color: var(--redacted);
+            user-select: none;
+            padding: 0 4px;
+        }
+
+        /* Pagination */
+        .pagination {
+            padding: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--ink);
+        }
+
+        .page-link {
+            text-decoration: none;
+            color: var(--ink);
+            font-weight: bold;
+            border: 2px solid var(--ink);
+            padding: 8px 20px;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        .page-link:hover {
+            background: var(--ink);
+            color: var(--paper);
+        }
+
+        .page-link.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .ink-smudge {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(0,0,0,0.06) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        footer {
+            padding: 40px;
+            text-align: center;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            background: #d9d2be;
+            border-top: 2px solid var(--ink);
+        }
+
+        @media (max-width: 768px) {
+            .manifest-controls {
+                grid-template-columns: 1fr;
+            }
+            header {
+                padding: 40px 20px;
+            }
+            .stamp-archive {
+                position: static;
+                display: inline-block;
+                margin-top: 10px;
+                font-size: 1.2rem;
+            }
+            .archive-table-container {
+                padding: 20px;
+            }
+            th:nth-child(4), td:nth-child(4) { display: none; } /* Hide zone on mobile */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dossier-container">
+        <div class="ink-smudge" style="top: 20%; left: -50px;"></div>
+        <div class="ink-smudge" style="bottom: 10%; right: -30px;"></div>
+
+        <header>
+            <a href="index.html" class="breadcrumb">← RETURN TO BASE COMMAND</a>
+            <div class="stamp-archive">Property of Jester</div>
+            <h1 class="page-title">The Archives</h1>
+            <p>Chronological manifest of all past dispatches, intel reports, and tactical rants.</p>
+        </header>
+
+        <section class="manifest-controls">
+            <div class="control-group">
+                <label for="search">Keyword Search</label>
+                <input type="text" id="search" class="search-input" placeholder="Search manifest for keywords...">
+            </div>
+            <div class="control-group">
+                <label for="zone">Conflict Zone</label>
+                <select id="zone" class="filter-select">
+                    <option>All Sectors</option>
+                    <option>Corporate Trenches</option>
+                    <option>The Digital Front</option>
+                    <option>High Desert</option>
+                    <option>Family Foxholes</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="level">Intel Level</label>
+                <select id="level" class="filter-select">
+                    <option>All Clearances</option>
+                    <option>Restricted</option>
+                    <option>Confidential</option>
+                    <option>Secret</option>
+                    <option>Top Secret</option>
+                </select>
+            </div>
+        </section>
+
+        <main class="archive-table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 120px;">Log #</th>
+                        <th>Subject Title</th>
+                        <th>Intel Level</th>
+                        <th>Conflict Zone</th>
+                        <th style="text-align: right;">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="file-id">DIS-084</td>
+                        <td><a href="#" class="file-title">The Corporate Gaslighting Handbook</a></td>
+                        <td><span class="intel-level level-confidential">Confidential</span></td>
+                        <td class="conflict-zone">Corporate Trenches</td>
+                        <td style="text-align: right;">OCT 24, 2024</td>
+                    </tr>
+                    <tr>
+                        <td class="file-id">DIS-083</td>
+                        <td><a href="#" class="file-title">Listening to the Mojave Wind</a></td>
+                        <td><span class="intel-level level-restricted">Restricted</span></td>
+                        <td class="conflict-zone">High Desert</td>
+                        <td style="text-align: right;">OCT 19, 2024</td>
+                    </tr>
+                    <tr>
+                        <td class="file-id">DIS-082</td>
+                        <td><a href="#" class="file-title">Burn the Slide Deck, Save the Soul</a></td>
+                        <td><span class="intel-level level-secret">Secret</span></td>
+                        <td class="conflict-zone">The Digital Front</td>
+                        <td style="text-align: right;">OCT 12, 2024</td>
+                    </tr>
+                    <tr>
+                        <td class="file-id">DIS-081</td>
+                        <td><a href="#" class="file-title">Project <span class="redacted">REDACTED</span> and the Cost of Liberty</a></td>
+                        <td><span class="intel-level level-topsecret">Top Secret</span></td>
+                        <td class="conflict-zone">Global Sector</td>
+                        <td style="text-align: right;">OCT 05, 2024</td>
+                    </tr>
+                    <tr>
+                        <td class="file-id">DIS-080</td>
+                        <td><a href="#" class="file-title">Gallows Humor for the Modern Serf</a></td>
+                        <td><span class="intel-level level-confidential">Confidential</span></td>
+                        <td class="conflict-zone">Corporate Trenches</td>
+                        <td style="text-align: right;">SEP 28, 2024</td>
+                    </tr>
+                    <tr>
+                        <td class="file-id">DIS-079</td>
+                        <td><a href="#" class="file-title">The Art of Saying "No" to Powerful Idiots</a></td>
+                        <td><span class="intel-level level-secret">Secret</span></td>
+                        <td class="conflict-zone">The Digital Front</td>
+                        <td style="text-align: right;">SEP 21, 2024</td>
+                    </tr>
+                    <tr>
+                        <td class="file-id">DIS-078</td>
+                        <td><a href="#" class="file-title">Why Small Business is Guerilla Warfare</a></td>
+                        <td><span class="intel-level level-restricted">Restricted</span></td>
+                        <td class="conflict-zone">Economic Front</td>
+                        <td style="text-align: right;">SEP 14, 2024</td>
+                    </tr>
+                    <tr>
+                        <td class="file-id">DIS-077</td>
+                        <td><a href="#" class="file-title">Lessons from a 2:00 AM Server Crash</a></td>
+                        <td><span class="intel-level level-confidential">Confidential</span></td>
+                        <td class="conflict-zone">The Digital Front</td>
+                        <td style="text-align: right;">SEP 07, 2024</td>
+                    </tr>
+                    <tr>
+                        <td class="file-id">DIS-076</td>
+                        <td><a href="#" class="file-title">Whiskey, Dogs, and the Pursuit of Truth</a></td>
+                        <td><span class="intel-level level-restricted">Restricted</span></td>
+                        <td class="conflict-zone">Personal Sector</td>
+                        <td style="text-align: right;">AUG 31, 2024</td>
+                    </tr>
+                </tbody>
+            </table>
+        </main>
+
+        <nav class="pagination">
+            <a href="#" class="page-link disabled">Previous Manifest</a>
+            <span style="font-family: 'Special Elite';">Page 01 of 12</span>
+            <a href="#" class="page-link">Next Manifest</a>
+        </nav>
+
+        <footer>
+            <p>© 19XX-2024 VETERAN JESTER DISPATCH // ARCHIVE DEPT // <span style="text-decoration: line-through;">EYES ONLY</span></p>
+            <p style="margin-top: 10px; opacity: 0.6;">All files are logged chronologically. Discrepancies should be reported to the quartermaster.</p>
+        </footer>
+    </div>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archive Manifest | Veteran Jester Dispatch</title>
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:wght@400;700&family=Roboto+Slab:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --olive: #4B5320;
+            --olive-dark: #353b16;
+            --tan: #d2c5a7;
+            --paper: #e4dec7;
+            --ink: #1a1a1b;
+            --stamp-red: rgba(169, 29, 17, 0.85);
+            --tape: rgba(210, 195, 140, 0.5);
+            --redacted: #1a1a1b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--tan);
+            background-image: radial-gradient(circle at 2px 2px, rgba(0,0,0,0.05) 1px, transparent 0);
+            background-size: 40px 40px;
+            color: var(--ink);
+            font-family: 'Courier Prime', monospace;
+            line-height: 1.5;
+            padding: 20px;
+        }
+
+        .dossier-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: var(--paper);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            border: 1px solid rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            min-height: 100vh;
+        }
+
+        .dossier-container::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
+            pointer-events: none;
+            opacity: 0.4;
+            z-index: 10;
+        }
+
+        header {
+            padding: 50px 40px 30px;
+            border-bottom: 3px double var(--ink);
+            position: relative;
+        }
+
+        .stamp-archive {
+            position: absolute;
+            top: 30px;
+            right: 50px;
+            border: 3px solid var(--stamp-red);
+            color: var(--stamp-red);
+            padding: 5px 20px;
+            font-family: 'Special Elite', cursive;
+            font-size: 1.8rem;
+            transform: rotate(-5deg);
+            text-transform: uppercase;
+            opacity: 0.8;
+            z-index: 20;
+        }
+
+        .breadcrumb {
+            font-family: 'Special Elite', cursive;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            display: block;
+            text-decoration: none;
+            color: var(--olive);
+        }
+
+        .page-title {
+            font-family: 'Special Elite', cursive;
+            font-size: 3rem;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+
+        /* Search and Filter Section */
+        .manifest-controls {
+            padding: 30px 40px;
+            background: rgba(0,0,0,0.03);
+            border-bottom: 1px solid var(--ink);
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .search-input, .filter-select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--ink);
+            background: var(--paper);
+            font-family: 'Courier Prime', monospace;
+            outline: none;
+        }
+
+        /* Logbook Table */
+        .archive-table-container {
+            padding: 40px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        thead th {
+            text-align: left;
+            padding: 15px 10px;
+            border-bottom: 2px solid var(--ink);
+            font-family: 'Roboto Slab', serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        tbody tr {
+            border-bottom: 1px dashed rgba(0,0,0,0.2);
+            transition: background 0.2s;
+        }
+
+        tbody tr:hover {
+            background: rgba(255,255,255,0.4);
+        }
+
+        td {
+            padding: 20px 10px;
+            vertical-align: middle;
+        }
+
+        .file-id {
+            font-weight: bold;
+            color: var(--olive);
+            white-space: nowrap;
+        }
+
+        .file-title {
+            font-family: 'Roboto Slab', serif;
+            font-weight: 700;
+            color: var(--ink);
+            text-decoration: none;
+        }
+
+        .file-title:hover {
+            text-decoration: underline;
+        }
+
+        .intel-level {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            border: 1px solid currentColor;
+        }
+
+        .level-restricted { color: #888; border-color: #888; }
+        .level-confidential { color: var(--olive); border-color: var(--olive); }
+        .level-secret { color: #d35400; border-color: #d35400; }
+        .level-topsecret { color: var(--stamp-red); border-color: var(--stamp-red); background: rgba(169, 29, 17, 0.05); }
+
+        .conflict-zone {
+            font-size: 0.85rem;
+            font-style: italic;
+            opacity: 0.8;
+        }
+
+        .redacted {
+            background: var(--redacted);
+            color: var(--redacted);
+            user-select: none;
+            padding: 0 4px;
+        }
+
+        /* Pagination */
+        .pagination {
+            padding: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--ink);
+        }
+
+        .page-link {
+            text-decoration: none;
+            color: var(--ink);
+            font-weight: bold;
+            border: 2px solid var(--ink);
+            padding: 8px 20px;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        .page-link:hover {
+            background: var(--ink);
+            color: var(--paper);
+        }
+
+        .page-link.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .ink-smudge {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(0,0,0,0.06) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        footer {
+            padding: 40px;
+            text-align: center;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            background: #d9d2be;
+            border-top: 2px solid var(--ink);
+        }
+
+        @media (max-width: 768px) {
+            .manifest-controls {
+                grid-template-columns: 1fr;
+            }
+            header {
+                padding: 40px 20px;
+            }
+            .stamp-archive {
+                position: static;
+                display: inline-block;
+                margin-top: 10px;
+                font-size: 1.2rem;
+            }
+            .archive-table-container {
+                padding: 20px;
+            }
+            th:nth-child(4), td:nth-child(4) { display: none; } /* Hide zone on mobile */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dossier-container">
+        <div class="ink-smudge" style="top: 20%; left: -50px;"></div>
+        <div class="ink-smudge" style="bottom: 10%; right: -30px;"></div>
+
+        <header>
+            <a href="#" class="breadcrumb">← RETURN TO BASE COMMAND</a>
+            <div class="stamp-archive">Property of Jester</div>
+            <h1 class="page-title">The Archives</h1>
+            <p>Chronological manifest of all past dispatches, intel reports, and tactical rants.</p>
+        </header>
+
+        <section class="manifest-controls">
+            <div class="control-group">
+                <label for="search">Keyword Search</label>
+                <input type="text" id="search" class="search-input" placeholder="Search manifest for keywords...">
+            </div>
+            <div class="control-group">
+                <label for="zone">Conflict Zone</label>
+                <select id="zone" class="filter-select">
+                    <option>All Sectors</option>
+                    <option>Corporate Trenches</option>
+                    <option>The Digital Front</option>
+                    <option>High Desert</option>
+                    <option>Family Foxholes</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="level">Intel Level</label>
+                <select id="level" class="filter-select">
+                    <option>All Clearances</option>
+                    <option>Restricted</option>
+                    <option>Confidential</option>
+                    <option>Secret</option>
+                    <option>Top Secret</option>
+                </select>
+            </div>
+        </section>
+
+        <main class="archive-table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 120px;">Log #</th>
+                        <th>Subject Title</th>
+                        <th>Intel Level</th>
+                        <th>Conflict Zone</th>
+                        <th style="text-align: right;">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="file-id">DIS-084</td>
+                        <td><a href="#" class="file-title">The Corporate Gaslighting Handbook</a></td>
+                        <td><span class="intel-level level-confidential">Confidential</span></td>
+                        <td class="conflict-zone">Corporate Trenches</td>
+                        <td style="text-align: right;">OCT 24, 2024</td>
+                    </tr>
+                    <tr>
+                        <td class="file-id">DIS-083</td>
+                        <td><a href="#" class="file-title">Listening to the Mojave Wind</a></td>
+                        <td><span class="intel-level level-restricted">Restricted</span></td>
+                        <td class="conflict-zone">High Desert</td>
+                        <td style="text-align: right;">OCT 19, 2024</td>
+                    </tr>
+                    <tr>
+                        <td class="file-id">DIS-082</td>
+                        <td><a href="#" class="file-title">Burn the Slide Deck, Save the Soul</a></td>
+                        <td><span class="intel-level level-secret">Secret</span></td>
+                        <td class="conflict-zone">The Digital Front</td>
+                        <td style="text-align: right;">OCT 12, 2024</td>
+                    </tr>
+                    <tr>
+                        <td class="file-id">DIS-081</td>
+                        <td><a href="#" class="file-title">Project <span class="redacted">REDACTED</span> and the Cost of Liberty</a></td>
+                        <td><span class="intel-level level-topsecret">Top Secret</span></td>
+                        <td class="conflict-zone">Global Sector</td>
+                        <td style="text-align: right;">OCT 05, 2024</td>
+                    </tr>
+                    <tr>
+                        <td class="file-id">DIS-080</td>
+                        <td><a href="#" class="file-title">Gallows Humor for the Modern Serf</a></td>
+                        <td><span class="intel-level level-confidential">Confidential</span></td>
+                        <td class="conflict-zone">Corporate Trenches</td>
+                        <td style="text-align: right;">SEP 28, 2024</td>
+                    </tr>
+                    <tr>
+                        <td class="file-id">DIS-079</td>
+                        <td><a href="#" class="file-title">The Art of Saying "No" to Powerful Idiots</a></td>
+                        <td><span class="intel-level level-secret">Secret</span></td>
+                        <td class="conflict-zone">The Digital Front</td>
+                        <td style="text-align: right;">SEP 21, 2024</td>
+                    </tr>
+                    <tr>
+                        <td class="file-id">DIS-078</td>
+                        <td><a href="#" class="file-title">Why Small Business is Guerilla Warfare</a></td>
+                        <td><span class="intel-level level-restricted">Restricted</span></td>
+                        <td class="conflict-zone">Economic Front</td>
+                        <td style="text-align: right;">SEP 14, 2024</td>
+                    </tr>
+                    <tr>
+                        <td class="file-id">DIS-077</td>
+                        <td><a href="#" class="file-title">Lessons from a 2:00 AM Server Crash</a></td>
+                        <td><span class="intel-level level-confidential">Confidential</span></td>
+                        <td class="conflict-zone">The Digital Front</td>
+                        <td style="text-align: right;">SEP 07, 2024</td>
+                    </tr>
+                    <tr>
+                        <td class="file-id">DIS-076</td>
+                        <td><a href="#" class="file-title">Whiskey, Dogs, and the Pursuit of Truth</a></td>
+                        <td><span class="intel-level level-restricted">Restricted</span></td>
+                        <td class="conflict-zone">Personal Sector</td>
+                        <td style="text-align: right;">AUG 31, 2024</td>
+                    </tr>
+                </tbody>
+            </table>
+        </main>
+
+        <nav class="pagination">
+            <a href="#" class="page-link disabled">Previous Manifest</a>
+            <span style="font-family: 'Special Elite';">Page 01 of 12</span>
+            <a href="#" class="page-link">Next Manifest</a>
+        </nav>
+
+        <footer>
+            <p>© 19XX-2024 VETERAN JESTER DISPATCH // ARCHIVE DEPT // <span style="text-decoration: line-through;">EYES ONLY</span></p>
+            <p style="margin-top: 10px; opacity: 0.6;">All files are logged chronologically. Discrepancies should be reported to the quartermaster.</p>
+        </footer>
+    </div>
+
+</body>
+</html>

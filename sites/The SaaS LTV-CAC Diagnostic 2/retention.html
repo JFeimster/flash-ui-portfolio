@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaaS Retention Cohort Heatmap</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050507;
+            --card-bg: rgba(13, 13, 18, 0.8);
+            --neon-cyan: #00f2ff;
+            --neon-purple: #9d00ff;
+            --neon-green: #00ff88;
+            --neon-red: #ff0055;
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+            --cell-bg: rgba(255, 255, 255, 0.03);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(0, 242, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(157, 0, 255, 0.1) 0%, transparent 40%);
+            padding: 20px;
+        }
+
+        .retention-card {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 32px;
+            padding: 40px;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        header {
+            text-align: left;
+            margin-bottom: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, #fff, var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            color: var(--text-dim);
+            font-size: 14px;
+        }
+
+        .metric-badge {
+            background: rgba(0, 242, 255, 0.1);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 12px;
+            text-align: right;
+        }
+
+        .metric-label {
+            display: block;
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--neon-cyan);
+            font-weight: 800;
+        }
+
+        .metric-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 4px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        th {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            padding: 10px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        td {
+            padding: 12px;
+            text-align: center;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: transform 0.2s ease;
+        }
+
+        td:hover {
+            transform: scale(1.05);
+            z-index: 2;
+            cursor: default;
+        }
+
+        .cohort-month {
+            text-align: left;
+            font-weight: 700;
+            color: var(--text-main);
+            background: none !important;
+            padding-left: 0;
+            font-size: 12px;
+        }
+
+        .user-count {
+            color: var(--text-dim);
+            font-size: 11px;
+            background: rgba(255, 255, 255, 0.05) !important;
+        }
+
+        /* Heatmap Gradient Logic */
+        .h-100 { background: rgba(0, 255, 136, 0.3); color: var(--neon-green); border: 1px solid rgba(0, 255, 136, 0.3); }
+        .h-90 { background: rgba(0, 255, 136, 0.2); color: #80ffc4; }
+        .h-80 { background: rgba(0, 242, 255, 0.2); color: #80f9ff; }
+        .h-70 { background: rgba(0, 242, 255, 0.15); color: #fff; }
+        .h-60 { background: rgba(0, 242, 255, 0.1); color: var(--text-dim); }
+        .h-50 { background: rgba(255, 0, 85, 0.1); color: #ff80aa; }
+        .h-critical { background: rgba(255, 0, 85, 0.25); color: var(--neon-red); border: 1px solid rgba(255, 0, 85, 0.3); font-weight: 800; }
+
+        .footer-insights {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .insight-card {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .insight-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .insight-title::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--neon-purple);
+        }
+
+        .insight-desc {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #cbd5e1;
+        }
+
+        .highlight-red { color: var(--neon-red); font-weight: 700; }
+        .highlight-green { color: var(--neon-green); font-weight: 700; }
+
+        @media (max-width: 600px) {
+            header { flex-direction: column; align-items: flex-start; gap: 16px; }
+            .footer-insights { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="retention-card">
+    <header>
+        <div>
+            <h1>Cohort Retention</h1>
+            <p class="subtitle">Visualizing the "Leaky Bucket" across lifecycles.</p>
+        </div>
+        <div class="metric-badge">
+            <span class="metric-label">Avg. Monthly Churn</span>
+            <span class="metric-value">5.2%</span>
+        </div>
+    </header>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th style="text-align: left;">Cohort</th>
+                    <th>Size</th>
+                    <th>M0</th>
+                    <th>M1</th>
+                    <th>M2</th>
+                    <th>M3</th>
+                    <th>M4</th>
+                    <th>M5</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="cohort-month">Oct 2023</td>
+                    <td class="user-count">1,240</td>
+                    <td class="h-100">100%</td>
+                    <td class="h-90">92%</td>
+                    <td class="h-80">88%</td>
+                    <td class="h-80">85%</td>
+                    <td class="h-70">82%</td>
+                    <td class="h-70">80%</td>
+                </tr>
+                <tr>
+                    <td class="cohort-month">Nov 2023</td>
+                    <td class="user-count">1,150</td>
+                    <td class="h-100">100%</td>
+                    <td class="h-90">90%</td>
+                    <td class="h-80">84%</td>
+                    <td class="h-70">79%</td>
+                    <td class="h-70">76%</td>
+                    <td class="h-60">72%</td>
+                </tr>
+                <tr>
+                    <td class="cohort-month">Dec 2023</td>
+                    <td class="user-count">1,420</td>
+                    <td class="h-100">100%</td>
+                    <td class="h-80">82%</td>
+                    <td class="h-70">75%</td>
+                    <td class="h-60">68%</td>
+                    <td class="h-50">61%</td>
+                    <td class="h-critical">54%</td>
+                </tr>
+                <tr>
+                    <td class="cohort-month">Jan 2024</td>
+                    <td class="user-count">980</td>
+                    <td class="h-100">100%</td>
+                    <td class="h-90">94%</td>
+                    <td class="h-80">91%</td>
+                    <td class="h-80">88%</td>
+                    <td class="h-80">86%</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td class="cohort-month">Feb 2024</td>
+                    <td class="user-count">1,850</td>
+                    <td class="h-100">100%</td>
+                    <td class="h-90">91%</td>
+                    <td class="h-80">86%</td>
+                    <td class="h-70">82%</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td class="cohort-month">Mar 2024</td>
+                    <td class="user-count">2,100</td>
+                    <td class="h-100">100%</td>
+                    <td class="h-critical">78%</td>
+                    <td class="h-critical">64%</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer-insights">
+        <div class="insight-card">
+            <div class="insight-title">Critical Leak Identified</div>
+            <p class="insight-desc">
+                The <span class="highlight-red">Dec 2023</span> cohort is decaying rapidly. Retention dropped to 54% by M5, suggesting a mismatch in holiday acquisition quality.
+            </p>
+        </div>
+        <div class="insight-card">
+            <div class="insight-title">Onboarding Friction</div>
+            <p class="insight-desc">
+                <span class="highlight-red">Mar 2024</span> shows a 22% drop in Month 1. This immediate churn suggests a failure in the initial value delivery (Aha! moment).
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Visual interaction effect
+    document.querySelectorAll('td:not(.cohort-month):not(.user-count)').forEach(cell => {
+        cell.addEventListener('mouseover', () => {
+            if (cell.innerText !== '-') {
+                cell.style.boxShadow = '0 0 15px rgba(0, 242, 255, 0.2)';
+            }
+        });
+        cell.addEventListener('mouseout', () => {
+            cell.style.boxShadow = 'none';
+        });
+    });
+</script>
+
+</body>
+</html></html>

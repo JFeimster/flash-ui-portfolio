@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE FALLOUT WALL | Impact Zones</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=Syne:wght@800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #000000;
+            --white: #ffffff;
+            --cream: #f4f1ea;
+            --red: #ff3c00;
+            --border: 4px solid #000000;
+            --shadow: 8px 8px 0px #000000;
+            --shadow-hover: 4px 4px 0px #000000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--cream);
+            color: var(--black);
+            font-family: 'Space Grotesk', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Nav & Marquee */
+        header {
+            border-bottom: var(--border);
+            padding: 20px 0;
+            background: var(--black);
+            color: var(--white);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .marquee {
+            overflow: hidden;
+            white-space: nowrap;
+            background: var(--red);
+            border-bottom: var(--border);
+            padding: 10px 0;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .marquee-inner {
+            display: inline-block;
+            animation: marquee 30s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* Hero */
+        .hero {
+            padding: 60px 0;
+            background: var(--white);
+            border-bottom: var(--border);
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(3rem, 12vw, 10rem);
+            text-transform: uppercase;
+            letter-spacing: -4px;
+            line-height: 0.8;
+            margin-bottom: 20px;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            border-top: var(--border);
+            border-bottom: var(--border);
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .stat-item {
+            padding: 20px;
+            border-right: var(--border);
+            text-align: center;
+        }
+
+        .stat-item:last-child { border-right: none; }
+
+        .stat-val {
+            font-size: 2.5rem;
+            font-family: 'Syne', sans-serif;
+            color: var(--red);
+            display: block;
+        }
+
+        .stat-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        /* Impact Grid */
+        .fallout-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            padding: 60px 0;
+        }
+
+        .impact-card {
+            background: var(--white);
+            border: var(--border);
+            box-shadow: var(--shadow);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            transition: 0.2s;
+        }
+
+        .impact-card:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 12px 12px 0px var(--red);
+        }
+
+        .platform-tag {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.7rem;
+            background: var(--black);
+            color: var(--white);
+            padding: 4px 8px;
+            align-self: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .impact-content {
+            font-size: 1.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        /* Special Types */
+        .card-tweet { border-left: 15px solid #1DA1F2; }
+        .card-terminal { background: #1a1a1a; color: #00ff00; border-color: #333; }
+        .card-terminal .platform-tag { background: #00ff00; color: #000; }
+        .card-terminal .impact-content { font-family: 'IBM Plex Mono', monospace; font-size: 1.2rem; text-transform: none; }
+        
+        .card-sticker {
+            background: var(--red);
+            color: var(--white);
+            transform: rotate(-2deg);
+        }
+
+        .user-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            border-top: 2px solid var(--black);
+            padding-top: 15px;
+        }
+
+        .card-terminal .user-meta { border-top-color: #333; }
+
+        .avatar {
+            width: 30px;
+            height: 30px;
+            background: var(--black);
+            border: 1px solid var(--white);
+        }
+
+        /* Actions */
+        .btn {
+            padding: 20px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            border: var(--border);
+            background: var(--white);
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.1s;
+            text-align: center;
+            display: inline-block;
+            text-decoration: none;
+            color: var(--black);
+        }
+
+        .btn:hover {
+            transform: translate(2px, 2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .btn-red {
+            background: var(--red);
+            color: var(--white);
+        }
+
+        footer {
+            background: var(--black);
+            color: var(--white);
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .back-link {
+            font-size: 3rem;
+            color: var(--red);
+            text-decoration: none;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+        }
+
+        .back-link:hover {
+            color: var(--white);
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .fallout-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 4rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="marquee">
+        <div class="marquee-inner">
+            VISUALIZING THE IMPACT RADIUS &nbsp; • &nbsp; ARCHIVING THE UNFILTERED &nbsp; • &nbsp; DECENTRALIZE THE NARRATIVE &nbsp; • &nbsp; THE TRUTH IS A GRENADE &nbsp; • &nbsp; VISUALIZING THE IMPACT RADIUS &nbsp; • &nbsp; 
+        </div>
+    </div>
+
+    <header>
+        <div class="container" style="display:flex; justify-content: space-between; align-items: center;">
+            <div style="font-weight: 900; font-size: 1.5rem; letter-spacing: -1px;">QUOTE GRENADE // FALLOUT</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem;">[ VIEWING: ARCHIVE_042 ]</div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>FALLOUT.</h1>
+            <p style="max-width: 700px; margin: 0 auto; font-weight: bold; text-transform: uppercase; font-size: 1.2rem;">
+                Where the shards landed. Tracking the transmission of high-velocity ideas across the digital wasteland.
+            </p>
+        </div>
+    </section>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-val">128.4K</span>
+            <span class="stat-label">TOTAL DETONATIONS</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-val">42</span>
+            <span class="stat-label">GOVERNMENTS ANNOYED</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-val">∞</span>
+            <span class="stat-label">SOVEREIGNTY LEVEL</span>
+        </div>
+    </div>
+
+    <main class="container">
+        <div class="fallout-grid">
+            <!-- Card 1: X/Twitter -->
+            <div class="impact-card card-tweet">
+                <div class="platform-tag">SOURCE: X.COM</div>
+                <div class="impact-content">
+                    "THE STATE IS A HALLUCINATION WITH A BUDGET."
+                </div>
+                <div class="user-meta">
+                    <div class="avatar" style="background: #333;"></div>
+                    <span>@anon_founder_01 // 4.2k RTs</span>
+                </div>
+            </div>
+
+            <!-- Card 2: Terminal -->
+            <div class="impact-card card-terminal">
+                <div class="platform-tag">SOURCE: SSH_SESSION</div>
+                <div class="impact-content">
+                    > sudo rm -rf /government/regulations<br>
+                    > echo "PROTOCOL > POLITICS"<br>
+                    > _
+                </div>
+                <div class="user-meta">
+                    <div class="avatar" style="background: #00ff00;"></div>
+                    <span>root@decentralized_node</span>
+                </div>
+            </div>
+
+            <!-- Card 3: Sticker -->
+            <div class="impact-card card-sticker">
+                <div class="platform-tag">SOURCE: PHYSICAL_WORLD</div>
+                <div class="impact-content">
+                    EXIT IS THE ONLY VOICE.
+                </div>
+                <div class="user-meta">
+                    <div class="avatar" style="background: var(--white);"></div>
+                    <span>LOCATION: BERLIN_SUBWAY</span>
+                </div>
+            </div>
+
+            <!-- Card 4: Normal Brutalist -->
+            <div class="impact-card">
+                <div class="platform-tag">SOURCE: DISPATCH</div>
+                <div class="impact-content">
+                    "PERMISSION IS FOR PEOPLE WHO DON'T HAVE CODE."
+                </div>
+                <div class="user-meta">
+                    <div class="avatar"></div>
+                    <span>DEV_LOG_INTERNAL // ARCHIVE</span>
+                </div>
+            </div>
+
+            <!-- Card 5: X/Twitter -->
+            <div class="impact-card card-tweet">
+                <div class="platform-tag">SOURCE: X.COM</div>
+                <div class="impact-content">
+                    "BUILD THINGS THAT MAKE THE GOVERNMENT OBSOLETE."
+                </div>
+                <div class="user-meta">
+                    <div class="avatar" style="background: #ff3c00;"></div>
+                    <span>@radical_builder // 12k Likes</span>
+                </div>
+            </div>
+
+            <!-- Card 6: Sticker/Inverted -->
+            <div class="impact-card" style="background: #000; color: #fff; transform: rotate(1deg);">
+                <div class="platform-tag" style="background: var(--red);">SOURCE: DARK_MODE</div>
+                <div class="impact-content">
+                    BE THE GLITCH IN THE SIMULATION.
+                </div>
+                <div class="user-meta" style="border-top-color: #333;">
+                    <div class="avatar" style="background: #fff;"></div>
+                    <span>USER_0xFF // ENCRYPTED</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 80px;">
+            <a href="index.html" class="btn btn-red">GO BACK & ARM THE NEXT GRENADE</a>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <h2 style="font-family: 'Syne', sans-serif; font-size: 3rem; margin-bottom: 20px;">STAY DANGEROUS.</h2>
+            <p style="margin-bottom: 40px; font-family: 'IBM Plex Mono', monospace;">SUBMIT YOUR FALLOUT SIGHTINGS TO: NULL@RADICAL.LABS</p>
+            <a href="index.html" class="back-link">RETURN TO BASE</a>
+            <p style="margin-top: 60px; font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; opacity: 0.5;">
+                DATA RECOVERY IN PROGRESS... [||||||||||] 100%
+            </p>
+        </div>
+    </footer>
+
+</body>
+</html>

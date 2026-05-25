@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Archives | Veteran Jester Dispatch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Stardos+Stencil:wght@400;700&family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #c5beb1;
+            --olive: #4b5320;
+            --dark-olive: #353b16;
+            --black: #1a1a1a;
+            --stencil-red: #9e1b1b;
+            --paper-white: #e8e4d9;
+            --ink-bleed: rgba(26, 26, 26, 0.8);
+            --texture: url("https://www.transparenttextures.com/patterns/cardboard-flat.png");
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: var(--texture);
+            color: var(--black);
+            font-family: 'Courier Prime', monospace;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .stencil {
+            font-family: 'Stardos Stencil', cursive;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .typewriter {
+            font-family: 'Special Elite', cursive;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            padding: 40px 0;
+            border-bottom: 2px solid var(--black);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.05) 10px, rgba(0,0,0,0.05) 20px);
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--black);
+            color: var(--bg-color);
+            padding: 5px 15px;
+            clip-path: polygon(0% 0%, 100% 5%, 95% 100%, 0% 95%);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        nav a {
+            color: var(--black);
+            text-decoration: none;
+            font-weight: bold;
+            margin-left: 25px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            border-bottom: 2px solid transparent;
+        }
+
+        nav a:hover, nav a.active {
+            border-bottom: 2px solid var(--stencil-red);
+        }
+
+        /* Archive Header */
+        .archive-hero {
+            padding: 60px 0;
+            border-bottom: 1px solid var(--black);
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .archive-hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+        }
+
+        .archive-meta {
+            font-family: 'Special Elite', cursive;
+            background: var(--black);
+            color: var(--bg-color);
+            display: inline-block;
+            padding: 5px 15px;
+            margin-bottom: 20px;
+        }
+
+        /* Filter System */
+        .filter-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 50px;
+            padding: 20px;
+            background: rgba(0,0,0,0.05);
+            border: 2px dashed var(--black);
+        }
+
+        .filter-label {
+            font-family: 'Stardos Stencil', cursive;
+            width: 100%;
+            margin-bottom: 10px;
+            font-size: 0.8rem;
+            color: var(--stencil-red);
+        }
+
+        .filter-btn {
+            background: transparent;
+            border: 1px solid var(--black);
+            padding: 8px 15px;
+            font-family: 'Courier Prime', monospace;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--black);
+            color: var(--bg-color);
+        }
+
+        .search-container {
+            flex-grow: 1;
+            min-width: 300px;
+            position: relative;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 8px 15px;
+            background: var(--paper-white);
+            border: 1px solid var(--black);
+            font-family: 'Special Elite', cursive;
+        }
+
+        /* Logbook / Table */
+        .logbook {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 80px;
+        }
+
+        .logbook thead {
+            background: var(--dark-olive);
+            color: var(--paper-white);
+        }
+
+        .logbook th {
+            font-family: 'Stardos Stencil', cursive;
+            padding: 15px;
+            text-align: left;
+            border: 1px solid var(--black);
+        }
+
+        .logbook td {
+            padding: 20px 15px;
+            border: 1px solid rgba(0,0,0,0.1);
+            background: var(--paper-white);
+            vertical-align: middle;
+        }
+
+        .log-row:hover td {
+            background: #fdfdfd;
+        }
+
+        .log-id {
+            font-family: 'Special Elite', cursive;
+            font-weight: bold;
+            color: var(--stencil-red);
+        }
+
+        .log-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-decoration: none;
+            color: var(--black);
+        }
+
+        .log-title:hover {
+            text-decoration: underline;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            background: var(--olive);
+            color: white;
+            border-radius: 2px;
+            text-transform: uppercase;
+        }
+
+        .tag.satire { background: #555; }
+        .tag.leadership { background: var(--dark-olive); }
+        .tag.freedom { background: var(--stencil-red); }
+
+        .status {
+            font-family: 'Stardos Stencil', cursive;
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+
+        .redacted {
+            background: var(--black);
+            color: var(--black);
+            user-select: none;
+            cursor: help;
+        }
+
+        /* Stamp */
+        .stamp {
+            position: absolute;
+            top: 20px;
+            right: 0;
+            border: 4px double var(--stencil-red);
+            color: var(--stencil-red);
+            padding: 5px 15px;
+            font-family: 'Stardos Stencil', cursive;
+            text-transform: uppercase;
+            transform: rotate(15deg);
+            opacity: 0.6;
+        }
+
+        /* Footer */
+        footer {
+            padding: 60px 0;
+            border-top: 2px solid var(--black);
+            text-align: center;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .footer-logo {
+            font-family: 'Stardos Stencil', cursive;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .archive-hero h1 { font-size: 2rem; }
+            .logbook thead { display: none; }
+            .logbook, .logbook tbody, .logbook tr, .logbook td {
+                display: block;
+                width: 100%;
+            }
+            .logbook tr { margin-bottom: 20px; border: 2px solid var(--black); }
+            .log-id { display: block; margin-bottom: 10px; }
+            .stamp { position: static; transform: none; display: inline-block; margin-bottom: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <a href="index.html" class="logo">VJD</a>
+            <nav>
+                <a href="#" class="active">Archives</a>
+                <a href="#">The Mission</a>
+                <a href="#">Store</a>
+                <a href="#" style="color: var(--stencil-red);">Read the Dispatch</a>
+            </nav>
+        </header>
+
+        <section class="archive-hero">
+            <div class="archive-meta">LOGBOOK // SECURE_FILE_882</div>
+            <h1>The Mission Reports</h1>
+            <p class="typewriter">A chronological index of every dispatch, rant, and operational debrief released to the public since inception.</p>
+            <div class="stamp">CLASSIFIED</div>
+        </section>
+
+        <div class="filter-bank">
+            <div class="filter-label">Filter by Classification:</div>
+            <button class="filter-btn active">All Reports</button>
+            <button class="filter-btn">Satire</button>
+            <button class="filter-btn">Leadership</button>
+            <button class="filter-btn">Freedom Commentary</button>
+            <button class="filter-btn">Entrepreneurship</button>
+            <div class="search-container">
+                <input type="text" placeholder="SEARCH INTEL (e.g. 'Tactical', 'HR', 'Stoic')...">
+            </div>
+        </div>
+
+        <table class="logbook">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Dispatch Title</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="log-row">
+                    <td class="log-id">#084</td>
+                    <td class="typewriter">15 NOV 23</td>
+                    <td><a href="#" class="log-title">The General's Guide to PowerPoint Warfare</a></td>
+                    <td><span class="tag satire">Satire</span></td>
+                    <td class="status">RELEASED</td>
+                </tr>
+                <tr class="log-row">
+                    <td class="log-id">#083</td>
+                    <td class="typewriter">08 NOV 23</td>
+                    <td><a href="#" class="log-title">Leading from the Bottom of a Mud Hole</a></td>
+                    <td><span class="tag leadership">Leadership</span></td>
+                    <td class="status">RELEASED</td>
+                </tr>
+                <tr class="log-row">
+                    <td class="log-id">#082</td>
+                    <td class="typewriter">01 NOV 23</td>
+                    <td><a href="#" class="log-title">Post-Combat Capitalism: Tactical Startups</a></td>
+                    <td><span class="tag">Business</span></td>
+                    <td class="status">RELEASED</td>
+                </tr>
+                <tr class="log-row">
+                    <td class="log-id">#081</td>
+                    <td class="typewriter">24 OCT 23</td>
+                    <td><a href="#" class="log-title">The Art of the Strategic Middle Finger</a></td>
+                    <td><span class="tag satire">Satire</span></td>
+                    <td class="status">RELEASED</td>
+                </tr>
+                <tr class="log-row">
+                    <td class="log-id">#080</td>
+                    <td class="typewriter">17 OCT 23</td>
+                    <td><a href="#" class="log-title">Why "Safe Spaces" Don't Exist in the Wild</a></td>
+                    <td><span class="tag freedom">Freedom</span></td>
+                    <td class="status">RELEASED</td>
+                </tr>
+                <tr class="log-row">
+                    <td class="log-id">#079</td>
+                    <td class="typewriter">10 OCT 23</td>
+                    <td><a href="#" class="log-title">Supply Chain Chaos: A Grunt's Perspective</a></td>
+                    <td><span class="tag">Business</span></td>
+                    <td class="status">RELEASED</td>
+                </tr>
+                <tr class="log-row">
+                    <td class="log-id">#078</td>
+                    <td class="typewriter">03 OCT 23</td>
+                    <td><a href="#" class="log-title">Stoicism for the Modern Insomniac</a></td>
+                    <td><span class="tag">Philosophy</span></td>
+                    <td class="status">RELEASED</td>
+                </tr>
+                <tr class="log-row">
+                    <td class="log-id">#077</td>
+                    <td class="typewriter">26 SEP 23</td>
+                    <td><span class="log-title redacted">TOP SECRET - INFORMATION WITHHELD</span></td>
+                    <td><span class="tag">Unknown</span></td>
+                    <td class="status" style="color: var(--stencil-red);">REDACTED</td>
+                </tr>
+                <tr class="log-row">
+                    <td class="log-id">#076</td>
+                    <td class="typewriter">19 SEP 23</td>
+                    <td><a href="#" class="log-title">The Infantryman's Guide to Corporate Networking</a></td>
+                    <td><span class="tag leadership">Leadership</span></td>
+                    <td class="status">RELEASED</td>
+                </tr>
+                <tr class="log-row">
+                    <td class="log-id">#075</td>
+                    <td class="typewriter">12 SEP 23</td>
+                    <td><a href="#" class="log-title">Digital Serfdom: Reclaiming Personal Liberty</a></td>
+                    <td><span class="tag freedom">Freedom</span></td>
+                    <td class="status">RELEASED</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="text-align: center; margin-bottom: 100px;">
+            <button class="filter-btn" style="padding: 15px 40px;">Load Older Missions</button>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <span class="footer-logo">Veteran Jester Dispatch</span>
+            <p>&copy; 2023 // All Rights Reserved // Out of Content & Out of Ammo</p>
+            <div class="social-links" style="margin-top: 20px;">
+                <a href="#" style="margin: 0 10px; color: var(--black); text-decoration: none; border-bottom: 1px solid var(--black);">Twitter/X</a>
+                <a href="#" style="margin: 0 10px; color: var(--black); text-decoration: none; border-bottom: 1px solid var(--black);">Instagram</a>
+                <a href="#" style="margin: 0 10px; color: var(--black); text-decoration: none; border-bottom: 1px solid var(--black);">Substack</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Archives | Veteran Jester Dispatch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Stardos+Stencil:wght@400;700&family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #c5beb1;
+            --olive: #4b5320;
+            --dark-olive: #353b16;
+            --black: #1a1a1a;
+            --stencil-red: #9e1b1b;
+            --paper-white: #e8e4d9;
+            --ink-bleed: rgba(26, 26, 26, 0.8);
+            --texture: url("https://www.transparenttextures.com/patterns/cardboard-flat.png");
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: var(--texture);
+            color: var(--black);
+            font-family: 'Courier Prime', monospace;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .stencil {
+            font-family: 'Stardos Stencil', cursive;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .typewriter {
+            font-family: 'Special Elite', cursive;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            padding: 40px 0;
+            border-bottom: 2px solid var(--black);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.05) 10px, rgba(0,0,0,0.05) 20px);
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--black);
+            color: var(--bg-color);
+            padding: 5px 15px;
+            clip-path: polygon(0% 0%, 100% 5%, 95% 100%, 0% 95%);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        nav a {
+            color: var(--black);
+            text-decoration: none;
+            font-weight: bold;
+            margin-left: 25px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            border-bottom: 2px solid transparent;
+        }
+
+        nav a:hover, nav a.active {
+            border-bottom: 2px solid var(--stencil-red);
+        }
+
+        /* Archive Header */
+        .archive-hero {
+            padding: 60px 0;
+            border-bottom: 1px solid var(--black);
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .archive-hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+        }
+
+        .archive-meta {
+            font-family: 'Special Elite', cursive;
+            background: var(--black);
+            color: var(--bg-color);
+            display: inline-block;
+            padding: 5px 15px;
+            margin-bottom: 20px;
+        }
+
+        /* Filter System */
+        .filter-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 50px;
+            padding: 20px;
+            background: rgba(0,0,0,0.05);
+            border: 2px dashed var(--black);
+        }
+
+        .filter-label {
+            font-family: 'Stardos Stencil', cursive;
+            width: 100%;
+            margin-bottom: 10px;
+            font-size: 0.8rem;
+            color: var(--stencil-red);
+        }
+
+        .filter-btn {
+            background: transparent;
+            border: 1px solid var(--black);
+            padding: 8px 15px;
+            font-family: 'Courier Prime', monospace;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--black);
+            color: var(--bg-color);
+        }
+
+        .search-container {
+            flex-grow: 1;
+            min-width: 300px;
+            position: relative;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 8px 15px;
+            background: var(--paper-white);
+            border: 1px solid var(--black);
+            font-family: 'Special Elite', cursive;
+        }
+
+        /* Logbook / Table */
+        .logbook {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 80px;
+        }
+
+        .logbook thead {
+            background: var(--dark-olive);
+            color: var(--paper-white);
+        }
+
+        .logbook th {
+            font-family: 'Stardos Stencil', cursive;
+            padding: 15px;
+            text-align: left;
+            border: 1px solid var(--black);
+        }
+
+        .logbook td {
+            padding: 20px 15px;
+            border: 1px solid rgba(0,0,0,0.1);
+            background: var(--paper-white);
+            vertical-align: middle;
+        }
+
+        .log-row:hover td {
+            background: #fdfdfd;
+        }
+
+        .log-id {
+            font-family: 'Special Elite', cursive;
+            font-weight: bold;
+            color: var(--stencil-red);
+        }
+
+        .log-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-decoration: none;
+            color: var(--black);
+        }
+
+        .log-title:hover {
+            text-decoration: underline;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            background: var(--olive);
+            color: white;
+            border-radius: 2px;
+            text-transform: uppercase;
+        }
+
+        .tag.satire { background: #555; }
+        .tag.leadership { background: var(--dark-olive); }
+        .tag.freedom { background: var(--stencil-red); }
+
+        .status {
+            font-family: 'Stardos Stencil', cursive;
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+
+        .redacted {
+            background: var(--black);
+            color: var(--black);
+            user-select: none;
+            cursor: help;
+        }
+
+        /* Stamp */
+        .stamp {
+            position: absolute;
+            top: 20px;
+            right: 0;
+            border: 4px double var(--stencil-red);
+            color: var(--stencil-red);
+            padding: 5px 15px;
+            font-family: 'Stardos Stencil', cursive;
+            text-transform: uppercase;
+            transform: rotate(15deg);
+            opacity: 0.6;
+        }
+
+        /* Footer */
+        footer {
+            padding: 60px 0;
+            border-top: 2px solid var(--black);
+            text-align: center;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .footer-logo {
+            font-family: 'Stardos Stencil', cursive;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .archive-hero h1 { font-size: 2rem; }
+            .logbook thead { display: none; }
+            .logbook, .logbook tbody, .logbook tr, .logbook td {
+                display: block;
+                width: 100%;
+            }
+            .logbook tr { margin-bottom: 20px; border: 2px solid var(--black); }
+            .log-id { display: block; margin-bottom: 10px; }
+            .stamp { position: static; transform: none; display: inline-block; margin-bottom: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <a href="index.html" class="logo">VJD</a>
+            <nav>
+                <a href="#" class="active">Archives</a>
+                <a href="#">The Mission</a>
+                <a href="#">Store</a>
+                <a href="#" style="color: var(--stencil-red);">Read the Dispatch</a>
+            </nav>
+        </header>
+
+        <section class="archive-hero">
+            <div class="archive-meta">LOGBOOK // SECURE_FILE_882</div>
+            <h1>The Mission Reports</h1>
+            <p class="typewriter">A chronological index of every dispatch, rant, and operational debrief released to the public since inception.</p>
+            <div class="stamp">CLASSIFIED</div>
+        </section>
+
+        <div class="filter-bank">
+            <div class="filter-label">Filter by Classification:</div>
+            <button class="filter-btn active">All Reports</button>
+            <button class="filter-btn">Satire</button>
+            <button class="filter-btn">Leadership</button>
+            <button class="filter-btn">Freedom Commentary</button>
+            <button class="filter-btn">Entrepreneurship</button>
+            <div class="search-container">
+                <input type="text" placeholder="SEARCH INTEL (e.g. 'Tactical', 'HR', 'Stoic')...">
+            </div>
+        </div>
+
+        <table class="logbook">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Dispatch Title</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="log-row">
+                    <td class="log-id">#084</td>
+                    <td class="typewriter">15 NOV 23</td>
+                    <td><a href="#" class="log-title">The General's Guide to PowerPoint Warfare</a></td>
+                    <td><span class="tag satire">Satire</span></td>
+                    <td class="status">RELEASED</td>
+                </tr>
+                <tr class="log-row">
+                    <td class="log-id">#083</td>
+                    <td class="typewriter">08 NOV 23</td>
+                    <td><a href="#" class="log-title">Leading from the Bottom of a Mud Hole</a></td>
+                    <td><span class="tag leadership">Leadership</span></td>
+                    <td class="status">RELEASED</td>
+                </tr>
+                <tr class="log-row">
+                    <td class="log-id">#082</td>
+                    <td class="typewriter">01 NOV 23</td>
+                    <td><a href="#" class="log-title">Post-Combat Capitalism: Tactical Startups</a></td>
+                    <td><span class="tag">Business</span></td>
+                    <td class="status">RELEASED</td>
+                </tr>
+                <tr class="log-row">
+                    <td class="log-id">#081</td>
+                    <td class="typewriter">24 OCT 23</td>
+                    <td><a href="#" class="log-title">The Art of the Strategic Middle Finger</a></td>
+                    <td><span class="tag satire">Satire</span></td>
+                    <td class="status">RELEASED</td>
+                </tr>
+                <tr class="log-row">
+                    <td class="log-id">#080</td>
+                    <td class="typewriter">17 OCT 23</td>
+                    <td><a href="#" class="log-title">Why "Safe Spaces" Don't Exist in the Wild</a></td>
+                    <td><span class="tag freedom">Freedom</span></td>
+                    <td class="status">RELEASED</td>
+                </tr>
+                <tr class="log-row">
+                    <td class="log-id">#079</td>
+                    <td class="typewriter">10 OCT 23</td>
+                    <td><a href="#" class="log-title">Supply Chain Chaos: A Grunt's Perspective</a></td>
+                    <td><span class="tag">Business</span></td>
+                    <td class="status">RELEASED</td>
+                </tr>
+                <tr class="log-row">
+                    <td class="log-id">#078</td>
+                    <td class="typewriter">03 OCT 23</td>
+                    <td><a href="#" class="log-title">Stoicism for the Modern Insomniac</a></td>
+                    <td><span class="tag">Philosophy</span></td>
+                    <td class="status">RELEASED</td>
+                </tr>
+                <tr class="log-row">
+                    <td class="log-id">#077</td>
+                    <td class="typewriter">26 SEP 23</td>
+                    <td><span class="log-title redacted">TOP SECRET - INFORMATION WITHHELD</span></td>
+                    <td><span class="tag">Unknown</span></td>
+                    <td class="status" style="color: var(--stencil-red);">REDACTED</td>
+                </tr>
+                <tr class="log-row">
+                    <td class="log-id">#076</td>
+                    <td class="typewriter">19 SEP 23</td>
+                    <td><a href="#" class="log-title">The Infantryman's Guide to Corporate Networking</a></td>
+                    <td><span class="tag leadership">Leadership</span></td>
+                    <td class="status">RELEASED</td>
+                </tr>
+                <tr class="log-row">
+                    <td class="log-id">#075</td>
+                    <td class="typewriter">12 SEP 23</td>
+                    <td><a href="#" class="log-title">Digital Serfdom: Reclaiming Personal Liberty</a></td>
+                    <td><span class="tag freedom">Freedom</span></td>
+                    <td class="status">RELEASED</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="text-align: center; margin-bottom: 100px;">
+            <button class="filter-btn" style="padding: 15px 40px;">Load Older Missions</button>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <span class="footer-logo">Veteran Jester Dispatch</span>
+            <p>&copy; 2023 // All Rights Reserved // Out of Content & Out of Ammo</p>
+            <div class="social-links" style="margin-top: 20px;">
+                <a href="#" style="margin: 0 10px; color: var(--black); text-decoration: none; border-bottom: 1px solid var(--black);">Twitter/X</a>
+                <a href="#" style="margin: 0 10px; color: var(--black); text-decoration: none; border-bottom: 1px solid var(--black);">Instagram</a>
+                <a href="#" style="margin: 0 10px; color: var(--black); text-decoration: none; border-bottom: 1px solid var(--black);">Substack</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

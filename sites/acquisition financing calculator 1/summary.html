@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;700;900&display=swap');
+
+        :root {
+            --bone-white: #F5F5F0;
+            --acid-green: #DFFF00;
+            --verdigris: #43B3AE;
+            --oxidized-dark: #2A4B45;
+            --black: #0A0A0A;
+            --border-width: 6px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--black);
+            font-family: 'Inter', sans-serif;
+            color: var(--bone-white);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .summary-container {
+            width: 100%;
+            max-width: 1000px;
+            border: var(--border-width) solid var(--bone-white);
+            padding: 80px;
+            position: relative;
+            background: var(--black);
+        }
+
+        .editorial-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: var(--border-width) solid var(--bone-white);
+            padding-bottom: 40px;
+            margin-bottom: 60px;
+        }
+
+        .title-block h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            line-height: 0.85;
+            text-transform: uppercase;
+            letter-spacing: -4px;
+        }
+
+        .meta-block {
+            text-align: right;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            line-height: 2;
+        }
+
+        .highlight-text {
+            color: var(--acid-green);
+        }
+
+        .stack-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 80px;
+        }
+
+        .stack-item {
+            border-top: 1px solid var(--bone-white);
+            padding-top: 20px;
+        }
+
+        .stack-label {
+            font-weight: 900;
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            display: block;
+            color: var(--verdigris);
+        }
+
+        .stack-value {
+            font-family: 'DM Serif Display', serif;
+            font-size: 4rem;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+
+        .stack-desc {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            line-height: 1.6;
+        }
+
+        .ledger-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 60px;
+        }
+
+        .ledger-table th {
+            text-align: left;
+            font-weight: 900;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 20px;
+            border: 1px solid #333;
+            background: #111;
+        }
+
+        .ledger-table td {
+            padding: 25px 20px;
+            border-bottom: 1px solid #333;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        .ledger-table .serif {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.5rem;
+        }
+
+        .summary-footer {
+            border-top: var(--border-width) solid var(--bone-white);
+            padding-top: 40px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+        }
+
+        .legal-disclaimer {
+            font-size: 0.65rem;
+            line-height: 1.8;
+            opacity: 0.5;
+            text-transform: uppercase;
+        }
+
+        .auth-stamp {
+            border: 2px solid var(--acid-green);
+            color: var(--acid-green);
+            padding: 15px;
+            text-align: center;
+            font-weight: 900;
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            transform: rotate(-2deg);
+        }
+
+        .print-btn {
+            position: absolute;
+            top: -60px;
+            right: 0;
+            background: none;
+            border: 1px solid var(--bone-white);
+            color: var(--bone-white);
+            padding: 10px 20px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .print-btn:hover {
+            background: var(--bone-white);
+            color: var(--black);
+        }
+
+        @media (max-width: 800px) {
+            .stack-grid { grid-template-columns: 1fr; }
+            .summary-container { padding: 40px 20px; }
+            .editorial-header { flex-direction: column; gap: 20px; }
+            .meta-block { text-align: left; }
+            .summary-footer { grid-template-columns: 1fr; }
+        }
+
+        @media print {
+            body { background: white; color: black; padding: 0; }
+            .summary-container { border: 2px solid black; max-width: 100%; }
+            .print-btn { display: none; }
+            .stack-item { border-top: 1px solid black; }
+            .ledger-table th { background: #eee; color: black; }
+            :root { --bone-white: #000; --black: #fff; --acid-green: #000; --verdigris: #000; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="summary-container">
+        <button class="print-btn" onclick="window.print()">Export Prospectus PDF</button>
+        
+        <header class="editorial-header">
+            <div class="title-block">
+                <h1>Capital<br>Stack <span class="highlight-text">01</span></h1>
+            </div>
+            <div class="meta-block">
+                Project: Obsidian Acquisition<br>
+                Date: 24 OCT 2023<br>
+                Class: Institutional / Senior<br>
+                Ref: 882-LVRG-SUM
+            </div>
+        </header>
+
+        <section class="stack-grid">
+            <div class="stack-item">
+                <span class="stack-label">SBA 7(a) Senior</span>
+                <div class="stack-value">75.0%</div>
+                <p class="stack-desc">Primary government-guaranteed facility. Amortized over 25 years with variable rate structure based on Prime + Margin.</p>
+            </div>
+            <div class="stack-item">
+                <span class="stack-label">Seller Carryback</span>
+                <div class="stack-value">15.0%</div>
+                <p class="stack-desc">Subordinated note held by the vendor. Interest-only period for 24 months, balloon payment at maturity.</p>
+            </div>
+            <div class="stack-item">
+                <span class="stack-label">Cash Equity</span>
+                <div class="stack-value" style="color: var(--acid-green);">10.0%</div>
+                <p class="stack-desc">Direct investor contribution. Represents total skin-in-the-game required for institutional compliance.</p>
+            </div>
+        </section>
+
+        <table class="ledger-table">
+            <thead>
+                <tr>
+                    <th>Tranche</th>
+                    <th>Rate/Cost</th>
+                    <th>Term</th>
+                    <th>Amortization</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>SBA 7(a) Senior Debt</td>
+                    <td class="serif">7.50%</td>
+                    <td>10 Years</td>
+                    <td>25 Year Full</td>
+                </tr>
+                <tr>
+                    <td>Seller Subordinated Note</td>
+                    <td class="serif">5.00%</td>
+                    <td>5 Years</td>
+                    <td>Interest Only</td>
+                </tr>
+                <tr>
+                    <td>Owner Equity Contribution</td>
+                    <td class="serif">--</td>
+                    <td>Infinite</td>
+                    <td>Residual</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <footer class="summary-footer">
+            <div class="legal-disclaimer">
+                This document is a confidential summary of the proposed financing architecture. All figures are estimates based on current market conditions. Institutional Grade Analytics does not guarantee final underwriting approval. Ref No: 882-LVRG-SUM. Unauthorized distribution is strictly prohibited under the non-disclosure agreement on file.
+            </div>
+            <div class="auth-stamp">
+                APPROVED FOR DISCLOSURE
+            </div>
+        </footer>
+    </div>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;700;900&display=swap');
+
+        :root {
+            --bone-white: #F5F5F0;
+            --acid-green: #DFFF00;
+            --verdigris: #43B3AE;
+            --oxidized-dark: #2A4B45;
+            --black: #0A0A0A;
+            --border-width: 6px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--black);
+            font-family: 'Inter', sans-serif;
+            color: var(--bone-white);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .summary-container {
+            width: 100%;
+            max-width: 1000px;
+            border: var(--border-width) solid var(--bone-white);
+            padding: 80px;
+            position: relative;
+            background: var(--black);
+        }
+
+        .editorial-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: var(--border-width) solid var(--bone-white);
+            padding-bottom: 40px;
+            margin-bottom: 60px;
+        }
+
+        .title-block h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            line-height: 0.85;
+            text-transform: uppercase;
+            letter-spacing: -4px;
+        }
+
+        .meta-block {
+            text-align: right;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            line-height: 2;
+        }
+
+        .highlight-text {
+            color: var(--acid-green);
+        }
+
+        .stack-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 80px;
+        }
+
+        .stack-item {
+            border-top: 1px solid var(--bone-white);
+            padding-top: 20px;
+        }
+
+        .stack-label {
+            font-weight: 900;
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            display: block;
+            color: var(--verdigris);
+        }
+
+        .stack-value {
+            font-family: 'DM Serif Display', serif;
+            font-size: 4rem;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+
+        .stack-desc {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            line-height: 1.6;
+        }
+
+        .ledger-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 60px;
+        }
+
+        .ledger-table th {
+            text-align: left;
+            font-weight: 900;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 20px;
+            border: 1px solid #333;
+            background: #111;
+        }
+
+        .ledger-table td {
+            padding: 25px 20px;
+            border-bottom: 1px solid #333;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        .ledger-table .serif {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.5rem;
+        }
+
+        .summary-footer {
+            border-top: var(--border-width) solid var(--bone-white);
+            padding-top: 40px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+        }
+
+        .legal-disclaimer {
+            font-size: 0.65rem;
+            line-height: 1.8;
+            opacity: 0.5;
+            text-transform: uppercase;
+        }
+
+        .auth-stamp {
+            border: 2px solid var(--acid-green);
+            color: var(--acid-green);
+            padding: 15px;
+            text-align: center;
+            font-weight: 900;
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            transform: rotate(-2deg);
+        }
+
+        .print-btn {
+            position: absolute;
+            top: -60px;
+            right: 0;
+            background: none;
+            border: 1px solid var(--bone-white);
+            color: var(--bone-white);
+            padding: 10px 20px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .print-btn:hover {
+            background: var(--bone-white);
+            color: var(--black);
+        }
+
+        @media (max-width: 800px) {
+            .stack-grid { grid-template-columns: 1fr; }
+            .summary-container { padding: 40px 20px; }
+            .editorial-header { flex-direction: column; gap: 20px; }
+            .meta-block { text-align: left; }
+            .summary-footer { grid-template-columns: 1fr; }
+        }
+
+        @media print {
+            body { background: white; color: black; padding: 0; }
+            .summary-container { border: 2px solid black; max-width: 100%; }
+            .print-btn { display: none; }
+            .stack-item { border-top: 1px solid black; }
+            .ledger-table th { background: #eee; color: black; }
+            :root { --bone-white: #000; --black: #fff; --acid-green: #000; --verdigris: #000; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="summary-container">
+        <button class="print-btn" onclick="window.print()">Export Prospectus PDF</button>
+        
+        <header class="editorial-header">
+            <div class="title-block">
+                <h1>Capital<br>Stack <span class="highlight-text">01</span></h1>
+            </div>
+            <div class="meta-block">
+                Project: Obsidian Acquisition<br>
+                Date: 24 OCT 2023<br>
+                Class: Institutional / Senior<br>
+                Ref: 882-LVRG-SUM
+            </div>
+        </header>
+
+        <section class="stack-grid">
+            <div class="stack-item">
+                <span class="stack-label">SBA 7(a) Senior</span>
+                <div class="stack-value">75.0%</div>
+                <p class="stack-desc">Primary government-guaranteed facility. Amortized over 25 years with variable rate structure based on Prime + Margin.</p>
+            </div>
+            <div class="stack-item">
+                <span class="stack-label">Seller Carryback</span>
+                <div class="stack-value">15.0%</div>
+                <p class="stack-desc">Subordinated note held by the vendor. Interest-only period for 24 months, balloon payment at maturity.</p>
+            </div>
+            <div class="stack-item">
+                <span class="stack-label">Cash Equity</span>
+                <div class="stack-value" style="color: var(--acid-green);">10.0%</div>
+                <p class="stack-desc">Direct investor contribution. Represents total skin-in-the-game required for institutional compliance.</p>
+            </div>
+        </section>
+
+        <table class="ledger-table">
+            <thead>
+                <tr>
+                    <th>Tranche</th>
+                    <th>Rate/Cost</th>
+                    <th>Term</th>
+                    <th>Amortization</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>SBA 7(a) Senior Debt</td>
+                    <td class="serif">7.50%</td>
+                    <td>10 Years</td>
+                    <td>25 Year Full</td>
+                </tr>
+                <tr>
+                    <td>Seller Subordinated Note</td>
+                    <td class="serif">5.00%</td>
+                    <td>5 Years</td>
+                    <td>Interest Only</td>
+                </tr>
+                <tr>
+                    <td>Owner Equity Contribution</td>
+                    <td class="serif">--</td>
+                    <td>Infinite</td>
+                    <td>Residual</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <footer class="summary-footer">
+            <div class="legal-disclaimer">
+                This document is a confidential summary of the proposed financing architecture. All figures are estimates based on current market conditions. Institutional Grade Analytics does not guarantee final underwriting approval. Ref No: 882-LVRG-SUM. Unauthorized distribution is strictly prohibited under the non-disclosure agreement on file.
+            </div>
+            <div class="auth-stamp">
+                APPROVED FOR DISCLOSURE
+            </div>
+        </footer>
+    </div>
+
+</body>
+</html>

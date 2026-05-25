@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VALOIS // Partner & Broker Portal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #030207;
+            --bg-surface: #0a0813;
+            --bg-surface-elevated: #110e20;
+            --border-subtle: rgba(255, 255, 255, 0.04);
+            --border-muted: rgba(255, 255, 255, 0.08);
+            --border-active: rgba(139, 92, 246, 0.3);
+            
+            --text-primary: #f4f4f7;
+            --text-secondary: #a1a1aa;
+            --text-muted: #52525b;
+            
+            --accent-purple: #8b5cf6;
+            --accent-purple-glow: rgba(139, 92, 246, 0.15);
+            --accent-velvet: #311042;
+            --accent-emerald: #10b981;
+            --accent-emerald-glow: rgba(16, 185, 129, 0.1);
+            --accent-amber: #f59e0b;
+            --accent-rose: #ef4444;
+
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            --transition-smooth: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            
+            /* Dynamic customizer values */
+            --custom-brand-color: #8b5cf6;
+            --custom-brand-glow: rgba(139, 92, 246, 0.15);
+        }
+
+        /* Partner Theme Adaptability */
+        body.partner-override {
+            --accent-purple: var(--custom-brand-color);
+            --accent-purple-glow: var(--custom-brand-glow);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+            transition: var(--transition-smooth);
+            background-image: radial-gradient(circle at 50% 0%, var(--accent-velvet) 0%, transparent 70%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        /* Clean Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-base);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-muted);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-purple);
+        }
+
+        /* Shell & Containers */
+        .app-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Top Bar Navigation */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: rgba(10, 8, 19, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 8px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-purple), #ec4899);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #fff;
+            font-size: 14px;
+            letter-spacing: -0.5px;
+            transition: var(--transition-smooth);
+        }
+
+        .brand-title {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: linear-gradient(to right, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-tag {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--accent-purple);
+            border: 1px solid var(--border-active);
+            padding: 2px 8px;
+            border-radius: 20px;
+            background: var(--accent-purple-glow);
+        }
+
+        .controls-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .select-partner {
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-muted);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 13px;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            outline: none;
+            transition: var(--transition-smooth);
+        }
+
+        .select-partner:hover {
+            border-color: var(--accent-purple);
+        }
+
+        .btn-action-primary {
+            background: var(--accent-purple);
+            color: #fff;
+            border: none;
+            font-family: var(--font-sans);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-action-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px var(--accent-purple-glow);
+        }
+
+        /* Bento Grid Architecture */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+        }
+
+        .bento-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-muted);
+            border-radius: 16px;
+            padding: 24px;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bento-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-active), transparent);
+            opacity: 0;
+            transition: var(--transition-smooth);
+        }
+
+        .bento-card:hover::before {
+            opacity: 1;
+        }
+
+        .bento-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Card Headers */
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .card-title-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .card-label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--accent-purple);
+            font-weight: 600;
+            transition: var(--transition-smooth);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .preview-badge {
+            font-size: 11px;
+            font-weight: 500;
+            background: var(--border-muted);
+            padding: 4px 10px;
+            border-radius: 20px;
+            color: var(--text-secondary);
+        }
+
+        /* Metrics Block Styling */
+        .col-metric {
+            grid-column: span 3;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 140px;
+        }
+
+        .metric-value {
+            font-family: var(--font-mono);
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin: 12px 0 4px 0;
+            color: var(--text-primary);
+        }
+
+        .metric-trend {
+            font-size: 11px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .trend-up { color: var(--accent-emerald); }
+        .trend-flat { color: var(--text-muted); }
+
+        /* Referral Tracker & Client Ledger (Size 8) */
+        .col-ledger {
+            grid-column: span 8;
+        }
+
+        .ledger-search-box {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .input-dark {
+            flex-grow: 1;
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-muted);
+            color: var(--text-primary);
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-family: var(--font-sans);
+            font-size: 13px;
+            outline: none;
+            transition: var(--transition-smooth);
+        }
+
+        .input-dark:focus {
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 10px var(--accent-purple-glow);
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        .custom-table th {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-muted);
+            letter-spacing: 0.5px;
+        }
+
+        .custom-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+        }
+
+        .custom-table tr:hover td {
+            background: rgba(255, 255, 255, 0.01);
+            color: var(--text-primary);
+        }
+
+        .badge-status {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .status-funded { background: var(--accent-emerald-glow); color: var(--accent-emerald); }
+        .status-review { background: rgba(245, 158, 11, 0.1); color: var(--accent-amber); }
+        .status-idle { background: var(--border-muted); color: var(--text-muted); }
+
+        /* Customizer Workspace (Size 7) */
+        .col-customizer {
+            grid-column: span 7;
+        }
+
+        .customizer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 20px;
+        }
+
+        .control-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .field-label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+        .color-picker-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-color {
+            appearance: none;
+            -webkit-appearance: none;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            background: none;
+        }
+
+        .input-color::-webkit-color-swatch-wrapper { padding: 0; }
+        .input-color::-webkit-color-swatch { border: 1px solid var(--border-muted); border-radius: 8px; }
+
+        /* Mockup Simulator Frame */
+        .simulator-box {
+            background: #030207;
+            border: 1px solid var(--border-muted);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        .sim-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 8px;
+        }
+
+        .sim-logo {
+            width: 20px;
+            height: 20px;
+            background: var(--custom-brand-color);
+            border-radius: 4px;
+            font-size: 10px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .sim-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .sim-domain-bar {
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sim-card {
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .sim-btn {
+            background: var(--custom-brand-color);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 2px 8px var(--custom-brand-glow);
+        }
+
+        /* Live Referral Link Builder (Size 5) */
+        .col-linkbuilder {
+            grid-column: span 5;
+        }
+
+        .link-output-box {
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-muted);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .url-text {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--accent-purple);
+            word-break: break-all;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        /* Commission ledger & Tiers (Size 4) */
+        .col-tiers {
+            grid-column: span 4;
+        }
+
+        .tier-progress-card {
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 12px;
+        }
+
+        .tier-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .tier-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent-amber);
+        }
+
+        .tier-bar-bg {
+            height: 6px;
+            background: var(--border-muted);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .tier-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-amber));
+            width: 75%;
+        }
+
+        /* Partner Ecosystem Promo / CTA banner */
+        .col-partner-promo {
+            grid-column: span 12;
+            background: radial-gradient(circle at 100% 100%, var(--accent-purple-glow) 0%, var(--bg-surface) 100%);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        /* Debug / Bottom Drawer System */
+        .debug-trigger-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #000;
+            color: #fff;
+            border: 1px solid #222;
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            cursor: pointer;
+            z-index: 999;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .debug-drawer {
+            position: fixed;
+            bottom: -600px;
+            left: 0;
+            right: 0;
+            height: 500px;
+            background: #06050a;
+            border-top: 1px solid #1c1830;
+            z-index: 1000;
+            box-shadow: 0 -12px 40px rgba(0,0,0,0.8);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            font-family: var(--font-mono);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .debug-drawer.open {
+            transform: translateY(-600px);
+        }
+
+        .debug-header {
+            padding: 16px 24px;
+            background: #0d0b16;
+            border-bottom: 1px solid #1c1830;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .debug-title {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--accent-purple);
+        }
+
+        .debug-tabs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .debug-tab {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            padding: 4px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .debug-tab.active {
+            background: var(--bg-surface-elevated);
+            color: var(--text-primary);
+            border-color: var(--border-muted);
+        }
+
+        .debug-body {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            font-size: 11px;
+            color: #10b981; /* Terminal green default */
+            background: #020104;
+        }
+
+        .close-debug-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* Footnotes Compliance Area */
+        footer {
+            margin-top: 24px;
+            border-top: 1px solid var(--border-subtle);
+            padding: 24px 0 60px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .compliance-text {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .compliance-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 1024px) {
+            .col-metric { grid-column: span 6; }
+            .col-customizer, .col-linkbuilder, .col-tiers, .col-ledger {
+                grid-column: span 12;
+            }
+            .customizer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .col-metric { grid-column: span 12; }
+            header {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+            .controls-group {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Partner Portal Header -->
+    <header>
+        <div class="brand">
+            <div class="brand-logo" id="headerLogo">V</div>
+            <div class="brand-title" id="headerTitle">Valois Brokerage</div>
+            <div class="brand-tag">Partner Node v2.4</div>
+        </div>
+        <div class="controls-group">
+            <select class="select-partner" id="partnerSelect" onchange="loadPartnerProfile(this.value)">
+                <!-- Generated dynamically -->
+            </select>
+            <button class="btn-action-primary" onclick="triggerReferralModal()">
+                <span>+</span> Register New Client
+            </button>
+        </div>
+    </header>
+
+    <!-- Bento Analytics View Grid -->
+    <div class="bento-grid">
+        
+        <!-- Metrics (Referred Pipeline) -->
+        <div class="bento-card col-metric">
+            <div class="card-title-group">
+                <div class="card-label">Total Pipeline</div>
+                <div class="metric-value" id="pipelineVal">$0.00</div>
+            </div>
+            <div class="metric-trend trend-up">
+                <span>▲ 12.4%</span> <span style="color: var(--text-muted);">this month</span>
+            </div>
+        </div>
+
+        <!-- Metrics (Commissions Earned) -->
+        <div class="bento-card col-metric">
+            <div class="card-title-group">
+                <div class="card-label">Earned Fees</div>
+                <div class="metric-value" id="commissionVal">$0.00</div>
+            </div>
+            <div class="metric-trend trend-up">
+                <span>▲ $8,450 pending</span>
+            </div>
+        </div>
+
+        <!-- Metrics (Active Referrals) -->
+        <div class="bento-card col-metric">
+            <div class="card-title-group">
+                <div class="card-label">Active Referrals</div>
+                <div class="metric-value" id="activeReferralsCount">0</div>
+            </div>
+            <div class="metric-trend trend-flat">
+                <span style="color: var(--text-secondary);">Conversion rate:</span> <span style="color: var(--accent-emerald);" id="conversionRate">0%</span>
+            </div>
+        </div>
+
+        <!-- Metrics (Tier Program Status) -->
+        <div class="bento-card col-metric col-tiers">
+            <div class="card-title-group">
+                <div class="card-label">Partner Tier</div>
+                <div class="tier-header" style="margin-top: 8px;">
+                    <span class="tier-title" id="tierName">Silver Affiliate</span>
+                    <span class="preview-badge" id="shareRate">1.5% Share</span>
+                </div>
+            </div>
+            <div class="tier-progress-card">
+                <div class="tier-bar-bg">
+                    <div class="tier-bar-fill" id="tierBar"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted);">
+                    <span>Next Level: Gold Partner</span>
+                    <span id="nextTierProgress">$50k to go</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive White-Label Co-Branding Studio (Size 7) -->
+        <div class="bento-card col-customizer">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <div class="card-label">Bespoke Settings</div>
+                    <div class="card-title">Co-Branded Portal Studio</div>
+                </div>
+                <span class="preview-badge" style="color: var(--accent-amber); border-color: rgba(245,158,11,0.2);">Live Preview</span>
+            </div>
+
+            <div class="customizer-grid">
+                <div class="control-panel">
+                    <div class="field-group">
+                        <label class="field-label">Partner Brand Name</label>
+                        <input type="text" class="input-dark" id="brandNameInput" value="Summit Asset Management" oninput="updateCoBrandingMockup()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Custom Subdomain</label>
+                        <input type="text" class="input-dark" id="subdomainInput" value="summit" oninput="updateCoBrandingMockup()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Portal Theme Accent</label>
+                        <div class="color-picker-wrap">
+                            <input type="color" class="input-color" id="accentColorInput" value="#8b5cf6" oninput="updateCoBrandingMockup()">
+                            <span class="url-text" id="colorCode" style="padding: 6px 12px;">#8b5cf6</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Client Portal Mockup Simulator -->
+                <div class="simulator-box" id="portalSimulator">
+                    <div class="sim-header">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <div class="sim-logo" id="simLogoLetter">S</div>
+                            <span class="sim-title" id="simHeaderTitle">Summit Asset Management</span>
+                        </div>
+                        <span class="preview-badge" style="font-size: 8px; padding: 2px 6px;">Client Secure Vault</span>
+                    </div>
+                    <div class="sim-domain-bar" id="simDomainText">
+                        https://summit.valois.capital/readiness
+                    </div>
+                    <div class="sim-card">
+                        <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Funding Readiness Score</div>
+                        <div style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin: 4px 0;" id="simScoreText">84</div>
+                        <div style="height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow:hidden;">
+                            <div style="height: 100%; width: 84%; background: var(--custom-brand-color);" id="simProgressBar"></div>
+                        </div>
+                    </div>
+                    <button class="sim-btn" id="simButton" onclick="alert('Simulated Borrower Dashboard Launch!')">Approve Capital Allocation</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Link Generator & Affiliate Tools (Size 5) -->
+        <div class="bento-card col-linkbuilder">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <div class="card-label">Referral Generation</div>
+                    <div class="card-title">Onboarding Links & UTMs</div>
+                </div>
+            </div>
+
+            <div class="control-panel">
+                <div class="field-group">
+                    <label class="field-label">Target Borrower Onboarding Flow</label>
+                    <select class="input-dark" id="flowSelect" onchange="generateReferralLink()">
+                        <option value="standard">Standard Onboarding Quiz</option>
+                        <option value="saas">SaaS Runway Calculator</option>
+                        <option value="ecommerce">E-Commerce Capital Fast-Track</option>
+                        <option value="asset_backed">Equipment & Hard Asset Appraisal</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Campaign Channel (UTM Source)</label>
+                    <input type="text" class="input-dark" id="utmSource" value="newsletter" placeholder="e.g., newsletter, cpa_invite" oninput="generateReferralLink()">
+                </div>
+                
+                <div class="link-output-box">
+                    <span class="field-label">Co-Branded Shareable URL</span>
+                    <div class="url-text" id="generatedLink">https://summit.valois.capital/?flow=standard&utm_source=newsletter</div>
+                    <button class="btn-action-primary" style="justify-content: center; width: 100%;" onclick="copyReferralLink()">Copy Co-Branded Link</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Referral Table & Client Ledger (Size 12) -->
+        <div class="bento-card col-ledger">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <div class="card-label">Referral Portfolio</div>
+                    <div class="card-title">Client Acquisition Ledger</div>
+                </div>
+                <div class="ledger-search-box" style="margin-bottom: 0;">
+                    <input type="text" class="input-dark" id="ledgerSearch" placeholder="Search referred borrowers..." oninput="filterLedger()">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="custom-table" id="referralsTable">
+                    <thead>
+                        <tr>
+                            <th>Borrower Company</th>
+                            <th>Onboarding Flow</th>
+                            <th>Readiness Score</th>
+                            <th>Pipeline Value</th>
+                            <th>Deal Stage</th>
+                            <th>Partner Fee Share</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="referralTableBody">
+                        <!-- Rendered dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Integration banner / Partner Ecosystem Integration -->
+        <div class="bento-card col-partner-promo">
+            <div style="max-width: 60%;">
+                <div class="card-label" style="color: var(--text-primary); margin-bottom: 4px;">Institutional Deal Syndication</div>
+                <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Export Broker Portfolio directly to the Secure Network Nodes</h3>
+                <p class="vertical-desc" style="font-size: 12px; color: var(--text-secondary); max-width: 500px;">Direct API connections push client credit files to Vanguard and Apex. Sync verified borrower dossiers safely without manual underwriting data entries.</p>
+            </div>
+            <button class="partner-btn" style="background: var(--text-primary); color: var(--bg-base); border: none; padding: 12px 24px; border-radius: 12px; font-family: var(--font-sans); font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition-smooth);" onclick="triggerSyndicationExport()">Syndicate Portfolio</button>
+        </div>
+
+    </div>
+
+    <!-- Footnotes Compliance Component -->
+    <footer>
+        <p class="compliance-text">
+            * Broker payouts and syndicated referrals generated via Valois Partner Node are subject to individual verification and SLA parameters. Custom co-branded subdomains require verified DNS entries mapping CNAME records to secure-ingress.valois.capital. Underwriting calculations are simulation guides and do not bind Valois' funding partners.
+        </p>
+        <div class="compliance-row">
+            <span>© Valois Technology Group. Broker-Dealer Services Frame.</span>
+            <span>SEC Safe Harbor // Broker Portal Node</span>
+        </div>
+    </footer>
+</div>
+
+<!-- Analyst / Debug Drawer Button -->
+<button class="debug-trigger-btn" onclick="toggleDebugDrawer()">
+    <span>⚡</span> PARTNER DATA CONFIGS
+</button>
+
+<!-- Bottom Analyst Drawer (Debug Interface) -->
+<div class="debug-drawer" id="analystDrawer">
+    <div class="debug-header">
+        <div class="debug-title">Broker Interface & Simulation Configs Panel</div>
+        <div class="debug-tabs">
+            <button class="debug-tab active" onclick="switchDebugTab('profiles')">partner_profiles.json</button>
+            <button class="debug-tab" onclick="switchDebugTab('payout_rules')">payout_rules.json</button>
+            <button class="debug-tab" onclick="switchDebugTab('co_branded_routing')">co_branded_routing.json</button>
+        </div>
+        <button class="close-debug-btn" onclick="toggleDebugDrawer()">✕</button>
+    </div>
+    <div class="debug-body" id="debugContent">
+        <!-- Tab Content dynamically rendered -->
+    </div>
+</div>
+
+<script>
+    // Config payloads (matching requested high-fidelity simulation model)
+    const partner_profiles = {
+        "summit_asset": {
+            "name": "Summit Wealth Advisory",
+            "logo_letter": "S",
+            "accent_color": "#8b5cf6",
+            "subdomain": "summit",
+            "total_pipeline": 15400000,
+            "earned_fees": 125000,
+            "active_count": 8,
+            "conversion_rate": "88%",
+            "tier": "Platinum Partner",
+            "share_rate": "2.5%",
+            "next_tier_rem": "Max Tier Reached",
+            "tier_progress": 100,
+            "referrals": [
+                { "company": "Vortex Heavy Machinery", "flow": "Asset-Backed Appraisal", "score": 92, "pipeline": 8200000, "stage": "Funded", "commission": "$205,000" },
+                { "company": "Nova SaaS Ventures", "flow": "SaaS Runway Fast-Track", "score": 84, "pipeline": 4500000, "stage": "In Review", "commission": "$112,500" },
+                { "company": "CloudCart Scaleup", "flow": "E-Commerce Velocity", "score": 76, "pipeline": 2700000, "stage": "Proposal Sent", "commission": "$67,500" }
+            ]
+        },
+        "apex_brokers": {
+            "name": "Apex Finance Group",
+            "logo_letter": "A",
+            "accent_color": "#10b981",
+            "subdomain": "apex",
+            "total_pipeline": 5200000,
+            "earned_fees": 45000,
+            "active_count": 3,
+            "conversion_rate": "67%",
+            "tier": "Gold Partner",
+            "share_rate": "2.0%",
+            "next_tier_rem": "$15,000 to Platinum",
+            "tier_progress": 75,
+            "referrals": [
+                { "company": "EcoFreight Logistics", "flow": "Asset-Backed Appraisal", "score": 88, "pipeline": 3200000, "stage": "Funded", "commission": "$64,000" },
+                { "company": "StripeShop Plus", "flow": "E-Commerce Velocity", "score": 68, "pipeline": 2000000, "stage": "In Review", "commission": "$40,000" }
+            ]
+        },
+        "precision_cpa": {
+            "name": "Precision Accountancy",
+            "logo_letter": "P",
+            "accent_color": "#f59e0b",
+            "subdomain": "precision",
+            "total_pipeline": 1200000,
+            "earned_fees": 12000,
+            "active_count": 2,
+            "conversion_rate": "50%",
+            "tier": "Silver Affiliate",
+            "share_rate": "1.5%",
+            "next_tier_rem": "$38,000 to Gold",
+            "tier_progress": 24,
+            "referrals": [
+                { "company": "MedCare Surgicals", "flow": "Standard Onboarding", "score": 78, "pipeline": 1200000, "stage": "In Review", "commission": "$18,000" }
+            ]
+        }
+    };
+
+    const payout_rules = {
+        "commission_schedule": [
+            { "tier": "Silver Affiliate", "volume_threshold": "$0 - $2.5M", "payout_rate": "1.5%", "syndication_priority": "Standard" },
+            { "tier": "Gold Partner", "volume_threshold": "$2.5M - $10M", "payout_rate": "2.0%", "syndication_priority": "High" },
+            { "tier": "Platinum Partner", "volume_threshold": "$10M+", "payout_rate": "2.5%", "syndication_priority": "Instant Allocation" }
+        ]
+    };
+
+    const co_branded_routing = {
+        "base_domain": "valois.capital",
+        "routing_mechanics": "Subdomain parsing acts as automated lookup query on institutional database config nodes. Header is fully custom-branded if query matches configuration tables."
+    };
+
+    // State Management
+    let currentPartnerKey = "summit_asset";
+    let activeDebugTab = "profiles";
+
+    window.onload = () => {
+        // Build Partner Select options
+        const select = document.getElementById("partnerSelect");
+        for (const [key, val] of Object.entries(partner_profiles)) {
+            const opt = document.createElement("option");
+            opt.value = key;
+            opt.textContent = val.name;
+            select.appendChild(opt);
+        }
+
+        loadPartnerProfile(currentPartnerKey);
+        switchDebugTab('profiles');
+    };
+
+    // Core Dashboard Rendering Engine
+    function loadPartnerProfile(key) {
+        currentPartnerKey = key;
+        const profile = partner_profiles[key];
+
+        // 1. Update Layout Accents
+        document.body.style.setProperty('--custom-brand-color', profile.accent_color);
+        // Generates transparent glow based on hex color
+        const hex = profile.accent_color.replace('#', '');
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+        document.body.style.setProperty('--custom-brand-glow', `rgba(${r}, ${g}, ${b}, 0.15)`);
+        document.body.classList.add('partner-override');
+
+        // Update brand metadata in Header
+        document.getElementById("headerTitle").textContent = profile.name;
+        const logo = document.getElementById("headerLogo");
+        logo.textContent = profile.logo_letter;
+        logo.style.background = `linear-gradient(135deg, ${profile.accent_color}, #ec4899)`;
+
+        // 2. Load Core Metrics
+        document.getElementById("pipelineVal").textContent = `$${(profile.total_pipeline / 1000000).toFixed(1)}M`;
+        document.getElementById("commissionVal").textContent = `$${profile.earned_fees.toLocaleString()}`;
+        document.getElementById("activeReferralsCount").textContent = profile.active_count;
+        document.getElementById("conversionRate").textContent = profile.conversion_rate;
+
+        // Tier Tracker updates
+        document.getElementById("tierName").textContent = profile.tier;
+        document.getElementById("shareRate").textContent = `${profile.share_rate} Share`;
+        document.getElementById("tierBar").style.width = `${profile.tier_progress}%`;
+        document.getElementById("nextTierProgress").textContent = profile.next_tier_rem;
+
+        // 3. Fill Out Customizer Inputs
+        document.getElementById("brandNameInput").value = profile.name;
+        document.getElementById("subdomainInput").value = profile.subdomain;
+        document.getElementById("accentColorInput").value = profile.accent_color;
+        document.getElementById("colorCode").textContent = profile.accent_color.toUpperCase();
+
+        updateCoBrandingMockup();
+
+        // 4. Load Active Referrals Ledger Table
+        renderLedgerTable(profile.referrals);
+
+        // Update console configs
+        updateConsoleOutput();
+    }
+
+    // Live Co-Branding Mockup updates
+    function updateCoBrandingMockup() {
+        const brandName = document.getElementById("brandNameInput").value || "Valois Delivery Partner";
+        const subdomain = document.getElementById("subdomainInput").value.toLowerCase().replace(/[^a-z0-9]/g, '') || "partner";
+        const accentColor = document.getElementById("accentColorInput").value;
+
+        // Write live inputs back into the simulator mockup frame
+        document.getElementById("simHeaderTitle").textContent = brandName;
+        document.getElementById("simLogoLetter").textContent = brandName.charAt(0).toUpperCase();
+        document.getElementById("simDomainText").textContent = `https://${subdomain}.valois.capital/readiness`;
+        document.getElementById("colorCode").textContent = accentColor.toUpperCase();
+
+        // Dynamically style simulator frame buttons/bars via variables
+        const simBox = document.getElementById("portalSimulator");
+        simBox.style.setProperty('--custom-brand-color', accentColor);
+        
+        const hex = accentColor.replace('#', '');
+        const r = parseInt(hex.substring(0,2), 16);
+        const g = parseInt(hex.substring(2,4), 16);
+        const b = parseInt(hex.substring(4,6), 16);
+        simBox.style.setProperty('--custom-brand-glow', `rgba(${r}, ${g}, ${b}, 0.25)`);
+
+        document.getElementById("simLogoLetter").style.background = accentColor;
+        document.getElementById("simProgressBar").style.backgroundColor = accentColor;
+        document.getElementById("simButton").style.backgroundColor = accentColor;
+        document.getElementById("simButton").style.boxShadow = `0 4px 12px rgba(${r}, ${g}, ${b}, 0.3)`;
+
+        // Update Link Generator URL text live
+        generateReferralLink();
+    }
+
+    // Dynamic Referral Link builder calculation
+    function generateReferralLink() {
+        const subdomain = document.getElementById("subdomainInput").value.toLowerCase().replace(/[^a-z0-9]/g, '') || "partner";
+        const flow = document.getElementById("flowSelect").value;
+        const utm = document.getElementById("utmSource").value || "invite";
+        const element = document.getElementById("generatedLink");
+        element.textContent = `https://${subdomain}.valois.capital/?flow=${flow}&utm_source=${utm}`;
+    }
+
+    // Copy Referral link to clipboard alert
+    function copyReferralLink() {
+        const text = document.getElementById("generatedLink").textContent;
+        navigator.clipboard.writeText(text);
+        alert(`Co-Branded Referral Link copied to clipboard:\n\n${text}`);
+    }
+
+    // Render client referral list
+    function renderLedgerTable(referrals) {
+        const container = document.getElementById("referralTableBody");
+        container.innerHTML = "";
+        
+        if (referrals.length === 0) {
+            container.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted);">No referrals matching criteria.</td></tr>`;
+            return;
+        }
+
+        referrals.forEach(ref => {
+            let stageClass = "status-idle";
+            if (ref.stage === "Funded") stageClass = "status-funded";
+            if (ref.stage === "In Review") stageClass = "status-review";
+
+            container.innerHTML += `
+                <tr>
+                    <td style="font-weight: 600; color: var(--text-primary);">${ref.company}</td>
+                    <td>${ref.flow}</td>
+                    <td>
+                        <span style="font-family: var(--font-mono); font-weight: 700; color: var(--accent-purple);">${ref.score}</span>
+                        <span style="font-size: 11px; color: var(--text-muted);">/ 100</span>
+                    </td>
+                    <td style="font-family: var(--font-mono); font-weight: 600;">$${ref.pipeline.toLocaleString()}</td>
+                    <td>
+                        <span class="badge-status ${stageClass}">${ref.stage}</span>
+                    </td>
+                    <td style="font-family: var(--font-mono); color: var(--accent-emerald); font-weight: 600;">${ref.commission}</td>
+                    <td>
+                        <button class="select-partner" style="padding: 4px 8px; font-size: 11px;" onclick="simulateClientLaunch('${ref.company}', ${ref.score})">Analyze</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    // Search and filter ledger clients
+    function filterLedger() {
+        const query = document.getElementById("ledgerSearch").value.toLowerCase();
+        const profile = partner_profiles[currentPartnerKey];
+        const filtered = profile.referrals.filter(ref => ref.company.toLowerCase().includes(query) || ref.flow.toLowerCase().includes(query));
+        renderLedgerTable(filtered);
+    }
+
+    // Register a simulation modal triggered action
+    function triggerReferralModal() {
+        const companyName = prompt("Enter referred business/company name:");
+        if (!companyName) return;
+
+        const score = Math.floor(Math.random() * (95 - 65 + 1)) + 65;
+        const pipeline = Math.floor(Math.random() * (10000000 - 1000000 + 1)) + 1000000;
+        const flowSelect = document.getElementById("flowSelect").value;
+        const formattedFlow = flowSelect.replace(/_/g, " ").toUpperCase();
+
+        const newReferral = {
+            company: companyName,
+            flow: formattedFlow,
+            score: score,
+            pipeline: pipeline,
+            stage: "In Review",
+            commission: "Calculating..."
+        };
+
+        // Inject new client to current active partner list
+        partner_profiles[currentPartnerKey].referrals.unshift(newReferral);
+        partner_profiles[currentPartnerKey].active_count += 1;
+        partner_profiles[currentPartnerKey].total_pipeline += pipeline;
+
+        loadPartnerProfile(currentPartnerKey);
+        alert(`Success! Successfully onboarded ${companyName} secure record inside partner node system.`);
+    }
+
+    // Simulate Launching borrower view inside co-branded node frame
+    function simulateClientLaunch(company, score) {
+        document.getElementById("simScoreText").textContent = score;
+        document.getElementById("simProgressBar").style.width = `${score}%`;
+        alert(`Launching Co-Branded Portal Simulator focus for: ${company}\nTarget Scorecard Index matched to: ${score}/100.`);
+    }
+
+    // Trigger Partner Portfolio Syndication Export
+    function triggerSyndicationExport() {
+        const profile = partner_profiles[currentPartnerKey];
+        const count = profile.referrals.length;
+        const payloadToken = `V-PARTNER-EXPORT-TOKEN-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+
+        alert(`Generating portfolio package payload...\n\nPartner Source Node: ${profile.name}\nRecords Included: ${count} Active Deals\nTotal Aggregate Value: $${(profile.total_pipeline/1000000).toFixed(2)}M\n\nSecurity Status: SSL Secured Institutional syndication tunnel initialized cleanly.\nPayload Token reference: ${payloadToken}`);
+    }
+
+    // Bottom Drawer Tab Logic
+    function toggleDebugDrawer() {
+        const drawer = document.getElementById("analystDrawer");
+        drawer.classList.toggle("open");
+    }
+
+    function switchDebugTab(tabName) {
+        activeDebugTab = tabName;
+        const tabs = document.querySelectorAll(".debug-tab");
+        tabs.forEach(tab => {
+            tab.classList.remove("active");
+            if (tab.innerText.includes(tabName)) {
+                tab.classList.add("active");
+            }
+        });
+        updateConsoleOutput();
+    }
+
+    function updateConsoleOutput() {
+        const output = document.getElementById("debugContent");
+        
+        if (activeDebugTab === "profiles") {
+            output.innerHTML = `
+                <div style="color: #a1a1aa; margin-bottom: 12px;">// Loaded: partner_profiles.json - Representing active partner setups</div>
+                <pre style="color: #c084fc;">${JSON.stringify(partner_profiles, null, 2)}</pre>
+            `;
+        } else if (activeDebugTab === "payout_rules") {
+            output.innerHTML = `
+                <div style="color: #a1a1aa; margin-bottom: 12px;">// Loaded: payout_rules.json - Commissions brackets & tier splits</div>
+                <pre style="color: #22d3ee;">${JSON.stringify(payout_rules, null, 2)}</pre>
+            `;
+        } else if (activeDebugTab === "co_branded_routing") {
+            output.innerHTML = `
+                <div style="color: #a1a1aa; margin-bottom: 12px;">// Loaded: co_branded_routing.json - Dynamic routing parsing structure</div>
+                <pre style="color: #34d399;">${JSON.stringify(co_branded_routing, null, 2)}</pre>
+            `;
+        }
+    }
+</script>
+
+</body>
+</html>

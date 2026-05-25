@@ -1,0 +1,1177 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Core Flow - Audit Trail & Compliance Log</title>
+    <!-- Google Fonts & Tailwind-inspired Layout system -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #08090d;
+            --bg-secondary: #0f111a;
+            --bg-tertiary: #161a26;
+            --border-color: #242b3d;
+            --border-hover: #3b4764;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            
+            /* High-voltage Neobrutalist Accents */
+            --accent-cyan: #00f0ff;
+            --accent-orange: #ff5c00;
+            --accent-magenta: #ff007a;
+            --accent-lime: #39ff14;
+            
+            --shadow-cyan: 0px 0px 20px rgba(0, 240, 255, 0.15);
+            --shadow-orange: 0px 0px 20px rgba(255, 92, 0, 0.15);
+            --shadow-magenta: 0px 0px 20px rgba(255, 0, 122, 0.15);
+            --shadow-lime: 0px 0px 20px rgba(57, 255, 20, 0.15);
+            
+            --brutal-shadow: 6px 6px 0px #000000;
+            --brutal-shadow-hover: 2px 2px 0px #000000;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-sans);
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        /* custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-cyan);
+        }
+
+        /* Utility classes */
+        .text-glow-cyan { text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
+        .text-glow-orange { text-shadow: 0 0 10px rgba(255, 92, 0, 0.5); }
+        .text-glow-magenta { text-shadow: 0 0 10px rgba(255, 0, 122, 0.5); }
+        .text-glow-lime { text-shadow: 0 0 10px rgba(57, 255, 20, 0.5); }
+
+        /* Navigation Header */
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: var(--bg-secondary);
+            border-bottom: 3px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 22px;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            color: var(--text-primary);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+            border: 2px solid #000;
+            box-shadow: 2px 2px 0px #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 18px;
+            color: #000;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            padding: 8px 16px;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-cyan);
+            border-bottom: 2px solid var(--accent-cyan);
+        }
+
+        /* Hero Dashboard Layout */
+        header {
+            max-width: 1440px;
+            margin: 40px auto;
+            padding: 0 40px;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        @media (max-width: 1024px) {
+            header {
+                grid-template-columns: 1fr;
+                margin: 20px auto;
+                padding: 0 20px;
+            }
+        }
+
+        .hero-left {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .hero-badge {
+            align-self: flex-start;
+            background: var(--accent-lime);
+            color: #000;
+            padding: 6px 14px;
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 2px solid #000;
+            box-shadow: var(--brutal-shadow-hover);
+            transform: rotate(-1deg);
+        }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: clamp(36px, 6vw, 68px);
+            font-weight: 800;
+            line-height: 1.0;
+            text-transform: uppercase;
+            color: var(--text-primary);
+            letter-spacing: -2px;
+        }
+
+        h1 span {
+            color: transparent;
+            -webkit-text-stroke: 1.5px var(--accent-cyan);
+            text-stroke: 1.5px var(--accent-cyan);
+        }
+
+        .hero-sub {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 620px;
+            line-height: 1.6;
+            border-left: 4px solid var(--accent-cyan);
+            padding-left: 20px;
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .stat-box {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            padding: 16px;
+            box-shadow: var(--brutal-shadow-hover);
+            border-radius: 4px;
+        }
+
+        .stat-val {
+            font-family: var(--font-display);
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+
+        /* Hero Right: Live Inspector Panel */
+        .terminal-box {
+            background: var(--bg-secondary);
+            border: 3px solid var(--border-color);
+            box-shadow: var(--brutal-shadow);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .terminal-header {
+            background: var(--bg-tertiary);
+            padding: 12px 20px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--border-color);
+        }
+        .dot.active-1 { background: var(--accent-cyan); }
+        .dot.active-2 { background: var(--accent-orange); }
+        .dot.active-3 { background: var(--accent-magenta); }
+
+        .terminal-title {
+            font-family: var(--font-display);
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .terminal-body {
+            padding: 24px;
+            min-height: 420px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Interactive Detail Panel Inside Terminal */
+        .inspector-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .inspector-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        .inspector-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+        }
+
+        .inspector-badge {
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--accent-cyan);
+            padding: 3px 8px;
+            font-size: 10px;
+            text-transform: uppercase;
+            border: 1px solid var(--accent-cyan);
+            font-weight: 700;
+        }
+
+        .inspector-fields {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .field-group {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .field-label {
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .field-val {
+            color: var(--text-primary);
+            font-family: monospace;
+            font-weight: bold;
+        }
+
+        /* Dynamic Visualizer Core Cryptographic Graph */
+        .flow-graph-container {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .flow-node-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .flow-node {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            text-align: center;
+            width: 45%;
+        }
+
+        .flow-node.highlight {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.15);
+        }
+
+        .flow-arrow-indicator {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--accent-cyan);
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .integrity-status-tile {
+            background: var(--bg-tertiary);
+            border: 1px dashed var(--border-color);
+            padding: 14px;
+            border-radius: 4px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .integrity-title {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .integrity-val {
+            font-family: var(--font-display);
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent-lime);
+        }
+
+        /* Search & Custom Filter Area */
+        .tools-library-section {
+            max-width: 1440px;
+            margin: 80px auto;
+            padding: 0 40px;
+        }
+
+        @media (max-width: 768px) {
+            .tools-library-section {
+                padding: 0 20px;
+                margin: 40px auto;
+            }
+        }
+
+        .section-headline {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 40px;
+            border-bottom: 3px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .section-headline {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+        }
+
+        .section-headline h2 {
+            font-family: var(--font-display);
+            font-size: 32px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .section-headline h2 span {
+            color: var(--accent-magenta);
+        }
+
+        /* Neobrutalist Filter Engine Bar */
+        .filter-bar {
+            display: flex;
+            width: 100%;
+            gap: 16px;
+            background: var(--bg-secondary);
+            border: 3px solid var(--border-color);
+            padding: 16px;
+            box-shadow: var(--brutal-shadow);
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            padding: 14px 14px 14px 44px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: var(--font-display);
+            text-transform: uppercase;
+            font-size: 13px;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--accent-magenta);
+            color: var(--text-primary);
+        }
+
+        .filter-btn.active {
+            background: var(--accent-cyan);
+            color: #000;
+            border-color: #000;
+            box-shadow: 3px 3px 0px #000;
+        }
+
+        /* Timeline & Table Layouts */
+        .timeline-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .timeline-item {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 80px 140px 1.5fr 1fr 140px;
+            gap: 20px;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        @media (max-width: 900px) {
+            .timeline-item {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                padding: 16px;
+            }
+        }
+
+        .timeline-item:hover {
+            transform: translate(-3px, -3px);
+            border-color: var(--accent-cyan);
+            box-shadow: 4px 4px 0px var(--accent-cyan);
+        }
+
+        .timeline-item.selected-active {
+            border-color: var(--accent-magenta);
+            box-shadow: 4px 4px 0px var(--accent-magenta);
+            background: var(--bg-tertiary);
+        }
+
+        .log-time {
+            font-family: monospace;
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--text-secondary);
+        }
+
+        .badge-status {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 4px 8px;
+            border: 1px solid #000;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 1px 1px 0px #000;
+        }
+
+        .badge-status.edit {
+            background: var(--accent-orange);
+            color: #000;
+        }
+
+        .badge-status.view {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+
+        .badge-status.share {
+            background: var(--accent-magenta);
+            color: #000;
+        }
+
+        .badge-status.download {
+            background: var(--accent-cyan);
+            color: #000;
+        }
+
+        .badge-status.security {
+            background: var(--accent-lime);
+            color: #000;
+        }
+
+        .log-target {
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--text-primary);
+            word-break: break-all;
+        }
+
+        .log-user {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-family: monospace;
+        }
+
+        .log-ip {
+            font-family: monospace;
+            font-size: 13px;
+            color: var(--accent-cyan);
+            text-align: right;
+        }
+
+        @media (max-width: 900px) {
+            .log-ip {
+                text-align: left;
+            }
+        }
+
+        /* Neobrutalist CTAs */
+        .btn-action {
+            background: var(--accent-cyan);
+            color: #000;
+            padding: 16px 32px;
+            border: 3px solid #000;
+            font-weight: 800;
+            font-family: var(--font-display);
+            text-transform: uppercase;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px #000;
+            transition: all 0.1s ease;
+            text-decoration: none;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        .btn-action:hover {
+            box-shadow: 2px 2px 0px #000;
+            transform: translate(2px, 2px);
+            background: #fff;
+        }
+
+        .btn-white {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+            padding: 14px 28px;
+            text-transform: uppercase;
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .btn-white:hover {
+            border-color: var(--accent-magenta);
+            color: var(--accent-magenta);
+        }
+
+        /* Live Highlight Toast for compliance updates */
+        .toast-notify {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--accent-lime);
+            padding: 16px 24px;
+            box-shadow: var(--brutal-shadow);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--font-display);
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            transform: translateY(150%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .toast-notify.visible {
+            transform: translateY(0);
+        }
+
+        .toast-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--accent-lime);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-lime);
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            100% { transform: scale(1.1); opacity: 1; }
+        }
+
+        footer {
+            background: #000000;
+            color: var(--text-primary);
+            border-top: 4px solid var(--border-color);
+            padding: 40px;
+            margin-top: 100px;
+        }
+
+        .footer-bottom {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: var(--text-secondary);
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation -->
+    <nav class="nav-header">
+        <div class="logo-area">
+            <div class="logo-icon">C</div>
+            CORE FLOW <span style="color: var(--accent-magenta); font-size: 12px; margin-left: 8px;">AUDIT TRAIL</span>
+        </div>
+        <div class="nav-links">
+            <a href="#compliance-log" class="nav-link">Event Logs</a>
+            <a href="#" onclick="triggerExport()" class="nav-link">Export Trail</a>
+        </div>
+        <button onclick="triggerVerification()" class="btn-action" style="padding: 10px 20px; font-size: 12px; box-shadow: 2px 2px 0px #000;">Verify Node</button>
+    </nav>
+
+    <!-- Hero Header Component -->
+    <header>
+        <div class="hero-left">
+            <div class="hero-badge">Compliance Center</div>
+            <h1>Immutable <span>Logs</span> & Cryptographic Audit</h1>
+            <p class="hero-sub">Real-time surveillance matrix tracking user profiles, administrative viewing, downloading triggers, external file shares, and computational resource modifications. Built to index critical financial data points for SEC, FINRA, and SOC2 compliance standards.</p>
+            
+            <div class="hero-stats">
+                <div class="stat-box">
+                    <div class="stat-val text-glow-cyan">4,204</div>
+                    <div class="stat-label">Total Logs Recorded</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-val text-glow-lime">SEC-9</div>
+                    <div class="stat-label">Standard Compliance</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-val text-glow-magenta">100%</div>
+                    <div class="stat-label">Immutable Chain</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Compliance Event Live Inspector -->
+        <div class="terminal-box" id="audit-inspector">
+            <div class="terminal-header">
+                <div class="terminal-dots">
+                    <div class="dot active-1"></div>
+                    <div class="dot active-2"></div>
+                    <div class="dot active-3"></div>
+                </div>
+                <div class="terminal-title">Audit Ledger Visualizer</div>
+                <div class="inspector-badge" id="active-tag">SECURITY</div>
+            </div>
+            
+            <div class="terminal-body">
+                <div class="inspector-container">
+                    <div class="inspector-header">
+                        <div class="inspector-title" id="active-target-title">risk-allocation-matrix.json</div>
+                        <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary);" id="active-time-lbl">TIMESTAMP: UTC</div>
+                    </div>
+
+                    <div class="inspector-fields">
+                        <div class="field-group">
+                            <span class="field-label">Trigger Event</span>
+                            <span class="field-val" id="active-event">SECURITY_INTEGRITY_CHECK</span>
+                        </div>
+                        <div class="field-group">
+                            <span class="field-label">User Principal</span>
+                            <span class="field-val" id="active-user">SYSTEM AUTO-DAEMON</span>
+                        </div>
+                        <div class="field-group">
+                            <span class="field-label">IPv4 / IPv6 Target</span>
+                            <span class="field-val" id="active-ip">10.0.0.1</span>
+                        </div>
+                        <div class="field-group">
+                            <span class="field-label">Location Base</span>
+                            <span class="field-val" id="active-location">US-EAST AWS NODE</span>
+                        </div>
+                        <div class="field-group">
+                            <span class="field-label">Session Signature</span>
+                            <span class="field-val" id="active-sig" style="color: var(--accent-cyan);">0x9A4F...12E3</span>
+                        </div>
+                    </div>
+
+                    <!-- Visual Flow Mapping nodes -->
+                    <div class="flow-graph-container">
+                        <div class="flow-node-row">
+                            <div class="flow-node highlight" id="active-flow-left">Pre-Event State</div>
+                            <div class="flow-arrow-indicator">&rarr;</div>
+                            <div class="flow-node highlight" id="active-flow-right">Post-Event State</div>
+                        </div>
+                    </div>
+
+                    <div class="integrity-status-tile">
+                        <div class="integrity-title">SHA-256 Ledger Validation</div>
+                        <div class="integrity-val text-glow-lime" id="active-hash-verification">NODE RECORD FULLY INTEGRATED & VALIDATED</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <div class="tools-library-section" id="compliance-log">
+        
+        <div class="section-headline">
+            <div>
+                <p style="text-transform: uppercase; font-size: 11px; font-weight: 800; color: var(--accent-magenta); letter-spacing: 2px;">Surveillance Ledger</p>
+                <h2 style="margin-top: 5px;">Compliance <span>Audit Trail</span></h2>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-white" onclick="triggerReportGenerate()">Generate CSV</button>
+            </div>
+        </div>
+
+        <!-- Brutalist Filter & Search Bar -->
+        <div class="filter-bar">
+            <div class="search-wrapper">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.637 10.637z" />
+                </svg>
+                <input type="text" id="logSearch" class="search-input" placeholder="Search by Target, IP Address, Username, or Action...">
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">
+                    All Entries
+                </button>
+                <button class="filter-btn" data-filter="edit">
+                    <span style="display:inline-block; width: 8px; height: 8px; border-radius:50%; background: var(--accent-orange);"></span>
+                    Edits
+                </button>
+                <button class="filter-btn" data-filter="download">
+                    <span style="display:inline-block; width: 8px; height: 8px; border-radius:50%; background: var(--accent-cyan);"></span>
+                    Downloads
+                </button>
+                <button class="filter-btn" data-filter="share">
+                    <span style="display:inline-block; width: 8px; height: 8px; border-radius:50%; background: var(--accent-magenta);"></span>
+                    Shares
+                </button>
+                <button class="filter-btn" data-filter="security">
+                    <span style="display:inline-block; width: 8px; height: 8px; border-radius:50%; background: var(--accent-lime);"></span>
+                    Security
+                </button>
+            </div>
+        </div>
+
+        <!-- Real-time Timeline Ledger list -->
+        <div class="timeline-container" id="timelineGrid">
+            <!-- Dynamically Rendered & Clickable -->
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-bottom">
+            <div>&copy; 2024 CORE FLOW COMPLIANCE MATRIX. VERIFIED LEDGER ARCHITECTURE.</div>
+            <div style="display: flex; gap: 20px;">
+                <span style="color: var(--accent-cyan); font-weight: 700;">COMPLIANCE VERIFIER v1.0.8</span>
+                <span>DATA IMMUTABLE</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive Active State / Update Notification Toast -->
+    <div id="toast" class="toast-notify">
+        <div class="toast-dot"></div>
+        <div id="toast-text">Verification Check Completed</div>
+    </div>
+
+    <script>
+        // Mock audit data database 
+        const auditLogs = [
+            {
+                id: "LOG-092",
+                time: "14:23:11 UTC",
+                date: "2024-11-20",
+                type: "edit",
+                target: "capital-allocation-matrix.xlsx",
+                user: "architect.alex@coreflow.io",
+                ip: "192.168.1.104",
+                location: "US-WEST (OAKLAND OFFICE)",
+                signature: "0x8F32DA...554B1A",
+                preState: "Allocation: $150K",
+                postState: "Allocation: $250K",
+                hash: "SHA-256 CHECK PASSED - MATCHES ORIGIN"
+            },
+            {
+                id: "LOG-091",
+                time: "12:05:42 UTC",
+                date: "2024-11-20",
+                type: "download",
+                target: "merchant-funding-agreement-v4.pdf",
+                user: "funder.direct@goldman-partners.com",
+                ip: "74.125.19.147",
+                location: "US-EAST (NYC HQ BRANCH)",
+                signature: "0x3D4F1B...882A12",
+                preState: "On-Server Draft",
+                postState: "Exported PDF Copy",
+                hash: "SHA-256 CHECK PASSED - EXPORT SECURED"
+            },
+            {
+                id: "LOG-090",
+                time: "09:12:01 UTC",
+                date: "2024-11-20",
+                type: "share",
+                target: "broker-commission-split-model.csv",
+                user: "brokerage-admin@coreflow.io",
+                ip: "203.0.113.12",
+                location: "US-SOUTH (MIAMI HUB)",
+                signature: "0xA92C3D...5D0C99",
+                preState: "Internal Shared",
+                postState: "Public Link Enabled",
+                hash: "SHA-256 CHECK PASSED - SIGNED & SENT"
+            },
+            {
+                id: "LOG-089",
+                time: "23:59:59 UTC",
+                date: "2024-11-19",
+                type: "security",
+                target: "risk-decision-matrix.json",
+                user: "SYSTEM AUTO-DAEMON",
+                ip: "10.0.0.1",
+                location: "US-EAST AWS NODE",
+                signature: "0x11B3C0...77D8AA",
+                preState: "Daily Integrity Run",
+                postState: "All Signatures OK",
+                hash: "SHA-256 BLOCK CONFLICTS DETECTED: ZERO"
+            },
+            {
+                id: "LOG-088",
+                time: "17:34:20 UTC",
+                date: "2024-11-19",
+                type: "view",
+                target: "revenue-financing-template.xlsm",
+                user: "guest-analyst@sequoia-capital.com",
+                ip: "198.51.100.42",
+                location: "US-WEST (SAND HILL RD)",
+                signature: "0x5E8C9A...3F11BB",
+                preState: "No Views Configured",
+                postState: "Session Init",
+                hash: "VIEW ACCESS ONLY - TEMPORARY TOKEN"
+            },
+            {
+                id: "LOG-087",
+                time: "11:15:00 UTC",
+                date: "2024-11-19",
+                type: "edit",
+                target: "equipment-roi-calculator-v2.bin",
+                user: "cto-executive@coreflow.io",
+                ip: "172.56.21.99",
+                location: "US-WEST (SEATTLE REMOTE)",
+                signature: "0x7F2A10...9B0FF2",
+                preState: "Version 1.0.7",
+                postState: "Version 1.0.8",
+                hash: "DEPLOYED DEPLOY-ID: 772-B"
+            },
+            {
+                id: "LOG-086",
+                time: "08:44:12 UTC",
+                date: "2024-11-19",
+                type: "download",
+                target: "dscr-verification-parameters.json",
+                user: "auditor.compliance@finra-panel.org",
+                ip: "192.0.2.18",
+                location: "US-EAST (WASHINGTON DC)",
+                signature: "0xCC90AA...1234F9",
+                preState: "Active Standard Log",
+                postState: "Verified Local Audit",
+                hash: "SECURITY LOCK ATTACHED"
+            }
+        ];
+
+        let activeLogId = "LOG-092";
+
+        // DOM elements
+        const timelineGrid = document.getElementById('timelineGrid');
+        const activeTargetTitle = document.getElementById('active-target-title');
+        const activeTimeLbl = document.getElementById('active-time-lbl');
+        const activeTag = document.getElementById('active-tag');
+        const activeEvent = document.getElementById('active-event');
+        const activeUser = document.getElementById('active-user');
+        const activeIp = document.getElementById('active-ip');
+        const activeLocation = document.getElementById('active-location');
+        const activeSig = document.getElementById('active-sig');
+        const activeFlowLeft = document.getElementById('active-flow-left');
+        const activeFlowRight = document.getElementById('active-flow-right');
+        const activeHashVerification = document.getElementById('active-hash-verification');
+        
+        const toast = document.getElementById('toast');
+        const toastText = document.getElementById('toast-text');
+
+        // Render Ledger List
+        function renderTimeline() {
+            timelineGrid.innerHTML = '';
+            auditLogs.forEach(log => {
+                const item = document.createElement('div');
+                item.className = `timeline-item ${log.id === activeLogId ? 'selected-active' : ''}`;
+                item.setAttribute('onclick', `selectLog('${log.id}')`);
+                item.dataset.category = log.type;
+                item.dataset.search = `${log.target} ${log.user} ${log.ip} ${log.type}`.toLowerCase();
+
+                item.innerHTML = `
+                    <div class="log-time">${log.time}</div>
+                    <div><span class="badge-status ${log.type}">${log.type}</span></div>
+                    <div class="log-target">${log.target}</div>
+                    <div class="log-user">${log.user}</div>
+                    <div class="log-ip">${log.ip}</div>
+                `;
+                timelineGrid.appendChild(item);
+            });
+        }
+
+        // Select specific Audit log
+        function selectLog(id) {
+            activeLogId = id;
+            const log = auditLogs.find(l => l.id === id);
+            if (!log) return;
+
+            // Highlight in list
+            document.querySelectorAll('.timeline-item').forEach(item => {
+                item.classList.remove('selected-active');
+            });
+            renderTimeline(); // re-draw with correct selection
+
+            // Update Inspector Title details
+            activeTargetTitle.innerText = log.target;
+            activeTimeLbl.innerText = `TIMESTAMP: ${log.date} ${log.time}`;
+            activeTag.innerText = log.type.toUpperCase();
+
+            // Set dynamic colors matching badge styles
+            activeTag.className = 'inspector-badge';
+            if (log.type === 'edit') {
+                activeTag.style.borderColor = 'var(--accent-orange)';
+                activeTag.style.color = 'var(--accent-orange)';
+                activeTag.style.background = 'rgba(255, 92, 0, 0.1)';
+            } else if (log.type === 'download') {
+                activeTag.style.borderColor = 'var(--accent-cyan)';
+                activeTag.style.color = 'var(--accent-cyan)';
+                activeTag.style.background = 'rgba(0, 240, 255, 0.1)';
+            } else if (log.type === 'share') {
+                activeTag.style.borderColor = 'var(--accent-magenta)';
+                activeTag.style.color = 'var(--accent-magenta)';
+                activeTag.style.background = 'rgba(255, 0, 122, 0.1)';
+            } else if (log.type === 'security') {
+                activeTag.style.borderColor = 'var(--accent-lime)';
+                activeTag.style.color = 'var(--accent-lime)';
+                activeTag.style.background = 'rgba(57, 255, 20, 0.1)';
+            } else {
+                activeTag.style.borderColor = 'var(--border-color)';
+                activeTag.style.color = 'var(--text-primary)';
+                activeTag.style.background = 'var(--bg-tertiary)';
+            }
+
+            activeEvent.innerText = `${log.type.toUpperCase()}_TRANSACTION_LOG`;
+            activeUser.innerText = log.user;
+            activeIp.innerText = log.ip;
+            activeLocation.innerText = log.location;
+            activeSig.innerText = log.signature;
+            activeFlowLeft.innerText = log.preState;
+            activeFlowRight.innerText = log.postState;
+            activeHashVerification.innerText = log.hash;
+
+            // Trigger minor high-fidelity response
+            showToast(`LOADED IMMUTABLE RECORD: ${log.id}`);
+        }
+
+        // Notification Helper
+        function showToast(text) {
+            toastText.innerText = text;
+            toast.classList.add('visible');
+            setTimeout(() => {
+                toast.classList.remove('visible');
+            }, 3000);
+        }
+
+        // Action: Verify current visualizer node integrity
+        function triggerVerification() {
+            showToast("SHA-256 CHECK: Ledger record authenticated on blockchain.");
+        }
+
+        // Action: Generate report
+        function triggerReportGenerate() {
+            showToast("Success! Compliance matrix generated into secure CSV.");
+        }
+
+        function triggerExport() {
+            showToast("Generating SOC-2 compliant transaction ledger...");
+        }
+
+        // Search engine optimization & filter listeners
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const searchInput = document.getElementById('logSearch');
+
+        function filterLogs() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+            const items = document.querySelectorAll('.timeline-item');
+
+            items.forEach(item => {
+                const searchStr = item.dataset.search;
+                const category = item.dataset.category;
+                
+                const matchesSearch = searchStr.includes(searchTerm);
+                const matchesFilter = activeFilter === 'all' || category === activeFilter;
+                
+                if (matchesSearch && matchesFilter) {
+                    item.style.display = 'grid';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                filterLogs();
+            });
+        });
+
+        searchInput.addEventListener('input', filterLogs);
+
+        // Initialize view
+        window.addEventListener('load', () => {
+            renderTimeline();
+            selectLog('LOG-092');
+        });
+    </script>
+</body>
+</html>
+```

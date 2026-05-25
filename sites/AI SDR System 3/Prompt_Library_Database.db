@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Lab | AI SDR Engine</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #030303;
+            --card-bg: rgba(15, 15, 20, 0.7);
+            --border: rgba(255, 255, 255, 0.08);
+            --primary: #8b5cf6;
+            --secondary: #ec4899;
+            --accent: #06b6d4;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --code-bg: #0f172a;
+            --aura-1: rgba(139, 92, 246, 0.15);
+            --aura-2: rgba(6, 182, 212, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .aura-blob {
+            position: fixed;
+            width: 800px;
+            height: 800px;
+            border-radius: 50%;
+            filter: blur(140px);
+            z-index: -1;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        .aura-1 { top: -200px; right: -100px; background: var(--aura-1); animation: drift 25s infinite alternate; }
+        .aura-2 { bottom: -200px; left: -100px; background: var(--aura-2); animation: drift 30s infinite alternate-reverse; }
+
+        @keyframes drift {
+            from { transform: translate(0, 0) rotate(0deg); }
+            to { transform: translate(150px, 100px) rotate(15deg); }
+        }
+
+        .lab-container {
+            width: 100%;
+            max-width: 1200px;
+            background: var(--card-bg);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            padding: 40px;
+            box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.7);
+        }
+
+        .lab-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 24px;
+        }
+
+        .title-group h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(to right, #fff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .title-group p {
+            color: var(--text-dim);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .lab-nav {
+            display: flex;
+            gap: 24px;
+        }
+
+        .nav-link {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 0;
+            border-bottom: 2px solid transparent;
+            transition: 0.2s;
+        }
+
+        .nav-link.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        /* Database Layout */
+        .db-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 40px;
+        }
+
+        /* Variables Sidebar */
+        .sidebar-section h3 {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-dim);
+            margin-bottom: 16px;
+        }
+
+        .variable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .var-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 12px;
+        }
+
+        .var-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--accent);
+            background: rgba(6, 182, 212, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 6px;
+        }
+
+        .var-desc {
+            font-size: 12px;
+            color: var(--text-dim);
+            line-height: 1.4;
+        }
+
+        /* Prompt Table */
+        .prompt-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .prompt-table th {
+            text-align: left;
+            font-size: 12px;
+            color: var(--text-dim);
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+        }
+
+        .prompt-table td {
+            padding: 20px 16px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        .prompt-name {
+            font-weight: 600;
+            color: var(--text-main);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .prompt-meta {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-model { background: rgba(139, 92, 246, 0.1); color: var(--primary); border: 1px solid rgba(139, 92, 246, 0.2); }
+        .badge-tone { background: rgba(236, 72, 153, 0.1); color: var(--secondary); border: 1px solid rgba(236, 72, 153, 0.2); }
+
+        .code-preview {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #94a3b8;
+            background: var(--code-bg);
+            padding: 12px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            max-width: 450px;
+            border: 1px solid var(--border);
+        }
+
+        .btn-action {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-action:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--text-dim);
+        }
+
+        .btn-new {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="aura-blob aura-1"></div>
+    <div class="aura-blob aura-2"></div>
+
+    <main class="lab-container">
+        <header class="lab-header">
+            <div class="title-group">
+                <h1>AI Messaging & Prompt Lab</h1>
+                <p>Creative infrastructure for <strong>Personalize</strong> & <strong>Draft</strong> stages</p>
+            </div>
+            <nav class="lab-nav">
+                <a href="#" class="nav-link active">Prompt Library</a>
+                <a href="#" class="nav-link">Email Templates</a>
+                <a href="#" class="nav-link">Tone Profiles</a>
+                <button class="btn-new">+ Create New</button>
+            </nav>
+        </header>
+
+        <div class="db-layout">
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3>Dynamic Variables</h3>
+                    <div class="variable-list">
+                        <div class="var-card">
+                            <span class="var-tag">{{first_name}}</span>
+                            <p class="var-desc">Prospect's given name from CRM/LinkedIn.</p>
+                        </div>
+                        <div class="var-card">
+                            <span class="var-tag">{{company_niche}}</span>
+                            <p class="var-desc">AI-generated categorization of the lead's industry.</p>
+                        </div>
+                        <div class="var-card">
+                            <span class="var-tag">{{recent_news}}</span>
+                            <p class="var-desc">Latest funding or product launch snippet.</p>
+                        </div>
+                        <div class="var-card">
+                            <span class="var-tag">{{pain_point}}</span>
+                            <p class="var-desc">Inferred challenge based on business type.</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <section class="main-content">
+                <table class="prompt-table">
+                    <thead>
+                        <tr>
+                            <th>PROMPT NAME</th>
+                            <th>CONFIGURATION</th>
+                            <th>LOGIC PREVIEW</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <span class="prompt-name">Icebreaker Gen v4</span>
+                                <span class="prompt-meta">Stage: Personalize</span>
+                            </td>
+                            <td>
+                                <div style="display: flex; flex-direction: column; gap: 6px;">
+                                    <span class="badge badge-model">GPT-4-Turbo</span>
+                                    <span class="badge badge-tone">Hyper-Personal</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="code-preview">"Act as a world-class SDR. Use {{recent_news}} to draft a 1-sentence opening for {{first_name}} at {{company_niche}}..."</div>
+                            </td>
+                            <td>
+                                <button class="btn-action">Edit</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="prompt-name">B2B Fintech Pitch</span>
+                                <span class="prompt-meta">Stage: Draft</span>
+                            </td>
+                            <td>
+                                <div style="display: flex; flex-direction: column; gap: 6px;">
+                                    <span class="badge badge-model">Claude-3-Opus</span>
+                                    <span class="badge badge-tone">Professional</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="code-preview">"Focus on the value proposition regarding liquidity. Mention how we solve {{pain_point}} for founders..."</div>
+                            </td>
+                            <td>
+                                <button class="btn-action">Edit</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="prompt-name">Short Follow-up #1</span>
+                                <span class="prompt-meta">Stage: Follow-up</span>
+                            </td>
+                            <td>
+                                <div style="display: flex; flex-direction: column; gap: 6px;">
+                                    <span class="badge badge-model">Gemini Pro</span>
+                                    <span class="badge badge-tone">Casual</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="code-preview">"Bump the previous thread. Keep it under 30 words. Ask if they have 10 mins Tuesday."</div>
+                            </td>
+                            <td>
+                                <button class="btn-action">Edit</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </main>
+
+</body>
+</html></html>

@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLASH-UI // Component Codex</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050505;
+            --card-bg: #0d0d0d;
+            --border: #222;
+            --accent: #00f2ff;
+            --accent-glow: rgba(0, 242, 255, 0.3);
+            --text-main: #e0e0e0;
+            --text-dim: #888;
+            --glass: rgba(255, 255, 255, 0.03);
+            --font-main: 'Space Grotesk', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 50% -20%, #111 0%, transparent 50%),
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 60px;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .logo span {
+            background: linear-gradient(90deg, var(--accent), #7000ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            background: var(--glass);
+            padding: 4px 12px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--accent);
+        }
+
+        .hero {
+            margin-bottom: 60px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+        }
+
+        .codex-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 30px;
+        }
+
+        .section-title {
+            grid-column: span 12;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+
+        /* Component Showcase Cards */
+        .preview-card {
+            grid-column: span 6;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview-area {
+            padding: 40px;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            position: relative;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .preview-info {
+            padding: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .component-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .component-id {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--accent);
+            background: var(--accent-glow);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .component-name {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .component-desc {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        /* Primitive Examples */
+        .primitive-bento {
+            width: 100%;
+            max-width: 300px;
+            padding: 20px;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 12px;
+            position: relative;
+        }
+        .primitive-bento::after {
+            content: '';
+            position: absolute;
+            top: 10px; right: 10px;
+            width: 40px; height: 2px;
+            background: var(--accent);
+        }
+
+        .primitive-stat {
+            text-align: center;
+        }
+        .stat-value {
+            font-family: var(--font-mono);
+            font-size: 2rem;
+            color: var(--accent);
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+        .stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--text-dim);
+        }
+
+        .primitive-input {
+            width: 100%;
+            background: #050505;
+            border: 1px solid var(--accent);
+            padding: 10px;
+            font-family: var(--font-mono);
+            color: var(--accent);
+            font-size: 0.8rem;
+            clip-path: polygon(0 0, 100% 0, 100% 70%, 95% 100%, 0 100%);
+        }
+
+        .primitive-pill {
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: linear-gradient(90deg, #7000ff, var(--accent));
+            color: #000;
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+
+        .primitive-terminal {
+            width: 100%;
+            background: #000;
+            border: 1px solid #222;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            padding: 10px;
+            color: #0f0;
+        }
+
+        .cursor { animation: blink 1s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        @media (max-width: 800px) {
+            .preview-card { grid-column: span 12; }
+        }
+
+        .copy-tag {
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .copy-tag:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <a href="#" class="logo">⚡ FLASH-<span>UI</span></a>
+            <div class="status">Codex: Active // Library v.1.0</div>
+        </header>
+
+        <section class="hero">
+            <h1>Component Codex</h1>
+            <p>The visual manifest of high-fidelity primitives. Reference these IDs in your design prompts.</p>
+        </section>
+
+        <main class="codex-grid">
+            
+            <div class="section-title">01. Layout Primitives</div>
+
+            <!-- Card A -->
+            <div class="preview-card">
+                <div class="preview-area">
+                    <div class="primitive-bento">
+                        <div style="height: 10px; width: 30%; background: #222; margin-bottom: 15px;"></div>
+                        <div style="height: 60px; background: var(--glass); border-radius: 4px;"></div>
+                    </div>
+                </div>
+                <div class="preview-info">
+                    <div class="component-meta">
+                        <span class="component-name">Bento Container</span>
+                        <span class="component-id copy-tag" onclick="copyId('BENTO_PRIMARY')">BENTO_PRIMARY</span>
+                    </div>
+                    <p class="component-desc">Standard content block with accent corner and glassmorphic interior.</p>
+                </div>
+            </div>
+
+            <!-- Card B -->
+            <div class="preview-card">
+                <div class="preview-area">
+                    <div class="primitive-stat">
+                        <div class="stat-value">99.9%</div>
+                        <div class="stat-label">Uptime Protocol</div>
+                    </div>
+                </div>
+                <div class="preview-info">
+                    <div class="component-meta">
+                        <span class="component-name">Data Metric</span>
+                        <span class="component-id copy-tag" onclick="copyId('METRIC_GLOW')">METRIC_GLOW</span>
+                    </div>
+                    <p class="component-desc">High-visibility numerical display with neon glow effects.</p>
+                </div>
+            </div>
+
+            <div class="section-title">02. Control Interface</div>
+
+            <!-- Input Node -->
+            <div class="preview-card">
+                <div class="preview-area">
+                    <div style="width: 80%;">
+                        <div class="primitive-input">SYST_INIT_SEQUENCE > _</div>
+                    </div>
+                </div>
+                <div class="preview-info">
+                    <div class="component-meta">
+                        <span class="component-name">Angled Input</span>
+                        <span class="component-id copy-tag" onclick="copyId('INPUT_ANGLED')">INPUT_ANGLED</span>
+                    </div>
+                    <p class="component-desc">Cyberpunk-style input field with clipped bottom-right corner.</p>
+                </div>
+            </div>
+
+            <!-- Status Pill -->
+            <div class="preview-card">
+                <div class="preview-area">
+                    <div class="primitive-pill">Operational</div>
+                </div>
+                <div class="preview-info">
+                    <div class="component-meta">
+                        <span class="component-name">Gradient Pill</span>
+                        <span class="component-id copy-tag" onclick="copyId('PILL_GRADIENT')">PILL_GRADIENT</span>
+                    </div>
+                    <p class="component-desc">High-contrast status indicator using system-wide brand gradients.</p>
+                </div>
+            </div>
+
+            <div class="section-title">03. Data Streams</div>
+
+            <!-- Terminal -->
+            <div class="preview-card" style="grid-column: span 12;">
+                <div class="preview-area">
+                    <div class="primitive-terminal">
+                        [SYS] Decrypting packet 0x882... DONE<br>
+                        [SYS] establishing handshake with FLASH_UI_LAB...<br>
+                        [SYS] Connection secure. Welcome, Architect.<br>
+                        <span class="cursor">_</span>
+                    </div>
+                </div>
+                <div class="preview-info">
+                    <div class="component-meta">
+                        <span class="component-name">Command Terminal</span>
+                        <span class="component-id copy-tag" onclick="copyId('TERMINAL_STREAM')">TERMINAL_STREAM</span>
+                    </div>
+                    <p class="component-desc">Full-width monospaced output console for live logging or technical data feeds.</p>
+                </div>
+            </div>
+
+        </main>
+
+        <footer style="margin-top: 80px; padding: 40px 0; border-top: 1px solid var(--border); text-align: center; font-size: 0.8rem; color: var(--text-dim);">
+            FLASH-UI Framework // Documentation System // 2024
+        </footer>
+    </div>
+
+    <script>
+        function copyId(id) {
+            navigator.clipboard.writeText(id);
+            const tags = document.querySelectorAll('.component-id');
+            tags.forEach(tag => {
+                if(tag.innerText.includes(id)) {
+                    const original = tag.innerText;
+                    tag.innerText = "COPIED";
+                    tag.style.background = "#fff";
+                    tag.style.color = "#000";
+                    setTimeout(() => {
+                        tag.innerText = original;
+                        tag.style.background = "var(--accent-glow)";
+                        tag.style.color = "var(--accent)";
+                    }, 1000);
+                }
+            });
+        }
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLASH-UI // Component Codex</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050505;
+            --card-bg: #0d0d0d;
+            --border: #222;
+            --accent: #00f2ff;
+            --accent-glow: rgba(0, 242, 255, 0.3);
+            --text-main: #e0e0e0;
+            --text-dim: #888;
+            --glass: rgba(255, 255, 255, 0.03);
+            --font-main: 'Space Grotesk', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 50% -20%, #111 0%, transparent 50%),
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 60px;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .logo span {
+            background: linear-gradient(90deg, var(--accent), #7000ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            background: var(--glass);
+            padding: 4px 12px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--accent);
+        }
+
+        .hero {
+            margin-bottom: 60px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+        }
+
+        .codex-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 30px;
+        }
+
+        .section-title {
+            grid-column: span 12;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+
+        /* Component Showcase Cards */
+        .preview-card {
+            grid-column: span 6;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview-area {
+            padding: 40px;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            position: relative;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .preview-info {
+            padding: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .component-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .component-id {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--accent);
+            background: var(--accent-glow);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .component-name {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .component-desc {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        /* Primitive Examples */
+        .primitive-bento {
+            width: 100%;
+            max-width: 300px;
+            padding: 20px;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 12px;
+            position: relative;
+        }
+        .primitive-bento::after {
+            content: '';
+            position: absolute;
+            top: 10px; right: 10px;
+            width: 40px; height: 2px;
+            background: var(--accent);
+        }
+
+        .primitive-stat {
+            text-align: center;
+        }
+        .stat-value {
+            font-family: var(--font-mono);
+            font-size: 2rem;
+            color: var(--accent);
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+        .stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--text-dim);
+        }
+
+        .primitive-input {
+            width: 100%;
+            background: #050505;
+            border: 1px solid var(--accent);
+            padding: 10px;
+            font-family: var(--font-mono);
+            color: var(--accent);
+            font-size: 0.8rem;
+            clip-path: polygon(0 0, 100% 0, 100% 70%, 95% 100%, 0 100%);
+        }
+
+        .primitive-pill {
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: linear-gradient(90deg, #7000ff, var(--accent));
+            color: #000;
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+
+        .primitive-terminal {
+            width: 100%;
+            background: #000;
+            border: 1px solid #222;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            padding: 10px;
+            color: #0f0;
+        }
+
+        .cursor { animation: blink 1s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        @media (max-width: 800px) {
+            .preview-card { grid-column: span 12; }
+        }
+
+        .copy-tag {
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .copy-tag:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <a href="#" class="logo">⚡ FLASH-<span>UI</span></a>
+            <div class="status">Codex: Active // Library v.1.0</div>
+        </header>
+
+        <section class="hero">
+            <h1>Component Codex</h1>
+            <p>The visual manifest of high-fidelity primitives. Reference these IDs in your design prompts.</p>
+        </section>
+
+        <main class="codex-grid">
+            
+            <div class="section-title">01. Layout Primitives</div>
+
+            <!-- Card A -->
+            <div class="preview-card">
+                <div class="preview-area">
+                    <div class="primitive-bento">
+                        <div style="height: 10px; width: 30%; background: #222; margin-bottom: 15px;"></div>
+                        <div style="height: 60px; background: var(--glass); border-radius: 4px;"></div>
+                    </div>
+                </div>
+                <div class="preview-info">
+                    <div class="component-meta">
+                        <span class="component-name">Bento Container</span>
+                        <span class="component-id copy-tag" onclick="copyId('BENTO_PRIMARY')">BENTO_PRIMARY</span>
+                    </div>
+                    <p class="component-desc">Standard content block with accent corner and glassmorphic interior.</p>
+                </div>
+            </div>
+
+            <!-- Card B -->
+            <div class="preview-card">
+                <div class="preview-area">
+                    <div class="primitive-stat">
+                        <div class="stat-value">99.9%</div>
+                        <div class="stat-label">Uptime Protocol</div>
+                    </div>
+                </div>
+                <div class="preview-info">
+                    <div class="component-meta">
+                        <span class="component-name">Data Metric</span>
+                        <span class="component-id copy-tag" onclick="copyId('METRIC_GLOW')">METRIC_GLOW</span>
+                    </div>
+                    <p class="component-desc">High-visibility numerical display with neon glow effects.</p>
+                </div>
+            </div>
+
+            <div class="section-title">02. Control Interface</div>
+
+            <!-- Input Node -->
+            <div class="preview-card">
+                <div class="preview-area">
+                    <div style="width: 80%;">
+                        <div class="primitive-input">SYST_INIT_SEQUENCE > _</div>
+                    </div>
+                </div>
+                <div class="preview-info">
+                    <div class="component-meta">
+                        <span class="component-name">Angled Input</span>
+                        <span class="component-id copy-tag" onclick="copyId('INPUT_ANGLED')">INPUT_ANGLED</span>
+                    </div>
+                    <p class="component-desc">Cyberpunk-style input field with clipped bottom-right corner.</p>
+                </div>
+            </div>
+
+            <!-- Status Pill -->
+            <div class="preview-card">
+                <div class="preview-area">
+                    <div class="primitive-pill">Operational</div>
+                </div>
+                <div class="preview-info">
+                    <div class="component-meta">
+                        <span class="component-name">Gradient Pill</span>
+                        <span class="component-id copy-tag" onclick="copyId('PILL_GRADIENT')">PILL_GRADIENT</span>
+                    </div>
+                    <p class="component-desc">High-contrast status indicator using system-wide brand gradients.</p>
+                </div>
+            </div>
+
+            <div class="section-title">03. Data Streams</div>
+
+            <!-- Terminal -->
+            <div class="preview-card" style="grid-column: span 12;">
+                <div class="preview-area">
+                    <div class="primitive-terminal">
+                        [SYS] Decrypting packet 0x882... DONE<br>
+                        [SYS] establishing handshake with FLASH_UI_LAB...<br>
+                        [SYS] Connection secure. Welcome, Architect.<br>
+                        <span class="cursor">_</span>
+                    </div>
+                </div>
+                <div class="preview-info">
+                    <div class="component-meta">
+                        <span class="component-name">Command Terminal</span>
+                        <span class="component-id copy-tag" onclick="copyId('TERMINAL_STREAM')">TERMINAL_STREAM</span>
+                    </div>
+                    <p class="component-desc">Full-width monospaced output console for live logging or technical data feeds.</p>
+                </div>
+            </div>
+
+        </main>
+
+        <footer style="margin-top: 80px; padding: 40px 0; border-top: 1px solid var(--border); text-align: center; font-size: 0.8rem; color: var(--text-dim);">
+            FLASH-UI Framework // Documentation System // 2024
+        </footer>
+    </div>
+
+    <script>
+        function copyId(id) {
+            navigator.clipboard.writeText(id);
+            const tags = document.querySelectorAll('.component-id');
+            tags.forEach(tag => {
+                if(tag.innerText.includes(id)) {
+                    const original = tag.innerText;
+                    tag.innerText = "COPIED";
+                    tag.style.background = "#fff";
+                    tag.style.color = "#000";
+                    setTimeout(() => {
+                        tag.innerText = original;
+                        tag.style.background = "var(--accent-glow)";
+                        tag.style.color = "var(--accent)";
+                    }, 1000);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

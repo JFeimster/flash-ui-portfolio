@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Edge - Document & Case Dashboard Navigation</title>
+    <!-- Google Fonts for Ultra-Modern High-Contrast Look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0c10;
+            --surface: #14161f;
+            --surface-card: #1a1d29;
+            --text-raw: #ffffff;
+            --text-muted: #8e95ad;
+            --accent-cyan: #00f3ff;
+            --accent-magenta: #ff0055;
+            --accent-yellow: #ffee00;
+            --accent-green: #39ff14;
+            --border-width: 3px;
+            --brutal-shadow-cyan: 4px 4px 0px var(--accent-cyan);
+            --brutal-shadow-magenta: 4px 4px 0px var(--accent-magenta);
+            --brutal-shadow-yellow: 4px 4px 0px var(--accent-yellow);
+            --transition-speed: 0.15s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-raw);
+            padding: 20px;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* Navbar Master Container */
+        .brutal-nav-container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto 30px auto;
+            position: relative;
+            z-index: 999;
+        }
+
+        /* Top Bar Navigation */
+        .brutal-navbar {
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            box-shadow: var(--brutal-shadow-cyan);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Brand / Identity styling */
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .brand-logo {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-magenta);
+            border: 2px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 20px;
+            box-shadow: 3px 3px 0px #fff;
+            transform: rotate(-3deg);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .brand-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 900;
+            font-size: 22px;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        .brand-text span {
+            color: var(--accent-cyan);
+        }
+
+        /* Navigation Links */
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-item {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 14px;
+            text-transform: uppercase;
+            padding: 10px 18px;
+            border: var(--border-width) solid transparent;
+            transition: all var(--transition-speed);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            border-color: #fff;
+            background: var(--surface-card);
+            box-shadow: 3px 3px 0px var(--accent-cyan);
+            transform: translate(-2px, -2px);
+        }
+
+        .nav-item.active {
+            background: var(--accent-cyan);
+            color: #000;
+            box-shadow: 3px 3px 0px #fff;
+        }
+
+        /* Case / Document Metric Badge Actions */
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .badge-btn {
+            background: var(--surface-card);
+            border: 2px solid #fff;
+            color: #fff;
+            padding: 8px 16px;
+            font-weight: 800;
+            font-size: 13px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 3px 3px 0px var(--accent-yellow);
+            font-family: 'Space Grotesk', sans-serif;
+            transition: all var(--transition-speed);
+        }
+
+        .badge-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0px var(--accent-yellow);
+        }
+
+        .badge-btn:active {
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0px var(--accent-yellow);
+        }
+
+        /* Specific Status Indicators */
+        .indicator-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent-magenta);
+            box-shadow: 0 0 8px var(--accent-magenta);
+        }
+
+        .indicator-dot.verified {
+            background: var(--accent-green);
+            box-shadow: 0 0 8px var(--accent-green);
+        }
+
+        .pending-count {
+            background: var(--accent-magenta);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 900;
+            padding: 2px 6px;
+            border: 1px solid #fff;
+        }
+
+        /* Dropdown Checklist and Activity Panel */
+        .nav-dropdown-panel {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 15px;
+            width: 420px;
+            background: var(--surface-card);
+            border: var(--border-width) solid #fff;
+            box-shadow: var(--brutal-shadow-magenta);
+            padding: 25px;
+            display: none;
+            z-index: 1001;
+        }
+
+        .nav-dropdown-panel.active {
+            display: block;
+            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: translateY(10px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px dashed rgba(255, 255, 255, 0.2);
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+
+        .panel-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 16px;
+            font-weight: 900;
+            text-transform: uppercase;
+            color: var(--accent-magenta);
+        }
+
+        .panel-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-weight: 900;
+            font-size: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .panel-close:hover {
+            color: #fff;
+        }
+
+        .panel-item-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
+        /* Submissions and Status Items */
+        .panel-item {
+            background: var(--surface);
+            border: 2px solid #fff;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .panel-item-title {
+            font-weight: 800;
+            font-size: 13px;
+            text-transform: uppercase;
+            color: #fff;
+        }
+
+        .panel-item-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .panel-item-badge {
+            font-size: 10px;
+            font-weight: 900;
+            padding: 4px 8px;
+            border: 1px solid #000;
+            text-transform: uppercase;
+        }
+
+        .panel-item-badge.pending {
+            background: var(--accent-yellow);
+            color: #000;
+        }
+
+        .panel-item-badge.verified {
+            background: var(--accent-green);
+            color: #000;
+        }
+
+        .panel-item-badge.review {
+            background: var(--accent-cyan);
+            color: #000;
+        }
+
+        .panel-action-btn {
+            display: block;
+            width: 100%;
+            text-align: center;
+            background: var(--accent-cyan);
+            color: #000;
+            border: 2px solid #fff;
+            padding: 12px;
+            font-weight: 900;
+            font-size: 13px;
+            text-transform: uppercase;
+            text-decoration: none;
+            box-shadow: 3px 3px 0px #fff;
+            margin-top: 15px;
+            transition: all var(--transition-speed);
+        }
+
+        .panel-action-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0px #fff;
+        }
+
+        /* Burger menu icon for mobile responsiveness */
+        .nav-burger {
+            display: none;
+            background: var(--surface-card);
+            border: 2px solid #fff;
+            width: 44px;
+            height: 44px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 3px 3px 0px #fff;
+        }
+
+        .nav-burger span {
+            display: block;
+            width: 20px;
+            height: 3px;
+            background: #fff;
+            position: relative;
+        }
+
+        .nav-burger span::before, .nav-burger span::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 3px;
+            background: #fff;
+            left: 0;
+        }
+
+        .nav-burger span::before { top: -8px; }
+        .nav-burger span::after { bottom: -8px; }
+
+        /* Responsive Layouts */
+        @media (max-width: 991px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: var(--surface);
+                border: var(--border-width) solid #fff;
+                box-shadow: var(--brutal-shadow-cyan);
+                flex-direction: column;
+                padding: 20px;
+                gap: 15px;
+                margin-top: 15px;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-item {
+                width: 100%;
+                text-align: center;
+            }
+
+            .nav-burger {
+                display: flex;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .brutal-navbar {
+                padding: 10px 15px;
+            }
+
+            .brand-text {
+                font-size: 18px;
+            }
+
+            .badge-btn span {
+                display: none;
+            }
+
+            .nav-dropdown-panel {
+                width: calc(100vw - 40px);
+                right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PORTABLE BRUTALIST DASHBOARD NAVIGATION -->
+    <div class="brutal-nav-container">
+        <nav class="brutal-navbar">
+            
+            <!-- Left: Branding -->
+            <a href="#" class="nav-brand">
+                <div class="brand-logo">D</div>
+                <div class="brand-text">Dynamic<span>Edge</span></div>
+            </a>
+
+            <!-- Center: Core Route Links -->
+            <div class="nav-links" id="navLinks">
+                <a href="#overview" class="nav-item active">Dashboard</a>
+                <a href="#documents" class="nav-item">Cases & Docs</a>
+                <a href="#pipelines" class="nav-item">Underwriting</a>
+                <a href="#brokers" class="nav-item">Commissions</a>
+            </div>
+
+            <!-- Right: Dynamic Action Metrics Indicators -->
+            <div class="nav-actions">
+                
+                <!-- Attachment Requests Action Toggle -->
+                <button class="badge-btn" onclick="toggleStatusDropdown()">
+                    <span class="indicator-dot"></span>
+                    <span>Submissions</span>
+                    <div class="pending-count" id="badgeCount">2</div>
+                </button>
+
+                <!-- Responsive Menu Toggle -->
+                <button class="nav-burger" onclick="toggleMobileMenu()">
+                    <span></span>
+                </button>
+            </div>
+
+            <!-- OVERVIEW & DOCUMENT VERIFICATION DROPDOWN POPUP -->
+            <div class="nav-dropdown-panel" id="statusDropdown">
+                <div class="panel-header">
+                    <div class="panel-title">Track Case Status</div>
+                    <button class="panel-close" onclick="toggleStatusDropdown()">[Close]</button>
+                </div>
+                
+                <div class="panel-item-list">
+                    
+                    <!-- Case Metric 1 -->
+                    <div class="panel-item">
+                        <div class="panel-item-info">
+                            <span class="panel-item-title">Operating Accounts (2023)</span>
+                            <span class="panel-item-sub">Case ID: #E-9402 • Updated 2h ago</span>
+                        </div>
+                        <span class="panel-item-badge verified">Verified</span>
+                    </div>
+
+                    <!-- Case Metric 2 -->
+                    <div class="panel-item">
+                        <div class="panel-item-info">
+                            <span class="panel-item-title">Real Estate DSCR Sheets</span>
+                            <span class="panel-item-sub">Attachment verification required</span>
+                        </div>
+                        <span class="panel-item-badge pending">Required</span>
+                    </div>
+
+                    <!-- Case Metric 3 -->
+                    <div class="panel-item">
+                        <div class="panel-item-info">
+                            <span class="panel-item-title">Tax Transcripts (Form 4506)</span>
+                            <span class="panel-item-sub">Under review by institutional lead</span>
+                        </div>
+                        <span class="panel-item-badge review">Under Review</span>
+                    </div>
+
+                    <!-- Case Metric 4 -->
+                    <div class="panel-item">
+                        <div class="panel-item-info">
+                            <span class="panel-item-title">Corporate Entity Certificate</span>
+                            <span class="panel-item-sub">State registry search successful</span>
+                        </div>
+                        <span class="panel-item-badge verified">Verified</span>
+                    </div>
+
+                </div>
+
+                <a href="#documents" class="panel-action-btn" onclick="toggleStatusDropdown()">
+                    Go to Documents Panel ↗
+                </a>
+            </div>
+
+        </nav>
+    </div>
+
+    <!-- DOCUMENT & CASE DASHBOARD NAVIGATION UTILITY CONTROL -->
+    <script>
+        function toggleStatusDropdown() {
+            const dropdown = document.getElementById('statusDropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        function toggleMobileMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        }
+
+        // Close dropdown if clicked outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('statusDropdown');
+            const toggleButton = document.querySelector('.badge-btn');
+            if (!toggleButton.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyst Policy Manager &amp; Scenario Simulator | Prism Debt Systems</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #03050a;
+            --bg-surface: rgba(10, 15, 30, 0.75);
+            --bg-surface-elevated: rgba(18, 25, 47, 0.9);
+            --border-glow-primary: rgba(37, 99, 235, 0.25);
+            --border-glow-accent: rgba(124, 58, 237, 0.2);
+            --accent-cobalt: #2563eb;
+            --accent-prism-violet: #7c3aed;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-rose: #f43f5e;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #475569;
+            --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .white-label-mode {
+            --bg-base: #fafaf9;
+            --bg-surface: rgba(255, 255, 255, 0.9);
+            --bg-surface-elevated: #ffffff;
+            --border-glow-primary: rgba(120, 113, 108, 0.15);
+            --border-glow-accent: rgba(120, 113, 108, 0.1);
+            --accent-cobalt: #1c1917;
+            --accent-prism-violet: #44403c;
+            --accent-cyan: #0f766e;
+            --text-primary: #1c1917;
+            --text-secondary: #57534e;
+            --text-muted: #a8a29e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(124, 58, 237, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 40%);
+            background-attachment: fixed;
+            transition: background-color 0.5s ease;
+        }
+
+        .app-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            background: var(--bg-surface);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            transition: var(--transition-smooth);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-prism {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-prism-violet), var(--accent-cyan), var(--accent-cobalt));
+            border-radius: 8px;
+            transform: rotate(45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+            transition: var(--transition-smooth);
+        }
+
+        .logo-prism::after {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: var(--bg-base);
+            border-radius: 3px;
+            transform: rotate(-45deg);
+        }
+
+        .logo-text h1 {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text p {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .global-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .scenario-selector-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 4px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .scenario-selector-wrap span {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+        }
+
+        select.scenario-dropdown {
+            background: transparent;
+            border: none;
+            color: var(--accent-cyan);
+            font-family: var(--font-sans);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            outline: none;
+            padding-right: 8px;
+        }
+
+        select.scenario-dropdown option {
+            background-color: #0d1326;
+            color: #fff;
+        }
+
+        .btn-toggle-view {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-toggle-view:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--accent-prism-violet);
+            box-shadow: 0 0 15px rgba(124, 58, 237, 0.2);
+        }
+
+        .btn-toggle-view svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--accent-cyan);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+        }
+
+        .bento-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-glow-primary);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+            transition: var(--transition-smooth);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+        }
+
+        .bento-card:hover {
+            border-color: var(--accent-prism-violet);
+            box-shadow: 0 8px 32px rgba(124, 58, 237, 0.15);
+        }
+
+        .bento-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-prism-violet), transparent);
+            opacity: 0;
+            transition: var(--transition-smooth);
+        }
+
+        .bento-card:hover::before {
+            opacity: 1;
+        }
+
+        .col-4 { grid-column: span 4; }
+        .col-5 { grid-column: span 5; }
+        .col-6 { grid-column: span 6; }
+        .col-7 { grid-column: span 7; }
+        .col-8 { grid-column: span 8; }
+        .col-12 { grid-column: span 12; }
+
+        @media (max-width: 1024px) {
+            .col-4, .col-5, .col-6, .col-7, .col-8 {
+                grid-column: span 12 !important;
+            }
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .card-title-group h2 {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title-group p {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: var(--font-mono);
+            margin-top: 2px;
+        }
+
+        .badge-status {
+            font-size: 11px;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .badge-status-prime {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-emerald);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .badge-status-neutral {
+            background: rgba(148, 163, 184, 0.1);
+            color: var(--text-secondary);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        /* Form & Control styles */
+        .controls-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+        }
+
+        .form-meta span { color: var(--text-secondary); }
+        .form-meta .meta-value { color: var(--accent-cyan); font-weight: 700; }
+
+        .slider-input {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255,255,255,0.08);
+            outline: none;
+        }
+
+        .slider-input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--accent-cyan);
+            transition: var(--transition-smooth);
+        }
+
+        .slider-input::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        /* Specific Purple slider styling for priority tuners */
+        .slider-priority::-webkit-slider-thumb {
+            background: var(--accent-prism-violet);
+            box-shadow: 0 0 10px var(--accent-prism-violet);
+        }
+
+        /* Checkbox & Switch style */
+        .switch-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .switch-label-wrap {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .switch-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .switch-desc {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .switch-input-wrap {
+            position: relative;
+            display: inline-block;
+            width: 36px;
+            height: 20px;
+        }
+
+        .switch-input-wrap input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider-switch {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255,255,255,0.1);
+            transition: .3s;
+            border-radius: 20px;
+        }
+
+        .slider-switch:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--text-muted);
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider-switch {
+            background-color: var(--accent-emerald);
+        }
+
+        input:checked + .slider-switch:before {
+            transform: translateX(16px);
+            background-color: #fff;
+        }
+
+        /* Comparison Visualization Block */
+        .comparison-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            height: 100%;
+        }
+
+        .chart-container {
+            background: rgba(0,0,0,0.15);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.02);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .chart-header-sub {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        .scorecard-comparison-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .bar-label {
+            font-size: 12px;
+            font-weight: 500;
+            width: 120px;
+            color: var(--text-secondary);
+        }
+
+        .bar-outer {
+            flex-grow: 1;
+            height: 14px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+            margin: 0 12px;
+        }
+
+        .bar-inner {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .bar-inner.baseline {
+            background: linear-gradient(90deg, var(--accent-cobalt), var(--accent-cyan));
+        }
+
+        .bar-inner.simulated {
+            background: linear-gradient(90deg, var(--accent-prism-violet), var(--accent-rose));
+        }
+
+        .bar-val {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            width: 32px;
+            text-align: right;
+            font-weight: 700;
+        }
+
+        /* Global Metrics Shift Card */
+        .delta-stat-panel {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .delta-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .delta-card .lbl {
+            font-size: 10px;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .delta-card .val {
+            font-size: 18px;
+            font-weight: 800;
+            margin: 4px 0;
+        }
+
+        .delta-card .pct {
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .pct-positive { color: var(--accent-emerald); }
+        .pct-negative { color: var(--accent-rose); }
+        .pct-neutral { color: var(--text-secondary); }
+
+        /* Table & Lists */
+        .registry-table-wrapper {
+            overflow-x: auto;
+        }
+
+        table.registry-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        table.registry-table th {
+            padding: 12px 16px;
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            font-size: 11px;
+            color: var(--text-muted);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        table.registry-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+            color: var(--text-secondary);
+        }
+
+        table.registry-table tr:hover td {
+            background: rgba(255,255,255,0.02);
+            color: var(--text-primary);
+        }
+
+        .cell-profile-title {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .cell-profile-type {
+            font-size: 10px;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .status-pill {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-pill.approved { background: rgba(16, 185, 129, 0.1); color: var(--accent-emerald); }
+        .status-pill.declined { background: rgba(244, 63, 94, 0.1); color: var(--accent-rose); }
+        .status-pill.marginal { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+
+        /* Code Block & Terminal UI */
+        .code-container-pre {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: #cbd5e1;
+            overflow-x: auto;
+            max-height: 250px;
+        }
+
+        .terminal-shell {
+            background: #020306;
+            border-radius: 8px;
+            padding: 16px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: #a8b2c2;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .terminal-line {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 4px;
+            line-height: 1.5;
+        }
+
+        .terminal-line .stamp { color: var(--accent-cyan); }
+        .terminal-line .accent { color: var(--accent-prism-violet); }
+        .terminal-line .success { color: var(--accent-emerald); }
+
+        .tab-headers {
+            display: flex;
+            gap: 4px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 16px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            text-transform: uppercase;
+            padding: 8px 16px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: var(--transition-smooth);
+        }
+
+        .tab-btn.active {
+            color: var(--accent-cyan);
+            border-bottom-color: var(--accent-cyan);
+        }
+
+        /* Buttons styling */
+        .action-button {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-button:hover {
+            background: var(--accent-prism-violet);
+            border-color: var(--accent-prism-violet);
+            box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+        }
+
+        .action-button-success {
+            background: linear-gradient(90deg, var(--accent-cobalt), var(--accent-cyan));
+            border: none;
+        }
+
+        .action-button-success:hover {
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.5);
+            transform: translateY(-1px);
+        }
+
+        /* SVG Line Graph Visualization styled neatly */
+        .svg-visual-graph {
+            width: 100%;
+            height: 160px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 8px;
+            border: 1px dashed rgba(255,255,255,0.05);
+            margin-top: 12px;
+        }
+
+        footer {
+            margin-top: 32px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 24px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .footer-badges {
+            display: flex;
+            gap: 12px;
+        }
+
+        .footer-badges span {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <!-- Interactive Top Control Header -->
+    <header>
+        <div class="logo-area">
+            <div class="logo-prism"></div>
+            <div class="logo-text">
+                <h1>PRISM POLICY MANAGER</h1>
+                <p>Scenario Simulation &amp; Rule Underwriting Governor</p>
+            </div>
+        </div>
+
+        <div class="global-controls">
+            <!-- Global Macro Scenario Swapper -->
+            <div class="scenario-selector-wrap">
+                <span>Simulation Paradigm:</span>
+                <select class="scenario-dropdown" id="paradigmSelect" onchange="loadPresetScenario(this.value)">
+                    <option value="standard">Standard Baseline Credit Matrix</option>
+                    <option value="tight_regime">Contractionary Regime (Strict Risk)</option>
+                    <option value="growth_hunt">Expansionary Yield Push (Aggressive)</option>
+                    <option value="asset_heavy">Asset-Backed Sovereign Collateral Rule</option>
+                </select>
+            </div>
+
+            <!-- Return to Primary App Button -->
+            <button class="btn-toggle-view" onclick="toggleViewMode()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="18" height="18" x="3" y="3" rx="2" />
+                    <path d="M9 3v18M15 3v18M3 9h18M3 15h18" />
+                </svg>
+                <span id="toggleText">Operator View</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Dynamic Bento Grid Layout -->
+    <main class="dashboard-grid">
+
+        <!-- Bento Card: Simulation Control Sliders (Parameter Inputs) -->
+        <div class="bento-card col-5">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <h2>Credit Threshold Governors</h2>
+                    <p>Stress-test pipeline approval limits</p>
+                </div>
+                <span class="badge-status badge-status-prime">Engine Override</span>
+            </div>
+
+            <div class="controls-stack">
+                <!-- Minimum Score Threshold -->
+                <div class="form-group">
+                    <div class="form-meta">
+                        <span>Approval Score Floor</span>
+                        <span class="meta-value" id="dispScoreFloor">700</span>
+                    </div>
+                    <input type="range" class="slider-input" id="inpScoreFloor" min="600" max="850" step="10" value="700" oninput="runSimRecalculation()">
+                </div>
+
+                <!-- Maximum Leverage Multiplier -->
+                <div class="form-group">
+                    <div class="form-meta">
+                        <span>Leverage Ceiling (Max)</span>
+                        <span class="meta-value" id="dispLeverageCeil">75%</span>
+                    </div>
+                    <input type="range" class="slider-input" id="inpLeverageCeil" min="50" max="90" step="5" value="75" oninput="runSimRecalculation()">
+                </div>
+
+                <!-- Minimum Liquidity Required -->
+                <div class="form-group">
+                    <div class="form-meta">
+                        <span>Liquidity Floor (Min)</span>
+                        <span class="meta-value" id="dispLiquidityFloor">40%</span>
+                    </div>
+                    <input type="range" class="slider-input" id="inpLiquidityFloor" min="30" max="80" step="5" value="40" oninput="runSimRecalculation()">
+                </div>
+
+                <!-- Weight Priority Controls -->
+                <div class="form-group" style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 16px;">
+                    <h3 style="font-size: 11px; text-transform: uppercase; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 8px;">Allocation Matrix Weights</h3>
+                    
+                    <div class="form-group">
+                        <div class="form-meta">
+                            <span>Liquidity Weight</span>
+                            <span class="meta-value" id="dispWeightLiquidity">1.0</span>
+                        </div>
+                        <input type="range" class="slider-input slider-priority" id="inpWeightLiquidity" min="0" max="2" step="0.1" value="1.0" oninput="runSimRecalculation()">
+                    </div>
+
+                    <div class="form-group" style="margin-top: 6px;">
+                        <div class="form-meta">
+                            <span>Growth Multiplier</span>
+                            <span class="meta-value" id="dispWeightGrowth">1.0</span>
+                        </div>
+                        <input type="range" class="slider-input slider-priority" id="inpWeightGrowth" min="0" max="2" step="0.1" value="1.0" oninput="runSimRecalculation()">
+                    </div>
+
+                    <div class="form-group" style="margin-top: 6px;">
+                        <div class="form-meta">
+                            <span>Collateral Premium</span>
+                            <span class="meta-value" id="dispWeightCollateral">1.0</span>
+                        </div>
+                        <input type="range" class="slider-input slider-priority" id="inpWeightCollateral" min="0" max="2" step="0.1" value="1.0" oninput="runSimRecalculation()">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bento Card: Visual Comparison Dashboard (Approval rate shift + visual bars) -->
+        <div class="bento-card col-7">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <h2>Approval Shift Diagnostics</h2>
+                    <p>Real-time Scenario Impact Delta analysis</p>
+                </div>
+                <span class="badge-status badge-status-prime" id="simDiffBadge" style="background: rgba(124, 58, 237, 0.15); color: var(--accent-prism-violet)">Model Sync Active</span>
+            </div>
+
+            <!-- Side by side comparison -->
+            <div class="comparison-layout">
+                <!-- Baseline -->
+                <div class="chart-container">
+                    <div>
+                        <div class="chart-header-sub">
+                            <span>Baseline Setup</span>
+                            <span style="color: var(--accent-cyan)">Standard Rules</span>
+                        </div>
+                        <div class="scorecard-comparison-bar">
+                            <span class="bar-label">Pipeline Approval</span>
+                            <div class="bar-outer">
+                                <div class="bar-inner baseline" style="width: 80%;"></div>
+                            </div>
+                            <span class="bar-val">80%</span>
+                        </div>
+                        <div class="scorecard-comparison-bar">
+                            <span class="bar-label">Avg Liquidity Floor</span>
+                            <div class="bar-outer">
+                                <div class="bar-inner baseline" style="width: 40%;"></div>
+                            </div>
+                            <span class="bar-val">40%</span>
+                        </div>
+                        <div class="scorecard-comparison-bar">
+                            <span class="bar-label">Max Leverage Limit</span>
+                            <div class="bar-outer">
+                                <div class="bar-inner baseline" style="width: 75%;"></div>
+                            </div>
+                            <span class="bar-val">75%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Simulated -->
+                <div class="chart-container">
+                    <div>
+                        <div class="chart-header-sub">
+                            <span>Simulated Target</span>
+                            <span style="color: var(--accent-rose)" id="simLabelTitle">Custom Tuning</span>
+                        </div>
+                        <div class="scorecard-comparison-bar">
+                            <span class="bar-label">Pipeline Approval</span>
+                            <div class="bar-outer">
+                                <div class="bar-inner simulated" id="barSimApproval" style="width: 60%;"></div>
+                            </div>
+                            <span class="bar-val" id="valSimApproval">60%</span>
+                        </div>
+                        <div class="scorecard-comparison-bar">
+                            <span class="bar-label">Sim Liquidity Floor</span>
+                            <div class="bar-outer">
+                                <div class="bar-inner simulated" id="barSimLiquidity" style="width: 40%;"></div>
+                            </div>
+                            <span class="bar-val" id="valSimLiquidity">40%</span>
+                        </div>
+                        <div class="scorecard-comparison-bar">
+                            <span class="bar-label">Sim Leverage Limit</span>
+                            <div class="bar-outer">
+                                <div class="bar-inner simulated" id="barSimLeverage" style="width: 75%;"></div>
+                            </div>
+                            <span class="bar-val" id="valSimLeverage">75%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Simulation Macro Telemetry Deltas -->
+            <div class="delta-stat-panel">
+                <div class="delta-card">
+                    <span class="lbl">Approval Rate Shift</span>
+                    <div class="val" id="deltaApprovalVal">-20%</div>
+                    <span class="pct pct-negative" id="deltaApprovalPct">▼ Fails 1 extra profile</span>
+                </div>
+                <div class="delta-card">
+                    <span class="lbl">Leverage Exposure Risk</span>
+                    <div class="val" id="deltaRiskVal">Medium</div>
+                    <span class="pct pct-neutral" id="deltaRiskSub">Acceptable Risk Range</span>
+                </div>
+                <div class="delta-card">
+                    <span class="lbl">Estimated Pipeline Yield</span>
+                    <div class="val" id="deltaYieldVal">8.35%</div>
+                    <span class="pct pct-positive" id="deltaYieldSub">+$450K Proj. Yield</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bento Card: Active Pipeline Stress-Testing Registry (Borrower profile status updates) -->
+        <div class="bento-card col-8">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <h2>Pipeline Stress-Testing Registry</h2>
+                    <p>Live matching of active cohorts against simulated criteria</p>
+                </div>
+                <span class="badge-status badge-status-neutral">Active Cohort (5 Targets)</span>
+            </div>
+
+            <div class="registry-table-wrapper">
+                <table class="registry-table">
+                    <thead>
+                        <tr>
+                            <th>Borrower Target</th>
+                            <th>Underlying Metrics</th>
+                            <th>Baseline Approval</th>
+                            <th>Simulated Status</th>
+                            <th>Risk Assessment Violations</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pipelineTableBody">
+                        <!-- Dynamic calculations insert rows here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Bento Card: Underwriting Policy Flag Controls (Switches) -->
+        <div class="bento-card col-4">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <h2>Policy Risk Rules</h2>
+                    <p>Activate / suppress automated rules</p>
+                </div>
+                <span class="badge-status" style="background: rgba(244, 63, 94, 0.1); color: var(--accent-rose)">Real-time Audit</span>
+            </div>
+
+            <div class="controls-stack" style="gap: 12px;">
+                <!-- Enforce Asset Backing rule -->
+                <div class="switch-group">
+                    <div class="switch-label-wrap">
+                        <span class="switch-title">UCC-1 Asset Premium</span>
+                        <span class="switch-desc">Require &gt;50% collateral depth</span>
+                    </div>
+                    <label class="switch-input-wrap">
+                        <input type="checkbox" id="chkCollateralStrict" onchange="runSimRecalculation()">
+                        <span class="slider-switch"></span>
+                    </label>
+                </div>
+
+                <!-- Enforce stable recurring visibility -->
+                <div class="switch-group">
+                    <div class="switch-label-wrap">
+                        <span class="switch-title">Stability Coverage Floor</span>
+                        <span class="switch-desc">Reject models with high growth fluctuations</span>
+                    </div>
+                    <label class="switch-input-wrap">
+                        <input type="checkbox" id="chkStabilityFloor" onchange="runSimRecalculation()">
+                        <span class="slider-switch"></span>
+                    </label>
+                </div>
+
+                <!-- Real Estate Special Restrictions -->
+                <div class="switch-group">
+                    <div class="switch-label-wrap">
+                        <span class="switch-title">LTV Margin Buffer</span>
+                        <span class="switch-desc">Cap high commercial RE leverage structures</span>
+                    </div>
+                    <label class="switch-input-wrap">
+                        <input type="checkbox" id="chkLtvBuffer" onchange="runSimRecalculation()">
+                        <span class="slider-switch"></span>
+                    </label>
+                </div>
+
+                <!-- Acquisition Escrow Compliance Check -->
+                <div class="switch-group">
+                    <div class="switch-label-wrap">
+                        <span class="switch-title">Escrow Transit Rule</span>
+                        <span class="switch-desc">Compulsory escrow verification checks</span>
+                    </div>
+                    <label class="switch-input-wrap">
+                        <input type="checkbox" id="chkEscrowCheck" checked onchange="runSimRecalculation()">
+                        <span class="slider-switch"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bento Card: Live Configuration Exporter (Config Blocks & copy buttons) -->
+        <div class="bento-card col-6">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <h2>Live Matrix Exporter</h2>
+                    <p>Compiled parameters ready for engine deployment</p>
+                </div>
+            </div>
+
+            <div class="tab-headers">
+                <button class="tab-btn active" onclick="switchExportTab('weights-json', this)">recommendation_weights.json</button>
+                <button class="tab-btn" onclick="switchExportTab('routing-json', this)">routing_logic.json</button>
+            </div>
+
+            <div id="weights-json" class="tab-content active">
+                <pre class="code-container-pre"><code id="codeExportWeights">// Loading json...</code></pre>
+            </div>
+            <div id="routing-json" class="tab-content" style="display: none;">
+                <pre class="code-container-pre"><code id="codeExportRouting">// Loading json...</code></pre>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 16px;">
+                <button class="action-button action-button-success" onclick="copyConfiguration()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                    Copy Config Payload
+                </button>
+                <button class="action-button" onclick="downloadConfig()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                    Download Configuration File
+                </button>
+            </div>
+        </div>
+
+        <!-- Bento Card: Simulation execution telemetry tracer -->
+        <div class="bento-card col-6">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <h2>Simulated Execution Log</h2>
+                    <p>Underwriting telemetry from last calculation thread</p>
+                </div>
+            </div>
+
+            <div class="terminal-shell" id="telemetryTerminal">
+                <div class="terminal-line">
+                    <span class="stamp">[09:00:00 COMPILING]</span>
+                    <span>System Policy core initialization sequence started.</span>
+                </div>
+            </div>
+
+            <div style="margin-top: 16px;">
+                <button class="action-button" onclick="clearLogs()" style="border-color: var(--accent-rose); color: var(--accent-rose);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    Purge Simulation Logs
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Analyst Strict Compliance Footer -->
+    <footer>
+        <span>© 2026 PRISM DEBT INTELLIGENCE SYSTEMS | POLICY SCENARIO SANDBOX ENVIRONMENT</span>
+        <div class="footer-badges">
+            <span>Audit Trail Confirmed</span>
+            <span>Scenario Sync Active</span>
+            <span>F-SEC V1.9</span>
+        </div>
+    </footer>
+
+</div>
+
+<!-- Interactive Simulated Rules Logic -->
+<script>
+    // Memory database of Borrower cohorts mimicking active stress-test pipeline datasets
+    const pipelines = {
+        saas: {
+            name: "SaaS Scaleup",
+            type: "High Velocity MRR",
+            score: 825,
+            liquidity: 92,
+            leverage: 45,
+            growth: 96,
+            collateral: 20,
+            cashFlow: 88,
+            baselineResult: "Approved"
+        },
+        ecom: {
+            name: "E-Commerce Titan",
+            type: "High Inventory Turn",
+            score: 715,
+            liquidity: 78,
+            leverage: 62,
+            growth: 89,
+            collateral: 55,
+            cashFlow: 70,
+            baselineResult: "Approved"
+        },
+        industrial: {
+            name: "Heavy Manufacturing",
+            type: "Asset Rich / Slow Growth",
+            score: 690,
+            liquidity: 45,
+            leverage: 80,
+            growth: 38,
+            collateral: 95,
+            cashFlow: 65,
+            baselineResult: "Declined"
+        },
+        realestate: {
+            name: "Commercial RE Portfolio",
+            type: "Asset Class Large Sizing",
+            score: 790,
+            liquidity: 60,
+            leverage: 72,
+            growth: 50,
+            collateral: 98,
+            cashFlow: 82,
+            baselineResult: "Approved"
+        },
+        acquisition: {
+            name: "LBO Search Fund",
+            type: "Transitional Cash Flows",
+            score: 755,
+            liquidity: 70,
+            leverage: 65,
+            growth: 72,
+            collateral: 48,
+            cashFlow: 80,
+            baselineResult: "Approved"
+        }
+    };
+
+    // Preset configurations for simulated regimes
+    const presets = {
+        standard: {
+            scoreFloor: 700,
+            leverageCeil: 75,
+            liquidityFloor: 40,
+            weightLiquidity: 1.0,
+            weightGrowth: 1.0,
+            weightCollateral: 1.0,
+            collateralStrict: false,
+            stabilityFloor: false,
+            ltvBuffer: false
+        },
+        tight_regime: {
+            scoreFloor: 750,
+            leverageCeil: 60,
+            liquidityFloor: 55,
+            weightLiquidity: 1.5,
+            weightGrowth: 0.5,
+            weightCollateral: 1.2,
+            collateralStrict: true,
+            stabilityFloor: true,
+            ltvBuffer: true
+        },
+        growth_hunt: {
+            scoreFloor: 650,
+            leverageCeil: 85,
+            liquidityFloor: 30,
+            weightLiquidity: 0.6,
+            weightGrowth: 1.8,
+            weightCollateral: 0.4,
+            collateralStrict: false,
+            stabilityFloor: false,
+            ltvBuffer: false
+        },
+        asset_heavy: {
+            scoreFloor: 680,
+            leverageCeil: 80,
+            liquidityFloor: 35,
+            weightLiquidity: 0.8,
+            weightGrowth: 0.4,
+            weightCollateral: 2.0,
+            collateralStrict: true,
+            stabilityFloor: false,
+            ltvBuffer: true
+        }
+    };
+
+    let activeExportTab = "weights-json";
+
+    // Trace Logs Handler
+    function logTrace(message, flag = "INFO") {
+        const term = document.getElementById("telemetryTerminal");
+        const timestamp = new Date().toLocaleTimeString();
+        
+        const line = document.createElement("div");
+        line.className = "terminal-line";
+        
+        let highlightClass = "";
+        if (flag === "SUCCESS") {
+            highlightClass = "success";
+        } else if (flag === "CRITICAL" || flag === "ALERT") {
+            highlightClass = "accent";
+        }
+
+        line.innerHTML = `
+            <span class="stamp">[${timestamp} ${flag}]</span>
+            <span class="${highlightClass}">${message}</span>
+        `;
+        term.appendChild(line);
+        term.scrollTop = term.scrollHeight;
+    }
+
+    function clearLogs() {
+        document.getElementById("telemetryTerminal").innerHTML = `
+            <div class="terminal-line">
+                <span class="stamp">[${new Date().toLocaleTimeString()} REBOOT]</span>
+                <span>System execution traces purged successfully.</span>
+            </div>
+        `;
+    }
+
+    // Toggle Back to Primary UI (Simulated path for full app)
+    function toggleViewMode() {
+        alert("Returning to primary Operator Control Deck Terminal view...");
+        window.history.back();
+    }
+
+    // Load macro policy presets
+    function loadPresetScenario(presetKey) {
+        const config = presets[presetKey];
+        if (!config) return;
+
+        logTrace(`Switching Scenario Paradigm configuration preset: ${presetKey.toUpperCase()}`, "REGIME");
+
+        // Set slider inputs
+        document.getElementById("inpScoreFloor").value = config.scoreFloor;
+        document.getElementById("inpLeverageCeil").value = config.leverageCeil;
+        document.getElementById("inpLiquidityFloor").value = config.liquidityFloor;
+        document.getElementById("inpWeightLiquidity").value = config.weightLiquidity;
+        document.getElementById("inpWeightGrowth").value = config.weightGrowth;
+        document.getElementById("inpWeightCollateral").value = config.weightCollateral;
+
+        // Set rule toggles
+        document.getElementById("chkCollateralStrict").checked = config.collateralStrict;
+        document.getElementById("chkStabilityFloor").checked = config.stabilityFloor;
+        document.getElementById("chkLtvBuffer").checked = config.ltvBuffer;
+
+        // Visual Title label mapping
+        const labelMap = {
+            standard: "Standard Baseline Credit Matrix",
+            tight_regime: "Contractionary Regime (Strict Risk)",
+            growth_hunt: "Expansionary Yield Push (Aggressive)",
+            asset_heavy: "Asset-Backed Sovereign Collateral Rule"
+        };
+        document.getElementById("simLabelTitle").innerText = labelMap[presetKey] || "Custom Tuning";
+
+        runSimRecalculation();
+    }
+
+    // Interactive Mathematics Model Simulation Engine
+    function runSimRecalculation() {
+        // Collect Parameters
+        const scoreFloor = parseInt(document.getElementById("inpScoreFloor").value);
+        const leverageCeil = parseInt(document.getElementById("inpLeverageCeil").value);
+        const liquidityFloor = parseInt(document.getElementById("inpLiquidityFloor").value);
+        
+        const weightLiquidity = parseFloat(document.getElementById("inpWeightLiquidity").value);
+        const weightGrowth = parseFloat(document.getElementById("inpWeightGrowth").value);
+        const weightCollateral = parseFloat(document.getElementById("inpWeightCollateral").value);
+
+        const collateralStrict = document.getElementById("chkCollateralStrict").checked;
+        const stabilityFloor = document.getElementById("chkStabilityFloor").checked;
+        const ltvBuffer = document.getElementById("chkLtvBuffer").checked;
+        const escrowCheck = document.getElementById("chkEscrowCheck").checked;
+
+        // Update displays
+        document.getElementById("dispScoreFloor").innerText = scoreFloor;
+        document.getElementById("dispLeverageCeil").innerText = leverageCeil + "%";
+        document.getElementById("dispLiquidityFloor").innerText = liquidityFloor + "%";
+        document.getElementById("dispWeightLiquidity").innerText = weightLiquidity.toFixed(1);
+        document.getElementById("dispWeightGrowth").innerText = weightGrowth.toFixed(1);
+        document.getElementById("dispWeightCollateral").innerText = weightCollateral.toFixed(1);
+
+        // Simulated chart values update
+        document.getElementById("barSimLiquidity").style.width = liquidityFloor + "%";
+        document.getElementById("valSimLiquidity").innerText = liquidityFloor + "%";
+        document.getElementById("barSimLeverage").style.width = leverageCeil + "%";
+        document.getElementById("valSimLeverage").innerText = leverageCeil + "%";
+
+        // Iterative Calculation across profiles
+        let simulatedApprovedCount = 0;
+        let totalCount = Object.keys(pipelines).length;
+        const tbody = document.getElementById("pipelineTableBody");
+        tbody.innerHTML = ""; // Clear list
+
+        logTrace("Recalculating pipeline approvals against simulation model parameters...", "CALC");
+
+        for (const [key, profile] of Object.entries(pipelines)) {
+            let violations = [];
+
+            // 1. Dynamic Weight Adjustment to profile raw score
+            let calculatedVariance = 
+                ((profile.liquidity * weightLiquidity) +
+                (profile.growth * weightGrowth) +
+                (profile.collateral * weightCollateral)) / (weightLiquidity + weightGrowth + weightCollateral);
+
+            let adjustedScore = Math.round((profile.score * 0.7) + (calculatedVariance * 3));
+            if (adjustedScore > 1000) adjustedScore = 1000;
+
+            // 2. Perform Rule checks
+            if (adjustedScore < scoreFloor) {
+                violations.push(`Score floor breached (${adjustedScore} vs ${scoreFloor} required)`);
+            }
+            if (profile.leverage > leverageCeil) {
+                violations.push(`Excessive Leverage limit exceeded (${profile.leverage}% vs ${leverageCeil}%)`);
+            }
+            if (profile.liquidity < liquidityFloor) {
+                violations.push(`Insufficient liquidity levels (${profile.liquidity}% vs ${liquidityFloor}%)`);
+            }
+            if (collateralStrict && profile.collateral < 50) {
+                violations.push(`Collateral strictness block: asset depth too low (${profile.collateral}% depth)`);
+            }
+            if (stabilityFloor && profile.growth > 90 && profile.cashFlow < 80) {
+                violations.push(`Growth variance stability lock triggered (Growth: ${profile.growth}% / CF: ${profile.cashFlow}%)`);
+            }
+            if (ltvBuffer && key === "realestate" && profile.leverage > 70) {
+                violations.push(`Special RE LTV Margin buffer violated`);
+            }
+            if (escrowCheck && key === "acquisition" && profile.liquidity < 75) {
+                violations.push(`M&A Transition Reserve limit warning`);
+            }
+
+            // Determine Simulated Status
+            let simStatus = "Approved";
+            let statusClass = "status-pill approved";
+
+            if (violations.length > 0) {
+                if (violations.length >= 2) {
+                    simStatus = "Declined";
+                    statusClass = "status-pill declined";
+                } else {
+                    simStatus = "Marginal";
+                    statusClass = "status-pill marginal";
+                }
+            } else {
+                simedStatus = "Approved";
+                simulatedApprovedCount++;
+            }
+
+            // Create table row
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>
+                    <span class="cell-profile-title">${profile.name}</span><br>
+                    <span class="cell-profile-type">${profile.type}</span>
+                </td>
+                <td style="font-family: var(--font-mono); font-size: 11px;">
+                    SC: ${adjustedScore} | LQ: ${profile.liquidity} | LV: ${profile.leverage} | CL: ${profile.collateral}
+                </td>
+                <td>
+                    <span class="status-pill ${profile.baselineResult.toLowerCase()}">${profile.baselineResult}</span>
+                </td>
+                <td>
+                    <span class="${statusClass}">${simStatus}</span>
+                </td>
+                <td style="color: var(--accent-rose); font-size: 11px;">
+                    ${violations.length > 0 ? violations.join("<br>") : '<span style="color: var(--accent-emerald);">✔ Pass</span>'}
+                </td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        // Calculate Global shift metrics
+        const simApprovalPct = (simulatedApprovedCount / totalCount) * 100;
+        document.getElementById("barSimApproval").style.width = simApprovalPct + "%";
+        document.getElementById("valSimApproval").innerText = simApprovalPct + "%";
+
+        // Baseline approval is 80% (4 out of 5 approved)
+        let approvalShiftVal = simApprovalPct - 80;
+        const deltaEl = document.getElementById("deltaApprovalVal");
+        const deltaSubEl = document.getElementById("deltaApprovalPct");
+
+        deltaEl.innerText = (approvalShiftVal >= 0 ? "+" : "") + approvalShiftVal + "%";
+        if (approvalShiftVal < 0) {
+            deltaEl.className = "val pct-negative";
+            deltaSubEl.innerText = "▼ Rejects " + Math.abs(approvalShiftVal / 20) + " cohort profile(s)";
+            deltaSubEl.className = "pct pct-negative";
+        } else if (approvalShiftVal > 0) {
+            deltaEl.className = "val pct-positive";
+            deltaSubEl.innerText = "▲ Activates " + (approvalShiftVal / 20) + " cohort profile(s)";
+            deltaSubEl.className = "pct pct-positive";
+        } else {
+            deltaEl.className = "val pct-neutral";
+            deltaSubEl.innerText = "■ No approval shift delta";
+            deltaSubEl.className = "pct pct-neutral";
+        }
+
+        // Est Pipeline yield calculations
+        let baseYield = 8.35;
+        let simulatedYield = baseYield + (weightGrowth * 0.4) - (weightCollateral * 0.3) + (scoreFloor > 700 ? -0.2 : 0.3);
+        document.getElementById("deltaYieldVal").innerText = simulatedYield.toFixed(2) + "%";
+
+        let riskAssessment = "Medium Exposure";
+        let riskClass = "pct pct-neutral";
+        if (leverageCeil > 80 || scoreFloor < 650) {
+            riskAssessment = "High Velocity Risk";
+            riskClass = "pct pct-negative";
+        } else if (leverageCeil < 65 && scoreFloor > 750) {
+            riskAssessment = "Conservative / Protected";
+            riskClass = "pct pct-positive";
+        }
+        document.getElementById("deltaRiskVal").innerText = riskAssessment;
+        document.getElementById("deltaRiskSub").innerText = "Underwriting Matrix Target";
+        document.getElementById("deltaRiskSub").className = riskClass;
+
+        // Generate JSON payloads
+        updateJsonExporters(scoreFloor, leverageCeil, liquidityFloor, weightLiquidity, weightGrowth, weightCollateral);
+
+        logTrace(`Calculation Sweep Finished. Yield target adjusted to ${simulatedYield.toFixed(2)}%. Approvals count: ${simulatedApprovedCount}/${totalCount}`, "SUCCESS");
+    }
+
+    // Dynamic Exporter generator logic
+    function updateJsonExporters(floor, ceil, liq, wLiq, wGro, wCol) {
+        const weightsJson = {
+            "metadata": {
+                "generated_timestamp": new Date().toISOString(),
+                "analyst_signature": "Prism Credit sandbox engine V1.9"
+            },
+            "recommendation_weights": {
+                "liquidity_index": parseFloat(wLiq.toFixed(2)),
+                "growth_velocity": parseFloat(wGro.toFixed(2)),
+                "collateral_premium": parseFloat(wCol.toFixed(2))
+            }
+        };
+
+        const routingJson = {
+            "routing_logic": {
+                "underwriting_filters": {
+                    "minimum_score_approval": floor,
+                    "maximum_leverage_ceiling": ceil,
+                    "minimum_liquidity_floor": liq
+                },
+                "scenarios": {
+                    "active_rules": {
+                        "collateral_strictness": document.getElementById("chkCollateralStrict").checked,
+                        "growth_stability_filter": document.getElementById("chkStabilityFloor").checked,
+                        "ltv_buffer_cap": document.getElementById("chkLtvBuffer").checked
+                    }
+                }
+            }
+        };
+
+        document.getElementById("codeExportWeights").innerText = JSON.stringify(weightsJson, null, 2);
+        document.getElementById("codeExportRouting").innerText = JSON.stringify(routingJson, null, 2);
+    }
+
+    // Spec exporters view switcher
+    function switchExportTab(tabId, btn) {
+        const header = btn.parentNode;
+        header.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
+        btn.classList.add("active");
+
+        const cards = header.parentNode.querySelectorAll(".tab-content");
+        cards.forEach(card => card.style.display = "none");
+        document.getElementById(tabId).style.display = "block";
+        activeExportTab = tabId;
+    }
+
+    // Clipboard and download mechanisms
+    function copyConfiguration() {
+        const textToCopy = document.getElementById(activeExportTab).innerText;
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            alert("Dynamic JSON payload copied directly to operational clipboard.");
+        });
+    }
+
+    function downloadConfig() {
+        const textToCopy = document.getElementById(activeExportTab).innerText;
+        const blob = new Blob([textToCopy], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = activeExportTab === "weights-json" ? "recommendation_weights.json" : "routing_logic.json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        logTrace(`Configuration file downloaded: ${a.download}`, "SYS");
+    }
+
+    // Init Page Run state
+    window.onload = function() {
+        runSimRecalculation();
+    }
+</script>
+
+</body>
+</html>

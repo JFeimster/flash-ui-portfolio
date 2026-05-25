@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --bg-overlay: rgba(2, 6, 23, 0.85);
+        --modal-bg: #0f172a;
+        --surface: #1e293b;
+        --surface-hover: #334155;
+        --border: #334155;
+        --text-primary: #f8fafc;
+        --text-secondary: #94a3b8;
+        --accent: #f8fafc;
+        --accent-text: #0f172a;
+        --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        --success: #10b981;
+    }
+
+    * {
+        box-sizing: border-box;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', sans-serif;
+        background: #020617;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+    }
+
+    .overlay {
+        position: fixed;
+        inset: 0;
+        background: var(--bg-overlay);
+        backdrop-filter: blur(12px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        z-index: 1000;
+    }
+
+    .modal {
+        background: var(--modal-bg);
+        width: 100%;
+        max-width: 480px;
+        border-radius: 24px;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        animation: modalAppear 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalAppear {
+        from { opacity: 0; transform: translateY(20px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .header {
+        padding: 32px 32px 24px;
+    }
+
+    .header h2 {
+        margin: 0;
+        color: var(--text-primary);
+        font-size: 1.25rem;
+        font-weight: 600;
+        letter-spacing: -0.025em;
+    }
+
+    .header p {
+        margin: 8px 0 0;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+
+    .section {
+        padding: 0 32px 24px;
+    }
+
+    .label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-secondary);
+        margin-bottom: 12px;
+    }
+
+    /* Timezone Select */
+    .input-pill {
+        width: 100%;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        transition: background 0.2s;
+        margin-bottom: 8px;
+    }
+
+    .input-pill:hover {
+        background: var(--surface-hover);
+    }
+
+    .input-pill span {
+        font-size: 0.9rem;
+        color: var(--text-primary);
+        flex: 1;
+    }
+
+    .input-pill svg {
+        width: 16px;
+        height: 16px;
+        margin-right: 12px;
+        color: var(--text-secondary);
+    }
+
+    .input-pill .chevron {
+        margin-right: 0;
+        margin-left: 12px;
+        opacity: 0.5;
+    }
+
+    /* Days of Week */
+    .day-selector {
+        display: flex;
+        justify-content: space-between;
+        gap: 6px;
+        margin-bottom: 16px;
+    }
+
+    .day-btn {
+        flex: 1;
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .day-btn.active {
+        background: var(--surface-hover);
+        border-color: var(--text-secondary);
+        color: var(--text-primary);
+    }
+
+    /* Time Range */
+    .time-range {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .time-input {
+        flex: 1;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px;
+        color: var(--text-primary);
+        font-size: 0.875rem;
+        text-align: center;
+    }
+
+    .range-divider {
+        color: var(--text-secondary);
+    }
+
+    /* Buffer Chips */
+    .chip-group {
+        display: flex;
+        gap: 8px;
+    }
+
+    .chip {
+        padding: 8px 16px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .chip.active {
+        background: var(--text-primary);
+        color: var(--accent-text);
+        border-color: var(--text-primary);
+    }
+
+    /* Settings Toggle */
+    .setting-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 0;
+    }
+
+    .setting-info h4 {
+        margin: 0;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+
+    .setting-info p {
+        margin: 4px 0 0;
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+    }
+
+    .toggle {
+        width: 40px;
+        height: 20px;
+        background: var(--surface-hover);
+        border-radius: 20px;
+        position: relative;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .toggle.on {
+        background: var(--success);
+    }
+
+    .toggle::after {
+        content: '';
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 14px;
+        height: 14px;
+        background: white;
+        border-radius: 50%;
+        transition: transform 0.3s;
+    }
+
+    .toggle.on::after {
+        transform: translateX(20px);
+    }
+
+    /* Footer */
+    .footer {
+        padding: 24px 32px 32px;
+        display: flex;
+        gap: 12px;
+        border-top: 1px solid var(--border);
+    }
+
+    .btn {
+        flex: 1;
+        padding: 14px;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: transform 0.1s ease, opacity 0.2s;
+        border: none;
+        outline: none;
+    }
+
+    .btn:active {
+        transform: scale(0.98);
+    }
+
+    .btn-secondary {
+        background: transparent;
+        color: var(--text-secondary);
+    }
+
+    .btn-primary {
+        background: var(--accent);
+        color: var(--accent-text);
+    }
+
+</style>
+</head>
+<body>
+
+<div class="overlay">
+    <div class="modal">
+        <div class="header">
+            <h2>Availability Settings</h2>
+            <p>Define your working hours and preferences to control when people can book sessions with you.</p>
+        </div>
+
+        <div class="section">
+            <span class="label">Default Time Zone</span>
+            <div class="input-pill">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                <span>(GMT-05:00) Eastern Time</span>
+                <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+        </div>
+
+        <div class="section">
+            <span class="label">Working Hours</span>
+            <div class="day-selector">
+                <div class="day-btn">S</div>
+                <div class="day-btn active">M</div>
+                <div class="day-btn active">T</div>
+                <div class="day-btn active">W</div>
+                <div class="day-btn active">T</div>
+                <div class="day-btn active">F</div>
+                <div class="day-btn">S</div>
+            </div>
+            <div class="time-range">
+                <div class="time-input">09:00 AM</div>
+                <span class="range-divider">to</span>
+                <div class="time-input">05:00 PM</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <span class="label">Meeting Buffer</span>
+            <div class="chip-group">
+                <div class="chip">None</div>
+                <div class="chip active">15 min</div>
+                <div class="chip">30 min</div>
+                <div class="chip">1 hour</div>
+            </div>
+        </div>
+
+        <div class="section" style="padding-bottom: 32px;">
+            <div class="setting-item">
+                <div class="setting-info">
+                    <h4>Auto-detect Time Zone</h4>
+                    <p>Update automatically when you travel</p>
+                </div>
+                <div class="toggle on"></div>
+            </div>
+            <div class="setting-item">
+                <div class="setting-info">
+                    <h4>Prevent Last-Minute Bookings</h4>
+                    <p>Minimum 2 hours notice required</p>
+                </div>
+                <div class="toggle on"></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <button class="btn btn-secondary">Reset to Default</button>
+            <button class="btn btn-primary">Save Preferences</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

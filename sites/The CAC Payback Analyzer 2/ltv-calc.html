@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LTV:CAC Efficiency Analyzer | Swiss Ledger</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper: #F9F9F7;
+            --ink: #1A1A1A;
+            --accent: #FF3B30;
+            --border: #1A1A1A;
+            --grid: rgba(26, 26, 26, 0.1);
+            --success: #008148;
+            --warning: #EBCB00;
+            --danger: #FF3B30;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: #E5E5E5;
+            font-family: 'Inter', -apple-system, sans-serif;
+            color: var(--ink);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .ledger-container {
+            background-color: var(--paper);
+            width: 100%;
+            max-width: 900px;
+            border: 2px solid var(--border);
+            box-shadow: 20px 20px 0px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ledger-container::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(var(--grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .header {
+            border-bottom: 2px solid var(--border);
+            padding: 40px;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .header-title h1 {
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 0.9;
+            letter-spacing: -0.04em;
+            text-transform: uppercase;
+        }
+
+        .header-title p {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .document-id {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            text-align: right;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            position: relative;
+            z-index: 1;
+        }
+
+        .input-section {
+            padding: 40px;
+            border-right: 2px solid var(--border);
+        }
+
+        .analysis-section {
+            padding: 40px;
+            background-color: rgba(255, 255, 255, 0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            background: transparent;
+            border: 1px solid var(--border);
+            padding: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            outline: none;
+            transition: background 0.2s;
+        }
+
+        input:focus {
+            background: #fff;
+            border-width: 2px;
+        }
+
+        .dial-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 0;
+        }
+
+        .dial-svg {
+            width: 280px;
+            height: 140px;
+            overflow: visible;
+        }
+
+        .dial-track {
+            fill: none;
+            stroke: #ddd;
+            stroke-width: 12;
+            stroke-linecap: round;
+        }
+
+        .dial-progress {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 12;
+            stroke-linecap: round;
+            stroke-dasharray: 440;
+            stroke-dashoffset: 440;
+            transition: stroke-dashoffset 0.5s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.5s;
+        }
+
+        .dial-labels {
+            display: flex;
+            justify-content: space-between;
+            width: 280px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            margin-top: 10px;
+            color: #666;
+        }
+
+        .results-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        .results-table td {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--grid);
+        }
+
+        .results-table .label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        .results-table .value {
+            text-align: right;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .bankability-status {
+            margin-top: 20px;
+            padding: 15px;
+            text-align: center;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border: 2px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .cta-button {
+            margin-top: 25px;
+            background: var(--ink);
+            color: white;
+            border: none;
+            padding: 18px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.1s, background 0.2s;
+        }
+
+        .cta-button:hover {
+            background: #000;
+            transform: translate(-2px, -2px);
+            box-shadow: 4px 4px 0px var(--accent);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            background: var(--ink);
+            color: white;
+            font-size: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .input-section {
+                border-right: none;
+                border-bottom: 2px solid var(--border);
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="ledger-container">
+    <div class="header">
+        <div class="header-title">
+            <div class="badge">UNIT ECONOMICS REV. 2024-C</div>
+            <h1>LTV:CAC RATIO<br>DEEP-DIVE</h1>
+            <p>Verification of long-term asset value</p>
+        </div>
+        <div class="document-id">
+            REF: LTV-CALC-02<br>
+            LOC: GLOBAL HQ<br>
+            STATUS: ACTIVE_VALU
+        </div>
+    </div>
+
+    <div class="main-grid">
+        <section class="input-section">
+            <div class="form-group">
+                <label>Avg Revenue Per User ($/Mo)</label>
+                <input type="number" id="arpu" value="120">
+            </div>
+            <div class="form-group">
+                <label>Gross Margin (%)</label>
+                <input type="number" id="margin" value="75">
+            </div>
+            <div class="form-group">
+                <label>Monthly Churn Rate (%)</label>
+                <input type="number" id="churn" value="3.5" step="0.1">
+            </div>
+            <div class="form-group">
+                <label>CAC ($)</label>
+                <input type="number" id="cac" value="450">
+            </div>
+            <div class="form-group">
+                <label>Annual Discount Rate (%)</label>
+                <input type="number" id="discount" value="10">
+            </div>
+        </section>
+
+        <section class="analysis-section">
+            <label style="text-align: center; margin-bottom: 10px;">LTV:CAC Efficiency Scale</label>
+            
+            <div class="dial-container">
+                <svg class="dial-svg" viewBox="0 0 200 100">
+                    <path class="dial-track" d="M 20 90 A 80 80 0 0 1 180 90" />
+                    <path id="dialProgress" class="dial-progress" d="M 20 90 A 80 80 0 0 1 180 90" />
+                </svg>
+                <div class="dial-labels">
+                    <span>1:1</span>
+                    <span>3:1</span>
+                    <span>5:1+</span>
+                </div>
+            </div>
+
+            <table class="results-table">
+                <tr>
+                    <td class="label">Customer Lifetime</td>
+                    <td class="value" id="lifetimeValue">28.6 Mo.</td>
+                </tr>
+                <tr>
+                    <td class="label">Lifetime Value (LTV)</td>
+                    <td class="value" id="ltvValue">$2,571.43</td>
+                </tr>
+                <tr>
+                    <td class="label">LTV : CAC Ratio</td>
+                    <td class="value" id="ratioValue">5.71x</td>
+                </tr>
+            </table>
+
+            <div id="statusBox" class="bankability-status">
+                RATIO STATUS: OPTIMAL
+            </div>
+
+            <button class="cta-button" onclick="window.print()">
+                Export Economic Audit
+            </button>
+        </section>
+    </div>
+</div>
+
+<script>
+    const inputs = ['arpu', 'margin', 'churn', 'cac', 'discount'];
+    const dialProgress = document.getElementById('dialProgress');
+    const lifetimeValue = document.getElementById('lifetimeValue');
+    const ltvValue = document.getElementById('ltvValue');
+    const ratioValue = document.getElementById('ratioValue');
+    const statusBox = document.getElementById('statusBox');
+
+    function calculate() {
+        const arpu = parseFloat(document.getElementById('arpu').value) || 0;
+        const margin = parseFloat(document.getElementById('margin').value) / 100 || 0;
+        const churn = parseFloat(document.getElementById('churn').value) / 100 || 0.0001; // Avoid div by zero
+        const cac = parseFloat(document.getElementById('cac').value) || 1;
+        const annualDiscount = parseFloat(document.getElementById('discount').value) / 100 || 0;
+        const monthlyDiscount = annualDiscount / 12;
+
+        const monthlyProfit = arpu * margin;
+        const lifetimeMonths = 1 / churn;
+        
+        // Discounted LTV Formula: LTV = Monthly Profit / (Churn + Monthly Discount Rate)
+        const ltv = monthlyProfit / (churn + monthlyDiscount);
+        const ratio = ltv / cac;
+
+        // Update UI
+        lifetimeValue.innerText = `${lifetimeMonths.toFixed(1)} Mo.`;
+        ltvValue.innerText = `$${ltv.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        ratioValue.innerText = `${ratio.toFixed(2)}x`;
+
+        // Dial logic: 1x ratio is start, 5x or more is max
+        // Range: 1 to 5. 1=0%, 5=100%
+        const maxRatio = 5;
+        const minRatio = 1;
+        const percentage = Math.max(0, Math.min(100, ((ratio - minRatio) / (maxRatio - minRatio)) * 100));
+        
+        // Dashoffset: 440 (0%) to 190 (100%)
+        const offset = 440 - (percentage * 2.5); 
+        dialProgress.style.strokeDashoffset = offset;
+
+        // Logic
+        if (ratio >= 3) {
+            dialProgress.style.stroke = "var(--success)";
+            statusBox.innerText = "RATIO STATUS: OPTIMAL";
+            statusBox.style.backgroundColor = "rgba(0, 129, 72, 0.1)";
+            statusBox.style.color = "var(--success)";
+            statusBox.style.borderColor = "var(--success)";
+        } else if (ratio >= 1.5) {
+            dialProgress.style.stroke = "var(--warning)";
+            statusBox.innerText = "RATIO STATUS: CONCERNING";
+            statusBox.style.backgroundColor = "rgba(235, 203, 0, 0.1)";
+            statusBox.style.color = "#8a7700";
+            statusBox.style.borderColor = "var(--warning)";
+        } else {
+            dialProgress.style.stroke = "var(--danger)";
+            statusBox.innerText = "RATIO STATUS: INVALID";
+            statusBox.style.backgroundColor = "rgba(255, 59, 48, 0.1)";
+            statusBox.style.color = "var(--danger)";
+            statusBox.style.borderColor = "var(--danger)";
+        }
+    }
+
+    inputs.forEach(id => {
+        document.getElementById(id).addEventListener('input', calculate);
+    });
+
+    calculate();
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LTV:CAC Efficiency Analyzer | Swiss Ledger</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper: #F9F9F7;
+            --ink: #1A1A1A;
+            --accent: #FF3B30;
+            --border: #1A1A1A;
+            --grid: rgba(26, 26, 26, 0.1);
+            --success: #008148;
+            --warning: #EBCB00;
+            --danger: #FF3B30;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: #E5E5E5;
+            font-family: 'Inter', -apple-system, sans-serif;
+            color: var(--ink);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .ledger-container {
+            background-color: var(--paper);
+            width: 100%;
+            max-width: 900px;
+            border: 2px solid var(--border);
+            box-shadow: 20px 20px 0px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ledger-container::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(var(--grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .header {
+            border-bottom: 2px solid var(--border);
+            padding: 40px;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .header-title h1 {
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 0.9;
+            letter-spacing: -0.04em;
+            text-transform: uppercase;
+        }
+
+        .header-title p {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .document-id {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            text-align: right;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            position: relative;
+            z-index: 1;
+        }
+
+        .input-section {
+            padding: 40px;
+            border-right: 2px solid var(--border);
+        }
+
+        .analysis-section {
+            padding: 40px;
+            background-color: rgba(255, 255, 255, 0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            background: transparent;
+            border: 1px solid var(--border);
+            padding: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            outline: none;
+            transition: background 0.2s;
+        }
+
+        input:focus {
+            background: #fff;
+            border-width: 2px;
+        }
+
+        .dial-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 0;
+        }
+
+        .dial-svg {
+            width: 280px;
+            height: 140px;
+            overflow: visible;
+        }
+
+        .dial-track {
+            fill: none;
+            stroke: #ddd;
+            stroke-width: 12;
+            stroke-linecap: round;
+        }
+
+        .dial-progress {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 12;
+            stroke-linecap: round;
+            stroke-dasharray: 440;
+            stroke-dashoffset: 440;
+            transition: stroke-dashoffset 0.5s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.5s;
+        }
+
+        .dial-labels {
+            display: flex;
+            justify-content: space-between;
+            width: 280px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            margin-top: 10px;
+            color: #666;
+        }
+
+        .results-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        .results-table td {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--grid);
+        }
+
+        .results-table .label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        .results-table .value {
+            text-align: right;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .bankability-status {
+            margin-top: 20px;
+            padding: 15px;
+            text-align: center;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border: 2px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .cta-button {
+            margin-top: 25px;
+            background: var(--ink);
+            color: white;
+            border: none;
+            padding: 18px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.1s, background 0.2s;
+        }
+
+        .cta-button:hover {
+            background: #000;
+            transform: translate(-2px, -2px);
+            box-shadow: 4px 4px 0px var(--accent);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            background: var(--ink);
+            color: white;
+            font-size: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .input-section {
+                border-right: none;
+                border-bottom: 2px solid var(--border);
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="ledger-container">
+    <div class="header">
+        <div class="header-title">
+            <div class="badge">UNIT ECONOMICS REV. 2024-C</div>
+            <h1>LTV:CAC RATIO<br>DEEP-DIVE</h1>
+            <p>Verification of long-term asset value</p>
+        </div>
+        <div class="document-id">
+            REF: LTV-CALC-02<br>
+            LOC: GLOBAL HQ<br>
+            STATUS: ACTIVE_VALU
+        </div>
+    </div>
+
+    <div class="main-grid">
+        <section class="input-section">
+            <div class="form-group">
+                <label>Avg Revenue Per User ($/Mo)</label>
+                <input type="number" id="arpu" value="120">
+            </div>
+            <div class="form-group">
+                <label>Gross Margin (%)</label>
+                <input type="number" id="margin" value="75">
+            </div>
+            <div class="form-group">
+                <label>Monthly Churn Rate (%)</label>
+                <input type="number" id="churn" value="3.5" step="0.1">
+            </div>
+            <div class="form-group">
+                <label>CAC ($)</label>
+                <input type="number" id="cac" value="450">
+            </div>
+            <div class="form-group">
+                <label>Annual Discount Rate (%)</label>
+                <input type="number" id="discount" value="10">
+            </div>
+        </section>
+
+        <section class="analysis-section">
+            <label style="text-align: center; margin-bottom: 10px;">LTV:CAC Efficiency Scale</label>
+            
+            <div class="dial-container">
+                <svg class="dial-svg" viewBox="0 0 200 100">
+                    <path class="dial-track" d="M 20 90 A 80 80 0 0 1 180 90" />
+                    <path id="dialProgress" class="dial-progress" d="M 20 90 A 80 80 0 0 1 180 90" />
+                </svg>
+                <div class="dial-labels">
+                    <span>1:1</span>
+                    <span>3:1</span>
+                    <span>5:1+</span>
+                </div>
+            </div>
+
+            <table class="results-table">
+                <tr>
+                    <td class="label">Customer Lifetime</td>
+                    <td class="value" id="lifetimeValue">28.6 Mo.</td>
+                </tr>
+                <tr>
+                    <td class="label">Lifetime Value (LTV)</td>
+                    <td class="value" id="ltvValue">$2,571.43</td>
+                </tr>
+                <tr>
+                    <td class="label">LTV : CAC Ratio</td>
+                    <td class="value" id="ratioValue">5.71x</td>
+                </tr>
+            </table>
+
+            <div id="statusBox" class="bankability-status">
+                RATIO STATUS: OPTIMAL
+            </div>
+
+            <button class="cta-button" onclick="window.print()">
+                Export Economic Audit
+            </button>
+        </section>
+    </div>
+</div>
+
+<script>
+    const inputs = ['arpu', 'margin', 'churn', 'cac', 'discount'];
+    const dialProgress = document.getElementById('dialProgress');
+    const lifetimeValue = document.getElementById('lifetimeValue');
+    const ltvValue = document.getElementById('ltvValue');
+    const ratioValue = document.getElementById('ratioValue');
+    const statusBox = document.getElementById('statusBox');
+
+    function calculate() {
+        const arpu = parseFloat(document.getElementById('arpu').value) || 0;
+        const margin = parseFloat(document.getElementById('margin').value) / 100 || 0;
+        const churn = parseFloat(document.getElementById('churn').value) / 100 || 0.0001;
+        const cac = parseFloat(document.getElementById('cac').value) || 1;
+        const annualDiscount = parseFloat(document.getElementById('discount').value) / 100 || 0;
+        const monthlyDiscount = annualDiscount / 12;
+
+        const monthlyProfit = arpu * margin;
+        const lifetimeMonths = 1 / churn;
+        
+        const ltv = monthlyProfit / (churn + monthlyDiscount);
+        const ratio = ltv / cac;
+
+        lifetimeValue.innerText = `${lifetimeMonths.toFixed(1)} Mo.`;
+        ltvValue.innerText = `$${ltv.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        ratioValue.innerText = `${ratio.toFixed(2)}x`;
+
+        const maxRatio = 5;
+        const minRatio = 1;
+        const percentage = Math.max(0, Math.min(100, ((ratio - minRatio) / (maxRatio - minRatio)) * 100));
+        
+        const offset = 440 - (percentage * 2.5); 
+        dialProgress.style.strokeDashoffset = offset;
+
+        if (ratio >= 3) {
+            dialProgress.style.stroke = "var(--success)";
+            statusBox.innerText = "RATIO STATUS: OPTIMAL";
+            statusBox.style.backgroundColor = "rgba(0, 129, 72, 0.1)";
+            statusBox.style.color = "var(--success)";
+            statusBox.style.borderColor = "var(--success)";
+        } else if (ratio >= 1.5) {
+            dialProgress.style.stroke = "var(--warning)";
+            statusBox.innerText = "RATIO STATUS: CONCERNING";
+            statusBox.style.backgroundColor = "rgba(235, 203, 0, 0.1)";
+            statusBox.style.color = "#8a7700";
+            statusBox.style.borderColor = "var(--warning)";
+        } else {
+            dialProgress.style.stroke = "var(--danger)";
+            statusBox.innerText = "RATIO STATUS: INVALID";
+            statusBox.style.backgroundColor = "rgba(255, 59, 48, 0.1)";
+            statusBox.style.color = "var(--danger)";
+            statusBox.style.borderColor = "var(--danger)";
+        }
+    }
+
+    inputs.forEach(id => {
+        document.getElementById(id).addEventListener('input', calculate);
+    });
+
+    calculate();
+</script>
+
+</body>
+</html>

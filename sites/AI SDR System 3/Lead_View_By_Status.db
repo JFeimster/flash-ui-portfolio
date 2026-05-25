@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead Intelligence Database | Lead_View_By_Status.db</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #030303;
+            --card-bg: rgba(15, 15, 20, 0.7);
+            --border: rgba(255, 255, 255, 0.08);
+            --primary: #8b5cf6;
+            --secondary: #ec4899;
+            --accent: #06b6d4;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --status-source: #3b82f6;
+            --status-research: #8b5cf6;
+            --status-qualified: #10b981;
+            --status-disqualified: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .db-container {
+            width: 100%;
+            max-width: 1200px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .db-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .db-title h1 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .db-title h1::before {
+            content: '📂';
+            font-size: 18px;
+        }
+
+        .db-title p {
+            color: var(--text-dim);
+            font-size: 13px;
+        }
+
+        .view-controls {
+            display: flex;
+            gap: 12px;
+        }
+
+        .search-bar {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: var(--text-main);
+            font-size: 13px;
+            width: 240px;
+        }
+
+        .filter-chip {
+            padding: 8px 14px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            color: var(--text-dim);
+            transition: 0.2s;
+        }
+
+        .filter-chip.active {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .db-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .db-table th {
+            text-align: left;
+            padding: 12px 16px;
+            color: var(--text-dim);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 11px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .db-table td {
+            padding: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            vertical-align: top;
+        }
+
+        .db-table tr:hover {
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .lead-name {
+            font-weight: 600;
+            color: var(--text-main);
+            display: block;
+        }
+
+        .lead-company {
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .status-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .tag-source { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); }
+        .tag-research { background: rgba(139, 92, 246, 0.1); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.2); }
+        .tag-qualified { background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
+
+        .ai-research-note {
+            background: rgba(255, 255, 255, 0.02);
+            border-left: 2px solid var(--primary);
+            padding: 8px 12px;
+            border-radius: 0 8px 8px 0;
+            max-width: 350px;
+            line-height: 1.5;
+        }
+
+        .ai-research-note .model-label {
+            display: block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9px;
+            text-transform: uppercase;
+            color: var(--secondary);
+            margin-bottom: 4px;
+        }
+
+        .category-pill {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: var(--text-dim);
+            white-space: nowrap;
+        }
+
+        .aura-bg {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, rgba(236, 72, 153, 0.05) 50%, transparent 100%);
+            z-index: -1;
+            filter: blur(80px);
+        }
+    </style>
+</head>
+<body>
+    <div class="aura-bg"></div>
+
+    <main class="db-container">
+        <header class="db-header">
+            <div class="db-title">
+                <h1>Lead Intelligence Database</h1>
+                <p>Lead_View_By_Status.db • Real-time synchronization with SDR Pipeline</p>
+            </div>
+            <div class="view-controls">
+                <input type="text" class="search-bar" placeholder="Filter leads...">
+                <div class="filter-chip active">All Leads</div>
+                <div class="filter-chip">Qualified</div>
+                <div class="filter-chip">Researching</div>
+            </div>
+        </header>
+
+        <table class="db-table">
+            <thead>
+                <tr>
+                    <th>Lead Info</th>
+                    <th>Status</th>
+                    <th>Niche / Business</th>
+                    <th>AI Research Intelligence</th>
+                    <th>Last Sync</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <span class="lead-name">Alex Rivers</span>
+                        <span class="lead-company">Stellar Metrics</span>
+                    </td>
+                    <td><span class="status-tag tag-qualified">Qualified</span></td>
+                    <td>
+                        <span class="category-pill">SaaS Founders</span><br>
+                        <span class="category-pill" style="margin-top: 4px; display: inline-block;">B2B Fintech</span>
+                    </td>
+                    <td>
+                        <div class="ai-research-note">
+                            <span class="model-label">GPT-4 Research</span>
+                            Stellar Metrics just secured Series A. Alex posted about automating their outbound workflow on LinkedIn 2 days ago. High intent.
+                        </div>
+                    </td>
+                    <td style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--text-dim);">2m ago</td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="lead-name">Sarah Chen</span>
+                        <span class="lead-company">Nexus Labs</span>
+                    </td>
+                    <td><span class="status-tag tag-research">Researching</span></td>
+                    <td>
+                        <span class="category-pill">AI Engineers</span><br>
+                        <span class="category-pill" style="margin-top: 4px; display: inline-block;">DevTools</span>
+                    </td>
+                    <td>
+                        <div class="ai-research-note" style="border-left-color: var(--accent);">
+                            <span class="model-label">Gemini Pro Analysis</span>
+                            Nexus Labs is scaling their SDR team from 2 to 10. Currently using manual spreadsheets. Potential for full automation suite.
+                        </div>
+                    </td>
+                    <td style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--text-dim);">14m ago</td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="lead-name">Marcus Thorne</span>
+                        <span class="lead-company">Velocity Gear</span>
+                    </td>
+                    <td><span class="status-tag tag-source">Lead Source</span></td>
+                    <td>
+                        <span class="category-pill">SaaS Founders</span><br>
+                        <span class="category-pill" style="margin-top: 4px; display: inline-block;">E-commerce</span>
+                    </td>
+                    <td>
+                        <div class="ai-research-note" style="border-left-color: var(--text-dim);">
+                            <span class="model-label">Pending...</span>
+                            Lead scraped from Y-Combinator directory. Scoping social profiles for relevant triggers...
+                        </div>
+                    </td>
+                    <td style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--text-dim);">1h ago</td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="lead-name">Elena Rodriguez</span>
+                        <span class="lead-company">Cloud Arch</span>
+                    </td>
+                    <td><span class="status-tag tag-qualified">Qualified</span></td>
+                    <td>
+                        <span class="category-pill">Marketing Leads</span><br>
+                        <span class="category-pill" style="margin-top: 4px; display: inline-block;">MarTech</span>
+                    </td>
+                    <td>
+                        <div class="ai-research-note">
+                            <span class="model-label">GPT-4 Research</span>
+                            Verified contact through Apollo. Recently spoke at Web Summit regarding AI efficiency. Matches ICP exactly.
+                        </div>
+                    </td>
+                    <td style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--text-dim);">3h ago</td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+</body>
+</html>

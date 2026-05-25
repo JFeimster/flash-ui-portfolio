@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE ARMORY | QUOTE GRENADE ARCHIVE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Archivo+Black&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #000000;
+            --red: #FF0000;
+            --cream: #F5F5DC;
+            --white: #FFFFFF;
+            --border-width: 4px;
+            --shadow-offset: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--cream);
+            color: var(--black);
+            font-family: 'Space Grotesk', sans-serif;
+            line-height: 1.2;
+            padding-bottom: 5rem;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Archivo Black', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .marquee {
+            overflow: hidden;
+            white-space: nowrap;
+            background: var(--black);
+            color: var(--white);
+            padding: 10px 0;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: var(--border-width) solid var(--black);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 30s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+        }
+
+        header {
+            background: var(--white);
+            padding: 4rem 2rem;
+            border-bottom: var(--border-width) solid var(--black);
+            text-align: center;
+        }
+
+        .nav-back {
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: var(--black);
+            text-decoration: none;
+            font-weight: 700;
+            text-transform: uppercase;
+            border: 2px solid var(--black);
+            padding: 0.5rem 1rem;
+            background: var(--red);
+            color: var(--white);
+            box-shadow: 4px 4px 0 var(--black);
+        }
+
+        .nav-back:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 var(--black);
+        }
+
+        .title-block h1 {
+            font-size: clamp(3rem, 8vw, 6rem);
+            margin-bottom: 1rem;
+        }
+
+        .filter-container {
+            background: var(--black);
+            padding: 2rem;
+            position: sticky;
+            top: 44px;
+            z-index: 99;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            border-bottom: var(--border-width) solid var(--black);
+        }
+
+        .cat-btn {
+            background: var(--white);
+            border: var(--border-width) solid var(--black);
+            padding: 0.75rem 1.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-family: 'Space Grotesk', sans-serif;
+            box-shadow: 4px 4px 0 var(--red);
+            transition: all 0.1s;
+        }
+
+        .cat-btn.active {
+            background: var(--red);
+            color: var(--white);
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0 var(--black);
+        }
+
+        .armory-grid {
+            max-width: 1400px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .grenade-card {
+            background: var(--white);
+            border: var(--border-width) solid var(--black);
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--black);
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .grenade-card:hover {
+            transform: scale(1.02) rotate(1deg);
+        }
+
+        .grenade-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: var(--red);
+        }
+
+        .grenade-cat {
+            font-family: 'Archivo Black';
+            font-size: 0.8rem;
+            color: var(--red);
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        .grenade-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            flex-grow: 1;
+        }
+
+        .copy-trigger {
+            background: var(--black);
+            color: var(--white);
+            border: none;
+            padding: 0.8rem;
+            font-family: 'Archivo Black';
+            text-transform: uppercase;
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+        .copy-trigger:hover {
+            background: var(--red);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--red);
+            color: var(--white);
+            padding: 1.5rem 3rem;
+            font-family: 'Archivo Black';
+            border: var(--border-width) solid var(--black);
+            box-shadow: 8px 8px 0 var(--black);
+            display: none;
+            z-index: 2000;
+        }
+
+        @media (max-width: 768px) {
+            .armory-grid { grid-template-columns: 1fr; }
+            header { padding: 2rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="marquee">
+        <div class="marquee-content">
+            FULL ARCHIVE — LOADED CHAMBER — SELECT YOUR WEAPON — DO NOT COMPLY — DECENTRALIZE EVERYTHING — SHARPEN THE BLADE — FULL ARCHIVE — LOADED CHAMBER — SELECT YOUR WEAPON — DO NOT COMPLY — DECENTRALIZE EVERYTHING — SHARPEN THE BLADE —
+        </div>
+    </div>
+
+    <header>
+        <div class="container">
+            <a href="index.html" class="nav-back">← Back to Armory</a>
+            <div class="title-block">
+                <h1>THE ARCHIVE</h1>
+                <p>A complete index of philosophical grenades and founder truths.</p>
+            </div>
+        </div>
+    </header>
+
+    <div class="filter-container" id="filters">
+        <button class="cat-btn active" data-cat="all">All Inventory</button>
+        <button class="cat-btn" data-cat="founder">Founding</button>
+        <button class="cat-btn" data-cat="liberty">Liberty</button>
+        <button class="cat-btn" data-cat="philosophy">Grenades</button>
+        <button class="cat-btn" data-cat="contrarian">Contrarian</button>
+    </div>
+
+    <main class="armory-grid" id="grenade-container">
+        <!-- Cards injected by JS -->
+    </main>
+
+    <div class="toast" id="toast">GRENADE COPIED</div>
+
+    <script>
+        const quotes = [
+            { text: "Permission is the ghost of a dead king.", cat: "liberty" },
+            { text: "If it's not a 'hell yes', it's a tax on your soul.", cat: "founder" },
+            { text: "Compliance is a slow suicide.", cat: "philosophy" },
+            { text: "Code is the only law that doesn't require a gun to enforce.", cat: "liberty" },
+            { text: "Your comfort zone is a gilded cage. Melt the bars.", cat: "philosophy" },
+            { text: "The state is a bug, not a feature.", cat: "liberty" },
+            { text: "Build things that make the state obsolete.", cat: "founder" },
+            { text: "If you aren't being cancelled by the middle-class, you aren't saying anything important.", cat: "contrarian" },
+            { text: "The most dangerous animal is a man with nothing to lose and a laptop.", cat: "philosophy" },
+            { text: "Bureaucracy is the art of making the possible impossible.", cat: "contrarian" },
+            { text: "Don't find customers for your products. Find a tribe for your mission.", cat: "founder" },
+            { text: "Taxation is the price we pay for a society we didn't vote for.", cat: "liberty" },
+            { text: "The future is decentralized or it is a prison.", cat: "philosophy" },
+            { text: "A startup is a conspiracy to change the world.", cat: "founder" },
+            { text: "Being 'realistic' is the most common path to mediocrity.", cat: "contrarian" },
+            { text: "The sovereign individual does not ask for room. They build it.", cat: "liberty" },
+            { text: "Your debt is someone else's asset. Stop being a line item.", cat: "philosophy" },
+            { text: "Disruption is only 'rude' to those who profit from the status quo.", cat: "founder" },
+            { text: "Privacy is not about having something to hide; it's about having something to protect.", cat: "liberty" },
+            { text: "Mainstream media is just a PR firm for the decline.", cat: "contrarian" }
+        ];
+
+        const container = document.getElementById('grenade-container');
+        const filterBtns = document.querySelectorAll('.cat-btn');
+        const toast = document.getElementById('toast');
+
+        function renderQuotes(filter = 'all') {
+            container.innerHTML = '';
+            
+            const filtered = filter === 'all' 
+                ? quotes 
+                : quotes.filter(q => q.cat === filter);
+
+            filtered.forEach(quote => {
+                const card = document.createElement('div');
+                card.className = 'grenade-card';
+                card.innerHTML = `
+                    <div>
+                        <div class="grenade-cat">${quote.cat}</div>
+                        <div class="grenade-text">"${quote.text}"</div>
+                    </div>
+                    <button class="copy-trigger" onclick="copyQuote('${quote.text.replace(/'/g, "\\'")}')">Copy Riff</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        window.copyQuote = (text) => {
+            navigator.clipboard.writeText(text).then(() => {
+                toast.style.display = 'block';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 2000);
+            });
+        };
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderQuotes(btn.dataset.cat);
+                window.scrollTo({ top: 400, behavior: 'smooth' });
+            });
+        });
+
+        // Initial render
+        renderQuotes();
+    </script>
+</body>
+</html>

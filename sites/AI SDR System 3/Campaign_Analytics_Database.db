@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campaign Analytics Database | Vector Aura</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #030303;
+            --card-bg: rgba(15, 15, 20, 0.8);
+            --border: rgba(255, 255, 255, 0.08);
+            --primary: #8b5cf6;
+            --secondary: #ec4899;
+            --accent: #06b6d4;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --notion-blue: #3b82f6;
+            --notion-green: #10b981;
+            --notion-yellow: #f59e0b;
+            --aura-1: rgba(139, 92, 246, 0.12);
+            --aura-2: rgba(6, 182, 212, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .aura-blob {
+            position: fixed;
+            width: 800px;
+            height: 800px;
+            border-radius: 50%;
+            filter: blur(140px);
+            z-index: -1;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .aura-1 { top: -200px; right: -100px; background: var(--aura-1); animation: float 15s infinite alternate; }
+        .aura-2 { bottom: -200px; left: -100px; background: var(--aura-2); animation: float 20s infinite alternate-reverse; }
+
+        @keyframes float {
+            from { transform: translate(0, 0); }
+            to { transform: translate(-50px, 80px); }
+        }
+
+        .analytics-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Notion Header Style */
+        .db-header {
+            padding: 32px 32px 16px 32px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .breadcrumbs {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-dim);
+            margin-bottom: 16px;
+        }
+
+        .db-title-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .db-title-area h1 {
+            font-size: 32px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .db-icon {
+            font-size: 32px;
+        }
+
+        .db-controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            padding-bottom: 8px;
+        }
+
+        .control-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.2s;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+        }
+
+        /* Table Structure */
+        .db-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .db-table th {
+            text-align: left;
+            padding: 12px 16px;
+            color: var(--text-dim);
+            font-weight: 500;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+        }
+
+        .db-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            height: 48px;
+        }
+
+        .db-table tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Property Styles */
+        .prop-title {
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .tag-purple { background: rgba(139, 92, 246, 0.2); color: #c084fc; }
+        .tag-blue { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+        .tag-green { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .tag-pink { background: rgba(236, 72, 153, 0.2); color: #f472b6; }
+
+        .number-mono {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+        }
+
+        .progress-bar-container {
+            width: 100px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            position: relative;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            background: var(--primary);
+        }
+
+        .roi-positive {
+            color: var(--notion-green);
+            font-weight: 600;
+        }
+
+        .roi-positive::before { content: '+$'; }
+
+        .relation-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 6px;
+            border-radius: 4px;
+            width: fit-content;
+        }
+
+        /* Calculation Footer */
+        .db-footer {
+            background: rgba(0, 0, 0, 0.2);
+            display: grid;
+            grid-template-columns: 250px 150px 100px 150px 150px 120px 1fr;
+            border-top: 1px solid var(--border);
+        }
+
+        .calc-cell {
+            padding: 10px 16px;
+            font-size: 12px;
+            color: var(--text-dim);
+            border-right: 1px solid var(--border);
+        }
+
+        .calc-value {
+            color: var(--text-main);
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            margin-left: 4px;
+        }
+
+        .gmail-sync {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 32px;
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .sync-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--notion-green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--notion-green);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="aura-blob aura-1"></div>
+    <div class="aura-blob aura-2"></div>
+
+    <main class="analytics-wrapper">
+        <header class="db-header">
+            <div class="breadcrumbs">
+                <span>Workspaces</span> / <span>Growth Engine</span> / <span>Outbound</span>
+            </div>
+            <div class="db-title-area">
+                <h1><span class="db-icon">📊</span> Campaign Performance Analytics</h1>
+                <div class="gmail-sync">
+                    <div class="sync-dot"></div>
+                    Synced with Gmail & Notion CRM
+                </div>
+            </div>
+            
+            <div class="db-controls">
+                <button class="control-btn">Filter</button>
+                <button class="control-btn">Sort</button>
+                <button class="control-btn">Search</button>
+                <button class="control-btn" style="margin-left: auto; background: var(--primary); color: white; border: none;">New Entry</button>
+            </div>
+        </header>
+
+        <table class="db-table">
+            <thead>
+                <tr>
+                    <th style="width: 250px;">Campaign Name</th>
+                    <th style="width: 150px;">Target Niche</th>
+                    <th style="width: 100px;">Leads</th>
+                    <th style="width: 150px;">Open Rate</th>
+                    <th style="width: 150px;">Response Rate</th>
+                    <th style="width: 120px;">Meetings</th>
+                    <th>Est. ROI</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="prop-title">
+                            <span style="font-size: 16px;">🚀</span> Q3 SaaS Founders SF
+                        </div>
+                    </td>
+                    <td><span class="tag tag-purple">SaaS</span></td>
+                    <td class="number-mono">1,240</td>
+                    <td>
+                        <div class="progress-bar-container"><div class="progress-fill" style="width: 68%;"></div></div>
+                        <span class="number-mono">68.2%</span>
+                    </td>
+                    <td>
+                        <div class="progress-bar-container"><div class="progress-fill" style="width: 14%; background: var(--secondary);"></div></div>
+                        <span class="number-mono">14.1%</span>
+                    </td>
+                    <td class="number-mono">32</td>
+                    <td class="roi-positive">42,500</td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="prop-title">
+                            <span style="font-size: 16px;">💎</span> Fintech B2B Series A
+                        </div>
+                    </td>
+                    <td><span class="tag tag-blue">Fintech</span></td>
+                    <td class="number-mono">850</td>
+                    <td>
+                        <div class="progress-bar-container"><div class="progress-fill" style="width: 54%;"></div></div>
+                        <span class="number-mono">54.0%</span>
+                    </td>
+                    <td>
+                        <div class="progress-bar-container"><div class="progress-fill" style="width: 9%; background: var(--secondary);"></div></div>
+                        <span class="number-mono">9.2%</span>
+                    </td>
+                    <td class="number-mono">18</td>
+                    <td class="roi-positive">28,200</td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="prop-title">
+                            <span style="font-size: 16px;">🛠️</span> DevTools Winter Alpha
+                        </div>
+                    </td>
+                    <td><span class="tag tag-green">Infrastructure</span></td>
+                    <td class="number-mono">420</td>
+                    <td>
+                        <div class="progress-bar-container"><div class="progress-fill" style="width: 72%;"></div></div>
+                        <span class="number-mono">72.5%</span>
+                    </td>
+                    <td>
+                        <div class="progress-bar-container"><div class="progress-fill" style="width: 22%; background: var(--secondary);"></div></div>
+                        <span class="number-mono">22.8%</span>
+                    </td>
+                    <td class="number-mono">24</td>
+                    <td class="roi-positive">15,400</td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="prop-title">
+                            <span style="font-size: 16px;">⚖️</span> LegalTech AI Pilot
+                        </div>
+                    </td>
+                    <td><span class="tag tag-pink">LegalTech</span></td>
+                    <td class="number-mono">2,100</td>
+                    <td>
+                        <div class="progress-bar-container"><div class="progress-fill" style="width: 41%;"></div></div>
+                        <span class="number-mono">41.2%</span>
+                    </td>
+                    <td>
+                        <div class="progress-bar-container"><div class="progress-fill" style="width: 4%; background: var(--secondary);"></div></div>
+                        <span class="number-mono">4.1%</span>
+                    </td>
+                    <td class="number-mono">12</td>
+                    <td class="roi-positive">5,800</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="db-footer">
+            <div class="calc-cell">Count <span class="calc-value">4</span></div>
+            <div class="calc-cell">Unique <span class="calc-value">4</span></div>
+            <div class="calc-cell">Sum <span class="calc-value">4,610</span></div>
+            <div class="calc-cell">Average <span class="calc-value">58.9%</span></div>
+            <div class="calc-cell">Average <span class="calc-value">12.5%</span></div>
+            <div class="calc-cell">Sum <span class="calc-value">86</span></div>
+            <div class="calc-cell">Total ROI <span class="calc-value" style="color: var(--notion-green)">$91,900</span></div>
+        </div>
+    </main>
+
+    <script>
+        // Interactive hover effects for Notion-like feel
+        document.querySelectorAll('tr').forEach(row => {
+            row.addEventListener('mouseenter', () => {
+                row.style.cursor = 'pointer';
+            });
+        });
+
+        // Simulate real-time sync animation
+        const syncDot = document.querySelector('.sync-dot');
+        setInterval(() => {
+            syncDot.style.opacity = '0.5';
+            setTimeout(() => {
+                syncDot.style.opacity = '1';
+            }, 500);
+        }, 3000);
+    </script>
+</body>
+</html>

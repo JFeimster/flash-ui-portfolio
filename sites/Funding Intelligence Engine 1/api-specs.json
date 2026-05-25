@@ -1,0 +1,383 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Prism Debt Intelligence System - Partner Embed & Routing API",
+    "description": "Production-grade OpenAPI specifications and orchestration schemas for affiliate, white-label, and institutional partner portals. Includes real-time routing engine parameter models, secure sandbox configuration parameters, custom styling properties matching the core theme architecture, and secure webhook protocols for tracking qualified borrower conversions.",
+    "version": "1.4.0",
+    "contact": {
+      "name": "Prism Institutional Developer Relations & Integration Support",
+      "email": "api-support@prismdebt.intelligence.systems",
+      "url": "https://partners.prismdebt.intelligence.systems"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.prismdebt.intelligence.systems/v1",
+      "description": "Production Secured API Gateway (OAuth2 Encrypted)"
+    },
+    {
+      "url": "https://sandbox.prismdebt.intelligence.systems/v1",
+      "description": "Partner Integration Sandbox Environment"
+    }
+  ],
+  "x-embed-iframe-config": {
+    "description": "Parameters for configuring and provisioning the embeddable dynamic white-label iFrame container. Enables direct customer-facing intake integrations matching the parent UI's responsive grid styling.",
+    "default_iframe_url": "https://embed.prismdebt.intelligence.systems/v1/widget",
+    "supported_features": [
+      "real_time_scoring_dial",
+      "dynamic_weight_sliders",
+      "structural_alternative_cards",
+      "underwriting_telemetry_trace"
+    ],
+    "style_customization_schema": {
+      "type": "object",
+      "properties": {
+        "theme_mode": {
+          "type": "string",
+          "enum": ["dark", "light", "white-label"],
+          "default": "dark",
+          "description": "Triggers either the high-fidelity deep space layout or clean corporate stone white-label overrides."
+        },
+        "css_variables": {
+          "type": "object",
+          "properties": {
+            "--bg-base": { "type": "string", "default": "#03050a", "description": "Primary container canvas backdrop color." },
+            "--bg-surface": { "type": "string", "default": "rgba(10, 15, 30, 0.75)", "description": "Backing fill for modular bento cards." },
+            "--accent-cobalt": { "type": "string", "default": "#2563eb", "description": "Primary action button, focus state, and indicator glow fill." },
+            "--accent-prism-violet": { "type": "string", "default": "#7c3aed", "description": "Analyst-specific debug UI coloring." },
+            "--accent-cyan": { "type": "string", "default": "#06b6d4", "description": "High-confidence recommendation path highlights." },
+            "--accent-emerald": { "type": "string", "default": "#10b981", "description": "Safe-tier indicators and prime qualification badges." },
+            "--accent-rose": { "type": "string", "default": "#f43f5e", "description": "Real-time compliance rule violation and subprime badge flags." }
+          }
+        }
+      }
+    },
+    "iframe_snippet_generator": {
+      "template": "<iframe src=\"https://embed.prismdebt.intelligence.systems/v1/widget?partner_id={{partner_id}}&theme={{theme}}&profile={{profile}}&weights={{weights}}\" width=\"100%\" height=\"800px\" style=\"border: 1px solid {{border_color}}; border-radius: 16px; background-color: {{bg_color}};\" allow=\"payment; clipboard-write\" loading=\"lazy\"></iframe>"
+    }
+  },
+  "x-webhook-events": {
+    "description": "Webhook payloads dispatched to client endpoints following referral status transformations or calculation milestones inside the routing engine.",
+    "signing_algorithm": "HMAC-SHA256",
+    "events": {
+      "referral.score_calculated": {
+        "description": "Triggered when a user completes the dynamic intake form and generates their initial readiness score.",
+        "payload_schema": {
+          "type": "object",
+          "properties": {
+            "event_id": { "type": "string", "example": "evt_8f2a1c09b7d4" },
+            "event_type": { "type": "string", "example": "referral.score_calculated" },
+            "timestamp": { "type": "string", "format": "date-time", "example": "2026-03-31T23:59:59Z" },
+            "data": {
+              "type": "object",
+              "properties": {
+                "referral_id": { "type": "string", "example": "ref_9021841" },
+                "calculated_score": { "type": "integer", "example": 825 },
+                "tier_classification": { "type": "string", "example": "Super Prime Tier" },
+                "optimal_funding_amount": { "type": "integer", "example": 3500000 },
+                "matched_pathway": { "type": "string", "example": "SaaS Recurring Revenue Bridge" }
+              }
+            }
+          }
+        }
+      },
+      "referral.terms_generated": {
+        "description": "Triggered when the partner's referred borrower initiates term sheet compilation inside the portal.",
+        "payload_schema": {
+          "type": "object",
+          "properties": {
+            "event_id": { "type": "string", "example": "evt_4c19d28e7a05" },
+            "event_type": { "type": "string", "example": "referral.terms_generated" },
+            "timestamp": { "type": "string", "format": "date-time", "example": "2026-04-01T00:05:12Z" },
+            "data": {
+              "type": "object",
+              "properties": {
+                "referral_id": { "type": "string", "example": "ref_9021841" },
+                "term_sheet_id": { "type": "string", "example": "tms_88301-A" },
+                "limit_approved": { "type": "integer", "example": 3500000 },
+                "aprs_yield_range": { "type": "string", "example": "8.2% - 10.0%" },
+                "amortization_months": { "type": "integer", "example": 36 }
+              }
+            }
+          }
+        }
+      },
+      "referral.conversion_confirmed": {
+        "description": "Dispatched once banking validation credentials (Plaid/OpenBank) are integrated and capital deployment protocol is authorized.",
+        "payload_schema": {
+          "type": "object",
+          "properties": {
+            "event_id": { "type": "string", "example": "evt_91a0b3f81e62" },
+            "event_type": { "type": "string", "example": "referral.conversion_confirmed" },
+            "timestamp": { "type": "string", "format": "date-time", "example": "2026-04-02T14:32:00Z" },
+            "data": {
+              "type": "object",
+              "properties": {
+                "referral_id": { "type": "string", "example": "ref_9021841" },
+                "funding_status": { "type": "string", "example": "securitized_escrow" },
+                "commission_payout_usd": { "type": "number", "example": 17500.00 }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-borrower-archetypes": {
+    "description": "Standardized baseline parameter structures aligned directly with the pre-seeded platform core models.",
+    "saas": {
+      "display_name": "SaaS Scaleup (High Velocity MRR)",
+      "baseline_score": 825,
+      "dimensions": { "liquidity": 92, "leverage": 45, "growth": 96, "collateral": 20, "cashFlow": 88 },
+      "recommended_path": "SaaS Recurring Revenue Bridge",
+      "optimal_sizing": 3500000,
+      "target_aprs": "8.2% - 10.0%",
+      "maturity_months": 36
+    },
+    "ecom": {
+      "display_name": "E-Commerce Titan (High Inventory Turn)",
+      "baseline_score": 715,
+      "dimensions": { "liquidity": 78, "leverage": 62, "growth": 89, "collateral": 55, "cashFlow": 70 },
+      "recommended_path": "E-Commerce Stock & Ads",
+      "optimal_sizing": 1200000,
+      "target_aprs": "9.1% - 11.5%",
+      "maturity_months": 18
+    },
+    "industrial": {
+      "display_name": "Heavy Manufacturing (Asset Rich)",
+      "baseline_score": 690,
+      "dimensions": { "liquidity": 45, "leverage": 80, "growth": 38, "collateral": 95, "cashFlow": 65 },
+      "recommended_path": "Equipment Financing Lease",
+      "optimal_sizing": 8500000,
+      "target_aprs": "6.2% - 7.8%",
+      "maturity_months": 60
+    },
+    "realestate": {
+      "display_name": "Commercial RE Asset Class",
+      "baseline_score": 790,
+      "dimensions": { "liquidity": 60, "leverage": 72, "growth": 50, "collateral": 98, "cashFlow": 82 },
+      "recommended_path": "Commercial Property Debt",
+      "optimal_sizing": 18000000,
+      "target_aprs": "5.5% - 7.0%",
+      "maturity_months": 120
+    },
+    "acquisition": {
+      "display_name": "LBO / Acquisition Search Fund",
+      "baseline_score": 755,
+      "dimensions": { "liquidity": 70, "leverage": 65, "growth": 72, "collateral": 48, "cashFlow": 80 },
+      "recommended_path": "Acquisition & M&A Leveraged",
+      "optimal_sizing": 6500000,
+      "target_aprs": "7.8% - 9.5%",
+      "maturity_months": 48
+    }
+  },
+  "paths": {
+    "/routing/evaluate": {
+      "post": {
+        "summary": "Query Routing Engine",
+        "description": "Submits multi-dimensional financial coordinates to calculate borrower risk tiers, trigger compliance audits, compute optimized funding pathways, and evaluate alternative structural options in real-time.",
+        "operationId": "evaluateRouting",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvaluationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Engine Recalculation Output",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvaluationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Metrics Format or Weight Out-Of-Bounds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized Integration Token Credentials"
+          }
+        }
+      }
+    },
+    "/partner/embed/iframe-url": {
+      "post": {
+        "summary": "Generate Secure Embed URL",
+        "description": "Generates a pre-signed, encrypted dynamic link containing custom theme configurations, customized weight overrides, and custom target visual configurations. Prevents client-side parameter tampering.",
+        "operationId": "generateIframeUrl",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IframeGenerationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Secure Pre-Signed Embed Link Generated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IframeGenerationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-PRISM-PARTNER-KEY",
+        "description": "Dynamic authorization credentials provisioned within the Prism Developer Management Dashboard."
+      }
+    },
+    "schemas": {
+      "EvaluationRequest": {
+        "type": "object",
+        "required": ["metrics"],
+        "properties": {
+          "borrower_profile_id": {
+            "type": "string",
+            "enum": ["saas", "ecom", "industrial", "realestate", "acquisition"],
+            "description": "Shorthand identifier for baseline profile initialization templates.",
+            "example": "saas"
+          },
+          "metrics": {
+            "type": "object",
+            "required": ["liquidity", "leverage", "growth", "collateral", "cashFlow"],
+            "properties": {
+              "liquidity": { "type": "integer", "minimum": 0, "maximum": 100, "example": 92 },
+              "leverage": { "type": "integer", "minimum": 0, "maximum": 100, "example": 45 },
+              "growth": { "type": "integer", "minimum": 0, "maximum": 100, "example": 96 },
+              "collateral": { "type": "integer", "minimum": 0, "maximum": 100, "example": 20 },
+              "cashFlow": { "type": "integer", "minimum": 0, "maximum": 100, "example": 88 }
+            }
+          },
+          "engine_overrides": {
+            "type": "object",
+            "properties": {
+              "liquidity_weight": { "type": "number", "minimum": 0.0, "maximum": 2.0, "default": 1.0, "example": 1.2 },
+              "growth_multiplier": { "type": "number", "minimum": 0.0, "maximum": 2.0, "default": 1.0, "example": 0.8 },
+              "collateral_premium": { "type": "number", "minimum": 0.0, "maximum": 2.0, "default": 1.0, "example": 1.0 }
+            }
+          }
+        }
+      },
+      "EvaluationResponse": {
+        "type": "object",
+        "properties": {
+          "final_score": { "type": "integer", "example": 825, "description": "Unified dynamic score output mapped 0-1000." },
+          "score_classification": { "type": "string", "example": "Super Prime Tier" },
+          "compliance_passed": { "type": "boolean", "example": true },
+          "active_risk_flags": {
+            "type": "array",
+            "items": { "type": "string" },
+            "example": [
+              "No tangible physical assets available for lien",
+              "Underlying model relies on non-provable contract longevity"
+            ]
+          },
+          "primary_recommendation": {
+            "type": "object",
+            "properties": {
+              "route_id": { "type": "string", "example": "startup_bridge" },
+              "pathway_title": { "type": "string", "example": "SaaS Recurring Revenue Bridge" },
+              "optimal_sizing": { "type": "integer", "example": 3500000 },
+              "interest_rate_yield": { "type": "string", "example": "8.2% - 10.0%" },
+              "maturity_window": { "type": "string", "example": "36 Months" },
+              "assessment_notes": { "type": "string", "example": "The SaaS recurring business model exhibits low systemic volatility with superior gross margins. Capital allocation is optimized for immediate deployment into sales acquisition channels with minimum asset-backed collateralization requirements." }
+            }
+          },
+          "alternative_structural_matches": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "structural_id": { "type": "string", "example": "card-wc" },
+                "title": { "type": "string", "example": "Working Capital Revolver" },
+                "match_percentage": { "type": "integer", "example": 90 },
+                "tier": { "type": "string", "enum": ["match-high", "match-medium", "match-low"], "example": "match-high" },
+                "max_limit": { "type": "integer", "example": 2000000 },
+                "est_yield": { "type": "string", "example": "7.2% - 9.0%" }
+              }
+            }
+          },
+          "execution_trace": {
+            "type": "array",
+            "items": { "type": "string" },
+            "example": [
+              "Dynamic Engine recalculation complete. Output Score: 825.",
+              "Matching metrics criteria against active lenders network.",
+              "Securing compliance rule evaluation pathways: Passed."
+            ]
+          }
+        }
+      },
+      "IframeGenerationRequest": {
+        "type": "object",
+        "required": ["partner_id"],
+        "properties": {
+          "partner_id": { "type": "string", "example": "prt_cobalt_0911" },
+          "initial_archetype": { "type": "string", "enum": ["saas", "ecom", "industrial", "realestate", "acquisition"], "default": "saas" },
+          "enable_white_label_css": { "type": "boolean", "default": false },
+          "interactive_overrides_enabled": { "type": "boolean", "default": true },
+          "theme_custom_variables": {
+            "type": "object",
+            "properties": {
+              "primary_color": { "type": "string", "example": "#2563eb" },
+              "dark_mode_background": { "type": "string", "example": "#03050a" }
+            }
+          }
+        }
+      },
+      "IframeGenerationResponse": {
+        "type": "object",
+        "properties": {
+          "secured_embed_url": { "type": "string", "example": "https://embed.prismdebt.intelligence.systems/v1/widget?token=eyJhY2Nlc3MiOiJwcnRfY29iYWx0Iiwic2lnbmF0dXJlIjoiYTU4ZjFlM2M5YmFkMjM0In0=" },
+          "embed_code_snippet": { "type": "string", "example": "<iframe src=\"https://embed.prismdebt.intelligence.systems/v1/widget?token=eyJhY2Nlc3Mi...\" width=\"100%\" height=\"800px\" style=\"border:none; border-radius:16px;\"></iframe>" },
+          "signature_expires_at": { "type": "string", "format": "date-time", "example": "2026-04-30T12:00:00Z" }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error_code": { "type": "string", "example": "OUT_OF_BOUNDS_PARAMETER" },
+          "error_message": { "type": "string", "example": "The 'liquidity' metric weight parameter must fall strictly between 0.0 and 2.0." },
+          "timestamp": { "type": "string", "format": "date-time", "example": "2026-03-31T23:59:59Z" }
+        }
+      }
+    }
+  }
+}

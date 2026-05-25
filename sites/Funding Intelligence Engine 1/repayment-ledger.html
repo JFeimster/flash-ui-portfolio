@@ -1,0 +1,1546 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post-Funding Amortization &amp; Repayment Ledger | Prism Debt Intelligence Systems</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #03050a;
+            --bg-surface: rgba(10, 15, 30, 0.75);
+            --bg-surface-elevated: rgba(18, 25, 47, 0.9);
+            --border-glow-primary: rgba(37, 99, 235, 0.25);
+            --border-glow-accent: rgba(124, 58, 237, 0.2);
+            --accent-cobalt: #2563eb;
+            --accent-prism-violet: #7c3aed;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-rose: #f43f5e;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #475569;
+            --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* White Label Overrides when active */
+        .white-label-mode {
+            --bg-base: #fafaf9;
+            --bg-surface: rgba(255, 255, 255, 0.9);
+            --bg-surface-elevated: #ffffff;
+            --border-glow-primary: rgba(120, 113, 108, 0.15);
+            --border-glow-accent: rgba(120, 113, 108, 0.1);
+            --accent-cobalt: #1c1917;
+            --accent-prism-violet: #44403c;
+            --accent-cyan: #0f766e;
+            --text-primary: #1c1917;
+            --text-secondary: #57534e;
+            --text-muted: #a8a29e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(124, 58, 237, 0.08) 0%, transparent 40%);
+            background-attachment: fixed;
+            transition: background-color 0.5s ease;
+        }
+
+        /* Container & Layout */
+        .app-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Top Header Control Area */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            background: var(--bg-surface);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            transition: var(--transition-smooth);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-prism {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-cobalt), var(--accent-prism-violet), var(--accent-cyan));
+            border-radius: 8px;
+            transform: rotate(45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.4);
+            transition: var(--transition-smooth);
+        }
+
+        .logo-prism::after {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: var(--bg-base);
+            border-radius: 3px;
+            transform: rotate(-45deg);
+        }
+
+        .logo-text h1 {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text p {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .global-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .profile-selector-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 4px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .profile-selector-wrap span {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+        }
+
+        select.archetype-dropdown {
+            background: transparent;
+            border: none;
+            color: var(--accent-cyan);
+            font-family: var(--font-sans);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            outline: none;
+            padding-right: 8px;
+        }
+
+        select.archetype-dropdown option {
+            background-color: #0d1326;
+            color: #fff;
+        }
+
+        /* Toggle Switches */
+        .btn-toggle-view {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-toggle-view:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--accent-cobalt);
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-toggle-view svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--accent-cyan);
+        }
+
+        /* Dashboard Grid Elements */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+        }
+
+        /* Bento Card Standard styles */
+        .bento-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-glow-primary);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+            transition: var(--transition-smooth);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+        }
+
+        .bento-card:hover {
+            border-color: var(--accent-cobalt);
+            box-shadow: 0 8px 32px rgba(37, 99, 235, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .bento-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+            opacity: 0;
+            transition: var(--transition-smooth);
+        }
+
+        .bento-card:hover::before {
+            opacity: 1;
+        }
+
+        /* Grid Allocation Layouts */
+        .col-4 { grid-column: span 4; }
+        .col-5 { grid-column: span 5; }
+        .col-7 { grid-column: span 7; }
+        .col-8 { grid-column: span 8; }
+        .col-12 { grid-column: span 12; }
+
+        @media (max-width: 1024px) {
+            .col-4, .col-5, .col-7, .col-8 {
+                grid-column: span 12 !important;
+            }
+        }
+
+        /* Card Headers */
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .card-title-group h2 {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title-group p {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: var(--font-mono);
+            margin-top: 2px;
+        }
+
+        .badge-status {
+            font-size: 11px;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .badge-status-prime {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-emerald);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .badge-status-active {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .badge-status-alert {
+            background: rgba(244, 63, 94, 0.1);
+            color: var(--accent-rose);
+            border: 1px solid rgba(244, 63, 94, 0.2);
+        }
+
+        /* Scorecard Meter / Refi Countdown Gauge */
+        .score-display-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 0;
+            position: relative;
+        }
+
+        .svg-meter {
+            width: 200px;
+            height: 200px;
+            transform: rotate(-90deg);
+        }
+
+        .svg-meter circle {
+            fill: none;
+            stroke-width: 12px;
+        }
+
+        .svg-meter-bg {
+            stroke: rgba(255, 255, 255, 0.05);
+        }
+
+        .svg-meter-fill {
+            stroke: url(#prismGradient);
+            stroke-dasharray: 565;
+            stroke-dashoffset: 565;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .score-center-text {
+            position: absolute;
+            text-align: center;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .score-value {
+            font-size: 40px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1;
+            color: var(--text-primary);
+        }
+
+        .score-max {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+        }
+
+        .score-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-top: 4px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Metric Highlights Group */
+        .metric-matrix-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .metric-matrix-card {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .metric-matrix-card .lbl {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-family: var(--font-mono);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .metric-matrix-card .val {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .metric-matrix-card .sub-val {
+            font-size: 10px;
+            color: var(--accent-emerald);
+            font-weight: 600;
+        }
+
+        /* Dynamic Interactive Table Styles */
+        .ledger-table-container {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.25);
+        }
+
+        table.ledger-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-sans);
+            font-size: 13px;
+            text-align: left;
+        }
+
+        table.ledger-table th {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        table.ledger-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            color: var(--text-secondary);
+        }
+
+        table.ledger-table tr.prepaid {
+            background: rgba(16, 185, 129, 0.03);
+        }
+
+        table.ledger-table tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Auto-Debit Settings */
+        .autodebit-status-bar {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px dashed rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .autodebit-badge-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--accent-emerald);
+            color: var(--accent-emerald);
+        }
+
+        .autodebit-status-text h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .autodebit-status-text p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Covenant / Vault Documents List */
+        .vault-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .vault-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 14px 16px;
+            transition: var(--transition-smooth);
+        }
+
+        .vault-item:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.03);
+        }
+
+        .vault-item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .doc-icon-box {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .doc-details h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .doc-details span {
+            font-size: 11px;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .vault-item-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Custom File Input Upload Simulation Box */
+        .dropzone-container {
+            border: 1.5px dashed var(--border-glow-primary);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .dropzone-container:hover {
+            border-color: var(--accent-prism-violet);
+            background: rgba(124, 58, 237, 0.04);
+        }
+
+        .dropzone-container p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Telemetry Trace shell */
+        .terminal-shell {
+            background: #020306;
+            border-radius: 8px;
+            padding: 16px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: #a8b2c2;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .terminal-line {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 4px;
+            line-height: 1.5;
+        }
+
+        .terminal-line .stamp { color: var(--accent-cyan); }
+        .terminal-line .accent { color: var(--accent-prism-violet); }
+        .terminal-line .success { color: var(--accent-emerald); }
+
+        /* General Custom Range Inputs */
+        .custom-range {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255,255,255,0.08);
+            outline: none;
+        }
+
+        .custom-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--accent-cobalt);
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--accent-cobalt);
+            transition: var(--transition-smooth);
+        }
+
+        .custom-range::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        /* Dynamic Selector switches for sliders */
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .slider-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+        }
+
+        .slider-meta span { color: var(--text-secondary); }
+        .slider-meta .slider-value-display { color: var(--accent-cyan); font-weight: 700; }
+
+        /* General Action Button styling */
+        .action-button {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-button:hover {
+            background: var(--accent-cobalt);
+            border-color: var(--accent-cobalt);
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-mini {
+            padding: 6px 12px;
+            font-size: 11px;
+            border-radius: 6px;
+        }
+
+        /* JSON Specs Inspector */
+        .integration-specs-drawer {
+            margin-top: 12px;
+        }
+
+        .tab-headers {
+            display: flex;
+            gap: 4px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 16px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            text-transform: uppercase;
+            padding: 8px 16px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: var(--transition-smooth);
+        }
+
+        .tab-btn.active {
+            color: var(--accent-cyan);
+            border-bottom-color: var(--accent-cyan);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .code-container-pre {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: #cbd5e1;
+            overflow-x: auto;
+            max-height: 250px;
+        }
+
+        /* Regulatory Compliance Footer */
+        footer {
+            margin-top: 32px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 24px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .compliance-wrapper {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .compliance-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .compliance-footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            border-top: 1px solid rgba(255,255,255,0.02);
+            padding-top: 16px;
+        }
+
+        .compliance-badges {
+            display: flex;
+            gap: 12px;
+        }
+
+        .compliance-badges span {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Switch UI Elements */
+        .toggle-switch-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+
+        .switch-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .switch-btn {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 22px;
+        }
+
+        .switch-btn input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider-round {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255,255,255,0.1);
+            transition: .3s;
+            border-radius: 34px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .slider-round:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider-round {
+            background-color: var(--accent-emerald);
+        }
+
+        input:checked + .slider-round:before {
+            transform: translateX(22px);
+        }
+
+        /* Highlight classes */
+        .highlight-emerald { color: var(--accent-emerald) !important; font-weight: 700; }
+        .highlight-cobalt { color: var(--accent-cobalt) !important; font-weight: 700; }
+        .highlight-cyan { color: var(--accent-cyan) !important; font-weight: 700; }
+
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <!-- Header Block mimicking the intelligence engine structure -->
+    <header>
+        <div class="logo-area">
+            <div class="logo-prism"></div>
+            <div class="logo-text">
+                <h1>PRISM AMORTIZATION &amp; REPAYMENT TERMINAL</h1>
+                <p>Post-Funding Asset Ledger &amp; Covenant Hub</p>
+            </div>
+        </div>
+
+        <div class="global-controls">
+            <!-- Active Loan Swapper -->
+            <div class="profile-selector-wrap">
+                <span>Active Facility:</span>
+                <select class="archetype-dropdown" id="facilitySelect" onchange="loadFacility(this.value)">
+                    <option value="saas_bridge">SaaS Bridge (Locked $3,500,000)</option>
+                    <option value="ecom_revolver">E-Commerce Revolver (Locked $1,200,000)</option>
+                    <option value="industrial_lease">Industrial Lease (Locked $8,500,000)</option>
+                </select>
+            </div>
+
+            <!-- White-label Switcher -->
+            <button class="btn-toggle-view" onclick="toggleWhiteLabelView()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2.25a.75.75 0 0 0-1.137-.65l-8.25 4.75A1.5 1.5 0 0 0 2 7.65v8.7a1.5 1.5 0 0 0 .613 1.3l8.25 4.75a.75.75 0 0 0 .774 0l8.25-4.75a1.5 1.5 0 0 0 .613-1.3v-8.7a1.5 1.5 0 0 0-.613-1.3l-8.25-4.75Z"/>
+                </svg>
+                <span id="toggleText">Switch to White-Label View</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Dynamic Bento Grid Layout -->
+    <main class="dashboard-grid">
+
+        <!-- Bento Card: Refinance Eligibility Gauge -->
+        <div class="bento-card col-4">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <h2>Refinance Eligibility</h2>
+                    <p>Performance-based Rate Calibration</p>
+                </div>
+                <span class="badge-status badge-status-prime" id="performanceStatusBadge">92% Tier AAA</span>
+            </div>
+
+            <div class="score-display-container">
+                <svg class="svg-meter">
+                    <defs>
+                        <linearGradient id="prismGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#10b981" />
+                            <stop offset="50%" stop-color="#06b6d4" />
+                            <stop offset="100%" stop-color="#2563eb" />
+                        </linearGradient>
+                    </defs>
+                    <circle class="svg-meter-bg" cx="100" cy="100" r="90" />
+                    <circle class="svg-meter-fill" id="meterFillCircle" cx="100" cy="100" r="90" />
+                </svg>
+                <div class="score-center-text">
+                    <div class="score-value" id="daysToRefiText">45</div>
+                    <div class="score-max" id="daysToRefiSub">Days Left</div>
+                    <div class="score-label" id="eligibilityLabel">Optimal Standby</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 16px;">
+                <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; text-align: center;">
+                    Maintaining consecutive on-time payments locks in automatic qualification for interest-rate downscaling of <span class="highlight-emerald" id="potentialRateDrop">1.25% APR</span>.
+                </p>
+            </div>
+
+            <!-- Dynamic Micro metrics indicators -->
+            <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                    <span style="color: var(--text-muted)">Payments Completed:</span>
+                    <span style="font-family: var(--font-mono); font-weight: 600;" id="paymentsCompletedRatio">14 / 36</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                    <span style="color: var(--text-muted)">Total Amortized:</span>
+                    <span style="font-family: var(--font-mono); font-weight: 600;" id="totalAmortizedPct">38.8%</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                    <span style="color: var(--text-muted)">On-Time Rate:</span>
+                    <span style="font-family: var(--font-mono); font-weight: 600; color: var(--accent-emerald)">100.0%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bento Card: Live Interactive Amortization Schedule & Accelerators -->
+        <div class="bento-card col-8">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <h2>Repayment &amp; Amortization Ledger</h2>
+                    <p>Real-Time Dynamic Schedule with Prepayment Accelerators</p>
+                </div>
+                <span class="badge-status badge-status-active" id="activeStatusBadge">Active Amortization</span>
+            </div>
+
+            <!-- Metrics highlights -->
+            <div class="metric-matrix-row">
+                <div class="metric-matrix-card">
+                    <span class="lbl">Principal Remaining</span>
+                    <div class="val" id="principalRemainingVal">$2,142,500</div>
+                    <span class="sub-val" id="outstandingLabel">61.2% Outstanding</span>
+                </div>
+                <div class="metric-matrix-card">
+                    <span class="lbl">Effective Rate</span>
+                    <div class="val" id="effectiveRateVal">8.45% APR</div>
+                    <span class="sub-val" style="color: var(--accent-prism-violet)" id="interestStructure">Fixed WACC</span>
+                </div>
+                <div class="metric-matrix-card">
+                    <span class="lbl">Next Installment</span>
+                    <div class="val" id="nextInstallmentVal">$110,483</div>
+                    <span class="sub-val" id="paymentDueDate">Due in 14 Days</span>
+                </div>
+            </div>
+
+            <!-- Advanced Config: Amortization Accelerator Slider -->
+            <div class="slider-group" style="background: rgba(255, 255, 255, 0.02); padding: 16px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.05);">
+                <div class="slider-meta">
+                    <span>Prepayment Accelerator Option</span>
+                    <span>Reduce WACC interest dynamically</span>
+                    <span class="slider-value-display" id="acceleratorVal">0% Extra</span>
+                </div>
+                <input type="range" class="custom-range" id="acceleratorSlider" min="0" max="50" step="5" value="0" oninput="recalculateAmortization(this.value)">
+                <div style="margin-top: 6px; display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); font-family: var(--font-mono);">
+                    <span>STANDARD TERM</span>
+                    <span>10% ACCEL</span>
+                    <span>20% ACCEL</span>
+                    <span>30% ACCEL</span>
+                    <span>40% ACCEL</span>
+                    <span>50% MAX VELOCITY</span>
+                </div>
+            </div>
+
+            <!-- Interactive Schedule Table -->
+            <div class="ledger-table-container">
+                <table class="ledger-table" id="amortizationTable">
+                    <thead>
+                        <tr>
+                            <th>Pmt #</th>
+                            <th>Target Date</th>
+                            <th>Total Payment</th>
+                            <th>Principal Paid</th>
+                            <th>Interest Paid</th>
+                            <th>Remaining Bal</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="amortizationBody">
+                        <!-- Filled dynamically by JavaScript based on swapper / slider -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Bento Card: Automatic Debit & Plaid Bank Configuration -->
+        <div class="bento-card col-4">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <h2>Auto-Debit Configuration</h2>
+                    <p>OpenBank Gateway &amp; Direct Clearing</p>
+                </div>
+            </div>
+
+            <!-- Connected Node Status -->
+            <div class="autodebit-status-bar">
+                <div class="autodebit-badge-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                        <path d="m9 12 2 2 4-4"/>
+                    </svg>
+                </div>
+                <div class="autodebit-status-text">
+                    <p>CONNECTED ROUTING</p>
+                    <h3 id="connectedBankText">Silicon Valley Bank (•••• 8820)</h3>
+                </div>
+            </div>
+
+            <!-- Config Options -->
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+                <div class="toggle-switch-wrapper">
+                    <span class="switch-label">Enable Smart Auto-Debit Protocol</span>
+                    <label class="switch-btn">
+                        <input type="checkbox" id="smartDebitToggle" checked onchange="toggleDebitState('smart', this.checked)">
+                        <span class="slider-round"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-switch-wrapper">
+                    <span class="switch-label">Daily Balance Buffers Protection</span>
+                    <label class="switch-btn">
+                        <input type="checkbox" id="bufferToggle" checked onchange="toggleDebitState('buffer', this.checked)">
+                        <span class="slider-round"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-switch-wrapper">
+                    <span class="switch-label">Split Repayment over Bi-Weekly intervals</span>
+                    <label class="switch-btn">
+                        <input type="checkbox" id="splitRepayToggle" onchange="toggleDebitState('split', this.checked)">
+                        <span class="slider-round"></span>
+                    </label>
+                </div>
+            </div>
+
+            <button class="action-button" onclick="triggerImmediatePayment()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Authorize One-off Additional Payment
+            </button>
+        </div>
+
+        <!-- Bento Card: Secure Documents Vault & Covenant Tracker -->
+        <div class="bento-card col-8">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <h2>Compliance Covenant Document Vault</h2>
+                    <p>Locked Secure IPFS Cryptographic Vault for Underwriting Covenants</p>
+                </div>
+                <span class="badge-status badge-status-prime" id="covenantComplianceBadge">Fully Compliant</span>
+            </div>
+
+            <!-- Upload Area -->
+            <div class="dropzone-container" id="dropzoneBox" onclick="triggerFileInput()">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="stroke: var(--accent-prism-violet)">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <div>
+                    <h4 style="font-size: 14px; color: var(--text-primary)">Upload Compliance PDF / CSV</h4>
+                    <p>Drag and drop or select your Monthly Ledger extraction for fast verification parsing.</p>
+                </div>
+                <input type="file" id="realFileInput" style="display: none;" onchange="simulateVaultUpload(this.files)">
+            </div>
+
+            <!-- List of requirements / current uploaded documents -->
+            <div class="vault-list" id="vaultDocumentsList">
+                <!-- Dynamically populated files -->
+            </div>
+        </div>
+
+        <!-- Bento Card: Telemetry Trace Log (Dynamic Execution) -->
+        <div class="bento-card col-12">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <h2>Live Execution Telemetry Trace Log</h2>
+                    <p>Real-Time Banking API Synchronization logs &amp; Event-Driven Telemetry</p>
+                </div>
+            </div>
+            <div class="terminal-shell" id="telemetryTerminal">
+                <div class="terminal-line">
+                    <span class="stamp">[SYSTEM LOG INITIALIZE]</span>
+                    <span>Operational parameters aligned. Connecting SVB Routing Network nodes...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bento Card: Webhook API Schemas for developers -->
+        <div class="bento-card col-12 integration-specs-drawer">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <h2>Developer Webhook Integration Specifications</h2>
+                    <p>Real-time event subscriptions representing debt state transformations</p>
+                </div>
+            </div>
+
+            <div class="tab-headers">
+                <button class="tab-btn active" onclick="switchSpecTab('webhook-payment-success', this)">payment.succeeded</button>
+                <button class="tab-btn" onclick="switchSpecTab('webhook-covenant-alert', this)">covenant.violated</button>
+                <button class="tab-btn" onclick="switchSpecTab('webhook-refi-eligible', this)">refinance.matured</button>
+            </div>
+
+            <!-- Tab Panels -->
+            <div id="webhook-payment-success" class="tab-content active">
+                <pre class="code-container-pre"><code>{
+  "event": "repayment.ledger.payment.succeeded",
+  "timestamp": "2026-03-15T00:00:12Z",
+  "data": {
+    "facility_id": "fac_saas_bridge_849",
+    "installment_number": 15,
+    "principal_applied": 92398.24,
+    "interest_applied": 18084.76,
+    "prepayment_accelerator": 0.0,
+    "remaining_principal": 2050101.76,
+    "clearing_partner": "silicon_valley_bank"
+  }
+}</code></pre>
+            </div>
+
+            <div id="webhook-covenant-alert" class="tab-content">
+                <pre class="code-container-pre"><code>{
+  "event": "repayment.ledger.covenant.violated",
+  "timestamp": "2026-03-15T01:45:00Z",
+  "data": {
+    "facility_id": "fac_industrial_lease_204",
+    "violation_code": "DSCR_FLOOR_BREACHED",
+    "expected_ratio": 1.25,
+    "actual_ratio": 1.14,
+    "days_to_remediate": 30,
+    "audit_reference": "audit_ipfs_hash_77a9df2b"
+  }
+}</code></pre>
+            </div>
+
+            <div id="webhook-refi-eligible" class="tab-content">
+                <pre class="code-container-pre"><code>{
+  "event": "repayment.ledger.refinance.matured",
+  "timestamp": "2026-03-15T03:00:00Z",
+  "data": {
+    "facility_id": "fac_saas_bridge_849",
+    "historical_score_wacc": 0.98,
+    "current_leverage": 2.4,
+    "eligible_interest_reduction": "1.25%",
+    "automated_offer_term": "fac_saas_super_prime_v2"
+  }
+}</code></pre>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Strict Compliance Regulatory Footer -->
+    <footer>
+        <div class="compliance-wrapper">
+            <div>
+                <p style="font-weight: 700; margin-bottom: 6px; color: var(--text-secondary);">DEBT REPAYMENT DISCLOSURES</p>
+                Calculations represented on this platform represent active institutional contracts. Outstanding interest, payment dates, and prepayments conform explicitly to master term sheet conventions and loan securitization framework guidelines. Early termination or prepayment limits vary per product class.
+            </div>
+            <div>
+                <p style="font-weight: 700; margin-bottom: 6px; color: var(--text-secondary);">COVENANT COMPLIANCE MATRIX</p>
+                Covenants represented in this portal are automatically processed and audited via automated cryptographic tools. Compliance failure warnings represent transient status states. If a covenant remains unresolved, formal notices of loan defaults will be issued to matching administrative contacts automatically.
+            </div>
+            <div>
+                <p style="font-weight: 700; margin-bottom: 6px; color: var(--text-secondary);">BANK NODE SECURITY &amp; FDIC</p>
+                Repayment flows run through partner banking portals linked securely via encrypted Plaid integration patterns. Transit operations leverage secure ACH networks complying with Nacha regulations, inside enterprise grade secure vaults guaranteeing that zero persistent banking credentials are saved in raw server structures.
+            </div>
+        </div>
+
+        <div class="compliance-footer-bottom">
+            <span>© 2026 PRISM DEBT INTELLIGENCE SYSTEMS INC. ALL RIGHTS RESERVED.</span>
+            <div class="compliance-badges">
+                <span>SOC2 TYPE II Certified</span>
+                <span>ISO 27001 SECURE</span>
+                <span>SEC/FCC Compliant</span>
+            </div>
+        </div>
+    </footer>
+
+</div>
+
+<!-- Interactive Engine Logic Script -->
+<script>
+    // Embedded Active Repayment Streams database
+    const loanFacilities = {
+        saas_bridge: {
+            facilityName: "SaaS Bridge Debt",
+            principalTotal: 3500000,
+            principalRemaining: 2142500,
+            rate: 8.45,
+            monthsTotal: 36,
+            monthsPaid: 14,
+            refiCountdownDays: 45,
+            potentialRateDrop: "1.25% APR",
+            bankDetails: "Silicon Valley Bank (•••• 8820)",
+            repayType: "Revenue Share (Cap Limit)",
+            baseMonthlyPayment: 110483,
+            covenants: [
+                { id: "saas_mrr_ledger", name: "SaaS MRR Verification File", type: "Monthly Recurring", status: "Approved", date: "Feb 2026" },
+                { id: "dscr_ratio", name: "DSCR Ratio Metric Certification", type: "Quarterly Audit", status: "Approved", date: "Q4 2025" },
+                { id: "saas_churn_verification", name: "Churn Variance Breakdown", type: "Quarterly Audit", status: "Due", date: "Q1 2026" }
+            ]
+        },
+        ecom_revolver: {
+            facilityName: "E-Commerce Stock Revolver",
+            principalTotal: 1200000,
+            principalRemaining: 540000,
+            rate: 9.80,
+            monthsTotal: 18,
+            monthsPaid: 10,
+            refiCountdownDays: 15,
+            potentialRateDrop: "2.00% APR",
+            bankDetails: "Mercury Bank Inc (•••• 4110)",
+            repayType: "Receivables Rolling Split",
+            baseMonthlyPayment: 72150,
+            covenants: [
+                { id: "inventory_audit", name: "Physical Inventory Stock Ledger", type: "Monthly Audit", status: "Approved", date: "Feb 2026" },
+                { id: "marketing_roi", name: "Paid Acquisition Spending Audit", type: "Monthly Review", status: "Pending", date: "Feb 2026" }
+            ]
+        },
+        industrial_lease: {
+            facilityName: "Equipment lease Credit Line",
+            principalTotal: 8500000,
+            principalRemaining: 6800000,
+            rate: 6.50,
+            monthsTotal: 60,
+            monthsPaid: 12,
+            refiCountdownDays: 90,
+            potentialRateDrop: "0.75% APR",
+            bankDetails: "JPMorgan Chase Bank (•••• 9904)",
+            repayType: "Straight Amortization (UCC-1 Tied)",
+            baseMonthlyPayment: 165420,
+            covenants: [
+                { id: "asset_utilization", name: "Fixed Asset Insurance Certificate", type: "Annual Review", status: "Approved", date: "Jan 2026" },
+                { id: "debt_leverage_ratio", name: "Total Leverage Compliance Ledger", type: "Quarterly Review", status: "Overdue", date: "Q1 2026" }
+            ]
+        }
+    };
+
+    let activeFacility = "saas_bridge";
+    let isWhiteLabelActive = false;
+    let prepaymentAcceleratorPct = 0;
+
+    // Load selected facility and trigger math updates
+    function loadFacility(key) {
+        activeFacility = key;
+        logTrace(`Active facility changed to: ${key.toUpperCase()}`);
+        document.getElementById("acceleratorSlider").value = 0;
+        prepaymentAcceleratorPct = 0;
+        document.getElementById("acceleratorVal").innerText = "0% Extra";
+        
+        runCalculations();
+    }
+
+    // Dynamic calculations representing amortization updates
+    function runCalculations() {
+        const facility = loanFacilities[activeFacility];
+        
+        // Update general values in DOM
+        document.getElementById("performanceStatusBadge").innerText = `92% Tier AAA`;
+        document.getElementById("daysToRefiText").innerText = facility.refiCountdownDays;
+        document.getElementById("potentialRateDrop").innerText = facility.potentialRateDrop;
+        
+        // Circular progress circle calculations
+        const scoreVal = facility.refiCountdownDays;
+        // Map 0 - 90 days to stroke dashoffset. Max offset is 565. Full circle (360) represents max refi readiness (0 days left).
+        const refiReadiness = Math.max(0, 90 - scoreVal);
+        const offset = 565 - (565 * (refiReadiness / 90));
+        document.getElementById("meterFillCircle").style.strokeDashoffset = offset;
+
+        // Determine dynamic labels
+        if (scoreVal <= 15) {
+            document.getElementById("eligibilityLabel").innerText = "ELGIBLE NOW";
+            document.getElementById("eligibilityLabel").style.color = "var(--accent-emerald)";
+        } else if (scoreVal <= 45) {
+            document.getElementById("eligibilityLabel").innerText = "Optimal Standby";
+            document.getElementById("eligibilityLabel").style.color = "var(--accent-cyan)";
+        } else {
+            document.getElementById("eligibilityLabel").innerText = "Accumulating History";
+            document.getElementById("eligibilityLabel").style.color = "var(--accent-prism-violet)";
+        }
+
+        document.getElementById("paymentsCompletedRatio").innerText = `${facility.monthsPaid} / ${facility.monthsTotal}`;
+        const amortizedPct = ((1 - (facility.principalRemaining / facility.principalTotal)) * 100).toFixed(1);
+        document.getElementById("totalAmortizedPct").innerText = `${amortizedPct}%`;
+
+        // Update Matrix details
+        document.getElementById("principalRemainingVal").innerText = `$${facility.principalRemaining.toLocaleString()}`;
+        const outstandingPct = ((facility.principalRemaining / facility.principalTotal) * 100).toFixed(1);
+        document.getElementById("outstandingLabel").innerText = `${outstandingPct}% Outstanding`;
+        
+        document.getElementById("effectiveRateVal").innerText = `${facility.rate}% APR`;
+        document.getElementById("interestStructure").innerText = facility.repayType;
+
+        const nextPmt = Math.round(facility.baseMonthlyPayment * (1 + (prepaymentAcceleratorPct / 100)));
+        document.getElementById("nextInstallmentVal").innerText = `$${nextPmt.toLocaleString()}`;
+
+        // Populate dynamic amortization ledger
+        renderAmortizationSchedule(facility);
+
+        // Render Covenant list
+        renderCovenantVault(facility);
+    }
+
+    // Interactive Amortization generation algorithm
+    function renderAmortizationSchedule(facility) {
+        const body = document.getElementById("amortizationBody");
+        body.innerHTML = "";
+
+        let balance = facility.principalRemaining;
+        const monthlyRate = (facility.rate / 100) / 12;
+        let basePmt = facility.baseMonthlyPayment;
+
+        // Draw next 5 predicted payment streams dynamically
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        let currentDate = new Date();
+        
+        for (let i = 1; i <= 6; i++) {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            const dateStr = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+            
+            // Dynamic payment calculation including user adjusted accelerators
+            let interestPaid = Math.round(balance * monthlyRate);
+            let totalPmt = basePmt * (1 + (prepaymentAcceleratorPct / 100));
+            if (totalPmt > balance) totalPmt = balance + interestPaid;
+            
+            let principalPaid = totalPmt - interestPaid;
+            balance = Math.max(0, balance - principalPaid);
+
+            const row = document.createElement("tr");
+            if (prepaymentAcceleratorPct > 0) {
+                row.className = "prepaid";
+            }
+
+            const isNext = i === 1;
+            const statusBadge = isNext ? 
+                `<span class="badge-status badge-status-active">NEXT DRAW</span>` : 
+                `<span class="badge-status" style="color: var(--text-muted); background: rgba(255,255,255,0.02)">PENDING</span>`;
+
+            row.innerHTML = `
+                <td style="font-family: var(--font-mono)">#${facility.monthsPaid + i}</td>
+                <td style="font-weight: 600">${dateStr}</td>
+                <td style="font-family: var(--font-mono); font-weight: 700; color: var(--text-primary)">$${totalPmt.toLocaleString()}</td>
+                <td style="font-family: var(--font-mono); color: var(--accent-cyan)">$${Math.round(principalPaid).toLocaleString()}</td>
+                <td style="font-family: var(--font-mono); color: var(--accent-rose)">$${Math.round(interestPaid).toLocaleString()}</td>
+                <td style="font-family: var(--font-mono); font-weight: 600">$${Math.round(balance).toLocaleString()}</td>
+                <td>${statusBadge}</td>
+            `;
+            body.appendChild(row);
+
+            if (balance <= 0) break;
+        }
+    }
+
+    // Dynamic Prepayment slider manipulation
+    function recalculateAmortization(val) {
+        prepaymentAcceleratorPct = parseInt(val);
+        document.getElementById("acceleratorVal").innerText = `${prepaymentAcceleratorPct}% Extra`;
+        
+        logTrace(`Interactive recalculation complete: Amortization acceleration adjusted to +${prepaymentAcceleratorPct}%`);
+        runCalculations();
+    }
+
+    // Interactive rendering of covenant list
+    function renderCovenantVault(facility) {
+        const container = document.getElementById("vaultDocumentsList");
+        container.innerHTML = "";
+
+        // Check overall facility compliance status
+        let hasOverdue = false;
+        let hasDue = false;
+        
+        facility.covenants.forEach(cov => {
+            const item = document.createElement("div");
+            item.className = "vault-item";
+
+            let badgeHtml = "";
+            let actionBtnHtml = "";
+
+            if (cov.status === "Approved") {
+                badgeHtml = `<span class="badge-status badge-status-prime">Approved</span>`;
+                actionBtnHtml = `<span style="font-size: 11px; font-family: var(--font-mono); color: var(--text-muted)">Verified Security Hash</span>`;
+            } else if (cov.status === "Pending") {
+                badgeHtml = `<span class="badge-status badge-status-active">Verification Pending</span>`;
+                actionBtnHtml = `<span style="font-size: 11px; font-family: var(--font-mono); color: var(--accent-cyan)">Audit Running</span>`;
+            } else {
+                badgeHtml = `<span class="badge-status badge-status-alert">Awaiting Upload</span>`;
+                actionBtnHtml = `<button class="action-button btn-mini" style="border-color: var(--accent-prism-violet)" onclick="triggerFileInput()">Upload Ledger</button>`;
+                hasDue = true;
+            }
+
+            if (cov.status === "Overdue") {
+                hasOverdue = true;
+            }
+
+            item.innerHTML = `
+                <div class="vault-item-left">
+                    <div class="doc-icon-box">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                    </div>
+                    <div class="doc-details">
+                        <h4>${cov.name}</h4>
+                        <span>${cov.type} • Required by: ${cov.date}</span>
+                    </div>
+                </div>
+                <div class="vault-item-right">
+                    ${badgeHtml}
+                    ${actionBtnHtml}
+                </div>
+            `;
+            container.appendChild(item);
+        });
+
+        const complianceBadge = document.getElementById("covenantComplianceBadge");
+        if (hasOverdue) {
+            complianceBadge.innerText = "COVENANT EXCEPTION ALERTS";
+            complianceBadge.className = "badge-status badge-status-alert";
+        } else if (hasDue) {
+            complianceBadge.innerText = "Covenants Pending Action";
+            complianceBadge.className = "badge-status badge-status-active";
+        } else {
+            complianceBadge.innerText = "Fully Compliant";
+            complianceBadge.className = "badge-status badge-status-prime";
+        }
+    }
+
+    // Auto-Debit Interactivity Toggles
+    function toggleDebitState(type, state) {
+        logTrace(`Interactive security override: direct auto-debit parameter '${type}' modified to ${state ? 'ENABLED' : 'DISABLED'}`);
+    }
+
+    // Trigger immediate payment button simulation
+    function triggerImmediatePayment() {
+        const amt = prompt("Input extra payment principal amount:", "50000");
+        if (amt) {
+            logTrace(`Transaction processed successfully: direct manual authorization for payment of $${parseFloat(amt).toLocaleString()} verified.`);
+            alert("Payment instruction submitted to clearing banks. Telemetry logs updated.");
+            
+            // Adjust current facility baseline values temporarily to demonstrate updates
+            loanFacilities[activeFacility].principalRemaining = Math.max(0, loanFacilities[activeFacility].principalRemaining - parseInt(amt));
+            runCalculations();
+        }
+    }
+
+    // Simulating Secure file upload to decentralized memory
+    function triggerFileInput() {
+        document.getElementById("realFileInput").click();
+    }
+
+    function simulateVaultUpload(files) {
+        if (files.length === 0) return;
+        const file = files[0];
+        
+        logTrace(`Uploading binary stream to vault: file '${file.name}' (${Math.round(file.size/1024)} KB)`);
+        
+        // Find first item needing upload to update
+        const facility = loanFacilities[activeFacility];
+        const dueCovenant = facility.covenants.find(c => c.status === "Due" || c.status === "Overdue");
+        
+        if (dueCovenant) {
+            dueCovenant.status = "Pending";
+            logTrace(`Document processing initialized. Parsing ledger variables and generating security SHA-256 footprint...`);
+            setTimeout(() => {
+                dueCovenant.status = "Approved";
+                logTrace(`Verification Audit Complete! File matched with underlying borrower database schema.`);
+                runCalculations();
+            }, 2500);
+        } else {
+            logTrace(`General verification completed. Adding arbitrary PDF attachment trace...`);
+        }
+        
+        runCalculations();
+    }
+
+    // Toggle Operator/White label views
+    function toggleWhiteLabelView() {
+        isWhiteLabelActive = !isWhiteLabelActive;
+        const bodyEl = document.body;
+        const toggleText = document.getElementById("toggleText");
+
+        if (isWhiteLabelActive) {
+            bodyEl.classList.add("white-label-mode");
+            toggleText.innerText = "Switch to Operator Terminal";
+            logTrace("Enabling White-Label presentation environment...");
+        } else {
+            bodyEl.classList.remove("white-label-mode");
+            toggleText.innerText = "Switch to White-Label View";
+            logTrace("Restoring complete operator ledger views...");
+        }
+    }
+
+    // Tab Specification Controls
+    function switchSpecTab(tabId, el) {
+        const buttons = el.parentNode.querySelectorAll(".tab-btn");
+        buttons.forEach(btn => btn.classList.remove("active"));
+        el.classList.add("active");
+
+        const parent = el.parentNode.parentNode;
+        const contentPanes = parent.querySelectorAll(".tab-content");
+        contentPanes.forEach(pane => pane.classList.remove("active"));
+        document.getElementById(tabId).classList.add("active");
+    }
+
+    // Dynamic execution telemetry utility
+    function logTrace(message) {
+        const term = document.getElementById("telemetryTerminal");
+        const timestamp = new Date().toLocaleTimeString();
+        
+        const line = document.createElement("div");
+        line.className = "terminal-line";
+        
+        let customStylingClass = "";
+        if (message.includes("Verification") || message.includes("success") || message.includes("Complete")) {
+            customStylingClass = "success";
+        } else if (message.includes("recalculation") || message.includes("override") || message.includes("modified")) {
+            customStylingClass = "accent";
+        }
+
+        line.innerHTML = `
+            <span class="stamp">[${timestamp}]</span>
+            <span class="${customStylingClass}">${message}</span>
+        `;
+        term.appendChild(line);
+        term.scrollTop = term.scrollHeight;
+    }
+
+    // Initialize ledger on load
+    window.onload = function() {
+        runCalculations();
+    }
+</script>
+
+</body>
+</html>
+```

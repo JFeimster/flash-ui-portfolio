@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash UI Export</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="ledger-container">
+    <div class="header">
+        <div class="header-title">
+            <div class="badge">AUDIT REV. 2024-B</div>
+            <h1>CAC PAYBACK<br>ANALYZER</h1>
+            <p>Verification of scalable capital efficiency</p>
+        </div>
+        <div class="document-id">
+            REF: MKT-PRINTER-01<br>
+            LOC: GLOBAL HQ<br>
+            STATUS: ACTIVE_CALC
+        </div>
+    </div>
+
+    <div class="main-grid">
+        <section class="input-section">
+            <div class="form-group">
+                <label>Monthly Ad Spend ($)</label>
+                <input type="number" id="spend" value="50000" step="1000">
+            </div>
+            <div class="form-group">
+                <label>New Customers Added</label>
+                <input type="number" id="customers" value="250" step="10">
+            </div>
+            <div class="form-group">
+                <label>ARPU ($/Month)</label>
+                <input type="number" id="arpu" value="120" step="5">
+            </div>
+            <div class="form-group">
+                <label>Gross Margin (%)</label>
+                <input type="number" id="margin" value="75" step="1" max="100">
+            </div>
+        </section>
+
+        <section class="analysis-section">
+            <label style="text-align: center; margin-bottom: 20px;">Bankability Scale</label>
+            
+            <div class="dial-container">
+                <svg class="dial-svg" viewBox="0 0 200 100">
+                    <path class="dial-track" d="M 20 90 A 80 80 0 0 1 180 90" />
+                    <path id="dialProgress" class="dial-progress" d="M 20 90 A 80 80 0 0 1 180 90" />
+                </svg>
+                <div class="dial-labels">
+                    <span>REJECTED</span>
+                    <span>WATCH</span>
+                    <span>BANKABLE</span>
+                </div>
+            </div>
+
+            <table class="results-table">
+                <tr>
+                    <td class="label">Customer Acquisition Cost (CAC)</td>
+                    <td class="value" id="cacValue">$200.00</td>
+                </tr>
+                <tr>
+                    <td class="label">Payback Period</td>
+                    <td class="value" id="paybackValue">2.22 Mo.</td>
+                </tr>
+            </table>
+
+            <div id="statusBox" class="bankability-status">
+                PRINTER STATUS: READY
+            </div>
+
+            <button class="cta-button" onclick="window.print()">
+                You have a money printer. Let us fund your CAC.
+            </button>
+        </section>
+    </div>
+</div>
+
+<script>
+    const inputs = ['spend', 'customers', 'arpu', 'margin'];
+    const dialProgress = document.getElementById('dialProgress');
+    const cacValue = document.getElementById('cacValue');
+    const paybackValue = document.getElementById('paybackValue');
+    const statusBox = document.getElementById('statusBox');
+
+    function calculate() {
+        const spend = parseFloat(document.getElementById('spend').value) || 0;
+        const customers = parseFloat(document.getElementById('customers').value) || 0;
+        const arpu = parseFloat(document.getElementById('arpu').value) || 0;
+        const margin = parseFloat(document.getElementById('margin').value) / 100 || 0;
+
+        if (customers === 0 || arpu === 0 || margin === 0) return;
+
+        const cac = spend / customers;
+        const monthlyGrossProfit = arpu * margin;
+        const payback = cac / monthlyGrossProfit;
+
+        // Update Text
+        cacValue.innerText = `$${cac.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        paybackValue.innerText = `${payback.toFixed(2)} Mo.`;
+
+        // Update Dial (Inverted: Lower is better. 18 months = 0%, 0 months = 100%)
+        // Max range is 18 months for the dial
+        const maxMonths = 18;
+        const percentage = Math.max(0, Math.min(100, ((maxMonths - payback) / maxMonths) * 100));
+        
+        // Dashoffset: 440 (empty) to 190 (full)
+        // Correct range calculation for the path:
+        const offset = 440 - (percentage * 2.5); 
+        dialProgress.style.strokeDashoffset = offset;
+
+        // Visual Colors and Status
+        if (payback < 6) {
+            dialProgress.style.stroke = "var(--success)";
+            statusBox.innerText = "PRINTER STATUS: BANKABLE";
+            statusBox.style.backgroundColor = "rgba(0, 129, 72, 0.1)";
+            statusBox.style.color = "var(--success)";
+            statusBox.style.borderColor = "var(--success)";
+        } else if (payback < 12) {
+            dialProgress.style.stroke = "var(--warning)";
+            statusBox.innerText = "PRINTER STATUS: CAUTION";
+            statusBox.style.backgroundColor = "rgba(235, 203, 0, 0.1)";
+            statusBox.style.color = "#8a7700";
+            statusBox.style.borderColor = "var(--warning)";
+        } else {
+            dialProgress.style.stroke = "var(--danger)";
+            statusBox.innerText = "PRINTER STATUS: REJECTED";
+            statusBox.style.backgroundColor = "rgba(255, 59, 48, 0.1)";
+            statusBox.style.color = "var(--danger)";
+            statusBox.style.borderColor = "var(--danger)";
+        }
+    }
+
+    inputs.forEach(id => {
+        document.getElementById(id).addEventListener('input', calculate);
+    });
+
+    // Initial run
+    calculate();
+</script>
+    <script src="script.js"></script>
+</body>
+</html>

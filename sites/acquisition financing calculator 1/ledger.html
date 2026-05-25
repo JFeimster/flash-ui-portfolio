@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;900&display=swap');
+
+        :root {
+            --bone-white: #F5F5F0;
+            --acid-green: #DFFF00;
+            --verdigris: #43B3AE;
+            --oxidized-dark: #2A4B45;
+            --black: #0A0A0A;
+            --border-width: 6px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--black);
+            font-family: 'Inter', sans-serif;
+            color: var(--bone-white);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .ledger-container {
+            width: 100%;
+            max-width: 900px;
+            border: var(--border-width) solid var(--bone-white);
+            background: var(--black);
+            padding: 60px;
+            position: relative;
+        }
+
+        .header {
+            border-bottom: var(--border-width) solid var(--bone-white);
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(2rem, 5vw, 4rem);
+            line-height: 0.9;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+        }
+
+        .status-badge {
+            background: var(--acid-green);
+            color: var(--black);
+            padding: 5px 15px;
+            font-weight: 900;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .ledger-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 60px;
+        }
+
+        .category-column {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .category-title {
+            font-weight: 900;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--bone-white);
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: opacity 0.3s ease;
+        }
+
+        .task-item input[type="checkbox"] {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--bone-white);
+            background: transparent;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .task-item input[type="checkbox"]:checked {
+            background: var(--acid-green);
+        }
+
+        .task-item input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--black);
+            font-weight: 900;
+        }
+
+        .results-section {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            border-top: var(--border-width) solid var(--bone-white);
+            padding-top: 40px;
+        }
+
+        .result-row {
+            width: 100%;
+        }
+
+        .label-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 10px;
+            font-family: 'DM Serif Display', serif;
+        }
+
+        .editorial-label {
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            font-style: italic;
+        }
+
+        .percentage {
+            font-size: 2rem;
+            color: var(--verdigris);
+        }
+
+        .progress-track {
+            height: 30px;
+            width: 100%;
+            background: #1a1a1a;
+            border: 2px solid var(--bone-white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--oxidized-dark), var(--verdigris));
+            transition: width 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(0,0,0,0.1) 10px,
+                rgba(0,0,0,0.2) 20px
+            );
+        }
+
+        .stats-footer {
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            opacity: 0.6;
+        }
+
+        @media (max-width: 800px) {
+            .ledger-grid { grid-template-columns: 1fr; }
+            .ledger-container { padding: 30px; }
+            .header { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ledger-container">
+        <div class="header">
+            <div>
+                <div class="status-badge">Due Diligence Phase</div>
+                <h1>The Vetting<br>Ledger</h1>
+            </div>
+            <div style="text-align: right">
+                <span style="font-family: 'DM Serif Display'; font-style: italic; font-size: 1.2rem;">Verdigris Brutalist v1.0</span>
+            </div>
+        </div>
+
+        <div class="ledger-grid">
+            <div class="category-column" data-cat="financial">
+                <div class="category-title">Financial Audit</div>
+                <label class="task-item"><input type="checkbox" onchange="updateLedger()"> 3Y Tax Returns</label>
+                <label class="task-item"><input type="checkbox" onchange="updateLedger()"> P&L Statements</label>
+                <label class="task-item"><input type="checkbox" onchange="updateLedger()"> AR/AP Aging</label>
+                <label class="task-item"><input type="checkbox" onchange="updateLedger()"> Bank Hex-Audit</label>
+            </div>
+            <div class="category-column" data-cat="legal">
+                <div class="category-title">Legal Review</div>
+                <label class="task-item"><input type="checkbox" onchange="updateLedger()"> Articles of Inc.</label>
+                <label class="task-item"><input type="checkbox" onchange="updateLedger()"> Client Contracts</label>
+                <label class="task-item"><input type="checkbox" onchange="updateLedger()"> IP Assignment</label>
+                <label class="task-item"><input type="checkbox" onchange="updateLedger()"> Compliance Bind</label>
+            </div>
+            <div class="category-column" data-cat="operational">
+                <div class="category-title">Operational Assessment</div>
+                <label class="task-item"><input type="checkbox" onchange="updateLedger()"> SOP Library</label>
+                <label class="task-item"><input type="checkbox" onchange="updateLedger()"> Staff Roster</label>
+                <label class="task-item"><input type="checkbox" onchange="updateLedger()"> Asset Inventory</label>
+                <label class="task-item"><input type="checkbox" onchange="updateLedger()"> Tech Stack Map</label>
+            </div>
+        </div>
+
+        <div class="results-section">
+            <div class="result-row">
+                <div class="label-group">
+                    <span class="editorial-label">Financial Integrity</span>
+                    <span class="percentage" id="financial-val">0%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="financial-bar" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="result-row">
+                <div class="label-group">
+                    <span class="editorial-label">Jurisdictional Scrutiny</span>
+                    <span class="percentage" id="legal-val">0%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="legal-bar" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="result-row">
+                <div class="label-group">
+                    <span class="editorial-label">Operational Capacity</span>
+                    <span class="percentage" id="operational-val">0%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="operational-bar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-footer">
+            <span>Security Clearance: High</span>
+            <span>Ref. No: 994-AUDT</span>
+            <span>Est. Closing: Q4-2024</span>
+        </div>
+    </div>
+
+    <script>
+        function updateLedger() {
+            const categories = ['financial', 'legal', 'operational'];
+            
+            categories.forEach(cat => {
+                const column = document.querySelector(`.category-column[data-cat="${cat}"]`);
+                const checkboxes = column.querySelectorAll('input[type="checkbox"]');
+                const total = checkboxes.length;
+                const checked = Array.from(checkboxes).filter(i => i.checked).length;
+                
+                const percent = (checked / total) * 100;
+                
+                document.getElementById(`${cat}-val`).innerText = Math.round(percent) + '%';
+                document.getElementById(`${cat}-bar`).style.width = percent + '%';
+                
+                // Add visual dimming to checked items
+                checkboxes.forEach(cb => {
+                    cb.parentElement.style.opacity = cb.checked ? '0.4' : '1';
+                });
+            });
+        }
+
+        // Initialize
+        updateLedger();
+    </script>
+</body>
+</html>

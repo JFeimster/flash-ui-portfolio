@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Dossier - Core Flow - Fintech Resource Library & Business Funding Engine</title>
+    <!-- Google Fonts & Tailwind-inspired Layout system -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #08090d;
+            --bg-secondary: #0f111a;
+            --bg-tertiary: #161a26;
+            --border-color: #242b3d;
+            --border-hover: #3b4764;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            
+            /* High-voltage Neobrutalist Accents */
+            --accent-cyan: #00f0ff;
+            --accent-orange: #ff5c00;
+            --accent-magenta: #ff007a;
+            --accent-lime: #39ff14;
+            
+            --shadow-cyan: 0px 0px 20px rgba(0, 240, 255, 0.15);
+            --shadow-orange: 0px 0px 20px rgba(255, 92, 0, 0.15);
+            --shadow-magenta: 0px 0px 20px rgba(255, 0, 122, 0.15);
+            --shadow-lime: 0px 0px 20px rgba(57, 255, 20, 0.15);
+            
+            --brutal-shadow: 6px 6px 0px #000000;
+            --brutal-shadow-hover: 2px 2px 0px #000000;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-sans);
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        /* custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-cyan);
+        }
+
+        /* Utility classes */
+        .text-glow-cyan { text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
+        .text-glow-orange { text-shadow: 0 0 10px rgba(255, 92, 0, 0.5); }
+        .text-glow-magenta { text-shadow: 0 0 10px rgba(255, 0, 122, 0.5); }
+        .text-glow-lime { text-shadow: 0 0 10px rgba(57, 255, 20, 0.5); }
+
+        /* Navigation Header */
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: var(--bg-secondary);
+            border-bottom: 3px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 22px;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+            border: 2px solid #000;
+            box-shadow: 2px 2px 0px #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 18px;
+            color: #000;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            padding: 8px 16px;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-cyan);
+            border-bottom: 2px solid var(--accent-cyan);
+        }
+
+        /* Neobrutalist CTAs */
+        .btn-action {
+            background: var(--accent-cyan);
+            color: #000;
+            padding: 16px 32px;
+            border: 3px solid #000;
+            font-weight: 800;
+            font-family: var(--font-display);
+            text-transform: uppercase;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px #000;
+            transition: all 0.1s ease;
+            text-decoration: none;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        .btn-action:hover {
+            box-shadow: 2px 2px 0px #000;
+            transform: translate(2px, 2px);
+            background: #fff;
+        }
+
+        .btn-action.disabled {
+            background: var(--bg-tertiary) !important;
+            color: var(--text-secondary) !important;
+            border-color: var(--border-color) !important;
+            box-shadow: none !important;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-white {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+            padding: 14px 28px;
+            text-transform: uppercase;
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-white:hover {
+            border-color: var(--accent-magenta);
+            color: var(--accent-magenta);
+        }
+
+        /* Main Workspace Container */
+        .wizard-workspace {
+            max-width: 1440px;
+            margin: 40px auto;
+            padding: 0 40px;
+            display: grid;
+            grid-template-columns: 1.25fr 0.75fr;
+            gap: 40px;
+        }
+
+        @media (max-width: 1024px) {
+            .wizard-workspace {
+                grid-template-columns: 1fr;
+                padding: 0 20px;
+                margin: 20px auto;
+            }
+        }
+
+        /* Section Headlines */
+        .wizard-header {
+            grid-column: 1 / -1;
+            margin-bottom: 20px;
+            border-bottom: 3px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+
+        .wizard-header h1 {
+            font-family: var(--font-display);
+            font-size: clamp(28px, 4vw, 48px);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: -1.5px;
+            line-height: 1.1;
+        }
+
+        .wizard-header h1 span {
+            color: transparent;
+            -webkit-text-stroke: 1.2px var(--accent-cyan);
+            text-stroke: 1.2px var(--accent-cyan);
+        }
+
+        .wizard-header p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        /* Progress Steps Bar */
+        .steps-tracker {
+            display: flex;
+            justify-content: space-between;
+            background: var(--bg-secondary);
+            border: 3px solid var(--border-color);
+            padding: 24px;
+            margin-bottom: 30px;
+            grid-column: 1 / -1;
+            gap: 20px;
+            box-shadow: var(--brutal-shadow-hover);
+            position: relative;
+        }
+
+        @media (max-width: 768px) {
+            .steps-tracker {
+                flex-direction: column;
+                gap: 16px;
+            }
+        }
+
+        .step-item {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+
+        .step-item.active {
+            opacity: 1;
+        }
+
+        .step-item.completed {
+            opacity: 0.85;
+        }
+
+        .step-badge {
+            width: 38px;
+            height: 38px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            color: var(--text-secondary);
+            font-family: var(--font-display);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .step-item.active .step-badge {
+            background: var(--accent-cyan);
+            color: #000;
+            border-color: #000;
+            box-shadow: 3px 3px 0px #000;
+        }
+
+        .step-item.completed .step-badge {
+            background: var(--accent-lime);
+            color: #000;
+            border-color: #000;
+            box-shadow: 2px 2px 0px #000;
+        }
+
+        .step-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .step-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-primary);
+        }
+
+        .step-item.active .step-title {
+            color: var(--accent-cyan);
+        }
+
+        .step-item.completed .step-title {
+            color: var(--accent-lime);
+        }
+
+        .step-desc {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        /* Step Card Section */
+        .step-card {
+            background: var(--bg-secondary);
+            border: 3px solid var(--border-color);
+            box-shadow: var(--brutal-shadow);
+            border-radius: 4px;
+            padding: 40px;
+            display: none;
+            flex-direction: column;
+            gap: 32px;
+            min-height: 480px;
+        }
+
+        .step-card.active {
+            display: flex;
+        }
+
+        .step-headline-group {
+            border-bottom: 2px dashed var(--border-color);
+            padding-bottom: 16px;
+        }
+
+        .step-headline-group h2 {
+            font-family: var(--font-display);
+            font-size: 24px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .step-headline-group p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        /* Input Styles */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 640px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+        }
+
+        .form-input {
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            padding: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+        }
+
+        .form-select {
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            padding: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 16px;
+        }
+
+        .form-select:focus {
+            border-color: var(--accent-cyan);
+        }
+
+        /* Custom 3-Attachment Uploader Layout */
+        .uploader-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .upload-slot {
+            background: var(--bg-primary);
+            border: 2px dashed var(--border-color);
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .upload-slot:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 240, 255, 0.02);
+        }
+
+        .upload-slot.highlighted {
+            border-color: var(--accent-orange);
+            background: rgba(255, 92, 0, 0.04);
+        }
+
+        .upload-slot.completed {
+            border-color: var(--accent-lime);
+            background: rgba(57, 255, 20, 0.02);
+            box-shadow: inset 0 0 10px rgba(57, 255, 20, 0.05);
+        }
+
+        .upload-slot.failed {
+            border-color: var(--accent-magenta);
+            background: rgba(255, 0, 122, 0.02);
+        }
+
+        .upload-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            z-index: 1;
+            flex: 1;
+        }
+
+        .upload-icon {
+            font-size: 28px;
+            background: var(--bg-tertiary);
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+
+        .upload-slot.completed .upload-icon {
+            background: var(--accent-lime);
+            color: #000;
+            border-color: #000;
+        }
+
+        .upload-meta {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .upload-meta h4 {
+            font-family: var(--font-display);
+            font-size: 14px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .upload-meta p {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .upload-status-badge {
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 1px;
+            border: 1px solid var(--border-color);
+            padding: 4px 10px;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            z-index: 1;
+        }
+
+        .upload-slot.completed .upload-status-badge {
+            border-color: var(--accent-lime);
+            color: var(--accent-lime);
+            background: rgba(57, 255, 20, 0.1);
+        }
+
+        .upload-slot.scanning .upload-status-badge {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            background: rgba(0, 240, 255, 0.1);
+        }
+
+        .upload-slot.failed .upload-status-badge {
+            border-color: var(--accent-magenta);
+            color: var(--accent-magenta);
+            background: rgba(255, 0, 122, 0.1);
+        }
+
+        .hidden-input {
+            display: none;
+        }
+
+        /* Real-time progression bar inside upload slot */
+        .progress-bar-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--bg-tertiary);
+            display: none;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--accent-cyan);
+            transition: width 0.1s linear;
+        }
+
+        .upload-slot.scanning .progress-bar-container {
+            display: block;
+        }
+
+        /* Malware logs terminal style */
+        .malware-log {
+            background: #040507;
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            font-family: monospace;
+            font-size: 11px;
+            color: var(--accent-cyan);
+            height: 70px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .upload-slot.scanning + .malware-log,
+        .upload-slot.completed + .malware-log,
+        .upload-slot.failed + .malware-log {
+            display: block;
+            margin-top: -16px;
+            margin-bottom: 12px;
+            border-top: none;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        /* Dossier metadata Visualizer Panel */
+        .dossier-terminal {
+            background: var(--bg-secondary);
+            border: 3px solid var(--border-color);
+            box-shadow: var(--brutal-shadow);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+
+        .terminal-header {
+            background: var(--bg-tertiary);
+            padding: 12px 20px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--border-color);
+        }
+        .dot.active-1 { background: var(--accent-cyan); }
+        .dot.active-2 { background: var(--accent-orange); }
+        .dot.active-3 { background: var(--accent-magenta); }
+
+        .terminal-title {
+            font-family: var(--font-display);
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .terminal-badge {
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--accent-cyan);
+            padding: 3px 8px;
+            font-size: 10px;
+            text-transform: uppercase;
+            border: 1px solid var(--accent-cyan);
+            font-weight: 700;
+        }
+
+        .terminal-body {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .meta-summary-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .summary-value {
+            font-family: var(--font-display);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-align: right;
+        }
+
+        .summary-value.highlight {
+            color: var(--accent-cyan);
+        }
+
+        /* Submission Checklist Panel */
+        .checklist-container {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .checklist-title {
+            font-family: var(--font-display);
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            font-weight: 700;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 6px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .checklist-bullet {
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: 900;
+            color: transparent;
+        }
+
+        .checklist-item.verified {
+            color: var(--text-primary);
+        }
+
+        .checklist-item.verified .checklist-bullet {
+            background: var(--accent-lime);
+            color: #000;
+            border-color: #000;
+        }
+
+        /* Review Agreement Box */
+        .agreement-box {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            background: var(--bg-tertiary);
+            border: 1px dashed var(--border-color);
+            padding: 20px;
+            margin-top: 10px;
+        }
+
+        .agreement-box input[type="checkbox"] {
+            margin-top: 4px;
+            cursor: pointer;
+            accent-color: var(--accent-cyan);
+        }
+
+        .agreement-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .agreement-text span {
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        /* Wizard Actions Bar */
+        .wizard-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        /* Toast Notifications */
+        .toast-notify {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--accent-cyan);
+            padding: 16px 24px;
+            box-shadow: var(--brutal-shadow);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--font-display);
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            transform: translateY(150%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .toast-notify.visible {
+            transform: translateY(0);
+        }
+
+        .toast-notify.success {
+            border-color: var(--accent-lime);
+        }
+
+        .toast-notify.success .toast-dot {
+            background: var(--accent-lime);
+            box-shadow: 0 0 10px var(--accent-lime);
+        }
+
+        .toast-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-cyan);
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            100% { transform: scale(1.1); opacity: 1; }
+        }
+
+        /* Success Core Flow Landing Page Component styles */
+        .success-hero {
+            text-align: center;
+            max-width: 800px;
+            margin: 80px auto;
+            padding: 40px;
+            background: var(--bg-secondary);
+            border: 3px solid var(--accent-lime);
+            box-shadow: 8px 8px 0px #000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .success-hero.visible {
+            display: flex;
+        }
+
+        .success-icon-giant {
+            font-size: 64px;
+            width: 100px;
+            height: 100px;
+            background: var(--accent-lime);
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #000;
+            box-shadow: 4px 4px 0 #000;
+            margin-bottom: 12px;
+        }
+
+        /* Footer styling */
+        footer {
+            background: #000000;
+            color: var(--text-primary);
+            border-top: 4px solid var(--border-color);
+            padding: 80px 40px;
+            margin-top: 120px;
+        }
+
+        .footer-grid {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 60px;
+        }
+
+        @media (max-width: 1024px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+        }
+
+        .footer-cta h2 {
+            font-family: var(--font-display);
+            font-size: 48px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        .footer-cta h2 span {
+            color: var(--accent-magenta);
+        }
+
+        .footer-cta p {
+            color: var(--text-secondary);
+            font-size: 16px;
+            max-width: 600px;
+            margin-bottom: 30px;
+        }
+
+        .footer-links-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .footer-column {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-width: 160px;
+        }
+
+        .footer-column h4 {
+            font-family: var(--font-display);
+            text-transform: uppercase;
+            font-size: 12px;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            position: relative;
+            padding-bottom: 4px;
+        }
+
+        .footer-column h4::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 30px;
+            height: 2px;
+            background: var(--accent-cyan);
+        }
+
+        .footer-column a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: color 0.15s ease;
+        }
+
+        .footer-column a:hover {
+            color: var(--accent-cyan);
+        }
+
+        .footer-bottom {
+            max-width: 1440px;
+            margin: 60px auto 0 auto;
+            padding-top: 30px;
+            border-top: 1px solid #1a202c;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: var(--text-secondary);
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation -->
+    <nav class="nav-header">
+        <a href="index.html" class="logo-area">
+            <div class="logo-icon">C</div>
+            CORE FLOW
+        </a>
+        <div class="nav-links">
+            <a href="index.html#tools-library" class="nav-link">Calculators</a>
+            <a href="index.html#strategy" class="nav-link">Expert Help</a>
+            <a href="index.html#faq" class="nav-link">FAQ</a>
+        </div>
+        <a href="index.html#tools-library" class="btn-action" style="padding: 10px 20px; font-size: 12px; box-shadow: 2px 2px 0px #000;">Launch Core</a>
+    </nav>
+
+    <!-- Main Submission Container -->
+    <main id="wizard-container">
+        <div class="wizard-workspace">
+            
+            <div class="wizard-header">
+                <h1>Dossier <span>Case Initiator</span></h1>
+                <p>Complete your step-by-step risk-mitigated underwriting dossier. All processes undergo automated decryption, schema verification, and immediate compliance checks.</p>
+            </div>
+
+            <!-- Steps Progress Bar Component -->
+            <div class="steps-tracker">
+                <div class="step-item active" id="tracker-step-1">
+                    <div class="step-badge">1</div>
+                    <div class="step-details">
+                        <span class="step-title">Company Profile</span>
+                        <span class="step-desc">Entity Parameters</span>
+                    </div>
+                </div>
+                <div class="step-item" id="tracker-step-2">
+                    <div class="step-badge">2</div>
+                    <div class="step-details">
+                        <span class="step-title">Funding Terms</span>
+                        <span class="step-desc">Target Underwrite</span>
+                    </div>
+                </div>
+                <div class="step-item" id="tracker-step-3">
+                    <div class="step-badge">3</div>
+                    <div class="step-details">
+                        <span class="step-title">Core Uploads</span>
+                        <span class="step-desc">Secure Uploader</span>
+                    </div>
+                </div>
+                <div class="step-item" id="tracker-step-4">
+                    <div class="step-badge">4</div>
+                    <div class="step-details">
+                        <span class="step-title">Security &amp; Transmit</span>
+                        <span class="step-desc">Malware Check</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Left Panel Form Container -->
+            <div class="left-form-panel">
+                
+                <!-- Step 1 Form Box -->
+                <div class="step-card active" id="step-1">
+                    <div class="step-headline-group">
+                        <h2>Step 1: Entity Background Configuration</h2>
+                        <p>Establish basic organizational parameters for indexing your financial record files.</p>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label class="form-label" for="companyName">Legal Corporate Name</label>
+                            <input type="text" id="companyName" class="form-input" placeholder="e.g., Apex Tech Solutions LLC" oninput="updateLiveSummary()">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="entityType">Corporate Structure</label>
+                            <select id="entityType" class="form-select" onchange="updateLiveSummary()">
+                                <option value="" disabled selected>Select structure type</option>
+                                <option value="LLC">LLC (Limited Liability Corp)</option>
+                                <option value="S-Corp">S-Corporation</option>
+                                <option value="C-Corp">C-Corporation</option>
+                                <option value="Partnership">Partnership</option>
+                                <option value="Sole Proprietor">Sole Proprietorship</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="ein">Federal EIN Tax ID</label>
+                            <input type="text" id="ein" class="form-input" placeholder="XX-XXXXXXX" oninput="updateLiveSummary()">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="industry">Industry Category</label>
+                            <select id="industry" class="form-select" onchange="updateLiveSummary()">
+                                <option value="" disabled selected>Select industry</option>
+                                <option value="SaaS/Technology">SaaS / Technology</option>
+                                <option value="Logistics">Logistics &amp; Transport</option>
+                                <option value="E-Commerce">E-Commerce</option>
+                                <option value="Construction">Construction / Trades</option>
+                                <option value="Healthcare">Healthcare / Biotech</option>
+                                <option value="Professional Services">Professional Services</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="annualRev">Estimated Gross Revenue</label>
+                            <select id="annualRev" class="form-select" onchange="updateLiveSummary()">
+                                <option value="" disabled selected>Select annual range</option>
+                                <option value="$100K - $500K">$100,000 - $500,000</option>
+                                <option value="$500K - $1.5M">$500,000 - $1,500,000</option>
+                                <option value="$1.5M - $5M">$1,500,000 - $5,000,000</option>
+                                <option value="$5M - $20M">$5,000,000 - $20,000,000</option>
+                                <option value="$20M+">$20,000,000+</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="wizard-actions">
+                        <div></div>
+                        <button class="btn-action" onclick="goToStep(2)">Proceed to Terms &rarr;</button>
+                    </div>
+                </div>
+
+                <!-- Step 2 Form Box -->
+                <div class="step-card" id="step-2">
+                    <div class="step-headline-group">
+                        <h2>Step 2: Key Underwriting Requirements</h2>
+                        <p>Configure details for target deployment parameters, timeframe, and proposed payback metrics.</p>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label" for="fundingAmt">Target Funding Required</label>
+                            <input type="number" id="fundingAmt" class="form-input" placeholder="e.g., 250000" min="5000" oninput="updateLiveSummary()">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="fundingTime">Desired Allocation Period</label>
+                            <select id="fundingTime" class="form-select" onchange="updateLiveSummary()">
+                                <option value="" disabled selected>Select timeframe</option>
+                                <option value="12 Months">12 Months (Short-Term Alternative)</option>
+                                <option value="24 Months">24 Months (Standard Business)</option>
+                                <option value="36 Months">36 Months (Growth Scaling)</option>
+                                <option value="60 Months">60 Months (Institutional Capex)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label class="form-label" for="proceedsUse">Planned Use of Proceeds</label>
+                            <select id="proceedsUse" class="form-select" onchange="updateLiveSummary()">
+                                <option value="" disabled selected>Primary capital application...</option>
+                                <option value="Working Capital">Working Capital Buffer &amp; Payroll</option>
+                                <option value="Equipment Capex">Equipment Purchase / Asset Upgrade</option>
+                                <option value="Inventory Restock">Inventory Acquisition &amp; Supply Scale</option>
+                                <option value="Marketing Acquisition">Client Acquisition Marketing Run</option>
+                                <option value="Debt Consolidation">Refinancing Out High-Cost Debt</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="wizard-actions">
+                        <button class="btn-white" onclick="goToStep(1)">&larr; Back to Profile</button>
+                        <button class="btn-action" onclick="goToStep(3)">Proceed to Attachments &rarr;</button>
+                    </div>
+                </div>
+
+                <!-- Step 3 Form Box (The Core 3-Attachment Component) -->
+                <div class="step-card" id="step-3">
+                    <div class="step-headline-group">
+                        <h2>Step 3: Core Dossier Documentation</h2>
+                        <p>Safely append validation documents. Your files undergo sandboxed metadata extraction and parsing metrics check instantly.</p>
+                    </div>
+
+                    <div class="uploader-container">
+                        
+                        <!-- File Upload Slot 1: Bank Statements -->
+                        <div class="upload-area">
+                            <div class="upload-slot" id="slot-bank" onclick="triggerFileSelect('bankInput')">
+                                <div class="upload-info">
+                                    <div class="upload-icon" id="icon-bank">🏦</div>
+                                    <div class="upload-meta">
+                                        <h4 id="label-bank-title">3 Months Corporate Bank Statements</h4>
+                                        <p id="label-bank-desc">Require single combined PDF format. Max 15MB.</p>
+                                    </div>
+                                </div>
+                                <div class="upload-status-badge" id="badge-bank">AWAITING FILE</div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-fill" id="progress-bank"></div>
+                                </div>
+                            </div>
+                            <input type="file" id="bankInput" class="hidden-input" accept=".pdf" onchange="handleFileSelected(this, 'bank', 15)">
+                            <div class="malware-log" id="log-bank"></div>
+                        </div>
+
+                        <!-- File Upload Slot 2: Corporate Tax Return -->
+                        <div class="upload-area">
+                            <div class="upload-slot" id="slot-tax" onclick="triggerFileSelect('taxInput')">
+                                <div class="upload-info">
+                                    <div class="upload-icon" id="icon-tax">📑</div>
+                                    <div class="upload-meta">
+                                        <h4 id="label-tax-title">Most Recent Filed Tax Return (IRS Form 1120/1065)</h4>
+                                        <p id="label-tax-desc">Require signed federal tax return PDF. Max 20MB.</p>
+                                    </div>
+                                </div>
+                                <div class="upload-status-badge" id="badge-tax">AWAITING FILE</div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-fill" id="progress-tax"></div>
+                                </div>
+                            </div>
+                            <input type="file" id="taxInput" class="hidden-input" accept=".pdf" onchange="handleFileSelected(this, 'tax', 20)">
+                            <div class="malware-log" id="log-tax"></div>
+                        </div>
+
+                        <!-- File Upload Slot 3: Owner ID Verification -->
+                        <div class="upload-area">
+                            <div class="upload-slot" id="slot-id" onclick="triggerFileSelect('idInput')">
+                                <div class="upload-info">
+                                    <div class="upload-icon" id="icon-id">🆔</div>
+                                    <div class="upload-meta">
+                                        <h4 id="label-id-title">Principal Driver's License or Passport</h4>
+                                        <p id="label-id-desc">Requires high-res color image copy or PDF scan. Max 10MB.</p>
+                                    </div>
+                                </div>
+                                <div class="upload-status-badge" id="badge-id">AWAITING FILE</div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-fill" id="progress-id"></div>
+                                </div>
+                            </div>
+                            <input type="file" id="idInput" class="hidden-input" accept=".pdf,.jpeg,.jpg,.png" onchange="handleFileSelected(this, 'id', 10)">
+                            <div class="malware-log" id="log-id"></div>
+                        </div>
+
+                    </div>
+
+                    <div class="wizard-actions">
+                        <button class="btn-white" onclick="goToStep(2)">&larr; Back to Terms</button>
+                        <button class="btn-action disabled" id="next-to-step-4" onclick="goToStep(4)" disabled>Proceed to Verification &rarr;</button>
+                    </div>
+                </div>
+
+                <!-- Step 4 Form Box -->
+                <div class="step-card" id="step-4">
+                    <div class="step-headline-group">
+                        <h2>Step 4: Cryptographic Handshake &amp; Transmission</h2>
+                        <p>Complete execution validation steps. Review all details, certify authenticity, and securely initiate the terminal transmission flow.</p>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        
+                        <div class="flow-graph-container" style="background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 4px; padding: 20px;">
+                            <p style="font-family: var(--font-display); font-size: 11px; text-transform: uppercase; color: var(--accent-orange); font-weight: 700; margin-bottom: 12px; letter-spacing: 1px;">Transmission Protocol</p>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center; position: relative;">
+                                <div class="flow-node highlight" style="background: var(--bg-secondary); border: 2px solid var(--accent-cyan); padding: 10px; border-radius: 4px; font-size: 12px; font-weight: 700; text-transform: uppercase; text-align: center; width: 45%;" id="flow-node-company"> Apex Solutions</div>
+                                <div style="color: var(--accent-cyan); font-weight: bold; font-size: 18px;">&rArr;</div>
+                                <div class="flow-node highlight" style="background: var(--bg-secondary); border: 2px solid var(--accent-lime); padding: 10px; border-radius: 4px; font-size: 12px; font-weight: 700; text-transform: uppercase; text-align: center; width: 45%;">Core Flow Node [Verified]</div>
+                            </div>
+                        </div>
+
+                        <div class="agreement-box">
+                            <input type="checkbox" id="certificationCheck" onchange="toggleSubmitButton()">
+                            <div class="agreement-text">
+                                I hereby certify and pledge that the corporate parameters, bank details, tax document indexes, and verification logs uploaded represents accurate operational facts. I authorize the <span>Core Flow Automated Indexer Engine</span> to encrypt and index this dossier for risk assessment.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="wizard-actions">
+                        <button class="btn-white" onclick="goToStep(3)">&larr; Back to Uploads</button>
+                        <button class="btn-action disabled text-glow-lime" id="final-submit-btn" onclick="executeFinalDossierSubmission()" disabled>Transmit Certified Dossier</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Panel: Live Metadata Visualizer Terminal -->
+            <div class="right-visualizer-panel">
+                <div class="dossier-terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-dots">
+                            <div class="dot active-1"></div>
+                            <div class="dot active-2"></div>
+                            <div class="dot active-3"></div>
+                        </div>
+                        <div class="terminal-title">Metadata Visualizer</div>
+                        <div class="terminal-badge" id="visualizer-status">INITIALIZING</div>
+                    </div>
+
+                    <div class="terminal-body">
+                        <div class="meta-summary-grid">
+                            <div class="summary-row">
+                                <span class="summary-label">Corporate Entity</span>
+                                <span class="summary-value" id="sum-company">---</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="summary-label">Structure</span>
+                                <span class="summary-value" id="sum-structure">---</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="summary-label">Federal tax identifier</span>
+                                <span class="summary-value" id="sum-ein">---</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="summary-label">Industrial Focus</span>
+                                <span class="summary-value" id="sum-industry">---</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="summary-label">Annual Gross Rev</span>
+                                <span class="summary-value highlight" id="sum-revenue">---</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="summary-label">Target Funding</span>
+                                <span class="summary-value highlight text-glow-cyan" id="sum-funding">---</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="summary-label">Payback Window</span>
+                                <span class="summary-value" id="sum-term">---</span>
+                            </div>
+                        </div>
+
+                        <!-- Check Status Requirements -->
+                        <div class="checklist-container">
+                            <div class="checklist-title">Verification checklist</div>
+                            
+                            <div class="checklist-item" id="chk-profile">
+                                <div class="checklist-bullet">&check;</div>
+                                profile configurations
+                            </div>
+                            <div class="checklist-item" id="chk-terms">
+                                <div class="checklist-bullet">&check;</div>
+                                Target placement metrics
+                            </div>
+                            <div class="checklist-item" id="chk-attachments">
+                                <div class="checklist-bullet">&check;</div>
+                                (3/3) Core Attachment files
+                            </div>
+                            <div class="checklist-item" id="chk-security">
+                                <div class="checklist-bullet">&check;</div>
+                                Malware Scan Validation
+                            </div>
+                        </div>
+
+                        <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; line-height: 1.4; border-top: 1px dashed var(--border-color); padding-top: 10px;">
+                            Calculations are localized. Client-side sandbox ensures no parameters leave your terminal without encrypted certification.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Success Interface Screen (Hidden by Default) -->
+    <section class="success-hero" id="success-screen">
+        <div class="success-icon-giant">&check;</div>
+        <h2 style="font-family: var(--font-display); font-size: 36px; text-transform: uppercase; font-weight: 800;">Dossier Core <span>Transmitted</span></h2>
+        <p style="color: var(--text-secondary); font-size: 16px; line-height: 1.6;">
+            Your file verification protocols successfully cleared threat definitions. The secure payload index key has been broadcast across target capital nodes under transmission signature <strong>#CF-92842-X</strong>.
+        </p>
+        
+        <div style="background: var(--bg-tertiary); border: 2px solid var(--border-color); padding: 18px; width: 100%; text-align: left; font-family: monospace; font-size: 11px; color: var(--accent-lime); display: flex; flex-direction: column; gap: 4px;">
+            <span>[SYS LOG] Packet Handshake Established: Core Flow Mainframe</span>
+            <span>[SYS LOG] Secure Payload Size Check: 12.8MB Verified</span>
+            <span>[SYS LOG] Status: COMPLIANT / QUEUED FOR UNDERWRITING ROUTE</span>
+            <span>[SYS LOG] Broadcast Node Targets: 12 Verified Liquidity Partners</span>
+        </div>
+
+        <div style="display: flex; gap: 16px; width: 100%; justify-content: center; margin-top: 12px;">
+            <a href="index.html" class="btn-white" style="flex: 1;">Return Home</a>
+            <button class="btn-action" style="flex: 1;" onclick="window.print()">Print Receipt Dossier</button>
+        </div>
+    </section>
+
+    <!-- Interactive Active State / Update Notification Toast -->
+    <div id="toast" class="toast-notify">
+        <div class="toast-dot"></div>
+        <div id="toast-text">Loading Dossier Engine...</div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-cta">
+                <h2>Accelerate your <span>capital matrix</span></h2>
+                <p>Interactive client-side models built for founders, brokers, and fintech visionaries. Analyze funding mechanisms without registration barriers or credit impacts.</p>
+                <a href="index.html#tools-library" class="btn-action">Open Sandbox Engine</a>
+            </div>
+            <div class="footer-links-group">
+                <div class="footer-column">
+                    <h4>Calculators</h4>
+                    <a href="index.html#tools-library">Term Loans</a>
+                    <a href="index.html#tools-library">MCA Factor Conversion</a>
+                    <a href="index.html#tools-library">Revenue Finance</a>
+                    <a href="index.html#tools-library">Broker Commission</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Platform</h4>
+                    <a href="index.html#tools-library">All Modules</a>
+                    <a href="index.html#strategy">Advisor Network</a>
+                    <a href="index.html#faq">Knowledge Base</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div>&copy; 2024 CORE FLOW FINTECH UTILITY. MASSIVE OPEN CALCULATOR UTILITIES. DATA-BACKED VELOCITY.</div>
+            <div style="display: flex; gap: 20px;">
+                <span style="color: var(--accent-cyan); font-weight: 700;">PROD VERSION 4.2</span>
+                <span>NO COOKIES TRACKED</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Wizard Javascript Processing Scripts -->
+    <script>
+        // Track wizard steps and file validations
+        let currentStep = 1;
+        const uploadedFiles = {
+            bank: { completed: false, name: null, size: 0 },
+            tax: { completed: false, name: null, size: 0 },
+            id: { completed: false, name: null, size: 0 }
+        };
+
+        // Initialize engine notifications
+        const toast = document.getElementById('toast');
+        const toastText = document.getElementById('toast-text');
+
+        function showToast(text, type = 'info') {
+            toastText.innerText = text;
+            toast.className = 'toast-notify';
+            if (type === 'success') {
+                toast.classList.add('success');
+            }
+            toast.classList.add('visible');
+            setTimeout(() => {
+                toast.classList.remove('visible');
+            }, 3000);
+        }
+
+        // Handle navigation steps
+        function goToStep(stepNum) {
+            // Basic step boundary limits
+            if (stepNum < 1 || stepNum > 4) return;
+            
+            // Validation block logic before proceeding to specific steps
+            if (stepNum === 2 && !validateStep1()) {
+                showToast("Please complete corporate configurations before step progression.");
+                return;
+            }
+            if (stepNum === 3 && !validateStep2()) {
+                showToast("Target Placement requirement details are missing.");
+                return;
+            }
+            if (stepNum === 4 && !validateStep3()) {
+                showToast("Dossier attachments must all clear malware sandbox analysis.");
+                return;
+            }
+
+            // Execute transition display changes
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+            document.getElementById(`step-${stepNum}`).classList.add('active');
+
+            // Update Steps Tracker Progress display
+            document.getElementById(`tracker-step-${currentStep}`).classList.remove('active');
+            if (stepNum > currentStep) {
+                document.getElementById(`tracker-step-${currentStep}`).classList.add('completed');
+            }
+            document.getElementById(`tracker-step-${stepNum}`).classList.add('active');
+
+            // Set state tracking & notify user
+            currentStep = stepNum;
+            updateLiveSummary();
+            showToast(`Loading Dossier Module: Step ${stepNum}`);
+
+            // If proceeding to Step 4, automatically verify malware safety grade status
+            if (stepNum === 4) {
+                document.getElementById('chk-security').classList.add('verified');
+                document.getElementById('visualizer-status').innerText = 'SECURE READY';
+                document.getElementById('visualizer-status').style.borderColor = 'var(--accent-lime)';
+                document.getElementById('visualizer-status').style.color = 'var(--accent-lime)';
+                document.getElementById('visualizer-status').style.background = 'rgba(57, 255, 20, 0.1)';
+            }
+        }
+
+        // Field Validation Methods
+        function validateStep1() {
+            const company = document.getElementById('companyName').value.trim();
+            const structure = document.getElementById('entityType').value;
+            const ein = document.getElementById('ein').value.trim();
+            const revenue = document.getElementById('annualRev').value;
+            return company !== "" && structure !== "" && ein !== "" && revenue !== "";
+        }
+
+        function validateStep2() {
+            const funding = document.getElementById('fundingAmt').value;
+            const term = document.getElementById('fundingTime').value;
+            const proceeds = document.getElementById('proceedsUse').value;
+            return funding > 0 && term !== "" && proceeds !== "";
+        }
+
+        function validateStep3() {
+            return uploadedFiles.bank.completed && uploadedFiles.tax.completed && uploadedFiles.id.completed;
+        }
+
+        // Live visual update logic
+        function updateLiveSummary() {
+            const nameVal = document.getElementById('companyName').value.trim();
+            const typeVal = document.getElementById('entityType').value;
+            const einVal = document.getElementById('ein').value.trim();
+            const indVal = document.getElementById('industry').value;
+            const revVal = document.getElementById('annualRev').value;
+            const fundingVal = document.getElementById('fundingAmt').value;
+            const termVal = document.getElementById('fundingTime').value;
+
+            // Apply updates to live visual elements
+            document.getElementById('sum-company').innerText = nameVal || "---";
+            document.getElementById('sum-structure').innerText = typeVal || "---";
+            document.getElementById('sum-ein').innerText = einVal || "---";
+            document.getElementById('sum-industry').innerText = indVal || "---";
+            document.getElementById('sum-revenue').innerText = revVal || "---";
+            
+            if (fundingVal) {
+                document.getElementById('sum-funding').innerText = `$${parseInt(fundingVal).toLocaleString()}`;
+            } else {
+                document.getElementById('sum-funding').innerText = "---";
+            }
+            
+            document.getElementById('sum-term').innerText = termVal || "---";
+
+            // Update checklist states
+            const chkProfile = document.getElementById('chk-profile');
+            const chkTerms = document.getElementById('chk-terms');
+            const chkAttachments = document.getElementById('chk-attachments');
+
+            if (validateStep1()) {
+                chkProfile.classList.add('verified');
+            } else {
+                chkProfile.classList.remove('verified');
+            }
+
+            if (validateStep2()) {
+                chkTerms.classList.add('verified');
+            } else {
+                chkTerms.classList.remove('verified');
+            }
+
+            if (validateStep3()) {
+                chkAttachments.classList.add('verified');
+            } else {
+                chkAttachments.classList.remove('verified');
+            }
+
+            // Sync visual terminal header status
+            const termStatus = document.getElementById('visualizer-status');
+            if (validateStep1() && validateStep2() && validateStep3()) {
+                termStatus.innerText = "READY";
+                termStatus.style.color = "var(--accent-cyan)";
+                termStatus.style.borderColor = "var(--accent-cyan)";
+            } else {
+                termStatus.innerText = "CONFIGURING";
+                termStatus.style.color = "var(--accent-orange)";
+                termStatus.style.borderColor = "var(--accent-orange)";
+                termStatus.style.background = "rgba(255, 92, 0, 0.05)";
+            }
+
+            // Update Step 4 Dynamic Transmitting Node Visual elements
+            document.getElementById('flow-node-company').innerText = nameVal || 'Apex Company Node';
+        }
+
+        // Instant Upload trigger actions
+        function triggerFileSelect(id) {
+            document.getElementById(id).click();
+        }
+
+        function handleFileSelected(inputElement, key, maxSizeMb) {
+            const file = inputElement.files[0];
+            if (!file) return;
+
+            const slot = document.getElementById(`slot-${key}`);
+            const badge = document.getElementById(`badge-${key}`);
+            const loaderContainer = slot.querySelector('.progress-bar-container');
+            const progressBar = document.getElementById(`progress-${key}`);
+            const logTerm = document.getElementById(`log-${key}`);
+
+            // Reset classes
+            slot.className = 'upload-slot';
+            slot.classList.add('scanning');
+            badge.innerText = 'INITIALIZING SCAN';
+            logTerm.innerText = '';
+
+            // Size validation logic
+            const fileSizeMb = file.size / (1024 * 1024);
+            if (fileSizeMb > maxSizeMb) {
+                // Instantly fail if constraint unmet
+                setTimeout(() => {
+                    slot.className = 'upload-slot failed';
+                    badge.innerText = 'SIZE EXCEEDED';
+                    logTerm.innerText = `[MALWARE TERMINAL ERROR]: File size ${fileSizeMb.toFixed(2)}MB exceeds maximum allowed threshold of ${maxSizeMb}MB.\nTransmission pipeline blocked.`;
+                    showToast("File validation error: Size exceeds boundaries.", "warning");
+                }, 500);
+                return;
+            }
+
+            // Initialize Progress Animation Simulator
+            let uploadProgress = 0;
+            const progressInterval = setInterval(() => {
+                uploadProgress += 15;
+                if (uploadProgress >= 100) {
+                    uploadProgress = 100;
+                    clearInterval(progressInterval);
+                    executeMalwareValidationSimulation(file, key, logTerm, slot, badge);
+                }
+                progressBar.style.width = `${uploadProgress}%`;
+            }, 100);
+        }
+
+        // Malware Sandboxed scanning validation simulation sequence
+        function executeMalwareValidationSimulation(file, key, logTerminal, slotElement, badgeElement) {
+            badgeElement.innerText = "SCANNING FILE";
+            badgeElement.style.color = "var(--accent-orange)";
+            badgeElement.style.borderColor = "var(--accent-orange)";
+
+            // Step 1: Sandbox decryption visual text logs
+            writeToTerminal(logTerminal, `[DECRYPTER] Inbound file schema check: "${file.name}" | Size: ${(file.size / 1024).toFixed(1)} KB...`);
+            
+            setTimeout(() => {
+                writeToTerminal(logTerminal, `[ANALYZER] Comparing binary block hashes with active ClamAV / VirusTotal registry targets...`);
+            }, 800);
+
+            setTimeout(() => {
+                writeToTerminal(logTerminal, `[ANALYZER] Threat matrix scan outcomes: 0 definitions flagged. Checking compliance rules...`);
+            }, 1600);
+
+            // Step 2: Final safe verification confirmation
+            setTimeout(() => {
+                writeToTerminal(logTerminal, `[COMPLIANCE] Success: File cleared malware parsing checks. Handshake index verified.`);
+                
+                // Set UI state to positive validated standard
+                slotElement.className = "upload-slot completed";
+                badgeElement.innerText = "PASSED SECURE";
+                
+                // Alter file title descriptions
+                document.getElementById(`label-${key}-title`).innerText = file.name;
+                document.getElementById(`label-${key}-desc`).innerText = `SECURE INDEX: MD5_${Math.random().toString(36).substring(7).toUpperCase()}`;
+
+                // Mark slot verified in local dataset
+                uploadedFiles[key].completed = true;
+                uploadedFiles[key].name = file.name;
+                uploadedFiles[key].size = file.size;
+
+                showToast(`Secure validation cleared: ${file.name}`, 'success');
+                updateLiveSummary();
+
+                // Enable Proceed Next Step button if all three uploaded elements verify completed
+                if (validateStep3()) {
+                    const btn = document.getElementById('next-to-step-4');
+                    btn.classList.remove('disabled');
+                    btn.removeAttribute('disabled');
+                }
+            }, 2400);
+        }
+
+        // Log appending helper
+        function writeToTerminal(element, message) {
+            element.innerText += `${message}\n`;
+            element.scrollTop = element.scrollHeight;
+        }
+
+        // Certified Checkbox triggers submit state
+        function toggleSubmitButton() {
+            const check = document.getElementById('certificationCheck');
+            const btn = document.getElementById('final-submit-btn');
+            
+            if (check.checked) {
+                btn.classList.remove('disabled');
+                btn.removeAttribute('disabled');
+            } else {
+                btn.classList.add('disabled');
+                btn.setAttribute('disabled', 'true');
+            }
+        }
+
+        // Finalize Secure Transmit sequence
+        function executeFinalDossierSubmission() {
+            showToast("Encrypting Payload Blocks... Sending Protocol Broadcast", "success");
+            
+            // Emulate terminal encryption sequence buffer
+            setTimeout(() => {
+                // Transitions user safely to success message
+                document.getElementById('wizard-container').style.display = 'none';
+                document.getElementById('success-screen').classList.add('visible');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 2000);
+        }
+
+        // Initialize state indicators on page load
+        window.addEventListener('load', () => {
+            updateLiveSummary();
+        });
+    </script>
+</body>
+</html>

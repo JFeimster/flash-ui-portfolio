@@ -1,0 +1,207 @@
+{
+  "version": "1.4.0",
+  "last_updated": "2026-03-31T08:00:00Z",
+  "schema_version": "https://prism-debt-intel.io/schemas/simulation-presets.v1.json",
+  "presets": [
+    {
+      "id": "macro_credit_squeeze",
+      "name": "Q3 Macro Credit Squeeze",
+      "description": "Simulates systemic high interest rate pressures. Prioritizes cash flow conservation and strong collateral backstops while heavily penalizing high-leverage growth structures.",
+      "category": "Risk Off",
+      "weights": {
+        "liquidity": 1.6,
+        "growth": 0.4,
+        "collateral": 1.8,
+        "cashFlow": 1.5,
+        "leverage": 1.4
+      },
+      "risk_tolerance": {
+        "leverage_ceiling": 60,
+        "liquidity_floor": 55,
+        "minimum_score_super_prime": 840,
+        "minimum_score_prime": 740,
+        "allow_unsecured_debt": false
+      },
+      "rule_adjustments": [
+        {
+          "rule_id": "ucc1_hard_requirement",
+          "action": "FORCE_ACTIVE",
+          "impact_severity": "HIGH",
+          "message": "All non-real-estate structures require blanket UCC-1 filings prior to terms generation."
+        },
+        {
+          "rule_id": "mrr_churn_ceiling_override",
+          "action": "CLAMP_MAX",
+          "value": 1.5,
+          "unit": "percent_monthly"
+        }
+      ],
+      "projected_metrics_impact": {
+        "approval_rate_shift_pct": -18.5,
+        "average_yield_offset_bps": 140,
+        "favored_product_route": "equip_lease",
+        "collateral_sensitivity_multiplier": 1.8
+      }
+    },
+    {
+      "id": "growth_capital_acceleration",
+      "name": "Growth Catalyst Protocol",
+      "description": "Risk-tolerant allocation logic optimized for fast-scaling digital and enterprise recurring assets. Relaxes rigid asset-backed criteria in favor of high velocity ARR indices.",
+      "category": "Growth Aggressive",
+      "weights": {
+        "liquidity": 0.9,
+        "growth": 1.9,
+        "collateral": 0.3,
+        "cashFlow": 1.2,
+        "leverage": 0.8
+      },
+      "risk_tolerance": {
+        "leverage_ceiling": 85,
+        "liquidity_floor": 35,
+        "minimum_score_super_prime": 780,
+        "minimum_score_prime": 680,
+        "allow_unsecured_debt": true
+      },
+      "rule_adjustments": [
+        {
+          "rule_id": "mrr_contract_multiplier",
+          "action": "INCREASE_WEIGHT",
+          "value": 1.35,
+          "message": "Unlocks multi-year recurring contract validation models for SaaS platforms."
+        },
+        {
+          "rule_id": "inventory_turnover_buffer",
+          "action": "RELAX_THRESHOLD",
+          "value": 12.0,
+          "unit": "days"
+        }
+      ],
+      "projected_metrics_impact": {
+        "approval_rate_shift_pct": 24.2,
+        "average_yield_offset_bps": -65,
+        "favored_product_route": "startup_bridge",
+        "collateral_sensitivity_multiplier": 0.3
+      }
+    },
+    {
+      "id": "asset_backed_premium",
+      "name": "Hard Asset & RE Concentrated",
+      "description": "Tailored strictly for commercial infrastructure, manufacturing scale-ups, and land assets. Minimizes synthetic valuation projections and relies strictly on audited tangible assets.",
+      "category": "Asset Backed",
+      "weights": {
+        "liquidity": 1.1,
+        "growth": 0.2,
+        "collateral": 2.0,
+        "cashFlow": 1.0,
+        "leverage": 1.6
+      },
+      "risk_tolerance": {
+        "leverage_ceiling": 75,
+        "liquidity_floor": 40,
+        "minimum_score_super_prime": 790,
+        "minimum_score_prime": 700,
+        "allow_unsecured_debt": false
+      },
+      "rule_adjustments": [
+        {
+          "rule_id": "depreciation_curve_lock",
+          "action": "APPLY_STRICT",
+          "value": 8.5,
+          "unit": "percent_annual"
+        },
+        {
+          "rule_id": "real_estate_appraisal_floor",
+          "action": "FORCE_MIN",
+          "value": 500000,
+          "unit": "usd"
+        }
+      ],
+      "projected_metrics_impact": {
+        "approval_rate_shift_pct": -8.1,
+        "average_yield_offset_bps": -110,
+        "favored_product_route": "re_property",
+        "collateral_sensitivity_multiplier": 2.0
+      }
+    },
+    {
+      "id": "regulatory_compliance_maxout",
+      "name": "Strict SEC/FCC Preflight Audit",
+      "description": "Pre-configured baseline matching maximal stress test models. Applies aggressive regulatory filters to exclude any potential subprime watchlists.",
+      "category": "Regulatory Strict",
+      "weights": {
+        "liquidity": 1.4,
+        "growth": 0.7,
+        "collateral": 1.2,
+        "cashFlow": 1.6,
+        "leverage": 1.5
+      },
+      "risk_tolerance": {
+        "leverage_ceiling": 50,
+        "liquidity_floor": 50,
+        "minimum_score_super_prime": 850,
+        "minimum_score_prime": 760,
+        "allow_unsecured_debt": false
+      },
+      "rule_adjustments": [
+        {
+          "rule_id": "audit_grade_minimum",
+          "action": "SET_STRICT_EQUAL",
+          "value": "tier_1_big_four",
+          "message": "Only entities under verified Big Four audits qualify for automated Prime routing paths."
+        },
+        {
+          "rule_id": "dscr_ceiling_clamp",
+          "action": "FORCE_MIN",
+          "value": 1.75,
+          "unit": "ratio_index"
+        }
+      ],
+      "projected_metrics_impact": {
+        "approval_rate_shift_pct": -31.4,
+        "average_yield_offset_bps": 220,
+        "favored_product_route": "wc_revolver",
+        "collateral_sensitivity_multiplier": 1.2
+      }
+    },
+    {
+      "id": "ecom_turnover_specialty",
+      "name": "E-Commerce Velocity Sweep",
+      "description": "Calibrated directly against high-velocity consumer spending indexes. Optimizes for fast working-capital payouts matching marketing scale factors.",
+      "category": "E-Commerce & Ads",
+      "weights": {
+        "liquidity": 1.3,
+        "growth": 1.4,
+        "collateral": 0.6,
+        "cashFlow": 1.1,
+        "leverage": 1.0
+      },
+      "risk_tolerance": {
+        "leverage_ceiling": 80,
+        "liquidity_floor": 45,
+        "minimum_score_super_prime": 800,
+        "minimum_score_prime": 710,
+        "allow_unsecured_debt": true
+      },
+      "rule_adjustments": [
+        {
+          "rule_id": "roas_coefficient_check",
+          "action": "MINIMUM_BENCHMARK",
+          "value": 3.2,
+          "unit": "multiplier"
+        },
+        {
+          "rule_id": "chargeback_rate_cap",
+          "action": "FORCE_MAX_LIMIT",
+          "value": 0.85,
+          "unit": "percent_total_sales"
+        }
+      ],
+      "projected_metrics_impact": {
+        "approval_rate_shift_pct": 14.8,
+        "average_yield_offset_bps": 75,
+        "favored_product_route": "ecom_stock_ads",
+        "collateral_sensitivity_multiplier": 0.6
+      }
+    }
+  ]
+}

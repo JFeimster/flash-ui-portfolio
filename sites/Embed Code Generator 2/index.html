@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash UI Export</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+        <div class="badge">Partner Tools v2.4</div>
+        <h1>Generate Partner Widget Embed Code</h1>
+        <p class="subheadline">Create copy/paste snippets for funding tools, calculators, application CTAs, and partner profile cards. No coding required.</p>
+    </header>
+
+    <main>
+        <!-- Left Column: Config -->
+        <section>
+            <div class="card">
+                <h3 class="section-title"><span>1</span> Widget Configuration</h3>
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>Widget Type</label>
+                        <select id="widgetType">
+                            <option value="funding-readiness">Funding Readiness Score</option>
+                            <option value="route-matcher">Route Matcher</option>
+                            <option value="app-cta">Application CTA Button</option>
+                            <option value="checklist">Document Checklist</option>
+                            <option value="faq">FAQ Widget</option>
+                            <option value="commission">Commission Estimator</option>
+                            <option value="profile">Partner Profile Card</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Tracking Source (UTM)</label>
+                        <input type="text" id="trackingSource" placeholder="e.g. blog_footer">
+                    </div>
+                    <div class="input-group">
+                        <label>Partner Name</label>
+                        <input type="text" id="partnerName" placeholder="e.g. Acme Agency">
+                    </div>
+                    <div class="input-group">
+                        <label>Partner ID</label>
+                        <input type="text" id="partnerId" placeholder="MS-99900">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="section-title"><span>2</span> Customization & Links</h3>
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>Application URL</label>
+                        <input type="text" id="appUrl" value="https://moonshine.capital/apply">
+                    </div>
+                    <div class="input-group">
+                        <label>Booking URL</label>
+                        <input type="text" id="bookingUrl" value="https://calendly.com/moonshine">
+                    </div>
+                    <div class="input-group">
+                        <label>Brand Accent Color</label>
+                        <div class="color-picker-wrapper">
+                            <input type="color" id="brandColor" value="#00f2ff">
+                            <input type="text" id="brandColorHex" value="#00f2ff" style="width: 100px">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Widget Dimensions</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" id="width" value="100%" placeholder="Width">
+                            <input type="text" id="height" value="600" placeholder="Height">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="output-container">
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('iframe')">iFrame Embed</div>
+                    <div class="tab" onclick="switchTab('script')">JS Snippet</div>
+                    <div class="tab" onclick="switchTab('link')">Direct Link</div>
+                </div>
+                
+                <div id="iframe-code" class="code-block-wrapper">
+                    <button class="copy-btn" onclick="copyCode('iframe-display')">Copy</button>
+                    <code id="iframe-display">&lt;iframe src="..."&gt;&lt;/iframe&gt;</code>
+                </div>
+
+                <div id="script-code" class="code-block-wrapper hidden">
+                    <button class="copy-btn" onclick="copyCode('script-display')">Copy</button>
+                    <code id="script-display">&lt;script src="https://cdn.moonshine.capital/widget.js" data-id="..."&gt;&lt;/script&gt;</code>
+                </div>
+
+                <div id="link-code" class="code-block-wrapper hidden">
+                    <button class="copy-btn" onclick="copyCode('link-display')">Copy</button>
+                    <code id="link-display">https://moonshine.capital/w/...</code>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Column: Preview -->
+        <aside>
+            <div class="preview-sticky">
+                <div class="preview-header">
+                    <h3 style="font-size: 0.9rem; font-weight: 600;">LIVE PREVIEW</h3>
+                    <span style="font-size: 0.75rem; color: var(--text-dim);"><span class="status-dot"></span> Syncing</span>
+                </div>
+                <div class="preview-box" id="widgetPreview">
+                    <!-- Dynamic Preview Content -->
+                    <div class="mock-widget" id="mockContent">
+                        <div id="mockTitle" style="font-weight: 800; font-size: 1.5rem; margin-bottom: 0.5rem;">Funding Readiness</div>
+                        <p id="mockSub" style="color: #666; margin-bottom: 1.5rem;">Check your eligibility for capital in 60 seconds.</p>
+                        <div style="background: #f4f4f5; height: 12px; border-radius: 10px; margin-bottom: 2rem;">
+                            <div style="background: var(--primary); width: 65%; height: 100%; border-radius: 10px;"></div>
+                        </div>
+                        <a href="#" class="mock-btn" id="mockCta">Get Started</a>
+                        <p id="mockPartner" style="margin-top: 1.5rem; font-size: 0.7rem; color: #999;">Powered by Moonshine Capital & Acme Agency</p>
+                    </div>
+                </div>
+                
+                <div class="card mt-4" style="background: rgba(0, 242, 255, 0.03); border-style: dashed;">
+                    <p style="font-size: 0.8rem; color: var(--primary);"><strong>Pro Tip:</strong> Add the <code>data-auto-height="true"</code> attribute to ensure the iframe resizes dynamically to the content.</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Guide Section -->
+        <section class="guide-section">
+            <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Installation Guides</h2>
+            <p class="subheadline">Select your platform for specific integration steps.</p>
+            
+            <div class="platform-grid">
+                <div class="platform-card">
+                    <img src="https://cdn.worldvectorlogo.com/logos/wix-logo-1.svg" alt="Wix">
+                    <span>Wix</span>
+                </div>
+                <div class="platform-card">
+                    <img src="https://cdn.worldvectorlogo.com/logos/wordpress-icon.svg" alt="WordPress">
+                    <span>WordPress</span>
+                </div>
+                <div class="platform-card">
+                    <img src="https://cdn.worldvectorlogo.com/logos/framer-icon.svg" alt="Framer">
+                    <span>Framer</span>
+                </div>
+                <div class="platform-card">
+                    <img src="https://cdn.worldvectorlogo.com/logos/carrd.svg" alt="Carrd">
+                    <span>Carrd</span>
+                </div>
+                <div class="platform-card">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/6/61/HTML5_logo_and_wordmark.svg" alt="HTML">
+                    <span>Static HTML</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section class="faq-section">
+            <div class="faq-item">
+                <h4>How do I track my leads?</h4>
+                <p>All widgets automatically append your Partner ID and Tracking Source to every lead submitted. You can view these in your Moonshine Partner Dashboard under the "Referrals" tab.</p>
+            </div>
+            <div class="faq-item">
+                <h4>Can I change the colors later?</h4>
+                <p>Yes. If you use the <b>JS Snippet</b>, updates to your partner profile will reflect automatically. If using the <b>iFrame</b>, you will need to regenerate the code if you change the hex code.</p>
+            </div>
+            <div class="faq-item">
+                <h4>Is it mobile responsive?</h4>
+                <p>Absolutely. All widgets are designed with a fluid layout. We recommend setting the width to 100% to ensure it fits any container on your site.</p>
+            </div>
+        </section>
+    </main>
+
+    <div id="toast">Code copied to clipboard!</div>
+
+    <script>
+        const inputs = ['widgetType', 'trackingSource', 'partnerName', 'partnerId', 'appUrl', 'bookingUrl', 'brandColor', 'width', 'height', 'brandColorHex'];
+        
+        function init() {
+            // Load from localStorage
+            inputs.forEach(id => {
+                const val = localStorage.getItem(id);
+                if (val) {
+                    document.getElementById(id).value = val;
+                }
+                
+                document.getElementById(id).addEventListener('input', () => {
+                    if (id === 'brandColor') document.getElementById('brandColorHex').value = document.getElementById(id).value;
+                    if (id === 'brandColorHex') document.getElementById('brandColor').value = document.getElementById(id).value;
+                    updateAll();
+                });
+            });
+
+            updateAll();
+        }
+
+        function updateAll() {
+            const data = {};
+            inputs.forEach(id => {
+                data[id] = document.getElementById(id).value;
+                localStorage.setItem(id, data[id]);
+            });
+
+            const baseUrl = "https://widgets.moonshine.capital";
+            const params = new URLSearchParams({
+                type: data.widgetType,
+                pid: data.partnerId,
+                source: data.trackingSource,
+                color: data.brandColor.replace('#', ''),
+                app: data.appUrl
+            });
+
+            const finalUrl = `${baseUrl}/${data.widgetType}?${params.toString()}`;
+
+            // Update Codes
+            document.getElementById('iframe-display').textContent = `<iframe src="${finalUrl}" width="${data.width}" height="${data.height}" frameborder="0" style="border:none; overflow:hidden;" allowTransparency="true" allow="encrypted-media"></iframe>`;
+            
+            document.getElementById('script-display').textContent = `<script src="https://cdn.moonshine.capital/sdk.js" id="ms-widget" data-widget="${data.widgetType}" data-partner="${data.partnerId}" data-color="${data.brandColor}"><\/script>`;
+            
+            document.getElementById('link-display').textContent = finalUrl;
+
+            // Update Preview
+            document.getElementById('mockPartner').textContent = `Powered by Moonshine Capital & ${data.partnerName || 'Partner'}`;
+            document.getElementById('mockCta').style.backgroundColor = data.brandColor;
+            
+            const titles = {
+                'funding-readiness': 'Funding Readiness Score',
+                'route-matcher': 'Route Matcher',
+                'app-cta': 'Ready to Scale?',
+                'checklist': 'Document Checklist',
+                'faq': 'Capital FAQ',
+                'commission': 'Commission Estimator',
+                'profile': 'Partner Profile'
+            };
+            
+            document.getElementById('mockTitle').textContent = titles[data.widgetType];
+        }
+
+        function switchTab(type) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            document.getElementById('iframe-code').classList.add('hidden');
+            document.getElementById('script-code').classList.add('hidden');
+            document.getElementById('link-code').classList.add('hidden');
+
+            document.getElementById(`${type}-code`).classList.remove('hidden');
+        }
+
+        function copyCode(id) {
+            const text = document.getElementById(id).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const toast = document.getElementById('toast');
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 3000);
+            });
+        }
+
+        window.onload = init;
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

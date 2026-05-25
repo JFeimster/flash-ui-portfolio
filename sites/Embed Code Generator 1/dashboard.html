@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonshine Capital | Affiliate Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #05070a;
+            --bg-card: #0d1117;
+            --bg-input: #161b22;
+            --neon-blue: #00f2ff;
+            --neon-green: #00ff9d;
+            --neon-purple: #bc13fe;
+            --text-main: #e6edf3;
+            --text-dim: #8b949e;
+            --border: #30363d;
+            --accent-glow: rgba(0, 242, 255, 0.15);
+            --font-mono: 'Fira Code', monospace;
+            --font-sans: 'Inter', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            margin-bottom: 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subheadline {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+        }
+
+        /* Stats Grid */
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--neon-blue);
+            opacity: 0.5;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            color: var(--text-main);
+        }
+
+        .stat-trend {
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .trend-up { color: var(--neon-green); }
+
+        /* Main Content Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+        }
+
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .panel-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--neon-blue);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .panel-title::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--neon-blue);
+            box-shadow: 0 0 10px var(--neon-blue);
+            border-radius: 50%;
+        }
+
+        /* Performance Table */
+        .widget-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .widget-table th {
+            text-align: left;
+            padding: 12px;
+            color: var(--text-dim);
+            font-weight: 500;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .widget-table td {
+            padding: 16px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .widget-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+        }
+
+        .tag-blue { color: var(--neon-blue); border-color: var(--neon-blue); }
+        .tag-green { color: var(--neon-green); border-color: var(--neon-green); }
+
+        /* Chart Mockup */
+        .chart-container {
+            height: 200px;
+            width: 100%;
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            padding: 20px 0;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(0deg, var(--neon-blue), transparent);
+            border-top: 2px solid var(--neon-blue);
+            opacity: 0.6;
+            transition: opacity 0.2s;
+            border-radius: 2px 2px 0 0;
+        }
+
+        .chart-bar:hover {
+            opacity: 1;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        /* Sidebar UI */
+        .quick-build-card {
+            background: linear-gradient(135deg, #0d1117, #161b22);
+            border: 1px solid var(--neon-blue);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.05);
+        }
+
+        .btn-primary {
+            background: var(--neon-blue);
+            color: var(--bg-deep);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .source-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .source-item:last-child { border-bottom: none; }
+
+        .source-name { font-size: 0.85rem; color: var(--text-main); }
+        .source-value { font-family: var(--font-mono); font-size: 0.85rem; color: var(--neon-green); }
+
+        @media (max-width: 1024px) {
+            .stats-overview { grid-template-columns: 1fr 1fr; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div>
+            <h1>Affiliate Performance</h1>
+            <p class="subheadline">Monitor your embedded widgets, track conversions, and optimize your referral strategy.</p>
+        </div>
+        <div style="text-align: right;">
+            <div style="font-size: 0.8rem; color: var(--text-dim);">Logged in as:</div>
+            <div style="color: var(--neon-blue); font-weight: 600;">Acme Partners (MS-9982)</div>
+        </div>
+    </header>
+
+    <div class="stats-overview">
+        <div class="stat-card">
+            <span class="stat-label">Total Impressions</span>
+            <div class="stat-value">42,891</div>
+            <div class="stat-trend trend-up">▲ 12% vs last month</div>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Widget Clicks</span>
+            <div class="stat-value">3,104</div>
+            <div class="stat-trend trend-up">▲ 8.4% vs last month</div>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Lead Conversions</span>
+            <div class="stat-value">158</div>
+            <div class="stat-trend trend-up">▲ 22.1% vs last month</div>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Estimated Comm.</span>
+            <div class="stat-value" style="color: var(--neon-green);">$12,450</div>
+            <div class="stat-trend">Payout pending: 12 days</div>
+        </div>
+    </div>
+
+    <main class="dashboard-grid">
+        <section>
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">Conversion Volume (30 Days)</div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-bar" style="height: 40%;"></div>
+                    <div class="chart-bar" style="height: 55%;"></div>
+                    <div class="chart-bar" style="height: 30%;"></div>
+                    <div class="chart-bar" style="height: 70%;"></div>
+                    <div class="chart-bar" style="height: 85%;"></div>
+                    <div class="chart-bar" style="height: 60%;"></div>
+                    <div class="chart-bar" style="height: 95%;"></div>
+                    <div class="chart-bar" style="height: 50%;"></div>
+                    <div class="chart-bar" style="height: 45%;"></div>
+                    <div class="chart-bar" style="height: 80%;"></div>
+                    <div class="chart-bar" style="height: 65%;"></div>
+                    <div class="chart-bar" style="height: 35%;"></div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">Active Embed Performance</div>
+                </div>
+                <table class="widget-table">
+                    <thead>
+                        <tr>
+                            <th>Widget Name / ID</th>
+                            <th>Type</th>
+                            <th>Impressions</th>
+                            <th>Clicks</th>
+                            <th>Leads</th>
+                            <th>Conv. %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div style="color: var(--text-main); font-weight: 500;">Blog Sidebar Main</div>
+                                <div style="font-size: 0.7rem; color: var(--text-dim);">ID: WID-001</div>
+                            </td>
+                            <td><span class="tag tag-blue">Readiness</span></td>
+                            <td>12,400</td>
+                            <td>890</td>
+                            <td>42</td>
+                            <td style="color: var(--neon-green); font-family: var(--font-mono);">4.7%</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div style="color: var(--text-main); font-weight: 500;">Resources Page Footer</div>
+                                <div style="font-size: 0.7rem; color: var(--text-dim);">ID: WID-004</div>
+                            </td>
+                            <td><span class="tag tag-blue">Matcher</span></td>
+                            <td>25,120</td>
+                            <td>1,420</td>
+                            <td>91</td>
+                            <td style="color: var(--neon-green); font-family: var(--font-mono);">6.4%</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div style="color: var(--text-main); font-weight: 500;">Checkout CTA</div>
+                                <div style="font-size: 0.7rem; color: var(--text-dim);">ID: WID-009</div>
+                            </td>
+                            <td><span class="tag tag-blue">CTA Button</span></td>
+                            <td>5,371</td>
+                            <td>794</td>
+                            <td>25</td>
+                            <td style="color: var(--neon-green); font-family: var(--font-mono);">3.1%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <aside>
+            <div class="quick-build-card">
+                <div class="panel-title" style="justify-content: center; margin-bottom: 1rem;">Quick Build</div>
+                <p style="font-size: 0.85rem; color: var(--text-dim);">Ready to deploy a new funding tool? Use our visual builder to customize and embed.</p>
+                <a href="index.html" class="btn-primary">Create New Embed</a>
+            </div>
+
+            <div class="panel" style="margin-top: 1.5rem;">
+                <div class="panel-title" style="margin-bottom: 1.5rem;">Top Traffic Sources</div>
+                <div class="source-item">
+                    <span class="source-name">acme-agency.com/blog</span>
+                    <span class="source-value">45%</span>
+                </div>
+                <div class="source-item">
+                    <span class="source-name">resource-hub.net</span>
+                    <span class="source-value">22%</span>
+                </div>
+                <div class="source-item">
+                    <span class="source-name">email-campaign-oct</span>
+                    <span class="source-value">18%</span>
+                </div>
+                <div class="source-item">
+                    <span class="source-name">partner-portal.io</span>
+                    <span class="source-value">15%</span>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title" style="margin-bottom: 1rem;">System Health</div>
+                <div style="display:flex; align-items:center; gap:10px; font-size: 0.8rem; color: var(--text-dim);">
+                    <div style="width:10px; height:10px; background:var(--neon-green); border-radius:50%; box-shadow: 0 0 10px var(--neon-green);"></div>
+                    API Status: Operational
+                </div>
+                <div style="display:flex; align-items:center; gap:10px; font-size: 0.8rem; color: var(--text-dim); margin-top: 8px;">
+                    <div style="width:10px; height:10px; background:var(--neon-green); border-radius:50%; box-shadow: 0 0 10px var(--neon-green);"></div>
+                    SDK v2.4 Active
+                </div>
+            </div>
+        </aside>
+    </main>
+</div>
+
+</body>
+</html>

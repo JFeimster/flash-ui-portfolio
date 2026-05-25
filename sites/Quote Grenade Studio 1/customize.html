@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VISUAL FALLOUT | Quote Customizer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=Syne:wght@800&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --black: #000000;
+            --white: #ffffff;
+            --cream: #f4f1ea;
+            --red: #ff3c00;
+            --border-width: 4px;
+            --dynamic-bg: var(--white);
+            --dynamic-text: var(--black);
+            --dynamic-border-color: var(--black);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--cream);
+            color: var(--black);
+            font-family: 'Space Grotesk', sans-serif;
+            line-height: 1.1;
+            overflow-x: hidden;
+        }
+
+        .marquee {
+            overflow: hidden;
+            white-space: nowrap;
+            background: var(--black);
+            color: var(--white);
+            border-bottom: 4px solid var(--black);
+            padding: 10px 0;
+            font-family: 'IBM Plex Mono', monospace;
+            text-transform: uppercase;
+        }
+
+        .marquee-inner {
+            display: inline-block;
+            animation: marquee 30s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        header {
+            border-bottom: 4px solid var(--black);
+            padding: 20px 0;
+            background: var(--white);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 4rem;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: -2px;
+        }
+
+        .editor-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 900px) {
+            .editor-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Preview Area */
+        .preview-zone {
+            background: #ccc;
+            background-image: radial-gradient(#999 1px, transparent 1px);
+            background-size: 20px 20px;
+            padding: 60px;
+            border: 4px solid var(--black);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 500px;
+        }
+
+        #export-target {
+            background: var(--dynamic-bg);
+            color: var(--dynamic-text);
+            border: var(--border-width) solid var(--dynamic-border-color);
+            padding: 60px 40px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 15px 15px 0px var(--black);
+            position: relative;
+        }
+
+        #display-text {
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        #display-meta {
+            font-family: 'IBM Plex Mono', monospace;
+            background: var(--dynamic-text);
+            color: var(--dynamic-bg);
+            display: inline-block;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+
+        /* Controls Area */
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .control-box {
+            background: var(--white);
+            border: 4px solid var(--black);
+            padding: 20px;
+            box-shadow: 8px 8px 0px var(--black);
+        }
+
+        .control-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            display: block;
+            border-bottom: 2px solid var(--black);
+            padding-bottom: 5px;
+        }
+
+        .theme-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .theme-btn {
+            padding: 15px;
+            border: 2px solid var(--black);
+            cursor: pointer;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            text-align: center;
+            transition: transform 0.1s;
+        }
+
+        .theme-btn:active { transform: scale(0.95); }
+
+        .btn-anarcho { background: #000; color: #fff; }
+        .btn-warning { background: #ff3c00; color: #000; }
+        .btn-vintage { background: #f4f1ea; color: #000; }
+        .btn-stark { background: #fff; color: #000; }
+
+        .slider-container input {
+            width: 100%;
+            height: 15px;
+            background: #eee;
+            outline: none;
+            border: 2px solid var(--black);
+            -webkit-appearance: none;
+        }
+
+        .slider-container input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 25px;
+            height: 25px;
+            background: var(--red);
+            border: 2px solid var(--black);
+            cursor: pointer;
+        }
+
+        .export-btn {
+            background: var(--red);
+            color: var(--white);
+            border: 4px solid var(--black);
+            padding: 25px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 900;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            box-shadow: 8px 8px 0px var(--black);
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .export-btn:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 4px 4px 0px var(--black);
+        }
+
+        .export-btn:active {
+            transform: translate(8px, 8px);
+            box-shadow: none;
+        }
+
+        .text-input {
+            width: 100%;
+            border: 2px solid var(--black);
+            padding: 10px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        footer {
+            margin-top: 80px;
+            border-top: 4px solid var(--black);
+            padding: 40px 0;
+            text-align: center;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="marquee">
+        <div class="marquee-inner">
+            VISUAL FALLOUT CUSTOMIZER &nbsp; • &nbsp; SHIP THE TRUTH IN STYLE &nbsp; • &nbsp; CUSTOM BORDERS ENABLED &nbsp; • &nbsp; EXPORT TO PNG &nbsp; • &nbsp; VISUAL FALLOUT CUSTOMIZER &nbsp; • &nbsp; 
+        </div>
+    </div>
+
+    <header>
+        <div class="container" style="display:flex; justify-content: space-between; align-items: center; padding: 10px 20px;">
+            <div style="font-weight: 900; font-size: 1.5rem; letter-spacing: -1px;">GRENADE LABS / CUSTOMIZER</div>
+            <a href="index.html" style="text-decoration: none; color: #000; font-weight: bold; border: 2px solid #000; padding: 5px 15px;">BACK TO ARMORY</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <h1>STYLING UNIT</h1>
+        <p>Weaponize your aesthetic. Adjust the visual fallout parameters before deployment.</p>
+
+        <div class="editor-grid">
+            <section class="preview-zone">
+                <div id="export-target">
+                    <div id="display-text" contenteditable="true">Sovereignty is a skill, not a right.</div>
+                    <div id="display-meta">/ / / RADICAL LIBERTARIAN / / /</div>
+                </div>
+            </section>
+
+            <aside class="controls-panel">
+                <div class="control-box">
+                    <label class="control-label">1. EDIT CONTENT</label>
+                    <textarea class="text-input" rows="3" id="raw-input" oninput="updateText(this.value)">Sovereignty is a skill, not a right.</textarea>
+                    <p style="font-size: 0.7rem; font-family: 'IBM Plex Mono'; opacity: 0.7;">Click text in preview to edit directly.</p>
+                </div>
+
+                <div class="control-box">
+                    <label class="control-label">2. CHOOSE THEME</label>
+                    <div class="theme-grid">
+                        <div class="theme-btn btn-anarcho" onclick="setTheme('anarcho')">Anarcho-Black</div>
+                        <div class="theme-btn btn-warning" onclick="setTheme('warning')">Warning-Red</div>
+                        <div class="theme-btn btn-vintage" onclick="setTheme('vintage')">Vintage-Cream</div>
+                        <div class="theme-btn btn-stark" onclick="setTheme('stark')">Stark-White</div>
+                    </div>
+                </div>
+
+                <div class="control-box">
+                    <label class="control-label">3. BORDER THICKNESS</label>
+                    <div class="slider-container">
+                        <input type="range" min="2" max="24" value="4" oninput="updateBorder(this.value)">
+                    </div>
+                </div>
+
+                <button class="export-btn" onclick="exportPNG()">DOWNLOAD GRENADE (.PNG)</button>
+            </aside>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2024 RADICAL LIBERTARIAN LABS. ALL STYLES ARE DECENTRALIZED.</p>
+    </footer>
+
+    <script>
+        const preview = document.getElementById('export-target');
+        const textDisplay = document.getElementById('display-text');
+        const textInput = document.getElementById('raw-input');
+
+        function updateText(val) {
+            textDisplay.innerText = val;
+        }
+
+        // Sync back from contenteditable
+        textDisplay.addEventListener('input', () => {
+            textInput.value = textDisplay.innerText;
+        });
+
+        function updateBorder(val) {
+            preview.style.borderWidth = val + 'px';
+            preview.style.boxShadow = `${val * 3}px ${val * 3}px 0px #000`;
+        }
+
+        function setTheme(type) {
+            const root = document.documentElement;
+            switch(type) {
+                case 'anarcho':
+                    root.style.setProperty('--dynamic-bg', '#000000');
+                    root.style.setProperty('--dynamic-text', '#ffffff');
+                    root.style.setProperty('--dynamic-border-color', '#ffffff');
+                    break;
+                case 'warning':
+                    root.style.setProperty('--dynamic-bg', '#ff3c00');
+                    root.style.setProperty('--dynamic-text', '#000000');
+                    root.style.setProperty('--dynamic-border-color', '#000000');
+                    break;
+                case 'vintage':
+                    root.style.setProperty('--dynamic-bg', '#f4f1ea');
+                    root.style.setProperty('--dynamic-text', '#000000');
+                    root.style.setProperty('--dynamic-border-color', '#000000');
+                    break;
+                case 'stark':
+                    root.style.setProperty('--dynamic-bg', '#ffffff');
+                    root.style.setProperty('--dynamic-text', '#000000');
+                    root.style.setProperty('--dynamic-border-color', '#000000');
+                    break;
+            }
+        }
+
+        async function exportPNG() {
+            const btn = document.querySelector('.export-btn');
+            btn.innerText = "CAPTURING...";
+            
+            try {
+                const canvas = await html2canvas(preview, {
+                    backgroundColor: null,
+                    scale: 2 // High resolution
+                });
+                
+                const link = document.createElement('a');
+                link.download = `quote-grenade-${Date.now()}.png`;
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+                btn.innerText = "DOWNLOAD GRENADE (.PNG)";
+            } catch (err) {
+                console.error("Export failed:", err);
+                btn.innerText = "ERROR - TRY AGAIN";
+            }
+        }
+    </script>
+</body>
+</html>

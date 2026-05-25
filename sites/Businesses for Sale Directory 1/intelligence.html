@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARKET INTELLIGENCE | EQUITY TERMINAL</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --obsidian: #050505;
+            --graphite: #121212;
+            --graphite-light: #1A1A1A;
+            --bone: #F5F5F0;
+            --acid-green: #C1FF00;
+            --oxidized-copper: #8E522F;
+            --copper-glow: #D97706;
+            --blood-orange: #FF4500;
+            --cream: #FFFDD0;
+            --border-thick: 2px;
+            --grain-opacity: 0.04;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--bone);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: var(--grain-opacity);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: -0.02em; }
+        
+        nav {
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            border-bottom: var(--border-thick) solid var(--graphite-light);
+            background: var(--obsidian);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--bone); text-decoration: none; }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { text-decoration: none; color: var(--bone); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; }
+        .nav-links a:hover { color: var(--acid-green); }
+
+        .intel-header {
+            padding: 4rem 2rem;
+            border-bottom: var(--border-thick) solid var(--graphite-light);
+        }
+
+        .intel-title {
+            font-size: clamp(3rem, 10vw, 8rem);
+            font-weight: 800;
+            line-height: 0.85;
+            margin-bottom: 1rem;
+            letter-spacing: -0.04em;
+        }
+
+        .intel-subtitle {
+            font-size: 1.2rem;
+            color: var(--oxidized-copper);
+            max-width: 800px;
+        }
+
+        .stats-strip {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            border-bottom: var(--border-thick) solid var(--bone);
+        }
+
+        .strip-item {
+            padding: 2rem;
+            border-right: 1px solid var(--graphite-light);
+        }
+
+        .strip-item:last-child { border-right: none; }
+        .strip-label { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #777; margin-bottom: 0.5rem; }
+        .strip-value { font-size: 2rem; font-weight: 800; }
+        .strip-trend { font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; }
+        .up { color: var(--acid-green); }
+        .down { color: var(--blood-orange); }
+
+        .main-container {
+            padding: 4rem 2rem;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 4rem;
+        }
+
+        .chart-section {
+            display: flex;
+            flex-direction: column;
+            gap: 4rem;
+        }
+
+        .chart-card {
+            border: var(--border-thick) solid var(--graphite-light);
+            background: var(--graphite);
+            padding: 2rem;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 3rem;
+        }
+
+        .chart-title { font-size: 1.5rem; font-weight: 800; }
+
+        /* Brutalist Bar Chart */
+        .bar-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 1rem;
+            height: 300px;
+            padding-top: 2rem;
+        }
+
+        .bar-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            justify-content: flex-end;
+        }
+
+        .bar {
+            width: 100%;
+            background: var(--oxidized-copper);
+            transition: height 1s ease;
+            position: relative;
+        }
+
+        .bar:hover { background: var(--acid-green); }
+        
+        .bar-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            margin-top: 1rem;
+            text-align: center;
+            white-space: nowrap;
+            transform: rotate(-45deg) translateX(-10px);
+            color: #888;
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 800;
+        }
+
+        /* Multiple Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+        }
+
+        .data-table th {
+            text-align: left;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: #777;
+            padding: 1rem;
+            border-bottom: var(--border-thick) solid var(--bone);
+        }
+
+        .data-table td {
+            padding: 1.2rem 1rem;
+            border-bottom: 1px solid var(--graphite-light);
+            font-weight: 700;
+        }
+
+        .multiple-badge {
+            background: var(--bone);
+            color: var(--obsidian);
+            padding: 0.2rem 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Heat Map Side */
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .heat-map-container {
+            border: var(--border-thick) solid var(--bone);
+            background: var(--obsidian);
+            padding: 1.5rem;
+        }
+
+        .heat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
+            margin-top: 1.5rem;
+        }
+
+        .heat-cell {
+            aspect-ratio: 1;
+            background: var(--graphite-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .heat-cell:hover { outline: 2px solid var(--bone); z-index: 2; }
+        .intensity-1 { background: #1a1a1a; color: #444; }
+        .intensity-2 { background: #3a2518; color: #888; }
+        .intensity-3 { background: #8e522f; color: var(--bone); }
+        .intensity-4 { background: #c1ff00; color: var(--obsidian); }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 1.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            border: var(--border-thick) solid var(--bone);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .btn-primary { background: var(--acid-green); color: var(--obsidian); border-color: var(--acid-green); }
+
+        @media (max-width: 1024px) {
+            .main-container { grid-template-columns: 1fr; }
+            .intel-title { font-size: 4rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo mono">EQUITY.TERMINAL</a>
+        <div class="nav-links">
+            <a href="#">BROWSE DEALS</a>
+            <a href="#">ANALYZER</a>
+            <a href="intelligence.html" style="color: var(--acid-green)">INTELLIGENCE</a>
+            <a href="#">SUBMIT</a>
+        </div>
+        <div>
+            <button class="btn mono" style="padding: 0.5rem 1rem; font-size: 0.7rem; background: transparent; color: var(--bone);">Login</button>
+        </div>
+    </nav>
+
+    <header class="intel-header">
+        <h1 class="intel-title">MARKET<br>INTELLIGENCE</h1>
+        <p class="intel-subtitle mono">REAL-TIME MULTIPLES, SECTOR VELOCITY, AND LIQUIDITY TRENDS ACROSS THE LOWER MIDDLE MARKET.</p>
+    </header>
+
+    <div class="stats-strip">
+        <div class="strip-item">
+            <p class="strip-label">MEDIAN MULTIPLE (SDE)</p>
+            <p class="strip-value">2.84x</p>
+            <p class="strip-trend down">▼ 0.12 pts (QoQ)</p>
+        </div>
+        <div class="strip-item">
+            <p class="strip-label">AVG. DEAL CLOSURE</p>
+            <p class="strip-value">142 Days</p>
+            <p class="strip-trend up">▲ 8 Days (QoQ)</p>
+        </div>
+        <div class="strip-item">
+            <p class="strip-label">SBA 7(a) INTEREST</p>
+            <p class="strip-value">10.25%</p>
+            <p class="strip-trend">STABLE</p>
+        </div>
+        <div class="strip-item">
+            <p class="strip-label">BUYER SEARCH INDEX</p>
+            <p class="strip-value">88.4</p>
+            <p class="strip-trend up">▲ 14% (YoY)</p>
+        </div>
+    </div>
+
+    <main class="main-container">
+        <div class="chart-section">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div>
+                        <h2 class="chart-title">Median Multiples by EBITDA Range</h2>
+                        <p class="mono" style="font-size: 0.7rem; color: #666; margin-top: 0.5rem;">Lower Middle Market Aggregate Data</p>
+                    </div>
+                    <div class="mono" style="font-size: 0.7rem;">UNIT: MULTIPLE (X)</div>
+                </div>
+                
+                <div class="bar-container">
+                    <div class="bar-group">
+                        <div class="bar" style="height: 45%;">
+                            <span class="bar-value">2.2x</span>
+                        </div>
+                        <span class="bar-label"><$250K</span>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar" style="height: 55%;">
+                            <span class="bar-value">2.7x</span>
+                        </div>
+                        <span class="bar-label">$250K-$500K</span>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar" style="height: 68%;">
+                            <span class="bar-value">3.4x</span>
+                        </div>
+                        <span class="bar-label">$500K-$1M</span>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar" style="height: 82%;">
+                            <span class="bar-value">4.1x</span>
+                        </div>
+                        <span class="bar-label">$1M-$2M</span>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar" style="height: 95%;">
+                            <span class="bar-value">5.2x</span>
+                        </div>
+                        <span class="bar-label">$2M-$5M</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-card" style="border-color: var(--bone);">
+                <h2 class="chart-title" style="margin-bottom: 2rem;">Sector Benchmarks</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>INDUSTRY SECTOR</th>
+                            <th>MEDIAN SDE MULTIPLE</th>
+                            <th>REVENUE MULTIPLE</th>
+                            <th>AVG. CASH DOWN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>HVAC & Mechanical</td>
+                            <td><span class="multiple-badge">3.12x</span></td>
+                            <td>0.85x</td>
+                            <td>15%</td>
+                        </tr>
+                        <tr>
+                            <td>SaaS (B2B)</td>
+                            <td><span class="multiple-badge">4.45x</span></td>
+                            <td>3.20x</td>
+                            <td>25%</td>
+                        </tr>
+                        <tr>
+                            <td>E-commerce / FBA</td>
+                            <td><span class="multiple-badge">2.60x</span></td>
+                            <td>1.10x</td>
+                            <td>40%</td>
+                        </tr>
+                        <tr>
+                            <td>Laundromats</td>
+                            <td><span class="multiple-badge">3.80x</span></td>
+                            <td>1.50x</td>
+                            <td>30%</td>
+                        </tr>
+                        <tr>
+                            <td>Digital Agencies</td>
+                            <td><span class="multiple-badge">2.45x</span></td>
+                            <td>0.90x</td>
+                            <td>20%</td>
+                        </tr>
+                        <tr>
+                            <td>Landscaping</td>
+                            <td><span class="multiple-badge">2.85x</span></td>
+                            <td>0.70x</td>
+                            <td>10%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <aside class="side-panel">
+            <div class="heat-map-container">
+                <h3 class="mono" style="font-size: 0.9rem; margin-bottom: 0.5rem;">LIQUIDITY HEAT MAP</h3>
+                <p style="font-size: 0.75rem; color: #888;">Concentration of active buyers vs. available listings by region.</p>
+                
+                <div class="heat-grid">
+                    <div class="heat-cell intensity-4">NE</div>
+                    <div class="heat-cell intensity-3">SE</div>
+                    <div class="heat-cell intensity-2">MW</div>
+                    <div class="heat-cell intensity-4">SW</div>
+                    <div class="heat-cell intensity-1">NW</div>
+                    <div class="heat-cell intensity-3">CA</div>
+                    <div class="heat-cell intensity-2">TX</div>
+                    <div class="heat-cell intensity-4">FL</div>
+                    <div class="heat-cell intensity-1">INTL</div>
+                    <div class="heat-cell intensity-2">REM</div>
+                    <div class="heat-cell intensity-3">MT</div>
+                    <div class="heat-cell intensity-1">AK</div>
+                </div>
+
+                <div style="margin-top: 1.5rem; display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 0.6rem;">
+                    <span>COLD</span>
+                    <div style="display: flex; gap: 2px;">
+                        <div style="width:10px; height:10px; background:#1a1a1a"></div>
+                        <div style="width:10px; height:10px; background:#3a2518"></div>
+                        <div style="width:10px; height:10px; background:#8e522f"></div>
+                        <div style="width:10px; height:10px; background:#c1ff00"></div>
+                    </div>
+                    <span>OVERSUBSCRIBED</span>
+                </div>
+            </div>
+
+            <div class="chart-card" style="background: var(--acid-green); color: var(--obsidian);">
+                <h3 class="mono" style="font-size: 1rem; margin-bottom: 1rem;">Intelligence Alert</h3>
+                <p style="font-size: 0.85rem; font-weight: 700; margin-bottom: 1.5rem;">Multiple expansion detected in "Home Services" sector. Median multiples have climbed from 2.8x to 3.1x in the last 6 months due to PE roll-up activity.</p>
+                <a href="#" class="btn btn-primary" style="border-color: var(--obsidian); width: 100%;">Download PDF Report</a>
+            </div>
+
+            <div class="chart-card">
+                <h3 class="mono" style="font-size: 0.8rem; margin-bottom: 1rem; color: var(--oxidized-copper);">Macro Sentiment</h3>
+                <div style="margin-bottom: 1rem;">
+                    <div style="display:flex; justify-content: space-between; font-size: 0.7rem; margin-bottom: 0.25rem;">
+                        <span class="mono">Seller Greed</span>
+                        <span class="mono">72%</span>
+                    </div>
+                    <div style="width:100%; height:4px; background: #222;">
+                        <div style="width:72%; height:100%; background: var(--blood-orange);"></div>
+                    </div>
+                </div>
+                <div>
+                    <div style="display:flex; justify-content: space-between; font-size: 0.7rem; margin-bottom: 0.25rem;">
+                        <span class="mono">Lender Confidence</span>
+                        <span class="mono">45%</span>
+                    </div>
+                    <div style="width:100%; height:4px; background: #222;">
+                        <div style="width:45%; height:100%; background: var(--acid-green);"></div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <footer style="padding: 4rem 2rem; border-top: 1px solid var(--graphite-light); margin-top: 4rem;">
+        <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 2rem;">
+            <div>
+                <div class="logo mono" style="margin-bottom: 1rem;">EQUITY.TERMINAL</div>
+                <p class="mono" style="font-size: 0.7rem; color: #555;">&copy; 2023 EQUITY TERMINAL DATA SYSTEMS. ALL RIGHTS RESERVED.</p>
+            </div>
+            <div style="display:flex; gap: 4rem;">
+                <div class="nav-links" style="flex-direction: column; gap: 0.5rem;">
+                    <span class="mono" style="font-size: 0.7rem; color: var(--oxidized-copper);">NAVIGATION</span>
+                    <a href="#">Deals</a>
+                    <a href="#">Intelligence</a>
+                    <a href="#">Analyzer</a>
+                </div>
+                <div class="nav-links" style="flex-direction: column; gap: 0.5rem;">
+                    <span class="mono" style="font-size: 0.7rem; color: var(--oxidized-copper);">LEGAL</span>
+                    <a href="#">Privacy</a>
+                    <a href="#">Terms</a>
+                    <a href="#">Data Methodology</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARKET INTELLIGENCE | EQUITY TERMINAL</title>
+</head>
+</html>

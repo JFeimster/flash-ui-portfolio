@@ -1,0 +1,208 @@
+:root {
+    --flame-size: clamp(2rem, 8vw, 6rem);
+}
+
+.hall-of-flame-section {
+    background-color: var(--black);
+    color: var(--white);
+    padding: 10rem 0;
+    position: relative;
+    overflow: hidden;
+    border-top: var(--border-width) solid var(--black);
+}
+
+.hall-of-flame-section::before {
+    content: "MOST DETONATED";
+    position: absolute;
+    top: 5%;
+    left: -5%;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 20vw;
+    color: rgba(255, 0, 0, 0.15);
+    line-height: 0.8;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 0;
+    transform: rotate(-5deg);
+}
+
+.flame-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 2rem;
+    position: relative;
+    z-index: 2;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.flame-item {
+    background: var(--white);
+    border: var(--border-width) solid var(--black);
+    padding: 3rem 2rem;
+    color: var(--black);
+    position: relative;
+    transition: all 0.15s cubic-bezier(0.33, 1, 0.68, 1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.flame-item:hover {
+    transform: scale(1.05) translate(-10px, -10px);
+    box-shadow: 20px 20px 0 var(--red);
+    background: var(--cream);
+    z-index: 10;
+}
+
+.flame-item.rank-1 {
+    grid-column: span 8;
+    grid-row: span 2;
+    min-height: 500px;
+    border-color: var(--red);
+}
+
+.flame-item.rank-2 {
+    grid-column: span 4;
+    margin-top: 4rem;
+}
+
+.flame-item.rank-3 {
+    grid-column: span 5;
+    margin-left: -2rem;
+}
+
+.flame-item.rank-4 {
+    grid-column: span 7;
+    background: var(--red);
+    color: var(--white);
+}
+
+.flame-item.rank-4:hover {
+    background: var(--black);
+    color: var(--red);
+    box-shadow: 20px 20px 0 var(--white);
+}
+
+.flame-quote {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: var(--flame-size);
+    line-height: 0.85;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    letter-spacing: -2px;
+}
+
+.flame-meta {
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.flame-meta::before {
+    content: "";
+    display: block;
+    width: 40px;
+    height: var(--border-width);
+    background: currentColor;
+}
+
+.flame-stat {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--black);
+    color: var(--white);
+    padding: 0.5rem 1rem;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 1rem;
+    transform: rotate(5deg);
+}
+
+.rank-4 .flame-stat {
+    background: var(--white);
+    color: var(--black);
+}
+
+/* Impact Animations */
+@keyframes shake-extreme {
+    0% { transform: translate(0,0) rotate(0); }
+    25% { transform: translate(5px, -5px) rotate(1deg); }
+    50% { transform: translate(-5px, 5px) rotate(-1deg); }
+    75% { transform: translate(5px, 5px) rotate(1deg); }
+    100% { transform: translate(0,0) rotate(0); }
+}
+
+.detonating {
+    animation: shake-extreme 0.2s cubic-bezier(.36,.07,.19,.97) infinite;
+}
+
+.glitch-text {
+    position: relative;
+    display: inline-block;
+}
+
+.glitch-text::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 2px;
+    text-shadow: -1px 0 var(--red);
+    top: 0;
+    color: var(--black);
+    background: transparent;
+    overflow: hidden;
+    clip: rect(0, 900px, 0, 0); 
+    animation: noise-anim 2s infinite linear alternate-reverse;
+}
+
+@keyframes noise-anim {
+    0% { clip: rect(10px, 9999px, 40px, 0); }
+    20% { clip: rect(50px, 9999px, 80px, 0); }
+    40% { clip: rect(20px, 9999px, 60px, 0); }
+    60% { clip: rect(70px, 9999px, 90px, 0); }
+    80% { clip: rect(10px, 9999px, 30px, 0); }
+    100% { clip: rect(40px, 9999px, 100px, 0); }
+}
+
+@media (max-width: 992px) {
+    .flame-grid {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .flame-item {
+        margin: 0 !important;
+        grid-column: span 12 !important;
+        min-height: auto !important;
+    }
+
+    .hall-of-flame-section::before {
+        font-size: 30vw;
+        top: 2%;
+    }
+}
+
+.impact-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--red);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.impact-active .impact-overlay {
+    animation: flash-animation 0.4s ease-out;
+}
+
+@keyframes flash-animation {
+    0% { opacity: 0.8; }
+    100% { opacity: 0; }
+}

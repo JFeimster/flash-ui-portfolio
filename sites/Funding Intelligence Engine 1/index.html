@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash UI Export</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app-container">
+    
+    <!-- Top Interactive Header -->
+    <header>
+        <div class="logo-area">
+            <div class="logo-prism"></div>
+            <div class="logo-text">
+                <h1>FUNDING INTELLIGENCE ENGINE</h1>
+                <p>Enterprise Risk Analytics &amp; Routing Hub</p>
+            </div>
+        </div>
+
+        <div class="global-controls">
+            <!-- Active Profile Swapper -->
+            <div class="profile-selector-wrap">
+                <span>Borrower Profile:</span>
+                <select class="archetype-dropdown" id="archetypeSelect" onchange="loadArchetype(this.value)">
+                    <option value="saas">SaaS Scaleup (High Velocity MRR)</option>
+                    <option value="ecom">E-Commerce Titan (High Inventory Turn)</option>
+                    <option value="industrial">Heavy Manufacturing (Asset Rich)</option>
+                    <option value="realestate">Commercial RE Asset Class</option>
+                    <option value="acquisition">LBO / Acquisition Search Fund</option>
+                </select>
+            </div>
+
+            <!-- White-label Switcher -->
+            <button class="btn-toggle-view" onclick="toggleWhiteLabelView()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2.25a.75.75 0 0 0-1.137-.65l-8.25 4.75A1.5 1.5 0 0 0 2 7.65v8.7a1.5 1.5 0 0 0 .613 1.3l8.25 4.75a.75.75 0 0 0 .774 0l8.25-4.75a1.5 1.5 0 0 0 .613-1.3v-8.7a1.5 1.5 0 0 0-.613-1.3l-8.25-4.75Z"/>
+                </svg>
+                <span id="toggleText">Switch to White-Label View</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Dynamic Bento Grid Layout -->
+    <main class="dashboard-grid">
+
+        <!-- Bento Card: Scorecard Meter -->
+        <div class="bento-card col-4">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <h2>Funding Readiness Score</h2>
+                    <p>Quantitative Risk Scoring</p>
+                </div>
+                <span class="badge-status badge-status-prime" id="scoreRatingBadge">Prime Tier</span>
+            </div>
+
+            <div class="score-display-container">
+                <svg class="svg-meter">
+                    <defs>
+                        <linearGradient id="prismGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#2563eb" />
+                            <stop offset="50%" stop-color="#7c3aed" />
+                            <stop offset="100%" stop-color="#06b6d4" />
+                        </linearGradient>
+                    </defs>
+                    <circle class="svg-meter-bg" cx="100" cy="100" r="90" />
+                    <circle class="svg-meter-fill" id="meterFillCircle" cx="100" cy="100" r="90" />
+                </svg>
+                <div class="score-center-text">
+                    <div class="score-value" id="scoreValueText">780</div>
+                    <div class="score-max">OUT OF 1000</div>
+                    <div class="score-label" id="scoreCategoryText">Excellent</div>
+                </div>
+            </div>
+
+            <!-- Multi-Dimensional Metrics Breakdown -->
+            <div class="dimensions-stack">
+                <div class="dimension-bar-item">
+                    <div class="dimension-meta">
+                        <span class="dimension-title">Liquidity Index</span>
+                        <span class="dimension-val" id="liquidityVal">84/100</span>
+                    </div>
+                    <div class="dimension-bar-outer">
+                        <div class="dimension-bar-inner" id="liquidityBar" style="width: 84%;"></div>
+                    </div>
+                </div>
+                <div class="dimension-bar-item">
+                    <div class="dimension-meta">
+                        <span class="dimension-title">Leverage Multiplier</span>
+                        <span class="dimension-val" id="leverageVal">52/100</span>
+                    </div>
+                    <div class="dimension-bar-outer">
+                        <div class="dimension-bar-inner" id="leverageBar" style="width: 52%;"></div>
+                    </div>
+                </div>
+                <div class="dimension-bar-item">
+                    <div class="dimension-meta">
+                        <span class="dimension-title">Growth Velocity</span>
+                        <span class="dimension-val" id="growthVal">91/100</span>
+                    </div>
+                    <div class="dimension-bar-outer">
+                        <div class="dimension-bar-inner" id="growthBar" style="width: 91%;"></div>
+                    </div>
+                </div>
+                <div class="dimension-bar-item">
+                    <div class="dimension-meta">
+                        <span class="dimension-title">Tangible Collateral Protection</span>
+                        <span class="dimension-val" id="collateralVal">30/100</span>
+                    </div>
+                    <div class="dimension-bar-outer">
+                        <div class="dimension-bar-inner" id="collateralBar" style="width: 30%;"></div>
+                    </div>
+                </div>
+                <div class="dimension-bar-item">
+                    <div class="dimension-meta">
+                        <span class="dimension-title">Debt Coverage (DSCR)</span>
+                        <span class="dimension-val" id="cashFlowVal">78/100</span>
+                    </div>
+                    <div class="dimension-bar-outer">
+                        <div class="dimension-bar-inner" id="cashFlowBar" style="width: 78%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bento Card: Primary Recommendation Match -->
+        <div class="bento-card col-8">
+            <div class="primary-recommendation-panel">
+                <div>
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <h2>Engine Match Analysis</h2>
+                            <p>Dynamic Allocation &amp; Decision Result</p>
+                        </div>
+                        <span class="badge-status badge-status-prime" id="recConfidenceBadge">94% Confidence Match</span>
+                    </div>
+
+                    <!-- Recommendation Hero Section -->
+                    <div class="recommendation-banner">
+                        <div class="recommendation-badge-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                            </svg>
+                        </div>
+                        <div class="recommendation-preview-text">
+                            <p>RECOMMENDED FUNDING PATHWAY</p>
+                            <h3 id="recommendedPathTitle">SaaS Recurring Revenue Bridge</h3>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Metrics Matrix -->
+                    <div class="metric-matrix-row">
+                        <div class="metric-matrix-card">
+                            <span class="lbl">Optimal Sizing</span>
+                            <div class="val" id="optSizingVal">$2,500,000</div>
+                            <span class="sub-val" id="optSizingSub">Up to $5M Max Cap</span>
+                        </div>
+                        <div class="metric-matrix-card">
+                            <span class="lbl">Implied Rate Yield</span>
+                            <div class="val" id="targetAprVal">8.45% - 10.2%</div>
+                            <span class="sub-val" id="targetAprSub">WACC Adjusted</span>
+                        </div>
+                        <div class="metric-matrix-card">
+                            <span class="lbl">Maturity Window</span>
+                            <div class="val" id="maturityVal">36 Months</div>
+                            <span class="sub-val">Non-dilutive Terms</span>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 24px;">
+                        <h4 style="font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary);">Underwriting Assessment Notes</h4>
+                        <p id="assessmentNotesText" style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                            The target entity displays outstanding recurring subscription visibility with consistent margins exceeding 70%. Capital allocations should prioritize scaling sales pipelines rather than asset-backed debt schemas.
+                        </p>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 12px; width: 100%;">
+                    <button class="action-button" onclick="alert('Initializing Automated Securitization and Term Sheet generation pipelines...')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        Generate Terms Sheet
+                    </button>
+                    <button class="action-button" style="border-color: var(--accent-cyan);" onclick="shareWhiteLabelLink()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                        Export Public White-Label
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bento Card: Internal Debug & Weights Drawer (Analyst Only) -->
+        <div class="bento-card col-8 analyst-drawer" id="analystPanel">
+            <div class="card-header analyst-drawer-toggle">
+                <div class="card-title-group">
+                    <h2 style="color: var(--accent-prism-violet)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="stroke: var(--accent-prism-violet); display: inline; vertical-align: middle; margin-right: 4px;"><path d="M20 7h-9M14 17H5M17 12H7"/></svg>
+                        Internal Debug &amp; Weights Configurator
+                    </h2>
+                    <p>Real-time Parameter Matrix Overrides</p>
+                </div>
+                <span class="badge-status" style="background: rgba(124, 58, 237, 0.15); color: var(--accent-prism-violet)">Analyst Module</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 12px;">
+                <!-- Real-Time Weight Sliders -->
+                <div class="weight-slider-stack">
+                    <h4 style="font-size: 12px; text-transform: uppercase; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 4px;">Matrix Tuning</h4>
+                    
+                    <div class="slider-group">
+                        <div class="slider-meta">
+                            <span>Liquidity Weight</span>
+                            <span class="slider-value-display" id="wLiquidityVal">1.0</span>
+                        </div>
+                        <input type="range" class="custom-range" id="sliderLiquidity" min="0" max="2" step="0.1" value="1.0" oninput="adjustEngineWeight('liquidity', this.value)">
+                    </div>
+
+                    <div class="slider-group">
+                        <div class="slider-meta">
+                            <span>Growth Multiplier</span>
+                            <span class="slider-value-display" id="wGrowthVal">1.0</span>
+                        </div>
+                        <input type="range" class="custom-range" id="sliderGrowth" min="0" max="2" step="0.1" value="1.0" oninput="adjustEngineWeight('growth', this.value)">
+                    </div>
+
+                    <div class="slider-group">
+                        <div class="slider-meta">
+                            <span>Collateral Premium</span>
+                            <span class="slider-value-display" id="wCollateralVal">1.0</span>
+                        </div>
+                        <input type="range" class="custom-range" id="sliderCollateral" min="0" max="2" step="0.1" value="1.0" oninput="adjustEngineWeight('collateral', this.value)">
+                    </div>
+                </div>
+
+                <!-- Live Evaluation Telemetry logs -->
+                <div>
+                    <h4 style="font-size: 12px; text-transform: uppercase; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 8px;">Dynamic Execution Trace Log</h4>
+                    <div class="terminal-shell" id="telemetryTerminal">
+                        <div class="terminal-line">
+                            <span class="stamp">[SYSTEM INITIALIZATION]</span>
+                            <span>Awaiting user parameters...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bento Card: Risk Audit Alerts -->
+        <div class="bento-card col-4" id="riskFlagsWrapper">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <h2>Risk Flag Exceptions</h2>
+                    <p>Compliance Pre-Flight Audit</p>
+                </div>
+                <span class="badge-status" style="background: rgba(244, 63, 94, 0.1); color: var(--accent-rose)">Real-time Rules</span>
+            </div>
+
+            <div class="risk-flags-panel" id="riskFlagsList">
+                <!-- Dynamically filled risk flags -->
+                <div class="risk-flag-pill">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="stroke: var(--accent-rose);"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    No Tangible Fixed Assets Identified
+                </div>
+            </div>
+        </div>
+
+        <!-- Horizontal Label separating route options -->
+        <div class="routes-section-title">
+            <h3>Alternative Structural Options Examined</h3>
+        </div>
+
+        <!-- 6 Vertical Cards Grid -->
+        <div class="col-12" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+            
+            <!-- Card 1: Working Capital -->
+            <div class="route-vertical-card" id="card-wc">
+                <div class="route-card-top">
+                    <div class="route-icon-box">WC</div>
+                    <span class="route-match-badge match-high" id="wc-match-pill">90% Match</span>
+                </div>
+                <div class="route-info">
+                    <h4>Working Capital Revolver</h4>
+                    <p>Secured by rolling receivables and short terms reserves.</p>
+                </div>
+                <div class="route-metrics">
+                    <div>
+                        <div class="route-metric-lbl">Max Limit</div>
+                        <div class="route-metric-val" id="wc-max">$2,000,000</div>
+                    </div>
+                    <div>
+                        <div class="route-metric-lbl">Est Yield</div>
+                        <div class="route-metric-val" id="wc-apr">7.2% - 9.0%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Ecommerce Funding -->
+            <div class="route-vertical-card" id="card-ecom">
+                <div class="route-card-top">
+                    <div class="route-icon-box">EC</div>
+                    <span class="route-match-badge match-medium" id="ecom-match-pill">75% Match</span>
+                </div>
+                <div class="route-info">
+                    <h4>E-Commerce Stock &amp; Ads</h4>
+                    <p>Optimized for rapid inventory turns and high ad spends.</p>
+                </div>
+                <div class="route-metrics">
+                    <div>
+                        <div class="route-metric-lbl">Max Limit</div>
+                        <div class="route-metric-val" id="ecom-max">$1,500,000</div>
+                    </div>
+                    <div>
+                        <div class="route-metric-lbl">Est Yield</div>
+                        <div class="route-metric-val" id="ecom-apr">8.5% - 11.2%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Startup Funding -->
+            <div class="route-vertical-card" id="card-startup">
+                <div class="route-card-top">
+                    <div class="route-icon-box">VC</div>
+                    <span class="route-match-badge match-high" id="startup-match-pill">95% Match</span>
+                </div>
+                <div class="route-info">
+                    <h4>Startup VC-Bridge Debt</h4>
+                    <p>Tailored for high-growth recurring models awaiting equity pricing rounds.</p>
+                </div>
+                <div class="route-metrics">
+                    <div>
+                        <div class="route-metric-lbl">Max Limit</div>
+                        <div class="route-metric-val" id="startup-max">$5,000,000</div>
+                    </div>
+                    <div>
+                        <div class="route-metric-lbl">Est Yield</div>
+                        <div class="route-metric-val" id="startup-apr">9.8% - 13.5%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Equipment Lease -->
+            <div class="route-vertical-card" id="card-equip">
+                <div class="route-card-top">
+                    <div class="route-icon-box">EQ</div>
+                    <span class="route-match-badge match-low" id="equip-match-pill">20% Match</span>
+                </div>
+                <div class="route-info">
+                    <h4>Equipment Financing Lease</h4>
+                    <p>Hard collateral backed long-term asset amortizations.</p>
+                </div>
+                <div class="route-metrics">
+                    <div>
+                        <div class="route-metric-lbl">Max Limit</div>
+                        <div class="route-metric-val" id="equip-max">$10,000,000</div>
+                    </div>
+                    <div>
+                        <div class="route-metric-lbl">Est Yield</div>
+                        <div class="route-metric-val" id="equip-apr">6.5% - 8.2%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 5: Real Estate Funding -->
+            <div class="route-vertical-card" id="card-re">
+                <div class="route-card-top">
+                    <div class="route-icon-box">RE</div>
+                    <span class="route-match-badge match-low" id="re-match-pill">15% Match</span>
+                </div>
+                <div class="route-info">
+                    <h4>Commercial Property Debt</h4>
+                    <p>SBA 504 and custom bridge mechanisms for real estate purchases.</p>
+                </div>
+                <div class="route-metrics">
+                    <div>
+                        <div class="route-metric-lbl">Max Limit</div>
+                        <div class="route-metric-val" id="re-max">$25,000,000</div>
+                    </div>
+                    <div>
+                        <div class="route-metric-lbl">Est Yield</div>
+                        <div class="route-metric-val" id="re-apr">5.8% - 7.5%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 6: Acquisition Debt -->
+            <div class="route-vertical-card" id="card-acq">
+                <div class="route-card-top">
+                    <div class="route-icon-box">AQ</div>
+                    <span class="route-match-badge match-medium" id="acq-match-pill">60% Match</span>
+                </div>
+                <div class="route-info">
+                    <h4>Acquisition &amp; M&amp;A Leveraged</h4>
+                    <p>Co-structured debt models targeting target cash flows and EBITDA.</p>
+                </div>
+                <div class="route-metrics">
+                    <div>
+                        <div class="route-metric-lbl">Max Limit</div>
+                        <div class="route-metric-val" id="acq-max">$15,000,000</div>
+                    </div>
+                    <div>
+                        <div class="route-metric-lbl">Est Yield</div>
+                        <div class="route-metric-val" id="acq-apr">8.0% - 10.5%</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bento Card: Partner/Affiliate API Gateway CTA -->
+        <div class="bento-card col-12 partner-cta-card">
+            <div class="partner-icon-circle">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="stroke: var(--accent-cyan)">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+            </div>
+            <h3>Lender Integration Portal</h3>
+            <p>Direct API integration structures with premium digital capital markets. Secure routing matching over 45+ institutional lending protocols automatically.</p>
+            <button class="partner-action-btn" onclick="alert('Securing API pathways... Request submitted.')">Link Plaid / OpenBank Nodes</button>
+        </div>
+
+        <!-- Bento Card: API Schemas and Vercel Deployment Instructions -->
+        <div class="bento-card col-12 integration-specs-drawer">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <h2>Developer Integration &amp; Deployment Specifications</h2>
+                    <p>Unified Configuration Schemas &amp; Infrastructure Matrix</p>
+                </div>
+            </div>
+
+            <div class="tab-headers">
+                <button class="tab-btn active" onclick="switchSpecTab('providers-spec', this)">providers.json</button>
+                <button class="tab-btn" onclick="switchSpecTab('products-spec', this)">products.json</button>
+                <button class="tab-btn" onclick="switchSpecTab('routing-spec', this)">routing_logic.json</button>
+                <button class="tab-btn" onclick="switchSpecTab('vercel-spec', this)">Vercel Deployment</button>
+            </div>
+
+            <!-- Tab Panels -->
+            <div id="providers-spec" class="tab-content active">
+                <pre class="code-container-pre"><code>{
+  "providers": [
+    {
+      "id": "apex_credit",
+      "name": "Apex Institutional Credit",
+      "tier": "Tier-1 Prime",
+      "supported_products": ["wc_revolver", "acq_leveraged"],
+      "minimum_score_threshold": 700
+    },
+    {
+      "id": "aether_vc",
+      "name": "Aether VC Debt Bridges",
+      "tier": "Venture",
+      "supported_products": ["startup_bridge"],
+      "minimum_score_threshold": 680
+    },
+    {
+      "id": "prism_asset",
+      "name": "Prism Asset-Backed Capital",
+      "tier": "Non-Bank Private",
+      "supported_products": ["equip_lease", "re_property"],
+      "minimum_score_threshold": 600
+    }
+  ]
+}</code></pre>
+            </div>
+
+            <div id="products-spec" class="tab-content">
+                <pre class="code-container-pre"><code>{
+  "products": [
+    {
+      "id": "wc_revolver",
+      "name": "Working Capital Revolver",
+      "target_aprs": "7.2% - 9.0%",
+      "max_limit": 2000000,
+      "affinity_weights": { "liquidity": 0.8, "cashFlow": 0.6 }
+    },
+    {
+      "id": "startup_bridge",
+      "name": "Startup VC-Bridge Debt",
+      "target_aprs": "9.8% - 13.5%",
+      "max_limit": 5000000,
+      "affinity_weights": { "growth": 1.0, "cashFlow": 0.5 }
+    },
+    {
+      "id": "equip_lease",
+      "name": "Equipment Financing Lease",
+      "target_aprs": "6.5% - 8.2%",
+      "max_limit": 10000000,
+      "affinity_weights": { "collateral": 1.0, "leverage": 0.4 }
+    }
+  ]
+}</code></pre>
+            </div>
+
+            <div id="routing-spec" class="tab-content">
+                <pre class="code-container-pre"><code>{
+  "routing_logic": {
+    "score_tiers": {
+      "super_prime": { "min": 800, "max": 1000, "risk_multiplier": 0.85 },
+      "prime": { "min": 700, "max": 799, "risk_multiplier": 1.0 },
+      "sub_prime": { "min": 0, "max": 699, "risk_multiplier": 1.4 }
+    },
+    "risk_rejections": {
+      "leverage_ceiling": 85,
+      "liquidity_floor": 40
+    }
+  }
+}</code></pre>
+            </div>
+
+            <div id="vercel-spec" class="tab-content">
+                <div style="font-size: 13px; line-height: 1.6; color: var(--text-secondary);">
+                    <p style="margin-bottom: 12px; font-weight: 700; color: var(--text-primary);">Deploy this production-ready high-fidelity frontend directly in seconds:</p>
+                    <ol style="margin-left: 20px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 8px;">
+                        <li>Ensure this entire document is saved locally as <code>index.html</code>.</li>
+                        <li>Verify that all embedded styling rules and javascript engines are fully contained (this single-file architecture guarantees instantaneous zero-dependency rendering).</li>
+                        <li>Install the Vercel CLI via terminal command: <code style="background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); color: var(--accent-cyan);">npm i -g vercel</code></li>
+                        <li>Run <code style="background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); color: var(--accent-cyan);">vercel</code> in your directory. Follow the interactive prompts to provision hosting instantly.</li>
+                    </ol>
+                    <div style="background: rgba(37,99,235,0.1); border: 1px solid var(--accent-cobalt); border-radius: 8px; padding: 12px; font-family: var(--font-mono); font-size: 11px;">
+                        $ vercel --prod<br>
+                        ? Set up and deploy? [Y/n] y<br>
+                        ✔ Deployment complete! Your dynamic Cobalt Prism allocation engine is live.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Strict Compliance Regulatory Footer -->
+    <footer>
+        <div class="compliance-wrapper">
+            <div>
+                <p style="font-weight: 700; margin-bottom: 6px; color: var(--text-secondary);">REGULATORY &amp; FDIC DISCLOSURES</p>
+                The Funding Intelligence Engine serves strictly as a mathematical simulation framework. Scores generated are indicators of risk parameters and do not constitute firm approvals or formal institutional commitment letters under FCC or Truth in Lending acts. Capital structures are conditional upon final underwriting analysis by partner credit committees.
+            </div>
+            <div>
+                <p style="font-weight: 700; margin-bottom: 6px; color: var(--text-secondary);">ALGORITHMIC ROUTING TRANSPARENCY</p>
+                Dynamic allocation weighting leverages custom models calibrated against historical private debt indexes. Underlying parameters including weightings, scoring algorithms, and product routing protocols are fully customizable via private client-side API integrations. High volatility scores indicate variable APR projections.
+            </div>
+            <div>
+                <p style="font-weight: 700; margin-bottom: 6px; color: var(--text-secondary);">DATA SECURITIZATION STANDARDS</p>
+                Entity evaluations represent transient memory execution paths. Banking datasets routed via partner links operate inside restricted sandboxes conforming strictly with Plaid Link Protocols and AES-GCM 256-bit secure key generation standards. Compliance matrices are checked in real-time.
+            </div>
+        </div>
+
+        <div class="compliance-footer-bottom">
+            <span>© 2026 PRISM DEBT INTELLIGENCE SYSTEMS INC. ALL RIGHTS RESERVED.</span>
+            <div class="compliance-badges">
+                <span>SOC2 TYPE II Certified</span>
+                <span>ISO 27001 SECURE</span>
+                <span>SEC/FCC Compliant</span>
+            </div>
+        </div>
+    </footer>
+
+</div>
+
+<!-- Interactive Engine Logic Script -->
+<script>
+    // Embedded memory-based borrower archetypes datasets mimicking borrower_archetypes.json
+    const borrowerArchetypes = {
+        saas: {
+            score: 825,
+            rating: "Super Prime Tier",
+            category: "Excellent",
+            dimensions: { liquidity: 92, leverage: 45, growth: 96, collateral: 20, cashFlow: 88 },
+            recommendedPath: "SaaS Recurring Revenue Bridge",
+            optAmount: "$3,500,000",
+            targetApr: "8.2% - 10.0%",
+            maturity: "36 Months",
+            assessment: "The SaaS recurring business model exhibits low systemic volatility with superior gross margins. Capital allocation is optimized for immediate deployment into sales acquisition channels with minimum asset-backed collateralization requirements.",
+            riskFlags: ["No tangible physical assets available for lien", "Underlying model relies on non-provable contract longevity"]
+        },
+        ecom: {
+            score: 715,
+            rating: "Prime Tier",
+            category: "Good",
+            dimensions: { liquidity: 78, leverage: 62, growth: 89, collateral: 55, cashFlow: 70 },
+            recommendedPath: "E-Commerce Stock & Ads",
+            optAmount: "$1,200,000",
+            targetApr: "9.1% - 11.5%",
+            maturity: "18 Months",
+            assessment: "Seasonal inventories introduce cash flow variance. Dynamic allocation engines recommend receivables financing over longer structural debt profiles. Scale operations into high product turnover cycles.",
+            riskFlags: ["Seasonal sales cycles compromise stable cash coverage ratios", "Supply chain concentration risk in non-domestic vectors"]
+        },
+        industrial: {
+            score: 690,
+            rating: "Standard Tier",
+            category: "Fair",
+            dimensions: { liquidity: 45, leverage: 80, growth: 38, collateral: 95, cashFlow: 65 },
+            recommendedPath: "Equipment Financing Lease",
+            optAmount: "$8,500,000",
+            targetApr: "6.2% - 7.8%",
+            maturity: "60 Months",
+            assessment: "Low growth vector backed by massive fixed assets. Underwriting indicates highly favorable term structures when physical assets are secured under formal UCC-1 filings.",
+            riskFlags: ["Highly leveraged debt portfolio limits additional cash revolvers", "Growth velocity below key industry benchmarks"]
+        },
+        realestate: {
+            score: 790,
+            rating: "Prime Tier",
+            category: "Excellent",
+            dimensions: { liquidity: 60, leverage: 72, growth: 50, collateral: 98, cashFlow: 82 },
+            recommendedPath: "Commercial Property Debt",
+            optAmount: "$18,000,000",
+            targetApr: "5.5% - 7.0%",
+            maturity: "120 Months",
+            assessment: "Optimal collateralization mitigates cash flow variability. Recommend locking fixed rates to hedge against macroeconomic capital yield volatility.",
+            riskFlags: ["Real estate values vulnerable to commercial district adjustments", "Longer capital amortizations reduce immediate liquidity levels"]
+        },
+        acquisition: {
+            score: 755,
+            rating: "Prime Tier",
+            category: "Good",
+            dimensions: { liquidity: 70, leverage: 65, growth: 72, collateral: 48, cashFlow: 80 },
+            recommendedPath: "Acquisition & M&A Leveraged",
+            optAmount: "$6,500,000",
+            targetApr: "7.8% - 9.5%",
+            maturity: "48 Months",
+            assessment: "Strong acquisition target cash flows support leverage debt. Structural allocation models warrant institutional credit parameters and operational escrow protections.",
+            riskFlags: ["Integration of target entity introduces transitional risk", "Higher leverage required post-transaction execution"]
+        }
+    };
+
+    // User interactive weight states mimicking recommendation_weights.json
+    let currentWeights = {
+        liquidity: 1.0,
+        growth: 1.0,
+        collateral: 1.0
+    };
+
+    let activeArchetype = "saas";
+    let isWhiteLabelActive = false;
+
+    // Load data structures dynamically and update presentation layer
+    function loadArchetype(key) {
+        activeArchetype = key;
+        const profile = borrowerArchetypes[key];
+        
+        // Log to simulated trace debugger
+        logTrace(`Switching baseline profile parameters: ${key.toUpperCase()}`);
+        logTrace(`Profile score recalculation starting...`);
+
+        runDynamicCalculations();
+    }
+
+    // Weight Adjustment Handler
+    function adjustEngineWeight(dimension, val) {
+        currentWeights[dimension] = parseFloat(val);
+        document.getElementById(`w${dimension.charAt(0).toUpperCase() + dimension.slice(1)}Val`).innerText = val;
+        
+        logTrace(`Updating logic parameters: dynamic weight '${dimension}' modified to ${val}`);
+        runDynamicCalculations();
+    }
+
+    // Interactive Math Calculation Engine Simulation
+    function runDynamicCalculations() {
+        const base = borrowerArchetypes[activeArchetype];
+        
+        // Compute dynamically modified score based on interactive weights
+        let totalWeight = currentWeights.liquidity + currentWeights.growth + currentWeights.collateral;
+        let weightedVariance = 
+            ((base.dimensions.liquidity * currentWeights.liquidity) +
+            (base.dimensions.growth * currentWeights.growth) +
+            (base.dimensions.collateral * currentWeights.collateral)) / totalWeight;
+        
+        // Dynamic simulated scorecard adjustments
+        let finalScore = Math.round((base.score * 0.7) + (weightedVariance * 3));
+        if (finalScore > 1000) finalScore = 1000;
+        if (finalScore < 300) finalScore = 300;
+
+        // Dynamic match scores computed for the 6 vertical categories based on baseline and weight biases
+        const wcMatch = Math.min(100, Math.round(base.dimensions.liquidity * 0.6 + base.dimensions.cashFlow * 0.4 + (currentWeights.liquidity - 1.0) * 10));
+        const ecomMatch = Math.min(100, Math.round(base.dimensions.growth * 0.5 + base.dimensions.liquidity * 0.5 + (currentWeights.growth - 1.0) * 12));
+        const startupMatch = Math.min(100, Math.round(base.dimensions.growth * 0.8 + base.dimensions.liquidity * 0.2 + (currentWeights.growth - 1.0) * 15 - (currentWeights.collateral - 1.0) * 10));
+        const equipMatch = Math.min(100, Math.round(base.dimensions.collateral * 0.9 + (currentWeights.collateral - 1.0) * 15));
+        const reMatch = Math.min(100, Math.round(base.dimensions.collateral * 0.85 + base.dimensions.cashFlow * 0.15 + (currentWeights.collateral - 1.0) * 10));
+        const acqMatch = Math.min(100, Math.round(base.dimensions.cashFlow * 0.6 + base.dimensions.leverage * 0.4 + (currentWeights.liquidity - 1.0) * 8));
+
+        // UI Updates - Core Scorecard Dial
+        document.getElementById("scoreValueText").innerText = finalScore;
+        
+        // Compute dashoffset for SVG Circle meter (perimeter is ~565)
+        const offset = 565 - (565 * (finalScore / 1000));
+        document.getElementById("meterFillCircle").style.strokeDashoffset = offset;
+
+        // Determine Category Label based on new dynamic calculations
+        let dynamicCategory = "Standard";
+        let badgeClass = "badge-status";
+        if (finalScore >= 800) {
+            dynamicCategory = "Super Prime";
+            badgeClass = "badge-status badge-status-prime";
+        } else if (finalScore >= 700) {
+            dynamicCategory = "Prime Tier";
+            badgeClass = "badge-status badge-status-prime";
+        } else {
+            dynamicCategory = "Subprime / Watchlist";
+            badgeClass = "badge-status";
+            document.getElementById("scoreRatingBadge").style.color = "var(--accent-rose)";
+        }
+        document.getElementById("scoreCategoryText").innerText = dynamicCategory;
+        document.getElementById("scoreRatingBadge").innerText = dynamicCategory;
+        document.getElementById("scoreRatingBadge").className = badgeClass;
+
+        // Update dimension metrics visual meters
+        updateMetricMeter("liquidity", base.dimensions.liquidity);
+        updateMetricMeter("leverage", base.dimensions.leverage);
+        updateMetricMeter("growth", base.dimensions.growth);
+        updateMetricMeter("collateral", base.dimensions.collateral);
+        updateMetricMeter("cashFlow", base.dimensions.cashFlow);
+
+        // Update recommendation text details
+        document.getElementById("recommendedPathTitle").innerText = base.recommendedPath;
+        document.getElementById("optSizingVal").innerText = base.optAmount;
+        document.getElementById("targetAprVal").innerText = base.targetApr;
+        document.getElementById("maturityVal").innerText = base.maturity;
+        document.getElementById("assessmentNotesText").innerText = base.assessment;
+
+        // Set dynamic match indicator badges in real-time
+        setMatchPill("wc", wcMatch);
+        setMatchPill("ecom", ecomMatch);
+        setMatchPill("startup", startupMatch);
+        setMatchPill("equip", equipMatch);
+        setMatchPill("re", reMatch);
+        setMatchPill("acq", acqMatch);
+
+        // Update compliance risk flags list dynamically
+        const riskListElement = document.getElementById("riskFlagsList");
+        riskListElement.innerHTML = "";
+        if (base.riskFlags && base.riskFlags.length > 0) {
+            base.riskFlags.forEach(flag => {
+                const flagElement = document.createElement("div");
+                flagElement.className = "risk-flag-pill";
+                flagElement.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="stroke: var(--accent-rose);"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    ${flag}
+                `;
+                riskListElement.appendChild(flagElement);
+            });
+        } else {
+            riskListElement.innerHTML = `
+                <div class="risk-flag-pill safe">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="stroke: var(--accent-emerald);"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    Baseline Audit Verified Secure
+                </div>
+            `;
+        }
+
+        logTrace(`Dynamic Engine recalculation complete. Output Score: ${finalScore}. Best match target: ${base.recommendedPath}.`);
+    }
+
+    function updateMetricMeter(id, value) {
+        document.getElementById(`${id}Val`).innerText = `${value}/100`;
+        document.getElementById(`${id}Bar`).style.width = `${value}%`;
+    }
+
+    function setMatchPill(prefix, matchVal) {
+        const pill = document.getElementById(`${prefix}-match-pill`);
+        pill.innerText = `${matchVal}% Match`;
+        
+        pill.className = "route-match-badge";
+        if (matchVal >= 80) {
+            pill.classList.add("match-high");
+        } else if (matchVal >= 50) {
+            pill.classList.add("match-medium");
+        } else {
+            pill.classList.add("match-low");
+        }
+    }
+
+    // Interactive trace log functions
+    function logTrace(message) {
+        const term = document.getElementById("telemetryTerminal");
+        const timestamp = new Date().toLocaleTimeString();
+        
+        const line = document.createElement("div");
+        line.className = "terminal-line";
+        
+        let customStylingClass = "";
+        if (message.includes("complete")) {
+            customStylingClass = "success";
+        } else if (message.includes("recalculation") || message.includes("modified")) {
+            customStylingClass = "accent";
+        }
+
+        line.innerHTML = `
+            <span class="stamp">[${timestamp}]</span>
+            <span class="${customStylingClass}">${message}</span>
+        `;
+        term.appendChild(line);
+        term.scrollTop = term.scrollHeight;
+    }
+
+    // Toggle Between Full Operator View and White-Labeled Client Presentation
+    function toggleWhiteLabelView() {
+        isWhiteLabelActive = !isWhiteLabelActive;
+        const bodyEl = document.body;
+        const analystEl = document.getElementById("analystPanel");
+        const toggleText = document.getElementById("toggleText");
+
+        if (isWhiteLabelActive) {
+            bodyEl.classList.add("white-label-mode");
+            analystEl.style.display = "none";
+            toggleText.innerText = "Switch to Operator Terminal";
+            logTrace("Enabling White-Label presentation environment...");
+        } else {
+            bodyEl.classList.remove("white-label-mode");
+            analystEl.style.display = "block";
+            toggleText.innerText = "Switch to White-Label View";
+            logTrace("Restoring complete multi-dimensional operator view...");
+        }
+    }
+
+    function shareWhiteLabelLink() {
+        alert("Sharable customer link generated!\nAll debug widgets and operational metrics weight controllers have been filtered out dynamically.");
+    }
+
+    // Specification Tab Navigation switches
+    function switchSpecTab(tabId, el) {
+        // Toggle tab highlights
+        const buttons = el.parentNode.querySelectorAll(".tab-btn");
+        buttons.forEach(btn => btn.classList.remove("active"));
+        el.classList.add("active");
+
+        // Toggle content containers
+        const parent = el.parentNode.parentNode;
+        const contentPanes = parent.querySelectorAll(".tab-content");
+        contentPanes.forEach(pane => pane.classList.remove("active"));
+        document.getElementById(tabId).classList.add("active");
+    }
+
+    // Initialize application on page load
+    window.onload = function() {
+        runDynamicCalculations();
+    }
+</script>
+    <script src="script.js"></script>
+</body>
+</html>

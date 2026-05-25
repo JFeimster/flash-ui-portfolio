@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUBMIT PAYLOAD | QUOTE GRENADE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #000000;
+            --red: #FF0000;
+            --cream: #FDFCF0;
+            --green: #00FF41;
+            --border: 4px solid #000000;
+            --shadow: 8px 8px 0px #000000;
+            --transition: 0.1s ease-in-out;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--black);
+            font-family: 'Space Mono', monospace;
+            color: var(--cream);
+            line-height: 1.4;
+            overflow-x: hidden;
+            padding-bottom: 100px;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Archivo Black', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* --- Header --- */
+        .terminal-header {
+            background: var(--red);
+            padding: 20px;
+            border-bottom: var(--border);
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .status-bar {
+            background: #222;
+            color: var(--green);
+            padding: 5px 20px;
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: var(--border);
+        }
+
+        /* --- Terminal UI --- */
+        .terminal-window {
+            background: #111;
+            border: var(--border);
+            box-shadow: 12px 12px 0px var(--red);
+            padding: 40px;
+            position: relative;
+        }
+
+        .terminal-window::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        .label {
+            display: block;
+            font-family: 'Archivo Black', sans-serif;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            color: var(--red);
+        }
+
+        textarea {
+            width: 100%;
+            background: transparent;
+            border: 2px solid #333;
+            color: var(--cream);
+            font-family: 'Space Mono', monospace;
+            font-size: 1.5rem;
+            padding: 20px;
+            resize: none;
+            outline: none;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        textarea:focus {
+            border-color: var(--red);
+        }
+
+        /* --- Savage Meter --- */
+        .meter-container {
+            margin: 40px 0;
+            padding: 20px;
+            border: 2px solid #333;
+        }
+
+        .meter-label-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .meter-bar-bg {
+            height: 40px;
+            background: #222;
+            border: 2px solid var(--black);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #meter-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--red);
+            transition: width 0.3s ease;
+        }
+
+        #savage-status {
+            font-family: 'Archivo Black', sans-serif;
+            color: var(--red);
+        }
+
+        /* --- Controls --- */
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 40px;
+        }
+
+        .cat-chip {
+            border: 2px solid #444;
+            padding: 8px 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            background: transparent;
+            color: #888;
+            cursor: pointer;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .cat-chip.active {
+            border-color: var(--red);
+            color: var(--red);
+            background: rgba(255,0,0,0.1);
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: var(--red);
+            color: white;
+            border: none;
+            padding: 25px;
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 2rem;
+            cursor: pointer;
+            box-shadow: 8px 8px 0px #333;
+            transition: var(--transition);
+        }
+
+        .submit-btn:active {
+            transform: translate(4px, 4px);
+            box-shadow: 4px 4px 0px #333;
+        }
+
+        .submit-btn:disabled {
+            background: #444;
+            cursor: not-allowed;
+        }
+
+        /* --- Nav --- */
+        .nav-back {
+            display: inline-block;
+            margin-top: 40px;
+            color: var(--cream);
+            text-decoration: none;
+            border-bottom: 2px solid var(--red);
+            font-weight: bold;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 20px;
+            background: var(--red);
+            animation: blink 1s infinite;
+            vertical-align: middle;
+        }
+
+        @media (max-width: 600px) {
+            .terminal-window { padding: 20px; }
+            .submit-btn { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="status-bar">
+        <span>STATION: 0xGRENADE-BETA</span>
+        <span>ACCESS_LEVEL: HIGH_CLEARANCE</span>
+        <span>ENCRYPTION: ACTIVE</span>
+    </div>
+
+    <header class="terminal-header">
+        <h1 style="font-size: 2.5rem;">PAYLOAD SUBMISSION</h1>
+        <p>DROP YOUR THOUGHT. ARM THE POPULACE.</p>
+    </header>
+
+    <main class="container">
+        
+        <div class="terminal-window">
+            <label class="label">DRAFT YOUR GRENADE <span class="cursor"></span></label>
+            <textarea id="payload-input" rows="4" placeholder="TYPE YOUR SUBMISSION HERE..." maxlength="140"></textarea>
+
+            <div class="meter-container">
+                <div class="meter-label-group">
+                    <span style="font-weight: bold;">SAVAGE METER</span>
+                    <span id="savage-status">DORMANT</span>
+                </div>
+                <div class="meter-bar-bg">
+                    <div id="meter-fill"></div>
+                </div>
+            </div>
+
+            <label class="label">CLASSIFICATION</label>
+            <div class="categories">
+                <button class="cat-chip active" onclick="setCat(this)">LIBERTY RIFF</button>
+                <button class="cat-chip" onclick="setCat(this)">FOUNDER TRUTH</button>
+                <button class="cat-chip" onclick="setCat(this)">CONTRA-PHILOSOPHY</button>
+                <button class="cat-chip" onclick="setCat(this)">JESTER POST</button>
+            </div>
+
+            <button class="submit-btn" id="submit-payload" disabled>ARM PAYLOAD</button>
+        </div>
+
+        <a href="index.html" class="nav-back">← RETURN TO ARMORY</a>
+
+    </main>
+
+    <script>
+        const input = document.getElementById('payload-input');
+        const meterFill = document.getElementById('meter-fill');
+        const savageStatus = document.getElementById('savage-status');
+        const submitBtn = document.getElementById('submit-payload');
+
+        const triggerWords = [
+            'STATE', 'TAX', 'EXIT', 'CODE', 'LAW', 'BUG', 'FEATURE', 
+            'PRISON', 'FREEDOM', 'DECENTRALIZE', 'FIAT', 'VIOLENCE', 
+            'WEAPON', 'TRUTH', 'BUILD', 'DIE', 'SHRAPNEL', 'BUREAUCRACY'
+        ];
+
+        input.addEventListener('input', () => {
+            const val = input.value.toUpperCase();
+            let score = 0;
+
+            if (val.length > 0) {
+                // Length score
+                score += Math.min(val.length / 2, 30);
+                
+                // Keyword score
+                triggerWords.forEach(word => {
+                    if (val.includes(word)) score += 15;
+                });
+
+                // Formatting score (all caps bonus)
+                if (val === input.value && val.length > 5) score += 20;
+            }
+
+            score = Math.min(score, 100);
+            updateMeter(score);
+            
+            submitBtn.disabled = val.length < 10;
+        });
+
+        function updateMeter(score) {
+            meterFill.style.width = score + '%';
+            
+            if (score === 0) {
+                savageStatus.innerText = "DORMANT";
+                meterFill.style.backgroundColor = "#222";
+            } else if (score < 30) {
+                savageStatus.innerText = "BEIGE OPINION";
+                meterFill.style.backgroundColor = "#555";
+            } else if (score < 60) {
+                savageStatus.innerText = "MILDLY COMBUSTIBLE";
+                meterFill.style.backgroundColor = "#ff9900";
+            } else if (score < 90) {
+                savageStatus.innerText = "HIGH EXPLOSIVE";
+                meterFill.style.backgroundColor = "var(--red)";
+            } else {
+                savageStatus.innerText = "TOTAL SHRAPNEL";
+                meterFill.style.backgroundColor = "var(--green)";
+            }
+        }
+
+        function setCat(el) {
+            document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        submitBtn.addEventListener('click', () => {
+            submitBtn.innerText = "UPLOADING...";
+            submitBtn.disabled = true;
+            input.disabled = true;
+            
+            setTimeout(() => {
+                alert("PAYLOAD RECEIVED. THE NETWORK GROWS STRONGER.");
+                window.location.href = 'index.html';
+            }, 2000);
+        });
+
+        // Background flicker effect
+        setInterval(() => {
+            if(Math.random() > 0.98) {
+                document.body.style.opacity = "0.9";
+                setTimeout(() => document.body.style.opacity = "1", 50);
+            }
+        }, 100);
+    </script>
+</body>
+</html>

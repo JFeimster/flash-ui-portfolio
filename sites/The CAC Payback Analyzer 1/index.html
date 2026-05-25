@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash UI Export</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="analyzer-container">
+        <div class="main-card">
+            <header class="header">
+                <p>LIQUIDITY PROTOCOL v2.4</p>
+                <h1>CAC Payback Analyzer</h1>
+                <p>Verify your marketing engine's bankability in real-time.</p>
+            </header>
+
+            <div class="input-section">
+                <div class="input-group">
+                    <label>Monthly Ad Spend</label>
+                    <div class="input-wrapper">
+                        <span class="unit">$</span>
+                        <input type="number" id="spend" value="50000" placeholder="0">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>New Customers / Mo</label>
+                    <div class="input-wrapper">
+                        <span class="unit">#</span>
+                        <input type="number" id="customers" value="250" placeholder="0">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>ARPU (Avg Monthly Rev)</label>
+                    <div class="input-wrapper">
+                        <span class="unit">$</span>
+                        <input type="number" id="arpu" value="120" placeholder="0">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Gross Margin %</label>
+                    <div class="input-wrapper">
+                        <span class="unit">%</span>
+                        <input type="number" id="margin" value="75" placeholder="0">
+                    </div>
+                </div>
+            </div>
+
+            <div class="visual-section">
+                <div class="gauge-container">
+                    <svg class="gauge-svg" viewBox="0 0 200 120">
+                        <path class="gauge-bg" d="M20,100 A80,80 0 0,1 180,100" />
+                        <path id="gauge-track" class="gauge-track" d="M20,100 A80,80 0 0,1 180,100" />
+                    </svg>
+                    <div id="needle" class="needle"></div>
+                </div>
+                
+                <div class="gauge-labels">
+                    <span>0m</span>
+                    <span>6m</span>
+                    <span>12m</span>
+                    <span>18m+</span>
+                </div>
+
+                <div class="score-display">
+                    <div id="payback-value" class="payback-value">0.0</div>
+                    <div class="payback-label">Month Payback</div>
+                    <div id="status-badge" class="status-badge">Calculating...</div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <span class="lbl">Customer Acquisition Cost</span>
+                        <span id="cac-val" class="val">$0</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="lbl">Monthly Contribution</span>
+                        <span id="cm-val" class="val">$0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cta-container">
+                <p class="money-printer-text" id="cta-message">You have a money printer. Let us fund your CAC.</p>
+                <button class="btn-primary">Unlock Growth Capital</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const inputs = ['spend', 'customers', 'arpu', 'margin'];
+        const needle = document.getElementById('needle');
+        const gaugeTrack = document.getElementById('gauge-track');
+        const paybackDisplay = document.getElementById('payback-value');
+        const statusBadge = document.getElementById('status-badge');
+        const cacDisplay = document.getElementById('cac-val');
+        const cmDisplay = document.getElementById('cm-val');
+        const ctaMessage = document.getElementById('cta-message');
+
+        function updateAnalyzer() {
+            const spend = parseFloat(document.getElementById('spend').value) || 0;
+            const customers = parseFloat(document.getElementById('customers').value) || 0;
+            const arpu = parseFloat(document.getElementById('arpu').value) || 0;
+            const margin = parseFloat(document.getElementById('margin').value) || 0;
+
+            if (customers === 0 || arpu === 0 || margin === 0) {
+                resetUI();
+                return;
+            }
+
+            const cac = spend / customers;
+            const contributionMargin = arpu * (margin / 100);
+            const paybackMonths = cac / contributionMargin;
+
+            // Update Text
+            cacDisplay.textContent = `$${Math.round(cac).toLocaleString()}`;
+            cmDisplay.textContent = `$${Math.round(contributionMargin).toLocaleString()}`;
+            paybackDisplay.textContent = paybackMonths.toFixed(1);
+
+            // Gauge Logic
+            // 0 months = -90deg, 18 months = 90deg
+            let rotation = -90 + (Math.min(paybackMonths, 18) / 18) * 180;
+            needle.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+
+            // SVG Track Logic
+            // Total length is approx 251 (Pi * r)
+            const circumference = 251;
+            const percentage = Math.min(paybackMonths, 18) / 18;
+            gaugeTrack.style.strokeDashoffset = circumference * (1 - percentage);
+
+            // Coloring & Status
+            if (paybackMonths < 6) {
+                statusBadge.textContent = "Elite Bankability";
+                statusBadge.className = "status-badge status-bankable";
+                gaugeTrack.style.stroke = "var(--emerald)";
+                paybackDisplay.style.color = "var(--emerald)";
+                paybackDisplay.classList.add('bankable-glow');
+                ctaMessage.textContent = "You have a money printer. Let us fund your CAC.";
+            } else if (paybackMonths <= 12) {
+                statusBadge.textContent = "Market Neutral";
+                statusBadge.className = "status-badge status-neutral";
+                gaugeTrack.style.stroke = "var(--warning)";
+                paybackDisplay.style.color = "var(--warning)";
+                paybackDisplay.classList.remove('bankable-glow');
+                ctaMessage.textContent = "Solid unit economics. We can optimize this.";
+            } else {
+                statusBadge.textContent = "High Risk Profile";
+                statusBadge.className = "status-badge status-risky";
+                gaugeTrack.style.stroke = "var(--danger)";
+                paybackDisplay.style.color = "var(--danger)";
+                paybackDisplay.classList.remove('bankable-glow');
+                ctaMessage.textContent = "Efficiency warning. Tighten your engine.";
+            }
+        }
+
+        function resetUI() {
+            paybackDisplay.textContent = "0.0";
+            statusBadge.textContent = "Awaiting Data";
+            statusBadge.className = "status-badge";
+            needle.style.transform = `translateX(-50%) rotate(-90deg)`;
+            gaugeTrack.style.strokeDashoffset = 251;
+        }
+
+        inputs.forEach(id => {
+            document.getElementById(id).addEventListener('input', updateAnalyzer);
+        });
+
+        // Init
+        updateAnalyzer();
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

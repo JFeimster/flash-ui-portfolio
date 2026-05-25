@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonshine Capital | Widget Library</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #05070a;
+            --bg-card: #0d1117;
+            --bg-input: #161b22;
+            --neon-blue: #00f2ff;
+            --neon-green: #00ff9d;
+            --text-main: #e6edf3;
+            --text-dim: #8b949e;
+            --border: #30363d;
+            --accent-glow: rgba(0, 242, 255, 0.15);
+            --font-mono: 'Fira Code', monospace;
+            --font-sans: 'Inter', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            margin-bottom: 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .subheadline {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            max-width: 700px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--neon-blue);
+        }
+
+        /* Filter Section */
+        .filter-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--neon-blue);
+            color: var(--text-main);
+        }
+
+        .filter-btn.active {
+            background: rgba(0, 242, 255, 0.1);
+            border-color: var(--neon-blue);
+            color: var(--neon-blue);
+        }
+
+        /* Widget Grid */
+        .widget-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 2rem;
+        }
+
+        .widget-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .widget-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--neon-blue);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .card-preview {
+            height: 200px;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background-image: radial-gradient(var(--border) 1px, transparent 1px);
+            background-size: 15px 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .card-category {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--neon-green);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-main);
+        }
+
+        .card-description {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin-bottom: 1.5rem;
+            min-height: 3rem;
+        }
+
+        .card-footer {
+            padding: 1.25rem 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-use {
+            background: var(--neon-blue);
+            color: var(--bg-deep);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .btn-use:hover {
+            opacity: 0.9;
+        }
+
+        .stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        /* Mock Widget Visuals */
+        .visual-score { width: 60px; height: 60px; border-radius: 50%; border: 3px solid var(--neon-blue); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); color: var(--neon-blue); font-weight: bold; }
+        .visual-list { width: 100px; }
+        .visual-bar { height: 6px; background: var(--border); border-radius: 3px; margin: 6px 0; width: 100%; position: relative; overflow: hidden; }
+        .visual-bar::after { content:''; position: absolute; left: 0; top: 0; height: 100%; width: 60%; background: var(--neon-green); }
+        .visual-cta { background: var(--neon-blue); padding: 8px 20px; border-radius: 4px; font-weight: bold; font-size: 12px; color: #000; box-shadow: 0 0 15px rgba(0,242,255,0.3); }
+
+        .badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--bg-deep);
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+            .widget-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div>
+            <h1>Widget Showcase</h1>
+            <p class="subheadline">Browse our collection of plug-and-play capital tools designed to increase your conversion rates and provide value to your users.</p>
+        </div>
+        <nav class="nav-links">
+            <a href="index.html" class="nav-link">← Generator</a>
+            <a href="#" class="nav-link">Documentation</a>
+        </nav>
+    </header>
+
+    <div class="filter-bar" id="filterBar">
+        <button class="filter-btn active" data-filter="all">All Widgets</button>
+        <button class="filter-btn" data-filter="conversion">Conversion</button>
+        <button class="filter-btn" data-filter="education">Educational</button>
+        <button class="filter-btn" data-filter="affiliate">Affiliate Tools</button>
+    </div>
+
+    <main class="widget-grid" id="widgetGrid">
+        <!-- Readiness -->
+        <article class="widget-card" data-category="conversion">
+            <div class="card-preview">
+                <div class="visual-score">840</div>
+                <div class="badge">POPULAR</div>
+            </div>
+            <div class="card-body">
+                <span class="card-category">Conversion</span>
+                <h3 class="card-title">Funding Readiness Score</h3>
+                <p class="card-description">A high-engagement diagnostic tool that scores a business's likelihood of securing capital.</p>
+            </div>
+            <div class="card-footer">
+                <div class="stats">
+                    <span>⚡ 12.4% CVR</span>
+                    <span>⏱️ 1m setup</span>
+                </div>
+                <a href="index.html?type=readiness" class="btn-use">Configure</a>
+            </div>
+        </article>
+
+        <!-- Matcher -->
+        <article class="widget-card" data-category="conversion">
+            <div class="card-preview">
+                <div style="display:flex; gap: 8px;">
+                    <div style="width:30px; height:30px; background:var(--border); border-radius:4px;"></div>
+                    <div style="width:30px; height:30px; background:var(--neon-blue); border-radius:4px;"></div>
+                    <div style="width:30px; height:30px; background:var(--border); border-radius:4px;"></div>
+                </div>
+            </div>
+            <div class="card-body">
+                <span class="card-category">Conversion</span>
+                <h3 class="card-title">Funding Route Matcher</h3>
+                <p class="card-description">Interactive quiz that recommends Revenue Based Financing vs. SBA vs. Venture Debt.</p>
+            </div>
+            <div class="card-footer">
+                <div class="stats">
+                    <span>⚡ 18.1% CVR</span>
+                    <span>⏱️ 2m setup</span>
+                </div>
+                <a href="index.html?type=matcher" class="btn-use">Configure</a>
+            </div>
+        </article>
+
+        <!-- CTA -->
+        <article class="widget-card" data-category="affiliate">
+            <div class="card-preview">
+                <div class="visual-cta">APPLY FOR FUNDING</div>
+            </div>
+            <div class="card-body">
+                <span class="card-category">Affiliate Tools</span>
+                <h3 class="card-title">Application CTA Button</h3>
+                <p class="card-description">High-performance tracking button with built-in hover effects and tracking logic.</p>
+            </div>
+            <div class="card-footer">
+                <div class="stats">
+                    <span>⚡ 5.2% CTR</span>
+                    <span>⏱️ 30s setup</span>
+                </div>
+                <a href="index.html?type=cta" class="btn-use">Configure</a>
+            </div>
+        </article>
+
+        <!-- Estimator -->
+        <article class="widget-card" data-category="affiliate">
+            <div class="card-preview">
+                <div style="text-align:center">
+                    <div style="font-size: 24px; color: var(--neon-green); font-weight: bold; margin-bottom: 5px;">$14,200</div>
+                    <div class="visual-bar" style="width: 120px;"></div>
+                </div>
+            </div>
+            <div class="card-body">
+                <span class="card-category">Affiliate Tools</span>
+                <h3 class="card-title">Commission Estimator</h3>
+                <p class="card-description">Show your sub-affiliates or team members exactly how much they can earn per referral.</p>
+            </div>
+            <div class="card-footer">
+                <div class="stats">
+                    <span>⚡ Engagement</span>
+                    <span>⏱️ 2m setup</span>
+                </div>
+                <a href="index.html?type=estimator" class="btn-use">Configure</a>
+            </div>
+        </article>
+
+        <!-- Checklist -->
+        <article class="widget-card" data-category="education">
+            <div class="card-preview">
+                <div class="visual-list">
+                    <div class="visual-bar"></div>
+                    <div class="visual-bar" style="width: 80%;"></div>
+                    <div class="visual-bar" style="width: 90%;"></div>
+                </div>
+            </div>
+            <div class="card-body">
+                <span class="card-category">Educational</span>
+                <h3 class="card-title">Document Checklist</h3>
+                <p class="card-description">Helps applicants prepare for underwriting. Reduces "stalled" applications significantly.</p>
+            </div>
+            <div class="card-footer">
+                <div class="stats">
+                    <span>⚡ Drop-off Reduction</span>
+                    <span>⏱️ 1m setup</span>
+                </div>
+                <a href="index.html?type=checklist" class="btn-use">Configure</a>
+            </div>
+        </article>
+
+        <!-- Profile Card -->
+        <article class="widget-card" data-category="affiliate">
+            <div class="card-preview">
+                <div style="width:40px; height:40px; background:var(--border); border-radius:50%; margin-bottom:10px; border:1px solid var(--neon-blue);"></div>
+                <div style="width:60px; height:4px; background:var(--text-dim); border-radius:2px;"></div>
+            </div>
+            <div class="card-body">
+                <span class="card-category">Affiliate Tools</span>
+                <h3 class="card-title">Partner Profile Card</h3>
+                <p class="card-description">Establish trust by showing your official Moonshine Capital Partner verification badge.</p>
+            </div>
+            <div class="card-footer">
+                <div class="stats">
+                    <span>⚡ Trust-building</span>
+                    <span>⏱️ 1m setup</span>
+                </div>
+                <a href="index.html?type=profile" class="btn-use">Configure</a>
+            </div>
+        </article>
+    </main>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const buttons = document.querySelectorAll('.filter-btn');
+        const cards = document.querySelectorAll('.widget-card');
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class
+                buttons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const filter = btn.getAttribute('data-filter');
+
+                cards.forEach(card => {
+                    if (filter === 'all' || card.getAttribute('data-category') === filter) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outreach Draft Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #050505;
+            --bg-surface: #0d0d0d;
+            --bg-card: #141414;
+            --border-muted: #222222;
+            --accent-primary: #00ff88;
+            --accent-glow: rgba(0, 255, 136, 0.15);
+            --text-main: #e0e0e0;
+            --text-muted: #707070;
+            --text-dim: #404040;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-sans: 'Inter', sans-serif;
+            --radius: 8px;
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            letter-spacing: -0.01em;
+        }
+
+        .agent-container {
+            width: 100%;
+            max-width: 1100px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-muted);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            display: grid;
+            grid-template-columns: 360px 1fr;
+        }
+
+        /* LEFT SIDEBAR: CONTACT CONTEXT */
+        .context-sidebar {
+            padding: 32px;
+            border-right: 1px solid var(--border-muted);
+            background: linear-gradient(180deg, var(--bg-surface) 0%, #0a0a0a 100%);
+        }
+
+        .header-section {
+            margin-bottom: 24px;
+        }
+
+        .badge {
+            display: inline-block;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            padding: 4px 8px;
+            border: 1px solid var(--accent-primary);
+            color: var(--accent-primary);
+            border-radius: 4px;
+            margin-bottom: 12px;
+            letter-spacing: 0.1em;
+            background: var(--accent-glow);
+        }
+
+        .contact-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-muted);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .contact-card .label {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .contact-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+
+        .contact-title {
+            font-size: 13px;
+            color: var(--accent-primary);
+            margin-bottom: 12px;
+        }
+
+        .intel-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--text-muted);
+            background: rgba(255,255,255,0.03);
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+            letter-spacing: 0.05em;
+        }
+
+        select, textarea {
+            width: 100%;
+            background: var(--bg-base);
+            border: 1px solid var(--border-muted);
+            border-radius: var(--radius);
+            padding: 12px;
+            color: #fff;
+            font-family: var(--font-sans);
+            font-size: 13px;
+            transition: var(--transition);
+        }
+
+        select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .gen-btn {
+            width: 100%;
+            background: var(--accent-primary);
+            color: #000;
+            border: none;
+            border-radius: var(--radius);
+            padding: 14px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .gen-btn:hover {
+            filter: brightness(1.1);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        /* RIGHT PANEL: DRAFT EDITOR */
+        .draft-workspace {
+            background: var(--bg-base);
+            display: flex;
+            flex-direction: column;
+            height: 650px;
+        }
+
+        .workspace-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .editor-container {
+            padding: 32px;
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .subject-line {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--border-muted);
+            padding: 12px 0;
+            font-size: 18px;
+            font-weight: 500;
+            color: #fff;
+            width: 100%;
+            border-radius: 0;
+        }
+
+        .subject-line:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .email-body {
+            flex-grow: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 15px;
+            line-height: 1.6;
+            resize: none;
+            padding: 0;
+        }
+
+        .email-body:focus {
+            outline: none;
+        }
+
+        .footer-actions {
+            padding: 24px 32px;
+            border-top: 1px solid var(--border-muted);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            background: var(--bg-surface);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border-muted);
+            color: var(--text-muted);
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-secondary:hover {
+            color: #fff;
+            border-color: var(--text-dim);
+        }
+
+        .btn-ghost {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            color: var(--accent-primary);
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-pill {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        @media (max-width: 850px) {
+            .agent-container { grid-template-columns: 1fr; }
+            .context-sidebar { border-right: none; border-bottom: 1px solid var(--border-muted); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="agent-container">
+        <!-- Sidebar: Source Data -->
+        <aside class="context-sidebar">
+            <div class="header-section">
+                <span class="badge">Draft Studio</span>
+                <h1>Outreach Composer</h1>
+            </div>
+
+            <div class="contact-card">
+                <span class="label">Target Contact</span>
+                <div class="contact-name">Sarah Jenkins</div>
+                <div class="contact-title">Lead Designer & Owner</div>
+                
+                <div class="intel-tag">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    Brooklyn, NY
+                </div>
+                <div class="intel-tag">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                    auradesign.io
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Draft Tone</label>
+                <select>
+                    <option>Professional / Direct</option>
+                    <option selected>Collaborative / Warm</option>
+                    <option>Executive / Brief</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Key Hook / Value Prop</label>
+                <textarea rows="3" placeholder="Mention their recent Brooklyn projects...">Noticed your recent work on the 5th Ave loft restoration. Our architectural lighting would complement your minimalist aesthetic.</textarea>
+            </div>
+
+            <button class="gen-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                Regenerate Draft
+            </button>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="draft-workspace">
+            <div class="workspace-header">
+                <div class="status-pill">
+                    <div class="pulse-dot"></div>
+                    DRAFT READY • VERIFIED CONTACT
+                </div>
+                <div class="status-pill" style="text-transform: uppercase;">
+                    Model: Outreach-v2
+                </div>
+            </div>
+
+            <div class="editor-container">
+                <input type="text" class="subject-line" value="Question about Aura Design's Brooklyn projects">
+                <textarea class="email-body">Hi Sarah,
+
+I've been following Aura Design Studio's work for some time, and I was particularly impressed by the minimalist approach you took with the 5th Ave loft restoration.
+
+I noticed you're based in Brooklyn as well. I'm reaching out because we've recently developed a new line of architectural lighting systems that seem to align perfectly with your studio's aesthetic. We've helped similar high-end design firms reduce installation complexity while maintaining the clean lines that projects like yours demand.
+
+Would you be open to a 5-minute chat next Tuesday or Wednesday to see if this might be a fit for your upcoming Fall portfolio?
+
+Best regards,
+
+[Your Name]
+Micro-Agent Studio</textarea>
+            </div>
+
+            <div class="footer-actions">
+                <button class="btn-secondary">Export to CRM</button>
+                <button class="btn-ghost">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    Copy to Clipboard
+                </button>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

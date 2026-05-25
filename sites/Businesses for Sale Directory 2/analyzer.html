@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNDERWRITING LAB // Acquisition Index</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --obsidian: #050505;
+            --graphite: #141414;
+            --bone: #F5F5F0;
+            --acid-green: #C5FF00;
+            --copper: #8B9D83;
+            --blood-orange: #FF3D00;
+            --border-width: 2px;
+            --grain-opacity: 0.04;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--bone);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.4;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3BaseFilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/feFilter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: var(--grain-opacity);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: var(--border-width) solid var(--graphite);
+            background: var(--obsidian);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo { font-weight: 900; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--bone); }
+        .logo span { background: var(--acid-green); color: var(--obsidian); padding: 2px 6px; }
+
+        .mono { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; }
+
+        .lab-container {
+            display: grid;
+            grid-template-columns: 450px 1fr;
+            min-height: calc(100vh - 74px);
+        }
+
+        /* Inputs Panel */
+        .inputs-panel {
+            padding: 3rem 2rem;
+            border-right: var(--border-width) solid var(--graphite);
+            background: var(--obsidian);
+        }
+
+        .input-group {
+            margin-bottom: 2rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--copper);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper span {
+            position: absolute;
+            left: 1rem;
+            color: var(--copper);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        input {
+            width: 100%;
+            background: var(--graphite);
+            border: 1px solid #333;
+            padding: 1rem 1rem 1rem 2.5rem;
+            color: var(--bone);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--acid-green);
+        }
+
+        .slider-group {
+            margin-top: 1rem;
+        }
+
+        input[type="range"] {
+            padding: 0;
+            height: 4px;
+            background: var(--graphite);
+            appearance: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            background: var(--acid-green);
+        }
+
+        /* Analysis Panel */
+        .analysis-panel {
+            background: #080808;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 3rem;
+            border-bottom: 1px solid var(--graphite);
+            padding-bottom: 1rem;
+        }
+
+        .terminal-header h1 {
+            font-size: 3rem;
+            line-height: 1;
+            font-weight: 900;
+        }
+
+        .main-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .metric-box {
+            border: 1px solid var(--graphite);
+            padding: 2rem;
+            position: relative;
+        }
+
+        .metric-box .label {
+            color: var(--copper);
+            margin-bottom: 1rem;
+        }
+
+        .metric-box .value {
+            font-size: 3rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+        }
+
+        .metric-box .status-dot {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .good { color: var(--acid-green) !important; }
+        .warning { color: var(--blood-orange) !important; }
+        .bg-good { background: var(--acid-green); box-shadow: 0 0 10px var(--acid-green); }
+        .bg-warning { background: var(--blood-orange); box-shadow: 0 0 10px var(--blood-orange); }
+
+        .breakdown-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table td {
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--graphite);
+        }
+
+        .data-table td:last-child {
+            text-align: right;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+        }
+
+        .data-table .label {
+            color: var(--copper);
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .verdict-area {
+            margin-top: auto;
+            padding: 2rem;
+            border: var(--border-width) solid var(--bone);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .verdict-text h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .verdict-signal {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 900;
+            font-size: 2rem;
+            padding: 0.5rem 1rem;
+        }
+
+        @media (max-width: 1100px) {
+            .lab-container { grid-template-columns: 1fr; }
+            .inputs-panel { border-right: none; border-bottom: var(--border-width) solid var(--graphite); }
+            .breakdown-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">ACQUISITION <span>INDEX</span></a>
+        <div class="mono" style="color: var(--copper)">Terminal // Underwriting Lab v1.0.4</div>
+    </nav>
+
+    <div class="lab-container">
+        <aside class="inputs-panel">
+            <div class="mono" style="color: var(--acid-green); margin-bottom: 2rem;">[ Input Parameters ]</div>
+            
+            <div class="input-group">
+                <label>Purchase Price</label>
+                <div class="input-wrapper">
+                    <span>$</span>
+                    <input type="number" id="price" value="1200000" oninput="calculate()">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Annual SDE (Cash Flow)</label>
+                <div class="input-wrapper">
+                    <span>$</span>
+                    <input type="number" id="sde" value="450000" oninput="calculate()">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Down Payment (%)</label>
+                <div class="input-wrapper">
+                    <span>%</span>
+                    <input type="number" id="down-pct" value="10" oninput="calculate()">
+                </div>
+                <div class="slider-group">
+                    <input type="range" id="down-slider" min="5" max="100" value="10" oninput="syncSlider('down')">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Interest Rate (%)</label>
+                <div class="input-wrapper">
+                    <span>%</span>
+                    <input type="number" id="rate" value="9.5" step="0.1" oninput="calculate()">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Amortization (Years)</label>
+                <div class="input-wrapper">
+                    <input type="number" id="years" value="10" style="padding-left: 1rem;" oninput="calculate()">
+                </div>
+            </div>
+
+            <div style="margin-top: 4rem; padding: 1.5rem; border: 1px solid var(--graphite); background: #0a0a0a;">
+                <div class="mono" style="color: var(--copper); margin-bottom: 1rem;">SBA 7(a) Quick Presets</div>
+                <button class="mono" style="background: var(--bone); color: var(--obsidian); border: none; padding: 0.5rem 1rem; cursor: pointer; font-weight: 700;" onclick="setPreset('sba')">Apply 10% Down / 10 Yr</button>
+            </div>
+        </aside>
+
+        <main class="analysis-panel">
+            <div class="terminal-header">
+                <div>
+                    <div class="mono" style="color: var(--acid-green)">Underwriting Matrix</div>
+                    <h1>DEAL_ANALYSIS.EXE</h1>
+                </div>
+                <div class="mono" id="current-date">SECURE CONNECTION: 128-BIT</div>
+            </div>
+
+            <div class="main-metrics">
+                <div class="metric-box">
+                    <div class="status-dot" id="dscr-dot"></div>
+                    <div class="mono label">Debt Coverage (DSCR)</div>
+                    <div class="value" id="dscr-val">1.85</div>
+                </div>
+                <div class="metric-box">
+                    <div class="status-dot" id="coc-dot"></div>
+                    <div class="mono label">Cash-on-Cash Return</div>
+                    <div class="value" id="coc-val">242%</div>
+                </div>
+                <div class="metric-box">
+                    <div class="status-dot" id="multiple-dot"></div>
+                    <div class="mono label">Entry Multiple</div>
+                    <div class="value" id="multiple-val">2.67x</div>
+                </div>
+            </div>
+
+            <div class="breakdown-grid">
+                <div>
+                    <div class="mono" style="margin-bottom: 1.5rem; color: var(--copper);">Capital Structure</div>
+                    <table class="data-table">
+                        <tr>
+                            <td class="label">Total Equity Required</td>
+                            <td id="equity-req">$0</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Total Debt Amount</td>
+                            <td id="debt-amt">$0</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Monthly Payment (P+I)</td>
+                            <td id="monthly-pay" style="color: var(--blood-orange)">$0</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Annual Debt Service</td>
+                            <td id="annual-debt">$0</td>
+                        </tr>
+                    </table>
+                </div>
+                <div>
+                    <div class="mono" style="margin-bottom: 1.5rem; color: var(--copper);">Profitability & Risk</div>
+                    <table class="data-table">
+                        <tr>
+                            <td class="label">Net Cash Flow (Post-Debt)</td>
+                            <td id="net-cash" style="color: var(--acid-green)">$0</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Earnings Yield</td>
+                            <td id="yield-val">0%</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Break-Even Occupancy/Rev</td>
+                            <td id="be-val">0%</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Loan to Value (LTV)</td>
+                            <td id="ltv-val">0%</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="verdict-area" id="verdict-container">
+                <div class="verdict-text">
+                    <h2 id="verdict-title">STRATEGIC ACQUISITION TARGET</h2>
+                    <p class="mono" id="verdict-sub">DSCR and Cash-on-Cash metrics exceed industry benchmarks.</p>
+                </div>
+                <div class="verdict-signal" id="verdict-signal">PROCEED</div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function formatCurrency(num) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(num);
+        }
+
+        function syncSlider(type) {
+            if (type === 'down') {
+                document.getElementById('down-pct').value = document.getElementById('down-slider').value;
+            }
+            calculate();
+        }
+
+        function setPreset(type) {
+            if (type === 'sba') {
+                document.getElementById('down-pct').value = 10;
+                document.getElementById('down-slider').value = 10;
+                document.getElementById('years').value = 10;
+                document.getElementById('rate').value = 9.5;
+            }
+            calculate();
+        }
+
+        function calculate() {
+            const price = parseFloat(document.getElementById('price').value) || 0;
+            const sde = parseFloat(document.getElementById('sde').value) || 0;
+            const downPct = parseFloat(document.getElementById('down-pct').value) || 0;
+            const rate = parseFloat(document.getElementById('rate').value) || 0;
+            const years = parseFloat(document.getElementById('years').value) || 0;
+
+            const downPayment = price * (downPct / 100);
+            const loanAmount = price - downPayment;
+            
+            // Mortgage Calculation
+            const monthlyRate = (rate / 100) / 12;
+            const numPayments = years * 12;
+            let monthlyPayment = 0;
+            
+            if (rate > 0) {
+                monthlyPayment = loanAmount * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / (Math.pow(1 + monthlyRate, numPayments) - 1);
+            } else {
+                monthlyPayment = loanAmount / numPayments;
+            }
+
+            const annualDebtService = monthlyPayment * 12;
+            const dscr = annualDebtService > 0 ? (sde / annualDebtService) : 0;
+            const netCashFlow = sde - annualDebtService;
+            const coc = downPayment > 0 ? (netCashFlow / downPayment) * 100 : 0;
+            const multiple = sde > 0 ? (price / sde) : 0;
+
+            // Update UI
+            document.getElementById('dscr-val').innerText = dscr.toFixed(2);
+            document.getElementById('coc-val').innerText = coc.toFixed(0) + '%';
+            document.getElementById('multiple-val').innerText = multiple.toFixed(2) + 'x';
+
+            document.getElementById('equity-req').innerText = formatCurrency(downPayment);
+            document.getElementById('debt-amt').innerText = formatCurrency(loanAmount);
+            document.getElementById('monthly-pay').innerText = formatCurrency(monthlyPayment);
+            document.getElementById('annual-debt').innerText = formatCurrency(annualDebtService);
+            document.getElementById('net-cash').innerText = formatCurrency(netCashFlow);
+            document.getElementById('yield-val').innerText = ( (sde/price) * 100 ).toFixed(1) + '%';
+            document.getElementById('ltv-val').innerText = (100 - downPct).toFixed(0) + '%';
+            document.getElementById('be-val').innerText = ( (annualDebtService / sde) * 100 ).toFixed(1) + '%';
+
+            // Logic Styling
+            const dscrBox = document.getElementById('dscr-val');
+            const dscrDot = document.getElementById('dscr-dot');
+            if (dscr < 1.25) {
+                dscrBox.className = 'value warning';
+                dscrDot.className = 'status-dot bg-warning';
+            } else {
+                dscrBox.className = 'value good';
+                dscrDot.className = 'status-dot bg-good';
+            }
+
+            const cocBox = document.getElementById('coc-val');
+            const cocDot = document.getElementById('coc-dot');
+            if (coc < 20) {
+                cocBox.className = 'value warning';
+                cocDot.className = 'status-dot bg-warning';
+            } else {
+                cocBox.className = 'value good';
+                cocDot.className = 'status-dot bg-good';
+            }
+
+            // Verdict Logic
+            const verdictCont = document.getElementById('verdict-container');
+            const verdictTitle = document.getElementById('verdict-title');
+            const verdictSignal = document.getElementById('verdict-signal');
+            const verdictSub = document.getElementById('verdict-sub');
+
+            if (dscr < 1.1) {
+                verdictCont.style.borderColor = 'var(--blood-orange)';
+                verdictTitle.innerText = 'HIGH LEVERAGE DANGER';
+                verdictSignal.innerText = 'ABORT';
+                verdictSignal.style.color = 'var(--blood-orange)';
+                verdictSub.innerText = 'Debt service exceeds or matches cash flow. Deal is un-bankable.';
+            } else if (dscr < 1.5) {
+                verdictCont.style.borderColor = 'var(--copper)';
+                verdictTitle.innerText = 'MARGINAL OPPORTUNITY';
+                verdictSignal.innerText = 'CAUTION';
+                verdictSignal.style.color = 'var(--copper)';
+                verdictSub.innerText = 'Tight debt coverage. Requires significant operational efficiency.';
+            } else {
+                verdictCont.style.borderColor = 'var(--acid-green)';
+                verdictTitle.innerText = 'ALPHA ASSET DETECTED';
+                verdictSignal.innerText = 'PROCEED';
+                verdictSignal.style.color = 'var(--acid-green)';
+                verdictSub.innerText = 'Strong cash flow with safety buffer. Highly leverageable.';
+            }
+        }
+
+        // Clock
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('current-date').innerText = 'TERMINAL_LINK_ACTIVE // ' + now.getHours() + ':' + now.getMinutes().toString().padStart(2, '0') + ':' + now.getSeconds().toString().padStart(2, '0');
+        }, 1000);
+
+        // Initial Calculation
+        calculate();
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNDERWRITING LAB // Acquisition Index</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --obsidian: #050505;
+            --graphite: #141414;
+            --bone: #F5F5F0;
+            --acid-green: #C5FF00;
+            --copper: #8B9D83;
+            --blood-orange: #FF3D00;
+            --border-width: 2px;
+            --grain-opacity: 0.04;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--bone);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.4;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3BaseFilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/feFilter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: var(--grain-opacity);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: var(--border-width) solid var(--graphite);
+            background: var(--obsidian);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo { font-weight: 900; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--bone); }
+        .logo span { background: var(--acid-green); color: var(--obsidian); padding: 2px 6px; }
+
+        .mono { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; }
+
+        .lab-container {
+            display: grid;
+            grid-template-columns: 450px 1fr;
+            min-height: calc(100vh - 74px);
+        }
+
+        /* Inputs Panel */
+        .inputs-panel {
+            padding: 3rem 2rem;
+            border-right: var(--border-width) solid var(--graphite);
+            background: var(--obsidian);
+        }
+
+        .input-group {
+            margin-bottom: 2rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--copper);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper span {
+            position: absolute;
+            left: 1rem;
+            color: var(--copper);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        input {
+            width: 100%;
+            background: var(--graphite);
+            border: 1px solid #333;
+            padding: 1rem 1rem 1rem 2.5rem;
+            color: var(--bone);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--acid-green);
+        }
+
+        .slider-group {
+            margin-top: 1rem;
+        }
+
+        input[type="range"] {
+            padding: 0;
+            height: 4px;
+            background: var(--graphite);
+            appearance: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            background: var(--acid-green);
+        }
+
+        /* Analysis Panel */
+        .analysis-panel {
+            background: #080808;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 3rem;
+            border-bottom: 1px solid var(--graphite);
+            padding-bottom: 1rem;
+        }
+
+        .terminal-header h1 {
+            font-size: 3rem;
+            line-height: 1;
+            font-weight: 900;
+        }
+
+        .main-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .metric-box {
+            border: 1px solid var(--graphite);
+            padding: 2rem;
+            position: relative;
+        }
+
+        .metric-box .label {
+            color: var(--copper);
+            margin-bottom: 1rem;
+        }
+
+        .metric-box .value {
+            font-size: 3rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+        }
+
+        .metric-box .status-dot {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .good { color: var(--acid-green) !important; }
+        .warning { color: var(--blood-orange) !important; }
+        .bg-good { background: var(--acid-green); box-shadow: 0 0 10px var(--acid-green); }
+        .bg-warning { background: var(--blood-orange); box-shadow: 0 0 10px var(--blood-orange); }
+
+        .breakdown-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table td {
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--graphite);
+        }
+
+        .data-table td:last-child {
+            text-align: right;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+        }
+
+        .data-table .label {
+            color: var(--copper);
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .verdict-area {
+            margin-top: auto;
+            padding: 2rem;
+            border: var(--border-width) solid var(--bone);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .verdict-text h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .verdict-signal {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 900;
+            font-size: 2rem;
+            padding: 0.5rem 1rem;
+        }
+
+        @media (max-width: 1100px) {
+            .lab-container { grid-template-columns: 1fr; }
+            .inputs-panel { border-right: none; border-bottom: var(--border-width) solid var(--graphite); }
+            .breakdown-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">ACQUISITION <span>INDEX</span></a>
+        <div class="mono" style="color: var(--copper)">Terminal // Underwriting Lab v1.0.4</div>
+    </nav>
+
+    <div class="lab-container">
+        <aside class="inputs-panel">
+            <div class="mono" style="color: var(--acid-green); margin-bottom: 2rem;">[ Input Parameters ]</div>
+            
+            <div class="input-group">
+                <label>Purchase Price</label>
+                <div class="input-wrapper">
+                    <span>$</span>
+                    <input type="number" id="price" value="1200000" oninput="calculate()">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Annual SDE (Cash Flow)</label>
+                <div class="input-wrapper">
+                    <span>$</span>
+                    <input type="number" id="sde" value="450000" oninput="calculate()">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Down Payment (%)</label>
+                <div class="input-wrapper">
+                    <span>%</span>
+                    <input type="number" id="down-pct" value="10" oninput="calculate()">
+                </div>
+                <div class="slider-group">
+                    <input type="range" id="down-slider" min="5" max="100" value="10" oninput="syncSlider('down')">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Interest Rate (%)</label>
+                <div class="input-wrapper">
+                    <span>%</span>
+                    <input type="number" id="rate" value="9.5" step="0.1" oninput="calculate()">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Amortization (Years)</label>
+                <div class="input-wrapper">
+                    <input type="number" id="years" value="10" style="padding-left: 1rem;" oninput="calculate()">
+                </div>
+            </div>
+
+            <div style="margin-top: 4rem; padding: 1.5rem; border: 1px solid var(--graphite); background: #0a0a0a;">
+                <div class="mono" style="color: var(--copper); margin-bottom: 1rem;">SBA 7(a) Quick Presets</div>
+                <button class="mono" style="background: var(--bone); color: var(--obsidian); border: none; padding: 0.5rem 1rem; cursor: pointer; font-weight: 700;" onclick="setPreset('sba')">Apply 10% Down / 10 Yr</button>
+            </div>
+        </aside>
+
+        <main class="analysis-panel">
+            <div class="terminal-header">
+                <div>
+                    <div class="mono" style="color: var(--acid-green)">Underwriting Matrix</div>
+                    <h1>DEAL_ANALYSIS.EXE</h1>
+                </div>
+                <div class="mono" id="current-date">SECURE CONNECTION: 128-BIT</div>
+            </div>
+
+            <div class="main-metrics">
+                <div class="metric-box">
+                    <div class="status-dot" id="dscr-dot"></div>
+                    <div class="mono label">Debt Coverage (DSCR)</div>
+                    <div class="value" id="dscr-val">1.85</div>
+                </div>
+                <div class="metric-box">
+                    <div class="status-dot" id="coc-dot"></div>
+                    <div class="mono label">Cash-on-Cash Return</div>
+                    <div class="value" id="coc-val">242%</div>
+                </div>
+                <div class="metric-box">
+                    <div class="status-dot" id="multiple-dot"></div>
+                    <div class="mono label">Entry Multiple</div>
+                    <div class="value" id="multiple-val">2.67x</div>
+                </div>
+            </div>
+
+            <div class="breakdown-grid">
+                <div>
+                    <div class="mono" style="margin-bottom: 1.5rem; color: var(--copper);">Capital Structure</div>
+                    <table class="data-table">
+                        <tr>
+                            <td class="label">Total Equity Required</td>
+                            <td id="equity-req">$0</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Total Debt Amount</td>
+                            <td id="debt-amt">$0</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Monthly Payment (P+I)</td>
+                            <td id="monthly-pay" style="color: var(--blood-orange)">$0</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Annual Debt Service</td>
+                            <td id="annual-debt">$0</td>
+                        </tr>
+                    </table>
+                </div>
+                <div>
+                    <div class="mono" style="margin-bottom: 1.5rem; color: var(--copper);">Profitability & Risk</div>
+                    <table class="data-table">
+                        <tr>
+                            <td class="label">Net Cash Flow (Post-Debt)</td>
+                            <td id="net-cash" style="color: var(--acid-green)">$0</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Earnings Yield</td>
+                            <td id="yield-val">0%</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Break-Even Occupancy/Rev</td>
+                            <td id="be-val">0%</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Loan to Value (LTV)</td>
+                            <td id="ltv-val">0%</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="verdict-area" id="verdict-container">
+                <div class="verdict-text">
+                    <h2 id="verdict-title">STRATEGIC ACQUISITION TARGET</h2>
+                    <p class="mono" id="verdict-sub">DSCR and Cash-on-Cash metrics exceed industry benchmarks.</p>
+                </div>
+                <div class="verdict-signal" id="verdict-signal">PROCEED</div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function formatCurrency(num) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(num);
+        }
+
+        function syncSlider(type) {
+            if (type === 'down') {
+                document.getElementById('down-pct').value = document.getElementById('down-slider').value;
+            }
+            calculate();
+        }
+
+        function setPreset(type) {
+            if (type === 'sba') {
+                document.getElementById('down-pct').value = 10;
+                document.getElementById('down-slider').value = 10;
+                document.getElementById('years').value = 10;
+                document.getElementById('rate').value = 9.5;
+            }
+            calculate();
+        }
+
+        function calculate() {
+            const price = parseFloat(document.getElementById('price').value) || 0;
+            const sde = parseFloat(document.getElementById('sde').value) || 0;
+            const downPct = parseFloat(document.getElementById('down-pct').value) || 0;
+            const rate = parseFloat(document.getElementById('rate').value) || 0;
+            const years = parseFloat(document.getElementById('years').value) || 0;
+
+            const downPayment = price * (downPct / 100);
+            const loanAmount = price - downPayment;
+            
+            // Mortgage Calculation
+            const monthlyRate = (rate / 100) / 12;
+            const numPayments = years * 12;
+            let monthlyPayment = 0;
+            
+            if (rate > 0) {
+                monthlyPayment = loanAmount * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / (Math.pow(1 + monthlyRate, numPayments) - 1);
+            } else {
+                monthlyPayment = loanAmount / numPayments;
+            }
+
+            const annualDebtService = monthlyPayment * 12;
+            const dscr = annualDebtService > 0 ? (sde / annualDebtService) : 0;
+            const netCashFlow = sde - annualDebtService;
+            const coc = downPayment > 0 ? (netCashFlow / downPayment) * 100 : 0;
+            const multiple = sde > 0 ? (price / sde) : 0;
+
+            // Update UI
+            document.getElementById('dscr-val').innerText = dscr.toFixed(2);
+            document.getElementById('coc-val').innerText = coc.toFixed(0) + '%';
+            document.getElementById('multiple-val').innerText = multiple.toFixed(2) + 'x';
+
+            document.getElementById('equity-req').innerText = formatCurrency(downPayment);
+            document.getElementById('debt-amt').innerText = formatCurrency(loanAmount);
+            document.getElementById('monthly-pay').innerText = formatCurrency(monthlyPayment);
+            document.getElementById('annual-debt').innerText = formatCurrency(annualDebtService);
+            document.getElementById('net-cash').innerText = formatCurrency(netCashFlow);
+            document.getElementById('yield-val').innerText = ( (sde/price) * 100 ).toFixed(1) + '%';
+            document.getElementById('ltv-val').innerText = (100 - downPct).toFixed(0) + '%';
+            document.getElementById('be-val').innerText = ( (annualDebtService / sde) * 100 ).toFixed(1) + '%';
+
+            // Logic Styling
+            const dscrBox = document.getElementById('dscr-val');
+            const dscrDot = document.getElementById('dscr-dot');
+            if (dscr < 1.25) {
+                dscrBox.className = 'value warning';
+                dscrDot.className = 'status-dot bg-warning';
+            } else {
+                dscrBox.className = 'value good';
+                dscrDot.className = 'status-dot bg-good';
+            }
+
+            const cocBox = document.getElementById('coc-val');
+            const cocDot = document.getElementById('coc-dot');
+            if (coc < 20) {
+                cocBox.className = 'value warning';
+                cocDot.className = 'status-dot bg-warning';
+            } else {
+                cocBox.className = 'value good';
+                cocDot.className = 'status-dot bg-good';
+            }
+
+            // Verdict Logic
+            const verdictCont = document.getElementById('verdict-container');
+            const verdictTitle = document.getElementById('verdict-title');
+            const verdictSignal = document.getElementById('verdict-signal');
+            const verdictSub = document.getElementById('verdict-sub');
+
+            if (dscr < 1.1) {
+                verdictCont.style.borderColor = 'var(--blood-orange)';
+                verdictTitle.innerText = 'HIGH LEVERAGE DANGER';
+                verdictSignal.innerText = 'ABORT';
+                verdictSignal.style.color = 'var(--blood-orange)';
+                verdictSub.innerText = 'Debt service exceeds or matches cash flow. Deal is un-bankable.';
+            } else if (dscr < 1.5) {
+                verdictCont.style.borderColor = 'var(--copper)';
+                verdictTitle.innerText = 'MARGINAL OPPORTUNITY';
+                verdictSignal.innerText = 'CAUTION';
+                verdictSignal.style.color = 'var(--copper)';
+                verdictSub.innerText = 'Tight debt coverage. Requires significant operational efficiency.';
+            } else {
+                verdictCont.style.borderColor = 'var(--acid-green)';
+                verdictTitle.innerText = 'ALPHA ASSET DETECTED';
+                verdictSignal.innerText = 'PROCEED';
+                verdictSignal.style.color = 'var(--acid-green)';
+                verdictSub.innerText = 'Strong cash flow with safety buffer. Highly leverageable.';
+            }
+        }
+
+        // Clock
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('current-date').innerText = 'TERMINAL_LINK_ACTIVE // ' + now.getHours() + ':' + now.getMinutes().toString().padStart(2, '0') + ':' + now.getSeconds().toString().padStart(2, '0');
+        }, 1000);
+
+        // Initial Calculation
+        calculate();
+    </script>
+</body>
+</html>

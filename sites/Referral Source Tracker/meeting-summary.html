@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --bg-overlay: rgba(2, 6, 23, 0.85);
+        --modal-bg: #0f172a;
+        --surface: #1e293b;
+        --surface-hover: #334155;
+        --border: #334155;
+        --text-primary: #f8fafc;
+        --text-secondary: #94a3b8;
+        --accent: #f8fafc;
+        --accent-text: #0f172a;
+        --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        --success: #10b981;
+    }
+
+    * {
+        box-sizing: border-box;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', sans-serif;
+        background: #020617;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        color: var(--text-primary);
+    }
+
+    .container {
+        width: 100%;
+        max-width: 480px;
+        padding: 20px;
+        animation: pageAppear 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes pageAppear {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .summary-card {
+        background: var(--modal-bg);
+        border-radius: 24px;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+    .header {
+        padding: 40px 32px 24px;
+        text-align: center;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+        padding: 4px 12px;
+        border-radius: 100px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-bottom: 16px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .header h1 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        letter-spacing: -0.025em;
+    }
+
+    .header p {
+        margin: 8px 0 0;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+    }
+
+    .section {
+        padding: 0 32px 28px;
+    }
+
+    .label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-secondary);
+        margin-bottom: 16px;
+    }
+
+    /* Reuse Avatar Group */
+    .avatar-group {
+        display: flex;
+        align-items: center;
+    }
+
+    .avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 2px solid var(--modal-bg);
+        background: var(--surface);
+        margin-left: -10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-primary);
+        font-size: 0.8rem;
+        font-weight: 600;
+        overflow: hidden;
+    }
+
+    .avatar:first-child { margin-left: 0; }
+
+    .avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Notes Styling */
+    .notes-box {
+        background: var(--surface);
+        border-radius: 16px;
+        padding: 16px;
+        border: 1px solid var(--border);
+    }
+
+    .notes-box p {
+        margin: 0;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        color: var(--text-secondary);
+    }
+
+    /* Action Items */
+    .action-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .action-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        border: 1px solid var(--border);
+    }
+
+    .checkbox {
+        width: 18px;
+        height: 18px;
+        border-radius: 6px;
+        border: 2px solid var(--border);
+        margin-top: 2px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .checkbox.checked {
+        background: var(--accent);
+        border-color: var(--accent);
+    }
+
+    .checkbox.checked svg {
+        color: var(--accent-text);
+    }
+
+    .action-text {
+        font-size: 0.875rem;
+        line-height: 1.4;
+    }
+
+    .action-text.completed {
+        text-decoration: line-through;
+        color: var(--text-secondary);
+    }
+
+    .footer {
+        padding: 0 32px 40px;
+        display: flex;
+        gap: 12px;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 14px;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .btn-secondary {
+        background: var(--surface);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+        background: var(--surface-hover);
+    }
+
+    .btn-primary {
+        background: var(--accent);
+        color: var(--accent-text);
+    }
+
+    .btn-primary:hover {
+        opacity: 0.9;
+    }
+
+    svg {
+        width: 16px;
+        height: 16px;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="summary-card">
+        <div class="header">
+            <div class="status-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Meeting Completed
+            </div>
+            <h1>Project Sync Summary</h1>
+            <p>October 24, 2023 • 13:00 - 14:00</p>
+        </div>
+
+        <div class="section">
+            <span class="label">Attendees</span>
+            <div class="avatar-group">
+                <div class="avatar">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=64&h=64&q=80" alt="User">
+                </div>
+                <div class="avatar">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=64&h=64&q=80" alt="User">
+                </div>
+                <div class="avatar">
+                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=64&h=64&q=80" alt="User">
+                </div>
+                <div class="avatar" style="background: var(--surface-hover);">JD</div>
+                <div class="avatar" style="background: var(--surface-hover);">+1</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <span class="label">Key Notes</span>
+            <div class="notes-box">
+                <p>Discussed the Q4 roadmap and finalized the design system updates. The team agreed on shifting the deployment date to Nov 12th to accommodate the new authentication flow. Sarah shared the initial prototypes for the dashboard mobile view.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <span class="label">Action Items</span>
+            <div class="action-list">
+                <div class="action-item">
+                    <div class="checkbox checked">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <span class="action-text completed">Update Figma design tokens</span>
+                </div>
+                <div class="action-item">
+                    <div class="checkbox"></div>
+                    <span class="action-text">Review API documentation for auth flow</span>
+                </div>
+                <div class="action-item">
+                    <div class="checkbox"></div>
+                    <span class="action-text">Schedule follow-up with DevOps team</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <button class="btn btn-secondary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+                Export
+            </button>
+            <button class="btn btn-primary">Done</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

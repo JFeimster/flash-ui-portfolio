@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scale & Efficiency Simulator | Emerald Circuit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050807;
+            --bg-card: #0c1210;
+            --emerald: #00ff88;
+            --emerald-dim: rgba(0, 255, 136, 0.2);
+            --emerald-glow: rgba(0, 255, 136, 0.5);
+            --danger: #ff4757;
+            --warning: #ffa502;
+            --text-main: #e0e0e0;
+            --text-dim: #889990;
+            --circuit-line: rgba(0, 255, 136, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at 2px 2px, var(--circuit-line) 1px, transparent 0);
+            background-size: 40px 40px;
+            padding: 20px;
+        }
+
+        .simulator-container {
+            width: 100%;
+            max-width: 1100px;
+            position: relative;
+        }
+
+        .main-card {
+            background: var(--bg-card);
+            border: 1px solid var(--emerald-dim);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            grid-column: span 2;
+            border-bottom: 1px solid var(--emerald-dim);
+            padding-bottom: 24px;
+            margin-bottom: 10px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            background: linear-gradient(to right, #fff, var(--emerald));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        .control-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: rgba(255,255,255,0.02);
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-group label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--emerald);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input {
+            width: 100%;
+            background: #000;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 12px;
+            color: #fff;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--emerald);
+        }
+
+        .simulation-view {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .projection-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        .projection-table th {
+            text-align: left;
+            padding: 12px;
+            color: var(--text-dim);
+            border-bottom: 1px solid var(--emerald-dim);
+            font-weight: 400;
+        }
+
+        .projection-table td {
+            padding: 16px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .row-bankable {
+            color: var(--emerald);
+        }
+
+        .row-warning {
+            color: var(--warning);
+        }
+
+        .row-danger {
+            color: var(--danger);
+        }
+
+        .threshold-indicator {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px dashed var(--emerald);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .threshold-val {
+            display: block;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--emerald);
+        }
+
+        .threshold-lbl {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--text-dim);
+        }
+
+        .chart-placeholder {
+            height: 120px;
+            width: 100%;
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            padding-bottom: 10px;
+        }
+
+        .bar {
+            flex: 1;
+            background: var(--emerald-dim);
+            border-top: 2px solid var(--emerald);
+            transition: height 0.5s ease;
+        }
+
+        .bar.exceeded {
+            background: rgba(255, 71, 87, 0.2);
+            border-color: var(--danger);
+        }
+
+        .badge {
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            margin-left: 8px;
+        }
+
+        .badge-bankable { background: var(--emerald); color: #000; }
+        .badge-limit { background: var(--danger); color: #fff; }
+
+        @media (max-width: 900px) {
+            .main-card { grid-template-columns: 1fr; }
+            .header { grid-column: span 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="simulator-container">
+        <div class="main-card">
+            <header class="header">
+                <p>CAPITAL EFFICIENCY PROTOCOL // SCALE_SIM_v1.0</p>
+                <h1>Scale & Efficiency Simulator</h1>
+            </header>
+
+            <aside class="control-panel">
+                <div class="input-group">
+                    <label>Current Monthly Spend</label>
+                    <input type="number" id="baseSpend" value="25000">
+                </div>
+                <div class="input-group">
+                    <label>Base CAC (Targeting)</label>
+                    <input type="number" id="baseCac" value="150">
+                </div>
+                <div class="input-group">
+                    <label>Net ARPU (Monthly)</label>
+                    <input type="number" id="arpu" value="80">
+                </div>
+                <div class="input-group">
+                    <label>Efficiency Decay (%)</label>
+                    <input type="number" id="decay" value="15" step="1">
+                </div>
+                <p style="font-size: 0.7rem; color: var(--text-dim); line-height: 1.4;">
+                    *Efficiency Decay models the percentage increase in CAC for every 100% increase in spend.
+                </p>
+            </aside>
+
+            <div class="simulation-view">
+                <div class="threshold-indicator">
+                    <span class="threshold-lbl">Max Bankable Spend (6m Payback Limit)</span>
+                    <span id="maxSpendDisplay" class="threshold-val">$0</span>
+                </div>
+
+                <div class="chart-placeholder" id="chart">
+                    <!-- Dynamic Bars -->
+                </div>
+
+                <table class="projection-table">
+                    <thead>
+                        <tr>
+                            <th>Spend Scale</th>
+                            <th>Est. CAC</th>
+                            <th>Payback Period</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="projectionBody">
+                        <!-- Rows injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const inputs = ['baseSpend', 'baseCac', 'arpu', 'decay'];
+        const tableBody = document.getElementById('projectionBody');
+        const maxSpendDisplay = document.getElementById('maxSpendDisplay');
+        const chart = document.getElementById('chart');
+
+        function calculateSimulation() {
+            const baseSpend = parseFloat(document.getElementById('baseSpend').value) || 0;
+            const baseCac = parseFloat(document.getElementById('baseCac').value) || 0;
+            const arpu = parseFloat(document.getElementById('arpu').value) || 0;
+            const decay = (parseFloat(document.getElementById('decay').value) || 0) / 100;
+
+            tableBody.innerHTML = '';
+            chart.innerHTML = '';
+            
+            const scales = [1, 1.5, 2, 3, 4, 6, 8, 10];
+            let limitFound = false;
+            let maxBankable = 0;
+
+            scales.forEach(scale => {
+                const currentSpend = baseSpend * scale;
+                // Diminishing returns model: CAC increases exponentially as spend increases relative to base
+                // CAC = baseCAC * (scale ^ sensitivity)
+                const sensitivity = Math.log(1 + decay) / Math.log(2); 
+                const currentCac = baseCac * Math.pow(scale, sensitivity);
+                const payback = currentCac / arpu;
+
+                let statusClass = 'row-bankable';
+                let statusText = 'Optimal';
+                let badgeClass = 'badge-bankable';
+
+                if (payback > 6) {
+                    statusClass = 'row-danger';
+                    statusText = 'Over-Scale';
+                    badgeClass = 'badge-limit';
+                } else if (payback > 4.5) {
+                    statusClass = 'row-warning';
+                    statusText = 'Thinning';
+                }
+
+                if (payback <= 6) {
+                    maxBankable = currentSpend;
+                }
+
+                // Add Row
+                const row = document.createElement('tr');
+                row.className = statusClass;
+                row.innerHTML = `
+                    <td>$${Math.round(currentSpend).toLocaleString()} <span style="color:var(--text-dim)">(${scale}x)</span></td>
+                    <td>$${currentCac.toFixed(2)}</td>
+                    <td>${payback.toFixed(1)} Months</td>
+                    <td><span class="badge ${badgeClass}">${statusText}</span></td>
+                `;
+                tableBody.appendChild(row);
+
+                // Add Bar to mini-chart
+                const bar = document.createElement('div');
+                bar.className = 'bar' + (payback > 6 ? ' exceeded' : '');
+                bar.style.height = `${Math.min((payback / 12) * 100, 100)}%`;
+                chart.appendChild(bar);
+            });
+
+            maxSpendDisplay.textContent = `$${Math.round(maxBankable).toLocaleString()}`;
+        }
+
+        inputs.forEach(id => {
+            document.getElementById(id).addEventListener('input', calculateSimulation);
+        });
+
+        // Initial Run
+        calculateSimulation();
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scale & Efficiency Simulator | Emerald Circuit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050807;
+            --bg-card: #0c1210;
+            --emerald: #00ff88;
+            --emerald-dim: rgba(0, 255, 136, 0.2);
+            --emerald-glow: rgba(0, 255, 136, 0.5);
+            --danger: #ff4757;
+            --warning: #ffa502;
+            --text-main: #e0e0e0;
+            --text-dim: #889990;
+            --circuit-line: rgba(0, 255, 136, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at 2px 2px, var(--circuit-line) 1px, transparent 0);
+            background-size: 40px 40px;
+            padding: 20px;
+        }
+
+        .simulator-container {
+            width: 100%;
+            max-width: 1100px;
+            position: relative;
+        }
+
+        .main-card {
+            background: var(--bg-card);
+            border: 1px solid var(--emerald-dim);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            grid-column: span 2;
+            border-bottom: 1px solid var(--emerald-dim);
+            padding-bottom: 24px;
+            margin-bottom: 10px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            background: linear-gradient(to right, #fff, var(--emerald));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        .control-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: rgba(255,255,255,0.02);
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-group label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--emerald);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input {
+            width: 100%;
+            background: #000;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 12px;
+            color: #fff;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--emerald);
+        }
+
+        .simulation-view {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .projection-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        .projection-table th {
+            text-align: left;
+            padding: 12px;
+            color: var(--text-dim);
+            border-bottom: 1px solid var(--emerald-dim);
+            font-weight: 400;
+        }
+
+        .projection-table td {
+            padding: 16px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .row-bankable {
+            color: var(--emerald);
+        }
+
+        .row-warning {
+            color: var(--warning);
+        }
+
+        .row-danger {
+            color: var(--danger);
+        }
+
+        .threshold-indicator {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px dashed var(--emerald);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .threshold-val {
+            display: block;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--emerald);
+        }
+
+        .threshold-lbl {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--text-dim);
+        }
+
+        .chart-placeholder {
+            height: 120px;
+            width: 100%;
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            padding-bottom: 10px;
+        }
+
+        .bar {
+            flex: 1;
+            background: var(--emerald-dim);
+            border-top: 2px solid var(--emerald);
+            transition: height 0.5s ease;
+        }
+
+        .bar.exceeded {
+            background: rgba(255, 71, 87, 0.2);
+            border-color: var(--danger);
+        }
+
+        .badge {
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            margin-left: 8px;
+        }
+
+        .badge-bankable { background: var(--emerald); color: #000; }
+        .badge-limit { background: var(--danger); color: #fff; }
+
+        @media (max-width: 900px) {
+            .main-card { grid-template-columns: 1fr; }
+            .header { grid-column: span 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="simulator-container">
+        <div class="main-card">
+            <header class="header">
+                <p>CAPITAL EFFICIENCY PROTOCOL // SCALE_SIM_v1.0</p>
+                <h1>Scale & Efficiency Simulator</h1>
+            </header>
+
+            <aside class="control-panel">
+                <div class="input-group">
+                    <label>Current Monthly Spend</label>
+                    <input type="number" id="baseSpend" value="25000">
+                </div>
+                <div class="input-group">
+                    <label>Base CAC (Targeting)</label>
+                    <input type="number" id="baseCac" value="150">
+                </div>
+                <div class="input-group">
+                    <label>Contribution Margin ($)</label>
+                    <input type="number" id="arpu" value="80">
+                </div>
+                <div class="input-group">
+                    <label>Efficiency Decay (%)</label>
+                    <input type="number" id="decay" value="15" step="1">
+                </div>
+                <p style="font-size: 0.7rem; color: var(--text-dim); line-height: 1.4;">
+                    *Efficiency Decay models the percentage increase in CAC for every 100% increase in spend.
+                </p>
+            </aside>
+
+            <div class="simulation-view">
+                <div class="threshold-indicator">
+                    <span class="threshold-lbl">Max Bankable Spend (6m Payback Limit)</span>
+                    <span id="maxSpendDisplay" class="threshold-val">$0</span>
+                </div>
+
+                <div class="chart-placeholder" id="chart">
+                    <!-- Dynamic Bars -->
+                </div>
+
+                <table class="projection-table">
+                    <thead>
+                        <tr>
+                            <th>Spend Scale</th>
+                            <th>Est. CAC</th>
+                            <th>Payback Period</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="projectionBody">
+                        <!-- Rows injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const inputs = ['baseSpend', 'baseCac', 'arpu', 'decay'];
+        const tableBody = document.getElementById('projectionBody');
+        const maxSpendDisplay = document.getElementById('maxSpendDisplay');
+        const chart = document.getElementById('chart');
+
+        function calculateSimulation() {
+            const baseSpend = parseFloat(document.getElementById('baseSpend').value) || 0;
+            const baseCac = parseFloat(document.getElementById('baseCac').value) || 0;
+            const arpu = parseFloat(document.getElementById('arpu').value) || 0;
+            const decay = (parseFloat(document.getElementById('decay').value) || 0) / 100;
+
+            tableBody.innerHTML = '';
+            chart.innerHTML = '';
+            
+            const scales = [1, 1.5, 2, 3, 4, 6, 8, 10];
+            let maxBankable = 0;
+
+            scales.forEach(scale => {
+                const currentSpend = baseSpend * scale;
+                
+                // Simplified diminishing returns model
+                const currentCac = baseCac * (1 + (decay * (scale - 1)));
+                const payback = currentCac / arpu;
+
+                let statusClass = 'row-bankable';
+                let statusText = 'Optimal';
+                let badgeClass = 'badge-bankable';
+
+                if (payback > 6) {
+                    statusClass = 'row-danger';
+                    statusText = 'Over-Scale';
+                    badgeClass = 'badge-limit';
+                } else if (payback > 4.5) {
+                    statusClass = 'row-warning';
+                    statusText = 'Thinning';
+                    badgeClass = '';
+                }
+
+                if (payback <= 6) {
+                    maxBankable = currentSpend;
+                }
+
+                // Add Row
+                const row = document.createElement('tr');
+                row.className = statusClass;
+                row.innerHTML = `
+                    <td>$${Math.round(currentSpend).toLocaleString()} <span style="color:var(--text-dim); font-size: 0.7rem;">(${scale}x)</span></td>
+                    <td>$${Math.round(currentCac).toLocaleString()}</td>
+                    <td>${payback.toFixed(1)} Months</td>
+                    <td><span class="badge ${badgeClass}">${statusText}</span></td>
+                `;
+                tableBody.appendChild(row);
+
+                // Add Bar to mini-chart
+                const bar = document.createElement('div');
+                bar.className = 'bar' + (payback > 6 ? ' exceeded' : '');
+                bar.style.height = `${Math.min((payback / 12) * 100, 100)}%`;
+                chart.appendChild(bar);
+            });
+
+            maxSpendDisplay.textContent = `$${Math.round(maxBankable).toLocaleString()}`;
+        }
+
+        inputs.forEach(id => {
+            document.getElementById(id).addEventListener('input', calculateSimulation);
+        });
+
+        // Initial Run
+        calculateSimulation();
+    </script>
+</body>
+</html>

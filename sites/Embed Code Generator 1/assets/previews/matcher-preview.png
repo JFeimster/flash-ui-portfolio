@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funding Route Matcher Preview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #05070a;
+            --bg-card: #0d1117;
+            --bg-input: #161b22;
+            --neon-blue: #00f2ff;
+            --neon-green: #00ff9d;
+            --text-main: #e6edf3;
+            --text-dim: #8b949e;
+            --border: #30363d;
+            --accent-glow: rgba(0, 242, 255, 0.15);
+            --font-sans: 'Inter', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        /* Widget Preview Container */
+        .preview-canvas {
+            width: 600px;
+            height: 400px;
+            background: radial-gradient(circle at top right, #0a1018, #05070a);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Grid Background Pattern */
+        .preview-canvas::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: radial-gradient(var(--border) 1px, transparent 1px);
+            background-size: 24px 24px;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        /* Mock Widget Component */
+        .matcher-widget {
+            width: 420px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(0, 242, 255, 0.05);
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-indicator {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 1.5rem;
+        }
+
+        .step-dot {
+            height: 4px;
+            border-radius: 2px;
+            background: var(--border);
+            flex: 1;
+        }
+
+        .step-dot.active {
+            background: var(--neon-blue);
+            box-shadow: 0 0 8px var(--neon-blue);
+        }
+
+        .matcher-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, var(--text-main), var(--text-dim));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .matcher-question {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin-bottom: 1.5rem;
+        }
+
+        .options-list {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .option-card {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            padding: 0.85rem 1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-card.selected {
+            border-color: var(--neon-blue);
+            background: rgba(0, 242, 255, 0.05);
+        }
+
+        .radio-circle {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            position: relative;
+        }
+
+        .selected .radio-circle {
+            border-color: var(--neon-blue);
+        }
+
+        .selected .radio-circle::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 6px;
+            height: 6px;
+            background: var(--neon-blue);
+            border-radius: 50%;
+        }
+
+        .option-text {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .matcher-footer {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-next {
+            background: var(--neon-blue);
+            color: #000;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .brand-tag {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            letter-spacing: -0.5px;
+        }
+
+        .use-case-badge {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            background: rgba(0, 255, 157, 0.1);
+            color: var(--neon-green);
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border: 1px solid rgba(0, 255, 157, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="preview-canvas">
+        <div class="use-case-badge">Best for Landing Page Heros</div>
+        
+        <div class="matcher-widget">
+            <div class="step-indicator">
+                <div class="step-dot active"></div>
+                <div class="step-dot active"></div>
+                <div class="step-dot"></div>
+                <div class="step-dot"></div>
+            </div>
+
+            <h2 class="matcher-title">Route Matcher</h2>
+            <p class="matcher-question">What is your primary use of capital?</p>
+
+            <div class="options-list">
+                <div class="option-card">
+                    <div class="radio-circle"></div>
+                    <span class="option-text">Inventory & Supply Chain</span>
+                </div>
+                <div class="option-card selected">
+                    <div class="radio-circle"></div>
+                    <span class="option-text">Scaling Ad Spend & Marketing</span>
+                </div>
+                <div class="option-card">
+                    <div class="radio-circle"></div>
+                    <span class="option-text">Product R&D / New Features</span>
+                </div>
+            </div>
+
+            <div class="matcher-footer">
+                <span class="brand-tag">MOONSHINE // CAP</span>
+                <button class="btn-next">Continue →</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

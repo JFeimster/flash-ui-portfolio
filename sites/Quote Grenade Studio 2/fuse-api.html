@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE FUSE | QUOTE GRENADE API</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Archivo+Black&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #000000;
+            --red: #FF0000;
+            --cream: #F5F5DC;
+            --white: #FFFFFF;
+            --green: #00FF00;
+            --border-width: 4px;
+            --shadow-offset: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--cream);
+            color: var(--black);
+            font-family: 'Space Grotesk', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.4;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Archivo Black', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: var(--black);
+            color: var(--white);
+            padding: 1rem 0;
+            border-bottom: var(--border-width) solid var(--red);
+        }
+
+        .nav-link {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            border: 2px solid var(--white);
+            padding: 0.5rem 1rem;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            background: var(--red);
+            color: var(--black);
+        }
+
+        .hero-api {
+            background: var(--white);
+            border-bottom: var(--border-width) solid var(--black);
+            padding: 4rem 2rem;
+            text-align: left;
+        }
+
+        .hero-api h1 {
+            font-size: clamp(3rem, 8vw, 6rem);
+            margin-bottom: 1rem;
+            color: var(--red);
+            line-height: 0.8;
+        }
+
+        .tagline {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--black);
+            color: var(--white);
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            transform: rotate(-1deg);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin: 3rem 0 1.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .section-title::after {
+            content: '';
+            flex-grow: 1;
+            height: var(--border-width);
+            background: var(--black);
+        }
+
+        .code-window {
+            background: var(--black);
+            color: var(--green);
+            padding: 2rem;
+            border: var(--border-width) solid var(--black);
+            box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--red);
+            font-family: 'Courier New', monospace;
+            position: relative;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        .code-header {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--red);
+            color: var(--white);
+            padding: 0.25rem 0.75rem;
+            font-family: 'Archivo Black';
+            font-size: 0.8rem;
+        }
+
+        .copy-trigger {
+            background: var(--white);
+            border: 2px solid var(--black);
+            padding: 0.5rem 1rem;
+            font-weight: 700;
+            margin-top: 1rem;
+            transition: all 0.1s;
+        }
+
+        .copy-trigger:hover {
+            background: var(--red);
+            color: var(--white);
+            transform: translate(-2px, -2px);
+            box-shadow: 4px 4px 0 var(--black);
+        }
+
+        .endpoint-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .method-badge {
+            background: var(--green);
+            color: var(--black);
+            padding: 0.2rem 0.5rem;
+            font-weight: 900;
+            margin-right: 0.5rem;
+        }
+
+        .docs-card {
+            background: var(--white);
+            border: var(--border-width) solid var(--black);
+            padding: 2rem;
+            box-shadow: 6px 6px 0 var(--black);
+        }
+
+        .docs-card h3 {
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--black);
+            padding-bottom: 0.5rem;
+        }
+
+        footer {
+            background: var(--black);
+            color: var(--white);
+            padding: 4rem 2rem;
+            margin-top: 4rem;
+            text-align: center;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--green);
+            color: var(--black);
+            padding: 1rem 2rem;
+            font-weight: bold;
+            border: var(--border-width) solid var(--black);
+            display: none;
+            z-index: 1000;
+        }
+
+        @media (max-width: 768px) {
+            .endpoint-grid { grid-template-columns: 1fr; }
+            .hero-api h1 { font-size: 3.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="color: var(--red);">THE FUSE</h3>
+            <a href="index.html" class="nav-link">Return to Armory</a>
+        </div>
+    </header>
+
+    <section class="hero-api">
+        <div class="container">
+            <h1>LIGHT<br>THE FUSE</h1>
+            <div class="tagline">DEVELOPER INTEGRATION GUIDE</div>
+            <p style="margin-top: 2rem; font-size: 1.25rem; font-weight: 700; max-width: 600px;">
+                Weaponize your own platforms. Use our static endpoints to inject radical truth into your Discord bots, websites, or terminal headers.
+            </p>
+        </div>
+    </section>
+
+    <main class="container">
+        
+        <h2 class="section-title">STATIC PAYLOADS</h2>
+        <div class="endpoint-grid">
+            <div class="docs-card">
+                <h3>ALL WEAPONS</h3>
+                <p><span class="method-badge">GET</span> <code>/api/v1/quotes.json</code></p>
+                <p style="margin-top: 1rem; font-size: 0.9rem;">Returns the complete library of grenades in raw JSON format.</p>
+            </div>
+            <div class="docs-card">
+                <h3>BY CATEGORY</h3>
+                <p><span class="method-badge">GET</span> <code>/api/v1/cat/{slug}.json</code></p>
+                <p style="margin-top: 1rem; font-size: 0.9rem;">Filter by: <code>liberty</code>, <code>founder</code>, <code>philosophy</code>, or <code>contrarian</code>.</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">THE PAYLOAD STRUCTURE</h2>
+        <div class="code-window">
+            <div class="code-header">JSON</div>
+<pre id="json-code">
+{
+  "status": "detonated",
+  "count": 20,
+  "data": [
+    {
+      "id": "q_001",
+      "text": "Permission is the ghost of a dead king.",
+      "category": "liberty",
+      "hazard_level": "high"
+    }
+  ]
+}
+</pre>
+            <button class="copy-trigger" onclick="copyCode('json-code')">Copy JSON Example</button>
+        </div>
+
+        <h2 class="section-title">WEB COMPONENT (EMBED)</h2>
+        <p style="margin-bottom: 1rem; font-weight: bold;">Drop this anywhere to render a live Quote Grenade.</p>
+        <div class="code-window">
+            <div class="code-header">HTML</div>
+<pre id="html-code">
+&lt;!-- Quote Grenade Embed --&gt;
+&lt;div id="grenade-plugin" data-theme="dark"&gt;&lt;/div&gt;
+&lt;script src="https://quotegrenade.io/js/fuse.js" async&gt;&lt;/script&gt;
+</pre>
+            <button class="copy-trigger" onclick="copyCode('html-code')">Copy Snippet</button>
+        </div>
+
+        <h2 class="section-title">FETCH SNIPPET</h2>
+        <div class="code-window" style="color: var(--white);">
+            <div class="code-header">JAVASCRIPT</div>
+<pre id="js-code">
+async function pullPin() {
+    const res = await fetch('https://quotegrenade.io/api/quotes.json');
+    const { data } = await res.json();
+    const grenade = data[Math.floor(Math.random() * data.length)];
+    console.log(`DETONATING: ${grenade.text}`);
+}
+</pre>
+            <button class="copy-trigger" onclick="copyCode('js-code')">Copy JS</button>
+        </div>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <h2 style="font-family: 'Archivo Black'; font-size: 2rem; margin-bottom: 1rem;">NO PERMISSION REQUIRED</h2>
+            <p>Code is Law. Build the Future. Exit the System.</p>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast">PAYLOAD COPIED TO CLIPBOARD</div>
+
+    <script>
+        function copyCode(elementId) {
+            const text = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const toast = document.getElementById('toast');
+                toast.style.display = 'block';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaaS Industry Benchmarks | LTV:CAC</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        :root {
+            --bg: #050505;
+            --card-bg: #0d0d0d;
+            --border: #222222;
+            --accent: #ffffff;
+            --text-dim: #888888;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff4444;
+            --enterprise: #a855f7;
+            --midmarket: #3b82f6;
+            --smb: #10b981;
+            --font-main: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--accent);
+            font-family: var(--font-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .benchmark-card {
+            width: 100%;
+            max-width: 540px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        header {
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        p.subtitle {
+            font-size: 12px;
+            color: var(--text-dim);
+            letter-spacing: 0.02em;
+        }
+
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+        }
+
+        .input-group input {
+            background: #151515;
+            border: 1px solid var(--border);
+            color: var(--accent);
+            padding: 10px;
+            font-family: var(--font-mono);
+            font-size: 14px;
+            outline: none;
+        }
+
+        .chart-container {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .benchmark-row {
+            position: relative;
+        }
+
+        .row-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+        .row-label { color: var(--accent); }
+        .row-target { color: var(--text-dim); }
+
+        .bar-bg {
+            height: 8px;
+            background: #151515;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .user-marker {
+            position: absolute;
+            top: -4px;
+            bottom: -4px;
+            width: 2px;
+            background: var(--accent);
+            z-index: 10;
+            box-shadow: 0 0 10px var(--accent);
+            transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .user-marker::after {
+            content: "YOU";
+            position: absolute;
+            top: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 8px;
+            font-family: var(--font-mono);
+            color: var(--accent);
+        }
+
+        .legend {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .analysis-box {
+            background: #111;
+            padding: 20px;
+            border: 1px solid var(--border);
+            margin-top: 30px;
+        }
+
+        .analysis-box h3 {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-dim);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .analysis-text {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #ccc;
+        }
+
+        .highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="benchmark-card">
+        <header>
+            <h1>Market Context</h1>
+            <p class="subtitle">Benchmarking your LTV:CAC against industry standards.</p>
+        </header>
+
+        <div class="input-section">
+            <div class="input-group">
+                <label>Current LTV ($)</label>
+                <input type="number" id="user-ltv" value="5000" placeholder="0">
+            </div>
+            <div class="input-group">
+                <label>Current CAC ($)</label>
+                <input type="number" id="user-cac" value="1500" placeholder="0">
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="user-marker" id="marker" style="left: 0%;"></div>
+
+            <!-- Enterprise -->
+            <div class="benchmark-row">
+                <div class="row-header">
+                    <span class="row-label">Enterprise SaaS</span>
+                    <span class="row-target">Target: 5.0x+</span>
+                </div>
+                <div class="bar-bg">
+                    <div class="bar-fill" style="width: 83.3%; background: var(--enterprise);"></div>
+                </div>
+            </div>
+
+            <!-- Mid-Market -->
+            <div class="benchmark-row">
+                <div class="row-header">
+                    <span class="row-label">Mid-Market SaaS</span>
+                    <span class="row-target">Target: 4.0x</span>
+                </div>
+                <div class="bar-bg">
+                    <div class="bar-fill" style="width: 66.6%; background: var(--midmarket);"></div>
+                </div>
+            </div>
+
+            <!-- SMB -->
+            <div class="benchmark-row">
+                <div class="row-header">
+                    <span class="row-label">SMB SaaS</span>
+                    <span class="row-target">Target: 3.0x</span>
+                </div>
+                <div class="bar-bg">
+                    <div class="bar-fill" style="width: 50%; background: var(--smb);"></div>
+                </div>
+            </div>
+
+            <!-- B2C -->
+            <div class="benchmark-row">
+                <div class="row-header">
+                    <span class="row-label">B2C / Consumer</span>
+                    <span class="row-target">Target: 2.0x</span>
+                </div>
+                <div class="bar-bg">
+                    <div class="bar-fill" style="width: 33.3%; background: var(--danger);"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item"><span class="dot" style="background: var(--enterprise)"></span> Enterprise</div>
+            <div class="legend-item"><span class="dot" style="background: var(--midmarket)"></span> Mid-Market</div>
+            <div class="legend-item"><span class="dot" style="background: var(--smb)"></span> SMB</div>
+            <div class="legend-item"><span class="dot" style="background: var(--danger)"></span> B2C</div>
+        </div>
+
+        <div class="analysis-box">
+            <h3>Diagnostic Narrative</h3>
+            <div class="analysis-text" id="analysis-output">
+                Enter your metrics to see how you stack up against industry averages.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ltvInput = document.getElementById('user-ltv');
+        const cacInput = document.getElementById('user-cac');
+        const marker = document.getElementById('marker');
+        const analysis = document.getElementById('analysis-output');
+
+        function calculateBenchmark() {
+            const ltv = parseFloat(ltvInput.value) || 0;
+            const cac = parseFloat(cacInput.value) || 1;
+            const ratio = ltv / cac;
+
+            // Map 0-6 ratio to 0-100%
+            const percentage = Math.min((ratio / 6) * 100, 100);
+            marker.style.left = `${percentage}%`;
+
+            let segmentText = "";
+            if (ratio >= 5) {
+                segmentText = "You are performing at an <span class='highlight'>Enterprise-grade efficiency</span>. This typically allows for aggressive venture scaling or significant dividend extraction.";
+            } else if (ratio >= 3.5) {
+                segmentText = "Your ratio is <span class='highlight'>Mid-Market healthy</span>. You have strong unit economics that support sustainable team growth and marketing expansion.";
+            } else if (ratio >= 2.5) {
+                segmentText = "You are in the <span class='highlight'>Standard SMB range</span>. While sustainable, you may face cash flow pressure if churn spikes or acquisition costs rise slightly.";
+            } else if (ratio >= 1.5) {
+                segmentText = "Your efficiency matches <span class='highlight'>B2C volume models</span>. If you are a B2B company, this suggests your acquisition engine is too expensive for your current pricing.";
+            } else {
+                segmentText = "You are currently <span class='highlight'>below industry minimums</span>. Focus on increasing retention or lowering CAC before attempting to scale spend.";
+            }
+
+            analysis.innerHTML = `Your LTV:CAC is <span class='highlight'>${ratio.toFixed(2)}x</span>. ${segmentText}`;
+        }
+
+        [ltvInput, cacInput].forEach(input => {
+            input.addEventListener('input', calculateBenchmark);
+        });
+
+        calculateBenchmark();
+    </script>
+</body>
+</html>

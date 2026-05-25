@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUBMIT LISTING // Acquisition Index Terminal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --obsidian: #050505;
+            --graphite: #141414;
+            --bone: #F5F5F0;
+            --acid-green: #C5FF00;
+            --copper: #8B9D83;
+            --blood-orange: #FF3D00;
+            --cream: #FFFDE7;
+            --border-width: 2px;
+            --grain-opacity: 0.04;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--bone);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.2;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3BaseFilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/feFilter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: var(--grain-opacity);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; }
+        .editorial { font-family: 'Playfair Display', serif; font-style: italic; text-transform: none; }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: var(--border-width) solid var(--graphite);
+            background: var(--obsidian);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo { font-weight: 900; font-size: 1.2rem; text-decoration: none; color: var(--bone); }
+        .logo span { background: var(--acid-green); color: var(--obsidian); padding: 2px 6px; }
+
+        .form-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 4rem;
+        }
+
+        .step-indicator {
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .step-dot {
+            width: 40px;
+            height: 4px;
+            background: var(--graphite);
+        }
+
+        .step-dot.active {
+            background: var(--acid-green);
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 { font-size: clamp(2.5rem, 5vw, 5rem); font-weight: 900; margin-bottom: 3rem; text-transform: uppercase; line-height: 0.9; }
+
+        .input-group {
+            margin-bottom: 4rem;
+            border-bottom: 1px solid var(--graphite);
+            padding-bottom: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .input-group:focus-within {
+            border-color: var(--acid-green);
+        }
+
+        label {
+            display: block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--copper);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        input[type="text"], input[type="number"], select, textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--bone);
+            font-size: 2rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            outline: none;
+        }
+
+        textarea {
+            font-size: 1.2rem;
+            height: 150px;
+            resize: none;
+        }
+
+        ::placeholder { color: var(--graphite); }
+
+        .quality-score-panel {
+            position: sticky;
+            top: 150px;
+            height: fit-content;
+            background: var(--graphite);
+            padding: 2rem;
+            border: 1px solid #333;
+        }
+
+        .score-gauge {
+            height: 300px;
+            width: 100%;
+            background: var(--obsidian);
+            position: relative;
+            margin: 2rem 0;
+            display: flex;
+            align-items: flex-end;
+            border: 1px solid #222;
+        }
+
+        .score-fill {
+            width: 100%;
+            height: 10%;
+            background: var(--acid-green);
+            transition: height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 0 20px var(--acid-green);
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 1.5rem 3rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 900;
+            text-transform: uppercase;
+            border: 1px solid var(--bone);
+            background: transparent;
+            color: var(--bone);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary { background: var(--bone); color: var(--obsidian); }
+        .btn-primary:hover { background: var(--acid-green); border-color: var(--acid-green); }
+
+        .upload-zone {
+            border: 2px dashed var(--graphite);
+            padding: 4rem;
+            text-align: center;
+            transition: border-color 0.3s;
+            margin-bottom: 2rem;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--acid-green);
+        }
+
+        .upload-zone input { display: none; }
+
+        @media (max-width: 900px) {
+            .form-container { grid-template-columns: 1fr; }
+            .quality-score-panel { order: -1; position: static; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">ACQUISITION <span>INDEX</span></a>
+        <div class="mono" style="color: var(--copper)">Broker Submission Portal v.2.04</div>
+    </nav>
+
+    <div class="form-container">
+        <main>
+            <div class="step-indicator" id="step-dots">
+                <div class="step-dot active"></div>
+                <div class="step-dot"></div>
+                <div class="step-dot"></div>
+                <div class="step-dot"></div>
+            </div>
+
+            <form id="submission-form">
+                <!-- STEP 1: IDENTITY -->
+                <section class="form-step active" data-step="1">
+                    <div class="mono" style="color: var(--acid-green); margin-bottom: 1rem;">// Step 01</div>
+                    <h1>What are we <br><span class="editorial">acquiring?</span></h1>
+                    
+                    <div class="input-group">
+                        <label>Business Heading / Stealth Name</label>
+                        <input type="text" id="title" placeholder="e.g. Multi-Unit HVAC Operator" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Primary Industry</label>
+                        <select id="industry">
+                            <option value="">Select Industry...</option>
+                            <option value="service">Home Services</option>
+                            <option value="tech">B2B SaaS / Tech</option>
+                            <option value="retail">Ecommerce / Retail</option>
+                            <option value="logistics">Logistics / Routes</option>
+                            <option value="industrial">Manufacturing</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Geographic Hub</label>
+                        <input type="text" id="location" placeholder="e.g. Austin, TX (or Remote)">
+                    </div>
+                </section>
+
+                <!-- STEP 2: FINANCIALS -->
+                <section class="form-step" data-step="2">
+                    <div class="mono" style="color: var(--acid-green); margin-bottom: 1rem;">// Step 02</div>
+                    <h1>The <span class="editorial">Hard</span> Numbers.</h1>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div class="input-group">
+                            <label>Annual Revenue (TTM)</label>
+                            <input type="number" id="revenue" placeholder="0.00">
+                        </div>
+                        <div class="input-group">
+                            <label>Annual SDE / EBITDA</label>
+                            <input type="number" id="sde" placeholder="0.00">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Asking Price</label>
+                        <input type="number" id="asking" placeholder="0.00">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Is Seller Financing Available?</label>
+                        <select id="financing">
+                            <option value="no">No / Cash Out</option>
+                            <option value="yes">Yes / Negotiable</option>
+                        </select>
+                    </div>
+                </section>
+
+                <!-- STEP 3: DOCUMENTATION -->
+                <section class="form-step" data-step="3">
+                    <div class="mono" style="color: var(--acid-green); margin-bottom: 1rem;">// Step 03</div>
+                    <h1>Proprietary <br><span class="editorial">Intelligence.</span></h1>
+                    
+                    <div class="upload-zone" onclick="document.getElementById('cim-upload').click()">
+                        <div class="mono" style="margin-bottom: 1rem;">Confidential Information Memorandum (CIM)</div>
+                        <p style="color: var(--copper)">Drag and drop PDF or click to browse</p>
+                        <input type="file" id="cim-upload">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Executive Summary / Investment Thesis</label>
+                        <textarea id="thesis" placeholder="Detail the moat, the growth levers, and the reason for exit..."></textarea>
+                    </div>
+                </section>
+
+                <!-- STEP 4: REVIEW -->
+                <section class="form-step" data-step="4">
+                    <div class="mono" style="color: var(--acid-green); margin-bottom: 1rem;">// Step 04</div>
+                    <h1>Final <br><span class="editorial">Review.</span></h1>
+                    <div style="background: var(--graphite); padding: 2rem; border: 1px solid var(--copper); margin-bottom: 2rem;">
+                        <p class="mono" style="color: var(--acid-green); margin-bottom: 1rem;">Terminal Transmission Ready</p>
+                        <p style="font-size: 1.2rem;">By submitting, you confirm this listing is authorized for publication and you have the legal right to represent the seller. Data will be scrubbed for stealth-mode compliance.</p>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Contact Email for Inquiries</label>
+                        <input type="text" id="contact" placeholder="broker@firm.com">
+                    </div>
+                </section>
+
+                <div class="btn-row">
+                    <button type="button" class="btn" id="prev-btn" style="visibility: hidden;" onclick="changeStep(-1)">Back</button>
+                    <button type="button" class="btn btn-primary" id="next-btn" onclick="changeStep(1)">Continue</button>
+                </div>
+            </form>
+        </main>
+
+        <aside class="quality-score-panel">
+            <div class="mono" style="margin-bottom: 0.5rem;">Deal Quality Score</div>
+            <div style="font-size: 2.5rem; font-weight: 900;" id="score-text">12%</div>
+            
+            <div class="score-gauge">
+                <div class="score-fill" id="score-fill"></div>
+            </div>
+
+            <div class="mono" style="font-size: 0.65rem; color: var(--copper);">
+                * High fidelity listings receive 4.5x more inquiries from verified search funds.
+            </div>
+
+            <div id="score-feedback" style="margin-top: 2rem; font-size: 0.75rem; color: var(--acid-green);">
+                > Awaiting core financials...
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 4;
+        const form = document.getElementById('submission-form');
+        const steps = document.querySelectorAll('.form-step');
+        const dots = document.querySelectorAll('.step-dot');
+        const scoreFill = document.getElementById('score-fill');
+        const scoreText = document.getElementById('score-text');
+        const feedback = document.getElementById('score-feedback');
+
+        function changeStep(dir) {
+            if (dir === 1 && !validateStep(currentStep)) return;
+
+            steps[currentStep - 1].classList.remove('active');
+            dots[currentStep - 1].classList.remove('active');
+            
+            currentStep += dir;
+
+            if (currentStep > totalSteps) {
+                alert("DEAL SUBMITTED TO TERMINAL. REDIRECTING...");
+                window.location.href = "index.html";
+                return;
+            }
+
+            steps[currentStep - 1].classList.add('active');
+            dots[currentStep - 1].classList.add('active');
+
+            document.getElementById('prev-btn').style.visibility = currentStep === 1 ? 'hidden' : 'visible';
+            document.getElementById('next-btn').innerText = currentStep === totalSteps ? 'Deploy Listing' : 'Continue';
+            
+            window.scrollTo(0, 0);
+        }
+
+        function validateStep(step) {
+            // Simplified validation for demo
+            return true; 
+        }
+
+        function updateScore() {
+            let score = 0;
+            const fields = {
+                title: document.getElementById('title').value,
+                industry: document.getElementById('industry').value,
+                revenue: document.getElementById('revenue').value,
+                sde: document.getElementById('sde').value,
+                thesis: document.getElementById('thesis').value,
+                contact: document.getElementById('contact').value
+            };
+
+            if (fields.title) score += 10;
+            if (fields.industry) score += 10;
+            if (fields.revenue && fields.sde) {
+                score += 30;
+                const multiple = fields.revenue / fields.sde;
+                if (multiple > 1) score += 10;
+            }
+            if (fields.thesis.length > 50) score += 20;
+            if (fields.contact.includes('@')) score += 20;
+
+            scoreFill.style.height = score + '%';
+            scoreText.innerText = score + '%';
+
+            if (score < 30) feedback.innerText = "> Awaiting core financials...";
+            else if (score < 60) feedback.innerText = "> Documentation required for Alpha status.";
+            else if (score < 90) feedback.innerText = "> Strong deal metrics detected.";
+            else feedback.innerText = "> ELITE LISTING QUALITY ACHIEVED.";
+        }
+
+        form.addEventListener('input', updateScore);
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUBMIT LISTING // Acquisition Index Terminal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --obsidian: #050505;
+            --graphite: #141414;
+            --bone: #F5F5F0;
+            --acid-green: #C5FF00;
+            --copper: #8B9D83;
+            --blood-orange: #FF3D00;
+            --cream: #FFFDE7;
+            --border-width: 2px;
+            --grain-opacity: 0.04;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--bone);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.2;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3BaseFilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/feFilter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: var(--grain-opacity);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; }
+        .editorial { font-family: 'Playfair Display', serif; font-style: italic; text-transform: none; }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: var(--border-width) solid var(--graphite);
+            background: var(--obsidian);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo { font-weight: 900; font-size: 1.2rem; text-decoration: none; color: var(--bone); }
+        .logo span { background: var(--acid-green); color: var(--obsidian); padding: 2px 6px; }
+
+        .form-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 4rem;
+        }
+
+        .step-indicator {
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .step-dot {
+            width: 40px;
+            height: 4px;
+            background: var(--graphite);
+        }
+
+        .step-dot.active {
+            background: var(--acid-green);
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 { font-size: clamp(2.5rem, 5vw, 5rem); font-weight: 900; margin-bottom: 3rem; text-transform: uppercase; line-height: 0.9; }
+
+        .input-group {
+            margin-bottom: 4rem;
+            border-bottom: 1px solid var(--graphite);
+            padding-bottom: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .input-group:focus-within {
+            border-color: var(--acid-green);
+        }
+
+        label {
+            display: block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--copper);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        input[type="text"], input[type="number"], select, textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--bone);
+            font-size: 2rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            outline: none;
+        }
+
+        textarea {
+            font-size: 1.2rem;
+            height: 150px;
+            resize: none;
+        }
+
+        ::placeholder { color: var(--graphite); }
+
+        .quality-score-panel {
+            position: sticky;
+            top: 150px;
+            height: fit-content;
+            background: var(--graphite);
+            padding: 2rem;
+            border: 1px solid #333;
+        }
+
+        .score-gauge {
+            height: 300px;
+            width: 100%;
+            background: var(--obsidian);
+            position: relative;
+            margin: 2rem 0;
+            display: flex;
+            align-items: flex-end;
+            border: 1px solid #222;
+        }
+
+        .score-fill {
+            width: 100%;
+            height: 10%;
+            background: var(--acid-green);
+            transition: height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 0 20px var(--acid-green);
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 1.5rem 3rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 900;
+            text-transform: uppercase;
+            border: 1px solid var(--bone);
+            background: transparent;
+            color: var(--bone);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary { background: var(--bone); color: var(--obsidian); }
+        .btn-primary:hover { background: var(--acid-green); border-color: var(--acid-green); }
+
+        .upload-zone {
+            border: 2px dashed var(--graphite);
+            padding: 4rem;
+            text-align: center;
+            transition: border-color 0.3s;
+            margin-bottom: 2rem;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--acid-green);
+        }
+
+        .upload-zone input { display: none; }
+
+        @media (max-width: 900px) {
+            .form-container { grid-template-columns: 1fr; }
+            .quality-score-panel { order: -1; position: static; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">ACQUISITION <span>INDEX</span></a>
+        <div class="mono" style="color: var(--copper)">Broker Submission Portal v.2.04</div>
+    </nav>
+
+    <div class="form-container">
+        <main>
+            <div class="step-indicator" id="step-dots">
+                <div class="step-dot active"></div>
+                <div class="step-dot"></div>
+                <div class="step-dot"></div>
+                <div class="step-dot"></div>
+            </div>
+
+            <form id="submission-form">
+                <!-- STEP 1: IDENTITY -->
+                <section class="form-step active" data-step="1">
+                    <div class="mono" style="color: var(--acid-green); margin-bottom: 1rem;">// Step 01</div>
+                    <h1>What are we <br><span class="editorial">acquiring?</span></h1>
+                    
+                    <div class="input-group">
+                        <label>Business Heading / Stealth Name</label>
+                        <input type="text" id="title" placeholder="e.g. Multi-Unit HVAC Operator" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Primary Industry</label>
+                        <select id="industry">
+                            <option value="">Select Industry...</option>
+                            <option value="service">Home Services</option>
+                            <option value="tech">B2B SaaS / Tech</option>
+                            <option value="retail">Ecommerce / Retail</option>
+                            <option value="logistics">Logistics / Routes</option>
+                            <option value="industrial">Manufacturing</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Geographic Hub</label>
+                        <input type="text" id="location" placeholder="e.g. Austin, TX (or Remote)">
+                    </div>
+                </section>
+
+                <!-- STEP 2: FINANCIALS -->
+                <section class="form-step" data-step="2">
+                    <div class="mono" style="color: var(--acid-green); margin-bottom: 1rem;">// Step 02</div>
+                    <h1>The <span class="editorial">Hard</span> Numbers.</h1>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div class="input-group">
+                            <label>Annual Revenue (TTM)</label>
+                            <input type="number" id="revenue" placeholder="0.00">
+                        </div>
+                        <div class="input-group">
+                            <label>Annual SDE / EBITDA</label>
+                            <input type="number" id="sde" placeholder="0.00">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Asking Price</label>
+                        <input type="number" id="asking" placeholder="0.00">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Is Seller Financing Available?</label>
+                        <select id="financing">
+                            <option value="no">No / Cash Out</option>
+                            <option value="yes">Yes / Negotiable</option>
+                        </select>
+                    </div>
+                </section>
+
+                <!-- STEP 3: DOCUMENTATION -->
+                <section class="form-step" data-step="3">
+                    <div class="mono" style="color: var(--acid-green); margin-bottom: 1rem;">// Step 03</div>
+                    <h1>Proprietary <br><span class="editorial">Intelligence.</span></h1>
+                    
+                    <div class="upload-zone" onclick="document.getElementById('cim-upload').click()">
+                        <div class="mono" style="margin-bottom: 1rem;">Confidential Information Memorandum (CIM)</div>
+                        <p style="color: var(--copper)">Drag and drop PDF or click to browse</p>
+                        <input type="file" id="cim-upload">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Executive Summary / Investment Thesis</label>
+                        <textarea id="thesis" placeholder="Detail the moat, the growth levers, and the reason for exit..."></textarea>
+                    </div>
+                </section>
+
+                <!-- STEP 4: REVIEW -->
+                <section class="form-step" data-step="4">
+                    <div class="mono" style="color: var(--acid-green); margin-bottom: 1rem;">// Step 04</div>
+                    <h1>Final <br><span class="editorial">Review.</span></h1>
+                    <div style="background: var(--graphite); padding: 2rem; border: 1px solid var(--copper); margin-bottom: 2rem;">
+                        <p class="mono" style="color: var(--acid-green); margin-bottom: 1rem;">Terminal Transmission Ready</p>
+                        <p style="font-size: 1.2rem;">By submitting, you confirm this listing is authorized for publication and you have the legal right to represent the seller. Data will be scrubbed for stealth-mode compliance.</p>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Contact Email for Inquiries</label>
+                        <input type="text" id="contact" placeholder="broker@firm.com">
+                    </div>
+                </section>
+
+                <div class="btn-row">
+                    <button type="button" class="btn" id="prev-btn" style="visibility: hidden;" onclick="changeStep(-1)">Back</button>
+                    <button type="button" class="btn btn-primary" id="next-btn" onclick="changeStep(1)">Continue</button>
+                </div>
+            </form>
+        </main>
+
+        <aside class="quality-score-panel">
+            <div class="mono" style="margin-bottom: 0.5rem;">Deal Quality Score</div>
+            <div style="font-size: 2.5rem; font-weight: 900;" id="score-text">12%</div>
+            
+            <div class="score-gauge">
+                <div class="score-fill" id="score-fill"></div>
+            </div>
+
+            <div class="mono" style="font-size: 0.65rem; color: var(--copper);">
+                * High fidelity listings receive 4.5x more inquiries from verified search funds.
+            </div>
+
+            <div id="score-feedback" style="margin-top: 2rem; font-size: 0.75rem; color: var(--acid-green);">
+                > Awaiting core financials...
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 4;
+        const form = document.getElementById('submission-form');
+        const steps = document.querySelectorAll('.form-step');
+        const dots = document.querySelectorAll('.step-dot');
+        const scoreFill = document.getElementById('score-fill');
+        const scoreText = document.getElementById('score-text');
+        const feedback = document.getElementById('score-feedback');
+
+        function changeStep(dir) {
+            if (dir === 1 && !validateStep(currentStep)) return;
+
+            steps[currentStep - 1].classList.remove('active');
+            dots[currentStep - 1].classList.remove('active');
+            
+            currentStep += dir;
+
+            if (currentStep > totalSteps) {
+                alert("DEAL SUBMITTED TO TERMINAL. REDIRECTING...");
+                window.location.href = "index.html";
+                return;
+            }
+
+            steps[currentStep - 1].classList.add('active');
+            dots[currentStep - 1].classList.add('active');
+
+            document.getElementById('prev-btn').style.visibility = currentStep === 1 ? 'hidden' : 'visible';
+            document.getElementById('next-btn').innerText = currentStep === totalSteps ? 'Deploy Listing' : 'Continue';
+            
+            window.scrollTo(0, 0);
+        }
+
+        function validateStep(step) {
+            // Simplified validation for demo
+            return true; 
+        }
+
+        function updateScore() {
+            let score = 0;
+            const fields = {
+                title: document.getElementById('title').value,
+                industry: document.getElementById('industry').value,
+                revenue: document.getElementById('revenue').value,
+                sde: document.getElementById('sde').value,
+                thesis: document.getElementById('thesis').value,
+                contact: document.getElementById('contact').value
+            };
+
+            if (fields.title) score += 10;
+            if (fields.industry) score += 10;
+            if (fields.revenue && fields.sde) {
+                score += 30;
+                const multiple = fields.revenue / fields.sde;
+                if (multiple > 1) score += 10;
+            }
+            if (fields.thesis.length > 50) score += 20;
+            if (fields.contact.includes('@')) score += 20;
+
+            scoreFill.style.height = score + '%';
+            scoreText.innerText = score + '%';
+
+            if (score < 30) feedback.innerText = "> Awaiting core financials...";
+            else if (score < 60) feedback.innerText = "> Documentation required for Alpha status.";
+            else if (score < 90) feedback.innerText = "> Strong deal metrics detected.";
+            else feedback.innerText = "> ELITE LISTING QUALITY ACHIEVED.";
+        }
+
+        form.addEventListener('input', updateScore);
+    </script>
+</body>
+</html>

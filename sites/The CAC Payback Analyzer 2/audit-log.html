@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Log | Swiss Ledger</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper: #F9F9F7;
+            --ink: #1A1A1A;
+            --accent: #FF3B30;
+            --border: #1A1A1A;
+            --grid: rgba(26, 26, 26, 0.1);
+            --success: #008148;
+            --warning: #EBCB00;
+            --danger: #FF3B30;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: #E5E5E5;
+            font-family: 'Inter', -apple-system, sans-serif;
+            color: var(--ink);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .ledger-container {
+            background-color: var(--paper);
+            width: 100%;
+            max-width: 900px;
+            border: 2px solid var(--border);
+            box-shadow: 20px 20px 0px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ledger-container::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(var(--grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .header {
+            border-bottom: 2px solid var(--border);
+            padding: 40px;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .header-title h1 {
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 0.9;
+            letter-spacing: -0.04em;
+            text-transform: uppercase;
+        }
+
+        .header-title p {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            background: var(--ink);
+            color: white;
+            font-size: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 10px;
+        }
+
+        .main-content {
+            position: relative;
+            z-index: 1;
+            padding: 40px;
+        }
+
+        .stats-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            border: 1px solid var(--border);
+            padding: 20px;
+            background: white;
+        }
+
+        .stat-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .trend-visual {
+            height: 120px;
+            width: 100%;
+            border-top: 1px solid var(--grid);
+            border-bottom: 1px solid var(--grid);
+            margin: 40px 0;
+            display: flex;
+            align-items: flex-end;
+            padding-bottom: 10px;
+        }
+
+        .trend-bar {
+            flex: 1;
+            margin: 0 4px;
+            background: var(--ink);
+            min-height: 2px;
+            transition: height 0.5s ease;
+        }
+
+        .audit-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .audit-table th {
+            text-align: left;
+            padding: 12px 10px;
+            font-size: 11px;
+            border-bottom: 2px solid var(--border);
+            text-transform: uppercase;
+        }
+
+        .audit-table td {
+            padding: 15px 10px;
+            border-bottom: 1px solid var(--grid);
+            font-size: 13px;
+        }
+
+        .status-dot {
+            height: 8px;
+            width: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 40px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            border: 2px solid var(--border);
+            transition: all 0.2s;
+            text-align: center;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .btn-primary {
+            background: var(--ink);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--ink);
+        }
+
+        .btn-outline:hover {
+            background: rgba(0,0,0,0.05);
+        }
+
+        @media (max-width: 768px) {
+            .stats-summary {
+                grid-template-columns: 1fr;
+            }
+            .header-title h1 {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="ledger-container">
+    <div class="header">
+        <div class="header-title">
+            <div class="badge">LOG REV. 2024-C</div>
+            <h1>UNIT ECONOMICS<br>AUDIT LOG</h1>
+            <p>Historical capital efficiency tracking</p>
+        </div>
+        <div class="document-id" id="currentDate">
+            PERIOD: Q3-2024<br>
+            FILE: ARCHIVE_01
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="stats-summary">
+            <div class="stat-card">
+                <div class="stat-label">Avg Payback</div>
+                <div class="stat-value" id="avgPayback">---</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Trend Velocity</div>
+                <div class="stat-value" id="trendVelocity">STABLE</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Audit Count</div>
+                <div class="stat-value" id="auditCount">0</div>
+            </div>
+        </div>
+
+        <label class="stat-label">Efficiency Trend (Payback Period)</label>
+        <div class="trend-visual" id="trendGraph">
+            <!-- Bars generated via JS -->
+        </div>
+
+        <table class="audit-table">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>CAC</th>
+                    <th>Payback</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="auditBody">
+                <!-- Rows generated via JS -->
+            </tbody>
+        </table>
+
+        <div class="btn-group">
+            <a href="index.html" class="btn btn-outline">Back to Analyzer</a>
+            <button class="btn btn-primary" onclick="clearLogs()">Wipe Audit History</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // In a real app, this would read from the calculator's saved data
+    // We will simulate data if the localStorage is empty for the demo
+    function getLogs() {
+        const logs = localStorage.getItem('cac_audit_logs');
+        if (logs) return JSON.parse(logs);
+        
+        // Mock data if empty
+        const mockData = [
+            { date: '2023-11-12 14:20', cac: 450.00, payback: 8.5, status: 'WATCH' },
+            { date: '2023-12-05 09:15', cac: 420.00, payback: 7.2, status: 'WATCH' },
+            { date: '2024-01-20 16:45', cac: 310.00, payback: 4.8, status: 'BANKABLE' },
+            { date: '2024-02-14 11:30', cac: 280.00, payback: 3.9, status: 'BANKABLE' },
+            { date: '2024-03-01 08:00', cac: 200.00, payback: 2.2, status: 'BANKABLE' }
+        ];
+        return mockData;
+    }
+
+    function renderAudit() {
+        const logs = getLogs();
+        const body = document.getElementById('auditBody');
+        const graph = document.getElementById('trendGraph');
+        const avgDisplay = document.getElementById('avgPayback');
+        const countDisplay = document.getElementById('auditCount');
+        const velocityDisplay = document.getElementById('trendVelocity');
+
+        body.innerHTML = '';
+        graph.innerHTML = '';
+
+        let totalPayback = 0;
+        
+        logs.forEach((log, index) => {
+            totalPayback += log.payback;
+            
+            // Render Table Row
+            const row = document.createElement('tr');
+            const statusColor = log.status === 'BANKABLE' ? 'var(--success)' : 
+                               log.status === 'WATCH' ? 'var(--warning)' : 'var(--danger)';
+            
+            row.innerHTML = `
+                <td>${log.date}</td>
+                <td>$${log.cac.toFixed(2)}</td>
+                <td>${log.payback.toFixed(2)} Mo.</td>
+                <td><span class="status-dot" style="background:${statusColor}"></span>${log.status}</td>
+            `;
+            body.appendChild(row);
+
+            // Render Trend Bar
+            const bar = document.createElement('div');
+            bar.className = 'trend-bar';
+            // Scale bar height: 18 months max
+            const height = Math.max(5, (log.payback / 12) * 100);
+            bar.style.height = `${Math.min(100, height)}%`;
+            if(log.status === 'BANKABLE') bar.style.backgroundColor = 'var(--success)';
+            if(log.status === 'REJECTED') bar.style.backgroundColor = 'var(--danger)';
+            graph.appendChild(bar);
+        });
+
+        // Update Stats
+        const avg = totalPayback / logs.length;
+        avgDisplay.innerText = `${avg.toFixed(1)} Mo.`;
+        countDisplay.innerText = logs.length;
+
+        if (logs.length > 1) {
+            const first = logs[0].payback;
+            const last = logs[logs.length - 1].payback;
+            if (last < first) velocityDisplay.innerText = 'IMPROVING';
+            else if (last > first) velocityDisplay.innerText = 'DECLINING';
+            else velocityDisplay.innerText = 'STABLE';
+        }
+
+        // Set date
+        const now = new Date();
+        document.getElementById('currentDate').innerHTML = `PERIOD: ${now.getFullYear()}<br>LOC: GLOBAL HQ<br>STATUS: ARCHIVED`;
+    }
+
+    function clearLogs() {
+        if(confirm("Confirm: Permanent deletion of audit history?")) {
+            localStorage.removeItem('cac_audit_logs');
+            location.reload();
+        }
+    }
+
+    // Initialize
+    window.onload = renderAudit;
+</script>
+
+</body>
+</html>

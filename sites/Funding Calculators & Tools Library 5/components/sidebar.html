@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Workspace & Sidebar - Dynamic Edge</title>
+    <!-- Google Fonts for Ultra-Modern High-Contrast Look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0c10;
+            --surface: #14161f;
+            --surface-card: #1a1d29;
+            --text-raw: #ffffff;
+            --text-muted: #8e95ad;
+            --accent-cyan: #00f3ff;
+            --accent-magenta: #ff0055;
+            --accent-yellow: #ffee00;
+            --border-width: 3px;
+            --brutal-shadow-cyan: 6px 6px 0px var(--accent-cyan);
+            --brutal-shadow-magenta: 6px 6px 0px var(--accent-magenta);
+            --brutal-shadow-yellow: 6px 6px 0px var(--accent-yellow);
+            --transition-speed: 0.15s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-raw);
+            line-height: 1.4;
+            padding: 20px;
+            overflow-x: hidden;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        .wrapper {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* SIDEBAR COMPONENT */
+        .dashboard-sidebar {
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            padding: 30px;
+            box-shadow: var(--brutal-shadow-cyan);
+            display: flex;
+            flex-direction: column;
+            gap: 35px;
+            height: fit-content;
+        }
+
+        .sidebar-section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 18px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-badge {
+            font-size: 11px;
+            background: var(--accent-magenta);
+            color: #fff;
+            padding: 3px 8px;
+            border: 1px solid #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+        }
+
+        /* Storage Metrics */
+        .storage-card {
+            background: var(--surface-card);
+            border: 2px solid #fff;
+            padding: 20px;
+            box-shadow: 4px 4px 0px #fff;
+        }
+
+        .storage-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .storage-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: var(--text-muted);
+        }
+
+        .storage-stats {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .storage-progress-container {
+            width: 100%;
+            height: 20px;
+            background: var(--bg);
+            border: 2px solid #fff;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .storage-progress-bar {
+            height: 100%;
+            width: 68%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-yellow));
+            transition: width 0.4s ease;
+        }
+
+        .storage-footer {
+            margin-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        /* Drop Zone */
+        .dropzone-container {
+            background: var(--surface-card);
+            border: 2px dashed #fff;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .dropzone-container:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 243, 255, 0.02);
+            transform: translateY(-2px);
+        }
+
+        .dropzone-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .dropzone-text {
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .dropzone-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* Shared Secure Folders */
+        .folder-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .folder-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: var(--surface-card);
+            border: 2px solid #fff;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .folder-item:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 4px 4px 0px var(--accent-yellow);
+        }
+
+        .folder-icon {
+            font-size: 24px;
+            background: var(--bg);
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #fff;
+        }
+
+        .folder-info {
+            flex-grow: 1;
+        }
+
+        .folder-name {
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .folder-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* MAIN CONTENT AREA */
+        .main-dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .dashboard-header {
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            padding: 40px;
+            box-shadow: var(--brutal-shadow-magenta);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,0,85,0.06) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .header-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .breadcrumbs {
+            display: flex;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--accent-cyan);
+            margin-bottom: 15px;
+        }
+
+        .breadcrumbs span {
+            color: #fff;
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(28px, 4vw, 44px);
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+
+        h1 span {
+            color: transparent;
+            -webkit-text-stroke: 1px #fff;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-magenta));
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .header-desc {
+            color: var(--text-muted);
+            font-size: 16px;
+            max-width: 700px;
+        }
+
+        /* Recently Received Files Feed */
+        .feed-container {
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            padding: 30px;
+            box-shadow: var(--brutal-shadow-yellow);
+        }
+
+        .feed-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .feed-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 22px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .action-link {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--accent-cyan);
+            text-decoration: none;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--accent-cyan);
+            padding-bottom: 2px;
+            transition: color var(--transition-speed);
+        }
+
+        .action-link:hover {
+            color: var(--accent-magenta);
+            border-bottom-color: var(--accent-magenta);
+        }
+
+        .file-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .feed-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: var(--surface-card);
+            border: 2px solid #fff;
+            padding: 20px;
+            transition: all var(--transition-speed);
+        }
+
+        .feed-item:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: 6px 6px 0px var(--accent-cyan);
+        }
+
+        .item-icon {
+            font-size: 24px;
+            width: 50px;
+            height: 50px;
+            background: var(--bg);
+            border: 2px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .item-details {
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .item-name {
+            font-size: 16px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .item-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .meta-sender {
+            color: var(--accent-yellow);
+            font-weight: 700;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-action {
+            background: var(--bg);
+            border: 2px solid #fff;
+            color: #fff;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+
+        .btn-action:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        /* Upload Toast/Feedback */
+        .toast-notification {
+            position: fixed;
+            bottom: 30px;
+            right: -400px;
+            width: 350px;
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            box-shadow: var(--brutal-shadow-magenta);
+            padding: 20px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: right 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .toast-notification.active {
+            right: 30px;
+        }
+
+        .toast-icon {
+            font-size: 24px;
+            background: var(--accent-magenta);
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border: 2px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toast-content h4 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .toast-content p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Utility buttons for mockup */
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-accent {
+            background: var(--accent-cyan);
+            color: #000;
+            padding: 12px 24px;
+            border: 2px solid #fff;
+            font-weight: 900;
+            font-size: 14px;
+            text-transform: uppercase;
+            box-shadow: 4px 4px 0px #fff;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+            text-decoration: none;
+        }
+
+        .btn-accent:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #fff;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .dashboard-header {
+                padding: 20px;
+            }
+            .feed-container {
+                padding: 20px;
+            }
+            .feed-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            .item-actions {
+                width: 100%;
+            }
+            .btn-action {
+                flex: 1;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        
+        <!-- SIDEBAR COMPONENT (DASHBOARD-SIDEBAR) -->
+        <aside class="dashboard-sidebar">
+            
+            <!-- SECTION 1: STORAGE METRICS -->
+            <div>
+                <div class="sidebar-section-title">
+                    <span>Storage Pool</span>
+                    <span class="section-badge">Live Status</span>
+                </div>
+                <div class="storage-card">
+                    <div class="storage-header">
+                        <span class="storage-title">Encrypted Space</span>
+                        <span class="storage-stats" id="storageStats">6.8 GB / 10 GB</span>
+                    </div>
+                    <div class="storage-progress-container">
+                        <div class="storage-progress-bar" id="progressBar"></div>
+                    </div>
+                    <div class="storage-footer">
+                        <span>68% Utilized</span>
+                        <span id="remainingStorage">3.2 GB Free</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 2: QUICK UPLOAD ZONE -->
+            <div>
+                <div class="sidebar-section-title">
+                    <span>Secure Dropzone</span>
+                </div>
+                <div class="dropzone-container" id="dropzone">
+                    <div class="dropzone-icon">📥</div>
+                    <div class="dropzone-text">Drop Secure File</div>
+                    <div class="dropzone-sub">or click to browse local storage</div>
+                    <input type="file" id="sidebarFileInput" class="file-input" onchange="simulateUpload(this)">
+                </div>
+            </div>
+
+            <!-- SECTION 3: SHARED SECURE FOLDERS -->
+            <div>
+                <div class="sidebar-section-title">
+                    <span>Shared Lockers</span>
+                </div>
+                <div class="folder-list">
+                    <a href="#audit" class="folder-item">
+                        <div class="folder-icon">📂</div>
+                        <div class="folder-info">
+                            <div class="folder-name">Audit & Compliance</div>
+                            <div class="folder-meta">14 Files • Updated 2h ago</div>
+                        </div>
+                    </a>
+                    <a href="#tax" class="folder-item">
+                        <div class="folder-icon">📂</div>
+                        <div class="folder-info">
+                            <div class="folder-name">Tax & Revenue Docs</div>
+                            <div class="folder-meta">28 Files • Updated Yesterday</div>
+                        </div>
+                    </a>
+                    <a href="#underwriting" class="folder-item">
+                        <div class="folder-icon">🔒</div>
+                        <div class="folder-info">
+                            <div class="folder-name">Direct Underwriting</div>
+                            <div class="folder-meta">6 Files • Updated 4d ago</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- MAIN WORKSPACE VIEWER -->
+        <main class="main-dashboard">
+            
+            <!-- HEADER -->
+            <header class="dashboard-header">
+                <div class="header-title-row">
+                    <div>
+                        <div class="breadcrumbs">Workspace <span>/</span> Dynamic Edge Client Hub</div>
+                        <h1>Secure <span>Workspace</span></h1>
+                        <p class="header-desc">A centralized portal to monitor verification assets, exchange sensitive financial declarations, and coordinate critical legal artifacts directly with specialized broker units.</p>
+                    </div>
+                    <div class="header-actions">
+                        <a href="#" class="btn-accent">
+                            + Connect Repository
+                        </a>
+                    </div>
+                </div>
+            </header>
+
+            <!-- RECENTLY RECEIVED FILES FEED -->
+            <section class="feed-container">
+                <div class="feed-header">
+                    <h2 class="feed-title">Recently Exchanged Artifacts</h2>
+                    <a href="#" class="action-link">View Vault History</a>
+                </div>
+                
+                <div class="file-feed" id="fileFeed">
+                    
+                    <!-- Feed Item 1 -->
+                    <div class="feed-item">
+                        <div class="item-icon">📄</div>
+                        <div class="item-details">
+                            <div class="item-name">Q4_ProfitAndLoss_Draft.xlsx</div>
+                            <div class="item-meta">
+                                <span>Size: 1.4 MB</span>
+                                <span>•</span>
+                                <span>Sent by <span class="meta-sender">Broker Desk 3</span></span>
+                                <span>•</span>
+                                <span>25 mins ago</span>
+                            </div>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn-action">Preview</button>
+                            <button class="btn-action" style="border-color: var(--accent-cyan); color: var(--accent-cyan)">Verify</button>
+                        </div>
+                    </div>
+
+                    <!-- Feed Item 2 -->
+                    <div class="feed-item">
+                        <div class="item-icon">⚖️</div>
+                        <div class="item-details">
+                            <div class="item-name">UCC1_LienFiling_StateClearance.pdf</div>
+                            <div class="item-meta">
+                                <span>Size: 740 KB</span>
+                                <span>•</span>
+                                <span>Sent by <span class="meta-sender">Risk Operations</span></span>
+                                <span>•</span>
+                                <span>4 hours ago</span>
+                            </div>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn-action">Preview</button>
+                            <button class="btn-action">Acknowledge</button>
+                        </div>
+                    </div>
+
+                    <!-- Feed Item 3 -->
+                    <div class="feed-item">
+                        <div class="item-icon">💼</div>
+                        <div class="item-details">
+                            <div class="item-name">Executed_TermSheet_DynamicEdge.pdf</div>
+                            <div class="item-meta">
+                                <span>Size: 2.1 MB</span>
+                                <span>•</span>
+                                <span>Sent by <span class="meta-sender">Automated System</span></span>
+                                <span>•</span>
+                                <span>1 day ago</span>
+                            </div>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn-action">Download</button>
+                            <button class="btn-action">View Audits</button>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div class="toast-notification" id="uploadToast">
+        <div class="toast-icon">✔</div>
+        <div class="toast-content">
+            <h4>File Deposited</h4>
+            <p id="toastFilename">Your document has been verified.</p>
+        </div>
+    </div>
+
+    <!-- CLIENT INTERACTIVE ENGINE -->
+    <script>
+        // Track current simulated storage pool size
+        let usedStorage = 6.8;
+        const totalStorage = 10;
+
+        function simulateUpload(input) {
+            if (!input.files || input.files.length === 0) return;
+            
+            const file = input.files[0];
+            const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1);
+            const fileSizeGB = parseFloat((file.size / (1024 * 1024 * 1024)).toFixed(2));
+            
+            // Limit fake size calculation impact
+            const simulatedCost = fileSizeGB > 0 ? fileSizeGB : 0.15;
+
+            // Trigger notification
+            const toast = document.getElementById('uploadToast');
+            document.getElementById('toastFilename').innerText = `${file.name} (${fileSizeMB} MB) was uploaded to your compliance lockbox successfully.`;
+            toast.classList.add('active');
+
+            setTimeout(() => {
+                toast.classList.remove('active');
+            }, 5000);
+
+            // Add new mock file to feed
+            const fileFeed = document.getElementById('fileFeed');
+            const newFeedItem = document.createElement('div');
+            newFeedItem.className = 'feed-item';
+            newFeedItem.innerHTML = `
+                <div class="item-icon">📤</div>
+                <div class="item-details">
+                    <div class="item-name">${file.name}</div>
+                    <div class="item-meta">
+                        <span>Size: ${fileSizeMB} MB</span>
+                        <span>•</span>
+                        <span>Sent by <span class="meta-sender">You (Client Upload)</span></span>
+                        <span>•</span>
+                        <span>Just now</span>
+                    </div>
+                </div>
+                <div class="item-actions">
+                    <button class="btn-action">Download</button>
+                    <button class="btn-action" style="border-color: var(--accent-magenta); color: var(--accent-magenta)">Revoke</button>
+                </div>
+            `;
+            fileFeed.insertBefore(newFeedItem, fileFeed.firstChild);
+
+            // Update Storage UI metrics
+            usedStorage = Math.min(totalStorage, parseFloat((usedStorage + simulatedCost).toFixed(2)));
+            const percentage = Math.round((usedStorage / totalStorage) * 100);
+            
+            document.getElementById('storageStats').innerText = `${usedStorage} GB / ${totalStorage} GB`;
+            document.getElementById('progressBar').style.width = `${percentage}%`;
+            document.getElementById('remainingStorage').innerText = `${(totalStorage - usedStorage).toFixed(1)} GB Free`;
+            
+            const storageLabel = document.querySelector('.storage-footer span:first-child');
+            if (storageLabel) {
+                storageLabel.innerText = `${percentage}% Utilized`;
+            }
+
+            // Reset input so upload can trigger again
+            input.value = '';
+        }
+
+        // Add subtle drag/drop indicator styling on sidebar dropzone
+        const dropzone = document.getElementById('dropzone');
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropzone.style.borderColor = 'var(--accent-magenta)';
+                dropzone.style.background = 'rgba(255, 0, 85, 0.04)';
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropzone.style.borderColor = '#fff';
+                dropzone.style.background = 'var(--surface-card)';
+            }, false);
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            const fileInput = document.getElementById('sidebarFileInput');
+            fileInput.files = files;
+            simulateUpload(fileInput);
+        });
+    </script>
+</body>
+</html>

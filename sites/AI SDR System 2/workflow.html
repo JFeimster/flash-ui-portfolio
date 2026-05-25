@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workflow Mapper | Obsidian AI SDR</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --glass-bg: rgba(18, 18, 18, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent-glow: rgba(120, 120, 120, 0.15);
+            --text-primary: #e0e0e0;
+            --text-secondary: #888888;
+            --accent-color: #ffffff;
+            --success: #4ade80;
+            --warning: #fbbf24;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 50% -20%, #1a1a1a 0%, transparent 70%),
+                radial-gradient(circle at 100% 100%, #0a0a0a 0%, transparent 50%);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .sdr-container {
+            width: 100%;
+            max-width: 1100px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            min-height: 700px;
+        }
+
+        /* Sidebar - Hook Monitor */
+        .config-sidebar {
+            padding: 2rem;
+            border-right: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .header-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-weight: 600;
+        }
+
+        .hook-item {
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .hook-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .hook-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .hook-status {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .status-online { background: var(--success); box-shadow: 0 0 8px var(--success); }
+        .status-idle { background: var(--warning); box-shadow: 0 0 8px var(--warning); }
+
+        .hook-meta {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+        }
+
+        /* Main Canvas - Sequence Map */
+        .main-canvas {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .workflow-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 3rem;
+        }
+
+        .sequence-map {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+            padding-left: 2rem;
+        }
+
+        .sequence-map::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: linear-gradient(180deg, var(--glass-border) 0%, rgba(255,255,255,0.1) 50%, var(--glass-border) 100%);
+        }
+
+        .node-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            padding: 1.5rem;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .node-card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .node-card::before {
+            content: '';
+            position: absolute;
+            left: -2rem;
+            top: 50%;
+            width: 1.5rem;
+            height: 1px;
+            background: var(--glass-border);
+        }
+
+        .node-card::after {
+            content: '';
+            position: absolute;
+            left: -2.25rem;
+            top: calc(50% - 3px);
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--bg-color);
+            border: 1px solid var(--text-secondary);
+        }
+
+        .node-type {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .node-title {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .node-config {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .config-bit {
+            font-size: 0.7rem;
+        }
+
+        .config-bit label {
+            display: block;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .config-bit span {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-color);
+        }
+
+        .delay-badge {
+            position: absolute;
+            right: -1rem;
+            top: -1rem;
+            background: #111;
+            border: 1px solid var(--glass-border);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+        }
+
+        .integration-icon {
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+        }
+
+        .action-bar {
+            margin-top: auto;
+            padding-top: 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: #000;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="sdr-container">
+        <!-- Connection Health Sidebar -->
+        <aside class="config-sidebar">
+            <h2 class="header-title">Trigger Health</h2>
+            
+            <div class="hook-item">
+                <div class="hook-header">
+                    <span class="hook-name">AppsScript_Relay</span>
+                    <div class="hook-status status-online"></div>
+                </div>
+                <div class="hook-meta">Latency: 142ms • Status: 200 OK</div>
+            </div>
+
+            <div class="hook-item">
+                <div class="hook-header">
+                    <span class="hook-name">Make_Webhook_01</span>
+                    <div class="hook-status status-online"></div>
+                </div>
+                <div class="hook-meta">Last sync: 2m ago • active</div>
+            </div>
+
+            <div class="hook-item">
+                <div class="hook-header">
+                    <span class="hook-name">Gmail_OAuth_Sync</span>
+                    <div class="hook-status status-idle"></div>
+                </div>
+                <div class="hook-meta">Token refresh in 4h 12m</div>
+            </div>
+
+            <div class="hook-item">
+                <div class="hook-header">
+                    <span class="hook-name">Notion_CRM_Push</span>
+                    <div class="hook-status status-online"></div>
+                </div>
+                <div class="hook-meta">Synced: 1,204 records</div>
+            </div>
+
+            <div style="margin-top: 2rem;">
+                <label class="header-title" style="font-size: 0.6rem; display: block; margin-bottom: 1rem;">Active Integrations</label>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <div style="padding: 4px 8px; border: 1px solid var(--glass-border); border-radius: 4px; font-size: 0.65rem; color: var(--text-secondary);">GMAIL_API</div>
+                    <div style="padding: 4px 8px; border: 1px solid var(--glass-border); border-radius: 4px; font-size: 0.65rem; color: var(--text-secondary);">MAKE_COM</div>
+                    <div style="padding: 4px 8px; border: 1px solid var(--glass-border); border-radius: 4px; font-size: 0.65rem; color: var(--text-secondary);">NOTION_V3</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Sequence Mapper -->
+        <main class="main-canvas">
+            <div class="workflow-header">
+                <div>
+                    <h1 style="font-size: 1.25rem; font-weight: 400; margin-bottom: 4px;">Automation Mapper</h1>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary);">Mapping Send & Follow-up Logic</p>
+                </div>
+            </div>
+
+            <div class="sequence-map">
+                <!-- Node 1: Initial Send -->
+                <div class="node-card">
+                    <span class="node-type">Entry Point</span>
+                    <h3 class="node-title">
+                        Initial Outreach
+                    </h3>
+                    <div class="node-config">
+                        <div class="config-bit">
+                            <label>Provider</label>
+                            <span>Gmail / SMTP</span>
+                        </div>
+                        <div class="config-bit">
+                            <label>Trigger</label>
+                            <span>Lead_Qualified</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Node 2: Follow-up 1 -->
+                <div class="node-card">
+                    <div class="delay-badge">T + 3 Days</div>
+                    <span class="node-type">Sequence Action</span>
+                    <h3 class="node-title">Follow-up #1: Case Study</h3>
+                    <div class="node-config">
+                        <div class="config-bit">
+                            <label>Condition</label>
+                            <span>No_Reply</span>
+                        </div>
+                        <div class="config-bit">
+                            <label>Script Hook</label>
+                            <span>Relay_Alpha</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Node 3: Follow-up 2 -->
+                <div class="node-card">
+                    <div class="delay-badge">T + 7 Days</div>
+                    <span class="node-type">Sequence Action</span>
+                    <h3 class="node-title">Follow-up #2: Breakup Thread</h3>
+                    <div class="node-config">
+                        <div class="config-bit">
+                            <label>Automation</label>
+                            <span>Make.com Flow</span>
+                        </div>
+                        <div class="config-bit">
+                            <label>Priority</label>
+                            <span>High</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Node 4: Termination -->
+                <div class="node-card" style="border-style: dashed;">
+                    <span class="node-type">Exit Point</span>
+                    <h3 class="node-title">Sync to CRM</h3>
+                    <div class="node-config">
+                        <div class="config-bit">
+                            <label>Destination</label>
+                            <span>Notion Table</span>
+                        </div>
+                        <div class="config-bit">
+                            <label>Event</label>
+                            <span>Sequence_End</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button class="btn-secondary">Test All Hooks</button>
+                <button class="btn-primary" style="margin-left: auto;">Deploy Workflow</button>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonshine Capital | Partner Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --bg-surface: #0f0f12;
+            --bg-elevated: #16161a;
+            --border: #26262b;
+            --border-bright: #3f3f46;
+            --neon-blue: #00f0ff;
+            --neon-green: #39ff14;
+            --text-primary: #f4f4f5;
+            --text-secondary: #a1a1aa;
+            --text-muted: #52525b;
+            --accent-gradient: linear-gradient(135deg, #00f0ff 0%, #39ff14 100%);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 10px; }
+
+        /* Navigation */
+        nav {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: -0.02em;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--neon-blue);
+        }
+
+        /* Hero */
+        .hero {
+            padding: 3rem 2rem;
+            border-bottom: 1px solid var(--border);
+            background: radial-gradient(circle at top right, rgba(57, 255, 20, 0.03), transparent 50%),
+                        radial-gradient(circle at top left, rgba(0, 240, 255, 0.03), transparent 50%);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Top Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--accent-gradient);
+            opacity: 0.3;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-delta {
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .delta-up { background: rgba(57, 255, 20, 0.1); color: var(--neon-green); }
+        .delta-down { background: rgba(255, 95, 86, 0.1); color: #ff5f56; }
+
+        /* Main Dashboard Content */
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-layout { grid-template-columns: 1fr; }
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        /* Performance Table */
+        .performance-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        .performance-table th {
+            text-align: left;
+            color: var(--text-muted);
+            font-weight: 500;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 0.05em;
+        }
+
+        .performance-table td {
+            padding: 1.25rem 0;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .performance-table tr:last-child td { border: none; }
+
+        .widget-name {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .widget-name .name { color: var(--text-primary); font-weight: 500; }
+        .widget-name .id { font-size: 0.7rem; font-family: 'JetBrains Mono'; color: var(--text-muted); }
+
+        .badge-live {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.7rem;
+            color: var(--neon-green);
+            background: rgba(57, 255, 20, 0.05);
+            padding: 2px 8px;
+            border-radius: 99px;
+            border: 1px solid rgba(57, 255, 20, 0.2);
+        }
+
+        .pulse {
+            width: 6px;
+            height: 6px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--neon-green);
+            animation: pulse-ring 2s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.5; }
+            100% { transform: scale(0.8); opacity: 1; }
+        }
+
+        /* Simple CSS Chart Mockup */
+        .chart-container {
+            height: 200px;
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            padding-top: 2rem;
+            margin-top: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .bar {
+            flex: 1;
+            background: linear-gradient(to top, rgba(0, 240, 255, 0.1), var(--neon-blue));
+            border-radius: 4px 4px 0 0;
+            transition: var(--transition);
+            position: relative;
+            min-height: 10px;
+        }
+
+        .bar:hover {
+            filter: brightness(1.2);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+        }
+
+        .bar::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        /* Activity List */
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            font-size: 0.85rem;
+        }
+
+        .activity-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .activity-content p { color: var(--text-secondary); }
+        .activity-content span { color: var(--text-muted); font-size: 0.75rem; }
+
+        .btn-primary {
+            background: var(--text-primary);
+            color: var(--bg-deep);
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .btn-primary:hover {
+            background: #fff;
+            transform: translateY(-1px);
+        }
+
+        .tag {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: var(--bg-elevated);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">MOONSHINE CAPITAL</div>
+        <div class="nav-links">
+            <a href="#" class="active">Performance</a>
+            <a href="#">Embed Generator</a>
+            <a href="#">Resources</a>
+            <a href="#">Settings</a>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="text-align: right;">
+                <p style="font-size: 0.8rem; font-weight: 600;">MS-882</p>
+                <p style="font-size: 0.7rem; color: var(--text-muted);">Growth Labs Agency</p>
+            </div>
+            <div style="width: 32px; height: 32px; background: var(--accent-gradient); border-radius: 50%;"></div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="container" style="padding: 0;">
+            <div class="section-header">
+                <div>
+                    <h1 style="font-size: 1.8rem; margin-bottom: 0.5rem;">Partner Performance Dashboard</h1>
+                    <p style="color: var(--text-secondary);">Tracking your influence and commissions in real-time.</p>
+                </div>
+                <a href="generator.html" class="btn-primary">+ Create New Widget</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- High Level Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-label">Total Commissions</span>
+                <div style="display: flex; align-items: baseline;">
+                    <span class="stat-value">$14,280.00</span>
+                    <span class="stat-delta delta-up">↑ 12%</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Active Embeds</span>
+                <div style="display: flex; align-items: baseline;">
+                    <span class="stat-value">12</span>
+                    <span style="font-size: 0.8rem; color: var(--text-muted); margin-left: 0.5rem;">Total Instances</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Avg. Conversion Rate</span>
+                <div style="display: flex; align-items: baseline;">
+                    <span class="stat-value">3.42%</span>
+                    <span class="stat-delta delta-up">↑ 0.8%</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Click-Throughs</span>
+                <div style="display: flex; align-items: baseline;">
+                    <span class="stat-value">1,892</span>
+                    <span class="stat-delta delta-down">↓ 2%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-layout">
+            <!-- Left Column: Detailed Performance -->
+            <div class="main-stats">
+                <div class="card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--neon-blue);"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+                            Top Performing Widgets
+                        </div>
+                        <select style="background: var(--bg-deep); color: var(--text-secondary); border: 1px solid var(--border); border-radius: 4px; font-size: 0.75rem; padding: 4px 8px;">
+                            <option>Last 30 Days</option>
+                            <option>Last 7 Days</option>
+                            <option>All Time</option>
+                        </select>
+                    </div>
+
+                    <table class="performance-table">
+                        <thead>
+                            <tr>
+                                <th>Widget Instance</th>
+                                <th>Impressions</th>
+                                <th>Clicks</th>
+                                <th>CTR</th>
+                                <th>Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="widget-name">
+                                        <span class="name">Ready Score - Footer</span>
+                                        <span class="id">ID: ms-calc-001</span>
+                                    </div>
+                                </td>
+                                <td>42,019</td>
+                                <td>1,204</td>
+                                <td>2.8%</td>
+                                <td style="color: var(--neon-green); font-weight: 600;">$8,400</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="widget-name">
+                                        <span class="name">Route Matcher Sidebar</span>
+                                        <span class="id">ID: ms-match-042</span>
+                                    </div>
+                                </td>
+                                <td>12,440</td>
+                                <td>592</td>
+                                <td>4.7%</td>
+                                <td style="color: var(--neon-green); font-weight: 600;">$4,120</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="widget-name">
+                                        <span class="name">Agency Application CTA</span>
+                                        <span class="id">ID: ms-cta-992</span>
+                                    </div>
+                                </td>
+                                <td>5,102</td>
+                                <td>96</td>
+                                <td>1.9%</td>
+                                <td style="color: var(--neon-green); font-weight: 600;">$1,760</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="chart-container">
+                        <div class="bar" style="height: 30%;" data-label="Mon"></div>
+                        <div class="bar" style="height: 45%;" data-label="Tue"></div>
+                        <div class="bar" style="height: 60%;" data-label="Wed"></div>
+                        <div class="bar" style="height: 55%;" data-label="Thu"></div>
+                        <div class="bar" style="height: 80%;" data-label="Fri"></div>
+                        <div class="bar" style="height: 95%;" data-label="Sat"></div>
+                        <div class="bar" style="height: 75%;" data-label="Sun"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Recent Events -->
+            <div class="sidebar">
+                <div class="card">
+                    <div class="section-title" style="margin-bottom: 1.5rem;">
+                        <span class="badge-live"><span class="pulse"></span> Live Activity</span>
+                    </div>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--neon-green)" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                            </div>
+                            <div class="activity-content">
+                                <p><strong>New Application</strong> started from <em>Route Matcher</em></p>
+                                <span>2 minutes ago</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--neon-blue)" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                            </div>
+                            <div class="activity-content">
+                                <p>Partner account <strong>MS-882</strong> whitelisted on <em>blog.growthlabs.com</em></p>
+                                <span>1 hour ago</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff5f56" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            </div>
+                            <div class="activity-content">
+                                <p>Widget error on <em>localhost:3000</em>. Check domain whitelist.</p>
+                                <span>4 hours ago</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--neon-green)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+                            </div>
+                            <div class="activity-content">
+                                <p>Commission of <strong>$1,200.00</strong> approved.</p>
+                                <span>Yesterday, 4:32 PM</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button style="width: 100%; background: none; border: 1px solid var(--border); color: var(--text-secondary); padding: 0.75rem; border-radius: 6px; margin-top: 2rem; font-size: 0.75rem; cursor: pointer; transition: var(--transition);">
+                        View All Activity Log
+                    </button>
+                </div>
+
+                <div class="card" style="margin-top: 1.5rem; background: var(--bg-elevated);">
+                    <div class="section-title" style="font-size: 0.8rem; color: var(--neon-blue);">
+                        Deployment Tip
+                    </div>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                        Widgets perform 40% better when placed above the fold on high-intent landing pages. Try the <strong>Funding Readiness Score</strong> on your "Contact Us" page.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer style="margin-top: 4rem; padding: 2rem; border-top: 1px solid var(--border); text-align: center;">
+        <p style="font-size: 0.75rem; color: var(--text-muted);">&copy; 2024 Moonshine Capital. All Performance data is updated every 15 minutes.</p>
+    </footer>
+
+</body>
+</html>
+```

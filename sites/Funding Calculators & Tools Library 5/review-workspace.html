@@ -1,0 +1,1041 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Workspace - Collaborative Annotation Board</title>
+    <!-- Google Fonts for Ultra-Modern High-Contrast Look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0c10;
+            --surface: #14161f;
+            --surface-card: #1a1d29;
+            --text-raw: #ffffff;
+            --text-muted: #8e95ad;
+            --accent-cyan: #00f3ff;
+            --accent-magenta: #ff0055;
+            --accent-yellow: #ffee00;
+            --accent-green: #00ff66;
+            --border-width: 3px;
+            --brutal-shadow-cyan: 6px 6px 0px var(--accent-cyan);
+            --brutal-shadow-magenta: 6px 6px 0px var(--accent-magenta);
+            --brutal-shadow-yellow: 6px 6px 0px var(--accent-yellow);
+            --brutal-shadow-green: 6px 6px 0px var(--accent-green);
+            --transition-speed: 0.15s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-raw);
+            line-height: 1.4;
+            padding: 20px;
+            overflow-x: hidden;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* Container Limit */
+        .wrapper {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Header / Workspace Control Panel */
+        header {
+            position: relative;
+            padding: 40px;
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            box-shadow: var(--brutal-shadow-cyan);
+            margin-bottom: 40px;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        @media (min-width: 900px) {
+            header {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+        }
+
+        .header-info h1 {
+            font-size: clamp(28px, 4vw, 44px);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -1.5px;
+            line-height: 0.95;
+            font-family: 'Space Grotesk', sans-serif;
+            margin-bottom: 8px;
+        }
+
+        .header-info h1 span {
+            color: transparent;
+            -webkit-text-stroke: 1.2px #fff;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-magenta));
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .workspace-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: var(--accent-magenta);
+            color: #fff;
+            border: 2px solid #fff;
+            font-weight: 900;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 3px 3px 0px #fff;
+            font-family: 'Space Grotesk', sans-serif;
+            margin-bottom: 12px;
+        }
+
+        /* Progress Dashboard Widget */
+        .status-widget {
+            background: var(--surface-card);
+            border: var(--border-width) solid #fff;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            min-width: 320px;
+            box-shadow: 4px 4px 0px #fff;
+        }
+
+        .radial-progress-container {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .radial-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 900;
+            font-size: 16px;
+            color: var(--accent-cyan);
+        }
+
+        .widget-stats {
+            flex-grow: 1;
+        }
+
+        .widget-stats h4 {
+            text-transform: uppercase;
+            font-size: 12px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        .widget-stats .metric {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 900;
+            font-size: 20px;
+            color: #fff;
+        }
+
+        .submit-btn {
+            background: var(--accent-green);
+            color: #000;
+            border: var(--border-width) solid #fff;
+            padding: 18px 30px;
+            font-weight: 900;
+            font-size: 16px;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 6px 6px 0px #fff;
+            font-family: 'Space Grotesk', sans-serif;
+            transition: all var(--transition-speed);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            height: fit-content;
+        }
+
+        .submit-btn:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: 9px 9px 0px #fff;
+        }
+
+        .submit-btn:active {
+            transform: translate(3px, 3px);
+            box-shadow: 0px 0px 0px #fff;
+        }
+
+        /* Workspace Grid (3-Column Layout) */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        @media (max-width: 1200px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .document-card {
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: var(--brutal-shadow-yellow);
+            transition: box-shadow 0.3s ease;
+            height: 720px; /* Uniform workspace layout */
+        }
+
+        /* Visual shifts depending on review status class */
+        .document-card.approved {
+            box-shadow: var(--brutal-shadow-green);
+        }
+        .document-card.needs-revision {
+            box-shadow: var(--brutal-shadow-yellow);
+        }
+        .document-card.rejected {
+            box-shadow: var(--brutal-shadow-magenta);
+        }
+
+        /* Document Header */
+        .doc-header {
+            padding: 20px;
+            background: var(--surface-card);
+            border-bottom: var(--border-width) solid #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .doc-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .doc-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 900;
+            font-size: 18px;
+            text-transform: uppercase;
+        }
+
+        .doc-filename {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: monospace;
+        }
+
+        /* Status Pills inside Header */
+        .status-badge {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 900;
+            font-size: 12px;
+            text-transform: uppercase;
+            padding: 6px 12px;
+            border: 2px solid #fff;
+            box-shadow: 2px 2px 0px #fff;
+        }
+
+        .status-badge.approved { background-color: var(--accent-green); color: #000; }
+        .status-badge.needs-revision { background-color: var(--accent-yellow); color: #000; }
+        .status-badge.rejected { background-color: var(--accent-magenta); color: #fff; }
+        .status-badge.pending { background-color: var(--surface); color: var(--text-muted); }
+
+        /* Control Tray for Individual Approval statuses */
+        .action-tray {
+            display: flex;
+            border-bottom: 2px solid #fff;
+            background: #000;
+        }
+
+        .tray-btn {
+            flex: 1;
+            padding: 12px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 900;
+            font-size: 11px;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            transition: all 0.1s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            color: #fff;
+            background: transparent;
+        }
+
+        .tray-btn:not(:last-child) {
+            border-right: 2px solid #fff;
+        }
+
+        .tray-btn-approve:hover, .tray-btn-approve.active {
+            background-color: var(--accent-green);
+            color: #000;
+        }
+
+        .tray-btn-revision:hover, .tray-btn-revision.active {
+            background-color: var(--accent-yellow);
+            color: #000;
+        }
+
+        .tray-btn-reject:hover, .tray-btn-reject.active {
+            background-color: var(--accent-magenta);
+            color: #fff;
+        }
+
+        /* Document Content Pane (Simulated PDF/Viewer) */
+        .doc-viewer {
+            flex-grow: 1;
+            padding: 24px;
+            overflow-y: auto;
+            background: #11131a;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #e2e4eb;
+            user-select: text;
+        }
+
+        .doc-viewer h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            color: #fff;
+            font-size: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            padding-bottom: 6px;
+        }
+
+        .doc-viewer p {
+            margin-bottom: 15px;
+        }
+
+        /* Highlight feature styles */
+        .highlightable {
+            transition: background-color 0.2s;
+            cursor: pointer;
+            border-radius: 2px;
+            padding: 2px 4px;
+            margin: 0 -2px;
+        }
+
+        .highlightable:hover {
+            background-color: rgba(255, 0, 85, 0.25);
+            outline: 1px dashed var(--accent-magenta);
+        }
+
+        .highlightable.active-highlight {
+            background-color: rgba(0, 243, 255, 0.35);
+            color: #fff;
+            border-bottom: 2px solid var(--accent-cyan);
+        }
+
+        .table-sim {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .table-sim th, .table-sim td {
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px;
+            text-align: left;
+        }
+
+        .table-sim th {
+            background: var(--surface-card);
+            text-transform: uppercase;
+            color: var(--accent-cyan);
+        }
+
+        /* Comment / Annotation Feed inside card */
+        .annotation-area {
+            border-top: var(--border-width) solid #fff;
+            background: var(--surface-card);
+            display: flex;
+            flex-direction: column;
+            max-height: 240px;
+        }
+
+        .annotation-header {
+            padding: 10px 20px;
+            background: #000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 800;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .annotations-list {
+            padding: 12px 20px;
+            overflow-y: auto;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: rgba(0,0,0,0.2);
+            min-height: 100px;
+            max-height: 140px;
+        }
+
+        .annotation-item {
+            font-size: 12px;
+            background: var(--surface);
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 8px 12px;
+            position: relative;
+        }
+
+        .annotation-author {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-bottom: 3px;
+            font-size: 11px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .annotation-item .delete-comment {
+            background: none;
+            border: none;
+            color: var(--accent-magenta);
+            cursor: pointer;
+            font-family: monospace;
+            font-weight: 900;
+        }
+
+        .annotation-quote {
+            font-style: italic;
+            border-left: 2px solid var(--accent-magenta);
+            padding-left: 6px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            display: inline-block;
+        }
+
+        /* Commentary Input */
+        .comment-input-form {
+            display: flex;
+            border-top: 1px solid rgba(255,255,255,0.15);
+            background: var(--surface);
+        }
+
+        .comment-input {
+            flex-grow: 1;
+            background: transparent;
+            border: none;
+            padding: 12px 16px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .comment-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .comment-submit-btn {
+            background: var(--accent-cyan);
+            color: #000;
+            border: none;
+            border-left: 1.5px solid #fff;
+            padding: 0 20px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 900;
+            font-size: 12px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+
+        .comment-submit-btn:hover {
+            background: #fff;
+        }
+
+        /* Informative Section below workspace */
+        .workspace-instructions {
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            padding: 30px;
+            margin-bottom: 60px;
+            box-shadow: var(--brutal-shadow-yellow);
+        }
+
+        .workspace-instructions h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 24px;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            color: var(--accent-yellow);
+        }
+
+        .workspace-instructions p {
+            color: var(--text-muted);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .instruction-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .step-card {
+            background: var(--surface-card);
+            border: 2px solid rgba(255,255,255,0.15);
+            padding: 20px;
+        }
+
+        .step-num {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--accent-cyan);
+            margin-bottom: 10px;
+        }
+
+        .step-card h4 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        .step-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Success Overlay Popups */
+        .toast-notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--surface);
+            border: var(--border-width) solid #fff;
+            box-shadow: var(--brutal-shadow-green);
+            padding: 20px 30px;
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            gap: 15px;
+            animation: slideIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .toast-icon {
+            font-size: 24px;
+            color: var(--accent-green);
+        }
+
+        .toast-content h5 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 15px;
+        }
+
+        .toast-content p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Footer */
+        footer {
+            border-top: var(--border-width) solid #fff;
+            padding: 40px 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <!-- WORKSPACE HEADER & MASTER TRACKER -->
+        <header>
+            <div class="header-info">
+                <div class="workspace-badge">⚡ Verification Portal</div>
+                <h1>Collaborative <span>Review Board</span></h1>
+                <p style="color: var(--text-muted); max-width: 680px; font-size: 15px;">Review incoming merchant files, annotate terms on the dynamic ledger, highlight points of friction, and toggle compliance states for institutional pipeline staging.</p>
+            </div>
+
+            <!-- Global Status Widget -->
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <div class="status-widget">
+                    <div class="radial-progress-container">
+                        <!-- Simulated percentage -->
+                        <span class="radial-text" id="progressPct">33%</span>
+                    </div>
+                    <div class="widget-stats">
+                        <h4>Review Progress</h4>
+                        <div class="metric" id="progressRatio">1 / 3 VERIFIED</div>
+                    </div>
+                </div>
+                <button class="submit-btn" onclick="submitGlobalAudit()">
+                    Submit Compliance Package 
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- SIDE-BY-SIDE REVIEW WORKSPACE GRID -->
+        <div class="workspace-grid">
+
+            <!-- DOCUMENT 1: Funding application -->
+            <div class="document-card needs-revision" id="doc1" data-id="1">
+                <div class="doc-header">
+                    <div class="doc-meta">
+                        <span class="doc-title">1. Underwriting Application</span>
+                        <span class="doc-filename">APP-8849-REV2.TXT</span>
+                    </div>
+                    <span class="status-badge needs-revision" id="docBadge1">Needs Revision</span>
+                </div>
+
+                <!-- Individual Decision Action Tray -->
+                <div class="action-tray">
+                    <button class="tray-btn tray-btn-approve" onclick="setDocStatus(1, 'approved')">✔ Approve</button>
+                    <button class="tray-btn tray-btn-revision active" onclick="setDocStatus(1, 'needs-revision')">⚠ Revision</button>
+                    <button class="tray-btn tray-btn-reject" onclick="setDocStatus(1, 'rejected')">✖ Reject</button>
+                </div>
+
+                <!-- Internal Simulated PDF Document Body -->
+                <div class="doc-viewer">
+                    <h3>Commercial Capital Funding Memo</h3>
+                    <p class="highlightable" data-ref="Entity Structuring" onclick="selectPara(this, 1)"><strong>Entity Structuring:</strong> Apex Logistics Group LLC is a registered commercial logistics provider operated under Delaware structure since August 2021.</p>
+                    
+                    <p class="highlightable" data-ref="Capital Request Amount" onclick="selectPara(this, 1)"><strong>Capital Request Amount:</strong> Asking for $250,000 corporate facility to initiate equipment lifecycle swap-out metrics. Target deployment date is within 14 fiscal banking days.</p>
+
+                    <p class="highlightable" data-ref="Revenue Discrepancy" onclick="selectPara(this, 1)"><strong>Key Financial Metrics:</strong> The entity reports average annual receipts of $1.4M with debt structures in place. <span style="text-decoration: underline; color: var(--accent-yellow);">Note: A temporary discrepancy exists between reported credit ledger volume and bank deposits.</span></p>
+
+                    <p class="highlightable" data-ref="Personal Guarantor Credit Score" onclick="selectPara(this, 1)"><strong>Guarantor Credit Status:</strong> Master guarantor reports dynamic Experian score threshold of 710, with perfect historical compliance parameters and no open judgments or liens.</p>
+
+                    <p style="font-size: 12px; color: var(--text-muted); border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px;">* CLICK ANY PARAGRAPH ABOVE TO HIGHLIGHT AND TARGET FOR ANNOTATIVE REMARK.</p>
+                </div>
+
+                <!-- Card Annotation Feed -->
+                <div class="annotation-area">
+                    <div class="annotation-header">
+                        <span>Friction Comments</span>
+                        <span id="commentCount1">2 Notes</span>
+                    </div>
+                    <div class="annotations-list" id="annList1">
+                        <div class="annotation-item">
+                            <div class="annotation-author">
+                                <span>Underwriter-Alpha</span>
+                                <button class="delete-comment" onclick="removeComment(this, 1)">[X]</button>
+                            </div>
+                            <span class="annotation-quote">"Revenue Discrepancy"</span>
+                            <div>Verify if discrepancy matches Q4 tax reconciliation files or bank audits.</div>
+                        </div>
+                        <div class="annotation-item">
+                            <div class="annotation-author">
+                                <span>Compliance-Bot</span>
+                                <button class="delete-comment" onclick="removeComment(this, 1)">[X]</button>
+                            </div>
+                            <span class="annotation-quote">"Entity Structuring"</span>
+                            <div>Delaware registration certified through 2024 state database check.</div>
+                        </div>
+                    </div>
+                    <!-- Commentary Interface -->
+                    <div class="comment-input-form">
+                        <input type="text" id="comInput1" class="comment-input" placeholder="Enter annotation feedback for highlighted segment...">
+                        <button class="comment-submit-btn" onclick="addComment(1)">ADD NOTE</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DOCUMENT 2: Bank Statement analysis -->
+            <div class="document-card approved" id="doc2" data-id="2">
+                <div class="doc-header">
+                    <div class="doc-meta">
+                        <span class="doc-title">2. Monthly Bank Ledger</span>
+                        <span class="doc-filename">BNK-OCT-DEC2023.CSV</span>
+                    </div>
+                    <span class="status-badge approved" id="docBadge2">Approved</span>
+                </div>
+
+                <!-- Individual Decision Action Tray -->
+                <div class="action-tray">
+                    <button class="tray-btn tray-btn-approve active" onclick="setDocStatus(2, 'approved')">✔ Approve</button>
+                    <button class="tray-btn tray-btn-revision" onclick="setDocStatus(2, 'needs-revision')">⚠ Revision</button>
+                    <button class="tray-btn tray-btn-reject" onclick="setDocStatus(2, 'rejected')">✖ Reject</button>
+                </div>
+
+                <!-- Internal Simulated PDF Document Body -->
+                <div class="doc-viewer">
+                    <h3>Deposit Cash Flow Analysis</h3>
+                    <p class="highlightable" data-ref="Consolidated Monthly Inflow" onclick="selectPara(this, 2)"><strong>Consolidated Monthly Inflow:</strong> Ledger records show gross corporate activity remains stable at $118,500 monthly mean average.</p>
+
+                    <table class="table-sim">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Deposits</th>
+                                <th>Avg Bal</th>
+                                <th>NSF count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>OCTOBER</td>
+                                <td>$124,100</td>
+                                <td>$42,100</td>
+                                <td>0</td>
+                            </tr>
+                            <tr>
+                                <td>NOVEMBER</td>
+                                <td>$113,800</td>
+                                <td>$38,900</td>
+                                <td>1</td>
+                            </tr>
+                            <tr>
+                                <td>DECEMBER</td>
+                                <td>$117,600</td>
+                                <td>$49,000</td>
+                                <td>0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p class="highlightable" data-ref="Non-Sufficient Funds Check" onclick="selectPara(this, 2)"><strong>Non-Sufficient Funds Status:</strong> System verified a single NSF occurrence in mid-November due to credit card settlements timing mismatch.</p>
+
+                    <p class="highlightable" data-ref="Consolidated Outflow Trends" onclick="selectPara(this, 2)"><strong>Consolidated Outflows:</strong> Vendor logistics, fuel management, and payroll accounting for roughly 74% of total aggregate operating costs.</p>
+                </div>
+
+                <!-- Card Annotation Feed -->
+                <div class="annotation-area">
+                    <div class="annotation-header">
+                        <span>Friction Comments</span>
+                        <span id="commentCount2">1 Note</span>
+                    </div>
+                    <div class="annotations-list" id="annList2">
+                        <div class="annotation-item">
+                            <div class="annotation-author">
+                                <span>Risk-Modeler</span>
+                                <button class="delete-comment" onclick="removeComment(this, 2)">[X]</button>
+                            </div>
+                            <span class="annotation-quote">"Non-Sufficient Funds Check"</span>
+                            <div>1 NSF event is well below threshold. Cleared within 24 hours. Safe score.</div>
+                        </div>
+                    </div>
+                    <!-- Commentary Interface -->
+                    <div class="comment-input-form">
+                        <input type="text" id="comInput2" class="comment-input" placeholder="Enter annotation feedback for highlighted segment...">
+                        <button class="comment-submit-btn" onclick="addComment(2)">ADD NOTE</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DOCUMENT 3: Corporate credit bureau report -->
+            <div class="document-card" id="doc3" data-id="3">
+                <div class="doc-header">
+                    <div class="doc-meta">
+                        <span class="doc-title">3. Business Credit Report</span>
+                        <span class="doc-filename">CRD-BUR-DB-REPORT.PDF</span>
+                    </div>
+                    <span class="status-badge pending" id="docBadge3">Pending Review</span>
+                </div>
+
+                <!-- Individual Decision Action Tray -->
+                <div class="action-tray">
+                    <button class="tray-btn tray-btn-approve" onclick="setDocStatus(3, 'approved')">✔ Approve</button>
+                    <button class="tray-btn tray-btn-revision" onclick="setDocStatus(3, 'needs-revision')">⚠ Revision</button>
+                    <button class="tray-btn tray-btn-reject" onclick="setDocStatus(3, 'rejected')">✖ Reject</button>
+                </div>
+
+                <!-- Internal Simulated PDF Document Body -->
+                <div class="doc-viewer">
+                    <h3>Commercial Scorecard Verification</h3>
+                    <p class="highlightable" data-ref="Dun & Bradstreet Paydex" onclick="selectPara(this, 3)"><strong>Dun & Bradstreet Paydex Score:</strong> Experian and D&B metrics generate an active Paydex ranking of 74, matching standard commercial trade timelines.</p>
+
+                    <p class="highlightable" data-ref="Trade Line Quantities" onclick="selectPara(this, 3)"><strong>Trade Lines Activated:</strong> Entity currently maintains 6 active verified trade lines. High credit balance extended equals $85,000.</p>
+
+                    <p class="highlightable" data-ref="UCC-1 Filings Search" onclick="selectPara(this, 3)"><strong>UCC-1 Financing Statements:</strong> Search reports 1 active UCC-1 filing listed by factoring provider in early 2022. <span style="text-decoration: underline; color: var(--accent-magenta);">Required validation checks on termination parameters.</span></p>
+
+                    <p class="highlightable" data-ref="Corporate Bankruptcy Registry" onclick="selectPara(this, 3)"><strong>Corporate Risk Rating:</strong> Hazard indicator scale registers "Very Low Risk." No indicators of state restructuring filings identified.</p>
+                </div>
+
+                <!-- Card Annotation Feed -->
+                <div class="annotation-area">
+                    <div class="annotation-header">
+                        <span>Friction Comments</span>
+                        <span id="commentCount3">0 Notes</span>
+                    </div>
+                    <div class="annotations-list" id="annList3">
+                        <!-- Empty initially to demonstrate interactive dynamic notes -->
+                    </div>
+                    <!-- Commentary Interface -->
+                    <div class="comment-input-form">
+                        <input type="text" id="comInput3" class="comment-input" placeholder="Enter annotation feedback for highlighted segment...">
+                        <button class="comment-submit-btn" onclick="addComment(3)">ADD NOTE</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- WORKSPACE GUIDELINES SECTION -->
+        <section class="workspace-instructions">
+            <h2>Underwriting Board Guidelines</h2>
+            <p>Ensure high-impact accuracy when assessing commercial debt structures. Annotation logs are preserved directly inside the transactional review feed for subsequent secondary approval routing.</p>
+            <div class="instruction-steps">
+                <div class="step-card">
+                    <div class="step-num">01</div>
+                    <h4>Isolate Core Metrics</h4>
+                    <p>Select relevant segments in the viewers above to trigger target-specific context threads instantly.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">02</div>
+                    <h4>Log Annotations</h4>
+                    <p>Enter compliance commentary, request tax verifications, and alert brokers directly from each document pane.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">03</div>
+                    <h4>Define Package State</h4>
+                    <p>Toggle approval actions on all 3 components. When the metrics hit 100% verified state, click "Submit compliance package."</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer>
+            <p>&copy; 2024 FINTECH UTILITY. CLOUD INTEGRATION WITH MULTI-SOURCE CREDIT AGGREGATOR ENGINE.</p>
+        </footer>
+    </div>
+
+    <!-- TOAST NOTIFICATIONS -->
+    <div class="toast-notification" id="toast">
+        <span class="toast-icon">⚡</span>
+        <div class="toast-content">
+            <h5 id="toastTitle">Document State Updated</h5>
+            <p id="toastMessage">Modification registered on active audit ledger.</p>
+        </div>
+    </div>
+
+    <!-- CORE WORKSPACE SCRIPT -->
+    <script>
+        // Track states of 3 documents: pending, approved, needs-revision, rejected
+        const docStates = {
+            1: 'needs-revision',
+            2: 'approved',
+            3: 'pending'
+        };
+
+        // Active highlighted text reference per document card
+        const selectedQuote = {
+            1: '',
+            2: '',
+            3: ''
+        };
+
+        // DOM elements cache
+        const progressPct = document.getElementById('progressPct');
+        const progressRatio = document.getElementById('progressRatio');
+        const toast = document.getElementById('toast');
+
+        // Initialize status calculation on boot
+        updateMasterStatus();
+
+        // Sets dynamic status state for specific document card
+        function setDocStatus(docId, state) {
+            docStates[docId] = state;
+
+            // Manage visual class additions to card
+            const card = document.getElementById(`doc${docId}`);
+            card.className = `document-card ${state}`;
+
+            // Update Header Status Badge
+            const badge = document.getElementById(`docBadge${docId}`);
+            badge.className = `status-badge ${state}`;
+            badge.innerText = state.replace('-', ' ');
+
+            // Set button statuses inside Tray
+            const trayButtons = card.querySelectorAll('.tray-btn');
+            trayButtons.forEach(btn => btn.classList.remove('active'));
+
+            const mapping = {
+                'approved': '.tray-btn-approve',
+                'needs-revision': '.tray-btn-revision',
+                'rejected': '.tray-btn-reject'
+            };
+            if (mapping[state]) {
+                card.querySelector(mapping[state]).classList.add('active');
+            }
+
+            // Fire System Alert Toast
+            showToast(
+                `Document ${docId} Modified`, 
+                `State registered successfully as: ${state.toUpperCase()}`
+            );
+
+            updateMasterStatus();
+        }
+
+        // Global state tally
+        function updateMasterStatus() {
+            const keys = Object.keys(docStates);
+            const total = keys.length;
+            const approvedCount = keys.filter(k => docStates[k] === 'approved').length;
+            const percentage = Math.round((approvedCount / total) * 100);
+
+            progressPct.innerText = `${percentage}%`;
+            progressRatio.innerText = `${approvedCount} / ${total} APPROVED`;
+        }
+
+        // Handle simulated paragraph selections and highlight state
+        function selectPara(element, docId) {
+            // Remove previous active highlights in this document's scope
+            const siblingParagraphs = element.closest('.doc-viewer').querySelectorAll('.highlightable');
+            siblingParagraphs.forEach(p => p.classList.remove('active-highlight'));
+
+            // Toggle / apply highlight
+            element.classList.add('active-highlight');
+
+            // Cache quote target
+            const refTag = element.dataset.ref;
+            selectedQuote[docId] = refTag;
+
+            // Focus on commentary entry input
+            const inputField = document.getElementById(`comInput${docId}`);
+            inputField.placeholder = `Add note for "${refTag}"...`;
+            inputField.focus();
+        }
+
+        // Handle adding custom annotations/comments
+        function addComment(docId) {
+            const inputField = document.getElementById(`comInput${docId}`);
+            const commentVal = inputField.value.trim();
+
+            if (!commentVal) {
+                alert("Please type a feedback message before submission.");
+                return;
+            }
+
+            const quote = selectedQuote[docId] || "General Context";
+            const feedContainer = document.getElementById(`annList${docId}`);
+
+            // Construct new dynamic HTML comment entity
+            const commentBlock = document.createElement('div');
+            commentBlock.className = 'annotation-item';
+            commentBlock.innerHTML = `
+                <div class="annotation-author">
+                    <span>Reviewer-Agent</span>
+                    <button class="delete-comment" onclick="removeComment(this, ${docId})">[X]</button>
+                </div>
+                <span class="annotation-quote">"${quote}"</span>
+                <div>${commentVal}</div>
+            `;
+
+            feedContainer.appendChild(commentBlock);
+            inputField.value = ''; // clear
+            inputField.placeholder = "Enter annotation feedback for highlighted segment...";
+
+            // Scroll comment feed to latest feedback
+            feedContainer.scrollTop = feedContainer.scrollHeight;
+
+            // Reset selection highlights visual triggers
+            const siblingParagraphs = document.getElementById(`doc${docId}`).querySelectorAll('.highlightable');
+            siblingParagraphs.forEach(p => p.classList.remove('active-highlight'));
+            selectedQuote[docId] = '';
+
+            updateCommentCount(docId);
+            showToast("Comment Logged", "Verification feedback captured successfully.");
+        }
+
+        // Delete annotation entry
+        function removeComment(element, docId) {
+            const targetItem = element.closest('.annotation-item');
+            targetItem.remove();
+            updateCommentCount(docId);
+            showToast("Comment Removed", "Log index updated.");
+        }
+
+        // Keeps counter values synchronized on panel tags
+        function updateCommentCount(docId) {
+            const feedContainer = document.getElementById(`annList${docId}`);
+            const totalItems = feedContainer.querySelectorAll('.annotation-item').length;
+            document.getElementById(`commentCount${docId}`).innerText = `${totalItems} Note${totalItems === 1 ? '' : 's'}`;
+        }
+
+        // Simulated audit deployment submission
+        function submitGlobalAudit() {
+            const states = Object.values(docStates);
+            const total = states.length;
+            const approved = states.filter(s => s === 'approved').length;
+
+            if (approved < total) {
+                alert(`WARNING: Currently only ${approved} of ${total} documents are set to "Approved". Verify all risk parameters before compiling final submission packages.`);
+            } else {
+                showToast("Audit Deployment Initiated", "Compliance ledger pushed directly to secondary approval team.", true);
+                alert("SUCCESS: The comprehensive compliance package has been successfully structured, locked, and deployed to active capital underwriters.");
+            }
+        }
+
+        // Dynamic visual notification controller
+        function showToast(title, message, persistentColor = false) {
+            const toastTitle = document.getElementById('toastTitle');
+            const toastMessage = document.getElementById('toastMessage');
+
+            toastTitle.innerText = title;
+            toastMessage.innerText = message;
+
+            if(persistentColor) {
+                toast.style.boxShadow = '6px 6px 0px var(--accent-cyan)';
+            } else {
+                toast.style.boxShadow = '6px 6px 0px var(--accent-green)';
+            }
+
+            toast.style.display = 'flex';
+
+            // Automatic dismiss after interval timeout window
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
+```

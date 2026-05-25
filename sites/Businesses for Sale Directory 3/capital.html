@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAPITAL VAULT | OXIDIZED LEDGER Financing Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --obsidian: #050505;
+            --bone: #F5F5F0;
+            --acid-green: #C1FF00;
+            --oxidized-copper: #8E593E;
+            --blood-orange: #FF3D00;
+            --graphite: #1A1A1A;
+            --panel: #0F0F0F;
+            --border-width: 2px;
+            --noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--obsidian);
+            color: var(--bone);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.4;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--noise);
+            opacity: 0.04;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: var(--border-width) solid var(--graphite);
+            background: var(--obsidian);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-weight: 900;
+            font-size: 1.5rem;
+            letter-spacing: -1px;
+            color: var(--bone);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span { color: var(--oxidized-copper); }
+
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a {
+            color: var(--bone);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .nav-links a:hover { color: var(--acid-green); }
+
+        /* Hero */
+        .vault-hero {
+            padding: 6rem 2rem;
+            border-bottom: var(--border-width) solid var(--graphite);
+            background: linear-gradient(to bottom, #0a0a0a, var(--obsidian));
+        }
+
+        .label-tag {
+            color: var(--acid-green);
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        h1 {
+            font-size: clamp(3rem, 7vw, 5rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        /* Calculator Section */
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 2px;
+            background: var(--graphite);
+            border: var(--border-width) solid var(--graphite);
+            margin: 4rem 0;
+        }
+
+        .calc-panel {
+            background: var(--obsidian);
+            padding: 3rem;
+        }
+
+        .calc-display {
+            background: #080808;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .calc-display::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(193, 255, 0, 0.03) 3px);
+            pointer-events: none;
+        }
+
+        .input-group {
+            margin-bottom: 2rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.7rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .input-group input {
+            width: 100%;
+            background: var(--panel);
+            border: 1px solid var(--graphite);
+            color: var(--bone);
+            padding: 1rem;
+            font-family: 'JetBrains Mono';
+            font-size: 1.2rem;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: var(--acid-green);
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .result-label {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .result-value {
+            font-family: 'JetBrains Mono';
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--acid-green);
+        }
+
+        .result-value.warning { color: var(--blood-orange); }
+
+        /* Lender Directory */
+        .section-header {
+            padding: 4rem 2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .lender-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            padding: 0 2rem 4rem;
+            gap: 2rem;
+        }
+
+        .lender-card {
+            border: var(--border-width) solid var(--graphite);
+            padding: 2rem;
+            background: var(--panel);
+            transition: all 0.2s;
+        }
+
+        .lender-card:hover {
+            border-color: var(--oxidized-copper);
+        }
+
+        .lender-type {
+            font-size: 0.6rem;
+            padding: 0.2rem 0.5rem;
+            background: var(--graphite);
+            color: var(--oxidized-copper);
+            font-weight: 900;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .lender-name {
+            font-size: 1.5rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+        }
+
+        .criteria-list {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .criteria-list li {
+            font-size: 0.8rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #1a1a1a;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .criteria-list li span:first-child { color: #666; }
+
+        /* Deal Memos */
+        .memo-section {
+            padding: 6rem 2rem;
+            background: var(--bone);
+            color: var(--obsidian);
+        }
+
+        .memo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .memo-download {
+            border: 2px solid var(--obsidian);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 250px;
+        }
+
+        .memo-download:hover {
+            background: var(--obsidian);
+            color: var(--bone);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-decoration: none;
+            font-size: 0.8rem;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid currentColor;
+            transition: all 0.2s;
+        }
+
+        .btn-acid { background: var(--acid-green); color: var(--obsidian); border-color: var(--acid-green); }
+        .btn-black { background: var(--obsidian); color: var(--bone); }
+
+        @media (max-width: 900px) {
+            .calculator-grid { grid-template-columns: 1fr; }
+            .memo-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 3rem; }
+        }
+
+        footer {
+            padding: 4rem 2rem;
+            border-top: var(--border-width) solid var(--graphite);
+            font-family: 'JetBrains Mono';
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">OXIDIZED<span>LEDGER</span></a>
+        <div class="nav-links">
+            <a href="#">Browse Deals</a>
+            <a href="#">Deal Analyzer</a>
+            <a href="#">Seller Financing</a>
+            <a href="#">Submit Listing</a>
+            <a href="capital.html" style="color: var(--acid-green);">Capital Vault</a>
+        </div>
+        <div class="mono" style="font-size: 0.7rem;">Vault Status: <span style="color: var(--acid-green);">Encrypted</span></div>
+    </nav>
+
+    <section class="vault-hero">
+        <span class="label-tag mono">// ACQUISITION CAPITAL VAULT</span>
+        <h1>Leverage is the Engine. Diligence is the Brake.</h1>
+        <p style="max-width: 600px; color: #888;">The centralized terminal for acquisition financing. Calculate debt capacity, access verified SBA lenders, and download bank-ready deal memo templates.</p>
+
+        <div class="calculator-grid">
+            <div class="calc-panel">
+                <h3 class="mono" style="margin-bottom: 2rem; color: var(--oxidized-copper);">Leverage Parameters</h3>
+                
+                <div class="input-group">
+                    <label class="mono">Total Purchase Price ($)</label>
+                    <input type="number" id="price" value="1500000" oninput="calculate()">
+                </div>
+
+                <div class="input-group">
+                    <label class="mono">Annual SDE / Cash Flow ($)</label>
+                    <input type="number" id="sde" value="450000" oninput="calculate()">
+                </div>
+
+                <div class="input-group">
+                    <label class="mono">Down Payment (%)</label>
+                    <input type="number" id="down" value="10" oninput="calculate()">
+                </div>
+
+                <div class="input-group">
+                    <label class="mono">Interest Rate (%) - Standard SBA 7a</label>
+                    <input type="number" id="rate" value="11.25" step="0.25" oninput="calculate()">
+                </div>
+            </div>
+
+            <div class="calc-display">
+                <h3 class="mono" style="margin-bottom: 2rem;">Debt Service Analysis</h3>
+                
+                <div class="result-row">
+                    <span class="result-label mono">Total Loan Amount</span>
+                    <span class="result-value" id="loanAmount">$1,350,000</span>
+                </div>
+
+                <div class="result-row">
+                    <span class="result-label mono">Annual Debt Service</span>
+                    <span class="result-value" id="debtService" style="color: var(--blood-orange);">$188,400</span>
+                </div>
+
+                <div class="result-row">
+                    <span class="result-label mono">Post-Debt Cash Flow</span>
+                    <span class="result-value" id="postCash">$261,600</span>
+                </div>
+
+                <div class="result-row">
+                    <span class="result-label mono">DSCR (Min 1.25 Required)</span>
+                    <span class="result-value" id="dscr">2.39x</span>
+                </div>
+
+                <div class="result-row" style="border: none;">
+                    <span class="result-label mono">Cash-on-Cash Return</span>
+                    <span class="result-value" id="coc" style="font-size: 2.5rem;">174%</span>
+                </div>
+
+                <div style="margin-top: 2rem; padding: 1rem; border: 1px dashed #333;">
+                    <p class="mono" style="font-size: 0.65rem; color: #555;">TERMINAL LOG: CALCULATIONS BASED ON 10-YEAR SBA MATURITY. INTEREST RATES SUBJECT TO FED REVISIONS. CONSULT LENDER FOR BINDING TERMS.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-header">
+        <div>
+            <span class="label-tag mono">// DIRECTORY</span>
+            <h2 class="mono" style="font-size: 2rem;">Verified Lending Partners</h2>
+        </div>
+        <div class="mono" style="font-size: 0.8rem; color: #666;">Filter: [ALL PARTNERS]</div>
+    </div>
+
+    <div class="lender-grid">
+        <div class="lender-card">
+            <span class="lender-type mono">SBA Preferred</span>
+            <h3 class="lender-name">Ironwood Capital</h3>
+            <ul class="criteria-list mono">
+                <li><span>Min SDE</span><span>$200k</span></li>
+                <li><span>Max Loan</span><span>$5.0M</span></li>
+                <li><span>Target Sector</span><span>Industrial / HVAC</span></li>
+                <li><span>Nationwide</span><span>Yes</span></li>
+            </ul>
+            <a href="#" class="btn btn-acid" style="width: 100%;">Connect with BDO</a>
+        </div>
+
+        <div class="lender-card">
+            <span class="lender-type mono">Private Debt</span>
+            <h3 class="lender-name">Obsidian Mezzanine</h3>
+            <ul class="criteria-list mono">
+                <li><span>Min SDE</span><span>$750k</span></li>
+                <li><span>Max Loan</span><span>$25.0M</span></li>
+                <li><span>Target Sector</span><span>SaaS / Recurring</span></li>
+                <li><span>Nationwide</span><span>Yes</span></li>
+            </ul>
+            <a href="#" class="btn btn-acid" style="width: 100%;">Submit Teaser</a>
+        </div>
+
+        <div class="lender-card">
+            <span class="lender-type mono">Asset Based</span>
+            <h3 class="lender-name">Forge & Foundry</h3>
+            <ul class="criteria-list mono">
+                <li><span>Min SDE</span><span>$150k</span></li>
+                <li><span>Max Loan</span><span>$2.5M</span></li>
+                <li><span>Target Sector</span><span>Manufacturing</span></li>
+                <li><span>Nationwide</span><span>Regional</span></li>
+            </ul>
+            <a href="#" class="btn btn-acid" style="width: 100%;">Inquire Now</a>
+        </div>
+    </div>
+
+    <section class="memo-section">
+        <span class="label-tag mono" style="color: var(--oxidized-copper);">// RESOURCES</span>
+        <h2 style="font-size: 3rem; text-transform: uppercase; font-weight: 900;">Bank-Ready Templates.</h2>
+        <p class="mono">Don't pitch with a spreadsheet. Pitch with a narrative.</p>
+
+        <div class="memo-grid">
+            <div class="memo-download">
+                <div>
+                    <h3 class="mono">01. The Executive Summary</h3>
+                    <p style="margin-top: 1rem; font-size: 0.9rem;">A 2-page high-level overview designed to get past the initial gatekeeper at SBA banks.</p>
+                </div>
+                <a href="#" class="btn btn-black">Download PDF</a>
+            </div>
+
+            <div class="memo-download">
+                <div>
+                    <h3 class="mono">02. Debt Narrative Template</h3>
+                    <p style="margin-top: 1rem; font-size: 0.9rem;">The "Why" behind the numbers. Explain the moat, the transition plan, and the mitigation of risks.</p>
+                </div>
+                <a href="#" class="btn btn-black">Download DOCX</a>
+            </div>
+
+            <div class="memo-download">
+                <div>
+                    <h3 class="mono">03. Source & Use Sheet</h3>
+                    <p style="margin-top: 1rem; font-size: 0.9rem;">Precision tracking of where every dollar of debt and equity is going. Mandatory for closing.</p>
+                </div>
+                <a href="#" class="btn btn-black">Download XLSX</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 2rem;">
+            <div>
+                <a href="#" class="logo">OXIDIZED<span>LEDGER</span></a>
+                <p style="margin-top: 1rem; color: #666; font-size: 0.8rem;">Acquisition Financing Terminal v4.0</p>
+            </div>
+            <div class="nav-links" style="flex-direction: column; gap: 0.5rem;">
+                <a href="index.html">Browse Deals</a>
+                <a href="#">Capital Vault</a>
+                <a href="#">Deal Analyzer</a>
+                <a href="#">Terms of Service</a>
+            </div>
+            <div style="text-align: right;">
+                <p class="mono" style="font-size: 0.8rem;">System Status: Secure</p>
+                <p class="mono" style="font-size: 0.8rem; color: #444;">&copy; 2024 Oxidized Ledger Inc.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function formatCurrency(num) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(num);
+        }
+
+        function calculate() {
+            const price = parseFloat(document.getElementById('price').value) || 0;
+            const sde = parseFloat(document.getElementById('sde').value) || 0;
+            const downPercent = parseFloat(document.getElementById('down').value) || 0;
+            const rate = (parseFloat(document.getElementById('rate').value) || 0) / 100;
+
+            const downPayment = price * (downPercent / 100);
+            const loanAmount = price - downPayment;
+            
+            // Monthly payment calc (10 years / 120 months)
+            const monthlyRate = rate / 12;
+            const months = 120;
+            const monthlyPayment = (loanAmount * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -months));
+            const annualDebtService = monthlyPayment * 12;
+
+            const postCash = sde - annualDebtService;
+            const dscr = sde / annualDebtService;
+            const coc = (postCash / downPayment) * 100;
+
+            document.getElementById('loanAmount').innerText = formatCurrency(loanAmount);
+            document.getElementById('debtService').innerText = formatCurrency(annualDebtService);
+            document.getElementById('postCash').innerText = formatCurrency(postCash);
+            document.getElementById('dscr').innerText = dscr.toFixed(2) + 'x';
+            document.getElementById('coc').innerText = Math.round(coc) + '%';
+
+            // Warning colors
+            const dscrEl = document.getElementById('dscr');
+            if (dscr < 1.25) {
+                dscrEl.style.color = 'var(--blood-orange)';
+            } else {
+                dscrEl.style.color = 'var(--acid-green)';
+            }
+        }
+
+        // Run once on load
+        calculate();
+    </script>
+</body>
+</html></html>

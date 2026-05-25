@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Logs - Person-Finder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #050505;
+            --bg-surface: #0d0d0d;
+            --bg-card: #141414;
+            --border-muted: #222222;
+            --accent-primary: #00ff88;
+            --accent-glow: rgba(0, 255, 136, 0.15);
+            --text-main: #e0e0e0;
+            --text-muted: #707070;
+            --text-dim: #404040;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-sans: 'Inter', sans-serif;
+            --radius: 8px;
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            letter-spacing: -0.01em;
+        }
+
+        .agent-container {
+            width: 100%;
+            max-width: 1100px;
+            height: 800px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-muted);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            display: grid;
+            grid-template-columns: 320px 1fr;
+        }
+
+        /* SIDEBAR: METRICS */
+        .sidebar-nav {
+            padding: 32px;
+            border-right: 1px solid var(--border-muted);
+            background: linear-gradient(180deg, var(--bg-surface) 0%, #0a0a0a 100%);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .back-link {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 32px;
+            transition: var(--transition);
+        }
+
+        .back-link:hover {
+            color: var(--accent-primary);
+        }
+
+        .stats-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-muted);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stats-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+            display: block;
+            letter-spacing: 0.05em;
+        }
+
+        .stats-value {
+            font-family: var(--font-mono);
+            font-size: 24px;
+            color: var(--accent-primary);
+            font-weight: 700;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .target-profile {
+            margin-top: auto;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-muted);
+        }
+
+        .profile-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .profile-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* MAIN CONTENT: LOG ENTRIES */
+        .log-view {
+            background: var(--bg-base);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .log-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-surface);
+        }
+
+        .log-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .timestamp-badge {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .log-timeline {
+            padding: 32px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .audit-entry {
+            position: relative;
+            padding-left: 28px;
+            margin-bottom: 40px;
+            border-left: 1px solid var(--border-muted);
+        }
+
+        .audit-entry::before {
+            content: "";
+            position: absolute;
+            left: -5px;
+            top: 0;
+            width: 9px;
+            height: 9px;
+            background: var(--bg-base);
+            border: 2px solid var(--accent-primary);
+            border-radius: 50%;
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .entry-action {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .entry-source {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--accent-primary);
+            background: var(--accent-glow);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .entry-thought {
+            background: var(--bg-card);
+            border: 1px solid var(--border-muted);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .thought-label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: block;
+            text-transform: uppercase;
+        }
+
+        .thought-text {
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--text-main);
+        }
+
+        .query-block {
+            background: #000;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: #888;
+            border-left: 3px solid var(--text-dim);
+            margin-top: 10px;
+        }
+
+        .query-block span {
+            color: var(--accent-primary);
+        }
+
+        .result-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 12px;
+        }
+
+        .status-success { color: var(--accent-primary); }
+        .status-fail { color: #ff4444; }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-muted); border-radius: 10px; }
+
+        @media (max-width: 900px) {
+            .agent-container { grid-template-columns: 1fr; height: auto; }
+            .sidebar-nav { border-right: none; border-bottom: 1px solid var(--border-muted); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="agent-container">
+        <aside class="sidebar-nav">
+            <a href="#" class="back-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                BACK TO SEARCH
+            </a>
+
+            <div class="stats-card">
+                <span class="stats-label">Confidence Score</span>
+                <div class="stats-value">94%</div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stats-card">
+                    <span class="stats-label">Queries</span>
+                    <div class="stats-value" style="font-size: 18px;">18</div>
+                </div>
+                <div class="stats-card">
+                    <span class="stats-label">Sources</span>
+                    <div class="stats-value" style="font-size: 18px;">06</div>
+                </div>
+            </div>
+
+            <div class="target-profile">
+                <div class="profile-name">Aura Design Studio</div>
+                <div class="profile-sub">Brooklyn, NY</div>
+                <div class="profile-sub" style="margin-top: 8px; font-family: var(--font-mono); font-size: 10px; color: var(--accent-primary);">ID: SRC-9902-X</div>
+            </div>
+        </aside>
+
+        <main class="log-view">
+            <div class="log-header">
+                <div class="log-title">Audit Trail: Reasoning Steps</div>
+                <div class="timestamp-badge">SESSION_START: 2023-10-24 14:02:01</div>
+            </div>
+
+            <div class="log-timeline">
+                <!-- Entry 1 -->
+                <div class="audit-entry">
+                    <div class="entry-header">
+                        <span class="entry-action">Initial Entity Disambiguation</span>
+                        <span class="entry-source">INTERNAL_ENGINE</span>
+                    </div>
+                    <div class="entry-thought">
+                        <span class="thought-label">Agent Logic</span>
+                        <p class="thought-text">Target "Aura Design Studio" has multiple matches in NY. Filtering by provided phone prefix (718) and industry "Interior Design" to isolate the correct legal entity.</p>
+                        <div class="query-block">
+                            RESOLVE entity_name=<span>"Aura Design Studio"</span> location=<span>"Brooklyn"</span>
+                        </div>
+                    </div>
+                    <div class="result-pill">
+                        <span class="status-success">●</span> Validated: Aura Design NY LLC (Reg #449210)
+                    </div>
+                </div>
+
+                <!-- Entry 2 -->
+                <div class="audit-entry">
+                    <div class="entry-header">
+                        <span class="entry-action">Executive Extraction (High Precision)</span>
+                        <span class="entry-source">GOOGLE_DORK_V2</span>
+                    </div>
+                    <div class="entry-thought">
+                        <span class="thought-label">Agent Logic</span>
+                        <p class="thought-text">Standard scraping failed to identify a 'Founder' title on the homepage. Escalating to advanced search operators to find press releases or legal filings mentioning ownership.</p>
+                        <div class="query-block">
+                            site:linkedin.com/in/* <span>"Aura Design Studio"</span> (Owner OR Founder OR Principal)
+                        </div>
+                    </div>
+                    <div class="result-pill">
+                        <span class="status-success">●</span> Identified: <strong>Marcus Thorne</strong> (Principal Architect)
+                    </div>
+                </div>
+
+                <!-- Entry 3 -->
+                <div class="audit-entry">
+                    <div class="entry-header">
+                        <span class="entry-action">Social Verification Cross-Check</span>
+                        <span class="entry-source">FACEBOOK_GRAPH</span>
+                    </div>
+                    <div class="entry-thought">
+                        <span class="thought-label">Agent Logic</span>
+                        <p class="thought-text">Cross-referencing Marcus Thorne with official business pages to ensure role active status. Checking for recent posts or mentions by the business account.</p>
+                    </div>
+                    <div class="result-pill">
+                        <span class="status-success">●</span> Confirmed: Subject tagged as "Our Founder" in post dated Oct 12, 2023.
+                    </div>
+                </div>
+
+                <!-- Entry 4 -->
+                <div class="audit-entry" style="border-left-color: var(--text-dim); margin-bottom: 0;">
+                    <div class="entry-header">
+                        <span class="entry-action" style="color: var(--text-muted)">Contact Data Enrichment</span>
+                        <span class="entry-source" style="background: var(--text-dim); color: var(--bg-base);">LUSH_API</span>
+                    </div>
+                    <div class="entry-thought" style="opacity: 0.6;">
+                        <span class="thought-label">Agent Logic</span>
+                        <p class="thought-text">Attempting to map professional email pattern based on discovered domain @auradesign.io. Validating via SMTP handshake.</p>
+                    </div>
+                    <div class="result-pill">
+                        <span class="status-fail">○</span> Pattern {f}{last} failed. Retrying {first}@...
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

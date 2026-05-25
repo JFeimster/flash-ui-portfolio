@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outreach Status Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0c10;
+            --bg-card: #11141b;
+            --border: #1f242d;
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.5);
+            --text-main: #e2e8f0;
+            --text-dim: #94a3b8;
+            --accent: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --input-bg: #07090d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .agent-container {
+            width: 100%;
+            max-width: 1100px;
+            height: 720px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Sidebar Stats */
+        .sidebar {
+            background: rgba(0, 0, 0, 0.2);
+            border-right: 1px solid var(--border);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .logo-box {
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .logo-box svg {
+            width: 20px;
+            height: 20px;
+            stroke: white;
+            fill: none;
+        }
+
+        .brand-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: -0.5px;
+        }
+
+        .stat-widget {
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .stat-sub {
+            font-size: 0.75rem;
+            margin-top: 4px;
+        }
+
+        /* Main Panel */
+        .main-panel {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            padding: 0;
+        }
+
+        .status-bar {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            overflow: hidden;
+        }
+
+        /* Outreach Log */
+        .outreach-log {
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .log-entry {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px 18px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .log-entry:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .entry-info h4 {
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+
+        .entry-info p {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .status-pill {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+
+        .pill-replied { background: rgba(16, 185, 129, 0.1); color: var(--accent); }
+        .pill-sent { background: rgba(59, 130, 246, 0.1); color: var(--primary); }
+        .pill-blocked { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+
+        /* Analytics Panel */
+        .analytics-panel {
+            border-left: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.15);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .panel-section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 12px;
+        }
+
+        .role-rate-item {
+            margin-bottom: 16px;
+        }
+
+        .role-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: 6px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+        }
+
+        .prevention-alert {
+            background: rgba(245, 158, 11, 0.05);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 6px;
+            padding: 12px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .prevention-alert svg {
+            color: var(--warning);
+            flex-shrink: 0;
+        }
+
+        .alert-text {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            line-height: 1.4;
+        }
+
+        .alert-text strong {
+            color: var(--text-main);
+        }
+
+        .btn-sync {
+            margin-top: auto;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-sync:hover {
+            background: var(--border);
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="agent-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="header-brand">
+                <div class="logo-box">
+                    <svg viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
+                    </svg>
+                </div>
+                <span class="brand-title">Outreach-Tracker</span>
+            </div>
+
+            <div class="stat-widget">
+                <div class="stat-label">Total Outbound</div>
+                <div class="stat-value">1,284</div>
+                <div class="stat-sub" style="color: var(--accent)">+12% from last week</div>
+            </div>
+
+            <div class="stat-widget">
+                <div class="stat-label">Avg. Response Rate</div>
+                <div class="stat-value">18.4%</div>
+                <div class="stat-sub" style="color: var(--primary)">High: Managers (24%)</div>
+            </div>
+
+            <div class="stat-widget">
+                <div class="stat-label">Duplicates Blocked</div>
+                <div class="stat-value">42</div>
+                <div class="stat-sub" style="color: var(--text-dim)">Global suppression list</div>
+            </div>
+
+            <button class="btn-sync">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Sync Email Logs
+            </button>
+        </aside>
+
+        <!-- Main Panel -->
+        <main class="main-panel">
+            <div class="status-bar">
+                <div class="status-indicator">
+                    <div class="dot"></div>
+                    <span>TRACKER STATUS: <span style="color:var(--primary)">SYNCED & READY</span></span>
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-dim); font-family: 'JetBrains Mono'">
+                    LOG_SEQ: 4402-TRK
+                </div>
+            </div>
+
+            <div class="workspace">
+                <!-- Outreach List -->
+                <div class="outreach-log">
+                    <div class="log-entry">
+                        <div class="entry-info">
+                            <h4>Sarah Jenkins</h4>
+                            <p>Operations Director @ Acme Corp • Contacted 2h ago</p>
+                        </div>
+                        <div class="status-pill pill-sent">Sent</div>
+                    </div>
+
+                    <div class="log-entry">
+                        <div class="entry-info">
+                            <h4>Michael Chen</h4>
+                            <p>Founder @ DevFlow Inc • Replied 4h ago</p>
+                        </div>
+                        <div class="status-pill pill-replied">Replied</div>
+                    </div>
+
+                    <div class="log-entry" style="border-color: rgba(239, 68, 68, 0.3)">
+                        <div class="entry-info">
+                            <h4>Marcus Thorne</h4>
+                            <p>CEO @ Thorne Logistics • Duplicate Match Found</p>
+                        </div>
+                        <div class="status-pill pill-blocked">Blocked</div>
+                    </div>
+
+                    <div class="log-entry">
+                        <div class="entry-info">
+                            <h4>Elena Rodriguez</h4>
+                            <p>General Manager @ Sunstone • Contacted 1d ago</p>
+                        </div>
+                        <div class="status-pill pill-sent">Sent</div>
+                    </div>
+
+                    <div class="log-entry">
+                        <div class="entry-info">
+                            <h4>info@venture-labs.io</h4>
+                            <p>General Inbox • Contacted 2d ago</p>
+                        </div>
+                        <div class="status-pill pill-sent">Sent</div>
+                    </div>
+
+                    <div class="log-entry">
+                        <div class="entry-info">
+                            <h4>David Wu</h4>
+                            <p>Operations Manager @ Peak • Replied 3d ago</p>
+                        </div>
+                        <div class="status-pill pill-replied">Replied</div>
+                    </div>
+                </div>
+
+                <!-- Right Analytics Panel -->
+                <div class="analytics-panel">
+                    <div class="section">
+                        <div class="panel-section-title">Success by Role</div>
+                        
+                        <div class="role-rate-item">
+                            <div class="role-meta">
+                                <span>Managers</span>
+                                <span style="color: var(--accent)">24%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 24%; background: var(--accent)"></div>
+                            </div>
+                        </div>
+
+                        <div class="role-rate-item">
+                            <div class="role-meta">
+                                <span>Founders/CEOs</span>
+                                <span style="color: var(--primary)">16%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 16%"></div>
+                            </div>
+                        </div>
+
+                        <div class="role-rate-item">
+                            <div class="role-meta">
+                                <span>Info@ Aliases</span>
+                                <span style="color: var(--danger)">3%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 3%; background: var(--danger)"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="panel-section-title">Duplicate Prevention</div>
+                        <div class="prevention-alert">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <div class="alert-text">
+                                <strong>Marcus Thorne</strong> was suppressed. Outreach was already completed by <strong>Agent-B4</strong> on 2023-10-12.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section" style="margin-top: auto;">
+                        <div class="panel-section-title">System Log</div>
+                        <div style="font-family: 'JetBrains Mono'; font-size: 0.65rem; color: #4ade80; background: #000; padding: 10px; border-radius: 4px; border: 1px solid var(--border);">
+                            <div>> Checking sequence: TRK-09</div>
+                            <div>> Mapping leads to DB...</div>
+                            <div>> 0 duplicates found in queue</div>
+                            <div style="opacity: 0.5">> Idle...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html></html>

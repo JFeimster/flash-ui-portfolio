@@ -1,0 +1,507 @@
+/* Onboarding Portal Layout & Structure */
+.onboarding-container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+/* Step Progress Wizard Tracker */
+.step-tracker {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-glow-primary);
+    border-radius: 16px;
+    padding: 24px 32px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.step-tracker::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 48px;
+    right: 48px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.05);
+    z-index: 1;
+    transform: translateY(-50%);
+}
+
+.step-tracker-line-fill {
+    position: absolute;
+    top: 50%;
+    left: 48px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent-cobalt), var(--accent-cyan));
+    z-index: 2;
+    transform: translateY(-50%);
+    transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    width: 0%;
+}
+
+.step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    z-index: 3;
+    cursor: pointer;
+}
+
+.step-node {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-base);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-muted);
+    transition: var(--transition-smooth);
+}
+
+.step-item.active .step-node {
+    border-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+    background: rgba(6, 182, 212, 0.1);
+}
+
+.step-item.completed .step-node {
+    border-color: var(--accent-emerald);
+    color: var(--accent-emerald);
+    background: rgba(16, 185, 129, 0.15);
+}
+
+.step-meta {
+    text-align: center;
+}
+
+.step-label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    transition: var(--transition-smooth);
+}
+
+.step-item.active .step-label {
+    color: var(--text-primary);
+}
+
+.step-item.completed .step-label {
+    color: var(--accent-emerald);
+}
+
+.step-sublabel {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+}
+
+/* Step Panels Manager */
+.step-panel {
+    display: none;
+    animation: fadeSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.step-panel.active {
+    display: block;
+}
+
+/* Interactive Integrations Grid */
+.integration-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+    margin-bottom: 24px;
+}
+
+.integration-card {
+    background: var(--bg-surface);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 180px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition-smooth);
+}
+
+.integration-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent-cyan), var(--accent-prism-violet));
+    opacity: 0;
+    transition: var(--transition-smooth);
+}
+
+.integration-card:hover {
+    border-color: var(--border-glow-primary);
+    transform: translateY(-2px);
+    background: var(--bg-surface-elevated);
+}
+
+.integration-card:hover::before {
+    opacity: 1;
+}
+
+.integration-card.connected {
+    border-color: rgba(16, 185, 129, 0.3);
+    background: rgba(10, 30, 20, 0.3);
+}
+
+.integration-card.connected::before {
+    background: var(--accent-emerald);
+    opacity: 1;
+}
+
+.integration-brand {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.integration-logo-wrapper {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-smooth);
+}
+
+.integration-card:hover .integration-logo-wrapper {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: var(--accent-cyan);
+}
+
+.integration-logo-wrapper svg {
+    width: 24px;
+    height: 24px;
+}
+
+.integration-info h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.integration-info p {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.integration-status-pill {
+    font-size: 10px;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    align-self: flex-start;
+}
+
+.status-disconnected {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.status-connecting {
+    background: rgba(6, 182, 212, 0.1);
+    color: var(--accent-cyan);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+    animation: textPulse 1.5s infinite ease-in-out;
+}
+
+.status-connected {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--accent-emerald);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+/* Onboarding Financial Metrics Inputs */
+.metrics-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+@media (max-width: 768px) {
+    .metrics-form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.metric-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.metric-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.metric-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
+.metric-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+}
+
+.metric-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.metric-input-prefix {
+    position: absolute;
+    left: 14px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+.metric-input-field {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 12px 14px;
+    padding-left: 28px;
+    font-size: 14px;
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    outline: none;
+    transition: var(--transition-smooth);
+}
+
+.metric-input-field:focus {
+    border-color: var(--accent-cyan);
+    background: rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 12px rgba(6, 182, 212, 0.15);
+}
+
+/* Ingest Live Analytics Panel */
+.ingest-telemetry-container {
+    background: #020306;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+    margin-top: 24px;
+}
+
+.ingest-header {
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ingest-header-title {
+    font-size: 11px;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: var(--accent-cyan);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ingest-header-dot {
+    width: 6px;
+    height: 6px;
+    background-color: var(--accent-rose);
+    border-radius: 50%;
+}
+
+.ingest-header-dot.active {
+    background-color: var(--accent-emerald);
+    box-shadow: 0 0 8px var(--accent-emerald);
+    animation: networkPulse 1.5s infinite alternate;
+}
+
+.ingest-terminal {
+    padding: 16px;
+    max-height: 200px;
+    overflow-y: auto;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ingest-line {
+    display: flex;
+    gap: 12px;
+}
+
+.ingest-timestamp {
+    color: var(--text-muted);
+}
+
+.ingest-flag {
+    color: var(--accent-prism-violet);
+    font-weight: 700;
+}
+
+.ingest-success {
+    color: var(--accent-emerald);
+}
+
+.ingest-accent {
+    color: var(--accent-cyan);
+}
+
+/* Verification Seals block */
+.verification-stack {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 20px;
+    margin-top: 24px;
+}
+
+.verification-badges-group {
+    display: flex;
+    gap: 12px;
+}
+
+.verification-badge {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 10px;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+/* Keyframes & Animations */
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes textPulse {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 0.4; }
+}
+
+@keyframes networkPulse {
+    from {
+        box-shadow: 0 0 4px var(--accent-emerald);
+    }
+    to {
+        box-shadow: 0 0 12px var(--accent-emerald);
+    }
+}
+
+/* White-Label Theme overrides */
+.white-label-mode .step-tracker {
+    background: var(--bg-surface-elevated);
+    border-color: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.white-label-mode .step-tracker::before {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.white-label-mode .step-node {
+    background: var(--bg-surface);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+.white-label-mode .integration-card {
+    background: var(--bg-surface-elevated);
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+.white-label-mode .integration-logo-wrapper {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+.white-label-mode .metric-input-field {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.12);
+    color: var(--text-primary);
+}
+
+.white-label-mode .metric-input-field:focus {
+    border-color: #000000;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.white-label-mode .ingest-telemetry-container {
+    background: #f5f5f4;
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+.white-label-mode .ingest-header {
+    background: rgba(0, 0, 0, 0.02);
+    border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+.white-label-mode .ingest-terminal {
+    color: var(--text-secondary);
+}
+
+.white-label-mode .verification-badge {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: rgba(0, 0, 0, 0.06);
+}

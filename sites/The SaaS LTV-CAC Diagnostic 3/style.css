@@ -1,0 +1,310 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap');
+
+        :root {
+            --bg: #0a0b10;
+            --surface: #12141c;
+            --border: #232735;
+            --accent: #00f2ff;
+            --accent-dim: rgba(0, 242, 255, 0.1);
+            --danger: #ff4d4d;
+            --success: #00ff9d;
+            --text-main: #e0e0e6;
+            --text-dim: #70758a;
+            --grid-size: 20px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            background-image: 
+                linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: var(--grid-size) var(--grid-size);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .diagnostic-card {
+            width: 100%;
+            max-width: 900px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .diagnostic-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+        }
+
+        /* Header Section */
+        .card-header {
+            padding: 30px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .header-title h1 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+
+        .header-title p {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+
+        .serial-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-align: right;
+            border: 1px solid var(--border);
+            padding: 4px 8px;
+        }
+
+        /* Main Content Grid */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            min-height: 400px;
+        }
+
+        /* Left Panel: Inputs */
+        .inputs-panel {
+            padding: 30px;
+            border-right: 1px solid var(--border);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper span {
+            position: absolute;
+            left: 12px;
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            background: transparent;
+            border: 1px solid var(--border);
+            padding: 12px 12px 12px 30px;
+            color: var(--text-main);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .input-wrapper input:focus {
+            border-color: var(--accent);
+            background: var(--accent-dim);
+        }
+
+        .input-wrapper.percent input {
+            padding-right: 35px;
+        }
+
+        .input-wrapper .suffix {
+            position: absolute;
+            right: 12px;
+            left: auto;
+        }
+
+        /* Right Panel: Visualization */
+        .viz-panel {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .gauge-container {
+            position: relative;
+            width: 300px;
+            height: 150px;
+            overflow: hidden;
+        }
+
+        .gauge-track {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            border: 20px solid var(--border);
+            box-sizing: border-box;
+        }
+
+        .gauge-fill {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            border: 20px solid transparent;
+            border-top-color: var(--accent);
+            border-right-color: var(--accent);
+            box-sizing: border-box;
+            transform: rotate(-45deg);
+            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .needle {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 4px;
+            height: 140px;
+            background: var(--text-main);
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(-90deg);
+            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
+        }
+
+        .needle::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 12px;
+            background: var(--text-main);
+            border-radius: 50%;
+        }
+
+        .viz-meta {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .ratio-value {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: -2px;
+        }
+
+        .ratio-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+
+        .status-badge {
+            margin-top: 20px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-block;
+        }
+
+        .status-healthy { background: rgba(0, 255, 157, 0.1); color: var(--success); border: 1px solid var(--success); }
+        .status-danger { background: rgba(255, 77, 77, 0.1); color: var(--danger); border: 1px solid var(--danger); }
+
+        /* Footer Section */
+        .card-footer {
+            padding: 30px;
+            border-top: 1px solid var(--border);
+            background: rgba(0, 242, 255, 0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cta-message {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .cta-message span {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .blueprint-btn {
+            background: var(--accent);
+            color: var(--bg);
+            border: none;
+            padding: 12px 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+        }
+
+        .blueprint-btn:hover {
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+            transform: translateY(-1px);
+        }
+
+        /* Blueprint Decorations */
+        .corner-accent {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border: 1px solid var(--accent);
+        }
+        .top-left { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+        .top-right { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+        .bottom-left { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+        .bottom-right { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+
+        @media (max-width: 768px) {
+            .grid-container { grid-template-columns: 1fr; }
+            .inputs-panel { border-right: none; border-bottom: 1px solid var(--border); }
+            .card-footer { flex-direction: column; text-align: center; gap: 20px; }
+        }

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Response Sentiment Tracker | Vector Aura</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #030303;
+            --card-bg: rgba(15, 15, 20, 0.7);
+            --border: rgba(255, 255, 255, 0.08);
+            --primary: #8b5cf6;
+            --secondary: #ec4899;
+            --accent: #06b6d4;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --pos: #10b981;
+            --neg: #ef4444;
+            --neu: #f59e0b;
+            --aura-1: rgba(139, 92, 246, 0.15);
+            --aura-2: rgba(6, 182, 212, 0.15);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .aura-blob {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: -1;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .aura-1 { top: -100px; left: -100px; background: var(--aura-1); animation: drift 20s infinite alternate; }
+        .aura-2 { bottom: -100px; right: -100px; background: var(--aura-2); animation: drift 25s infinite alternate-reverse; }
+
+        @keyframes drift {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(100px, 50px) scale(1.1); }
+        }
+
+        .tracker-container {
+            width: 100%;
+            max-width: 1100px;
+            background: var(--card-bg);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+        }
+
+        .db-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .db-title h2 {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .db-title h2 span {
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 10px;
+            border-radius: 6px;
+            color: var(--text-dim);
+            font-weight: 400;
+        }
+
+        .db-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-ghost {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-ghost:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--text-dim);
+        }
+
+        /* Stats Bar */
+        .stats-strip {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            padding: 16px;
+            border-radius: 12px;
+        }
+
+        .stat-item label {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+
+        .stat-item .val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        /* Database Table Style */
+        .db-table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            padding: 12px 16px;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+        }
+
+        td {
+            padding: 16px;
+            font-size: 13px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .sentiment-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .sentiment-tag.positive { background: rgba(16, 185, 129, 0.1); color: var(--pos); }
+        .sentiment-tag.neutral { background: rgba(245, 158, 11, 0.1); color: var(--neu); }
+        .sentiment-tag.negative { background: rgba(239, 68, 68, 0.1); color: var(--neg); }
+
+        .campaign-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+        }
+
+        .roi-indicator {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
+        }
+
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-top: 24px;
+        }
+
+        .pulse-small {
+            width: 8px;
+            height: 8px;
+            background: var(--pos);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--pos);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="aura-blob aura-1"></div>
+    <div class="aura-blob aura-2"></div>
+
+    <main class="tracker-container">
+        <header class="db-header">
+            <div class="db-title">
+                <h2>📊 Response Sentiment Tracker <span>Linked: Gmail API</span></h2>
+            </div>
+            <div class="db-actions">
+                <button class="btn-ghost">Filter</button>
+                <button class="btn-ghost">Sort</button>
+                <button class="btn-ghost" style="background: var(--primary); border: none;">+ Add View</button>
+            </div>
+        </header>
+
+        <section class="stats-strip">
+            <div class="stat-item">
+                <label>Sentiment Score</label>
+                <div class="val" style="color: var(--pos);">8.4/10</div>
+            </div>
+            <div class="stat-item">
+                <label>Response Velocity</label>
+                <div class="val">2.4 hrs</div>
+            </div>
+            <div class="stat-item">
+                <label>Conv. Rate (MQL)</label>
+                <div class="val" style="color: var(--accent);">18.2%</div>
+            </div>
+            <div class="stat-item">
+                <label>Est. Pipeline ROI</label>
+                <div class="val">$14,200</div>
+            </div>
+        </section>
+
+        <div class="db-table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Lead / Contact</th>
+                        <th>Sentiment</th>
+                        <th>Campaign Source</th>
+                        <th>Latest Interaction</th>
+                        <th>ROI Potential</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div style="font-weight: 600;">Alex Rivera</div>
+                            <div style="font-size: 11px; color: var(--text-dim);">Founder @ TechFlow</div>
+                        </td>
+                        <td><span class="sentiment-tag positive">● POSITIVE</span></td>
+                        <td><a href="#" class="campaign-link">SaaS_Outreach_Q4</a></td>
+                        <td>"Interested. Can we chat Tuesday?"</td>
+                        <td class="roi-indicator">$4,500</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div style="font-weight: 600;">Sarah Chen</div>
+                            <div style="font-size: 11px; color: var(--text-dim);">VP Growth @ Prism</div>
+                        </td>
+                        <td><span class="sentiment-tag positive">● POSITIVE</span></td>
+                        <td><a href="#" class="campaign-link">Fintech_SeriesA</a></td>
+                        <td>"Love the personalization. Sending to CEO."</td>
+                        <td class="roi-indicator">$8,000</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div style="font-weight: 600;">Marcus Thorne</div>
+                            <div style="font-size: 11px; color: var(--text-dim);">Director @ Helix</div>
+                        </td>
+                        <td><span class="sentiment-tag neutral">● NEUTRAL</span></td>
+                        <td><a href="#" class="campaign-link">SaaS_Outreach_Q4</a></td>
+                        <td>"Not right now. Check back in July."</td>
+                        <td class="roi-indicator" style="color: var(--text-dim);">$0</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div style="font-weight: 600;">Jordan Blake</div>
+                            <div style="font-size: 11px; color: var(--text-dim);">Manager @ Cloud9</div>
+                        </td>
+                        <td><span class="sentiment-tag negative">● NEGATIVE</span></td>
+                        <td><a href="#" class="campaign-link">Generic_FollowUp</a></td>
+                        <td>"Unsubscribe please."</td>
+                        <td class="roi-indicator" style="color: var(--neg);">-$20</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div style="font-weight: 600;">Elena Rodriguez</div>
+                            <div style="font-size: 11px; color: var(--text-dim);">CEO @ AeroDynamic</div>
+                        </td>
+                        <td><span class="sentiment-tag positive">● POSITIVE</span></td>
+                        <td><a href="#" class="campaign-link">Fintech_SeriesA</a></td>
+                        <td>"Booked a meeting via your link."</td>
+                        <td class="roi-indicator">$12,000</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <footer class="sync-status">
+            <div class="pulse-small"></div>
+            Last synced with Gmail & Notion: 4 minutes ago
+        </footer>
+    </main>
+
+</body>
+</html>

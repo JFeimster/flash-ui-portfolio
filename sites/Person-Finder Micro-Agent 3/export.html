@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prism Export | Integration Center</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Inter:wght@300;400;600&display=swap');
+
+        :root {
+            --bg-deep: #05070a;
+            --glass: rgba(15, 20, 28, 0.85);
+            --accent-cyan: #00f2ff;
+            --accent-magenta: #ff00ea;
+            --accent-lime: #bcff00;
+            --border-glow: rgba(0, 242, 255, 0.2);
+            --text-main: #e0e6ed;
+            --text-dim: #7a869a;
+            --prism-gradient: linear-gradient(135deg, #00f2ff 0%, #ff00ea 50%, #bcff00 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg-deep);
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 32px 32px;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .prism-container {
+            width: 1000px;
+            max-width: 95vw;
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 4px;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .prism-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--prism-gradient);
+            z-index: 10;
+        }
+
+        .header {
+            padding: 20px 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 20px;
+            height: 20px;
+            background: var(--prism-gradient);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+
+        .brand-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 13px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            height: 580px;
+        }
+
+        /* Left side: Data Preview */
+        .preview-panel {
+            padding: 32px;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            overflow-y: auto;
+        }
+
+        .panel-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 12px;
+            color: var(--accent-cyan);
+            border-bottom: 1px solid rgba(0, 242, 255, 0.2);
+            font-weight: 400;
+        }
+
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            color: var(--text-main);
+        }
+
+        .data-table tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Right side: Export Tools */
+        .tools-panel {
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        .config-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            border-radius: 2px;
+        }
+
+        .config-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: white;
+            margin-bottom: 15px;
+            display: block;
+            border-left: 2px solid var(--accent-magenta);
+            padding-left: 10px;
+        }
+
+        .mapping-grid {
+            display: grid;
+            grid-template-columns: 1fr 20px 1fr;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .field-tag {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 10px;
+            font-size: 11px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-dim);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .arrow { color: var(--accent-cyan); font-size: 14px; text-align: center; }
+
+        select {
+            width: 100%;
+            background: #0d1117;
+            border: 1px solid rgba(0, 242, 255, 0.3);
+            color: var(--accent-cyan);
+            padding: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            outline: none;
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: auto;
+        }
+
+        .action-btn {
+            padding: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--text-dim);
+            color: var(--text-dim);
+        }
+
+        .btn-outline:hover {
+            border-color: white;
+            color: white;
+        }
+
+        .btn-primary {
+            background: transparent;
+            border: 1px solid var(--accent-lime);
+            color: var(--accent-lime);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-lime);
+            color: var(--bg-deep);
+            box-shadow: 0 0 15px rgba(188, 255, 0, 0.3);
+        }
+
+        .status-msg {
+            margin-top: 15px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--accent-magenta);
+            display: none;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            color: var(--text-dim);
+        }
+
+        .tab.active {
+            background: rgba(0, 242, 255, 0.1);
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body>
+
+    <div class="prism-container">
+        <header class="header">
+            <div class="brand">
+                <div class="brand-logo"></div>
+                <h1 class="brand-name">Integration Center</h1>
+            </div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim);">
+                SESSION_ID: PRISM-X-992
+            </div>
+        </header>
+
+        <main class="main-content">
+            <section class="preview-panel">
+                <div class="panel-label">
+                    <span>Staged Lead Data (3 Records Found)</span>
+                    <span style="color: var(--accent-cyan)">[RAW_VIEW]</span>
+                </div>
+                
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>IDENTIFIER</th>
+                            <th>NAME</th>
+                            <th>ROLE</th>
+                            <th>ENTITY</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#001</td>
+                            <td>Sarah Jenkins</td>
+                            <td>Director of Ops</td>
+                            <td>Acme Dynamics</td>
+                        </tr>
+                        <tr>
+                            <td>#002</td>
+                            <td>Marcus Thorne</td>
+                            <td>VP Engineering</td>
+                            <td>Acme Dynamics</td>
+                        </tr>
+                        <tr>
+                            <td>#003</td>
+                            <td>Elena Rodriguez</td>
+                            <td>Head of Growth</td>
+                            <td>Acme Dynamics</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div style="margin-top: 32px;">
+                    <div class="panel-label">JSON Data Stream</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); border: 1px solid rgba(255,255,255,0.05);">
+                        {<br>
+                        &nbsp;&nbsp;"batch_id": "992-ALPHA",<br>
+                        &nbsp;&nbsp;"timestamp": "2023-10-24T14:22:01Z",<br>
+                        &nbsp;&nbsp;"leads": [<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;{"name": "Sarah Jenkins", "score": 0.98},<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;{"name": "Marcus Thorne", "score": 0.84}<br>
+                        &nbsp;&nbsp;]<br>
+                        }
+                    </div>
+                </div>
+            </section>
+
+            <section class="tools-panel">
+                <div class="tabs">
+                    <div class="tab active">CRM SYNC</div>
+                    <div class="tab">FLAT FILE</div>
+                    <div class="tab">API WEBHOOK</div>
+                </div>
+
+                <div class="config-box">
+                    <span class="config-title">Destination Mapping</span>
+                    <div style="margin-bottom: 12px; font-size: 11px; color: var(--text-dim);">Target CRM: <span style="color: white;">Salesforce (API v52.0)</span></div>
+                    
+                    <div class="mapping-grid">
+                        <div class="field-tag">LeadName</div>
+                        <div class="arrow">→</div>
+                        <select>
+                            <option>FullName</option>
+                            <option>FirstName</option>
+                            <option>LastName</option>
+                        </select>
+
+                        <div class="field-tag">EntityName</div>
+                        <div class="arrow">→</div>
+                        <select>
+                            <option>Company</option>
+                            <option>AccountName</option>
+                        </select>
+
+                        <div class="field-tag">ContactRole</div>
+                        <div class="arrow">→</div>
+                        <select>
+                            <option>Title</option>
+                            <option>JobFunction</option>
+                        </select>
+
+                        <div class="field-tag">PrismScore</div>
+                        <div class="arrow">→</div>
+                        <select>
+                            <option>LeadRating</option>
+                            <option>CustomField__c</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="config-box">
+                    <span class="config-title">Export Settings</span>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-dim);">
+                            <input type="checkbox" checked style="accent-color: var(--accent-magenta);"> Scrub duplicate records
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-dim);">
+                            <input type="checkbox" checked style="accent-color: var(--accent-magenta);"> Append LinkedIn profile URLs
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-dim);">
+                            <input type="checkbox" style="accent-color: var(--accent-magenta);"> Encrypt sensitive metadata
+                        </label>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <div class="action-btn btn-outline" onclick="simulateExport('CSV')">Export CSV</div>
+                    <div class="action-btn btn-outline" onclick="simulateExport('JSON')">Export JSON</div>
+                </div>
+                
+                <div class="action-btn btn-primary" onclick="simulateExport('CRM')">Push to Salesforce</div>
+
+                <div class="status-msg" id="statusBox">
+                    <span style="display: block; font-weight: 700;">TRANSMISSION SUCCESSFUL</span>
+                    <span id="statusDetails">Object created: 3 New Leads in Production.</span>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        function simulateExport(type) {
+            const statusBox = document.getElementById('statusBox');
+            const statusDetails = document.getElementById('statusDetails');
+            
+            statusBox.style.display = 'none';
+            
+            setTimeout(() => {
+                statusBox.style.display = 'block';
+                if (type === 'CRM') {
+                    statusBox.style.color = 'var(--accent-lime)';
+                    statusDetails.innerText = 'Integration successful. 3 leads pushed to Salesforce API.';
+                } else {
+                    statusBox.style.color = 'var(--accent-cyan)';
+                    statusDetails.innerText = `File generated: prism_export_${Date.now()}.${type.toLowerCase()}`;
+                }
+            }, 600);
+        }
+
+        // Tab Switching Simulation
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prism Export | Integration Center</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Inter:wght@300;400;600&display=swap');
+
+        :root {
+            --bg-deep: #05070a;
+            --glass: rgba(15, 20, 28, 0.85);
+            --accent-cyan: #00f2ff;
+            --accent-magenta: #ff00ea;
+            --accent-lime: #bcff00;
+            --border-glow: rgba(0, 242, 255, 0.2);
+            --text-main: #e0e6ed;
+            --text-dim: #7a869a;
+            --prism-gradient: linear-gradient(135deg, #00f2ff 0%, #ff00ea 50%, #bcff00 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg-deep);
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 32px 32px;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .prism-container {
+            width: 1000px;
+            max-width: 95vw;
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 4px;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .prism-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--prism-gradient);
+            z-index: 10;
+        }
+
+        .header {
+            padding: 20px 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 20px;
+            height: 20px;
+            background: var(--prism-gradient);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+
+        .brand-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 13px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            height: 580px;
+        }
+
+        /* Left side: Data Preview */
+        .preview-panel {
+            padding: 32px;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            overflow-y: auto;
+        }
+
+        .panel-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 12px;
+            color: var(--accent-cyan);
+            border-bottom: 1px solid rgba(0, 242, 255, 0.2);
+            font-weight: 400;
+        }
+
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            color: var(--text-main);
+        }
+
+        .data-table tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Right side: Export Tools */
+        .tools-panel {
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        .config-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            border-radius: 2px;
+        }
+
+        .config-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: white;
+            margin-bottom: 15px;
+            display: block;
+            border-left: 2px solid var(--accent-magenta);
+            padding-left: 10px;
+        }
+
+        .mapping-grid {
+            display: grid;
+            grid-template-columns: 1fr 20px 1fr;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .field-tag {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 10px;
+            font-size: 11px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-dim);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .arrow { color: var(--accent-cyan); font-size: 14px; text-align: center; }
+
+        select {
+            width: 100%;
+            background: #0d1117;
+            border: 1px solid rgba(0, 242, 255, 0.3);
+            color: var(--accent-cyan);
+            padding: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            outline: none;
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: auto;
+        }
+
+        .action-btn {
+            padding: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--text-dim);
+            color: var(--text-dim);
+        }
+
+        .btn-outline:hover {
+            border-color: white;
+            color: white;
+        }
+
+        .btn-primary {
+            background: transparent;
+            border: 1px solid var(--accent-lime);
+            color: var(--accent-lime);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-lime);
+            color: var(--bg-deep);
+            box-shadow: 0 0 15px rgba(188, 255, 0, 0.3);
+        }
+
+        .status-msg {
+            margin-top: 15px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--accent-magenta);
+            display: none;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            color: var(--text-dim);
+        }
+
+        .tab.active {
+            background: rgba(0, 242, 255, 0.1);
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body>
+
+    <div class="prism-container">
+        <header class="header">
+            <div class="brand">
+                <div class="brand-logo"></div>
+                <h1 class="brand-name">Integration Center</h1>
+            </div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim);">
+                SESSION_ID: PRISM-X-992
+            </div>
+        </header>
+
+        <main class="main-content">
+            <section class="preview-panel">
+                <div class="panel-label">
+                    <span>Staged Lead Data (3 Records Found)</span>
+                    <span style="color: var(--accent-cyan)">[RAW_VIEW]</span>
+                </div>
+                
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>IDENTIFIER</th>
+                            <th>NAME</th>
+                            <th>ROLE</th>
+                            <th>ENTITY</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#001</td>
+                            <td>Sarah Jenkins</td>
+                            <td>Director of Ops</td>
+                            <td>Acme Dynamics</td>
+                        </tr>
+                        <tr>
+                            <td>#002</td>
+                            <td>Marcus Thorne</td>
+                            <td>VP Engineering</td>
+                            <td>Acme Dynamics</td>
+                        </tr>
+                        <tr>
+                            <td>#003</td>
+                            <td>Elena Rodriguez</td>
+                            <td>Head of Growth</td>
+                            <td>Acme Dynamics</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div style="margin-top: 32px;">
+                    <div class="panel-label">JSON Data Stream</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); border: 1px solid rgba(255,255,255,0.05);">
+                        {<br>
+                        &nbsp;&nbsp;"batch_id": "992-ALPHA",<br>
+                        &nbsp;&nbsp;"timestamp": "2023-10-24T14:22:01Z",<br>
+                        &nbsp;&nbsp;"leads": [<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;{"name": "Sarah Jenkins", "score": 0.98},<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;{"name": "Marcus Thorne", "score": 0.84}<br>
+                        &nbsp;&nbsp;]<br>
+                        }
+                    </div>
+                </div>
+            </section>
+
+            <section class="tools-panel">
+                <div class="tabs">
+                    <div class="tab active">CRM SYNC</div>
+                    <div class="tab">FLAT FILE</div>
+                    <div class="tab">API WEBHOOK</div>
+                </div>
+
+                <div class="config-box">
+                    <span class="config-title">Destination Mapping</span>
+                    <div style="margin-bottom: 12px; font-size: 11px; color: var(--text-dim);">Target CRM: <span style="color: white;">Salesforce (API v52.0)</span></div>
+                    
+                    <div class="mapping-grid">
+                        <div class="field-tag">LeadName</div>
+                        <div class="arrow">→</div>
+                        <select>
+                            <option>FullName</option>
+                            <option>FirstName</option>
+                            <option>LastName</option>
+                        </select>
+
+                        <div class="field-tag">EntityName</div>
+                        <div class="arrow">→</div>
+                        <select>
+                            <option>Company</option>
+                            <option>AccountName</option>
+                        </select>
+
+                        <div class="field-tag">ContactRole</div>
+                        <div class="arrow">→</div>
+                        <select>
+                            <option>Title</option>
+                            <option>JobFunction</option>
+                        </select>
+
+                        <div class="field-tag">PrismScore</div>
+                        <div class="arrow">→</div>
+                        <select>
+                            <option>LeadRating</option>
+                            <option>CustomField__c</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="config-box">
+                    <span class="config-title">Export Settings</span>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-dim);">
+                            <input type="checkbox" checked style="accent-color: var(--accent-magenta);"> Scrub duplicate records
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-dim);">
+                            <input type="checkbox" checked style="accent-color: var(--accent-magenta);"> Append LinkedIn profile URLs
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-dim);">
+                            <input type="checkbox" style="accent-color: var(--accent-magenta);"> Encrypt sensitive metadata
+                        </label>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <div class="action-btn btn-outline" onclick="simulateExport('CSV')">Export CSV</div>
+                    <div class="action-btn btn-outline" onclick="simulateExport('JSON')">Export JSON</div>
+                </div>
+                
+                <div class="action-btn btn-primary" onclick="simulateExport('CRM')">Push to Salesforce</div>
+
+                <div class="status-msg" id="statusBox">
+                    <span style="display: block; font-weight: 700;">TRANSMISSION SUCCESSFUL</span>
+                    <span id="statusDetails">Object created: 3 New Leads in Production.</span>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        function simulateExport(type) {
+            const statusBox = document.getElementById('statusBox');
+            const statusDetails = document.getElementById('statusDetails');
+            
+            statusBox.style.display = 'none';
+            
+            setTimeout(() => {
+                statusBox.style.display = 'block';
+                if (type === 'CRM') {
+                    statusBox.style.color = 'var(--accent-lime)';
+                    statusDetails.innerText = 'Integration successful. 3 leads pushed to Salesforce API.';
+                } else {
+                    statusBox.style.color = 'var(--accent-cyan)';
+                    statusDetails.innerText = `File generated: prism_export_${Date.now()}.${type.toLowerCase()}`;
+                }
+            }, 600);
+        }
+
+        // Tab Switching Simulation
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

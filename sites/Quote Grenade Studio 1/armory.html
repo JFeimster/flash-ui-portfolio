@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE ARMORY | Quote Archive</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=Syne:wght@800&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #000000;
+            --white: #ffffff;
+            --cream: #f4f1ea;
+            --red: #ff3c00;
+            --border: 4px solid #000000;
+            --shadow: 8px 8px 0px #000000;
+            --shadow-hover: 4px 4px 0px #000000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--cream);
+            color: var(--black);
+            font-family: 'Space Grotesk', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .marquee {
+            overflow: hidden;
+            white-space: nowrap;
+            background: var(--black);
+            color: var(--white);
+            border-bottom: var(--border);
+            padding: 10px 0;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .marquee-inner {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        header {
+            border-bottom: var(--border);
+            padding: 20px 0;
+            background: var(--white);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-links a {
+            color: var(--black);
+            text-decoration: none;
+            font-weight: 800;
+            text-transform: uppercase;
+            border: 2px solid var(--black);
+            padding: 5px 15px;
+            font-size: 0.9rem;
+        }
+
+        .nav-links a:hover {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .hero-mini {
+            padding: 60px 0;
+            border-bottom: var(--border);
+            background: var(--red);
+            color: var(--white);
+        }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            margin-bottom: 10px;
+        }
+
+        .search-controls {
+            background: var(--white);
+            border-bottom: var(--border);
+            padding: 40px 0;
+            position: sticky;
+            top: 73px;
+            z-index: 90;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 20px;
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            border: var(--border);
+            box-shadow: var(--shadow);
+            outline: none;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        .filter-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tag-btn {
+            background: transparent;
+            border: 3px solid var(--black);
+            padding: 10px 20px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .tag-btn.active {
+            background: var(--black);
+            color: var(--white);
+            box-shadow: 4px 4px 0px var(--red);
+        }
+
+        .armory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            padding: 60px 0;
+        }
+
+        .armory-card {
+            background: var(--white);
+            border: var(--border);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 250px;
+            transition: transform 0.2s;
+            position: relative;
+        }
+
+        .armory-card:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 8px 8px 0px var(--black);
+        }
+
+        .armory-card-text {
+            font-size: 1.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .armory-card-meta {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            border-top: 2px solid var(--black);
+            padding-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copy-trigger {
+            background: var(--black);
+            color: var(--white);
+            border: none;
+            padding: 5px 10px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: bold;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        .copy-trigger:hover {
+            background: var(--red);
+        }
+
+        footer {
+            background: var(--black);
+            color: var(--white);
+            padding: 60px 0;
+            border-top: var(--border);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--red);
+            color: var(--white);
+            padding: 15px 30px;
+            border: var(--border);
+            font-weight: bold;
+            text-transform: uppercase;
+            display: none;
+            z-index: 1000;
+        }
+
+        @media (max-width: 600px) {
+            .armory-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="marquee">
+        <div class="marquee-inner">
+            BROWSE THE STOCKPILE. &nbsp; • &nbsp; LOAD YOUR TRUTH. &nbsp; • &nbsp; DECENTRALIZE YOUR THOUGHTS. &nbsp; • &nbsp; THE ARMORY IS OPEN. &nbsp; • &nbsp; BROWSE THE STOCKPILE. &nbsp; • &nbsp; 
+        </div>
+    </div>
+
+    <header>
+        <div class="container" style="display:flex; justify-content: space-between; align-items: center;">
+            <div style="font-weight: 900; font-size: 1.5rem; letter-spacing: -1px;">QUOTE GRENADE / ARMORY</div>
+            <nav class="nav-links">
+                <a href="index.html">← BACK TO GEN</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero-mini">
+        <div class="container">
+            <h1>THE ARMORY</h1>
+            <p style="font-family: 'IBM Plex Mono', monospace; font-weight: bold; text-transform: uppercase;">A searchable archive of high-velocity philosophical munitions.</p>
+        </div>
+    </section>
+
+    <div class="search-controls">
+        <div class="container">
+            <input type="text" class="search-bar" id="searchInput" placeholder="SEARCH BY KEYWORD OR CONCEPT..." onkeyup="filterQuotes()">
+            
+            <div class="filter-row">
+                <div class="tag-cloud" id="yieldFilters">
+                    <button class="tag-btn active" onclick="setYield('all', this)">ALL AMMO</button>
+                    <button class="tag-btn" onclick="setYield('liberty', this)">LIBERTY</button>
+                    <button class="tag-btn" onclick="setYield('founder', this)">FOUNDRY</button>
+                    <button class="tag-btn" onclick="setYield('metamodern', this)">METAMODERN</button>
+                    <button class="tag-btn" onclick="setYield('contrarian', this)">CONTRARIAN</button>
+                </div>
+                <div style="font-family: 'IBM Plex Mono', monospace; font-weight: bold;" id="count-display">
+                    SHOWING: 20/20
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="container">
+        <div class="armory-grid" id="armoryGrid">
+            <!-- Quotes injected here -->
+        </div>
+    </main>
+
+    <footer>
+        <div class="container" style="text-align: center;">
+            <p style="font-family: 'IBM Plex Mono', monospace; font-weight: bold;">© 2024 RADICAL LIBERTARIAN LABS. NO RIGHTS RESERVED.</p>
+        </div>
+    </footer>
+
+    <div id="toast" class="toast">MUNITION COPIED</div>
+
+    <script>
+        const quotes = [
+            { text: "Sovereignty is a skill, not a right.", cat: "liberty" },
+            { text: "The state is a hallucination with a budget.", cat: "liberty" },
+            { text: "Build things that make the government obsolete.", cat: "founder" },
+            { text: "Optimism is a moral duty, pessimism is a luxury of the bored.", cat: "metamodern" },
+            { text: "If it's not a 'Hell Yes', it's a 'Don't tax me'.", cat: "contrarian" },
+            { text: "Protocol > Politics.", cat: "liberty" },
+            { text: "Exit is the only real voice.", cat: "liberty" },
+            { text: "Your attention is the only remaining scarce resource.", cat: "metamodern" },
+            { text: "Be the glitch in the simulation.", cat: "metamodern" },
+            { text: "Permission is for people who don't have code.", cat: "founder" },
+            { text: "The future is a series of opt-in networks.", cat: "liberty" },
+            { text: "Everything is a remix, but the ownership is mine.", cat: "founder" },
+            { text: "Logic is the ultimate weapon of the unarmed.", cat: "contrarian" },
+            { text: "The most radical thing you can do is be happy.", cat: "metamodern" },
+            { text: "Stop asking for a seat at the table and build your own floor.", cat: "founder" },
+            { text: "Consensus is a trap. Conviction is a tool.", cat: "contrarian" },
+            { text: "Taxes are the subscription fee for a service you can't cancel.", cat: "liberty" },
+            { text: "Play stupid games, win stupid regulations.", cat: "contrarian" },
+            { text: "Code is the only law that doesn't require a police force.", cat: "founder" },
+            { text: "They can't cancel what they can't coordinate.", cat: "metamodern" }
+        ];
+
+        let currentYield = 'all';
+
+        function setYield(yieldType, btn) {
+            currentYield = yieldType;
+            document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            filterQuotes();
+        }
+
+        function filterQuotes() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const grid = document.getElementById('armoryGrid');
+            const countDisplay = document.getElementById('count-display');
+            
+            const filtered = quotes.filter(q => {
+                const matchesSearch = q.text.toLowerCase().includes(query);
+                const matchesYield = currentYield === 'all' || q.cat === currentYield;
+                return matchesSearch && matchesYield;
+            });
+
+            grid.innerHTML = filtered.map(q => `
+                <div class="armory-card">
+                    <div class="armory-card-text">"${q.text}"</div>
+                    <div class="armory-card-meta">
+                        <span>TYPE: ${q.cat}</span>
+                        <button class="copy-trigger" onclick="copyText('${q.text.replace(/'/g, "\\'")}')">COPY ARTIFACT</button>
+                    </div>
+                </div>
+            `).join('');
+
+            countDisplay.innerText = `SHOWING: ${filtered.length}/${quotes.length}`;
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const toast = document.getElementById('toast');
+                toast.style.display = 'block';
+                setTimeout(() => toast.style.display = 'none', 2000);
+            });
+        }
+
+        // Init
+        window.onload = filterQuotes;
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE ARMORY | Quote Archive</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=Syne:wght@800&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #000000;
+            --white: #ffffff;
+            --cream: #f4f1ea;
+            --red: #ff3c00;
+            --border: 4px solid #000000;
+            --shadow: 8px 8px 0px #000000;
+            --shadow-hover: 4px 4px 0px #000000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--cream);
+            color: var(--black);
+            font-family: 'Space Grotesk', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .marquee {
+            overflow: hidden;
+            white-space: nowrap;
+            background: var(--black);
+            color: var(--white);
+            border-bottom: var(--border);
+            padding: 10px 0;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .marquee-inner {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        header {
+            border-bottom: var(--border);
+            padding: 20px 0;
+            background: var(--white);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-links a {
+            color: var(--black);
+            text-decoration: none;
+            font-weight: 800;
+            text-transform: uppercase;
+            border: 2px solid var(--black);
+            padding: 5px 15px;
+            font-size: 0.9rem;
+        }
+
+        .nav-links a:hover {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .hero-mini {
+            padding: 60px 0;
+            border-bottom: var(--border);
+            background: var(--red);
+            color: var(--white);
+        }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            margin-bottom: 10px;
+        }
+
+        .search-controls {
+            background: var(--white);
+            border-bottom: var(--border);
+            padding: 40px 0;
+            position: sticky;
+            top: 73px;
+            z-index: 90;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 20px;
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            border: var(--border);
+            box-shadow: var(--shadow);
+            outline: none;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        .filter-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tag-btn {
+            background: transparent;
+            border: 3px solid var(--black);
+            padding: 10px 20px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .tag-btn.active {
+            background: var(--black);
+            color: var(--white);
+            box-shadow: 4px 4px 0px var(--red);
+        }
+
+        .armory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            padding: 60px 0;
+        }
+
+        .armory-card {
+            background: var(--white);
+            border: var(--border);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 250px;
+            transition: transform 0.2s;
+            position: relative;
+        }
+
+        .armory-card:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 8px 8px 0px var(--black);
+        }
+
+        .armory-card-text {
+            font-size: 1.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .armory-card-meta {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            border-top: 2px solid var(--black);
+            padding-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copy-trigger {
+            background: var(--black);
+            color: var(--white);
+            border: none;
+            padding: 5px 10px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: bold;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        .copy-trigger:hover {
+            background: var(--red);
+        }
+
+        footer {
+            background: var(--black);
+            color: var(--white);
+            padding: 60px 0;
+            border-top: var(--border);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--red);
+            color: var(--white);
+            padding: 15px 30px;
+            border: var(--border);
+            font-weight: bold;
+            text-transform: uppercase;
+            display: none;
+            z-index: 1000;
+        }
+
+        @media (max-width: 600px) {
+            .armory-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="marquee">
+        <div class="marquee-inner">
+            BROWSE THE STOCKPILE. &nbsp; • &nbsp; LOAD YOUR TRUTH. &nbsp; • &nbsp; DECENTRALIZE YOUR THOUGHTS. &nbsp; • &nbsp; THE ARMORY IS OPEN. &nbsp; • &nbsp; BROWSE THE STOCKPILE. &nbsp; • &nbsp; 
+        </div>
+    </div>
+
+    <header>
+        <div class="container" style="display:flex; justify-content: space-between; align-items: center;">
+            <div style="font-weight: 900; font-size: 1.5rem; letter-spacing: -1px;">QUOTE GRENADE / ARMORY</div>
+            <nav class="nav-links">
+                <a href="#">← BACK TO GEN</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero-mini">
+        <div class="container">
+            <h1>THE ARMORY</h1>
+            <p style="font-family: 'IBM Plex Mono', monospace; font-weight: bold; text-transform: uppercase;">A searchable archive of high-velocity philosophical munitions.</p>
+        </div>
+    </section>
+
+    <div class="search-controls">
+        <div class="container">
+            <input type="text" class="search-bar" id="searchInput" placeholder="SEARCH BY KEYWORD OR CONCEPT..." onkeyup="filterQuotes()">
+            
+            <div class="filter-row">
+                <div class="tag-cloud" id="yieldFilters">
+                    <button class="tag-btn active" onclick="setYield('all', this)">ALL AMMO</button>
+                    <button class="tag-btn" onclick="setYield('liberty', this)">LIBERTY</button>
+                    <button class="tag-btn" onclick="setYield('founder', this)">FOUNDRY</button>
+                    <button class="tag-btn" onclick="setYield('metamodern', this)">METAMODERN</button>
+                    <button class="tag-btn" onclick="setYield('contrarian', this)">CONTRARIAN</button>
+                </div>
+                <div style="font-family: 'IBM Plex Mono', monospace; font-weight: bold;" id="count-display">
+                    SHOWING: 20/20
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="container">
+        <div class="armory-grid" id="armoryGrid">
+            <!-- Quotes injected here -->
+        </div>
+    </main>
+
+    <footer>
+        <div class="container" style="text-align: center;">
+            <p style="font-family: 'IBM Plex Mono', monospace; font-weight: bold;">© 2024 RADICAL LIBERTARIAN LABS. NO RIGHTS RESERVED.</p>
+        </div>
+    </footer>
+
+    <div id="toast" class="toast">MUNITION COPIED</div>
+
+    <script>
+        const quotes = [
+            { text: "Sovereignty is a skill, not a right.", cat: "liberty" },
+            { text: "The state is a hallucination with a budget.", cat: "liberty" },
+            { text: "Build things that make the government obsolete.", cat: "founder" },
+            { text: "Optimism is a moral duty, pessimism is a luxury of the bored.", cat: "metamodern" },
+            { text: "If it's not a 'Hell Yes', it's a 'Don't tax me'.", cat: "contrarian" },
+            { text: "Protocol > Politics.", cat: "liberty" },
+            { text: "Exit is the only real voice.", cat: "liberty" },
+            { text: "Your attention is the only remaining scarce resource.", cat: "metamodern" },
+            { text: "Be the glitch in the simulation.", cat: "metamodern" },
+            { text: "Permission is for people who don't have code.", cat: "founder" },
+            { text: "The future is a series of opt-in networks.", cat: "liberty" },
+            { text: "Everything is a remix, but the ownership is mine.", cat: "founder" },
+            { text: "Logic is the ultimate weapon of the unarmed.", cat: "contrarian" },
+            { text: "The most radical thing you can do is be happy.", cat: "metamodern" },
+            { text: "Stop asking for a seat at the table and build your own floor.", cat: "founder" },
+            { text: "Consensus is a trap. Conviction is a tool.", cat: "contrarian" },
+            { text: "Taxes are the subscription fee for a service you can't cancel.", cat: "liberty" },
+            { text: "Play stupid games, win stupid regulations.", cat: "contrarian" },
+            { text: "Code is the only law that doesn't require a police force.", cat: "founder" },
+            { text: "They can't cancel what they can't coordinate.", cat: "metamodern" }
+        ];
+
+        let currentYield = 'all';
+
+        function setYield(yieldType, btn) {
+            currentYield = yieldType;
+            document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            filterQuotes();
+        }
+
+        function filterQuotes() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const grid = document.getElementById('armoryGrid');
+            const countDisplay = document.getElementById('count-display');
+            
+            const filtered = quotes.filter(q => {
+                const matchesSearch = q.text.toLowerCase().includes(query);
+                const matchesYield = currentYield === 'all' || q.cat === currentYield;
+                return matchesSearch && matchesYield;
+            });
+
+            grid.innerHTML = filtered.map(q => `
+                <div class="armory-card">
+                    <div class="armory-card-text">"${q.text}"</div>
+                    <div class="armory-card-meta">
+                        <span>TYPE: ${q.cat.toUpperCase()}</span>
+                        <button class="copy-trigger" onclick="copyText(\`${q.text.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">COPY ARTIFACT</button>
+                    </div>
+                </div>
+            `).join('');
+
+            countDisplay.innerText = `SHOWING: ${filtered.length}/${quotes.length}`;
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const toast = document.getElementById('toast');
+                toast.style.display = 'block';
+                setTimeout(() => toast.style.display = 'none', 2000);
+            });
+        }
+
+        // Init
+        window.onload = filterQuotes;
+    </script>
+</body>
+</html>

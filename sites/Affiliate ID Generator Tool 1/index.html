@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash UI Export</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="max-w-6xl w-full grid grid-cols-1 md:grid-cols-12 gap-6 relative">
+        <!-- Header Section -->
+        <div class="md:col-span-12 flex justify-between items-end border-b border-emerald-900/50 pb-4 mb-2">
+            <div>
+                <h1 class="text-2xl font-bold tracking-tighter emerald-glow">MOONSHINE CAPITAL</h1>
+                <p class="text-[10px] text-emerald-500/60 uppercase tracking-[0.3em]">Partner Provisioning Terminal v4.0.2</p>
+            </div>
+            <div class="text-right">
+                <p class="text-[10px] text-slate-500 uppercase">System Status</p>
+                <p class="text-xs text-emerald-400 font-bold tracking-widest uppercase">● Operational</p>
+            </div>
+        </div>
+
+        <!-- NEW ENTRY FORM -->
+        <div class="md:col-span-7 bento-card p-6 relative overflow-hidden">
+            <div class="scanline"></div>
+            <h2 class="text-xs font-bold text-emerald-500 mb-6 flex items-center gap-2 tracking-widest">
+                <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                NEW_ENTRY_PROTOCOL
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                    <label class="text-[10px] text-slate-500 uppercase tracking-wider">Full Name <span class="text-emerald-500">*</span></label>
+                    <input type="text" id="fullName" class="input-field text-sm" placeholder="e.g. John Smith">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] text-slate-500 uppercase tracking-wider">Partner Type</label>
+                    <select id="partnerType" class="input-field text-sm">
+                        <option value="BRK">Broker</option>
+                        <option value="REF">Referral Source</option>
+                        <option value="AFF">Affiliate</option>
+                        <option value="VND">Vendor</option>
+                    </select>
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] text-slate-500 uppercase tracking-wider">Company Name</label>
+                    <input type="text" id="company" class="input-field text-sm" placeholder="Entity Name">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] text-slate-500 uppercase tracking-wider">Registration Date</label>
+                    <input type="date" id="regDate" class="input-field text-sm">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] text-slate-500 uppercase tracking-wider">Email Address</label>
+                    <input type="email" id="email" class="input-field text-sm" placeholder="name@domain.com">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] text-slate-500 uppercase tracking-wider">Birthday</label>
+                    <input type="date" id="birthday" class="input-field text-sm">
+                </div>
+                <div class="md:col-span-2 space-y-1">
+                    <label class="text-[10px] text-slate-500 uppercase tracking-wider">Physical Address</label>
+                    <input type="text" id="address" class="input-field text-sm" placeholder="Street, City, Postcode">
+                </div>
+            </div>
+        </div>
+
+        <!-- ACTION & OUTPUT -->
+        <div class="md:col-span-5 flex flex-col gap-6">
+            <!-- ID Generator -->
+            <div class="bento-card p-6 flex flex-col justify-center items-center text-center space-y-4">
+                <h2 class="text-xs font-bold text-slate-400 tracking-widest uppercase">ID Generator Engine</h2>
+                <button onclick="generateProvision()" class="execute-btn w-full py-4 text-sm">
+                    Execute Provisioning
+                </button>
+                <p class="text-[9px] text-slate-500 italic">Logic: MC-[TYPE]-[INITIALS][YY]</p>
+            </div>
+
+            <!-- Provisioning Result -->
+            <div id="resultCard" class="bento-card p-6 opacity-40 transition-opacity duration-500">
+                <h2 class="text-xs font-bold text-emerald-500 mb-4 tracking-widest uppercase">Provisioning Result</h2>
+                <div class="bg-black/40 border border-emerald-900 p-4 rounded mb-4">
+                    <p class="text-[10px] text-slate-500 uppercase mb-2">Unique Tracking Link</p>
+                    <div class="flex items-center justify-between gap-2">
+                        <code id="outputLink" class="text-emerald-400 text-xs break-all">moonshinecapital.com/ref/PENDING...</code>
+                        <button onclick="copyToClipboard()" class="text-emerald-500 hover:text-emerald-300 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div id="copySuccess" class="text-[9px] text-emerald-400 uppercase tracking-widest opacity-0 transition-opacity">Link copied to secure clipboard</div>
+            </div>
+        </div>
+
+        <!-- AUDIT LOG -->
+        <div class="md:col-span-12 bento-card p-4 overflow-hidden">
+            <div class="flex justify-between items-center mb-4 px-2">
+                <h2 class="text-xs font-bold text-slate-400 tracking-widest uppercase">Audit Log (Recent Sessions)</h2>
+                <span class="text-[9px] text-slate-600 tracking-tighter">TOTAL_RECORDS: 1,482</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead class="text-slate-500 uppercase text-[10px] border-b border-slate-800">
+                        <tr>
+                            <th class="pb-2 font-medium px-2">Partner Name</th>
+                            <th class="pb-2 font-medium px-2">Mission ID</th>
+                            <th class="pb-2 font-medium px-2">Entity</th>
+                            <th class="pb-2 font-medium px-2">Provision Date</th>
+                            <th class="pb-2 font-medium px-2 text-right">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="auditLogBody" class="text-slate-300">
+                        <!-- Default Rows -->
+                        <tr class="border-b border-slate-900/50 hover:bg-emerald-500/5">
+                            <td class="py-3 px-2">Sarah Jenkins</td>
+                            <td class="py-3 px-2 text-emerald-500 font-bold">MC-BRK-SJ24</td>
+                            <td class="py-3 px-2">Prime Meridian Ltd</td>
+                            <td class="py-3 px-2 text-slate-500">2024-05-12</td>
+                            <td class="py-3 px-2 text-right text-emerald-400">ACTIVE</td>
+                        </tr>
+                        <tr class="border-b border-slate-900/50 hover:bg-emerald-500/5">
+                            <td class="py-3 px-2">Marcus Vane</td>
+                            <td class="py-3 px-2 text-emerald-500 font-bold">MC-REF-MV24</td>
+                            <td class="py-3 px-2">Vane Advisory</td>
+                            <td class="py-3 px-2 text-slate-500">2024-05-10</td>
+                            <td class="py-3 px-2 text-right text-emerald-400">ACTIVE</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const auditLog = [];
+
+        function generateProvision() {
+            const name = document.getElementById('fullName').value;
+            const type = document.getElementById('partnerType').value;
+            const company = document.getElementById('company').value || "N/A";
+            const dateInput = document.getElementById('regDate').value;
+            
+            if (!name) {
+                alert("PROTOCOL ERROR: Full Name is mandatory for provisioning.");
+                return;
+            }
+
+            // Generate Initials
+            const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+            
+            // Get Year
+            const date = dateInput ? new Date(dateInput) : new Date();
+            const year = date.getFullYear().toString().slice(-2);
+            
+            // Mission ID Logic
+            const missionID = `MC-${type}-${initials}${year}`;
+            const finalLink = `moonshinecapital.com/ref/${missionID}`;
+
+            // Update UI
+            const outputLink = document.getElementById('outputLink');
+            const resultCard = document.getElementById('resultCard');
+            
+            outputLink.innerText = finalLink;
+            resultCard.classList.remove('opacity-40');
+            resultCard.classList.add('opacity-100');
+
+            // Update Audit Log
+            const auditRow = {
+                name: name,
+                id: missionID,
+                company: company,
+                date: date.toISOString().split('T')[0]
+            };
+
+            addToAuditLog(auditRow);
+        }
+
+        function addToAuditLog(entry) {
+            const tbody = document.getElementById('auditLogBody');
+            const row = document.createElement('tr');
+            row.className = "border-b border-slate-900/50 hover:bg-emerald-500/5 animate-pulse";
+            row.innerHTML = `
+                <td class="py-3 px-2">${entry.name}</td>
+                <td class="py-3 px-2 text-emerald-400 font-bold">${entry.id}</td>
+                <td class="py-3 px-2 text-slate-400">${entry.company}</td>
+                <td class="py-3 px-2 text-slate-500">${entry.date}</td>
+                <td class="py-3 px-2 text-right text-emerald-400">SYNCED</td>
+            `;
+            
+            tbody.prepend(row);
+            
+            // Keep only last 5
+            if (tbody.children.length > 5) {
+                tbody.removeChild(tbody.lastChild);
+            }
+            
+            setTimeout(() => row.classList.remove('animate-pulse'), 1000);
+        }
+
+        function copyToClipboard() {
+            const text = document.getElementById('outputLink').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const successMsg = document.getElementById('copySuccess');
+                successMsg.style.opacity = '1';
+                setTimeout(() => { successMsg.style.opacity = '0'; }, 2000);
+            });
+        }
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

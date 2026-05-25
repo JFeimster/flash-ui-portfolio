@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonshine Capital | Brand Settings</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #05070a;
+            --bg-card: #0d1117;
+            --bg-input: #161b22;
+            --neon-blue: #00f2ff;
+            --neon-green: #00ff9d;
+            --text-main: #e6edf3;
+            --text-dim: #8b949e;
+            --border: #30363d;
+            --accent-glow: rgba(0, 242, 255, 0.15);
+            --font-mono: 'Fira Code', monospace;
+            --font-sans: 'Inter', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            margin-bottom: 3rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .subheadline {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--neon-blue);
+            color: var(--neon-blue);
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 3rem;
+        }
+
+        @media (max-width: 850px) {
+            .settings-grid { grid-template-columns: 1fr; }
+        }
+
+        .nav-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-input);
+            color: var(--text-main);
+        }
+
+        .nav-item.active {
+            background: rgba(0, 242, 255, 0.05);
+            border-color: var(--border);
+            color: var(--neon-blue);
+        }
+
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .panel-header {
+            margin-bottom: 2rem;
+        }
+
+        .panel-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .panel-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 0.8rem;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--neon-blue);
+        }
+
+        .color-input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        .color-preview {
+            width: 48px;
+            height: 48px;
+            padding: 2px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--neon-blue);
+            color: var(--bg-deep);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1rem;
+            transition: box-shadow 0.2s;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .hint {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-top: 0.4rem;
+            display: block;
+        }
+
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--neon-green);
+            color: #000;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: none;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div>
+            <h1>Partner Brand Settings</h1>
+            <p class="subheadline">Configure global defaults for your affiliate identity.</p>
+        </div>
+        <a href="index.html" class="btn-outline">← Back to Generator</a>
+    </header>
+
+    <main class="settings-grid">
+        <aside class="nav-sidebar">
+            <a href="#" class="nav-item active">General Settings</a>
+            <a href="#" class="nav-item">Brand Identity</a>
+            <a href="#" class="nav-item">Tracking & UTMs</a>
+            <a href="#" class="nav-item">API Keys</a>
+            <a href="#" class="nav-item">Webhooks</a>
+        </aside>
+
+        <section class="panel">
+            <div class="panel-header">
+                <h2 class="panel-title">Default Configurations</h2>
+                <p class="panel-subtitle">These values will auto-populate the Embed Generator whenever you start a new build.</p>
+            </div>
+
+            <form id="settingsForm">
+                <div class="form-group">
+                    <label>Default Partner ID</label>
+                    <input type="text" id="globalPartnerId" placeholder="e.g. MS-XXXX">
+                    <span class="hint">Your unique identifier assigned by Moonshine Capital.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Global Brand Accent Color</label>
+                    <div class="color-input-wrapper">
+                        <input type="color" id="globalBrandColor" class="color-preview" value="#00f2ff">
+                        <input type="text" id="globalBrandColorHex" value="#00f2ff">
+                    </div>
+                    <span class="hint">The primary color used for buttons, borders, and highlights.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Default Application URL</label>
+                    <input type="text" id="globalAppUrl" placeholder="https://moonshine.cap/apply/your-tag">
+                    <span class="hint">The link your clients will be sent to after finishing the widget flow.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Default Tracking Source</label>
+                    <input type="text" id="globalTrackingSource" placeholder="e.g. partner-dashboard">
+                    <span class="hint">Appended to UTM parameters for attribution.</span>
+                </div>
+
+                <div style="margin-top: 3rem; border-top: 1px solid var(--border); padding-top: 2rem;">
+                    <button type="submit" class="btn-primary">Save Global Defaults</button>
+                </div>
+            </form>
+        </section>
+    </main>
+</div>
+
+<div id="toast">Settings Saved Successfully!</div>
+
+<script>
+    const form = document.getElementById('settingsForm');
+    const colorPicker = document.getElementById('globalBrandColor');
+    const colorHex = document.getElementById('globalBrandColorHex');
+
+    // Load existing settings
+    function loadSettings() {
+        const settings = JSON.parse(localStorage.getItem('ms_brand_settings') || '{}');
+        if (settings.partnerId) document.getElementById('globalPartnerId').value = settings.partnerId;
+        if (settings.brandColor) {
+            colorPicker.value = settings.brandColor;
+            colorHex.value = settings.brandColor;
+        }
+        if (settings.appUrl) document.getElementById('globalAppUrl').value = settings.appUrl;
+        if (settings.trackingSource) document.getElementById('globalTrackingSource').value = settings.trackingSource;
+    }
+
+    // Sync color inputs
+    colorPicker.addEventListener('input', (e) => {
+        colorHex.value = e.target.value;
+    });
+
+    colorHex.addEventListener('input', (e) => {
+        if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
+            colorPicker.value = e.target.value;
+        }
+    });
+
+    // Save settings
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const settings = {
+            partnerId: document.getElementById('globalPartnerId').value,
+            brandColor: colorPicker.value,
+            appUrl: document.getElementById('globalAppUrl').value,
+            trackingSource: document.getElementById('globalTrackingSource').value,
+            updatedAt: new Date().toISOString()
+        };
+
+        localStorage.setItem('ms_brand_settings', JSON.stringify(settings));
+        
+        const toast = document.getElementById('toast');
+        toast.style.display = 'block';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
+    });
+
+    window.onload = loadSettings;
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonshine Capital | Brand Settings</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #05070a;
+            --bg-card: #0d1117;
+            --bg-input: #161b22;
+            --neon-blue: #00f2ff;
+            --neon-green: #00ff9d;
+            --text-main: #e6edf3;
+            --text-dim: #8b949e;
+            --border: #30363d;
+            --accent-glow: rgba(0, 242, 255, 0.15);
+            --font-mono: 'Fira Code', monospace;
+            --font-sans: 'Inter', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            margin-bottom: 3rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .subheadline {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--neon-blue);
+            color: var(--neon-blue);
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 3rem;
+        }
+
+        @media (max-width: 850px) {
+            .settings-grid { grid-template-columns: 1fr; }
+        }
+
+        .nav-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-input);
+            color: var(--text-main);
+        }
+
+        .nav-item.active {
+            background: rgba(0, 242, 255, 0.05);
+            border-color: var(--border);
+            color: var(--neon-blue);
+        }
+
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .panel-header {
+            margin-bottom: 2rem;
+        }
+
+        .panel-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .panel-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 0.8rem;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--neon-blue);
+        }
+
+        .color-input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        .color-preview {
+            width: 48px;
+            height: 48px;
+            padding: 2px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--neon-blue);
+            color: var(--bg-deep);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1rem;
+            transition: box-shadow 0.2s;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .hint {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-top: 0.4rem;
+            display: block;
+        }
+
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--neon-green);
+            color: #000;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: none;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div>
+            <h1>Partner Brand Settings</h1>
+            <p class="subheadline">Configure global defaults for your affiliate identity.</p>
+        </div>
+        <a href="index.html" class="btn-outline">← Back to Generator</a>
+    </header>
+
+    <main class="settings-grid">
+        <aside class="nav-sidebar">
+            <a href="#" class="nav-item active">General Settings</a>
+            <a href="#" class="nav-item">Brand Identity</a>
+            <a href="#" class="nav-item">Tracking & UTMs</a>
+            <a href="#" class="nav-item">API Keys</a>
+            <a href="#" class="nav-item">Webhooks</a>
+        </aside>
+
+        <section class="panel">
+            <div class="panel-header">
+                <h2 class="panel-title">Default Configurations</h2>
+                <p class="panel-subtitle">These values will auto-populate the Embed Generator whenever you start a new build.</p>
+            </div>
+
+            <form id="settingsForm">
+                <div class="form-group">
+                    <label>Default Partner ID</label>
+                    <input type="text" id="globalPartnerId" placeholder="e.g. MS-XXXX">
+                    <span class="hint">Your unique identifier assigned by Moonshine Capital.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Global Brand Accent Color</label>
+                    <div class="color-input-wrapper">
+                        <input type="color" id="globalBrandColor" class="color-preview" value="#00f2ff">
+                        <input type="text" id="globalBrandColorHex" value="#00f2ff">
+                    </div>
+                    <span class="hint">The primary color used for buttons, borders, and highlights.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Default Application URL</label>
+                    <input type="text" id="globalAppUrl" placeholder="https://moonshine.cap/apply/your-tag">
+                    <span class="hint">The link your clients will be sent to after finishing the widget flow.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Default Tracking Source</label>
+                    <input type="text" id="globalTrackingSource" placeholder="e.g. partner-dashboard">
+                    <span class="hint">Appended to UTM parameters for attribution.</span>
+                </div>
+
+                <div style="margin-top: 3rem; border-top: 1px solid var(--border); padding-top: 2rem;">
+                    <button type="submit" class="btn-primary">Save Global Defaults</button>
+                </div>
+            </form>
+        </section>
+    </main>
+</div>
+
+<div id="toast">Settings Saved Successfully!</div>
+
+<script>
+    const form = document.getElementById('settingsForm');
+    const colorPicker = document.getElementById('globalBrandColor');
+    const colorHex = document.getElementById('globalBrandColorHex');
+
+    function loadSettings() {
+        const settings = JSON.parse(localStorage.getItem('ms_brand_settings') || '{}');
+        if (settings.partnerId) document.getElementById('globalPartnerId').value = settings.partnerId;
+        if (settings.brandColor) {
+            colorPicker.value = settings.brandColor;
+            colorHex.value = settings.brandColor;
+        }
+        if (settings.appUrl) document.getElementById('globalAppUrl').value = settings.appUrl;
+        if (settings.trackingSource) document.getElementById('globalTrackingSource').value = settings.trackingSource;
+    }
+
+    colorPicker.addEventListener('input', (e) => {
+        colorHex.value = e.target.value;
+    });
+
+    colorHex.addEventListener('input', (e) => {
+        if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
+            colorPicker.value = e.target.value;
+        }
+    });
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const settings = {
+            partnerId: document.getElementById('globalPartnerId').value,
+            brandColor: colorPicker.value,
+            appUrl: document.getElementById('globalAppUrl').value,
+            trackingSource: document.getElementById('globalTrackingSource').value,
+            updatedAt: new Date().toISOString()
+        };
+
+        localStorage.setItem('ms_brand_settings', JSON.stringify(settings));
+        
+        const toast = document.getElementById('toast');
+        toast.style.display = 'block';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
+    });
+
+    window.onload = loadSettings;
+</script>
+
+</body>
+</html>

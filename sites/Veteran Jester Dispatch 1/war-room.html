@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The War Room | Tactical Leadership Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:wght@400;700&family=Roboto+Slab:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --olive: #4B5320;
+            --olive-dark: #353b16;
+            --tan: #d2c5a7;
+            --paper: #e4dec7;
+            --ink: #1a1a1b;
+            --stamp-red: rgba(169, 29, 17, 0.85);
+            --tape: rgba(210, 195, 140, 0.5);
+            --folder-tab: #c5ba9d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--tan);
+            background-image: radial-gradient(circle at 2px 2px, rgba(0,0,0,0.05) 1px, transparent 0);
+            background-size: 40px 40px;
+            color: var(--ink);
+            font-family: 'Courier Prime', monospace;
+            line-height: 1.5;
+            padding: 20px;
+        }
+
+        .dossier-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: var(--paper);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            border: 1px solid rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dossier-container::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
+            pointer-events: none;
+            opacity: 0.4;
+            z-index: 10;
+        }
+
+        /* Tactical Header */
+        header {
+            padding: 80px 40px 40px;
+            border-bottom: 4px double var(--ink);
+            position: relative;
+            background: rgba(0,0,0,0.02);
+        }
+
+        .folder-tab {
+            position: absolute;
+            top: 0;
+            left: 40px;
+            background: var(--folder-tab);
+            padding: 10px 30px;
+            font-family: 'Special Elite', cursive;
+            font-size: 1.2rem;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            box-shadow: 2px -2px 5px rgba(0,0,0,0.1);
+        }
+
+        .stamp-status {
+            position: absolute;
+            top: 60px;
+            right: 60px;
+            border: 3px solid var(--olive);
+            color: var(--olive);
+            padding: 8px 20px;
+            font-family: 'Special Elite', cursive;
+            font-size: 1.8rem;
+            transform: rotate(-5deg);
+            text-transform: uppercase;
+            opacity: 0.8;
+            z-index: 20;
+        }
+
+        .war-room-title {
+            font-family: 'Special Elite', cursive;
+            font-size: 4rem;
+            line-height: 0.9;
+            margin-bottom: 15px;
+            color: var(--ink);
+        }
+
+        .mission-objective {
+            font-family: 'Roboto Slab', serif;
+            font-weight: 700;
+            max-width: 600px;
+            margin-bottom: 20px;
+            border-left: 8px solid var(--olive-dark);
+            padding-left: 20px;
+        }
+
+        .coord-bar {
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            opacity: 0.7;
+        }
+
+        /* Briefing Cards */
+        .briefing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+            padding: 40px;
+        }
+
+        .briefing-card {
+            background: #fffef9;
+            border: 1px solid #c5ba9d;
+            padding: 30px;
+            position: relative;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease;
+        }
+
+        .briefing-card:hover {
+            transform: scale(1.02);
+            z-index: 5;
+        }
+
+        .briefing-card::after {
+            content: "";
+            position: absolute;
+            top: 0; right: 0;
+            border-width: 0 30px 30px 0;
+            border-style: solid;
+            border-color: var(--tan) var(--tan) transparent transparent;
+        }
+
+        .card-dept {
+            font-family: 'Special Elite', cursive;
+            font-size: 0.8rem;
+            color: var(--stamp-red);
+            margin-bottom: 10px;
+            text-decoration: underline;
+        }
+
+        .card-subject {
+            font-family: 'Roboto Slab', serif;
+            font-weight: 900;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            line-height: 1.2;
+            text-transform: uppercase;
+        }
+
+        .brief-intel {
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+            color: #444;
+        }
+
+        .action-btn {
+            display: inline-block;
+            background: var(--ink);
+            color: var(--paper);
+            padding: 10px 20px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        /* Tactical Assets Section */
+        .assets-section {
+            padding: 60px 40px;
+            background: rgba(0,0,0,0.03);
+            border-top: 1px solid var(--ink);
+        }
+
+        .section-header {
+            font-family: 'Special Elite', cursive;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--ink);
+            padding-bottom: 10px;
+        }
+
+        .asset-list {
+            list-style: none;
+        }
+
+        .asset-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px dashed rgba(0,0,0,0.1);
+        }
+
+        .asset-code {
+            font-weight: bold;
+            background: var(--olive);
+            color: white;
+            padding: 2px 8px;
+            margin-right: 20px;
+            font-size: 0.8rem;
+        }
+
+        .asset-title {
+            flex: 1;
+            font-weight: 700;
+        }
+
+        /* Sidebar/Split */
+        .intelligence-split {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+            padding: 40px;
+        }
+
+        .intel-block {
+            padding: 30px;
+            background: rgba(255,255,255,0.5);
+            border: 2px solid var(--ink);
+        }
+
+        .comms-log {
+            font-size: 0.85rem;
+            line-height: 1.4;
+            color: #555;
+        }
+
+        .comms-entry {
+            margin-bottom: 15px;
+        }
+
+        .timestamp {
+            color: var(--stamp-red);
+            font-weight: bold;
+        }
+
+        /* Footer */
+        footer {
+            padding: 60px 40px;
+            background: #c5ba9d;
+            text-align: center;
+            border-top: 5px solid var(--olive-dark);
+        }
+
+        .footer-logo {
+            font-family: 'Special Elite', cursive;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .ink-smudge {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(0,0,0,0.06) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 15;
+        }
+
+        @media (max-width: 768px) {
+            .intelligence-split { grid-template-columns: 1fr; }
+            .war-room-title { font-size: 2.5rem; }
+            header { padding-top: 100px; }
+            .stamp-status { position: relative; top: 0; right: 0; display: inline-block; margin-bottom: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dossier-container">
+        <div class="folder-tab">FILE: WAR_ROOM_LDRSHIP</div>
+        <div class="ink-smudge" style="top: 40%; right: -50px;"></div>
+
+        <header>
+            <div class="stamp-status">Approved</div>
+            <div class="coord-bar">LOC: 35.6895° N, 139.6917° E // TIME: 0400_HOURS</div>
+            <h1 class="war-room-title">The War Room</h1>
+            <p class="mission-objective">
+                Tactical leadership frameworks, entrepreneurial survival strategies, and high-stakes decision-making protocols derived from combat operations and small business warfare.
+            </p>
+        </header>
+
+        <section class="briefing-grid">
+            <!-- Briefing 1 -->
+            <div class="briefing-card">
+                <div class="card-dept">STRATEGY // DECENTRALIZED COMMAND</div>
+                <h3 class="card-subject">Mission Command for Startup Founders</h3>
+                <p class="brief-intel">How to provide clear "Command Intent" so your team can execute effectively without a babysitter in the room.</p>
+                <a href="#" class="action-btn">Open File 01-A</a>
+            </div>
+
+            <!-- Briefing 2 -->
+            <div class="briefing-card">
+                <div class="card-dept">PERSONNEL // PSYCHOLOGY</div>
+                <h3 class="card-subject">The Moral Injury of Bad Management</h3>
+                <p class="brief-intel">Identifying toxic leadership traits that cause systemic attrition and how to rebuild trust in a fractured squad.</p>
+                <a href="#" class="action-btn">Open File 08-C</a>
+            </div>
+
+            <!-- Briefing 3 -->
+            <div class="briefing-card">
+                <div class="card-dept">TACTICAL // PRODUCTIVITY</div>
+                <h3 class="card-subject">OODA Loop: Business Decision Speed</h3>
+                <p class="brief-intel">Observe, Orient, Decide, Act. Using fighter pilot logic to out-maneuver competitors in a saturated market.</p>
+                <a href="#" class="action-btn">Open File 12-F</a>
+            </div>
+
+            <!-- Briefing 4 -->
+            <div class="briefing-card">
+                <div class="card-dept">LOGISTICS // SURVIVAL</div>
+                <h3 class="card-subject">Burn Rates & Supply Lines</h3>
+                <p class="brief-intel">Why your runway is shorter than you think and how to forage for resources when the VC cash dries up.</p>
+                <a href="#" class="action-btn">Open File 04-B</a>
+            </div>
+        </section>
+
+        <section class="intelligence-split">
+            <div class="intel-block">
+                <h2 class="section-header">Field Operations Report</h2>
+                <p style="margin-bottom: 20px; font-style: italic; border-left: 3px solid var(--stamp-red); padding-left: 15px;">
+                    "In the absence of orders, go find something and kill it." — This doesn't mean literal violence. It means when the market shifts and your plan fails, you don't wait for a memo. You find a problem and you solve it.
+                </p>
+                <div class="comms-log">
+                    <div class="comms-entry">
+                        <span class="timestamp">[08:42]</span> <span style="font-weight: bold;">Jester:</span> Initial rollout of the "Clarity Protocol" successful in test sector Alpha.
+                    </div>
+                    <div class="comms-entry">
+                        <span class="timestamp">[11:15]</span> <span style="font-weight: bold;">H.Q.:</span> Resistance met in Middle Management layer. Recommend immediate flank.
+                    </div>
+                    <div class="comms-entry">
+                        <span class="timestamp">[14:30]</span> <span style="font-weight: bold;">Jester:</span> Middle management bypassed. Direct communication established with frontline assets.
+                    </div>
+                </div>
+            </div>
+
+            <div class="intel-block" style="background: var(--olive); color: var(--paper); border: none;">
+                <h3 style="font-family: 'Special Elite'; margin-bottom: 15px;">The Jester's Rulebook</h3>
+                <ul class="asset-list" style="font-size: 0.85rem;">
+                    <li style="margin-bottom: 10px;">1. Never complain down.</li>
+                    <li style="margin-bottom: 10px;">2. Prioritize & Execute.</li>
+                    <li style="margin-bottom: 10px;">3. Humility is a weapon.</li>
+                    <li>4. Check your ego at the wire.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="assets-section">
+            <h2 class="section-header">Available Assets (Tools)</h2>
+            <div class="asset-list">
+                <div class="asset-item">
+                    <span class="asset-code">PDF_09</span>
+                    <span class="asset-title">Post-Mortem / AAR Template (After Action Report)</span>
+                    <a href="#" class="card-link" style="color: var(--ink); font-weight: bold;">DOWNLOAD</a>
+                </div>
+                <div class="asset-item">
+                    <span class="asset-code">XLS_44</span>
+                    <span class="asset-title">Battlefield Triage: Product Backlog Prioritizer</span>
+                    <a href="#" class="card-link" style="color: var(--ink); font-weight: bold;">DOWNLOAD</a>
+                </div>
+                <div class="asset-item">
+                    <span class="asset-code">DOC_12</span>
+                    <span class="asset-title">The "Non-Bullshit" Employee Handbook Manifesto</span>
+                    <a href="#" class="card-link" style="color: var(--ink); font-weight: bold;">DOWNLOAD</a>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="footer-logo">VETERAN JESTER // WAR ROOM</div>
+            <p style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px;">
+                Secure Connection Established // Data Encrypted // Eyes Only
+            </p>
+            <div style="margin-top: 20px;">
+                <a href="index.html" class="action-btn">Return to Dispatch</a>
+            </div>
+        </footer>
+    </div>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The War Room | Tactical Leadership Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:wght@400;700&family=Roboto+Slab:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --olive: #4B5320;
+            --olive-dark: #353b16;
+            --tan: #d2c5a7;
+            --paper: #e4dec7;
+            --ink: #1a1a1b;
+            --stamp-red: rgba(169, 29, 17, 0.85);
+            --tape: rgba(210, 195, 140, 0.5);
+            --folder-tab: #c5ba9d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--tan);
+            background-image: radial-gradient(circle at 2px 2px, rgba(0,0,0,0.05) 1px, transparent 0);
+            background-size: 40px 40px;
+            color: var(--ink);
+            font-family: 'Courier Prime', monospace;
+            line-height: 1.5;
+            padding: 20px;
+        }
+
+        .dossier-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: var(--paper);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            border: 1px solid rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dossier-container::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
+            pointer-events: none;
+            opacity: 0.4;
+            z-index: 10;
+        }
+
+        header {
+            padding: 80px 40px 40px;
+            border-bottom: 4px double var(--ink);
+            position: relative;
+            background: rgba(0,0,0,0.02);
+        }
+
+        .folder-tab {
+            position: absolute;
+            top: 0;
+            left: 40px;
+            background: var(--folder-tab);
+            padding: 10px 30px;
+            font-family: 'Special Elite', cursive;
+            font-size: 1.2rem;
+            box-shadow: 2px -2px 5px rgba(0,0,0,0.1);
+        }
+
+        .stamp-status {
+            position: absolute;
+            top: 60px;
+            right: 60px;
+            border: 3px solid var(--olive);
+            color: var(--olive);
+            padding: 8px 20px;
+            font-family: 'Special Elite', cursive;
+            font-size: 1.8rem;
+            transform: rotate(-5deg);
+            text-transform: uppercase;
+            opacity: 0.8;
+            z-index: 20;
+        }
+
+        .war-room-title {
+            font-family: 'Special Elite', cursive;
+            font-size: 4rem;
+            line-height: 0.9;
+            margin-bottom: 15px;
+            color: var(--ink);
+        }
+
+        .mission-objective {
+            font-family: 'Roboto Slab', serif;
+            font-weight: 700;
+            max-width: 600px;
+            margin-bottom: 20px;
+            border-left: 8px solid var(--olive-dark);
+            padding-left: 20px;
+        }
+
+        .coord-bar {
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            opacity: 0.7;
+        }
+
+        .briefing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+            padding: 40px;
+        }
+
+        .briefing-card {
+            background: #fffef9;
+            border: 1px solid #c5ba9d;
+            padding: 30px;
+            position: relative;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease;
+        }
+
+        .briefing-card:hover {
+            transform: scale(1.02);
+            z-index: 5;
+        }
+
+        .briefing-card::after {
+            content: "";
+            position: absolute;
+            top: 0; right: 0;
+            border-width: 0 30px 30px 0;
+            border-style: solid;
+            border-color: var(--tan) var(--tan) transparent transparent;
+        }
+
+        .card-dept {
+            font-family: 'Special Elite', cursive;
+            font-size: 0.8rem;
+            color: var(--stamp-red);
+            margin-bottom: 10px;
+            text-decoration: underline;
+        }
+
+        .card-subject {
+            font-family: 'Roboto Slab', serif;
+            font-weight: 900;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            line-height: 1.2;
+            text-transform: uppercase;
+        }
+
+        .brief-intel {
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+            color: #444;
+        }
+
+        .action-btn {
+            display: inline-block;
+            background: var(--ink);
+            color: var(--paper);
+            padding: 10px 20px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .assets-section {
+            padding: 60px 40px;
+            background: rgba(0,0,0,0.03);
+            border-top: 1px solid var(--ink);
+        }
+
+        .section-header {
+            font-family: 'Special Elite', cursive;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--ink);
+            padding-bottom: 10px;
+        }
+
+        .asset-list {
+            list-style: none;
+        }
+
+        .asset-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px dashed rgba(0,0,0,0.1);
+        }
+
+        .asset-code {
+            font-weight: bold;
+            background: var(--olive);
+            color: white;
+            padding: 2px 8px;
+            margin-right: 20px;
+            font-size: 0.8rem;
+        }
+
+        .asset-title {
+            flex: 1;
+            font-weight: 700;
+        }
+
+        .intelligence-split {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+            padding: 40px;
+        }
+
+        .intel-block {
+            padding: 30px;
+            background: rgba(255,255,255,0.5);
+            border: 2px solid var(--ink);
+        }
+
+        .comms-log {
+            font-size: 0.85rem;
+            line-height: 1.4;
+            color: #555;
+        }
+
+        .comms-entry {
+            margin-bottom: 15px;
+        }
+
+        .timestamp {
+            color: var(--stamp-red);
+            font-weight: bold;
+        }
+
+        footer {
+            padding: 60px 40px;
+            background: #c5ba9d;
+            text-align: center;
+            border-top: 5px solid var(--olive-dark);
+        }
+
+        .footer-logo {
+            font-family: 'Special Elite', cursive;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .ink-smudge {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(0,0,0,0.06) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 15;
+        }
+
+        @media (max-width: 768px) {
+            .intelligence-split { grid-template-columns: 1fr; }
+            .war-room-title { font-size: 2.5rem; }
+            header { padding-top: 100px; }
+            .stamp-status { position: relative; top: 0; right: 0; display: inline-block; margin-bottom: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dossier-container">
+        <div class="folder-tab">FILE: WAR_ROOM_LDRSHIP</div>
+        <div class="ink-smudge" style="top: 40%; right: -50px;"></div>
+
+        <header>
+            <div class="stamp-status">Approved</div>
+            <div class="coord-bar">LOC: 35.6895° N, 139.6917° E // TIME: 0400_HOURS</div>
+            <h1 class="war-room-title">The War Room</h1>
+            <p class="mission-objective">
+                Tactical leadership frameworks, entrepreneurial survival strategies, and high-stakes decision-making protocols derived from combat operations and small business warfare.
+            </p>
+        </header>
+
+        <section class="briefing-grid">
+            <div class="briefing-card">
+                <div class="card-dept">STRATEGY // DECENTRALIZED COMMAND</div>
+                <h3 class="card-subject">Mission Command for Startup Founders</h3>
+                <p class="brief-intel">How to provide clear "Command Intent" so your team can execute effectively without a babysitter in the room.</p>
+                <a href="#" class="action-btn">Open File 01-A</a>
+            </div>
+
+            <div class="briefing-card">
+                <div class="card-dept">PERSONNEL // PSYCHOLOGY</div>
+                <h3 class="card-subject">The Moral Injury of Bad Management</h3>
+                <p class="brief-intel">Identifying toxic leadership traits that cause systemic attrition and how to rebuild trust in a fractured squad.</p>
+                <a href="#" class="action-btn">Open File 08-C</a>
+            </div>
+
+            <div class="briefing-card">
+                <div class="card-dept">TACTICAL // PRODUCTIVITY</div>
+                <h3 class="card-subject">OODA Loop: Business Decision Speed</h3>
+                <p class="brief-intel">Observe, Orient, Decide, Act. Using fighter pilot logic to out-maneuver competitors in a saturated market.</p>
+                <a href="#" class="action-btn">Open File 12-F</a>
+            </div>
+
+            <div class="briefing-card">
+                <div class="card-dept">LOGISTICS // SURVIVAL</div>
+                <h3 class="card-subject">Burn Rates & Supply Lines</h3>
+                <p class="brief-intel">Why your runway is shorter than you think and how to forage for resources when the VC cash dries up.</p>
+                <a href="#" class="action-btn">Open File 04-B</a>
+            </div>
+        </section>
+
+        <section class="intelligence-split">
+            <div class="intel-block">
+                <h2 class="section-header">Field Operations Report</h2>
+                <p style="margin-bottom: 20px; font-style: italic; border-left: 3px solid var(--stamp-red); padding-left: 15px;">
+                    "In the absence of orders, go find something and solve it. Don't wait for a committee to approve your survival."
+                </p>
+                <div class="comms-log">
+                    <div class="comms-entry">
+                        <span class="timestamp">[08:42]</span> <span style="font-weight: bold;">Jester:</span> Initial rollout of the "Clarity Protocol" successful in test sector Alpha.
+                    </div>
+                    <div class="comms-entry">
+                        <span class="timestamp">[11:15]</span> <span style="font-weight: bold;">H.Q.:</span> Resistance met in Middle Management layer. Recommend immediate flank.
+                    </div>
+                    <div class="comms-entry">
+                        <span class="timestamp">[14:30]</span> <span style="font-weight: bold;">Jester:</span> Middle management bypassed. Direct communication established with frontline assets.
+                    </div>
+                </div>
+            </div>
+
+            <div class="intel-block" style="background: var(--olive); color: var(--paper); border: none;">
+                <h3 style="font-family: 'Special Elite'; margin-bottom: 15px;">The Rulebook</h3>
+                <ul class="asset-list" style="font-size: 0.85rem;">
+                    <li style="margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px;">1. Never complain down.</li>
+                    <li style="margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px;">2. Prioritize & Execute.</li>
+                    <li style="margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px;">3. Humility is a weapon.</li>
+                    <li>4. Check your ego at the wire.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="assets-section">
+            <h2 class="section-header">Available Assets</h2>
+            <div class="asset-list">
+                <div class="asset-item">
+                    <span class="asset-code">PDF_09</span>
+                    <span class="asset-title">Post-Mortem / AAR Template (After Action Report)</span>
+                    <a href="#" style="color: var(--ink); font-weight: bold; font-size: 0.8rem;">DOWNLOAD</a>
+                </div>
+                <div class="asset-item">
+                    <span class="asset-code">XLS_44</span>
+                    <span class="asset-title">Battlefield Triage: Product Backlog Prioritizer</span>
+                    <a href="#" style="color: var(--ink); font-weight: bold; font-size: 0.8rem;">DOWNLOAD</a>
+                </div>
+                <div class="asset-item">
+                    <span class="asset-code">DOC_12</span>
+                    <span class="asset-title">The "Non-Bullshit" Employee Handbook Manifesto</span>
+                    <a href="#" style="color: var(--ink); font-weight: bold; font-size: 0.8rem;">DOWNLOAD</a>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="footer-logo">VETERAN JESTER // WAR ROOM</div>
+            <p style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.8;">
+                Secure Connection Established // Data Encrypted // Eyes Only
+            </p>
+            <div style="margin-top: 20px;">
+                <a href="#" class="action-btn">Return to Base</a>
+            </div>
+        </footer>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,185 @@
+:root {
+    --black: #000000;
+    --white: #ffffff;
+    --cream: #f4f1ea;
+    --red: #ff3c00;
+    --border: 4px solid #000000;
+    --shadow: 8px 8px 0px #000000;
+    --shadow-hover: 4px 4px 0px #000000;
+}
+
+.submission-chamber {
+    background: var(--white);
+    border: var(--border);
+    box-shadow: var(--shadow);
+    padding: 40px;
+    margin: 60px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.submission-chamber::before {
+    content: "RESTRICTED AREA";
+    position: absolute;
+    top: 10px;
+    right: -30px;
+    background: var(--red);
+    color: var(--white);
+    padding: 5px 40px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: bold;
+    font-size: 0.7rem;
+    transform: rotate(45deg);
+}
+
+.chamber-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 3rem;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+    line-height: 0.9;
+}
+
+.form-group {
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.form-label {
+    display: block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+}
+
+.chamber-input, 
+.chamber-textarea {
+    width: 100%;
+    border: var(--border);
+    padding: 20px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    background: var(--cream);
+    outline: none;
+    transition: all 0.2s;
+}
+
+.chamber-input:focus, 
+.chamber-textarea:focus {
+    background: var(--white);
+    box-shadow: 4px 4px 0px var(--red);
+}
+
+.chamber-textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+/* Censorship Meter Styles */
+.meter-container {
+    border: var(--border);
+    background: var(--black);
+    padding: 15px;
+    margin-bottom: 30px;
+}
+
+.meter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--white);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.meter-track {
+    height: 30px;
+    background: #333;
+    width: 100%;
+    position: relative;
+}
+
+.meter-bar {
+    height: 100%;
+    background: var(--red);
+    width: 100%; /* Default state: 100% censored */
+    transition: width 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.meter-status {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--white);
+    font-weight: bold;
+    font-family: 'IBM Plex Mono', monospace;
+    mix-blend-mode: difference;
+}
+
+/* Submission Button */
+.submit-btn {
+    width: 100%;
+    background: var(--black);
+    color: var(--white);
+    border: var(--border);
+    padding: 25px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.1s;
+    box-shadow: var(--shadow);
+}
+
+.submit-btn:hover {
+    background: var(--red);
+    transform: translate(2px, 2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.submit-btn:active {
+    transform: translate(8px, 8px);
+    box-shadow: none;
+}
+
+.success-state {
+    display: none;
+    text-align: center;
+    padding: 40px;
+    border: 4px dashed var(--black);
+}
+
+.glitch-text {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--red);
+    margin-top: 10px;
+    display: block;
+}
+
+@media (max-width: 600px) {
+    .chamber-title {
+        font-size: 2rem;
+    }
+    
+    .submission-chamber {
+        padding: 20px;
+    }
+}
+
+/* State management for "Censorship Drop" via external JS */
+.meter-decensored .meter-bar {
+    width: 5% !important; /* Drops to near zero */
+}
+
+.meter-decensored .meter-status::after {
+    content: " [UNCENSORED]";
+    color: #00ff00;
+}

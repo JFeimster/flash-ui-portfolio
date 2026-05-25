@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANALYZER | EQUITY TERMINAL</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --obsidian: #050505;
+            --graphite: #121212;
+            --graphite-light: #1A1A1A;
+            --bone: #F5F5F0;
+            --acid-green: #C1FF00;
+            --oxidized-copper: #8E522F;
+            --copper-glow: #D97706;
+            --blood-orange: #FF4500;
+            --cream: #FFFDD0;
+            --border-thick: 2px;
+            --grain-opacity: 0.04;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--bone);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: var(--grain-opacity);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: -0.02em; }
+        
+        nav {
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            border-bottom: var(--border-thick) solid var(--graphite-light);
+            background: var(--obsidian);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--bone); text-decoration: none; }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { text-decoration: none; color: var(--bone); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; }
+
+        .workbench-header {
+            padding: 4rem 2rem 2rem 2rem;
+            border-bottom: 1px solid var(--graphite-light);
+        }
+
+        .tagline { color: var(--oxidized-copper); font-size: 0.8rem; margin-bottom: 0.5rem; }
+        .title { font-size: 4rem; font-weight: 800; line-height: 1; margin-bottom: 1rem; }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Sidebar Inputs */
+        .controls-panel {
+            padding: 2rem;
+            border-right: var(--border-thick) solid var(--graphite-light);
+            background: rgba(18, 18, 18, 0.5);
+        }
+
+        .input-group { margin-bottom: 2rem; }
+        .input-group label { display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #777; margin-bottom: 0.5rem; }
+        .input-wrapper { position: relative; display: flex; align-items: center; }
+        .input-wrapper span { position: absolute; left: 1rem; font-family: 'JetBrains Mono', monospace; color: var(--bone); opacity: 0.5; }
+        .input-wrapper input {
+            width: 100%;
+            background: var(--obsidian);
+            border: 1px solid var(--graphite-light);
+            padding: 1rem 1rem 1rem 2.5rem;
+            color: var(--bone);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            outline: none;
+        }
+        .input-wrapper input:focus { border-color: var(--acid-green); }
+
+        .slider-group { margin-bottom: 2rem; }
+        input[type=range] { width: 100%; accent-color: var(--acid-green); background: var(--graphite-light); height: 4px; }
+
+        /* Results Display */
+        .results-panel {
+            padding: 2rem;
+            background: var(--obsidian);
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .status-banner {
+            padding: 2rem;
+            border: 4px solid var(--bone);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-banner.green-lit { border-color: var(--acid-green); background: rgba(193, 255, 0, 0.05); }
+        .status-banner.red-flag { border-color: var(--blood-orange); background: rgba(255, 69, 0, 0.05); }
+
+        .status-label { font-size: 0.8rem; font-weight: 800; margin-bottom: 0.25rem; }
+        .status-value { font-size: 3rem; font-weight: 800; line-height: 1; }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1px;
+            background: var(--graphite-light);
+            border: 1px solid var(--graphite-light);
+        }
+
+        .metric-tile {
+            background: var(--obsidian);
+            padding: 2rem;
+        }
+
+        .tile-label { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #555; margin-bottom: 1rem; }
+        .tile-value { font-size: 2rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+
+        .chart-sim-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: auto;
+        }
+
+        .stress-test-card {
+            background: var(--graphite);
+            padding: 2rem;
+            border-left: 4px solid var(--oxidized-copper);
+        }
+
+        .debt-schedule {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .debt-schedule th { text-align: left; color: #555; padding-bottom: 1rem; font-weight: 400; }
+        .debt-schedule td { padding: 0.5rem 0; border-bottom: 1px solid var(--graphite-light); }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 1.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-decoration: none;
+            border: var(--border-thick) solid var(--bone);
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--acid-green);
+            color: var(--obsidian);
+            border-color: var(--acid-green);
+        }
+
+        @media (max-width: 1024px) {
+            .main-layout { grid-template-columns: 1fr; }
+            .controls-panel { border-right: none; border-bottom: var(--border-thick) solid var(--graphite-light); }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo mono">EQUITY.TERMINAL</a>
+        <div class="nav-links">
+            <a href="#">BROWSE DEALS</a>
+            <a href="#" style="color: var(--acid-green)">ANALYZER</a>
+            <a href="#">FINANCING</a>
+            <a href="#">RESOURCES</a>
+        </div>
+        <div class="mono" style="font-size: 0.7rem; opacity: 0.6;">v.2.0.4.STABLE</div>
+    </nav>
+
+    <header class="workbench-header">
+        <p class="tagline mono">// FINANCIAL INTELLIGENCE UNIT</p>
+        <h1 class="title">DEAL ANALYZER WORKBENCH</h1>
+    </header>
+
+    <main class="main-layout">
+        <!-- INPUTS -->
+        <aside class="controls-panel">
+            <div class="input-group">
+                <label>PURCHASE PRICE</label>
+                <div class="input-wrapper">
+                    <span>$</span>
+                    <input type="number" id="purchasePrice" value="1200000" step="10000" oninput="calculate()">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>ANNUAL SDE (CASH FLOW)</label>
+                <div class="input-wrapper">
+                    <span>$</span>
+                    <input type="number" id="sde" value="400000" step="5000" oninput="calculate()">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>DOWN PAYMENT (%)</label>
+                <div class="slider-group">
+                    <input type="range" id="downPaymentPct" min="5" max="50" value="10" oninput="calculate()">
+                    <div class="mono" style="display:flex; justify-content:space-between; margin-top:0.5rem; font-size:0.8rem;">
+                        <span id="downPaymentDisplay">10%</span>
+                        <span id="downPaymentTotal" style="color: var(--oxidized-copper)">$120,000</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>LOAN TERMS (SBA 7A DEFAULT)</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div>
+                        <label style="font-size: 0.6rem;">INTEREST (%)</label>
+                        <input type="number" id="interestRate" value="10.5" step="0.1" class="mono" style="width:100%; background:var(--obsidian); border:1px solid var(--graphite-light); color:white; padding: 0.5rem;" oninput="calculate()">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.6rem;">YEARS</label>
+                        <input type="number" id="loanYears" value="10" class="mono" style="width:100%; background:var(--obsidian); border:1px solid var(--graphite-light); color:white; padding: 0.5rem;" oninput="calculate()">
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn" style="width: 100%; margin-top: 2rem;">Export Pro-Forma PDF</button>
+        </aside>
+
+        <!-- OUTPUTS -->
+        <section class="results-panel">
+            <div id="statusBanner" class="status-banner green-lit">
+                <div>
+                    <div class="status-label mono">ACQUISITION STATUS</div>
+                    <div id="statusText" class="status-value">GREEN LIT</div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="status-label mono">DSCR RATIO</div>
+                    <div id="dscrValue" class="status-value">1.84</div>
+                </div>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-tile">
+                    <div class="tile-label">ENTRY MULTIPLE</div>
+                    <div id="entryMultiple" class="tile-value">3.00x</div>
+                </div>
+                <div class="metric-tile">
+                    <div class="tile-label">DEBT SERVICE (ANNUAL)</div>
+                    <div id="annualDebt" class="tile-value">$165,402</div>
+                </div>
+                <div class="metric-tile">
+                    <div class="tile-label">CASH-ON-CASH ROI</div>
+                    <div id="cocReturn" class="tile-value" style="color: var(--acid-green);">145.2%</div>
+                </div>
+                <div class="metric-tile">
+                    <div class="tile-label">POST-DEBT CASH FLOW</div>
+                    <div id="netCashFlow" class="tile-value">$234,598</div>
+                </div>
+            </div>
+
+            <div class="chart-sim-container">
+                <div class="stress-test-card">
+                    <h3 class="mono" style="font-size: 0.8rem; margin-bottom: 1.5rem; color: var(--oxidized-copper);">Risk Assessment: Stress Test</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 1.5rem;">Simulated 25% drop in SDE due to market volatility or transition friction.</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(0,0,0,0.3);">
+                        <span class="mono" style="font-size: 0.7rem;">Simulated DSCR</span>
+                        <span id="stressDscr" class="mono" style="font-weight: 800; color: var(--acid-green);">1.38</span>
+                    </div>
+                    <div style="margin-top: 1rem; font-size: 0.75rem; color: #888;">
+                        * Minimum lender requirement is typically 1.25x.
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="mono" style="font-size: 0.8rem; margin-bottom: 1.5rem;">Capital Stack</h3>
+                    <table class="debt-schedule">
+                        <thead>
+                            <tr>
+                                <th>SOURCE</th>
+                                <th>AMOUNT</th>
+                                <th>%</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Equity (Down Payment)</td>
+                                <td id="stackEquity">$120,000</td>
+                                <td id="stackEquityPct">10%</td>
+                            </tr>
+                            <tr>
+                                <td>Senior Debt (SBA)</td>
+                                <td id="stackDebt">$1,080,000</td>
+                                <td id="stackDebtPct">90%</td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: 800;">Total Purchase Price</td>
+                                <td id="stackTotal" style="font-weight: 800;">$1,200,000</td>
+                                <td style="font-weight: 800;">100%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function formatCurrency(num) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(num);
+        }
+
+        function calculate() {
+            const price = parseFloat(document.getElementById('purchasePrice').value) || 0;
+            const sde = parseFloat(document.getElementById('sde').value) || 0;
+            const downPct = parseFloat(document.getElementById('downPaymentPct').value) || 0;
+            const rate = parseFloat(document.getElementById('interestRate').value) / 100 || 0;
+            const years = parseFloat(document.getElementById('loanYears').value) || 1;
+
+            const downTotal = price * (downPct / 100);
+            const loanAmount = price - downTotal;
+
+            // Mortgage Formula: P [ i(1 + i)^n ] / [ (1 + i)^n – 1]
+            const monthlyRate = rate / 12;
+            const numPayments = years * 12;
+            let monthlyPayment = 0;
+            
+            if (rate > 0) {
+                monthlyPayment = loanAmount * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / (Math.pow(1 + monthlyRate, numPayments) - 1);
+            } else {
+                monthlyPayment = loanAmount / numPayments;
+            }
+
+            const annualDebtService = monthlyPayment * 12;
+            const dscr = sde / annualDebtService;
+            const multiple = price / sde;
+            const netCashFlow = sde - annualDebtService;
+            const coc = (netCashFlow / downTotal) * 100;
+
+            // Update UI
+            document.getElementById('downPaymentDisplay').innerText = downPct + '%';
+            document.getElementById('downPaymentTotal').innerText = formatCurrency(downTotal);
+            
+            document.getElementById('dscrValue').innerText = dscr.toFixed(2);
+            document.getElementById('entryMultiple').innerText = multiple.toFixed(2) + 'x';
+            document.getElementById('annualDebt').innerText = formatCurrency(annualDebtService);
+            document.getElementById('netCashFlow').innerText = formatCurrency(netCashFlow);
+            document.getElementById('cocReturn').innerText = coc.toFixed(1) + '%';
+
+            // Stack table
+            document.getElementById('stackEquity').innerText = formatCurrency(downTotal);
+            document.getElementById('stackEquityPct').innerText = downPct + '%';
+            document.getElementById('stackDebt').innerText = formatCurrency(loanAmount);
+            document.getElementById('stackDebtPct').innerText = (100 - downPct) + '%';
+            document.getElementById('stackTotal').innerText = formatCurrency(price);
+
+            // Stress Test (25% SDE drop)
+            const stressDscrValue = (sde * 0.75) / annualDebtService;
+            document.getElementById('stressDscr').innerText = stressDscrValue.toFixed(2);
+            document.getElementById('stressDscr').style.color = stressDscrValue < 1.1 ? 'var(--blood-orange)' : 'var(--acid-green)';
+
+            // Status Logic
+            const banner = document.getElementById('statusBanner');
+            const statusText = document.getElementById('statusText');
+            
+            if (dscr >= 1.25 && stressDscrValue >= 1.0) {
+                banner.className = 'status-banner green-lit';
+                statusText.innerText = 'GREEN LIT';
+            } else if (dscr >= 1.1) {
+                banner.className = 'status-banner';
+                banner.style.borderColor = 'var(--oxidized-copper)';
+                banner.style.background = 'transparent';
+                statusText.innerText = 'CAUTION';
+            } else {
+                banner.className = 'status-banner red-flag';
+                statusText.innerText = 'RED FLAG';
+            }
+        }
+
+        // Initialize
+        calculate();
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANALYZER | EQUITY TERMINAL</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --obsidian: #050505;
+            --graphite: #121212;
+            --graphite-light: #1A1A1A;
+            --bone: #F5F5F0;
+            --acid-green: #C1FF00;
+            --oxidized-copper: #8E522F;
+            --copper-glow: #D97706;
+            --blood-orange: #FF4500;
+            --cream: #FFFDD0;
+            --border-thick: 2px;
+            --grain-opacity: 0.04;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--bone);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: var(--grain-opacity);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: -0.02em; }
+        
+        nav {
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            border-bottom: var(--border-thick) solid var(--graphite-light);
+            background: var(--obsidian);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--bone); text-decoration: none; }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { text-decoration: none; color: var(--bone); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; }
+
+        .workbench-header {
+            padding: 4rem 2rem 2rem 2rem;
+            border-bottom: 1px solid var(--graphite-light);
+        }
+
+        .tagline { color: var(--oxidized-copper); font-size: 0.8rem; margin-bottom: 0.5rem; }
+        .title { font-size: 4rem; font-weight: 800; line-height: 1; margin-bottom: 1rem; }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Sidebar Inputs */
+        .controls-panel {
+            padding: 2rem;
+            border-right: var(--border-thick) solid var(--graphite-light);
+            background: rgba(18, 18, 18, 0.5);
+        }
+
+        .input-group { margin-bottom: 2rem; }
+        .input-group label { display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #777; margin-bottom: 0.5rem; }
+        .input-wrapper { position: relative; display: flex; align-items: center; }
+        .input-wrapper span { position: absolute; left: 1rem; font-family: 'JetBrains Mono', monospace; color: var(--bone); opacity: 0.5; }
+        .input-wrapper input {
+            width: 100%;
+            background: var(--obsidian);
+            border: 1px solid var(--graphite-light);
+            padding: 1rem 1rem 1rem 2.5rem;
+            color: var(--bone);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            outline: none;
+        }
+        .input-wrapper input:focus { border-color: var(--acid-green); }
+
+        .slider-group { margin-bottom: 2rem; }
+        input[type=range] { width: 100%; accent-color: var(--acid-green); background: var(--graphite-light); height: 4px; }
+
+        /* Results Display */
+        .results-panel {
+            padding: 2rem;
+            background: var(--obsidian);
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .status-banner {
+            padding: 2rem;
+            border: 4px solid var(--bone);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-banner.green-lit { border-color: var(--acid-green); background: rgba(193, 255, 0, 0.05); }
+        .status-banner.red-flag { border-color: var(--blood-orange); background: rgba(255, 69, 0, 0.05); }
+
+        .status-label { font-size: 0.8rem; font-weight: 800; margin-bottom: 0.25rem; }
+        .status-value { font-size: 3rem; font-weight: 800; line-height: 1; }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1px;
+            background: var(--graphite-light);
+            border: 1px solid var(--graphite-light);
+        }
+
+        .metric-tile {
+            background: var(--obsidian);
+            padding: 2rem;
+        }
+
+        .tile-label { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #555; margin-bottom: 1rem; }
+        .tile-value { font-size: 2rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+
+        .chart-sim-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: auto;
+        }
+
+        .stress-test-card {
+            background: var(--graphite);
+            padding: 2rem;
+            border-left: 4px solid var(--oxidized-copper);
+        }
+
+        .debt-schedule {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .debt-schedule th { text-align: left; color: #555; padding-bottom: 1rem; font-weight: 400; }
+        .debt-schedule td { padding: 0.5rem 0; border-bottom: 1px solid var(--graphite-light); }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 1.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-decoration: none;
+            border: var(--border-thick) solid var(--bone);
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--acid-green);
+            color: var(--obsidian);
+            border-color: var(--acid-green);
+        }
+
+        @media (max-width: 1024px) {
+            .main-layout { grid-template-columns: 1fr; }
+            .controls-panel { border-right: none; border-bottom: var(--border-thick) solid var(--graphite-light); }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo mono">EQUITY.TERMINAL</a>
+        <div class="nav-links">
+            <a href="#">BROWSE DEALS</a>
+            <a href="#" style="color: var(--acid-green)">ANALYZER</a>
+            <a href="#">FINANCING</a>
+            <a href="#">RESOURCES</a>
+        </div>
+        <div class="mono" style="font-size: 0.7rem; opacity: 0.6;">v.2.0.4.STABLE</div>
+    </nav>
+
+    <header class="workbench-header">
+        <p class="tagline mono">// FINANCIAL INTELLIGENCE UNIT</p>
+        <h1 class="title">DEAL ANALYZER WORKBENCH</h1>
+    </header>
+
+    <main class="main-layout">
+        <!-- INPUTS -->
+        <aside class="controls-panel">
+            <div class="input-group">
+                <label>PURCHASE PRICE</label>
+                <div class="input-wrapper">
+                    <span>$</span>
+                    <input type="number" id="purchasePrice" value="1200000" step="10000" oninput="calculate()">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>ANNUAL SDE (CASH FLOW)</label>
+                <div class="input-wrapper">
+                    <span>$</span>
+                    <input type="number" id="sde" value="400000" step="5000" oninput="calculate()">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>DOWN PAYMENT (%)</label>
+                <div class="slider-group">
+                    <input type="range" id="downPaymentPct" min="5" max="50" value="10" oninput="calculate()">
+                    <div class="mono" style="display:flex; justify-content:space-between; margin-top:0.5rem; font-size:0.8rem;">
+                        <span id="downPaymentDisplay">10%</span>
+                        <span id="downPaymentTotal" style="color: var(--oxidized-copper)">$120,000</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>LOAN TERMS (SBA 7A DEFAULT)</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div>
+                        <label style="font-size: 0.6rem;">INTEREST (%)</label>
+                        <input type="number" id="interestRate" value="10.5" step="0.1" class="mono" style="width:100%; background:var(--obsidian); border:1px solid var(--graphite-light); color:white; padding: 0.5rem;" oninput="calculate()">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.6rem;">YEARS</label>
+                        <input type="number" id="loanYears" value="10" class="mono" style="width:100%; background:var(--obsidian); border:1px solid var(--graphite-light); color:white; padding: 0.5rem;" oninput="calculate()">
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn" style="width: 100%; margin-top: 2rem;">Export Pro-Forma PDF</button>
+        </aside>
+
+        <!-- OUTPUTS -->
+        <section class="results-panel">
+            <div id="statusBanner" class="status-banner green-lit">
+                <div>
+                    <div class="status-label mono">ACQUISITION STATUS</div>
+                    <div id="statusText" class="status-value">GREEN LIT</div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="status-label mono">DSCR RATIO</div>
+                    <div id="dscrValue" class="status-value">1.84</div>
+                </div>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-tile">
+                    <div class="tile-label">ENTRY MULTIPLE</div>
+                    <div id="entryMultiple" class="tile-value">3.00x</div>
+                </div>
+                <div class="metric-tile">
+                    <div class="tile-label">DEBT SERVICE (ANNUAL)</div>
+                    <div id="annualDebt" class="tile-value">$165,402</div>
+                </div>
+                <div class="metric-tile">
+                    <div class="tile-label">CASH-ON-CASH ROI</div>
+                    <div id="cocReturn" class="tile-value" style="color: var(--acid-green);">145.2%</div>
+                </div>
+                <div class="metric-tile">
+                    <div class="tile-label">POST-DEBT CASH FLOW</div>
+                    <div id="netCashFlow" class="tile-value">$234,598</div>
+                </div>
+            </div>
+
+            <div class="chart-sim-container">
+                <div class="stress-test-card">
+                    <h3 class="mono" style="font-size: 0.8rem; margin-bottom: 1.5rem; color: var(--oxidized-copper);">Risk Assessment: Stress Test</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 1.5rem;">Simulated 25% drop in SDE due to market volatility or transition friction.</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(0,0,0,0.3);">
+                        <span class="mono" style="font-size: 0.7rem;">Simulated DSCR</span>
+                        <span id="stressDscr" class="mono" style="font-weight: 800; color: var(--acid-green);">1.38</span>
+                    </div>
+                    <div style="margin-top: 1rem; font-size: 0.75rem; color: #888;">
+                        * Minimum lender requirement is typically 1.25x.
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="mono" style="font-size: 0.8rem; margin-bottom: 1.5rem;">Capital Stack</h3>
+                    <table class="debt-schedule">
+                        <thead>
+                            <tr>
+                                <th>SOURCE</th>
+                                <th>AMOUNT</th>
+                                <th>%</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Equity (Down Payment)</td>
+                                <td id="stackEquity">$120,000</td>
+                                <td id="stackEquityPct">10%</td>
+                            </tr>
+                            <tr>
+                                <td>Senior Debt (SBA)</td>
+                                <td id="stackDebt">$1,080,000</td>
+                                <td id="stackDebtPct">90%</td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: 800;">Total Purchase Price</td>
+                                <td id="stackTotal" style="font-weight: 800;">$1,200,000</td>
+                                <td style="font-weight: 800;">100%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function formatCurrency(num) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(num);
+        }
+
+        function calculate() {
+            const price = parseFloat(document.getElementById('purchasePrice').value) || 0;
+            const sde = parseFloat(document.getElementById('sde').value) || 0;
+            const downPct = parseFloat(document.getElementById('downPaymentPct').value) || 0;
+            const rate = parseFloat(document.getElementById('interestRate').value) / 100 || 0;
+            const years = parseFloat(document.getElementById('loanYears').value) || 1;
+
+            const downTotal = price * (downPct / 100);
+            const loanAmount = price - downTotal;
+
+            // Mortgage Formula: P [ i(1 + i)^n ] / [ (1 + i)^n – 1]
+            const monthlyRate = rate / 12;
+            const numPayments = years * 12;
+            let monthlyPayment = 0;
+            
+            if (rate > 0) {
+                monthlyPayment = loanAmount * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / (Math.pow(1 + monthlyRate, numPayments) - 1);
+            } else {
+                monthlyPayment = loanAmount / numPayments;
+            }
+
+            const annualDebtService = monthlyPayment * 12;
+            const dscr = sde / annualDebtService;
+            const multiple = price / sde;
+            const netCashFlow = sde - annualDebtService;
+            const coc = (netCashFlow / downTotal) * 100;
+
+            // Update UI
+            document.getElementById('downPaymentDisplay').innerText = downPct + '%';
+            document.getElementById('downPaymentTotal').innerText = formatCurrency(downTotal);
+            
+            document.getElementById('dscrValue').innerText = dscr.toFixed(2);
+            document.getElementById('entryMultiple').innerText = multiple.toFixed(2) + 'x';
+            document.getElementById('annualDebt').innerText = formatCurrency(annualDebtService);
+            document.getElementById('netCashFlow').innerText = formatCurrency(netCashFlow);
+            document.getElementById('cocReturn').innerText = coc.toFixed(1) + '%';
+
+            // Stack table
+            document.getElementById('stackEquity').innerText = formatCurrency(downTotal);
+            document.getElementById('stackEquityPct').innerText = downPct + '%';
+            document.getElementById('stackDebt').innerText = formatCurrency(loanAmount);
+            document.getElementById('stackDebtPct').innerText = (100 - downPct) + '%';
+            document.getElementById('stackTotal').innerText = formatCurrency(price);
+
+            // Stress Test (25% SDE drop)
+            const stressDscrValue = (sde * 0.75) / annualDebtService;
+            document.getElementById('stressDscr').innerText = stressDscrValue.toFixed(2);
+            document.getElementById('stressDscr').style.color = stressDscrValue < 1.1 ? 'var(--blood-orange)' : 'var(--acid-green)';
+
+            // Status Logic
+            const banner = document.getElementById('statusBanner');
+            const statusText = document.getElementById('statusText');
+            
+            if (dscr >= 1.25 && stressDscrValue >= 1.0) {
+                banner.className = 'status-banner green-lit';
+                statusText.innerText = 'GREEN LIT';
+            } else if (dscr >= 1.1) {
+                banner.className = 'status-banner';
+                banner.style.borderColor = 'var(--oxidized-copper)';
+                banner.style.background = 'transparent';
+                statusText.innerText = 'CAUTION';
+            } else {
+                banner.className = 'status-banner red-flag';
+                statusText.innerText = 'RED FLAG';
+            }
+        }
+
+        // Initialize
+        calculate();
+    </script>
+</body>
+</html>

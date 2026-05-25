@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HALL OF FLAME | QUOTE GRENADE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Archivo+Black&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #000000;
+            --red: #FF0000;
+            --cream: #F5F5DC;
+            --white: #FFFFFF;
+            --border-width: 4px;
+            --shadow-offset: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--black);
+            color: var(--white);
+            font-family: 'Space Grotesk', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.1;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Archivo Black', sans-serif;
+            text-transform: uppercase;
+        }
+
+        /* Nav */
+        nav {
+            background: var(--red);
+            border-bottom: var(--border-width) solid var(--black);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            color: var(--black);
+            text-decoration: none;
+            font-family: 'Archivo Black';
+            font-size: 1.5rem;
+        }
+
+        .back-link {
+            color: var(--black);
+            font-weight: 700;
+            text-decoration: none;
+            border: 2px solid var(--black);
+            padding: 0.5rem 1rem;
+            background: var(--white);
+            box-shadow: 4px 4px 0 var(--black);
+        }
+
+        /* Hero */
+        .flame-hero {
+            padding: 6rem 2rem;
+            background: var(--white);
+            color: var(--black);
+            text-align: center;
+            border-bottom: var(--border-width) solid var(--black);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .flame-hero h1 {
+            font-size: clamp(4rem, 15vw, 12rem);
+            line-height: 0.8;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .flame-hero .bg-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-5deg);
+            font-size: 20rem;
+            color: rgba(255, 0, 0, 0.05);
+            font-family: 'Archivo Black';
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        /* Gallery Grid */
+        .flame-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 0;
+            border-bottom: var(--border-width) solid var(--white);
+        }
+
+        .flame-card {
+            border: 2px solid var(--white);
+            padding: 4rem 2rem;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            background: var(--black);
+        }
+
+        .flame-card:nth-child(3n+1) {
+            background: var(--red);
+        }
+
+        .flame-card:hover {
+            z-index: 10;
+            transform: scale(1.02);
+            filter: invert(1);
+        }
+
+        .detonation-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--white);
+            color: var(--black);
+            padding: 0.5rem 1rem;
+            font-weight: 900;
+            font-size: 0.8rem;
+            transform: rotate(5deg);
+            border: 2px solid var(--black);
+        }
+
+        .quote-body {
+            font-family: 'Archivo Black';
+            font-size: 2.5rem;
+            line-height: 1;
+            margin-top: 2rem;
+        }
+
+        .quote-meta {
+            margin-top: 3rem;
+            border-top: 2px solid currentColor;
+            padding-top: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .tag {
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        /* Overlapping Typography Section */
+        .overlap-section {
+            padding: 10rem 2rem;
+            background: var(--cream);
+            color: var(--black);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .overlap-text {
+            font-family: 'Archivo Black';
+            font-size: clamp(3rem, 10vw, 8rem);
+            text-align: center;
+            max-width: 1000px;
+            line-height: 0.85;
+            position: relative;
+        }
+
+        .overlap-text span {
+            display: block;
+            position: relative;
+        }
+
+        .overlap-text .layer-1 { color: var(--red); margin-left: -50px; z-index: 3; }
+        .overlap-text .layer-2 { margin-top: -30px; z-index: 2; }
+        .overlap-text .layer-3 { color: var(--white); text-shadow: 4px 4px 0 var(--black); margin-top: -20px; z-index: 1; }
+
+        /* Scroll Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--black);
+            border-top: var(--border-width) solid var(--white);
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .btn-large {
+            display: inline-block;
+            background: var(--red);
+            color: var(--white);
+            font-family: 'Archivo Black';
+            font-size: 2rem;
+            padding: 2rem 4rem;
+            border: var(--border-width) solid var(--white);
+            text-decoration: none;
+            transition: 0.2s;
+            box-shadow: 12px 12px 0 var(--white);
+        }
+
+        .btn-large:hover {
+            transform: translate(-6px, -6px);
+            box-shadow: 18px 18px 0 var(--white);
+        }
+
+        @media (max-width: 768px) {
+            .flame-grid { grid-template-columns: 1fr; }
+            .flame-card { min-height: 350px; }
+            .overlap-text { font-size: 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">QUOTE GRENADE</a>
+        <a href="index.html" class="back-link">← ARM THE DEVICE</a>
+    </nav>
+
+    <header class="flame-hero">
+        <div class="bg-text">LOUD LOUD LOUD</div>
+        <h1>HALL OF<br>FLAME</h1>
+        <p style="font-weight: 700; font-size: 1.2rem; text-transform: uppercase;">The Most Detonated Riffs in the Armory</p>
+    </header>
+
+    <div class="flame-grid">
+        <div class="flame-card">
+            <div class="detonation-badge">84.2K DETONATIONS</div>
+            <div class="quote-body">"PERMISSION IS THE GHOST OF A DEAD KING."</div>
+            <div class="quote-meta">
+                <span class="tag">#LIBERTY</span>
+                <span style="font-size: 2rem;">💥</span>
+            </div>
+        </div>
+
+        <div class="flame-card">
+            <div class="detonation-badge">61.9K DETONATIONS</div>
+            <div class="quote-body">"COMPLIANCE IS A SLOW SUICIDE."</div>
+            <div class="quote-meta">
+                <span class="tag">#GRENADE</span>
+                <span style="font-size: 2rem;">🔥</span>
+            </div>
+        </div>
+
+        <div class="flame-card">
+            <div class="detonation-badge">55.0K DETONATIONS</div>
+            <div class="quote-body">"THE STATE IS A BUG, NOT A FEATURE."</div>
+            <div class="quote-meta">
+                <span class="tag">#CONTRARIAN</span>
+                <span style="font-size: 2rem;">💣</span>
+            </div>
+        </div>
+
+        <div class="flame-card">
+            <div class="detonation-badge">42.1K DETONATIONS</div>
+            <div class="quote-body">"BUILD THINGS THAT MAKE THE STATE OBSOLETE."</div>
+            <div class="quote-meta">
+                <span class="tag">#FOUNDER</span>
+                <span style="font-size: 2rem;">⚡️</span>
+            </div>
+        </div>
+
+        <div class="flame-card">
+            <div class="detonation-badge">38.7K DETONATIONS</div>
+            <div class="quote-body">"YOUR COMFORT ZONE IS A GILDED CAGE."</div>
+            <div class="quote-meta">
+                <span class="tag">#PHILOSOPHY</span>
+                <span style="font-size: 2rem;">🌪️</span>
+            </div>
+        </div>
+
+        <div class="flame-card">
+            <div class="detonation-badge">29.4K DETONATIONS</div>
+            <div class="quote-body">"CODE IS THE ONLY LAW WITHOUT A GUN."</div>
+            <div class="quote-meta">
+                <span class="tag">#CRYPTO</span>
+                <span style="font-size: 2rem;">🔗</span>
+            </div>
+        </div>
+    </div>
+
+    <section class="overlap-section">
+        <div class="overlap-text reveal">
+            <span class="layer-1">SILENCE IS</span>
+            <span class="layer-2">A SLOW</span>
+            <span class="layer-3">POISON.</span>
+        </div>
+        <p style="margin-top: 4rem; font-weight: 800; max-width: 500px; text-align: center; text-transform: uppercase;">
+            These quotes have been shared across the decentralized web, printed on illicit stickers, and whispered in the halls of progress.
+        </p>
+    </section>
+
+    <footer>
+        <a href="index.html" class="btn-large">PULL THE PIN AGAIN</a>
+        <p style="margin-top: 4rem; opacity: 0.5; font-weight: 700;">NO COPYRIGHT. NO PERMISSION. JUST TRUTH.</p>
+    </footer>
+
+    <script>
+        // Scroll Reveal Logic
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Tilt effect for cards on mouse move
+        const cards = document.querySelectorAll('.flame-card');
+        cards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = (y - centerY) / 20;
+                const rotateY = (centerX - x) / 20;
+                
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)`;
+            });
+        });
+    </script>
+</body>
+</html>

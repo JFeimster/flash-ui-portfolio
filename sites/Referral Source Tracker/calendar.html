@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --bg-body: #020617;
+        --bg-overlay: rgba(2, 6, 23, 0.9);
+        --modal-bg: #0f172a;
+        --surface: #1e293b;
+        --surface-hover: #334155;
+        --border: #334155;
+        --text-primary: #f8fafc;
+        --text-secondary: #94a3b8;
+        --accent: #f8fafc;
+        --accent-text: #0f172a;
+        --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+        box-sizing: border-box;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', sans-serif;
+        background: var(--bg-body);
+        color: var(--text-primary);
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    /* Top Navigation */
+    .top-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 32px;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg-body);
+        z-index: 10;
+    }
+
+    .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+    }
+
+    .current-month {
+        font-size: 1.25rem;
+        font-weight: 600;
+        letter-spacing: -0.025em;
+    }
+
+    .nav-controls {
+        display: flex;
+        gap: 8px;
+    }
+
+    .icon-btn {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--text-primary);
+        padding: 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        transition: background 0.2s;
+    }
+
+    .icon-btn:hover {
+        background: var(--surface-hover);
+    }
+
+    .view-toggle {
+        display: flex;
+        background: var(--surface);
+        padding: 4px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+    }
+
+    .toggle-btn {
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        padding: 6px 16px;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .toggle-btn.active {
+        background: var(--surface-hover);
+        color: var(--text-primary);
+    }
+
+    /* Calendar Grid */
+    .calendar-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+    }
+
+    .grid-header {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        border-bottom: 1px solid var(--border);
+        background: var(--bg-body);
+    }
+
+    .weekday {
+        padding: 12px;
+        text-align: center;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-secondary);
+        border-right: 1px solid var(--border);
+    }
+
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        grid-auto-rows: minmax(140px, 1fr);
+        flex: 1;
+    }
+
+    .day-cell {
+        border-right: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        padding: 12px;
+        transition: background 0.2s;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .day-cell:hover {
+        background: rgba(30, 41, 59, 0.4);
+    }
+
+    .day-cell.other-month {
+        color: #334155;
+        background: rgba(15, 23, 42, 0.3);
+    }
+
+    .day-number {
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .day-cell.today .day-number {
+        background: var(--accent);
+        color: var(--accent-text);
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+    }
+
+    /* Event Tags */
+    .event {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--text-secondary);
+        border-radius: 6px;
+        padding: 6px 8px;
+        font-size: 0.75rem;
+        margin-bottom: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: transform 0.1s;
+    }
+
+    .event:hover {
+        transform: translateY(-1px);
+        background: var(--surface-hover);
+    }
+
+    .event.active {
+        border-left-color: #fbbf24;
+    }
+
+    .event.meeting {
+        border-left-color: #6366f1;
+    }
+
+    /* Floating Action Button */
+    .fab {
+        position: fixed;
+        bottom: 32px;
+        right: 32px;
+        background: var(--accent);
+        color: var(--accent-text);
+        width: 56px;
+        height: 56px;
+        border-radius: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+        cursor: pointer;
+        border: none;
+        transition: transform 0.2s;
+    }
+
+    .fab:hover {
+        transform: scale(1.05);
+    }
+
+    /* Modal (Hidden by default) */
+    #scheduleModal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+    }
+
+    #scheduleModal:target {
+        display: flex;
+    }
+
+    .modal-overlay {
+        position: absolute;
+        inset: 0;
+        background: var(--bg-overlay);
+        backdrop-filter: blur(12px);
+    }
+
+    .modal-content {
+        position: relative;
+        z-index: 1001;
+        margin: auto;
+    }
+
+    /* Specific overrides from base for the calendar context */
+    .avatar-group { display: flex; align-items: center; }
+    .avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--modal-bg); background: var(--surface); margin-left: -8px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 600; overflow: hidden; }
+    .avatar:first-child { margin-left: 0; }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    
+    @media (max-width: 768px) {
+        .weekday:nth-child(n+6), .day-cell:nth-child(7n), .day-cell:nth-child(7n-1) {
+            display: none;
+        }
+        .grid-header, .calendar-grid {
+            grid-template-columns: repeat(5, 1fr);
+        }
+    }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+    <div class="nav-left">
+        <span class="current-month">October 2023</span>
+        <div class="nav-controls">
+            <button class="icon-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <button class="icon-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+        </div>
+    </div>
+    <div class="view-toggle">
+        <button class="toggle-btn active">Month</button>
+        <button class="toggle-btn">Week</button>
+        <button class="toggle-btn">Day</button>
+    </div>
+</nav>
+
+<div class="calendar-container">
+    <div class="grid-header">
+        <div class="weekday">Mon</div>
+        <div class="weekday">Tue</div>
+        <div class="weekday">Wed</div>
+        <div class="weekday">Thu</div>
+        <div class="weekday">Fri</div>
+        <div class="weekday">Sat</div>
+        <div class="weekday">Sun</div>
+    </div>
+    <div class="calendar-grid">
+        <!-- Week 1 (Partial) -->
+        <div class="day-cell other-month"><span class="day-number">25</span></div>
+        <div class="day-cell other-month"><span class="day-number">26</span></div>
+        <div class="day-cell other-month"><span class="day-number">27</span></div>
+        <div class="day-cell other-month"><span class="day-number">28</span></div>
+        <div class="day-cell other-month"><span class="day-number">29</span></div>
+        <div class="day-cell other-month"><span class="day-number">30</span></div>
+        <div class="day-cell"><span class="day-number">1</span></div>
+        
+        <!-- Week 2 -->
+        <div class="day-cell"><span class="day-number">2</span></div>
+        <div class="day-cell"><span class="day-number">3</span></div>
+        <div class="day-cell"><span class="day-number">4</span></div>
+        <div class="day-cell"><span class="day-number">5</span><div class="event active">Design Review</div></div>
+        <div class="day-cell"><span class="day-number">6</span></div>
+        <div class="day-cell"><span class="day-number">7</span></div>
+        <div class="day-cell"><span class="day-number">8</span></div>
+
+        <!-- Week 3 -->
+        <div class="day-cell"><span class="day-number">9</span></div>
+        <div class="day-cell"><span class="day-number">10</span><div class="event meeting">Client Pitch</div></div>
+        <div class="day-cell"><span class="day-number">11</span></div>
+        <div class="day-cell"><span class="day-number">12</span></div>
+        <div class="day-cell"><span class="day-number">13</span></div>
+        <div class="day-cell"><span class="day-number">14</span></div>
+        <div class="day-cell"><span class="day-number">15</span></div>
+
+        <!-- Week 4 -->
+        <div class="day-cell"><span class="day-number">16</span></div>
+        <div class="day-cell"><span class="day-number">17</span></div>
+        <div class="day-cell"><span class="day-number">18</span></div>
+        <div class="day-cell"><span class="day-number">19</span></div>
+        <div class="day-cell"><span class="day-number">20</span></div>
+        <div class="day-cell"><span class="day-number">21</span></div>
+        <div class="day-cell"><span class="day-number">22</span></div>
+
+        <!-- Week 5 -->
+        <div class="day-cell"><span class="day-number">23</span></div>
+        <a href="#scheduleModal" style="text-decoration: none; color: inherit;">
+            <div class="day-cell today">
+                <span class="day-number">24</span>
+                <div class="event meeting" style="border-left-color: var(--accent);">Project Sync</div>
+            </div>
+        </a>
+        <div class="day-cell"><span class="day-number">25</span></div>
+        <div class="day-cell"><span class="day-number">26</span></div>
+        <div class="day-cell"><span class="day-number">27</span></div>
+        <div class="day-cell"><span class="day-number">28</span></div>
+        <div class="day-cell"><span class="day-number">29</span></div>
+    </div>
+</div>
+
+<button class="fab" onclick="window.location.hash='scheduleModal'">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+</button>
+
+<!-- Reusable Modal (Imported from BASE) -->
+<div id="scheduleModal">
+    <div class="modal-overlay" onclick="window.location.hash=''"></div>
+    <div class="modal-content">
+        <style>
+            .modal { background: var(--modal-bg); width: 100%; max-width: 440px; border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; animation: modalAppear 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+            @keyframes modalAppear { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+            .header { padding: 32px 32px 24px; }
+            .header h2 { margin: 0; color: var(--text-primary); font-size: 1.25rem; font-weight: 600; letter-spacing: -0.025em; }
+            .header p { margin: 8px 0 0; color: var(--text-secondary); font-size: 0.875rem; line-height: 1.5; }
+            .section { padding: 0 32px 24px; }
+            .label { display: block; font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 12px; }
+            .add-btn { background: transparent; border: 1px dashed var(--border); cursor: pointer; color: var(--text-secondary); transition: all 0.2s; }
+            .add-btn:hover { border-color: var(--text-secondary); color: var(--text-primary); }
+            .picker-container { display: grid; grid-template-columns: 1fr; gap: 12px; }
+            .input-pill { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; cursor: pointer; transition: background 0.2s; }
+            .input-pill:hover { background: var(--surface-hover); }
+            .input-pill span { font-size: 0.9rem; color: var(--text-primary); }
+            .input-pill svg { width: 16px; height: 16px; margin-right: 12px; color: var(--text-secondary); }
+            .time-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
+            .time-chip { padding: 8px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 0.75rem; text-align: center; cursor: pointer; transition: all 0.2s; }
+            .time-chip:hover { border-color: var(--text-primary); color: var(--text-primary); }
+            .time-chip.active { background: var(--text-primary); color: var(--accent-text); border-color: var(--text-primary); }
+            .footer { padding: 24px 32px 32px; display: flex; gap: 12px; }
+            .btn { flex: 1; padding: 14px; border-radius: 12px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: transform 0.1s ease, opacity 0.2s; border: none; outline: none; }
+            .btn-secondary { background: transparent; color: var(--text-secondary); }
+            .btn-primary { background: var(--accent); color: var(--accent-text); }
+        </style>
+        <div class="modal">
+            <div class="header">
+                <h2>Schedule Session</h2>
+                <p>Select your preferred time and invite participants for the project sync.</p>
+            </div>
+            <div class="section">
+                <span class="label">Participants</span>
+                <div class="avatar-group">
+                    <div class="avatar"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=64&h=64&q=80" alt="U"></div>
+                    <div class="avatar"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=64&h=64&q=80" alt="U"></div>
+                    <div class="avatar" style="background: var(--surface-hover);">+2</div>
+                    <button class="avatar add-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+                </div>
+            </div>
+            <div class="section">
+                <span class="label">Date & Time</span>
+                <div class="picker-container">
+                    <div class="input-pill">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        <span>October 24, 2023</span>
+                    </div>
+                    <div class="time-grid">
+                        <div class="time-chip">09:00</div>
+                        <div class="time-chip">10:30</div>
+                        <div class="time-chip active">13:00</div>
+                        <div class="time-chip">14:30</div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer">
+                <button class="btn btn-secondary" onclick="window.location.hash=''">Discard</button>
+                <button class="btn btn-primary" onclick="window.location.hash=''">Confirm Meeting</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

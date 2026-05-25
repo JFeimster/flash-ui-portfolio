@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funding Options Explorer | Swiss Ledger</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper: #F9F9F7;
+            --ink: #1A1A1A;
+            --accent: #FF3B30;
+            --border: #1A1A1A;
+            --grid: rgba(26, 26, 26, 0.1);
+            --success: #008148;
+            --muted: #666;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: #E5E5E5;
+            font-family: 'Inter', -apple-system, sans-serif;
+            color: var(--ink);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .ledger-container {
+            background-color: var(--paper);
+            width: 100%;
+            max-width: 900px;
+            border: 2px solid var(--border);
+            box-shadow: 20px 20px 0px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ledger-container::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(var(--grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .header {
+            border-bottom: 2px solid var(--border);
+            padding: 40px;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .header-title h1 {
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 0.9;
+            letter-spacing: -0.04em;
+            text-transform: uppercase;
+        }
+
+        .header-title p {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            background: var(--ink);
+            color: white;
+            font-size: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 10px;
+        }
+
+        .document-id {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            text-align: right;
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            position: relative;
+            z-index: 1;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .option-card {
+            padding: 40px;
+        }
+
+        .option-card:first-child {
+            border-right: 2px solid var(--border);
+        }
+
+        .option-card h2 {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .term-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--grid);
+        }
+
+        .term-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+        }
+
+        .term-value {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .spread-analysis {
+            padding: 40px;
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .spread-header {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .spread-header::after {
+            content: "";
+            flex-grow: 1;
+            height: 1px;
+            background: var(--border);
+            margin-left: 15px;
+        }
+
+        .comparison-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .bar-group {
+            width: 100%;
+        }
+
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            margin-bottom: 5px;
+        }
+
+        .bar-wrapper {
+            height: 24px;
+            background: #eee;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: var(--ink);
+        }
+
+        .bar-fill.accent {
+            background: var(--accent);
+        }
+
+        .bar-fill.success {
+            background: var(--success);
+        }
+
+        .footer-cta {
+            padding: 40px;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            gap: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 20px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            border: 2px solid var(--border);
+            transition: all 0.2s;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--ink);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent);
+            transform: translate(-4px, -4px);
+            box-shadow: 4px 4px 0px var(--ink);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--ink);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0,0,0,0.05);
+        }
+
+        @media (max-width: 768px) {
+            .matrix-grid {
+                grid-template-columns: 1fr;
+            }
+            .option-card:first-child {
+                border-right: none;
+                border-bottom: 2px solid var(--border);
+            }
+            .header-title h1 {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="ledger-container">
+    <div class="header">
+        <div class="header-title">
+            <div class="badge">SECURED TERMS v4.2</div>
+            <h1>FUNDING<br>ELIGIBILITY</h1>
+            <p>Capital Deployment Matrix & Cost Analysis</p>
+        </div>
+        <div class="document-id">
+            EST: JUN-2024<br>
+            CLASS: NON-DILUTIVE<br>
+            ID: SL-9920-X
+        </div>
+    </div>
+
+    <div class="matrix-grid">
+        <div class="option-card">
+            <div class="badge" style="background: var(--accent);">RECOMMENDED</div>
+            <h2>REVENUE-BASED<br>FINANCING</h2>
+            <div class="term-row">
+                <span class="term-label">Cost of Capital</span>
+                <span class="term-value">6% - 12% Flat</span>
+            </div>
+            <div class="term-row">
+                <span class="term-label">Repayment Type</span>
+                <span class="term-value">% of Receipts</span>
+            </div>
+            <div class="term-row">
+                <span class="term-label">Funding Speed</span>
+                <span class="term-value">48 Hours</span>
+            </div>
+            <div class="term-row">
+                <span class="term-label">Warrants/Equity</span>
+                <span class="term-value">0% (None)</span>
+            </div>
+        </div>
+
+        <div class="option-card">
+            <div class="badge" style="background: var(--muted);">STRUCTURED</div>
+            <h2>VENTURE<br>DEBT</h2>
+            <div class="term-row">
+                <span class="term-label">Cost of Capital</span>
+                <span class="term-value">SOFR + 3-5%</span>
+            </div>
+            <div class="term-row">
+                <span class="term-label">Repayment Type</span>
+                <span class="term-value">Fixed Monthly</span>
+            </div>
+            <div class="term-row">
+                <span class="term-label">Funding Speed</span>
+                <span class="term-value">4-6 Weeks</span>
+            </div>
+            <div class="term-row">
+                <span class="term-label">Warrants/Equity</span>
+                <span class="term-value">0.5% - 2.0%</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="spread-analysis">
+        <div class="spread-header">Efficiency Delta Analysis</div>
+        
+        <div class="comparison-bars">
+            <div class="bar-group">
+                <div class="bar-label">
+                    <span>PROJECTED ROAS (LTV/CAC)</span>
+                    <span>480% (High Efficiency)</span>
+                </div>
+                <div class="bar-wrapper">
+                    <div class="bar-fill success" style="width: 85%;"></div>
+                </div>
+            </div>
+
+            <div class="bar-group">
+                <div class="bar-label">
+                    <span>COST OF CAPITAL (RBF)</span>
+                    <span>8.2% Effective</span>
+                </div>
+                <div class="bar-wrapper">
+                    <div class="bar-fill accent" style="width: 15%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <p style="font-family: 'JetBrains Mono', monospace; font-size: 11px; margin-top: 25px; line-height: 1.5; color: var(--muted);">
+            SYSTEM NOTE: The spread between your ROAS (4.8x) and the cost of capital (1.08x) represents a significant arbitrage opportunity. Funding the CAC gap with non-dilutive capital is mathematically superior to using equity or cash-on-hand.
+        </p>
+    </div>
+
+    <div class="footer-cta">
+        <a href="#" class="btn btn-secondary">Download PDF</a>
+        <a href="#" class="btn btn-primary">Lock In Terms</a>
+    </div>
+</div>
+
+</body>
+</html>

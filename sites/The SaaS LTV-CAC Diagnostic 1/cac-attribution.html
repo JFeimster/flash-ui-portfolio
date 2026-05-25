@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAC Breakdown & Attribution</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        :root {
+            --bg: #050505;
+            --card-bg: #0d0d0d;
+            --border: #222222;
+            --accent: #ffffff;
+            --text-dim: #888888;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff4444;
+            --font-main: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--accent);
+            font-family: var(--font-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .diagnostic-card {
+            width: 100%;
+            max-width: 520px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .diagnostic-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0.2;
+        }
+
+        header {
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            color: var(--accent);
+        }
+
+        p.subtitle {
+            font-size: 12px;
+            color: var(--text-dim);
+            letter-spacing: 0.02em;
+        }
+
+        .section-label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--accent);
+            margin: 24px 0 12px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid var(--border);
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .inputs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-group label {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .input-group input {
+            background: #151515;
+            border: 1px solid var(--border);
+            color: var(--accent);
+            padding: 10px;
+            font-family: var(--font-mono);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .input-group input:focus {
+            border-color: var(--accent);
+        }
+
+        .results-panel {
+            margin-top: 32px;
+            padding: 24px;
+            background: #111;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .cac-total-label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .cac-total-value {
+            font-size: 42px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+        }
+
+        .breakdown-summary {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-dim);
+            display: flex;
+            justify-content: space-between;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px dashed var(--border);
+        }
+
+        .cta-container {
+            margin-top: 24px;
+        }
+
+        .primary-cta {
+            width: 100%;
+            background: var(--accent);
+            color: var(--bg);
+            border: none;
+            padding: 18px;
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: transform 0.1s ease, opacity 0.2s ease;
+        }
+
+        .primary-cta:hover {
+            opacity: 0.9;
+        }
+
+        .glow {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+            filter: blur(60px);
+            opacity: 0.05;
+            z-index: 0;
+            pointer-events: none;
+            bottom: -50px;
+            right: -50px;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="diagnostic-card">
+        <div class="glow"></div>
+        <header>
+            <h1>CAC Attribution</h1>
+            <p class="subtitle">Derived fully-loaded customer acquisition costs.</p>
+        </header>
+
+        <span class="section-label">Paid Media Spend</span>
+        <div class="inputs-grid">
+            <div class="input-group">
+                <label>Ad Platforms <span>$</span></label>
+                <input type="number" id="ad-spend" value="5000" placeholder="0">
+            </div>
+            <div class="input-group">
+                <label>Agency Fees <span>$</span></label>
+                <input type="number" id="agency-spend" value="1500" placeholder="0">
+            </div>
+        </div>
+
+        <span class="section-label">Human Capital</span>
+        <div class="inputs-grid">
+            <div class="input-group">
+                <label>Sales Salaries <span>$</span></label>
+                <input type="number" id="salaries" value="8000" placeholder="0">
+            </div>
+            <div class="input-group">
+                <label>Commissions <span>$</span></label>
+                <input type="number" id="commissions" value="2000" placeholder="0">
+            </div>
+        </div>
+
+        <span class="section-label">Infrastructure & Volume</span>
+        <div class="inputs-grid">
+            <div class="input-group">
+                <label>Software/Tools <span>$</span></label>
+                <input type="number" id="software" value="850" placeholder="0">
+            </div>
+            <div class="input-group">
+                <label>New Customers <span>QTY</span></label>
+                <input type="number" id="customers" value="15" placeholder="1">
+            </div>
+        </div>
+
+        <div class="results-panel">
+            <div class="cac-total-label">Fully Loaded CAC</div>
+            <div class="cac-total-value" id="cac-result">$0.00</div>
+            <div class="breakdown-summary">
+                <span id="total-spend-display">Total Investment: $0</span>
+                <span id="efficiency-ratio">Efficiency: 0.0x</span>
+            </div>
+        </div>
+
+        <div class="cta-container">
+            <button class="primary-cta" onclick="window.print()">
+                Export Attribution Report
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const inputs = [
+            'ad-spend', 'agency-spend', 'salaries', 
+            'commissions', 'software', 'customers'
+        ];
+
+        const elements = {};
+        inputs.forEach(id => elements[id] = document.getElementById(id));
+        
+        const cacResult = document.getElementById('cac-result');
+        const totalSpendDisplay = document.getElementById('total-spend-display');
+        const efficiencyRatio = document.getElementById('efficiency-ratio');
+
+        function calculateCAC() {
+            const ads = parseFloat(elements['ad-spend'].value) || 0;
+            const agency = parseFloat(elements['agency-spend'].value) || 0;
+            const salaries = parseFloat(elements['salaries'].value) || 0;
+            const commissions = parseFloat(elements['commissions'].value) || 0;
+            const software = parseFloat(elements['software'].value) || 0;
+            const customers = parseFloat(elements['customers'].value) || 1;
+
+            const totalCost = ads + agency + salaries + commissions + software;
+            const cac = totalCost / Math.max(customers, 1);
+            
+            // Update UI
+            cacResult.textContent = `$${cac.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            totalSpendDisplay.textContent = `Total Investment: $${totalCost.toLocaleString()}`;
+            
+            // Simple efficiency logic (Ad Spend vs Overhead)
+            const adRatio = ads > 0 ? (totalCost / ads).toFixed(1) : "0.0";
+            efficiencyRatio.textContent = `Load Factor: ${adRatio}x`;
+
+            // Visual feedback on CAC value
+            if (cac > 2000) {
+                cacResult.style.color = 'var(--danger)';
+            } else if (cac > 500) {
+                cacResult.style.color = 'var(--warning)';
+            } else {
+                cacResult.style.color = 'var(--success)';
+            }
+        }
+
+        inputs.forEach(id => {
+            elements[id].addEventListener('input', calculateCAC);
+        });
+
+        // Initialize
+        calculateCAC();
+    </script>
+</body>
+</html>
