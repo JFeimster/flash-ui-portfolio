@@ -1,7 +1,7 @@
 # Batch 21A: Startup Credit Stacker Console Pilot Consolidation
 
 Generated: 2026-05-25  
-Branch: `batch-21a-pilot-startup-credit-stacker-consolidation`
+Branch: `batch-21a-startup-credit-stacker-complete`
 
 ## Purpose
 
@@ -13,7 +13,7 @@ This batch is intentionally limited to:
 Startup Credit Stacker Console 1-4
 ```
 
-## Target structure
+## Final structure
 
 ```txt
 sites/startup-credit-stacker-console/
@@ -36,17 +36,17 @@ sites/startup-credit-stacker-console/
 
 Created canonical variant folders using the original source blob SHAs from the existing `/sites/Startup Credit Stacker Console N/` folders.
 
-Added:
+Moved all four old spaced `/sites` folders into canonical variant folders:
 
 ```txt
-sites/startup-credit-stacker-console/variant-1/index.html
-sites/startup-credit-stacker-console/variant-1/style.css
-sites/startup-credit-stacker-console/variant-2/index.html
-sites/startup-credit-stacker-console/variant-2/style.css
-sites/startup-credit-stacker-console/variant-3/index.html
-sites/startup-credit-stacker-console/variant-3/style.css
-sites/startup-credit-stacker-console/variant-4/index.html
-sites/startup-credit-stacker-console/variant-4/style.css
+sites/Startup Credit Stacker Console 1/index.html -> sites/startup-credit-stacker-console/variant-1/index.html
+sites/Startup Credit Stacker Console 1/style.css -> sites/startup-credit-stacker-console/variant-1/style.css
+sites/Startup Credit Stacker Console 2/index.html -> sites/startup-credit-stacker-console/variant-2/index.html
+sites/Startup Credit Stacker Console 2/style.css -> sites/startup-credit-stacker-console/variant-2/style.css
+sites/Startup Credit Stacker Console 3/index.html -> sites/startup-credit-stacker-console/variant-3/index.html
+sites/Startup Credit Stacker Console 3/style.css -> sites/startup-credit-stacker-console/variant-3/style.css
+sites/Startup Credit Stacker Console 4/index.html -> sites/startup-credit-stacker-console/variant-4/index.html
+sites/Startup Credit Stacker Console 4/style.css -> sites/startup-credit-stacker-console/variant-4/style.css
 ```
 
 Updated hub page:
@@ -64,38 +64,9 @@ The hub now links to:
 /sites/startup-credit-stacker-console/variant-4/
 ```
 
-## Removed old spaced /sites variant files
+## GitHub compare result
 
-Removed from the pilot branch:
-
-```txt
-sites/Startup Credit Stacker Console 1/index.html
-sites/Startup Credit Stacker Console 1/style.css
-sites/Startup Credit Stacker Console 2/index.html
-sites/Startup Credit Stacker Console 2/style.css
-```
-
-GitHub compare now recognizes these as renames into:
-
-```txt
-sites/startup-credit-stacker-console/variant-1/
-sites/startup-credit-stacker-console/variant-2/
-```
-
-## Pending removal due connector blocking
-
-The connector blocked deletion attempts for variant 3 and variant 4 old spaced folders.
-
-Still pending removal:
-
-```txt
-sites/Startup Credit Stacker Console 3/index.html
-sites/Startup Credit Stacker Console 3/style.css
-sites/Startup Credit Stacker Console 4/index.html
-sites/Startup Credit Stacker Console 4/style.css
-```
-
-The new canonical copies for variant 3 and variant 4 already exist, but the old folders remain until deletion can be completed through GitHub UI, Codex, or a local filesystem migration script.
+GitHub compare recognizes all eight variant files as renames into the canonical folder structure. This is the desired consolidation pattern.
 
 ## Not touched
 
@@ -108,11 +79,11 @@ Startup Credit Stacker Console 3/
 Startup Credit Stacker Console 4/
 ```
 
-Those should be handled only after the `/sites` consolidation pattern is fully approved.
+Those should be handled after `/sites` consolidation is approved and repeated for the remaining groups.
 
 ## Verification performed
 
-Verified on the pilot branch:
+Verified on the completed pilot branch:
 
 ```txt
 sites/startup-credit-stacker-console/index.html
@@ -123,11 +94,8 @@ sites/startup-credit-stacker-console/variant-4/style.css
 
 ## Recommendation
 
-Do not merge until one of the following is true:
+Use this pilot pattern for the next consolidation batch:
 
-1. Old variant 3 and 4 spaced folders are also removed, or
-2. The PR is accepted as a partial pilot proving the structure, with a follow-up commit/task to remove the remaining old spaced folders.
-
-Preferred next step:
-
-Use Codex/local filesystem access to finish the old folder removals cleanly, then repeat this migration pattern across the remaining variant groups.
+```txt
+copy/move real files -> update hub links -> verify canonical variant paths -> remove old spaced /sites folders -> then consider root duplicate cleanup
+```
