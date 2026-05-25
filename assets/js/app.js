@@ -1,8 +1,29 @@
+const DEFAULT_DISPLAY_RULES = {
+  version: "1.0.0",
+  defaultCardRules: {
+    hideTechnicalFieldsByDefault: true,
+    showAdvancedDetailsToggle: true,
+    primaryCtaLabel: "Open Site",
+    secondaryCtaLabel: "Copy Link",
+    detailsCtaLabel: "View Details",
+    sourceCtaLabel: "View Source",
+    deploymentPlanLabel: "Deployment Plan",
+    reviewNotesLabel: "Review Notes"
+  },
+  technicalLabelsToHide: [],
+  badgeRules: [],
+  categoryDisplayRules: [],
+  readinessRules: [],
+  recommendedUseRules: [],
+  descriptionRules: []
+};
+
 const state = {
   items: [],
   query: "",
   category: "All",
-  status: "All"
+  status: "All",
+  rules: DEFAULT_DISPLAY_RULES
 };
 
 const REPO_URL = "https://github.com/JFeimster/flash-ui-portfolio";
@@ -40,6 +61,15 @@ function slugify(value = "") {
 function encodePath(path = "", trailingSlash = false) {
   const encoded = String(path).split("/").map(encodeURIComponent).join("/");
   return `/${encoded}${trailingSlash ? "/" : ""}`;
+}
+
+function normalizeWhitespace(value = "") {
+  return String(value).replace(/\s+/g, " ").trim();
+}
+
+function makeKeywordRegex(pattern) {
+  if (!pattern || pattern === "*") return null;
+  return new RegExp(pattern, "i");
 }
 
 function guessCategory(name = "") {
@@ -87,16 +117,212 @@ function sourceUrl(item) {
   return `${REPO_URL}/${looksFile ? "blob" : "tree"}/main/${encoded}`;
 }
 
+function cleanDisplayTitle(item) {
+  const rawTitle = item.title || item.path || "Untitled asset";
+  return normalizeWhitespace(
+    rawTitle
+      .replace(/^sites\s+/i, "")
+      .replace(/ index\.html$/i, "")
+      .replace(/\.html$/i, "")
+      .replace(/_/g, " ")
+  );
+}
+
+function getAssetTypeLabel(item) {
+  const categoryRule = (state.rules.categoryDisplayRules || []).find(rule => rule.match === item.category);
+  if (categoryRule) return categoryRule.label;
+  if (item.type === "nextjs-app") return "Standalone App";
+  if (item.type === "docs-archive") return "Archive / Docs";
+  if (item.type === "zip-archive") return "Archive Package";
+  return "Website";
+}
+
+function getRecommendedUse(item, displayTitle) {
+  const text = [displayTitle, item.category, item.type, item.path].join(" ");
+
+  if (/(Partner|Referral|Affiliate|Darwin|Attorney)/i.test(text)) return "Partner enablement";
+  if (/(Calculator|Analyzer|Estimator|Matcher|Generator|Scorecard)/i.test(text)) return "Interactive tool";
+  if (/Lead Magnet/i.test(text)) return "Lead generation";
+  if (/(AI Agent|AI Lab|Agent Library)/i.test(text)) return "AI demo/library";
+  if (/(Personal|Radical Libertarian|Jester|Founder)/i.test(text)) return "Personal brand";
+  if (/(Editorial|Bento|Content Hub|Pillar)/i.test(text)) return "Content hub";
+  if (item.type === "nextjs-app" || item.needsStandaloneDeploy || item.hasPackageJson) return "Standalone app candidate";
+
+  const fallback = (state.rules.recommendedUseRules || []).find(rule => rule.id === "default");
+  return fallback?.label || "Prototype / experiment";
+}
+
+function getDescription(item, displayTitle) {
+  if (item.description) return item.description;
+
+  const haystack = [displayTitle, item.category, item.type, item.path].join(" ");
+  const matchedRule = (state.rules.descriptionRules || []).find(rule => {
+    if (rule.match === "*") return false;
+    return makeKeywordRegex(rule.match)?.test(haystack);
+  });
+  if (matchedRule) return matchedRule.description;
+
+  const defaultRule = (state.rules.descriptionRules || []).find(rule => rule.match === "*");
+  return defaultRule?.description || "Flash UI starter asset ready for review, reuse, or promotion.";
+}
+
+function getReadiness(item, deployable, nested, archive) {
+  if (deployable) {
+    return { label: "Ready to Share", tone: "ready" };
+  }
+  if (nested) {
+    return { label: "Needs Deployment", tone: "deploy" };
+  }
+  if (item.needsNormalization || /review/i.test(item.status || "")) {
+    return { label: "Needs Polish", tone: "polish" };
+  }
+  if (archive) {
+    return { label: "Needs Review", tone: "review" };
+  }
+  return { label: "Needs Review", tone: "review" };
+}
+
+function hasVariantName(displayTitle, path) {
+  return /\b\d+\)?$/i.test(displayTitle) || /(?:^|[\s-_])(variant|v\d+)(?:$|[\s-_])/i.test(path || "");
+}
+
+function getBadgeDefinitions() {
+  const map = new Map();
+  (state.rules.badgeRules || []).forEach(rule => {
+    map.set(rule.id, {
+      id: rule.id,
+      label: rule.label,
+      emoji: rule.emoji || "",
+      text: `${rule.emoji ? `${rule.emoji} ` : ""}${rule.label}`.trim()
+    });
+  });
+  return map;
+}
+
+function getViewerBadges(item, displayTitle, nested, archive) {
+  const defs = getBadgeDefinitions();
+  const haystack = [displayTitle, item.category, item.type, item.path].join(" ");
+  const badges = [];
+  const add = id => {
+    const badge = defs.get(id);
+    if (badge && !badges.some(entry => entry.id === id)) badges.push(badge);
+  };
+
+  if (item.livePath && !archive && !nested) add("live-site");
+  if (/Lead Magnet/i.test(haystack)) add("lead-magnet");
+  if (/(Tool|Calculator|Generator|Analyzer|Scorecard|Matcher|Estimator)/i.test(haystack)) add("tool");
+  if (/(Experiment|prototype)/i.test(haystack)) add("experiment");
+  if (/(Partner|Referral|Affiliate|Darwin|Attorney)/i.test(haystack)) add("partner-asset");
+  if (/(AI Agent|AI Lab|Agent Library)/i.test(haystack)) add("ai-agent");
+  if (item.extractionStatus === "static-site-extracted") add("zip-extracted");
+  if (item.livePath && !nested && !archive) add("ready-to-share");
+  if (item.needsNormalization || /review/i.test(item.status || "")) add("needs-polish");
+  if (item.needsStandaloneDeploy || item.type === "nextjs-app") add("standalone-app");
+  if (hasVariantName(displayTitle, item.path)) add("variant");
+  if (item.featured) add("featured");
+
+  return badges;
+}
+
+function getCardActions(item, detailsId, deployable, nested, archive) {
+  const labels = state.rules.defaultCardRules || DEFAULT_DISPLAY_RULES.defaultCardRules;
+  const actions = [];
+
+  if (deployable) {
+    actions.push(`<a class="btn primary" href="${escapeHtml(item.livePath)}" target="_blank" rel="noreferrer">${escapeHtml(labels.primaryCtaLabel)}</a>`);
+    actions.push(`<button class="btn" type="button" data-copy-link="${escapeHtml(item.livePath)}">${escapeHtml(labels.secondaryCtaLabel)}</button>`);
+  } else if (nested) {
+    actions.push(`<a class="btn primary" href="${escapeHtml(sourceUrl(item))}" target="_blank" rel="noreferrer">${escapeHtml(labels.sourceCtaLabel)}</a>`);
+    actions.push(`<button class="btn" type="button" data-open-details="${escapeHtml(detailsId)}">${escapeHtml(labels.deploymentPlanLabel)}</button>`);
+  } else if (!item.livePath || archive) {
+    actions.push(`<a class="btn primary" href="${escapeHtml(sourceUrl(item))}" target="_blank" rel="noreferrer">${escapeHtml(labels.sourceCtaLabel)}</a>`);
+    actions.push(`<button class="btn" type="button" data-open-details="${escapeHtml(detailsId)}">${escapeHtml(archive ? labels.reviewNotesLabel : labels.detailsCtaLabel)}</button>`);
+  }
+
+  if (state.rules.defaultCardRules?.showAdvancedDetailsToggle) {
+    actions.push(`<button class="btn subtle" type="button" data-open-details="${escapeHtml(detailsId)}">Advanced / Dev Details</button>`);
+  }
+
+  return actions.join("");
+}
+
+function getFriendlyStatusLabel(status) {
+  const map = {
+    "portfolio-site": "Portfolio Site",
+    "legacy-root": "Legacy Root",
+    "legacy-root-folder": "Legacy Root Folder",
+    "archive-needs-review": "Archive Needs Review",
+    "nested-app-needs-standalone-deploy": "Nested App Needs Deployment",
+    "portfolio-root-html": "Portfolio Root HTML"
+  };
+  return map[status] || status;
+}
+
+function getDisplayMeta(item) {
+  const displayTitle = cleanDisplayTitle(item);
+  const deployable = isDeployable(item);
+  const nested = isNestedApp(item);
+  const archive = isArchive(item);
+  const assetType = getAssetTypeLabel(item);
+  const recommendedUse = getRecommendedUse(item, displayTitle);
+  const description = getDescription(item, displayTitle);
+  const readiness = getReadiness(item, deployable, nested, archive);
+  const badges = getViewerBadges(item, displayTitle, nested, archive);
+  const technicalDetails = [
+    ["path", item.path || "None"],
+    ["type", item.type || "Unknown"],
+    ["status", item.status || "Unknown"],
+    ["source", item.source || "Unknown"],
+    ["livePath", item.livePath || "None"],
+    ["hasIndex", String(Boolean(item.hasIndex))],
+    ["hasPackageJson", String(Boolean(item.hasPackageJson))],
+    ["hasZip", String(Boolean(item.hasZip))],
+    ["hasMarkdown", String(Boolean(item.hasMarkdown))],
+    ["needsNormalization", String(Boolean(item.needsNormalization))],
+    ["needsStandaloneDeploy", String(Boolean(item.needsStandaloneDeploy))],
+    ["extractionStatus", item.extractionStatus || "None"],
+    ["notes", item.notes || "None"]
+  ];
+
+  return {
+    displayTitle,
+    deployable,
+    nested,
+    archive,
+    assetType,
+    recommendedUse,
+    description,
+    readiness,
+    badges,
+    technicalDetails
+  };
+}
+
 function renderSelect(container, values, key, label) {
   container.innerHTML = `
     <select data-filter-key="${key}" aria-label="${escapeHtml(label)}">
-      ${values.map(value => `<option value="${escapeHtml(value)}" ${state[key] === value ? "selected" : ""}>${escapeHtml(value)}</option>`).join("")}
+      ${values.map(value => `<option value="${escapeHtml(value)}" ${state[key] === value ? "selected" : ""}>${escapeHtml(key === "status" ? getFriendlyStatusLabel(value) : value)}</option>`).join("")}
     </select>
   `;
 }
 
 function itemMatches(item) {
-  const haystack = [item.title, item.category, item.type, item.status, item.path, item.source, item.notes].join(" ").toLowerCase();
+  const meta = item.displayMeta || getDisplayMeta(item);
+  const haystack = [
+    item.title,
+    item.category,
+    item.type,
+    item.status,
+    item.path,
+    item.source,
+    item.notes,
+    meta.displayTitle,
+    meta.description,
+    meta.assetType,
+    meta.recommendedUse,
+    meta.readiness.label,
+    meta.badges.map(badge => badge.label).join(" ")
+  ].join(" ").toLowerCase();
   const matchesQuery = !state.query || haystack.includes(state.query.toLowerCase());
   const matchesCategory = state.category === "All" || item.category === state.category;
   const matchesStatus = state.status === "All" || item.status === state.status;
@@ -121,50 +347,56 @@ function renderCards() {
     els.grid.innerHTML = `
       <section class="empty">
         <h2>No matching assets found.</h2>
-        <p>Clear a filter or search for another term. The goblins are in here somewhere.</p>
+        <p>Clear a filter or search for another term.</p>
       </section>
     `;
     return;
   }
 
   els.grid.innerHTML = visible.map(item => {
-    const deployable = isDeployable(item);
-    const nested = isNestedApp(item);
-    const archive = isArchive(item);
+    const meta = item.displayMeta || getDisplayMeta(item);
+    const { deployable, nested, archive } = meta;
     const cardClass = nested ? " app-card" : archive ? " archive-card" : !deployable ? " review-card" : "";
-    const openButton = deployable
-      ? `<a class="btn primary" href="${escapeHtml(item.livePath)}" target="_blank" rel="noreferrer">Open Site</a>`
-      : "";
-    const sourceButton = `<a class="btn" href="${escapeHtml(sourceUrl(item))}" target="_blank" rel="noreferrer">View Source Path</a>`;
-    const reviewBadge = !deployable ? `<span class="badge review">Needs Review</span>` : "";
-    const nestedBadge = nested ? `<span class="badge app">Nested App</span>` : "";
-    const archiveBadge = archive ? `<span class="badge archive">Archive</span>` : "";
+    const detailsId = `details-${escapeHtml(item.slug || slugify(meta.displayTitle))}`;
+    const badgeMarkup = meta.badges.map(badge => `<span class="badge viewer">${escapeHtml(badge.text)}</span>`).join("");
+    const detailRows = meta.technicalDetails.map(([label, value]) => `
+      <div class="detail-row">
+        <dt>${escapeHtml(label)}</dt>
+        <dd>${escapeHtml(value)}</dd>
+      </div>
+    `).join("");
 
     return `
       <article class="card${cardClass}">
         <div class="card-top">
-          <h2>${escapeHtml(item.title)}</h2>
-          <div class="badge-stack">${reviewBadge}${nestedBadge}${archiveBadge}</div>
+          <div class="card-heading">
+            <h2>${escapeHtml(meta.displayTitle)}</h2>
+            <p class="card-description">${escapeHtml(meta.description)}</p>
+          </div>
+          <div class="badge-stack">
+            <span class="badge readiness ${escapeHtml(meta.readiness.tone)}">${escapeHtml(meta.readiness.label)}</span>
+          </div>
         </div>
-        <div class="meta">
-          <span class="badge">${escapeHtml(item.category || "Uncategorized")}</span>
-          <span class="badge">${escapeHtml(item.type || "Unknown")}</span>
-          <span class="badge">${escapeHtml(item.status || "Unknown")}</span>
+        <div class="meta viewer-meta">
+          <span class="meta-chip">
+            <span class="meta-label">Asset Type</span>
+            <strong>${escapeHtml(meta.assetType)}</strong>
+          </span>
+          <span class="meta-chip">
+            <span class="meta-label">Recommended Use</span>
+            <strong>${escapeHtml(meta.recommendedUse)}</strong>
+          </span>
         </div>
-        <div class="path">${escapeHtml(item.path || "No path recorded")}</div>
-        <ul class="flags">
-          <li>${item.hasIndex ? "index.html" : "no index.html"}</li>
-          <li>${item.hasPackageJson ? "package.json" : "no package.json"}</li>
-          <li>${item.hasZip ? "ZIP present" : "no ZIP flagged"}</li>
-          <li>${item.hasMarkdown ? "Markdown/docs" : "no docs flagged"}</li>
-        </ul>
-        ${item.notes ? `<p class="notes">${escapeHtml(item.notes)}</p>` : ""}
+        <div class="badge-row">${badgeMarkup || `<span class="badge viewer">Prototype</span>`}</div>
         <div class="card-actions">
-          ${openButton}
-          ${sourceButton}
-          ${item.needsNormalization ? `<span class="badge">Needs normalization</span>` : ""}
-          ${item.needsStandaloneDeploy ? `<span class="badge">Standalone deploy</span>` : ""}
+          ${getCardActions(item, detailsId, deployable, nested, archive)}
         </div>
+        ${state.rules.defaultCardRules?.showAdvancedDetailsToggle ? `
+          <details class="details-panel" id="${detailsId}">
+            <summary>Advanced / Dev Details</summary>
+            <dl class="detail-grid">${detailRows}</dl>
+          </details>
+        ` : ""}
       </article>
     `;
   }).join("");
@@ -197,6 +429,31 @@ function bindEvents() {
     if (!select) return;
     state[select.dataset.filterKey] = select.value;
     renderShell();
+  });
+
+  document.addEventListener("click", async event => {
+    const copyButton = event.target.closest("[data-copy-link]");
+    if (copyButton) {
+      const link = copyButton.getAttribute("data-copy-link");
+      if (!link) return;
+      try {
+        await navigator.clipboard.writeText(new URL(link, window.location.origin).href);
+        copyButton.textContent = "Copied";
+        window.setTimeout(() => {
+          copyButton.textContent = state.rules.defaultCardRules?.secondaryCtaLabel || DEFAULT_DISPLAY_RULES.defaultCardRules.secondaryCtaLabel;
+        }, 1600);
+      } catch (error) {
+        console.warn("Clipboard copy failed.", error);
+      }
+      return;
+    }
+
+    const detailsButton = event.target.closest("[data-open-details]");
+    if (!detailsButton) return;
+    const details = document.getElementById(detailsButton.getAttribute("data-open-details"));
+    if (!details) return;
+    details.open = true;
+    details.scrollIntoView({ behavior: "smooth", block: "nearest" });
   });
 }
 
@@ -329,7 +586,18 @@ async function fetchJson(path) {
 async function init() {
   bindEvents();
   try {
-    const baseRegistry = await fetchJson("/data/site-registry.json");
+    const [baseRegistry, displayRules] = await Promise.all([
+      fetchJson("/data/site-registry.json"),
+      fetchJson("/data/card-display-rules.json").catch(() => DEFAULT_DISPLAY_RULES)
+    ]);
+    state.rules = {
+      ...DEFAULT_DISPLAY_RULES,
+      ...displayRules,
+      defaultCardRules: {
+        ...DEFAULT_DISPLAY_RULES.defaultCardRules,
+        ...(displayRules.defaultCardRules || {})
+      }
+    };
     let batch5Registry = [];
     let staticExtractionRegistry = [];
 
@@ -359,7 +627,10 @@ async function init() {
       merged.set(key, item);
     });
 
-    state.items = Array.from(merged.values());
+    state.items = Array.from(merged.values()).map(item => ({
+      ...item,
+      displayMeta: getDisplayMeta(item)
+    }));
   } catch (error) {
     console.error(error);
     state.items = [];
