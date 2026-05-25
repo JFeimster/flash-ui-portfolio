@@ -112,7 +112,7 @@ Review the pull request with this sequence:
 1. Confirm only expected `/sites/[canonical-slug]/variant-n/` targets changed.
 2. Confirm canonical hub `index.html` files still exist and only their variant links changed.
 3. Read the generated JSON and Markdown migration reports for warnings or skipped variants.
-4. Confirm no root-level folders, no ZIP archives, and no standalone app candidates were moved.
+4. Confirm no root-level folders, ZIP archives, source packages, or standalone app source files were deleted, extracted, modified, or rewritten outside the approved mapped variant folder moves.
 5. Confirm `vercel.json` and `data/site-registry.json` remain untouched.
 
 ## Smoke Test Checklist
