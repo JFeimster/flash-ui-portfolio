@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash UI Export</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- ========================================== -->
+  <!-- TOP CONTROL & REF TRACKING BAR SIMULATOR -->
+  <!-- ========================================== -->
+  <div class="bg-obsidian-900 border-b border-white/10 py-2.5 px-4 sticky top-0 z-50 text-xs font-mono">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-2 text-gray-400">
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-accent-gold animate-pulse"></span>
+        <span class="text-white font-bold">PROTOTYPE SYSTEM CONTROLLER</span>
+        <span class="text-gray-600">|</span>
+        <span class="hidden sm:inline">Active Referral Parameter Simulator:</span>
+      </div>
+      
+      <!-- Virtual URL & Tracking Simulator inputs -->
+      <div class="flex flex-wrap items-center gap-2">
+        <div class="flex items-center bg-black/40 border border-white/5 rounded px-2 py-1">
+          <span class="text-gray-500 mr-1">ref=</span>
+          <input type="text" id="simRef" value="JANE2026" oninput="updateTracking()" class="bg-transparent text-accent-gold outline-none w-16 font-bold">
+        </div>
+        <div class="flex items-center bg-black/40 border border-white/5 rounded px-2 py-1">
+          <span class="text-gray-500 mr-1">partner=</span>
+          <input type="text" id="simPartner" value="jane-smith" oninput="updateTracking()" class="bg-transparent text-accent-gold outline-none w-20">
+        </div>
+        <div class="flex items-center bg-black/40 border border-white/5 rounded px-2 py-1">
+          <span class="text-gray-500 mr-1">partner_name=</span>
+          <input type="text" id="simPartnerName" value="Jane Smith" oninput="updateTracking()" class="bg-transparent text-accent-gold outline-none w-24">
+        </div>
+        <div class="flex items-center bg-black/40 border border-white/5 rounded px-2 py-1">
+          <span class="text-gray-500 mr-1">partner_type=</span>
+          <select id="simPartnerType" onchange="updateTracking()" class="bg-transparent text-accent-gold outline-none w-28 cursor-pointer">
+            <option value="Broker Partner" class="bg-obsidian-950 text-accent-gold">Broker Partner</option>
+            <option value="Affiliate Partner" class="bg-obsidian-950 text-accent-gold">Affiliate Partner</option>
+            <option value="CPA Partner" class="bg-obsidian-950 text-accent-gold">CPA Partner</option>
+            <option value="Strategic Partner" class="bg-obsidian-950 text-accent-gold">Strategic Partner</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- VIRTUAL ROUTING HEADER SYSTEM -->
+  <!-- ========================================== -->
+  <header class="bg-obsidian-950/80 backdrop-blur-md border-b border-white/5 sticky top-[41px] z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <div class="flex items-center gap-3">
+          <!-- Logo Shield Mark -->
+          <div class="w-10 h-10 rounded bg-gradient-to-br from-accent-gold to-obsidian-950 border border-accent-gold/40 flex items-center justify-center font-mono font-black text-black text-lg bg-accent-gold shadow-md">
+            M
+          </div>
+          <div>
+            <span class="text-white font-bold tracking-tight block text-lg font-mono">MOONSHINE <span class="text-accent-gold">CAPITAL</span></span>
+            <span class="text-[10px] uppercase text-gray-500 font-mono tracking-widest block -mt-1">Growth Systems</span>
+          </div>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden lg:flex items-center gap-1 text-sm font-medium">
+          <button onclick="switchView('homepage')" id="nav-homepage" class="px-3.5 py-2 text-accent-gold rounded-md transition duration-150 border-b-2 border-accent-gold font-mono text-xs">ROOT /</button>
+          <button onclick="switchView('partnerPage')" id="nav-partnerPage" class="px-3.5 py-2 text-gray-400 hover:text-white rounded-md transition duration-150 font-mono text-xs">/partners/jane-smith</button>
+          <button onclick="switchView('fundingDir')" id="nav-fundingDir" class="px-3.5 py-2 text-gray-400 hover:text-white rounded-md transition duration-150 font-mono text-xs">/funding/</button>
+          <button onclick="switchView('verticalsDir')" id="nav-verticalsDir" class="px-3.5 py-2 text-gray-400 hover:text-white rounded-md transition duration-150 font-mono text-xs">/verticals/</button>
+          <button onclick="switchView('toolsDir')" id="nav-toolsDir" class="px-3.5 py-2 text-gray-400 hover:text-white rounded-md transition duration-150 font-mono text-xs">/tools/</button>
+          <button onclick="switchView('readmeView')" id="nav-readmeView" class="px-3.5 py-2 text-gray-400 hover:text-white rounded-md transition duration-150 font-mono text-xs">README.md</button>
+        </nav>
+
+        <div class="flex items-center gap-3">
+          <!-- Live Parameter Display Badge -->
+          <div class="hidden sm:flex flex-col items-end text-right font-mono text-[10px] text-gray-400 bg-obsidian-900 border border-white/5 py-1 px-2.5 rounded">
+            <div><span class="text-accent-gold">Tracking Hook:</span> Active</div>
+            <div id="badgeTrackUrl" class="text-gray-500 truncate max-w-[150px]">?ref=JANE2026</div>
+          </div>
+          <button onclick="openApplyModal()" class="bg-gradient-to-r from-accent-gold to-yellow-600 hover:from-yellow-600 hover:to-accent-gold text-black font-semibold text-xs py-2.5 px-5 rounded tracking-wide transition-all uppercase duration-300 shadow shadow-accent-gold/20 font-mono">
+            Apply Now
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobil routing selector for ease of navigation -->
+  <div class="lg:hidden bg-obsidian-900 border-b border-white/5 p-2 flex gap-1 overflow-x-auto whitespace-nowrap text-xs">
+    <button onclick="switchView('homepage')" id="m-nav-homepage" class="px-3 py-1.5 bg-accent-gold text-black rounded font-mono font-bold text-[10px]">ROOT /</button>
+    <button onclick="switchView('partnerPage')" id="m-nav-partnerPage" class="px-3 py-1.5 text-gray-300 hover:bg-white/5 rounded font-mono text-[10px]">/jane-smith</button>
+    <button onclick="switchView('fundingDir')" id="m-nav-fundingDir" class="px-3 py-1.5 text-gray-300 hover:bg-white/5 rounded font-mono text-[10px]">/funding</button>
+    <button onclick="switchView('verticalsDir')" id="m-nav-verticalsDir" class="px-3 py-1.5 text-gray-300 hover:bg-white/5 rounded font-mono text-[10px]">/verticals</button>
+    <button onclick="switchView('toolsDir')" id="m-nav-toolsDir" class="px-3 py-1.5 text-gray-300 hover:bg-white/5 rounded font-mono text-[10px]">/tools</button>
+    <button onclick="switchView('readmeView')" id="m-nav-readmeView" class="px-3 py-1.5 text-gray-300 hover:bg-white/5 rounded font-mono text-[10px]">README</button>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MAIN WORKSPACE FOR VIRTUAL PAGES -->
+  <!-- ========================================== -->
+  <main class="flex-grow">
+
+    <!-- ========================================== -->
+    <!-- VIEW A: HOMEPAGE (/) -->
+    <!-- ========================================== -->
+    <section id="view-homepage" class="workspace-view">
+      <!-- HERO SECTION -->
+      <div class="relative overflow-hidden pt-16 pb-24 border-b border-white/5 bg-gradient-to-b from-obsidian-950 via-obsidian-950/80 to-obsidian-900">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(212,175,55,0.06),transparent_60%)]"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            <div class="lg:col-span-7 space-y-6 text-left">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-accent-gold/10 border border-accent-gold/30 text-accent-gold text-xs font-mono">
+                <span class="w-1.5 h-1.5 rounded-full bg-accent-gold animate-ping"></span>
+                PARTNER PORTAL INITIALIZED
+              </div>
+              
+              <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-none">
+                Partner With Moonshine Capital and Turn Your <span class="text-accent-gold">Network Into a Smarter Funding Path</span>
+              </h1>
+              
+              <p class="text-gray-400 text-lg sm:text-xl max-w-2xl font-light">
+                Give your clients, audience, or business network a cleaner way to explore funding readiness, compare capital paths, and request next steps — without overpromising outcomes or sending people into application roulette.
+              </p>
+              
+              <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                <button onclick="openApplyModal()" class="bg-accent-gold hover:bg-accent-goldHover text-obsidian-950 font-bold px-8 py-4 rounded text-center transition duration-200 font-mono tracking-wide text-sm">
+                  JOIN THE PARTNER PROGRAM
+                </button>
+                <button onclick="switchView('fundingDir')" class="bg-obsidian-800 hover:bg-gray-700 text-white font-medium px-8 py-4 rounded text-center border border-white/10 transition duration-200 font-mono text-sm">
+                  VIEW FUNDING TYPES
+                </button>
+                <button onclick="switchView('partnerPage')" class="bg-transparent hover:bg-white/5 text-gray-300 font-medium px-6 py-4 rounded text-center border border-dashed border-white/20 transition duration-200 font-mono text-xs flex items-center justify-center gap-2">
+                  SEE SAMPLE PARTNER PAGE
+                </button>
+              </div>
+            </div>
+
+            <!-- Dashboard Preview Visual -->
+            <div class="lg:col-span-5 relative">
+              <div class="glass-card p-6 rounded-lg border border-white/10 glow-gold relative overflow-hidden">
+                <div class="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                  </div>
+                  <div class="text-[10px] font-mono text-gray-500">PARTNER_PORTAL_PREVIEW.exe</div>
+                </div>
+
+                <div class="space-y-4 text-xs font-mono">
+                  <!-- Live Link Bar -->
+                  <div class="bg-black/60 p-2.5 rounded border border-white/5">
+                    <div class="text-[9px] text-gray-500">YOUR SHAREABLE REFERRAL PATHWAY</div>
+                    <div class="text-accent-gold flex items-center justify-between mt-0.5 select-all overflow-x-auto whitespace-nowrap">
+                      <span>moonshinecapital.com/partners/<span class="sim-slug text-white font-bold">jane-smith</span>/?ref=<span class="sim-ref">JANE2026</span></span>
+                    </div>
+                  </div>
+
+                  <!-- Mini Dashboard Metrics -->
+                  <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-obsidian-950 p-3 rounded border border-white/5">
+                      <div class="text-[10px] text-gray-500 uppercase">Referral Leads</div>
+                      <div class="text-xl font-bold text-white mt-1">42</div>
+                      <div class="text-[9px] text-accent-emerald mt-0.5">● 12 Actively Evaluating</div>
+                    </div>
+                    <div class="bg-obsidian-950 p-3 rounded border border-white/5">
+                      <div class="text-[10px] text-gray-500 uppercase">Readiness Average</div>
+                      <div class="text-xl font-bold text-accent-gold mt-1">74 <span class="text-xs text-gray-400">/100</span></div>
+                      <div class="text-[9px] text-gray-400 mt-0.5">Tier: "Needs Review"</div>
+                    </div>
+                  </div>
+
+                  <!-- Tool Card Preview inside visual -->
+                  <div class="bg-obsidian-950/80 p-3 rounded border border-white/5 space-y-2">
+                    <div class="flex items-center justify-between">
+                      <span class="text-[10px] uppercase text-gray-400 font-bold">Funding Readiness Scorecard</span>
+                      <span class="bg-accent-gold/10 text-accent-gold text-[9px] px-1.5 py-0.2 rounded border border-accent-gold/20">Active Widget</span>
+                    </div>
+                    <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+                      <div class="bg-accent-gold h-full w-[74%] rounded-full"></div>
+                    </div>
+                    <div class="flex justify-between text-[9px] text-gray-500">
+                      <span>Level: Warm Fit</span>
+                      <span>Capture Status: Verified</span>
+                    </div>
+                  </div>
+
+                  <!-- Trust Matrix Footer -->
+                  <div class="text-[10px] text-gray-500 flex items-center justify-between border-t border-white/5 pt-3">
+                    <div class="flex items-center gap-1 text-accent-emerald">
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                      Attribution Synced
+                    </div>
+                    <div>Safe Integration Flow</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- PARTNER TRUST STRIP -->
+      <div class="bg-obsidian-950 border-b border-white/5 py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+          <p class="text-[11px] uppercase tracking-widest text-gray-500 font-mono mb-6">APPROVED PARTNERSHIP NETWORK VERTICALS</p>
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-6 items-center justify-center text-sm font-mono text-gray-400">
+            <div class="hover:text-white transition duration-200 border border-white/5 bg-white/[0.01] py-2 px-4 rounded text-center">CPA Advisory Firms</div>
+            <div class="hover:text-white transition duration-200 border border-white/5 bg-white/[0.01] py-2 px-4 rounded text-center">Funding Brokers</div>
+            <div class="hover:text-white transition duration-200 border border-white/5 bg-white/[0.01] py-2 px-4 rounded text-center">Ecom Consultants</div>
+            <div class="hover:text-white transition duration-200 border border-white/5 bg-white/[0.01] py-2 px-4 rounded text-center">Business Coaches</div>
+            <div class="hover:text-white transition duration-200 border border-white/5 bg-white/[0.01] py-2 px-4 rounded text-center">Strategic Affiliates</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WHY PARTNER WITH MOONSHINE -->
+      <div class="py-20 px-4 max-w-7xl mx-auto">
+        <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+          <span class="text-xs uppercase text-accent-gold font-mono font-bold tracking-widest">WHY MOONSHINE CAPITAL?</span>
+          <h2 class="text-3xl md:text-4xl font-extrabold text-white">We Built Serious Partner Infrastructure</h2>
+          <p class="text-gray-400">No application black holes. No unrealistic guarantees. We empower you to deliver compliant, highly structured paths to commercial capital and readiness insights.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="glass-card p-8 rounded-lg space-y-4">
+            <div class="w-12 h-12 rounded bg-accent-gold/10 border border-accent-gold/20 flex items-center justify-center text-accent-gold">
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            </div>
+            <h3 class="text-lg font-bold text-white">Strict Regulatory Guardrails</h3>
+            <p class="text-gray-400 text-sm">Every page, widget, and tool strictly adheres to non-promissory disclosures. Build trust without promising impossible credit or approval outcomes.</p>
+          </div>
+
+          <div class="glass-card p-8 rounded-lg space-y-4">
+            <div class="w-12 h-12 rounded bg-accent-gold/10 border border-accent-gold/20 flex items-center justify-center text-accent-gold">
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <h3 class="text-lg font-bold text-white">Fully Custom Referral Hubs</h3>
+            <p class="text-gray-400 text-sm">Instantly deploy subdirectories (e.g., /partners/your-brand/) featuring your tracking tokens, custom intro, signature, and native widgets.</p>
+          </div>
+
+          <div class="glass-card p-8 rounded-lg space-y-4">
+            <div class="w-12 h-12 rounded bg-accent-gold/10 border border-accent-gold/20 flex items-center justify-center text-accent-gold">
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2"/></svg>
+            </div>
+            <h3 class="text-lg font-bold text-white">Conversion-Optimized Widgets</h3>
+            <p class="text-gray-400 text-sm">Equip your clients with interactive Runway Calculators, Scorecards, and Intake Forms engineered specifically for high conversion.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- HOW THE FLOW WORKS -->
+      <div class="bg-obsidian-900 border-t border-b border-white/5 py-20 px-4">
+        <div class="max-w-7xl mx-auto">
+          <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+            <span class="text-xs uppercase text-accent-gold font-mono font-bold tracking-widest">THE VALUE PIPELINE</span>
+            <h2 class="text-3xl md:text-4xl font-extrabold text-white">How Referral Tracking Flows</h2>
+            <p class="text-gray-400">Complete loop transparency. From custom landing to scorecard completion, tracking remains locked to your ID.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-6 text-center font-mono">
+            <div class="bg-obsidian-950 p-6 rounded border border-white/5 relative">
+              <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent-gold text-black text-xs font-bold px-3 py-1 rounded">STEP 01</div>
+              <h4 class="text-white font-bold text-base pt-4 mb-2">Deploy Partner Route</h4>
+              <p class="text-xs text-gray-400">Approved partners receive custom static URL setups under our master domain directory structure.</p>
+            </div>
+            <div class="bg-obsidian-950 p-6 rounded border border-white/5 relative">
+              <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent-gold text-black text-xs font-bold px-3 py-1 rounded">STEP 02</div>
+              <h4 class="text-white font-bold text-base pt-4 mb-2">Trackable Client Clicks</h4>
+              <p class="text-xs text-gray-400">Query parameters auto-inject across standard embeds, native calculators, and strategy anchors.</p>
+            </div>
+            <div class="bg-obsidian-950 p-6 rounded border border-white/5 relative">
+              <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent-gold text-black text-xs font-bold px-3 py-1 rounded">STEP 03</div>
+              <h4 class="text-white font-bold text-base pt-4 mb-2">Interactive Screening</h4>
+              <p class="text-xs text-gray-400">Clients calculate readiness instantly via native tools. Results auto-bind to your partner ID profile.</p>
+            </div>
+            <div class="bg-obsidian-950 p-6 rounded border border-white/5 relative">
+              <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent-gold text-black text-xs font-bold px-3 py-1 rounded">STEP 04</div>
+              <h4 class="text-white font-bold text-base pt-4 mb-2">Compliant Intake</h4>
+              <p class="text-xs text-gray-400">Tally or customized embeds sync final application details to our intake desk with immediate notifications.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ SECTION (HOMEPAGE) -->
+      <div class="py-20 px-4 max-w-4xl mx-auto">
+        <h2 class="text-3xl font-extrabold text-center text-white mb-10 font-mono uppercase tracking-tight">System FAQ</h2>
+        <div class="space-y-4">
+          <div class="glass-card rounded p-4">
+            <button onclick="toggleFaq(0)" class="w-full flex justify-between items-center text-left text-white font-semibold font-mono text-sm focus:outline-none">
+              <span>Is business funding or partner commission guaranteed?</span>
+              <svg id="faq-icon-0" class="w-5 h-5 text-accent-gold transform transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div id="faq-body-0" class="hidden mt-3 text-sm text-gray-400 leading-relaxed font-sans space-y-2 border-t border-white/5 pt-2">
+              <p>Absolutely not. Moonshine Capital maintains rigid commitment-free disclosures. All commercial options are entirely dependent on underwriter analysis, documentation validity, macro lending conditions, and business profile factors. We never guarantee capital availability or commissions.</p>
+            </div>
+          </div>
+
+          <div class="glass-card rounded p-4">
+            <button onclick="toggleFaq(1)" class="w-full flex justify-between items-center text-left text-white font-semibold font-mono text-sm focus:outline-none">
+              <span>How are static tracking attributes maintained without databases?</span>
+              <svg id="faq-icon-1" class="w-5 h-5 text-accent-gold transform transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div id="faq-body-1" class="hidden mt-3 text-sm text-gray-400 leading-relaxed font-sans space-y-2 border-t border-white/5 pt-2">
+              <p>Our static-first architecture maps incoming query parameters (e.g., <code class="text-xs text-accent-gold bg-black/40 px-1 rounded">ref</code>, <code class="text-xs text-accent-gold bg-black/40 px-1 rounded">partner</code>) directly to URL structures in outbound targets or hidden form parameters via local storage injection.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- VIEW B: CO-BRANDED PARTNER PAGE (/partners/jane-smith) -->
+    <!-- ========================================== -->
+    <section id="view-partnerPage" class="workspace-view hidden">
+      <!-- CO-BRANDED PARTNER STICKY HERO HEADER -->
+      <div class="bg-obsidian-900 border-b border-accent-gold/20 py-12 px-4 relative overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(212,175,55,0.04),transparent)]"></div>
+        <div class="max-w-7xl mx-auto text-center space-y-4 relative z-10">
+          
+          <div class="flex items-center justify-center gap-2 text-xs font-mono tracking-widest text-gray-400">
+            <span class="text-white font-bold">MOONSHINE CAPITAL</span>
+            <span>×</span>
+            <span class="text-accent-gold uppercase font-black" id="coBrandName">JANE SMITH</span>
+          </div>
+
+          <h1 class="text-3xl md:text-5xl font-extrabold text-white leading-tight">
+            See What Funding Options Your <span class="text-accent-gold">Business May Be Ready For</span>
+          </h1>
+
+          <p class="text-gray-400 text-lg max-w-3xl mx-auto font-light">
+            <span id="coBrandName2" class="font-semibold text-white">Jane Smith</span> has partnered with Moonshine Capital to help business owners discover clear, organized, non-guaranteed paths to operational capital readiness.
+          </p>
+
+          <div class="inline-flex flex-wrap items-center justify-center gap-3 bg-black/60 border border-white/10 px-4 py-2 rounded font-mono text-xs text-gray-400 mt-4">
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-accent-gold"></span> Referral ID: <span id="coBrandRef" class="text-white font-bold">JANE2026</span></span>
+            <span class="text-gray-600">|</span>
+            <span id="coBrandType" class="bg-accent-gold/10 text-accent-gold px-2 py-0.5 rounded text-[10px] border border-accent-gold/20">Broker Partner</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PARTNER PROFILE & COPY LINK MODULE -->
+      <div class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center border-b border-white/5">
+        <div class="lg:col-span-8 flex flex-col sm:flex-row items-center gap-6 bg-obsidian-900/60 p-6 rounded-lg border border-white/5">
+          <!-- Mock Avatar -->
+          <div class="w-20 h-20 rounded-full bg-gradient-to-br from-accent-gold to-obsidian-950 border-2 border-accent-gold/40 flex items-center justify-center text-white text-3xl font-mono font-bold shrink-0">
+            JS
+          </div>
+          <div class="space-y-2 text-center sm:text-left">
+            <div class="text-lg font-bold text-white font-mono flex flex-wrap items-center justify-center sm:justify-start gap-2">
+              <span>Jane Smith Consulting</span>
+              <span class="text-xs bg-accent-emerald/10 text-accent-emerald border border-accent-emerald/30 py-0.5 px-2 rounded-full">Primary Referral Link</span>
+            </div>
+            <p class="text-xs text-gray-400 font-sans max-w-xl">
+              "I created this page to give my clients and network a cleaner way to explore business funding readiness through Moonshine Capital. Start with the funding flow, prepare your details, and take the next step when you are ready."
+            </p>
+          </div>
+        </div>
+        
+        <div class="lg:col-span-4 bg-obsidian-900/60 p-6 rounded-lg border border-white/5 text-center space-y-4">
+          <div class="text-xs font-mono text-gray-400 uppercase tracking-widest">Share Your Resource Link</div>
+          <button onclick="copyReferenceUrl()" class="w-full bg-white/5 hover:bg-white/10 border border-white/10 py-3 px-4 rounded font-mono text-xs flex items-center justify-center gap-2 text-accent-gold transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+            Copy My Share URL
+          </button>
+          <div class="text-[9px] text-gray-500 font-mono tracking-tight break-all" id="simLiveUrlText">
+            https://moonshinecapital.com/partners/jane-smith/?ref=JANE2026
+          </div>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE NATIVE SCORECARD -->
+      <div class="py-16 px-4 max-w-4xl mx-auto space-y-12">
+        <div class="text-center space-y-3">
+          <span class="text-xs uppercase text-accent-gold font-mono tracking-widest font-bold bg-accent-gold/10 px-3 py-1 border border-accent-gold/20 rounded">MODE B - LOCAL INTERACTIVE SCREENER</span>
+          <h2 class="text-3xl font-extrabold text-white">Funding Readiness Scorecard</h2>
+          <p class="text-gray-400 text-sm max-w-xl mx-auto">Calculate potential eligibility points instantly. Completed results route with tracking parameters intact.</p>
+        </div>
+
+        <!-- SCORECARD INTERACTIVE COMPONENT -->
+        <div id="scorecard-wrapper" class="glass-card rounded-lg border border-white/10 p-6 md:p-8">
+          
+          <!-- PROGRESS INDICATOR -->
+          <div class="mb-8">
+            <div class="flex items-center justify-between text-xs font-mono text-gray-400 mb-2">
+              <span id="step-count">Question 1 of 6</span>
+              <span id="step-progress">16% Complete</span>
+            </div>
+            <div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+              <div id="progress-bar" class="bg-accent-gold h-full w-[16%] transition-all duration-300"></div>
+            </div>
+          </div>
+
+          <!-- QUESTION INTERFACE -->
+          <div id="question-container" class="space-y-6">
+            <!-- Dynamic Questions Rendered via JS -->
+          </div>
+
+          <!-- BUTTON CONTROLS -->
+          <div class="flex justify-between items-center mt-8 border-t border-white/5 pt-6">
+            <button id="prevBtn" onclick="prevStep()" class="text-xs text-gray-400 hover:text-white font-mono flex items-center gap-1.5 opacity-50 cursor-not-allowed" disabled>
+              ← Back
+            </button>
+            <button id="nextBtn" onclick="nextStep()" class="bg-accent-gold hover:bg-accent-goldHover text-black font-semibold text-xs py-2.5 px-6 rounded font-mono">
+              Next Step →
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- LEAD INTENT TALLY PLACEHOLDER FORM SECTION -->
+      <div class="bg-obsidian-900/60 border-t border-b border-white/5 py-16 px-4">
+        <div class="max-w-4xl mx-auto space-y-8">
+          <div class="text-center space-y-3">
+            <span class="text-xs uppercase text-accent-gold font-mono tracking-widest font-bold">MODE A - FORM EMBED</span>
+            <h2 class="text-3xl font-extrabold text-white">Start Your Funding Request</h2>
+            <p class="text-gray-400 text-sm">Submit your preliminary profile values. The referral configuration tracks automatically via iframe query hooks.</p>
+          </div>
+
+          <!-- Sandbox Iframe Container -->
+          <div class="glass-card rounded border border-white/10 p-4">
+            <div class="flex items-center justify-between bg-black/40 border border-white/5 py-2 px-3 rounded mb-4 font-mono text-[10px] text-gray-400">
+              <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Sandbox Mock Embed Panel: <code class="text-accent-gold" id="sandboxUrl">tally.so/embed/...</code></span>
+              <span class="text-gray-500">Static Framework Sandbox</span>
+            </div>
+            
+            <div class="border border-dashed border-white/10 bg-black/20 rounded h-64 flex flex-col items-center justify-center text-center p-6 space-y-4">
+              <svg class="w-10 h-10 text-accent-gold/40" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <div>
+                <h4 class="text-white font-mono text-sm font-bold">Standard Tally Endpoint Triggered</h4>
+                <p class="text-xs text-gray-500 max-w-md mx-auto mt-1">This slot represents where an external static Tally or typeform layout would embed. Active parameters below reflect tracking hooks captured by our helper engine:</p>
+              </div>
+              <div class="text-[10px] bg-black/60 p-2.5 rounded font-mono text-accent-gold max-w-xl truncate select-all" id="mockTallyEmbedString">
+                &lt;iframe data-tally-src="https://tally.so/embed/YOUR_TALLY_FORM_ID?ref=JANE2026&amp;partner=jane-smith..."&gt;
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- VIEW C: FUNDING DIRECTORY (/funding/) -->
+    <!-- ========================================== -->
+    <section id="view-fundingDir" class="workspace-view hidden">
+      <div class="py-16 px-4 max-w-7xl mx-auto space-y-12">
+        <div class="text-center space-y-4 max-w-3xl mx-auto">
+          <span class="text-xs uppercase text-accent-gold font-mono font-bold tracking-widest">FUNDING DIRECTORY</span>
+          <h1 class="text-3xl md:text-5xl font-extrabold text-white">Explore Moonshine Capital Funding Paths</h1>
+          <p class="text-gray-400">Different businesses need different capital lanes. Browse active options, readiness markers, and typical documentation benchmarks in a clean, compliance-first interface.</p>
+        </div>
+
+        <!-- Filters Block -->
+        <div class="flex flex-wrap items-center justify-center gap-2 border-b border-white/5 pb-8 font-mono text-xs">
+          <button onclick="filterFunding('all')" class="bg-accent-gold text-black font-semibold py-1.5 px-4 rounded transition duration-150">All Paths</button>
+          <button onclick="filterFunding('Startup')" class="bg-white/5 hover:bg-white/10 text-white py-1.5 px-4 rounded border border-white/5 transition duration-150">Startup Paths</button>
+          <button onclick="filterFunding('Working')" class="bg-white/5 hover:bg-white/10 text-white py-1.5 px-4 rounded border border-white/5 transition duration-150">Revenue / Working Capital</button>
+          <button onclick="filterFunding('Lines')" class="bg-white/5 hover:bg-white/10 text-white py-1.5 px-4 rounded border border-white/5 transition duration-150">Lines of Credit</button>
+          <button onclick="filterFunding('Asset')" class="bg-white/5 hover:bg-white/10 text-white py-1.5 px-4 rounded border border-white/5 transition duration-150">Equipment / Asset-Backed</button>
+        </div>
+
+        <!-- Funding Paths Grid Container -->
+        <div id="fundingGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Populated dynamically by script.js using real schema mockup -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- VIEW D: VERTICALS DIRECTORY (/verticals/) -->
+    <!-- ========================================== -->
+    <section id="view-verticalsDir" class="workspace-view hidden">
+      <div class="py-16 px-4 max-w-7xl mx-auto space-y-16">
+        <div class="text-center space-y-4 max-w-3xl mx-auto">
+          <span class="text-xs uppercase text-accent-gold font-mono font-bold tracking-widest">VERTICAL ADVISORY PROGRAM</span>
+          <h1 class="text-4xl font-extrabold text-white">Niche-Tailored Referral Partnerships</h1>
+          <p class="text-gray-400">Enable client conversation paths customized for specific sectors without introducing speculative underwriting statements.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- CPA Block -->
+          <div class="glass-card p-8 rounded-lg space-y-6">
+            <div class="inline-block text-xs font-mono bg-accent-gold/10 text-accent-gold px-2.5 py-1 rounded border border-accent-gold/20">CPA / ACCOUNTING</div>
+            <h3 class="text-2xl font-bold text-white">CPAs and Tax Professionals</h3>
+            <p class="text-sm text-gray-400 leading-relaxed">
+              Help business clients address seasonal liquidity drops, outstanding tax balances, or significant capital purchases with a highly structured client referral resource panel. No speculative guarantees of outcome are ever presented.
+            </p>
+            <div class="space-y-2 border-t border-white/5 pt-4">
+              <div class="text-xs font-mono text-gray-400">TYPICAL CLIENT SCENARIOS:</div>
+              <ul class="text-xs text-gray-500 space-y-1 font-mono">
+                <li>● Off-season revenue smoothing</li>
+                <li>● Equipment acquisition cost-containment</li>
+                <li>● Payroll processing support</li>
+              </ul>
+            </div>
+            <button onclick="openApplyModal('CPA')" class="w-full bg-accent-gold hover:bg-accent-goldHover text-black font-semibold font-mono text-xs py-3 rounded text-center transition">
+              Establish CPA Referral Stream
+            </button>
+          </div>
+
+          <!-- RE / INVESTOR Block -->
+          <div class="glass-card p-8 rounded-lg space-y-6">
+            <div class="inline-block text-xs font-mono bg-accent-gold/10 text-accent-gold px-2.5 py-1 rounded border border-accent-gold/20">REAL ESTATE / CONSULTING</div>
+            <h3 class="text-2xl font-bold text-white">Real Estate Professionals</h3>
+            <p class="text-sm text-gray-400 leading-relaxed">
+              Deliver comprehensive commercial credit and funding framework guides to flippers, landlords, and commercial owner-operators. Facilitate readiness checks without risk.
+            </p>
+            <div class="space-y-2 border-t border-white/5 pt-4">
+              <div class="text-xs font-mono text-gray-400">TYPICAL CLIENT SCENARIOS:</div>
+              <ul class="text-xs text-gray-500 space-y-1 font-mono">
+                <li>● Construction or rehab bridge liquidity</li>
+                <li>● Commercial building down payments</li>
+                <li>● DSCR rental asset expansions</li>
+              </ul>
+            </div>
+            <button onclick="openApplyModal('Real Estate')" class="w-full bg-accent-gold hover:bg-accent-goldHover text-black font-semibold font-mono text-xs py-3 rounded text-center transition">
+              Establish RE Partner Stream
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- VIEW E: TOOLS DIRECTORY (/tools/) -->
+    <!-- ========================================== -->
+    <section id="view-toolsDir" class="workspace-view hidden">
+      <div class="py-16 px-4 max-w-7xl mx-auto space-y-12">
+        <div class="text-center space-y-4 max-w-3xl mx-auto">
+          <span class="text-xs uppercase text-accent-gold font-mono font-bold tracking-widest">EMBEDDED TOOLKIT</span>
+          <h1 class="text-4xl font-extrabold text-white">Client Screening Utilities</h1>
+          <p class="text-gray-400">Equip your domain properties with conversion-optimized tools designed to pre-filter, score, and qualify lead traffic while securing referral attribution parameters.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 font-mono">
+          <div class="bg-obsidian-900 border border-white/10 p-6 rounded-lg space-y-4 flex flex-col justify-between">
+            <div class="space-y-2">
+              <span class="text-[10px] bg-accent-emerald/10 text-accent-emerald border border-accent-emerald/30 px-2 py-0.5 rounded">Native Ready</span>
+              <h3 class="text-lg font-bold text-white font-mono">Readiness Scorecard</h3>
+              <p class="text-xs text-gray-400 font-sans">The 100-point step validator built into co-branded referral profiles.</p>
+            </div>
+            <button onclick="switchView('partnerPage')" class="w-full border border-white/10 hover:border-accent-gold/30 text-xs py-2 rounded text-center text-gray-300">Run Tool Widget</button>
+          </div>
+
+          <div class="bg-obsidian-900 border border-white/10 p-6 rounded-lg space-y-4 flex flex-col justify-between">
+            <div class="space-y-2">
+              <span class="text-[10px] bg-accent-gold/10 text-accent-gold border border-accent-gold/30 px-2 py-0.5 rounded">Tally Form</span>
+              <h3 class="text-lg font-bold text-white font-mono">Get Funded Portal</h3>
+              <p class="text-xs text-gray-400 font-sans">Structured entry forms feeding back into primary underwriting desks.</p>
+            </div>
+            <button onclick="switchView('partnerPage')" class="w-full border border-white/10 hover:border-accent-gold/30 text-xs py-2 rounded text-center text-gray-300">Preview Form Area</button>
+          </div>
+
+          <div class="bg-obsidian-900 border border-white/10 p-6 rounded-lg space-y-4 flex flex-col justify-between">
+            <div class="space-y-2">
+              <span class="text-[10px] bg-accent-blue/10 text-blue-400 border border-blue-400/30 px-2 py-0.5 rounded">Simulator</span>
+              <h3 class="text-lg font-bold text-white font-mono">Burn Runway Calc</h3>
+              <p class="text-xs text-gray-400 font-sans">Calculates remaining months of cash reserves to optimize funding timing.</p>
+            </div>
+            <button onclick="alert('Demo Simulator Integration: Complete parameters above to populate downstream static embeds!')" class="w-full border border-white/10 hover:border-accent-gold/30 text-xs py-2 rounded text-center text-gray-300">Launch Simulation</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- VIEW F: README & COMPLIANCE SYSTEM -->
+    <!-- ========================================== -->
+    <section id="view-readmeView" class="workspace-view hidden">
+      <div class="py-16 px-4 max-w-4xl mx-auto space-y-8 font-mono text-xs text-gray-400">
+        <div class="bg-obsidian-900 border border-white/10 p-8 rounded-lg space-y-6">
+          <div class="flex items-center justify-between border-b border-white/5 pb-4">
+            <h1 class="text-xl font-bold text-white">README.md</h1>
+            <span class="text-[10px] text-gray-500 font-mono">SYSTEM DOCUMENTATION</span>
+          </div>
+
+          <div class="space-y-4 font-sans text-sm">
+            <h2 class="text-base font-bold text-accent-gold font-mono">1. SYSTEM ARCHITECTURE & DIRECTORY</h2>
+            <p>This system utilizes static-first deployment pipelines designed to fit GitHub Pages or alternative static hosting setups without back-end complexity. Maintain the directory layout as documented in the codebase configuration manifest:</p>
+            <pre class="bg-black/40 p-3 rounded font-mono text-xs text-gray-300 border border-white/5">
+/
+  index.html
+  styles.css
+  script.js
+/data/
+  partners.js
+  funding-types.js
+  verticals.js
+            </pre>
+
+            <h2 class="text-base font-bold text-accent-gold font-mono">2. HOW TO DEPLOY A NEW CO-BRANDED PARTNER</h2>
+            <p>To register a new referral partner or broker target profile, insert a descriptive static partner profile configuration matching the standard schema template inside your data layout arrays:</p>
+            <pre class="bg-black/40 p-3 rounded font-mono text-xs text-emerald-400 border border-white/5">
+{
+  partnerName: "Jane Smith",
+  partnerSlug: "jane-smith",
+  partnerReferralCode: "JANE2026",
+  partnerType: "Broker Partner"
+}
+            </pre>
+
+            <h2 class="text-base font-bold text-accent-gold font-mono">3. ATTRIBUTION AND COMPLIANCE RULES</h2>
+            <p>Maintain consistent visibility of the pre-qualification and compensation disclaimers across all downstream targets. Never provide commitments or rate assurances.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================== -->
+  <!-- APPLICATION CTA MODAL -->
+  <!-- ========================================== -->
+  <div id="applyModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 items-center justify-center p-4 hidden">
+    <div class="bg-obsidian-950 border border-white/10 p-6 rounded-lg max-w-md w-full relative space-y-4">
+      <button onclick="closeApplyModal()" class="absolute top-4 right-4 text-gray-500 hover:text-white font-mono text-lg">×</button>
+      
+      <div class="text-center space-y-2">
+        <h3 class="text-xl font-bold text-white font-mono uppercase tracking-tight">Become a Partner</h3>
+        <p class="text-xs text-gray-400">Complete this entry matrix to apply for a custom co-branded subpath route with tracking anchors.</p>
+      </div>
+
+      <form id="partnerApplicationForm" class="space-y-4 font-mono text-xs" onsubmit="handlePartnerSubmit(event)">
+        <div class="space-y-1">
+          <label class="block text-gray-500">PROPOSED SLUG NAME (e.g. your-brand)</label>
+          <input type="text" id="appSlug" required class="w-full bg-black/40 border border-white/10 rounded p-2.5 text-accent-gold outline-none" placeholder="example-consulting">
+        </div>
+        <div class="space-y-1">
+          <label class="block text-gray-500">YOUR BUSINESS ENTITY NAME</label>
+          <input type="text" required class="w-full bg-black/40 border border-white/10 rounded p-2.5 text-accent-gold outline-none" placeholder="My Enterprise Corp">
+        </div>
+        <div class="space-y-1">
+          <label class="block text-gray-500">PARTNER TYPE VERTICAL</label>
+          <select class="w-full bg-black/40 border border-white/10 rounded p-2.5 text-accent-gold outline-none">
+            <option>Broker Partner</option>
+            <option>Affiliate Partner</option>
+            <option>CPA Partner</option>
+            <option>Strategic Referral Partner</option>
+          </select>
+        </div>
+
+        <div class="text-[10px] text-gray-500 font-sans leading-relaxed bg-black/40 p-3 rounded border border-white/5">
+          <strong>Referral Commission Disclosure:</strong> This application acts as a profile initialization setup request. Execution of programmatic partner tracking agreements and terms verification remains mandatory before commission distributions can occur.
+        </div>
+
+        <button type="submit" class="w-full bg-accent-gold hover:bg-accent-goldHover text-black font-semibold py-3 rounded text-center transition tracking-wide uppercase">
+          Initialize Partner Request
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- COMPLIANCE & LEGAL STATIC FOOTER -->
+  <!-- ========================================== -->
+  <footer class="bg-obsidian-950 border-t border-white/5 py-12 px-4 mt-auto">
+    <div class="max-w-7xl mx-auto space-y-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+        <!-- Logo and address block -->
+        <div class="space-y-3">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded bg-accent-gold text-black flex items-center justify-center font-mono font-black text-xs">M</div>
+            <span class="text-white font-bold font-mono tracking-tight text-sm">MOONSHINE <span class="text-accent-gold">CAPITAL</span></span>
+          </div>
+          <p class="text-xs text-gray-500 max-w-sm leading-relaxed">
+            Institutional-grade referral structures for brokers, advisors, and corporate connectors who seek strict regulatory consistency and optimized static workflow templates.
+          </p>
+        </div>
+
+        <!-- Links/Anchors -->
+        <div class="flex flex-wrap gap-4 text-xs font-mono text-gray-400 md:justify-end">
+          <button onclick="switchView('homepage')" class="hover:text-accent-gold">Root /</button>
+          <span class="text-gray-700">|</span>
+          <button onclick="switchView('partnerPage')" class="hover:text-accent-gold">Sample Profile</button>
+          <span class="text-gray-700">|</span>
+          <button onclick="switchView('fundingDir')" class="hover:text-accent-gold">Funding Matrix</button>
+          <span class="text-gray-700">|</span>
+          <button onclick="switchView('verticalsDir')" class="hover:text-accent-gold">Verticals</button>
+          <span class="text-gray-700">|</span>
+          <button onclick="switchView('readmeView')" class="hover:text-accent-gold">System Manifest</button>
+        </div>
+      </div>
+
+      <!-- DISCLOSURES & RULES -->
+      <div class="border-t border-white/5 pt-8 space-y-4 text-[11px] text-gray-500 leading-relaxed font-sans">
+        <p>
+          <strong>Referral Disclosure:</strong> This page may be associated with a Moonshine Capital referral partner, affiliate, broker, or strategic partner. The referring partner may receive compensation, credit, or recognition for qualified referrals. Referral attribution does not affect eligibility, underwriting, funding decisions, or available options.
+        </p>
+        <p>
+          <strong>Compliance Disclaimer:</strong> Moonshine Capital does not guarantee funding, approvals, credit outcomes, revenue, partner compensation, or specific financial results. All funding options are subject to eligibility, underwriting, lender requirements, documentation, business profile, industry, location, and other factors. This site is for educational and referral purposes only and does not provide legal, tax, or financial advice.
+        </p>
+        <div class="flex flex-col sm:flex-row justify-between items-center text-[10px] text-gray-600 font-mono gap-4 pt-2">
+          <span>© 2026 Moonshine Capital. All commercial and distribution rights reserved.</span>
+          <span>Security Protocol: Static Secured SSL Target</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================== -->
+  <!-- JAVASCRIPT SYSTEM ENGINE (STATIC INTEGRATIONS) -->
+  <!-- ========================================== -->
+  <script>
+    // ==========================================
+    // STATIC SCHEMA DATA OBJECTS
+    // ==========================================
+    const fundingTypes = [
+      {
+        name: "Startup Funding Path",
+        slug: "startup-funding",
+        category: "Startup / Credit-Leverage",
+        bestFor: "New founders, early-stage operators with strong personal credit.",
+        commonUses: ["Launch capital", "Setup costs", "Initial runway"],
+        readinessMarkers: ["Strong personal credit profile", "Verifiable secondary income"],
+        typicalDocs: ["ID docs", "Soft-pull authorization", "Bank account records"],
+        speedExpectation: "Varies depending on profile readiness",
+        cautionFlags: "Weak personal score history, outstanding tax liens."
+      },
+      {
+        name: "Revenue Advance Program",
+        slug: "working-capital",
+        category: "Fast Capital / Revenue Advance",
+        bestFor: "Active businesses with urgent short-term cash demands.",
+        commonUses: ["Payroll support", "Inventory acquisition", "Operational cycles"],
+        readinessMarkers: ["Consistent monthly deposits", "Minimum 6+ months active operational timeline"],
+        typicalDocs: ["Recent business bank records", "Basic identity documentation"],
+        speedExpectation: "Often accelerated turnaround paths",
+        cautionFlags: "Recent non-sufficient funds (NSF) marks, multi-stack balances."
+      },
+      {
+        name: "Business Line Access Solution",
+        slug: "business-lines-of-credit",
+        category: "Revolving Access",
+        bestFor: "Established operators seeking recurrent cash resources.",
+        commonUses: ["Flex purchases", "Emergency backups", "Seasonal adjustments"],
+        readinessMarkers: ["Clean entity profiles", "Active sales cycles"],
+        typicalDocs: ["Comprehensive business financials", "Core operating agreements"],
+        speedExpectation: "Subject to underwriting schedule",
+        cautionFlags: "Chaotic primary bank activity, lack of consistent accounting."
+      }
+    ];
+
+    // ==========================================
+    // SCORECARD LOGIC STATE ENGINE
+    // ==========================================
+    let currentScorecardStep = 0;
+    let scorecardPoints = 0;
+    let selectedAnswers = {};
+
+    const scorecardQuestions = [
+      {
+        id: "monthly_revenue",
+        question: "What is your average monthly business revenue?",
+        category: "Revenue",
+        options: [
+          { label: "$0 - $2,999", points: 2 },
+          { label: "$3,000 - $8,499", points: 10 },
+          { label: "$8,500 - $14,999", points: 15 },
+          { label: "$15,000 - $49,999", points: 20 },
+          { label: "$50,000+", points: 25 }
+        ]
+      },
+      {
+        id: "time_in_business",
+        question: "How long has your business entity been operational?",
+        category: "Timeline",
+        options: [
+          { label: "0 - 3 months", points: 2 },
+          { label: "4 - 11 months", points: 8 },
+          { label: "12 - 23 months", points: 15 },
+          { label: "24+ months", points: 20 }
+        ]
+      },
+      {
+        id: "personal_credit",
+        question: "What is your estimated personal credit score?",
+        category: "Credit",
+        options: [
+          { label: "Below 580", points: 2 },
+          { label: "580 - 649", points: 10 },
+          { label: "650 - 699", points: 15 },
+          { label: "700+", points: 20 }
+        ]
+      },
+      {
+        id: "bank_activity",
+        question: "Describe your business deposit and bank activity:",
+        category: "Bank Health",
+        options: [
+          { label: "No formal business bank account", points: 0 },
+          { label: "Inconsistent/low weekly deposits", points: 5 },
+          { label: "Consistent deposits, clean records", points: 15 }
+        ]
+      },
+      {
+        id: "business_structure",
+        question: "What is your current business organization structure?",
+        category: "Structure",
+        options: [
+          { label: "Sole Proprietor / Freelancer", points: 4 },
+          { label: "Registered LLC or Corporation", points: 10 }
+        ]
+      },
+      {
+        id: "funding_purpose",
+        question: "What is your primary proposed use of funds?",
+        category: "Purpose",
+        options: [
+          { label: "Working capital, short-cycle needs", points: 6 },
+          { label: "Equipment / inventory buys", points: 10 },
+          { label: "Startup launch / capital buffers", points: 5 }
+        ]
+      }
+    ];
+
+    // ==========================================
+    // INITIALIZATION & EVENT DISPATCHING
+    // ==========================================
+    window.addEventListener('DOMContentLoaded', () => {
+      // Sync inputs initially
+      updateTracking();
+      renderFundingTypes();
+      renderScorecardStep();
+    });
+
+    // Handle tracking simulation logic
+    function updateTracking() {
+      const ref = document.getElementById('simRef').value;
+      const partner = document.getElementById('simPartner').value;
+      const partnerName = document.getElementById('simPartnerName').value;
+      const partnerType = document.getElementById('simPartnerType').value;
+
+      // Update co-branding headers instantly
+      document.getElementById('coBrandName').innerText = partnerName;
+      document.getElementById('coBrandName2').innerText = partnerName;
+      document.getElementById('coBrandRef').innerText = ref;
+      document.getElementById('coBrandType').innerText = partnerType;
+
+      // Update DOM previews
+      document.querySelectorAll('.sim-slug').forEach(el => el.innerText = partner);
+      document.querySelectorAll('.sim-ref').forEach(el => el.innerText = ref);
+
+      // Construct live simulated URL string
+      const currentSimUrl = `https://moonshinecapital.com/partners/${partner}/?ref=${ref}&partner=${partner}&partner_name=${encodeURIComponent(partnerName)}&partner_type=${encodeURIComponent(partnerType)}&utm_source=partner&utm_medium=referral&utm_campaign=${partner}`;
+      document.getElementById('simLiveUrlText').innerText = currentSimUrl;
+      document.getElementById('badgeTrackUrl').innerText = `?ref=${ref}`;
+
+      // Update simulated form embed code block preview
+      const tallyEmbedMarkup = `<iframe data-tally-src="https://tally.so/embed/YOUR_TALLY_FORM_ID?alignLeft=1&hideTitle=1&ref=${ref}&partner=${partner}&partner_name=${encodeURIComponent(partnerName)}&partner_type=${encodeURIComponent(partnerType)}&utm_source=partner&utm_medium=referral&utm_campaign=${partner}&utm_content=embedded-form" loading="lazy" width="100%" height="800"></iframe>`;
+      document.getElementById('mockTallyEmbedString').innerText = tallyEmbedMarkup;
+      document.getElementById('sandboxUrl').innerText = `tally.so/embed/YOUR_ID?ref=${ref}`;
+    }
+
+    // Copy reference link with visual success feedback
+    function copyReferenceUrl() {
+      const urlText = document.getElementById('simLiveUrlText').innerText;
+      navigator.clipboard.writeText(urlText).then(() => {
+        alert("Referral Tracking Link copied to clipboard! (Parameters successfully bound)");
+      });
+    }
+
+    // Simple single-page routing simulator
+    function switchView(viewId) {
+      document.querySelectorAll('.workspace-view').forEach(view => {
+        view.classList.add('hidden');
+      });
+      document.getElementById(`view-${viewId}`).classList.remove('hidden');
+
+      // Update navigation button active styles
+      const navIds = ['homepage', 'partnerPage', 'fundingDir', 'verticalsDir', 'toolsDir', 'readmeView'];
+      navIds.forEach(id => {
+        const btn = document.getElementById(`nav-${id}`);
+        const mBtn = document.getElementById(`m-nav-${id}`);
+        
+        if (id === viewId) {
+          btn.className = "px-3.5 py-2 text-accent-gold rounded-md transition duration-150 border-b-2 border-accent-gold font-mono text-xs font-bold";
+          mBtn.className = "px-3 py-1.5 bg-accent-gold text-black rounded font-mono font-bold text-[10px]";
+        } else {
+          btn.className = "px-3.5 py-2 text-gray-400 hover:text-white rounded-md transition duration-150 font-mono text-xs";
+          mBtn.className = "px-3 py-1.5 text-gray-300 hover:bg-white/5 rounded font-mono text-[10px]";
+        }
+      });
+
+      // Scroll to workspace start smoothly
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ==========================================
+    // RENDER METRIC: FUNDING PRODUCTS
+    // ==========================================
+    function renderFundingTypes() {
+      const container = document.getElementById('fundingGrid');
+      container.innerHTML = '';
+
+      fundingTypes.forEach(p => {
+        const card = document.createElement('div');
+        card.className = "bg-obsidian-900 border border-white/10 p-6 rounded-lg space-y-4 flex flex-col justify-between hover:border-accent-gold/40 transition duration-150";
+        card.innerHTML = `
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] uppercase font-mono tracking-widest text-accent-gold font-bold border border-accent-gold/20 bg-accent-gold/5 px-2 py-0.5 rounded">${p.category}</span>
+            </div>
+            <h3 class="text-lg font-bold text-white font-mono leading-tight">${p.name}</h3>
+            
+            <div class="space-y-1 text-xs">
+              <span class="text-gray-500 font-mono block">BEST FOR:</span>
+              <p class="text-gray-300 font-sans">${p.bestFor}</p>
+            </div>
+
+            <div class="space-y-1 text-xs">
+              <span class="text-gray-500 font-mono block">READINESS MARKERS:</span>
+              <p class="text-gray-400 font-sans">${p.readinessMarkers.join(', ')}</p>
+            </div>
+
+            <div class="space-y-1 text-xs">
+              <span class="text-gray-500 font-mono block">REQUIRED DOCS:</span>
+              <p class="text-gray-400 font-sans">${p.typicalDocs.join(', ')}</p>
+            </div>
+          </div>
+
+          <div class="border-t border-white/5 pt-4 mt-2">
+            <button onclick="switchView('partnerPage')" class="w-full bg-white/5 hover:bg-accent-gold hover:text-black text-white py-2.5 rounded font-mono text-xs transition duration-200">
+              Run Score Assessment
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function filterFunding(category) {
+      alert(`Simulated Action: Filtering listing views. In absolute production deployments, CSS toggle hooks or separate templates manage filtering values.`);
+    }
+
+    // ==========================================
+    // SCORECARD INTERACTIVE COMPONENT
+    // ==========================================
+    function renderScorecardStep() {
+      const container = document.getElementById('question-container');
+      const q = scorecardQuestions[currentScorecardStep];
+      
+      // Update Step progress numbers
+      const totalSteps = scorecardQuestions.length;
+      document.getElementById('step-count').innerText = `Question ${currentScorecardStep + 1} of ${totalSteps}`;
+      const percentage = Math.round(((currentScorecardStep) / totalSteps) * 100);
+      document.getElementById('step-progress').innerText = `${percentage}% Complete`;
+      document.getElementById('progress-bar').style.width = `${percentage}%`;
+
+      // Render Question Markup
+      container.innerHTML = `
+        <div class="space-y-3">
+          <span class="text-xs uppercase text-accent-gold font-mono tracking-widest font-bold">${q.category} Assessment Area</span>
+          <h3 class="text-xl font-bold text-white font-mono">${q.question}</h3>
+        </div>
+        <div class="grid grid-cols-1 gap-3 pt-2">
+          ${q.options.map((opt, idx) => {
+            const isSelected = selectedAnswers[q.id] === opt.points;
+            return `
+              <button onclick="selectScoreOption('${q.id}', ${opt.points})" class="w-full text-left p-4 rounded border transition duration-150 flex items-center justify-between font-mono text-xs ${
+                isSelected 
+                  ? 'border-accent-gold bg-accent-gold/10 text-white font-bold' 
+                  : 'border-white/10 bg-black/40 text-gray-400 hover:border-white/20 hover:text-white'
+              }">
+                <span>${opt.label}</span>
+                <span class="text-[10px] text-gray-500">Select Item</span>
+              </button>
+            `;
+          }).join('')}
+        </div>
+      `;
+
+      // Back Button state control
+      const prevBtn = document.getElementById('prevBtn');
+      if (currentScorecardStep === 0) {
+        prevBtn.disabled = true;
+        prevBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      } else {
+        prevBtn.disabled = false;
+        prevBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+
+      // Update Next button indicator if last step
+      const nextBtn = document.getElementById('nextBtn');
+      if (currentScorecardStep === totalSteps - 1) {
+        nextBtn.innerText = "Calculate Results →";
+      } else {
+        nextBtn.innerText = "Next Step →";
+      }
+    }
+
+    function selectScoreOption(questionId, points) {
+      selectedAnswers[questionId] = points;
+      renderScorecardStep();
+    }
+
+    function nextStep() {
+      const q = scorecardQuestions[currentScorecardStep];
+      if (selectedAnswers[q.id] === undefined) {
+        alert("Please select an evaluation item to proceed.");
+        return;
+      }
+
+      if (currentScorecardStep < scorecardQuestions.length - 1) {
+        currentScorecardStep++;
+        renderScorecardStep();
+      } else {
+        // Compute and trigger Lead Capturing view before results
+        renderLeadCaptureScreen();
+      }
+    }
+
+    function prevStep() {
+      if (currentScorecardStep > 0) {
+        currentScorecardStep--;
+        renderScorecardStep();
+      }
+    }
+
+    function renderLeadCaptureScreen() {
+      // Complete bar progression
+      document.getElementById('step-progress').innerText = `100% Complete`;
+      document.getElementById('progress-bar').style.width = `100%`;
+
+      const container = document.getElementById('question-container');
+      container.innerHTML = `
+        <div class="space-y-4">
+          <div class="text-center space-y-2">
+            <span class="text-xs uppercase text-accent-emerald font-mono tracking-widest font-bold">CALCULATION COMPLETE</span>
+            <h3 class="text-xl font-bold text-white font-mono">Verify Your Business Contact Profile</h3>
+            <p class="text-xs text-gray-400 max-w-sm mx-auto">Input coordinates below to initialize calculations and secure your referral tracking attributes before displaying the scorecard report.</p>
+          </div>
+
+          <form id="scorecardLeadForm" onsubmit="calculateFinalScorecardResult(event)" class="space-y-3 font-mono text-xs max-w-md mx-auto pt-4">
+            <div class="grid grid-cols-2 gap-3">
+              <input type="text" required placeholder="First Name" class="bg-black/40 border border-white/10 rounded p-2.5 text-accent-gold outline-none">
+              <input type="text" required placeholder="Last Name" class="bg-black/40 border border-white/10 rounded p-2.5 text-accent-gold outline-none">
+            </div>
+            <input type="email" required placeholder="Email Address" class="w-full bg-black/40 border border-white/10 rounded p-2.5 text-accent-gold outline-none">
+            <input type="tel" required placeholder="Phone Number" class="w-full bg-black/40 border border-white/10 rounded p-2.5 text-accent-gold outline-none">
+            
+            <label class="flex items-start gap-2 text-[10px] text-gray-500 font-sans cursor-pointer pt-2 select-none">
+              <input type="checkbox" required class="mt-0.5 rounded border-white/10 bg-black/40">
+              <span>I agree to be contacted about funding options and understand this score is not an approval, offer, or guarantee of funding.</span>
+            </label>
+
+            <button type="submit" class="w-full bg-gradient-to-r from-accent-gold to-yellow-600 hover:from-yellow-600 hover:to-accent-gold text-black font-semibold py-3 rounded text-center transition uppercase tracking-widest mt-4">
+              Reveal Calculations
+            </button>
+          </form>
+        </div>
+      `;
+
+      // Hide baseline footer controls
+      document.getElementById('prevBtn').style.display = 'none';
+      document.getElementById('nextBtn').style.display = 'none';
+    }
+
+    function calculateFinalScorecardResult(e) {
+      e.preventDefault();
+      
+      // Sum up points
+      let score = 0;
+      Object.keys(selectedAnswers).forEach(key => {
+        score += selectedAnswers[key];
+      });
+
+      // Calculate Tier
+      let tier = "";
+      let tierColor = "";
+      let statusDesc = "";
+      
+      if (score >= 80) {
+        tier = "Highly Fundable";
+        tierColor = "text-accent-emerald";
+        statusDesc = "Your business profile exhibits structural strengths across primary underwriting matrix factors.";
+      } else if (score >= 65) {
+        tier = "Fundable, But Needs Review";
+        tierColor = "text-accent-gold";
+        statusDesc = "Good core parameters present, but select variables might trigger underwriter scrutiny or manual mitigation rules.";
+      } else if (score >= 45) {
+        tier = "Possible Fit for Select Programs";
+        tierColor = "text-blue-400";
+        statusDesc = "Limited compliance markers. Viable options will likely require additional credit, collateral, or revenue proof.";
+      } else {
+        tier = "Not Ready Yet — But Fixable";
+        tierColor = "text-red-400";
+        statusDesc = "We recommend utilizing business-credit construction templates or adjusting timeline factors prior to formal underwriting.";
+      }
+
+      // Render Results Screen
+      const container = document.getElementById('question-container');
+      container.innerHTML = `
+        <div class="space-y-6 text-center">
+          <div class="space-y-2">
+            <span class="text-xs uppercase text-gray-500 font-mono tracking-widest">FINAL READINESS DISCLOSURE</span>
+            <h3 class="text-2xl font-bold text-white font-mono">Your Funding Score Status</h3>
+          </div>
+
+          <div class="bg-black/60 border border-white/5 py-8 px-6 rounded-lg max-w-sm mx-auto space-y-4">
+            <div class="text-xs font-mono text-gray-400 uppercase">Calculated Value</div>
+            <div class="text-5xl font-black ${tierColor} font-mono">${score} <span class="text-sm text-gray-600">/ 100</span></div>
+            <div class="text-xs uppercase font-bold ${tierColor} font-mono tracking-wider">${tier}</div>
+          </div>
+
+          <p class="text-xs text-gray-400 font-sans max-w-md mx-auto leading-relaxed">
+            ${statusDesc}
+          </p>
+
+          <div class="text-[10px] font-sans text-gray-500 max-w-lg mx-auto leading-relaxed border-t border-white/5 pt-4">
+            <strong>Pre-Qualification Notice:</strong> This score represents academic estimation templates. It does not constitute a commitment, credit offer, underwriting review, or guaranteed terms.
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+            <button onclick="resetScorecard()" class="bg-white/5 hover:bg-white/10 text-gray-300 font-semibold font-mono text-xs py-2.5 px-6 rounded transition">
+              Reset Screener
+            </button>
+            <button onclick="switchView('partnerPage')" class="bg-accent-gold hover:bg-accent-goldHover text-black font-semibold font-mono text-xs py-2.5 px-6 rounded transition">
+              Get Formally Funded
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function resetScorecard() {
+      currentScorecardStep = 0;
+      scorecardPoints = 0;
+      selectedAnswers = {};
+      
+      // Restore buttons
+      document.getElementById('prevBtn').style.display = 'block';
+      document.getElementById('nextBtn').style.display = 'block';
+      
+      renderScorecardStep();
+    }
+
+    // Modal Control Utils
+    function openApplyModal(verticalText = '') {
+      document.getElementById('applyModal').classList.remove('hidden');
+      document.getElementById('applyModal').classList.add('flex');
+      if (verticalText) {
+        document.getElementById('appSlug').value = `${verticalText.toLowerCase().replace(/\s+/g, '-')}-partner`;
+      }
+    }
+
+    function closeApplyModal() {
+      document.getElementById('applyModal').classList.add('hidden');
+      document.getElementById('applyModal').classList.remove('flex');
+    }
+
+    function handlePartnerSubmit(e) {
+      e.preventDefault();
+      const slug = document.getElementById('appSlug').value;
+      alert(`System Action: Static Request registered! A developer can now safely append this profile to the local Javascript arrays config: /partners/${slug}/`);
+      closeApplyModal();
+    }
+
+    // Standard FAQ Utility Action
+    function toggleFaq(index) {
+      const body = document.getElementById(`faq-body-${index}`);
+      const icon = document.getElementById(`faq-icon-${index}`);
+      if (body.classList.contains('hidden')) {
+        body.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+      } else {
+        body.classList.add('hidden');
+        icon.classList.remove('rotate-180');
+      }
+    }
+  </script>
+    <script src="script.js"></script>
+</body>
+</html>
