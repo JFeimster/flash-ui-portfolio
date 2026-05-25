@@ -1,4 +1,4 @@
-# Recommended Pages
+# Additional Site Files
 
 ## Attorney Partner Dashboard
 
@@ -28,40 +28,32 @@ A multi-step, white-labeled intake form for the business owners being referred. 
 
 An educational repository detailing different capital types such as SBA 7(a), bridge loans, and equipment leasing. This helps attorneys identify which specific product fits their client's current legal milestone (e.g., acquisition vs. restructuring).
 
+### Suggested Structure:
 
+- funding-types.html
+- solutions-grid.css
+- product-filter.js
+- data-definitions.json
 
-Suggested Structure:
-
-* funding-types.html
-* solutions-grid.css
-* product-filter.js
-* data-definitions.json
-
-
-Attorney Marketing Toolkit
+## Attorney Marketing Toolkit
 
 A dedicated page for partners to download co-branded materials, including PDF handouts for clients, email templates for introductions, and pre-written social media blurbs for LinkedIn.
 
+### Suggested Structure:
 
+- toolkit.html
+- asset-gallery.css
+- download-manager.js
+- preview-modal.js
 
-Suggested Structure:
-
-* toolkit.html
-* asset-gallery.css
-* download-manager.js
-* preview-modal.js
-
-
-Compliance \& Privacy Center
+## Compliance \& Privacy Center
 
 A detailed section outlining the referral agreement terms, data protection protocols (SOC2/GDPR), and professional boundary disclosures to ensure legal partners feel secure about the ethical implications of their referrals.
 
+### Suggested Structure:
 
-
-Suggested Structure:
-
-* compliance.html
-* legal-styles.css
-* document-viewer.js
-* agreement-export.js
+- compliance.html
+- legal-styles.css
+- document-viewer.js
+- agreement-export.js
 
