@@ -638,4 +638,12 @@ async function init() {
   renderShell();
 }
 
+function loadAssetActionHelper() {
+  const script = document.createElement("script");
+  script.src = "/assets/js/asset-actions.js";
+  script.defer = true;
+  document.body.appendChild(script);
+}
+
 init();
+loadAssetActionHelper();
