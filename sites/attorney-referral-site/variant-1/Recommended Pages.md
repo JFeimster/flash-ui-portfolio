@@ -1,38 +1,30 @@
-**# Recommended Pages**
+# Recommended Pages
 
-
-
-**Attorney Partner Dashboard**
+## Attorney Partner Dashboard
 
 A secure portal where attorneys can track the real-time status of their referred clients, view total capital deployed via their referrals, and access unique referral links and generated QR codes for their physical office spaces.
 
+### Suggested Structure:
 
+- dashboard.html
+- dashboard-theme.css
+- referral-tracker.js
+- metrics-chart.js
+- api-config.js
 
-Suggested Structure:
-
-* dashboard.html
-* dashboard-theme.css
-* referral-tracker.js
-* metrics-chart.js
-* api-config.js
-
-
-**Client Funding Application Form**
+## Client Funding Application Form
 
 A multi-step, white-labeled intake form for the business owners being referred. It collects essential business data, funding requirements, and preliminary financial documents in a secure, professional interface that maintains the Moonshine Capital aesthetic.
 
+### Suggested Structure:
 
+- apply.html
+- form-stepper.js
+- file-upload-handler.js
+- form-styles.css
+- validation-logic.js
 
-Suggested Structure:
-
-* apply.html
-* form-stepper.js
-* file-upload-handler.js
-* form-styles.css
-* validation-logic.js
-
-
-Funding Solutions Library
+## Funding Solutions Library
 
 An educational repository detailing different capital types such as SBA 7(a), bridge loans, and equipment leasing. This helps attorneys identify which specific product fits their client's current legal milestone (e.g., acquisition vs. restructuring).
 
