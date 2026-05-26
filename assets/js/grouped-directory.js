@@ -23,20 +23,19 @@
     showNeedsReview: false
   };
 
+  const REPO_URL = "https://github.com/JFeimster/flash-ui-portfolio";
+
   const grid = document.querySelector("#cardGrid");
   const search = document.querySelector("#searchInput");
   const categoryFilters = document.querySelector("#categoryFilters");
   const statusFilters = document.querySelector("#statusFilters");
   const assetCount = document.querySelector("#assetCount");
   const deployableCount = document.querySelector("#deployableCount");
+  const legacyCount = document.querySelector("#legacyCount");
   const sitesCount = document.querySelector("#sitesCount");
+  const nestedAppCount = document.querySelector("#nestedAppCount");
   const archiveCount = document.querySelector("#archiveCount");
   const visibleCount = document.querySelector("#visibleCount");
-
-  const registryFiles = [
-    "/data/site-registry.json",
-    "/data/site-registry-static-extractions.json"
-  ];
 
   function escapeHtml(value = "") {
     return String(value)
@@ -93,6 +92,7 @@
         needsNormalization: true
       };
     });
+
     const staticItems = (manifest.static || []).map(([name, subdir = "", hasZip = false, hasMarkdown = false]) => {
       const livePath = subdir ? `sites/${name}/${subdir}` : `sites/${name}`;
       return {
@@ -109,6 +109,7 @@
         hasMarkdown
       };
     });
+
     const docs = (manifest.docs || []).map(name => ({
       title: `sites ${name}`,
       slug: `sites-${slugify(name)}`,
@@ -120,6 +121,7 @@
       livePath: "",
       hasMarkdown: true
     }));
+
     const apps = (manifest.apps || []).map(([name, folder, category = "Apps"]) => ({
       title: `sites ${name}`,
       slug: `sites-${slugify(name)}`,
@@ -132,6 +134,7 @@
       hasPackageJson: true,
       needsStandaloneDeploy: true
     }));
+
     return [...rootHtml, ...staticItems, ...docs, ...apps];
   }
 
@@ -140,6 +143,7 @@
     const extractionStatus = item.extractionStatus || "unknown-needs-manual-review";
     const isStatic = ["static-site-extracted", "static-site-existing", "skipped-existing-index"].includes(extractionStatus);
     const isStandalone = extractionStatus === "nextjs-app-needs-standalone-deploy" || Boolean(item.needsStandaloneDeploy);
+
     return {
       ...item,
       title,
@@ -156,6 +160,8 @@
   function displayTitle(item) {
     return String(item.title || item.path || "Untitled asset")
       .replace(/^sites\s+/i, "")
+      .replace(/^sites\//i, "")
+      .replace(/\/index\.html$/i, "")
       .replace(/ index\.html$/i, "")
       .replace(/\.html$/i, "")
       .replace(/_/g, " ")
@@ -163,9 +169,25 @@
       .trim();
   }
 
+  function normalizedPathSlug(item) {
+    return slugify(String(item.path || "").replace(/^sites\//, "").replace(/\/index\.html$/i, ""));
+  }
+
+  function canonicalItemKey(item) {
+    return slugify(displayTitle(item));
+  }
+
+  function sourceUrl(item) {
+    const path = String(item.path || "");
+    const encoded = path.split("/").map(encodeURIComponent).join("/");
+    const looksFile = /\.[a-z0-9]+$/i.test(path);
+    return `${REPO_URL}/${looksFile ? "blob" : "tree"}/main/${encoded}`;
+  }
+
   function isArchive(item) {
     if (["static-site-extracted", "static-site-existing", "skipped-existing-index"].includes(item.extractionStatus)) return false;
-    return item.status === "archive-needs-review" || item.type === "zip-archive" || item.type === "docs-archive" || item.hasZip || item.hasMarkdown;
+    if (item.livePath && item.hasIndex && item.type !== "zip-archive" && item.type !== "docs-archive") return false;
+    return item.status === "archive-needs-review" || item.type === "zip-archive" || item.type === "docs-archive" || (!item.livePath && (item.hasZip || item.hasMarkdown));
   }
 
   function isNestedApp(item) {
@@ -174,6 +196,83 @@
 
   function isDeployable(item) {
     return Boolean(item.livePath) && !isNestedApp(item) && !isArchive(item);
+  }
+
+  function isLegacy(item) {
+    return item.status === "legacy-root" ||
+      item.status === "legacy-root-folder" ||
+      item.source === "existing-root-file" ||
+      item.source === "existing-root-folder";
+  }
+
+  function isSitesAsset(item) {
+    return String(item.path || "").startsWith("sites/");
+  }
+
+  function isLikelyHubItem(item, group) {
+    const pathSlug = normalizedPathSlug(item);
+    const titleSlug = canonicalItemKey(item);
+    return pathSlug === group.groupId || titleSlug === group.groupId;
+  }
+
+  function itemMatchesName(item, name = "") {
+    const wanted = slugify(name);
+    return Boolean(wanted) && [canonicalItemKey(item), slugify(item.title), slugify(item.slug), normalizedPathSlug(item)].includes(wanted);
+  }
+
+  function resolveGroupTarget(group, items = []) {
+    const deployableItems = items.filter(isDeployable);
+    const hub = deployableItems.find(item => isLikelyHubItem(item, group));
+    if (hub) {
+      return {
+        href: hub.livePath,
+        label: state.rules.groupCardCtaLabel || "Open Hub",
+        kind: "hub",
+        item: hub,
+        note: "Canonical hub path found in loaded registry."
+      };
+    }
+
+    const primary = deployableItems.find(item => itemMatchesName(item, group.recommendedPrimary));
+    if (primary) {
+      return {
+        href: primary.livePath,
+        label: "Open Primary Variant",
+        kind: "primary",
+        item: primary,
+        note: "Canonical hub path not indexed; using recommended primary variant instead."
+      };
+    }
+
+    const sitesVariant = deployableItems.find(isSitesAsset);
+    if (sitesVariant) {
+      return {
+        href: sitesVariant.livePath,
+        label: "Open First Live Variant",
+        kind: "fallback-sites",
+        item: sitesVariant,
+        note: "Canonical hub path not indexed; using first live /sites variant instead."
+      };
+    }
+
+    const anyVariant = deployableItems[0];
+    if (anyVariant) {
+      return {
+        href: anyVariant.livePath,
+        label: "Open First Live Variant",
+        kind: "fallback-any",
+        item: anyVariant,
+        note: "Canonical hub path not indexed; using first live variant instead."
+      };
+    }
+
+    return {
+      href: "",
+      label: "Needs Review",
+      kind: "missing",
+      item: null,
+      note: "No live canonical hub or deployable variant was found in the loaded registry."
+    };
   }
 
   function canonicalHubPath(group) {
@@ -220,8 +319,14 @@
       grouped.get(match.groupId).items.push(item);
     });
 
-    const groupRows = Array.from(grouped.values()).filter(row => row.items.some(isDeployable) || row.items.length);
-    const variantItems = state.showIndividualVariants ? groupRows.flatMap(row => row.items.map(item => ({ kind: "asset", item, groupedVariant: true }))) : [];
+    grouped.forEach(row => {
+      row.target = resolveGroupTarget(row.group, row.items);
+    });
+
+    const groupRows = Array.from(grouped.values()).filter(row => row.items.length);
+    const variantItems = state.showIndividualVariants
+      ? groupRows.flatMap(row => row.items.map(item => ({ kind: "asset", item, groupedVariant: true })))
+      : [];
     const rows = [...groupRows, ...variantItems, ...(state.rules.showUngroupedAssets ? ungrouped : [])];
 
     return rows.filter(row => {
@@ -239,13 +344,16 @@
   }
 
   function rowStatus(row) {
-    if (row.kind === "group") return row.manualReview ? "manual-review" : "canonical-group-hub";
+    if (row.kind === "group") {
+      if (row.manualReview) return "manual-review";
+      return row.target?.kind === "hub" ? "canonical-group-hub" : "group-primary-fallback";
+    }
     return row.item.status || "unknown";
   }
 
   function rowSearchText(row) {
     if (row.kind === "group") {
-      return [row.group.displayTitle, row.group.groupId, row.group.category, row.group.groupType, row.group.confidence, (row.group.items || []).join(" ")].join(" ").toLowerCase();
+      return [row.group.displayTitle, row.group.groupId, row.group.category, row.group.groupType, row.group.confidence, row.target?.kind, (row.group.items || []).join(" ")].join(" ").toLowerCase();
     }
     const item = row.item;
     return [item.title, item.slug, item.category, item.type, item.status, item.path, item.notes].join(" ").toLowerCase();
@@ -274,8 +382,8 @@
     }
     panel.innerHTML = `
       <div class="group-mode-banner">
-        <div><strong>Grouped Directory Mode</strong><span>Canonical hubs are shown first. Variant cards are suppressed by default so the homepage stops cosplaying as a junk drawer.</span></div>
-        <span class="mode-pill">Batch 22D</span>
+        <div><strong>Grouped Directory Mode</strong><span>Canonical hubs are shown first. If a hub path is missing, the card safely falls back to the recommended live variant instead of linking to a 404.</span></div>
+        <span class="mode-pill">Registry cleanup</span>
       </div>
       <div class="group-toggle-row">
         ${(state.rules.advancedToggles || []).map(toggle => `
@@ -291,9 +399,14 @@
   function renderStats(rows) {
     const groupRows = rows.filter(row => row.kind === "group");
     const assetRows = rows.filter(row => row.kind === "asset");
-    assetCount.textContent = String(groupRows.length + assetRows.length);
-    deployableCount.textContent = String(groupRows.length + assetRows.filter(row => isDeployable(row.item)).length);
-    sitesCount.textContent = String(groupRows.length);
+    const deployableGroups = groupRows.filter(row => Boolean(row.target?.href));
+    const deployableAssets = assetRows.filter(row => isDeployable(row.item));
+
+    assetCount.textContent = String(rows.length);
+    deployableCount.textContent = String(deployableGroups.length + deployableAssets.length);
+    if (legacyCount) legacyCount.textContent = String(assetRows.filter(row => isLegacy(row.item)).length);
+    sitesCount.textContent = String(groupRows.length + assetRows.filter(row => isSitesAsset(row.item)).length);
+    if (nestedAppCount) nestedAppCount.textContent = String(assetRows.filter(row => isNestedApp(row.item)).length);
     archiveCount.textContent = String(assetRows.filter(row => isArchive(row.item)).length);
     visibleCount.textContent = String(rows.length);
   }
@@ -318,27 +431,32 @@
 
   function renderGroupCard(row) {
     const group = row.group;
-    const hubPath = canonicalHubPath(group);
+    const target = row.target || resolveGroupTarget(group, row.items);
     const count = group.items?.length || row.items.length;
+    const expectedHubPath = canonicalHubPath(group);
     const variants = (group.items || []).slice(0, 5).map(item => `<span>${escapeHtml(item.replace(group.displayTitle, "").trim() || item)}</span>`).join("");
+    const readinessTone = target.href ? (target.kind === "hub" ? "ready" : "polish") : "review";
+    const readinessLabel = target.href ? (target.kind === "hub" ? "Group Hub" : "Primary Fallback") : "Needs Review";
+    const actionMarkup = target.href
+      ? `<a class="btn primary" href="${escapeHtml(target.href)}" target="_blank" rel="noreferrer">${escapeHtml(target.label)}</a><button class="btn" type="button" data-group-copy="${escapeHtml(target.href)}">Copy Link</button>`
+      : `<a class="btn primary" href="${escapeHtml(REPO_URL)}/tree/main/sites" target="_blank" rel="noreferrer">Review Sites Folder</a>`;
+
     return `
-      <article class="card group-card">
+      <article class="card group-card ${target.kind !== "hub" ? "group-fallback-card" : ""}">
         <div class="card-top">
           <div class="card-heading">
             <h2>${escapeHtml(group.displayTitle)}</h2>
-            <p class="card-description">Canonical group hub for ${escapeHtml(count)} ${escapeHtml(state.rules.variantCountLabel || "variants")}. Use this when browsing concepts instead of individual Flash UI exports.</p>
+            <p class="card-description">Canonical group for ${escapeHtml(count)} ${escapeHtml(state.rules.variantCountLabel || "variants")}. ${escapeHtml(target.note)}</p>
           </div>
-          <div class="badge-stack"><span class="badge readiness ready">Group Hub</span></div>
+          <div class="badge-stack"><span class="badge readiness ${escapeHtml(readinessTone)}">${escapeHtml(readinessLabel)}</span></div>
         </div>
         <div class="meta viewer-meta">
           <span class="meta-chip"><span class="meta-label">Category</span><strong>${escapeHtml(group.category || guessCategory(group.displayTitle))}</strong></span>
           <span class="meta-chip"><span class="meta-label">Variants</span><strong>${escapeHtml(count)}</strong></span>
+          <span class="meta-chip"><span class="meta-label">Expected Hub</span><strong>${escapeHtml(expectedHubPath)}</strong></span>
         </div>
         <div class="variant-strip" aria-label="Variants">${variants}</div>
-        <div class="card-actions">
-          <a class="btn primary" href="${escapeHtml(hubPath)}" target="_blank" rel="noreferrer">${escapeHtml(state.rules.groupCardCtaLabel || "Open Hub")}</a>
-          <button class="btn" type="button" data-group-copy="${escapeHtml(hubPath)}">Copy Hub Link</button>
-        </div>
+        <div class="card-actions">${actionMarkup}</div>
       </article>
     `;
   }
@@ -362,7 +480,7 @@
           <span class="meta-chip"><span class="meta-label">Status</span><strong>${escapeHtml(item.status || "unknown")}</strong></span>
         </div>
         <div class="card-actions">
-          ${deployable ? `<a class="btn primary" href="${escapeHtml(item.livePath)}" target="_blank" rel="noreferrer">Open Site</a><button class="btn" data-group-copy="${escapeHtml(item.livePath)}" type="button">Copy Link</button>` : `<a class="btn primary" href="https://github.com/JFeimster/flash-ui-portfolio/tree/main/${escapeHtml(item.path || "")}" target="_blank" rel="noreferrer">View Source</a>`}
+          ${deployable ? `<a class="btn primary" href="${escapeHtml(item.livePath)}" target="_blank" rel="noreferrer">Open Site</a><button class="btn" data-group-copy="${escapeHtml(item.livePath)}" type="button">Copy Link</button>` : `<a class="btn primary" href="${escapeHtml(sourceUrl(item))}" target="_blank" rel="noreferrer">View Source</a>`}
         </div>
       </article>
     `;
@@ -389,10 +507,14 @@
     document.addEventListener("click", async event => {
       const button = event.target.closest("[data-group-copy]");
       if (!button) return;
-      await navigator.clipboard.writeText(new URL(button.dataset.groupCopy, window.location.origin).href);
-      const previous = button.textContent;
-      button.textContent = "Copied";
-      window.setTimeout(() => { button.textContent = previous; }, 1400);
+      try {
+        await navigator.clipboard.writeText(new URL(button.dataset.groupCopy, window.location.origin).href);
+        const previous = button.textContent;
+        button.textContent = "Copied";
+        window.setTimeout(() => { button.textContent = previous; }, 1400);
+      } catch (error) {
+        console.warn("Clipboard copy failed.", error);
+      }
     });
   }
 
