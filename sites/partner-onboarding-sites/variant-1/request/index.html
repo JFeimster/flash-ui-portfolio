@@ -1,0 +1,598 @@
+```html
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desk Builder & Partner Intake | Moonshine Capital Partners</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Space Grotesk & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['Space Grotesk', 'monospace'],
+                    },
+                    colors: {
+                        matteBlack: '#0d0d0d',
+                        graphiteGray: '#1a1a1a',
+                        boneWhite: '#f4f3ef',
+                        electricGreen: '#00ff66',
+                        signalOrange: '#ff5500',
+                        cobaltBlue: '#0066ff',
+                        chromeAccent: '#a3a3a3'
+                    },
+                    boxShadow: {
+                        neobrutalGreen: '4px 4px 0px 0px #00ff66',
+                        neobrutalOrange: '4px 4px 0px 0px #ff5500',
+                        neobrutalBlue: '4px 4px 0px 0px #0066ff',
+                        neobrutalWhite: '4px 4px 0px 0px #f4f3ef',
+                        neobrutalBlack: '6px 6px 0px 0px #0d0d0d',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0d0d0d;
+            color: #f4f3ef;
+            overflow-x: hidden;
+        }
+        .glass-panel {
+            background: rgba(26, 26, 26, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .text-glow-green {
+            text-shadow: 0 0 10px rgba(0, 255, 102, 0.4);
+        }
+        .text-glow-orange {
+            text-shadow: 0 0 10px rgba(255, 85, 0, 0.4);
+        }
+        .text-glow-blue {
+            text-shadow: 0 0 10px rgba(0, 102, 255, 0.4);
+        }
+        .border-dashed-grid {
+            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased border-dashed-grid">
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-50 w-full glass-panel border-b border-white/10 px-4 lg:px-8 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <a href="../" class="flex items-center gap-3 group">
+                <div class="h-10 w-10 bg-electricGreen flex items-center justify-center font-mono font-black text-black text-lg border-2 border-black shadow-[2px_2px_0px_rgba(255,255,255,1)] group-hover:bg-white transition-colors">
+                    M
+                </div>
+                <div>
+                    <span class="font-mono font-bold text-lg tracking-wider text-white block">MOONSHINE</span>
+                    <span class="text-xs text-electricGreen font-mono uppercase tracking-widest block -mt-1">Capital Partners</span>
+                </div>
+            </a>
+
+            <div class="flex items-center gap-4">
+                <a href="../#directory" class="text-chromeAccent hover:text-white font-mono text-sm transition-colors">
+                    ← Back to Directory
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Section -->
+    <main class="max-w-7xl mx-auto px-4 py-12 lg:py-16">
+        <div class="mb-12 border-b border-white/10 pb-8">
+            <span class="font-mono text-xs text-electricGreen uppercase tracking-widest font-extrabold block mb-2">Self-Serve Static Deployment</span>
+            <h1 class="font-mono text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-none">
+                Configure Your Funding Desk.
+            </h1>
+            <p class="text-chromeAccent text-sm sm:text-base max-w-2xl mt-4">
+                Input your bio, program specialties, target audience, and preferred theme. Preview your custom endpoint in real-time, generate the static JSON configuration file, and copy the deployment schemas.
+            </p>
+        </div>
+
+        <!-- 2 Column Layout: Workspace Forms + Interactive Sandbox Preview -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+            
+            <!-- Left Panel: Multi-Step Configurator -->
+            <div class="lg:col-span-7 bg-graphiteGray/40 border-2 border-white/10 p-6 sm:p-8 rounded-sm relative">
+                <!-- Step Status bar -->
+                <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/10">
+                    <div class="flex items-center gap-2">
+                        <span id="stepBadge" class="bg-electricGreen text-black font-mono font-black text-xs px-2.5 py-1 uppercase">Step 1 of 4</span>
+                        <span id="stepTitle" class="font-mono text-xs font-bold text-white uppercase tracking-wider">Identity Details</span>
+                    </div>
+                    <div class="flex gap-1.5" id="stepIndicatorDots">
+                        <span class="w-2.5 h-2.5 bg-electricGreen border border-black"></span>
+                        <span class="w-2.5 h-2.5 bg-white/10 border border-black"></span>
+                        <span class="w-2.5 h-2.5 bg-white/10 border border-black"></span>
+                        <span class="w-2.5 h-2.5 bg-white/10 border border-black"></span>
+                    </div>
+                </div>
+
+                <!-- Multi-Step Form Container -->
+                <form id="deskConfiguratorForm" class="space-y-6" onsubmit="return false;">
+                    
+                    <!-- STEP 1: IDENTITY & URL SLUG -->
+                    <div id="stepSection1" class="space-y-5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block font-mono text-[11px] text-white uppercase mb-2">Partner Name *</label>
+                                <input type="text" id="partnerNameInput" value="Darwin Hanneman" required placeholder="e.g. Darwin Hanneman" class="w-full bg-matteBlack border-2 border-white/15 focus:border-electricGreen text-white px-4 py-3 text-sm font-mono focus:outline-none transition-all">
+                            </div>
+                            <div>
+                                <label class="block font-mono text-[11px] text-white uppercase mb-2">Avatar Initials *</label>
+                                <input type="text" id="partnerInitialsInput" value="DH" maxlength="3" required placeholder="e.g. DH" class="w-full bg-matteBlack border-2 border-white/15 focus:border-electricGreen text-white px-4 py-3 text-sm font-mono focus:outline-none transition-all">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block font-mono text-[11px] text-white uppercase mb-2">Email Address *</label>
+                                <input type="email" id="partnerEmailInput" value="dhanneman@domain.com" required placeholder="name@domain.com" class="w-full bg-matteBlack border-2 border-white/15 focus:border-electricGreen text-white px-4 py-3 text-sm font-mono focus:outline-none transition-all">
+                            </div>
+                            <div>
+                                <label class="block font-mono text-[11px] text-white uppercase mb-2">Target Market / Niche *</label>
+                                <select id="partnerMarketSelect" class="w-full bg-matteBlack border-2 border-white/15 focus:border-electricGreen text-white px-4 py-3 text-sm font-mono focus:outline-none transition-all">
+                                    <option value="Contractors">Contractor Market</option>
+                                    <option value="Ecommerce">Ecommerce & SaaS</option>
+                                    <option value="Real Estate">Real Estate Developers</option>
+                                    <option value="Local Business">Local Retail / Main Street</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block font-mono text-[11px] text-white uppercase mb-2">Primary Program Focus *</label>
+                                <select id="partnerSpecialtySelect" class="w-full bg-matteBlack border-2 border-white/15 focus:border-electricGreen text-white px-4 py-3 text-sm font-mono focus:outline-none transition-all">
+                                    <option value="Working Capital">Working Capital</option>
+                                    <option value="Merchant Cash Advance">Merchant Cash Advance</option>
+                                    <option value="SBA Funding">SBA Funding</option>
+                                    <option value="Lines of Credit">Lines of Credit</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-mono text-[11px] text-white uppercase mb-2">Static URL Slug</label>
+                                <div class="flex">
+                                    <span class="bg-white/5 border-2 border-r-0 border-white/15 px-3 py-3 text-xs text-chromeAccent font-mono flex items-center">/partners/</span>
+                                    <input type="text" id="partnerSlugInput" value="darwin-hanneman" placeholder="darwin-hanneman" class="w-full bg-matteBlack border-2 border-white/15 focus:border-electricGreen text-white px-3 py-3 text-sm font-mono focus:outline-none transition-all">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: DETAILS & CALENDAR EMBED -->
+                    <div id="stepSection2" class="space-y-5 hidden">
+                        <div>
+                            <label class="block font-mono text-[11px] text-white uppercase mb-2">Profile Tagline / Best Fit description *</label>
+                            <input type="text" id="partnerTargetInput" value="Commercial contractors needing quick progress funding and machinery lease pipelines." required placeholder="e.g. DTC brands with $100k+ monthly recurring revenue" class="w-full bg-matteBlack border-2 border-white/15 focus:border-electricGreen text-white px-4 py-3 text-sm font-mono focus:outline-none transition-all">
+                        </div>
+
+                        <div>
+                            <label class="block font-mono text-[11px] text-white uppercase mb-2">Short Professional Bio (1-2 sentences) *</label>
+                            <textarea id="partnerBioInput" required rows="3" placeholder="Commercial finance advisor specialized in structuring flexible capital avenues and managing quick merchant underwriting workflows." class="w-full bg-matteBlack border-2 border-white/15 focus:border-electricGreen text-white px-4 py-3 text-sm font-mono focus:outline-none transition-all">Commercial finance advisor specialized in structuring flexible capital avenues and managing quick merchant underwriting workflows.</textarea>
+                        </div>
+
+                        <div>
+                            <label class="block font-mono text-[11px] text-white uppercase mb-2">Custom Booking/Calendar Embed Link (Calendly / Tally)</label>
+                            <input type="url" id="partnerBookingInput" value="https://calendly.com/moonshine-capital-partners/consultation" placeholder="https://calendly.com/your-desk" class="w-full bg-matteBlack border-2 border-white/15 focus:border-electricGreen text-white px-4 py-3 text-sm font-mono focus:outline-none transition-all">
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: BRANDING & PRE-QUAL DEFAULTS -->
+                    <div id="stepSection3" class="space-y-5 hidden">
+                        <div>
+                            <label class="block font-mono text-[11px] text-white uppercase mb-2">Accent Color Theme Selection</label>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <label class="border-2 border-white/10 bg-matteBlack hover:border-white p-3 flex flex-col items-center justify-center cursor-pointer relative group">
+                                    <input type="radio" name="themeColor" value="green" checked class="absolute top-2 right-2 accent-electricGreen">
+                                    <span class="w-5 h-5 bg-electricGreen border border-black mb-1.5"></span>
+                                    <span class="font-mono text-[10px] text-white uppercase">Electric Green</span>
+                                </label>
+                                <label class="border-2 border-white/10 bg-matteBlack hover:border-white p-3 flex flex-col items-center justify-center cursor-pointer relative">
+                                    <input type="radio" name="themeColor" value="orange" class="absolute top-2 right-2 accent-signalOrange">
+                                    <span class="w-5 h-5 bg-signalOrange border border-black mb-1.5"></span>
+                                    <span class="font-mono text-[10px] text-white uppercase">Signal Orange</span>
+                                </label>
+                                <label class="border-2 border-white/10 bg-matteBlack hover:border-white p-3 flex flex-col items-center justify-center cursor-pointer relative">
+                                    <input type="radio" name="themeColor" value="blue" class="absolute top-2 right-2 accent-cobaltBlue">
+                                    <span class="w-5 h-5 bg-cobaltBlue border border-black mb-1.5"></span>
+                                    <span class="font-mono text-[10px] text-white uppercase">Cobalt Blue</span>
+                                </label>
+                                <label class="border-2 border-white/10 bg-matteBlack hover:border-white p-3 flex flex-col items-center justify-center cursor-pointer relative">
+                                    <input type="radio" name="themeColor" value="white" class="absolute top-2 right-2 accent-white">
+                                    <span class="w-5 h-5 bg-boneWhite border border-black mb-1.5"></span>
+                                    <span class="font-mono text-[10px] text-white uppercase">Bone White</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block font-mono text-[11px] text-white uppercase mb-2">Pre-Qual Min Monthly Revenue ($)</label>
+                                <input type="number" id="prequalRevInput" value="10000" class="w-full bg-matteBlack border-2 border-white/15 focus:border-electricGreen text-white px-4 py-3 text-sm font-mono focus:outline-none transition-all">
+                            </div>
+                            <div>
+                                <label class="block font-mono text-[11px] text-white uppercase mb-2">Pre-Qual Min Operations Time (Months)</label>
+                                <input type="number" id="prequalTimeInput" value="3" class="w-full bg-matteBlack border-2 border-white/15 focus:border-electricGreen text-white px-4 py-3 text-sm font-mono focus:outline-none transition-all">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4: STATIC EXPORT & EXPORT SCHEMAS -->
+                    <div id="stepSection4" class="space-y-5 hidden">
+                        <div class="p-4 bg-white/5 border border-white/10">
+                            <h4 class="font-mono text-sm font-bold text-white mb-2">Your Dynamic Descriptor Array Ready</h4>
+                            <p class="text-xs text-chromeAccent mb-4">
+                                Copy the JSON payload array entry block below to submit for local desk deployment builds.
+                            </p>
+                            
+                            <div class="relative">
+                                <pre id="jsonOutput" class="bg-matteBlack p-4 text-xs font-mono text-electricGreen overflow-x-auto border border-white/20 rounded-sm select-all h-44"></pre>
+                                <button onclick="copyGeneratedSchema()" class="absolute right-2 top-2 bg-white text-black font-mono font-bold text-[10px] px-3 py-1.5 border border-black shadow-[2px_2px_0px_#00ff66] hover:shadow-none transition-all">
+                                    Copy Code
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-electricGreen/10 border-2 border-dashed border-electricGreen/40 p-4">
+                            <h5 class="font-mono text-xs font-extrabold text-electricGreen uppercase mb-2">How to Deploy Fast</h5>
+                            <ol class="list-decimal list-inside space-y-1.5 text-xs text-chromeAccent">
+                                <li>Copy the generated JSON config output structure.</li>
+                                <li>Send this payload block directly to <strong class="text-white">JFeimster System Specialists</strong>.</li>
+                                <li>The static builder compiles and updates the roster under <code class="text-white">/partners/darwin-hanneman/index.html</code></li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Action Controls inside Box -->
+                    <div class="flex items-center justify-between pt-6 border-t border-white/10">
+                        <button type="button" id="prevBtn" onclick="navigateStep(-1)" class="opacity-40 pointer-events-none font-mono bg-transparent border-2 border-white/20 text-chromeAccent hover:text-white px-5 py-3 text-xs uppercase tracking-wider transition-all">
+                            ← Back
+                        </button>
+                        <button type="button" id="nextBtn" onclick="navigateStep(1)" class="font-mono bg-electricGreen hover:bg-white text-black font-extrabold px-6 py-3 text-xs uppercase tracking-wider border-2 border-black shadow-neobrutalWhite hover:shadow-none transition-all">
+                            Next Stage →
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Right Panel: Real-Time Live Sandbox Preview Desk Mockup -->
+            <div class="lg:col-span-5 sticky top-28">
+                <span class="font-mono text-[10px] text-chromeAccent uppercase tracking-widest block mb-3 font-bold flex items-center gap-2">
+                    <span class="inline-block w-2.5 h-2.5 bg-electricGreen animate-ping rounded-full"></span> Live Deployment Preview
+                </span>
+
+                <!-- Preview Desk Frame using custom brutal colors shifting dynamically based on selection -->
+                <div id="previewCardFrame" class="bg-matteBlack border-4 border-white p-6 shadow-neobrutalGreen transform transition-all duration-300">
+                    <div class="absolute -top-3.5 -right-3.5 bg-signalOrange text-white font-mono text-[10px] font-bold px-3 py-1 uppercase tracking-wider border-2 border-black shadow-[2px_2px_0px_#fff]">
+                        Desktop Preview
+                    </div>
+
+                    <!-- Mock Header inside -->
+                    <div class="flex items-center gap-3 border-b border-white/10 pb-4 mb-4">
+                        <div id="previewAvatar" class="h-12 w-12 bg-white/10 border-2 border-electricGreen flex items-center justify-center font-mono font-extrabold text-white text-lg">
+                            DH
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 id="previewName" class="font-mono font-bold text-white text-base">Darwin Hanneman</h3>
+                                <span class="bg-electricGreen/10 text-electricGreen text-[9px] font-mono font-bold px-1.5 py-0.5 rounded border border-electricGreen/30">Partner</span>
+                            </div>
+                            <p id="previewProgram" class="text-xs text-chromeAccent">Commercial Finance Desk</p>
+                        </div>
+                    </div>
+
+                    <!-- Specialty tags -->
+                    <div class="flex flex-wrap gap-1.5 mb-4">
+                        <span id="previewMarketBadge" class="text-[9px] font-mono bg-white/5 text-white px-2 py-0.5 border border-white/10">Contractor Focus</span>
+                        <span id="previewSpecialtyBadge" class="text-[9px] font-mono bg-white/5 text-white px-2 py-0.5 border border-white/10">SBA Funding</span>
+                    </div>
+
+                    <!-- Target best fit statement -->
+                    <div class="mb-4 bg-white/[0.02] border border-white/10 p-3">
+                        <span class="text-[9px] font-mono text-chromeAccent uppercase block mb-1">Target Niche Objective</span>
+                        <p id="previewTarget" class="text-xs text-white leading-relaxed font-semibold">
+                            Commercial contractors needing quick progress funding and machinery lease pipelines.
+                        </p>
+                    </div>
+
+                    <!-- Bio Block -->
+                    <p id="previewBio" class="text-xs text-chromeAccent leading-relaxed mb-6">
+                        Commercial finance advisor specialized in structuring flexible capital avenues and managing quick merchant underwriting workflows.
+                    </p>
+
+                    <!-- CTAs inside mock with chosen accents -->
+                    <div class="space-y-2 mb-6">
+                        <button id="previewCtaPrimary" class="w-full text-center py-2.5 bg-electricGreen text-black font-mono font-bold text-xs uppercase tracking-wider border-2 border-black shadow-[2px_2px_0px_rgba(255,255,255,1)]">
+                            Start Funding Review
+                        </button>
+                        <a id="previewCtaSecondary" href="#" target="_blank" class="block w-full text-center py-2.5 bg-transparent text-white border border-white/30 font-mono font-bold text-xs uppercase tracking-wider hover:bg-white/5 transition-all">
+                            Book Strategy Call
+                        </a>
+                    </div>
+
+                    <!-- Pre-Qual visual state box -->
+                    <div class="bg-white/5 border border-white/10 p-3 rounded-sm">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-mono text-[9px] text-chromeAccent uppercase tracking-widest font-bold">Desk Requirements</span>
+                            <span class="font-mono text-[9px] text-electricGreen" id="previewRequirementsStatus">Active Desk Filter</span>
+                        </div>
+                        <div class="space-y-1.5 text-xs text-chromeAccent font-mono">
+                            <div class="flex items-center gap-2">
+                                <span class="text-electricGreen">✔</span> Monthly Rev Target: <strong class="text-white" id="previewReqRev">$10,000+</strong>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-electricGreen">✔</span> Minimum Operations: <strong class="text-white" id="previewReqTime">3+ Months</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Direct dynamic url link mockup -->
+                    <div class="border-t border-white/10 pt-4 flex items-center justify-between text-[11px] font-mono text-chromeAccent">
+                        <span>Static Path:</span>
+                        <span id="previewUrlPath" class="text-white font-semibold">/partners/darwin-hanneman/</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer System Component -->
+    <footer class="bg-matteBlack border-t border-white/10 pt-16 pb-12 px-4 mt-24">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-chromeAccent">
+            <div class="flex items-center gap-3">
+                <div class="h-8 w-8 bg-electricGreen flex items-center justify-center font-mono font-black text-black text-sm border border-black">
+                    M
+                </div>
+                <div>
+                    <span class="font-mono font-bold text-white block uppercase tracking-wider">MOONSHINE CAPITAL</span>
+                    <span class="text-[10px] text-electricGreen font-mono uppercase block -mt-1">Setup Engine Tools</span>
+                </div>
+            </div>
+            <span>© 2026 Moonshine Capital Partners. Powered by JFeimster System Infrastructure</span>
+        </div>
+    </footer>
+
+    <!-- JS Form & Preview Interactive Logic -->
+    <script>
+        let currentStep = 1;
+
+        // Form elements mapping
+        const partnerNameInput = document.getElementById('partnerNameInput');
+        const partnerInitialsInput = document.getElementById('partnerInitialsInput');
+        const partnerEmailInput = document.getElementById('partnerEmailInput');
+        const partnerMarketSelect = document.getElementById('partnerMarketSelect');
+        const partnerSpecialtySelect = document.getElementById('partnerSpecialtySelect');
+        const partnerSlugInput = document.getElementById('partnerSlugInput');
+        const partnerTargetInput = document.getElementById('partnerTargetInput');
+        const partnerBioInput = document.getElementById('partnerBioInput');
+        const partnerBookingInput = document.getElementById('partnerBookingInput');
+        const prequalRevInput = document.getElementById('prequalRevInput');
+        const prequalTimeInput = document.getElementById('prequalTimeInput');
+
+        // Dynamic visual update nodes
+        const previewName = document.getElementById('previewName');
+        const previewAvatar = document.getElementById('previewAvatar');
+        const previewProgram = document.getElementById('previewProgram');
+        const previewMarketBadge = document.getElementById('previewMarketBadge');
+        const previewSpecialtyBadge = document.getElementById('previewSpecialtyBadge');
+        const previewTarget = document.getElementById('previewTarget');
+        const previewBio = document.getElementById('previewBio');
+        const previewCtaSecondary = document.getElementById('previewCtaSecondary');
+        const previewReqRev = document.getElementById('previewReqRev');
+        const previewReqTime = document.getElementById('previewReqTime');
+        const previewUrlPath = document.getElementById('previewUrlPath');
+
+        // Sync inputs with mockup preview instantly
+        function updateLivePreview() {
+            previewName.innerText = partnerNameInput.value || "Darwin Hanneman";
+            previewAvatar.innerText = (partnerInitialsInput.value || "DH").toUpperCase();
+            previewProgram.innerText = partnerSpecialtySelect.value + " Commercial Desk";
+            previewMarketBadge.innerText = partnerMarketSelect.value + " Focus";
+            previewSpecialtyBadge.innerText = partnerSpecialtySelect.value;
+            previewTarget.innerText = partnerTargetInput.value || "Commercial contractors needing quick progress funding and machinery lease pipelines.";
+            previewBio.innerText = partnerBioInput.value || "Commercial finance advisor specialized in structuring flexible capital avenues and managing quick merchant underwriting workflows.";
+            
+            // Format URL path slug
+            let cleanedSlug = (partnerSlugInput.value || "darwin-hanneman")
+                .toLowerCase()
+                .trim()
+                .replace(/[^a-z0-9-]/g, '-');
+            previewUrlPath.innerText = `/partners/${cleanedSlug}/`;
+            
+            // Requirements block update
+            const formattedRev = Number(prequalRevInput.value || 0).toLocaleString();
+            previewReqRev.innerText = `$${formattedRev}+`;
+            previewReqTime.innerText = `${prequalTimeInput.value || 0}+ Months`;
+
+            // Meeting Link CTA target update
+            previewCtaSecondary.href = partnerBookingInput.value || "#";
+
+            // Generate Schema Block automatically
+            generateJsonOutput(cleanedSlug);
+        }
+
+        // Multi-step form step swapping
+        function navigateStep(direction) {
+            // Validation check before proceeding
+            if (direction === 1) {
+                const currentFormSection = document.getElementById(`stepSection${currentStep}`);
+                const inputsToValidate = currentFormSection.querySelectorAll('[required]');
+                let sectionValid = true;
+                inputsToValidate.forEach(input => {
+                    if (!input.checkValidity()) {
+                        input.reportValidity();
+                        sectionValid = false;
+                    }
+                });
+                if (!sectionValid) return;
+            }
+
+            // Hide existing
+            document.getElementById(`stepSection${currentStep}`).classList.add('hidden');
+            
+            // Set index bounds
+            currentStep += direction;
+            if (currentStep < 1) currentStep = 1;
+            if (currentStep > 4) currentStep = 4;
+
+            // Show updated
+            document.getElementById(`stepSection${currentStep}`).classList.remove('hidden');
+
+            // Handle UI button states
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const stepBadge = document.getElementById('stepBadge');
+            const stepTitle = document.getElementById('stepTitle');
+
+            if (currentStep === 1) {
+                prevBtn.classList.add('opacity-40', 'pointer-events-none');
+                nextBtn.innerText = "Next Stage →";
+                stepBadge.innerText = "Step 1 of 4";
+                stepTitle.innerText = "Identity Details";
+            } else if (currentStep === 2) {
+                prevBtn.classList.remove('opacity-40', 'pointer-events-none');
+                nextBtn.innerText = "Next Stage →";
+                stepBadge.innerText = "Step 2 of 4";
+                stepTitle.innerText = "Desk Descriptors";
+            } else if (currentStep === 3) {
+                prevBtn.classList.remove('opacity-40', 'pointer-events-none');
+                nextBtn.innerText = "Generate Static File →";
+                stepBadge.innerText = "Step 3 of 4";
+                stepTitle.innerText = "Theme Options";
+            } else if (currentStep === 4) {
+                prevBtn.classList.remove('opacity-40', 'pointer-events-none');
+                nextBtn.innerText = "All Steps Completed ✓";
+                nextBtn.classList.add('opacity-40', 'pointer-events-none');
+                stepBadge.innerText = "Step 4 of 4";
+                stepTitle.innerText = "Export Schemas";
+            }
+
+            // Update step tracker dots
+            const dots = document.getElementById('stepIndicatorDots').children;
+            for (let i = 0; i < dots.length; i++) {
+                if (i < currentStep) {
+                    dots[i].className = "w-2.5 h-2.5 bg-electricGreen border border-black";
+                } else {
+                    dots[i].className = "w-2.5 h-2.5 bg-white/10 border border-black";
+                }
+            }
+
+            updateLivePreview();
+        }
+
+        // Apply theme selection and swap colors dynamically inside browser layout
+        function applyColorAccentTheme() {
+            const selectedColor = document.querySelector('input[name="themeColor"]:checked').value;
+            const previewCardFrame = document.getElementById('previewCardFrame');
+            const previewCtaPrimary = document.getElementById('previewCtaPrimary');
+            const previewRequirementsStatus = document.getElementById('previewRequirementsStatus');
+
+            // Reset class options
+            previewCardFrame.className = "bg-matteBlack border-4 border-white p-6 transform transition-all duration-300 ";
+            previewCtaPrimary.className = "w-full text-center py-2.5 font-mono font-bold text-xs uppercase tracking-wider border-2 border-black ";
+
+            if (selectedColor === 'green') {
+                previewCardFrame.classList.add('shadow-neobrutalGreen');
+                previewCtaPrimary.classList.add('bg-electricGreen', 'text-black', 'shadow-[2px_2px_0px_rgba(255,255,255,1)]');
+                previewAvatar.className = "h-12 w-12 bg-white/10 border-2 border-electricGreen flex items-center justify-center font-mono font-extrabold text-white text-lg";
+                previewRequirementsStatus.className = "font-mono text-[9px] text-electricGreen";
+            } else if (selectedColor === 'orange') {
+                previewCardFrame.classList.add('shadow-neobrutalOrange');
+                previewCtaPrimary.classList.add('bg-signalOrange', 'text-white', 'shadow-[2px_2px_0px_rgba(255,255,255,1)]');
+                previewAvatar.className = "h-12 w-12 bg-white/10 border-2 border-signalOrange flex items-center justify-center font-mono font-extrabold text-white text-lg";
+                previewRequirementsStatus.className = "font-mono text-[9px] text-signalOrange";
+            } else if (selectedColor === 'blue') {
+                previewCardFrame.classList.add('shadow-neobrutalBlue');
+                previewCtaPrimary.classList.add('bg-cobaltBlue', 'text-white', 'shadow-[2px_2px_0px_rgba(255,255,255,1)]');
+                previewAvatar.className = "h-12 w-12 bg-white/10 border-2 border-cobaltBlue flex items-center justify-center font-mono font-extrabold text-white text-lg";
+                previewRequirementsStatus.className = "font-mono text-[9px] text-cobaltBlue";
+            } else if (selectedColor === 'white') {
+                previewCardFrame.classList.add('shadow-neobrutalWhite');
+                previewCtaPrimary.classList.add('bg-boneWhite', 'text-black', 'shadow-[2px_2px_0px_rgba(255,255,255,1)]');
+                previewAvatar.className = "h-12 w-12 bg-white/10 border-2 border-boneWhite flex items-center justify-center font-mono font-extrabold text-white text-lg";
+                previewRequirementsStatus.className = "font-mono text-[9px] text-boneWhite";
+            }
+        }
+
+        // Generate JSON output payload block dynamically
+        function generateJsonOutput(slugValue) {
+            const selectedColor = document.querySelector('input[name="themeColor"]:checked').value;
+            const mockSchema = {
+                partner: {
+                    name: partnerNameInput.value || "Darwin Hanneman",
+                    slug: slugValue,
+                    avatarInitials: (partnerInitialsInput.value || "DH").toUpperCase(),
+                    email: partnerEmailInput.value || "dhanneman@domain.com",
+                    niche: partnerMarketSelect.value,
+                    specialty: partnerSpecialtySelect.value,
+                    tagline: partnerTargetInput.value || "",
+                    bio: partnerBioInput.value || "",
+                    bookingLink: partnerBookingInput.value || ""
+                },
+                config: {
+                    theme: selectedColor,
+                    prequal: {
+                        minRevenue: Number(prequalRevInput.value || 10000),
+                        minTimeInBusinessMonths: Number(prequalTimeInput.value || 3)
+                    },
+                    deployedBy: "JFeimster System Compiler",
+                    generationTime: new Date().toISOString()
+                }
+            };
+
+            document.getElementById('jsonOutput').innerText = JSON.stringify(mockSchema, null, 4);
+        }
+
+        // Copy generated static payload code trigger
+        function copyGeneratedSchema() {
+            const rawCodeBlock = document.getElementById('jsonOutput').innerText;
+            navigator.clipboard.writeText(rawCodeBlock).then(() => {
+                alert("Static Partner Desk Configuration Copied! Post or email this payload to Moonshine Specialists.");
+            });
+        }
+
+        // Event listeners mapping
+        const interactiveInputs = [
+            partnerNameInput, partnerInitialsInput, partnerEmailInput,
+            partnerMarketSelect, partnerSpecialtySelect, partnerSlugInput,
+            partnerTargetInput, partnerBioInput, partnerBookingInput,
+            prequalRevInput, prequalTimeInput
+        ];
+
+        interactiveInputs.forEach(input => {
+            input.addEventListener('input', updateLivePreview);
+            input.addEventListener('change', updateLivePreview);
+        });
+
+        // Watch color selector changes
+        document.querySelectorAll('input[name="themeColor"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                applyColorAccentTheme();
+                updateLivePreview();
+            });
+        });
+
+        // Kickoff
+        window.addEventListener('DOMContentLoaded', () => {
+            updateLivePreview();
+            applyColorAccentTheme();
+        });
+    </script>
+</body>
+</html>
+```
