@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonshine Capital Partners - Affiliate Analytics Dashboard</title>
+    <!-- Tailwind CSS CDN for structure/layout utility -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Neo-Brutalist Custom Styles matching Prism Logic aesthetic */
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&family=Syne:wght@700;800&display=swap');
+
+        :root {
+            --bg-color: #000000;
+            --card-bg: #ffffff;
+            --accent: #E2FF00; /* Toxic Neon Volt Yellow */
+            --accent-muted: #b5cc00;
+            --accent-pink: #FF0055; /* Hot Neon Pink secondary */
+            --border-width: 4px;
+            --shadow-offset: 8px;
+            --font-display: 'Syne', 'Space Grotesk', sans-serif;
+            --font-body: 'Space Grotesk', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: #000000;
+            font-family: var(--font-body);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(226, 255, 0, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(255, 0, 85, 0.08) 0%, transparent 40%),
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 20px 20px, 20px 20px;
+        }
+
+        h1, h2, h3, h4, .brutalist-header {
+            font-family: var(--font-display);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.03em;
+        }
+
+        /* Thick Border & Hard Shadow Custom Utility classes */
+        .brutalist-border {
+            border: var(--border-width) solid #000000;
+        }
+
+        .brutalist-shadow-accent {
+            box-shadow: var(--shadow-offset) var(--shadow-offset) 0px 0px var(--accent);
+        }
+
+        .brutalist-shadow-black {
+            box-shadow: var(--shadow-offset) var(--shadow-offset) 0px 0px #000000;
+        }
+
+        .brutalist-shadow-pink {
+            box-shadow: var(--shadow-offset) var(--shadow-offset) 0px 0px var(--accent-pink);
+        }
+
+        .brutalist-shadow-white {
+            box-shadow: var(--shadow-offset) var(--shadow-offset) 0px 0px #ffffff;
+        }
+
+        .brutalist-btn {
+            border: var(--border-width) solid #000000;
+            font-weight: 900;
+            text-transform: uppercase;
+            transition: all 0.1s ease;
+            position: relative;
+        }
+
+        .brutalist-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 10px 10px 0px 0px #000000;
+        }
+
+        .brutalist-btn:active {
+            transform: translate(4px, 4px);
+            box-shadow: 2px 2px 0px 0px #000000;
+        }
+
+        .brutalist-btn-accent {
+            background-color: var(--accent);
+            color: #000000;
+        }
+
+        .brutalist-btn-accent:hover {
+            box-shadow: 10px 10px 0px 0px var(--accent-pink);
+        }
+
+        .brutalist-btn-pink {
+            background-color: var(--accent-pink);
+            color: #ffffff;
+        }
+
+        .brutalist-btn-pink:hover {
+            box-shadow: 10px 10px 0px 0px var(--accent);
+        }
+
+        .brutalist-btn-white {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        /* Input styling */
+        .brutalist-input {
+            border: var(--border-width) solid #000000;
+            font-weight: 700;
+            outline: none;
+            transition: all 0.15s ease;
+        }
+
+        .brutalist-input:focus {
+            background-color: #fafdf0;
+            box-shadow: 4px 4px 0px 0px var(--accent);
+            transform: translate(-2px, -2px);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000000;
+            border-left: var(--border-width) solid #ffffff;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border: 3px solid #000000;
+        }
+
+        /* Raw vector pattern */
+        .brutalist-pattern {
+            background-color: #ffffff;
+            background-image: radial-gradient(#000000 20%, transparent 20%),
+                              radial-gradient(#000000 20%, transparent 20%);
+            background-size: 8px 8px;
+            background-position: 0 0, 4px 4px;
+        }
+
+        /* Pulse and blink indicators for alive dashboard feel */
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .live-blink {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+        .scanline::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom, transparent 50%, rgba(226, 255, 0, 0.1) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+        }
+
+        /* Custom bar animations */
+        .chart-bar {
+            transition: height 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col justify-between">
+
+    <!-- Header / Central Command Bar -->
+    <header class="w-full bg-white brutalist-border brutalist-shadow-accent p-4 mb-8 flex flex-col md:flex-row justify-between items-center gap-4 z-10 relative">
+        <div class="flex items-center gap-4">
+            <div class="bg-black text-white p-3 brutalist-border flex items-center justify-center font-black text-2xl tracking-tighter">
+                MC⚡️
+            </div>
+            <div>
+                <h1 class="text-2xl md:text-3xl font-black tracking-tight leading-none">MOONSHINE CAPITAL</h1>
+                <p class="text-xs font-bold tracking-widest text-gray-500 uppercase mt-1">// PARTNER PERFOMANCE COMMAND CENTRE v3.4</p>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+            <div class="flex items-center gap-2 bg-black text-white px-3 py-1.5 brutalist-border">
+                <span class="inline-block w-3 h-3 bg-[#E2FF00] rounded-none live-blink"></span>
+                <span class="text-xs font-mono font-black uppercase tracking-wider text-[#E2FF00]">
+                    LIVE SYNC: ACTIVE
+                </span>
+            </div>
+            <div class="bg-gray-100 px-3 py-1.5 brutalist-border text-xs font-black uppercase">
+                ID: <span id="partner-id-display" class="text-[#FF0055]">ALPHA_PARTNER</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Layout -->
+    <main class="w-full max-w-7xl mx-auto flex flex-col gap-8 flex-grow mb-8">
+
+        <!-- Top KPIs Raw Metrics Row -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            <!-- KPI 1: Click Metrics -->
+            <div class="bg-white p-6 brutalist-border brutalist-shadow-black flex flex-col justify-between h-40 group hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[10px_10px_0px_0px_#000000] transition-all">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs font-black uppercase tracking-wider text-gray-500">// TOTAL TRAFFIC CLICKS</span>
+                    <span class="text-2xl">⚡</span>
+                </div>
+                <div>
+                    <span class="text-4xl md:text-5xl font-black leading-none block tracking-tight" id="kpi-clicks">24,892</span>
+                    <span class="text-xs font-mono font-bold text-green-600 mt-1 inline-block">▲ +14.2% THIS WEEK</span>
+                </div>
+            </div>
+
+            <!-- KPI 2: Pipeline Lead Conversions -->
+            <div class="bg-[#E2FF00] p-6 brutalist-border brutalist-shadow-black flex flex-col justify-between h-40 group hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[10px_10px_0px_0px_#FF0055] transition-all">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs font-black uppercase tracking-wider text-black">// MAPPED CONVERSIONS</span>
+                    <span class="text-2xl">📂</span>
+                </div>
+                <div>
+                    <span class="text-4xl md:text-5xl font-black leading-none block tracking-tight" id="kpi-conversions">184</span>
+                    <span class="text-xs font-mono font-bold text-black mt-1 inline-block">// CONVERSION RATE: 0.74%</span>
+                </div>
+            </div>
+
+            <!-- KPI 3: Pipeline Value Generated -->
+            <div class="bg-black text-white p-6 brutalist-border brutalist-shadow-accent flex flex-col justify-between h-40 group hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs font-black uppercase tracking-wider text-gray-400">// PIPELINE ROUTING DEPTH</span>
+                    <span class="text-2xl text-[#E2FF00]">💰</span>
+                </div>
+                <div>
+                    <span class="text-3xl md:text-4xl font-black leading-none block tracking-tight text-[#E2FF00]" id="kpi-pipeline">$42.1M</span>
+                    <span class="text-xs font-mono font-bold text-gray-400 mt-1 inline-block">// UNDER EVALUATION FLOW</span>
+                </div>
+            </div>
+
+            <!-- KPI 4: Total Commission Earned -->
+            <div class="bg-white p-6 brutalist-border brutalist-shadow-pink flex flex-col justify-between h-40 group hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[10px_10px_0px_0px_#000000] transition-all">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs font-black uppercase tracking-wider text-gray-500">// TOTAL EARNED COMMISSIONS</span>
+                    <span class="text-2xl">🔥</span>
+                </div>
+                <div>
+                    <span class="text-4xl md:text-5xl font-black leading-none block tracking-tight text-[#FF0055]" id="kpi-commissions">$84,150</span>
+                    <span class="text-xs font-mono font-bold bg-[#E2FF00] text-black px-1.5 py-0.5 mt-1 inline-block font-black border border-black text-[10px] uppercase">LIQUID FUNDS VERIFIED</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Chart & Action Center Grid -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- Left Side: Stark Analytics & Interactive Graph (8 Columns) -->
+            <div class="lg:col-span-8 bg-white brutalist-border brutalist-shadow-black flex flex-col">
+                <!-- Chart Header Controls -->
+                <div class="bg-black text-white p-4 border-b-4 border-black flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <span class="text-xs font-mono text-[#E2FF00] block">// GRAPHICAL TRAFFIC ENGINE</span>
+                        <h3 class="text-xl font-black uppercase">PERFORMANCE ACTIVITY MATRIX</h3>
+                    </div>
+                    <!-- Time Filters -->
+                    <div class="flex border border-white">
+                        <button onclick="updateChartTimeline('24h')" id="btn-time-24h" class="timeline-btn bg-[#E2FF00] text-black font-black text-xs px-3 py-1.5 border-r border-white uppercase transition-colors">24 HOURS</button>
+                        <button onclick="updateChartTimeline('7d')" id="btn-time-7d" class="timeline-btn bg-black text-white hover:bg-zinc-800 font-black text-xs px-3 py-1.5 border-r border-white uppercase transition-colors">7 DAYS</button>
+                        <button onclick="updateChartTimeline('30d')" id="btn-time-30d" class="timeline-btn bg-black text-white hover:bg-zinc-800 font-black text-xs px-3 py-1.5 uppercase transition-colors">30 DAYS</button>
+                    </div>
+                </div>
+
+                <!-- Live Brutalist Custom Bar Chart -->
+                <div class="p-6 bg-gray-50 brutalist-pattern min-h-[340px] flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute top-4 left-4 text-[10px] font-mono text-gray-500 tracking-wider">
+                        COORDS: LATENCY_INDEX // Y: CONVERSIONS X: TIME
+                    </div>
+                    
+                    <!-- Graph Layout Grid representation -->
+                    <div class="flex items-end justify-between h-64 border-b-4 border-l-4 border-black pt-8 px-4 bg-white bg-opacity-95 z-10 relative">
+                        <!-- Bar Item 1 -->
+                        <div class="flex flex-col items-center flex-1 group">
+                            <span class="text-[10px] font-mono font-black text-[#FF0055] opacity-0 group-hover:opacity-100 transition-opacity mb-1" id="bar-val-0">1.2k</span>
+                            <div class="chart-bar w-6 sm:w-10 bg-black group-hover:bg-[#FF0055] brutalist-border border-b-0" id="bar-0" style="height: 45%;"></div>
+                            <span class="text-[9px] font-black uppercase mt-2 tracking-tighter" id="bar-lbl-0">08:00</span>
+                        </div>
+                        <!-- Bar Item 2 -->
+                        <div class="flex flex-col items-center flex-1 group">
+                            <span class="text-[10px] font-mono font-black text-[#FF0055] opacity-0 group-hover:opacity-100 transition-opacity mb-1" id="bar-val-1">1.8k</span>
+                            <div class="chart-bar w-6 sm:w-10 bg-black group-hover:bg-[#FF0055] brutalist-border border-b-0" id="bar-1" style="height: 65%;"></div>
+                            <span class="text-[9px] font-black uppercase mt-2 tracking-tighter" id="bar-lbl-1">10:00</span>
+                        </div>
+                        <!-- Bar Item 3 -->
+                        <div class="flex flex-col items-center flex-1 group">
+                            <span class="text-[10px] font-mono font-black text-[#FF0055] opacity-0 group-hover:opacity-100 transition-opacity mb-1" id="bar-val-2">2.4k</span>
+                            <div class="chart-bar w-6 sm:w-10 bg-[#E2FF00] group-hover:bg-[#FF0055] brutalist-border border-b-0" id="bar-2" style="height: 90%;"></div>
+                            <span class="text-[9px] font-black uppercase mt-2 tracking-tighter" id="bar-lbl-2">12:00</span>
+                        </div>
+                        <!-- Bar Item 4 -->
+                        <div class="flex flex-col items-center flex-1 group">
+                            <span class="text-[10px] font-mono font-black text-[#FF0055] opacity-0 group-hover:opacity-100 transition-opacity mb-1" id="bar-val-3">0.9k</span>
+                            <div class="chart-bar w-6 sm:w-10 bg-black group-hover:bg-[#FF0055] brutalist-border border-b-0" id="bar-3" style="height: 30%;"></div>
+                            <span class="text-[9px] font-black uppercase mt-2 tracking-tighter" id="bar-lbl-3">14:00</span>
+                        </div>
+                        <!-- Bar Item 5 -->
+                        <div class="flex flex-col items-center flex-1 group">
+                            <span class="text-[10px] font-mono font-black text-[#FF0055] opacity-0 group-hover:opacity-100 transition-opacity mb-1" id="bar-val-4">1.5k</span>
+                            <div class="chart-bar w-6 sm:w-10 bg-black group-hover:bg-[#FF0055] brutalist-border border-b-0" id="bar-4" style="height: 55%;"></div>
+                            <span class="text-[9px] font-black uppercase mt-2 tracking-tighter" id="bar-lbl-4">16:00</span>
+                        </div>
+                        <!-- Bar Item 6 -->
+                        <div class="flex flex-col items-center flex-1 group">
+                            <span class="text-[10px] font-mono font-black text-[#FF0055] opacity-0 group-hover:opacity-100 transition-opacity mb-1" id="bar-val-5">2.1k</span>
+                            <div class="chart-bar w-6 sm:w-10 bg-black group-hover:bg-[#FF0055] brutalist-border border-b-0" id="bar-5" style="height: 78%;"></div>
+                            <span class="text-[9px] font-black uppercase mt-2 tracking-tighter" id="bar-lbl-5">18:00</span>
+                        </div>
+                        <!-- Bar Item 7 -->
+                        <div class="flex flex-col items-center flex-1 group">
+                            <span class="text-[10px] font-mono font-black text-[#FF0055] opacity-0 group-hover:opacity-100 transition-opacity mb-1" id="bar-val-6">2.8k</span>
+                            <div class="chart-bar w-6 sm:w-10 bg-[#E2FF00] group-hover:bg-[#FF0055] brutalist-border border-b-0" id="bar-6" style="height: 95%;"></div>
+                            <span class="text-[9px] font-black uppercase mt-2 tracking-tighter" id="bar-lbl-6">20:00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Summary Metric Panel inside chart block -->
+                <div class="bg-gray-100 p-4 border-t-4 border-black grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                    <div class="border-r-0 md:border-r-4 border-black pb-2 md:pb-0">
+                        <span class="text-[10px] text-gray-500 font-bold block">// BOUNCE METRIC</span>
+                        <span class="text-lg font-black uppercase">22.41%</span>
+                    </div>
+                    <div class="border-r-0 md:border-r-4 border-black pb-2 md:pb-0">
+                        <span class="text-[10px] text-gray-500 font-bold block">// PEAK TRAFFIC PERIOD</span>
+                        <span class="text-lg font-black uppercase text-[#FF0055]" id="metric-peak-time">20:00 UTC</span>
+                    </div>
+                    <div class="border-r-0 md:border-r-4 border-black pb-2 md:pb-0">
+                        <span class="text-[10px] text-gray-500 font-bold block">// ENGAGEMENT RATIO</span>
+                        <span class="text-lg font-black uppercase">8.94 : 1</span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-gray-500 font-bold block">// EST. PAYOUT RATE</span>
+                        <span class="text-lg font-black uppercase bg-black text-white px-2 py-0.5 inline-block text-xs mt-1">15% BASE</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Persistent Interactive Controls (4 Columns) -->
+            <div class="lg:col-span-4 flex flex-col gap-8">
+                
+                <!-- Quick Link Constructor Widget -->
+                <div class="bg-white p-6 brutalist-border brutalist-shadow-pink relative overflow-hidden scanline">
+                    <div class="border-b-4 border-black pb-3 mb-4">
+                        <span class="text-xs font-black uppercase bg-[#FF0055] text-white px-2 py-0.5 inline-block">// ENGINE INTERNALS</span>
+                        <h4 class="text-xl font-black mt-1">LINK CONSTRUCTOR</h4>
+                    </div>
+                    <p class="text-xs font-bold text-gray-600 mb-4 leading-relaxed">
+                        Construct tracking parameters below. Sub-IDs drop distinct identifiers within ledger operations instantly.
+                    </p>
+
+                    <div class="flex flex-col gap-3 mb-4">
+                        <div>
+                            <label class="block text-[10px] font-black uppercase mb-1">OPTIONAL SUB-ID (CODENAME)</label>
+                            <input type="text" id="sub-id-input" placeholder="E.G. TWITTER_CAMPAIGN" class="w-full brutalist-input p-3 text-sm uppercase" onkeyup="regenerateLink()">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black uppercase mb-1">CONSTRUCTED ROUTE URL</label>
+                            <div class="bg-black text-[#E2FF00] p-3 brutalist-border font-mono text-[11px] select-all break-all overflow-x-auto min-h-[48px]" id="constructed-link-display">
+                                https://moonshine.capital/?ref=ALPHA_PARTNER
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="copyTrackingLink()" class="w-full py-3 text-sm brutalist-btn brutalist-btn-accent flex items-center justify-center gap-2">
+                        📋 COPY GENERATED LINK
+                    </button>
+                </div>
+
+                <!-- Instant Ingestion Portal Form (Inline simulation) -->
+                <div class="bg-white p-6 brutalist-border brutalist-shadow-black">
+                    <div class="border-b-4 border-black pb-3 mb-4">
+                        <span class="text-xs font-black bg-black text-white px-2 py-0.5 inline-block">// DIRECT TERMINAL INGEST</span>
+                        <h4 class="text-xl font-black mt-1">QUICK PIPELINE SUBMIT</h4>
+                    </div>
+                    
+                    <form id="ingestion-form" onsubmit="handleQuickSubmit(event)" class="flex flex-col gap-3">
+                        <div>
+                            <label class="block text-[10px] font-black uppercase mb-1">CLIENT NAME</label>
+                            <input type="text" id="lead-name" placeholder="E.G. CAPITAL INITIATIVE CORP" class="w-full brutalist-input p-2.5 text-xs uppercase" required>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black uppercase mb-1">CONTRACT / VALUE TARGET</label>
+                            <select id="lead-value" class="w-full brutalist-input p-2.5 text-xs bg-white uppercase font-black">
+                                <option value="$500K">$500,000 - $1,000,000</option>
+                                <option value="$2.5M">$1,000,000 - $5,000,000</option>
+                                <option value="$12.5M">$5,000,000 - $20,000,000</option>
+                                <option value="$35M">$20,000,000+</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full py-3 brutalist-btn brutalist-btn-pink text-xs font-black">
+                            ⚡ RUN DIAGNOSTIC SUBMISSION
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Live Pipeline Audit Ledger (Full-width Row) -->
+        <section class="bg-white brutalist-border brutalist-shadow-accent">
+            <div class="bg-black text-white p-4 border-b-4 border-black flex justify-between items-center flex-wrap gap-2">
+                <div>
+                    <span class="text-xs font-mono text-[#E2FF00] block">// HIGH FREQUENCY LEDGER RECORDS</span>
+                    <h3 class="text-2xl font-black uppercase">LIVE PIPELINE AUDIT</h3>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="inline-block w-2.5 h-2.5 bg-green-500 live-blink"></span>
+                    <span class="text-xs font-mono font-bold tracking-tight uppercase">STREAMING EVENT MATRIX</span>
+                </div>
+            </div>
+
+            <!-- Ledger Scroll Container -->
+            <div class="overflow-x-auto w-full">
+                <table class="w-full text-left border-collapse min-w-[700px]">
+                    <thead>
+                        <tr class="bg-gray-100 border-b-4 border-black">
+                            <th class="p-4 text-xs font-black uppercase border-r-2 border-black">LEDGER ID</th>
+                            <th class="p-4 text-xs font-black uppercase border-r-2 border-black">TARGET IDENTIFIER</th>
+                            <th class="p-4 text-xs font-black uppercase border-r-2 border-black">DATE INGESTED</th>
+                            <th class="p-4 text-xs font-black uppercase border-r-2 border-black">CAPITAL VALUE</th>
+                            <th class="p-4 text-xs font-black uppercase border-r-2 border-black">COMMISSION OUTLINE (15%)</th>
+                            <th class="p-4 text-xs font-black uppercase">SYSTEM RESOLUTION</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ledger-rows" class="font-mono text-xs font-bold divide-y-2 divide-black">
+                        <!-- Ledger row 1 -->
+                        <tr class="hover:bg-[#FAFDF0] transition-colors">
+                            <td class="p-4 border-r-2 border-black text-[#FF0055]">#TX-94821-MC</td>
+                            <td class="p-4 border-r-2 border-black">ALPHA_PARTNER <span class="bg-gray-200 text-black px-1.5 text-[9px] ml-1">SUBID: TWITTER</span></td>
+                            <td class="p-4 border-r-2 border-black">TODAY, 14:32:05 UTC</td>
+                            <td class="p-4 border-r-2 border-black font-black">$5,000,000</td>
+                            <td class="p-4 border-r-2 border-black text-green-600 font-black">$750,000</td>
+                            <td class="p-4 flex items-center gap-2">
+                                <span class="px-2 py-0.5 bg-yellow-300 text-black border border-black font-black text-[10px] uppercase">IN ASSESSMENT</span>
+                            </td>
+                        </tr>
+                        <!-- Ledger row 2 -->
+                        <tr class="hover:bg-[#FAFDF0] transition-colors">
+                            <td class="p-4 border-r-2 border-black text-[#FF0055]">#TX-94711-MC</td>
+                            <td class="p-4 border-r-2 border-black">ALPHA_PARTNER</td>
+                            <td class="p-4 border-r-2 border-black">TODAY, 09:12:44 UTC</td>
+                            <td class="p-4 border-r-2 border-black font-black">$1,200,000</td>
+                            <td class="p-4 border-r-2 border-black text-green-600 font-black">$180,000</td>
+                            <td class="p-4 flex items-center gap-2">
+                                <span class="px-2 py-0.5 bg-[#E2FF00] text-black border border-black font-black text-[10px] uppercase">TERM SHEET SIGNED</span>
+                            </td>
+                        </tr>
+                        <!-- Ledger row 3 -->
+                        <tr class="hover:bg-[#FAFDF0] transition-colors">
+                            <td class="p-4 border-r-2 border-black text-[#FF0055]">#TX-93502-MC</td>
+                            <td class="p-4 border-r-2 border-black">ALPHA_PARTNER <span class="bg-gray-200 text-black px-1.5 text-[9px] ml-1">SUBID: DIRECT_OUT</span></td>
+                            <td class="p-4 border-r-2 border-black">YESTERDAY, 18:22:10 UTC</td>
+                            <td class="p-4 border-r-2 border-black font-black">$15,000,000</td>
+                            <td class="p-4 border-r-2 border-black text-green-600 font-black">$2,250,000</td>
+                            <td class="p-4 flex items-center gap-2">
+                                <span class="px-2 py-0.5 bg-black text-white font-black text-[10px] uppercase">COMMISSION LIQUIDATED</span>
+                            </td>
+                        </tr>
+                        <!-- Ledger row 4 -->
+                        <tr class="hover:bg-[#FAFDF0] transition-colors">
+                            <td class="p-4 border-r-2 border-black text-[#FF0055]">#TX-92900-MC</td>
+                            <td class="p-4 border-r-2 border-black">ALPHA_PARTNER</td>
+                            <td class="p-4 border-r-2 border-black">2 DAYS AGO</td>
+                            <td class="p-4 border-r-2 border-black font-black">$500,000</td>
+                            <td class="p-4 border-r-2 border-black text-green-600 font-black">$75,000</td>
+                            <td class="p-4 flex items-center gap-2">
+                                <span class="px-2 py-0.5 bg-red-500 text-white border border-black font-black text-[10px] uppercase">DECLINED / RISK HIGH</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Ledger Footer Stats panel -->
+            <div class="bg-gray-50 p-4 border-t-4 border-black flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-mono font-bold">
+                <p class="text-gray-600 uppercase tracking-tight">
+                    ⚡ RUNNING VERIFIED BALANCE LEDGER: 4 RECORD(S) RENDERED FOR ACCOUNT KEY ALPHA_PARTNER
+                </p>
+                <button onclick="requestCommissionDisbursal()" class="w-full md:w-auto px-5 py-2.5 text-xs brutalist-btn brutalist-btn-white flex items-center justify-center gap-2">
+                    💵 REQUEST DISBURSAL CHANNELS
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Payout Dispatch Terminal Simulation (Modal-Style Bottom Banner) -->
+    <section id="disbursal-terminal" class="hidden fixed bottom-4 right-4 left-4 md:left-auto md:w-[480px] bg-black text-white brutalist-border brutalist-shadow-white p-6 z-50">
+        <div class="flex justify-between items-start border-b-2 border-[#E2FF00] pb-3 mb-4">
+            <div>
+                <span class="text-xs font-mono text-[#E2FF00] block">// DISBURSAL DISPATCH GATEWAY</span>
+                <h4 class="text-lg font-black uppercase text-white">REVENUE ROUTING</h4>
+            </div>
+            <button onclick="closeDisbursalTerminal()" class="text-white bg-red-600 p-1 border border-black text-xs font-black">✕</button>
+        </div>
+
+        <div class="bg-zinc-950 p-3 brutalist-border border-zinc-800 font-mono text-[11px] text-[#E2FF00] mb-4 h-32 overflow-y-auto" id="terminal-screen">
+            <p>&gt; SECURE CHANNEL CHECKPOINT INITIATED...</p>
+            <p>&gt; AUTHORIZED USER: ALPHA_PARTNER</p>
+            <p>&gt; PENDING ACCRUED COMMISSIONS: $84,150.00</p>
+            <p>&gt; READY FOR WIRE / CRYPTO USDC CLEARANCE.</p>
+        </div>
+
+        <div class="flex gap-2">
+            <button onclick="dispatchFunds('BANK WIRE')" class="flex-1 py-2.5 brutalist-btn bg-[#E2FF00] text-black text-xs font-black">
+                🏦 DIRECT WIRE
+            </button>
+            <button onclick="dispatchFunds('USDC METAMASK')" class="flex-1 py-2.5 brutalist-btn bg-white text-black text-xs font-black">
+                🪙 LIQUID USDC
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer System Status Ledger -->
+    <footer class="w-full bg-black text-white p-4 brutalist-border flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-mono">
+        <div>
+            <span>SYSTEM CONTEXT: MOONSHINE CAPITAL PERFORMANCE ENGINE v3.44</span>
+        </div>
+        <div class="flex gap-4">
+            <a href="#" class="hover:text-[#E2FF00] underline font-bold">LEDGER STATUS</a>
+            <span>|</span>
+            <a href="#" class="hover:text-[#E2FF00] underline font-bold">API INTEGRATION MANUAL</a>
+            <span>|</span>
+            <a href="#" class="hover:text-[#E2FF00] underline font-bold">SECURITY GATE</a>
+        </div>
+    </footer>
+
+    <!-- INTERACTION LOGIC LAYER (VANILLA JAVASCRIPT) -->
+    <script>
+        // Set dynamic state variables
+        const partnerID = "ALPHA_PARTNER";
+        let subID = "";
+
+        // Chart Data Timelines
+        const timelineData = {
+            "24h": {
+                labels: ["08:00", "10:00", "12:00", "14:00", "16:00", "18:00", "20:00"],
+                heights: ["45%", "65%", "90%", "30%", "55%", "78%", "95%"],
+                values: ["1.2k", "1.8k", "2.4k", "0.9k", "1.5k", "2.1k", "2.8k"],
+                peak: "20:00 UTC"
+            },
+            "7d": {
+                labels: ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"],
+                heights: ["70%", "85%", "40%", "60%", "95%", "35%", "50%"],
+                values: ["9.2k", "11.1k", "5.4k", "7.8k", "14.2k", "4.1k", "6.3k"],
+                peak: "FRIDAY"
+            },
+            "30d": {
+                labels: ["WK-01", "WK-02", "WK-03", "WK-04", "WK-05", "WK-06", "WK-07"],
+                heights: ["50%", "65%", "75%", "98%", "45%", "85%", "60%"],
+                values: ["32.1k", "41.5k", "48.2k", "62.4k", "28.1k", "54.9k", "38.2k"],
+                peak: "WEEK 4"
+            }
+        };
+
+        /**
+         * Update Link Generator Sub-IDs live preview
+         */
+        function regenerateLink() {
+            const rawInput = document.getElementById('sub-id-input').value.toUpperCase().replace(/[^A-Z0-9_-]/g, '');
+            document.getElementById('sub-id-input').value = rawInput;
+            subID = rawInput;
+
+            const baseRefUrl = `https://moonshine.capital/?ref=${partnerID}`;
+            const displayEl = document.getElementById('constructed-link-display');
+
+            if (subID.trim() === "") {
+                displayEl.innerText = baseRefUrl;
+            } else {
+                displayEl.innerText = `${baseRefUrl}&subid=${subID}`;
+            }
+        }
+
+        /**
+         * Copy dynamic tracking link
+         */
+        function copyTrackingLink() {
+            const displayEl = document.getElementById('constructed-link-display');
+            const range = document.createRange();
+            range.selectNode(displayEl);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            
+            try {
+                document.execCommand('copy');
+                alert(`TRACKING LINK CONSTRUCTED AND COPIED SUCCESSFULLY:\n${displayEl.innerText}`);
+            } catch (err) {
+                alert("SYSTEM WARNING: COPY TO CLIPBOARD FAILURE. MANUALLY COPY DETECTED LINK.");
+            }
+            window.getSelection().removeAllRanges();
+        }
+
+        /**
+         * Update Custom Timeline Chart Columns
+         */
+        function updateChartTimeline(timeline) {
+            // Update Navigation Button States
+            const buttons = document.querySelectorAll('.timeline-btn');
+            buttons.forEach(btn => {
+                btn.className = "timeline-btn bg-black text-white hover:bg-zinc-800 font-black text-xs px-3 py-1.5 border-r border-white uppercase transition-colors";
+            });
+            // Mark last one without border-r specifically
+            document.getElementById('btn-time-30d').className = "timeline-btn bg-black text-white hover:bg-zinc-800 font-black text-xs px-3 py-1.5 uppercase transition-colors";
+
+            // Set current active button state
+            const activeBtn = document.getElementById(`btn-time-${timeline}`);
+            activeBtn.className = "timeline-btn bg-[#E2FF00] text-black font-black text-xs px-3 py-1.5 border-r border-white uppercase transition-colors";
+            if(timeline === '30d') {
+                activeBtn.className = "timeline-btn bg-[#E2FF00] text-black font-black text-xs px-3 py-1.5 uppercase transition-colors";
+            }
+
+            // Retrieve configuration block
+            const config = timelineData[timeline];
+
+            // Render live charts
+            for (let i = 0; i < 7; i++) {
+                const barEl = document.getElementById(`bar-${i}`);
+                const valueEl = document.getElementById(`bar-val-${i}`);
+                const labelEl = document.getElementById(`bar-lbl-${i}`);
+
+                if (barEl && valueEl && labelEl) {
+                    barEl.style.height = config.heights[i];
+                    valueEl.innerText = config.values[i];
+                    labelEl.innerText = config.labels[i];
+                }
+            }
+
+            // Peak statistics dynamic injection
+            document.getElementById('metric-peak-time').innerText = config.peak;
+        }
+
+        /**
+         * Quick Dynamic Ingestion Submission Handler
+         */
+        function handleQuickSubmit(event) {
+            event.preventDefault();
+            const clientName = document.getElementById('lead-name').value;
+            const targetVal = document.getElementById('lead-value').value;
+
+            if (clientName.trim() === "") return;
+
+            // Generate Mock Transaction ID
+            const txId = `#TX-${Math.floor(10000 + Math.random() * 90000)}-MC`;
+            
+            // Format today's date timestamp
+            const rawTime = new Date().toLocaleTimeString('en-US', { hour12: false });
+            const timestamp = `TODAY, ${rawTime} UTC`;
+
+            // Calculate mock commission rate (15% base of simulated numeric representations)
+            let numericVal = 0;
+            if (targetVal === "$500K") numericVal = 500000;
+            else if (targetVal === "$2.5M") numericVal = 2500000;
+            else if (targetVal === "$12.5M") numericVal = 12500000;
+            else if (targetVal === "$35M") numericVal = 35000000;
+
+            const commissionValue = (numericVal * 0.15).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+
+            // Create Dynamic Ledger Row
+            const tbody = document.getElementById('ledger-rows');
+            const tr = document.createElement('tr');
+            tr.className = "hover:bg-[#FAFDF0] transition-colors bg-[#FAFDF0]";
+            tr.innerHTML = `
+                <td class="p-4 border-r-2 border-black text-[#FF0055] font-black">${txId}</td>
+                <td class="p-4 border-r-2 border-black">${partnerID} ${subID ? `<span class="bg-black text-[#E2FF00] px-1.5 text-[9px] ml-1">SUBID: ${subID}</span>` : ''}</td>
+                <td class="p-4 border-r-2 border-black">${timestamp}</td>
+                <td class="p-4 border-r-2 border-black font-black">${numericVal.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })}</td>
+                <td class="p-4 border-r-2 border-black text-green-600 font-black">${commissionValue}</td>
+                <td class="p-4 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-yellow-300 text-black border border-black font-black text-[10px] uppercase">DIAGNOSTIC PASSED</span>
+                </td>
+            `;
+
+            // Prepend new simulation record
+            tbody.insertBefore(tr, tbody.firstChild);
+
+            // Display alert simulation completion
+            alert(`[INGESTION INJECTION COMPLETED]\nTRANSACTION: ${txId}\nPARTNER DETECTED: ${partnerID}\nSUB-IDENTIFIER: ${subID || 'NONE'}\nDIAGNOSTIC STATUS: PASSED RECONCILIATION`);
+
+            // Clear inputs
+            document.getElementById('lead-name').value = "";
+        }
+
+        /**
+         * Disbursal Gate Modal Simulation Actions
+         */
+        function requestCommissionDisbursal() {
+            const modal = document.getElementById('disbursal-terminal');
+            modal.classList.remove('hidden');
+            
+            // Populate/Reset Terminal log
+            const terminalScreen = document.getElementById('terminal-screen');
+            terminalScreen.innerHTML = `
+                <p>&gt; SECURE CHANNEL CHECKPOINT INITIATED...</p>
+                <p>&gt; AUTHORIZED USER: ALPHA_PARTNER</p>
+                <p>&gt; PENDING ACCRUED COMMISSIONS: $84,150.00</p>
+                <p>&gt; READY FOR WIRE / CRYPTO USDC CLEARANCE.</p>
+            `;
+        }
+
+        function closeDisbursalTerminal() {
+            document.getElementById('disbursal-terminal').classList.add('hidden');
+        }
+
+        function dispatchFunds(channel) {
+            const terminalScreen = document.getElementById('terminal-screen');
+            terminalScreen.innerHTML += `
+                <p class="text-white">&gt; INITIATING ROUTING VIA ${channel}...</p>
+                <p class="text-white">&gt; RESOLVING ESCROW LEDGERS...</p>
+                <p class="text-[#FF0055]">&gt; TRANSFERS AUTHORIZED successfully.</p>
+                <p>&gt; TRANSACTION DISPATCHED. ID: #MC-OUT-${Math.floor(100000 + Math.random() * 900000)}</p>
+            `;
+            
+            setTimeout(() => {
+                alert(`[DISPATCH ENGINE COMPLETED]\nCOMMISSION DISBURSAL SECURED VIA: ${channel}\nESTIMATED LIQUIDITY RELEASE IN 10 MINUTES.`);
+                closeDisbursalTerminal();
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

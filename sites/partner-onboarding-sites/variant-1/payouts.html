@@ -1,0 +1,612 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonshine Capital Ledger & Payouts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #000000;
+            background-image: radial-gradient(#222222 15%, transparent 15%), radial-gradient(#222222 15%, transparent 15%);
+            background-size: 24px 24px;
+            background-position: 0 0, 12px 12px;
+            color: #ffffff;
+        }
+
+        .neo-border {
+            border: 4px solid #000000;
+        }
+
+        .neo-border-white {
+            border: 4px solid #ffffff;
+        }
+
+        .neo-shadow {
+            box-shadow: 8px 8px 0px #000000;
+        }
+
+        .neo-shadow-white {
+            box-shadow: 8px 8px 0px #ff4800;
+        }
+
+        .neo-shadow-accent {
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .neo-btn {
+            border: 4px solid #000000;
+            box-shadow: 6px 6px 0px #000000;
+            transition: all 0.07s ease-in-out;
+        }
+
+        .neo-btn:active {
+            transform: translate(4px, 4px);
+            box-shadow: 2px 2px 0px #000000;
+        }
+
+        .neo-btn-white {
+            border: 4px solid #ffffff;
+            box-shadow: 6px 6px 0px #ff4800;
+            transition: all 0.07s ease-in-out;
+        }
+
+        .neo-btn-white:active {
+            transform: translate(4px, 4px);
+            box-shadow: 2px 2px 0px #ff4800;
+        }
+
+        /* Custom Scrollbar for Neo-Brutalist look */
+        ::-webkit-scrollbar {
+            width: 16px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000000;
+            border-left: 4px solid #ffffff;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ff4800;
+            border: 4px solid #000000;
+        }
+
+        .blink {
+            animation: blinker 1.2s linear infinite;
+        }
+        @keyframes blinker {
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex items-center justify-center">
+
+    <!-- Container -->
+    <div class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        
+        <!-- SIDEBAR (4 Cols) -->
+        <aside class="lg:col-span-4 bg-[#ffffff] text-[#000000] neo-border-white neo-shadow-white p-6 flex flex-col justify-between relative overflow-hidden min-h-[500px] lg:min-h-[750px]">
+            <!-- Decorative raw stamp -->
+            <div class="absolute top-0 right-0 bg-black text-[#00ff66] font-black px-4 py-2 text-xs uppercase tracking-widest border-b-4 border-l-4 border-black font-mono">
+                LEDGER: RUNNING
+            </div>
+            
+            <div>
+                <!-- Brand logo / header -->
+                <div class="mb-10">
+                    <span class="bg-[#000000] text-[#ff4800] text-3xl font-black px-4 py-1 inline-block tracking-tighter transform -rotate-1">
+                        MOONSHINE
+                    </span>
+                    <span class="text-xl font-black tracking-widest block mt-2 text-[#000000] underline decoration-[#ff4800] decoration-4">
+                        LEDGER & INVOICES
+                    </span>
+                </div>
+
+                <!-- Navigation List -->
+                <div class="space-y-4">
+                    <h3 class="font-black text-sm uppercase tracking-widest text-zinc-500 mb-4">// ACCOUNTING NAVIGATION</h3>
+                    
+                    <button onclick="switchView('overview')" id="nav-overview" class="w-full text-left flex items-center gap-4 p-3 bg-black text-white neo-border transition-all">
+                        <span class="bg-[#ff4800] text-black font-black w-8 h-8 flex items-center justify-center border-2 border-black">01</span>
+                        <span class="font-bold text-sm tracking-tight uppercase">PAYOUT OVERVIEW</span>
+                    </button>
+
+                    <button onclick="switchView('ledger')" id="nav-ledger" class="w-full text-left flex items-center gap-4 p-3 bg-white text-black border-4 border-black transition-all hover:bg-zinc-100">
+                        <span class="bg-zinc-200 text-black font-black w-8 h-8 flex items-center justify-center border-2 border-black">02</span>
+                        <span class="font-bold text-sm tracking-tight uppercase">TRANSACTION LEDGER</span>
+                    </button>
+
+                    <button onclick="switchView('payout-settings')" id="nav-settings" class="w-full text-left flex items-center gap-4 p-3 bg-white text-black border-4 border-black transition-all hover:bg-zinc-100">
+                        <span class="bg-zinc-200 text-black font-black w-8 h-8 flex items-center justify-center border-2 border-black">03</span>
+                        <span class="font-bold text-sm tracking-tight uppercase">GATEWAY & CHANNELS</span>
+                    </button>
+
+                    <button onclick="openInvoiceModal()" class="w-full text-left flex items-center gap-4 p-3 bg-[#00ff66] text-black border-4 border-black transition-all hover:bg-white">
+                        <span class="bg-black text-[#00ff66] font-black w-8 h-8 flex items-center justify-center border-2 border-black">⚡</span>
+                        <span class="font-bold text-sm tracking-tight uppercase">SUBMIT NEW INVOICE</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Terminal Area -->
+            <div class="mt-8 border-t-4 border-black pt-6">
+                <div class="bg-black text-[#00ff66] p-4 neo-border font-mono text-xs flex flex-col justify-between h-44">
+                    <div class="overflow-y-auto space-y-2 h-24 scrollbar-thin" id="terminal-messages">
+                        <p class="text-zinc-500">// LEDGER CORE PROTOCOL STABLE</p>
+                        <p><span class="text-[#ff4800] font-bold">SYSTEM:</span> Ready to process commissions.</p>
+                    </div>
+                    <div class="flex gap-1 border-t border-zinc-800 pt-2">
+                        <input type="text" id="terminal-input" placeholder="RUN QUERY..." class="bg-black text-[#00ff66] focus:outline-none w-full uppercase placeholder-zinc-700">
+                        <button onclick="sendTerminalCommand()" class="bg-[#ff4800] text-black font-black px-3 py-1 hover:bg-white transition-colors">EXEC</button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN INTERACTIVE WORKSPACE (8 Cols) -->
+        <main class="lg:col-span-8 bg-[#000000] text-[#ffffff] neo-border-white neo-shadow-white p-6 md:p-10 flex flex-col justify-between min-h-[600px] lg:min-h-[750px] relative overflow-hidden">
+            
+            <!-- BACKGROUND INTEL DECORATION -->
+            <div class="absolute inset-0 pointer-events-none opacity-5 flex flex-col justify-between p-4 font-mono select-none">
+                <div class="flex justify-between text-xs">
+                    <span>LEDGER CORE v4.9</span>
+                    <span>ROUTE_ADDR: 0x8F...E49A</span>
+                </div>
+                <div class="text-7xl font-black tracking-widest text-center">ACCOUNTING_MODE</div>
+                <div class="flex justify-between text-xs">
+                    <span>SECURITY: AES-256</span>
+                    <span>LEDGER BALANCE: STABLE</span>
+                </div>
+            </div>
+
+            <!-- WORKSPACE SECTIONS -->
+            <div class="relative z-10 space-y-8 my-auto">
+
+                <!-- SECTION 1: OVERVIEW & BALANCES -->
+                <div id="view-overview" class="view-panel space-y-8">
+                    <div class="space-y-4">
+                        <div class="inline-block bg-[#ff4800] text-black text-xs font-black px-3 py-1 uppercase tracking-widest">
+                            LEDGER DASHBOARD // OVERVIEW
+                        </div>
+                        <h1 class="text-4xl md:text-6xl font-black tracking-tight leading-none uppercase">
+                            ACCOUNT <span class="text-[#ff4800]">REVENUE</span> LEDGER
+                        </h1>
+                    </div>
+
+                    <!-- Giant Typographic Metrics -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 border-4 border-white p-4 bg-zinc-950">
+                        <!-- Metric 1: Unpaid -->
+                        <div class="bg-[#ff4800] p-4 text-black neo-border flex flex-col justify-between min-h-[140px]">
+                            <div>
+                                <span class="text-xs font-black uppercase tracking-widest font-mono">// UNPAID ACCOUNT BALANCE</span>
+                                <h2 class="text-3xl md:text-4xl font-black leading-none mt-2 select-all">$12,850.00</h2>
+                            </div>
+                            <span class="text-[10px] font-mono font-bold blink block mt-4 bg-black text-[#00ff66] text-center py-1 border-2 border-black">AUTOPAY TRIGGER ARMED</span>
+                        </div>
+                        
+                        <!-- Metric 2: Next Payout -->
+                        <div class="bg-black p-4 text-white border-2 border-white flex flex-col justify-between min-h-[140px]">
+                            <div>
+                                <span class="text-xs font-black uppercase tracking-widest text-zinc-400 font-mono">// NEXT PAYOUT DATE</span>
+                                <h2 class="text-3xl md:text-4xl font-black leading-none mt-2 text-[#ff4800]">OCT-27-2023</h2>
+                            </div>
+                            <span class="text-[10px] font-mono text-zinc-500 block mt-4">ESTIMATED CYCLE: FRIDAY NOON EST</span>
+                        </div>
+
+                        <!-- Metric 3: Lifetime Earnings -->
+                        <div class="bg-white p-4 text-black neo-border flex flex-col justify-between min-h-[140px]">
+                            <div>
+                                <span class="text-xs font-black uppercase tracking-widest text-zinc-500 font-mono">// LIFETIME DISTRIBUTED</span>
+                                <h2 class="text-3xl md:text-4xl font-black leading-none mt-2">$84,200.00</h2>
+                            </div>
+                            <span class="text-[10px] font-mono text-zinc-600 block mt-4">TOTAL COMMISSIONS CALCULATED</span>
+                        </div>
+                    </div>
+
+                    <!-- Quick Action Banner -->
+                    <div class="bg-zinc-900 border-4 border-white p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div class="space-y-1 text-left">
+                            <h3 class="font-black text-xl uppercase tracking-tight text-[#ff4800]">REQUEST EMERGENCY WITHDRAWAL</h3>
+                            <p class="text-xs font-mono text-zinc-400">Initiate immediate manual route execution. Subject to 1.5% hot-route handling fee.</p>
+                        </div>
+                        <button onclick="requestEmergencyPayout()" class="w-full md:w-auto bg-[#00ff66] hover:bg-white text-black font-black text-sm uppercase py-4 px-8 tracking-widest border-4 border-black neo-btn">
+                            FORCE CLEARING NOW ⚡
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: TRANSACTION LEDGER -->
+                <div id="view-ledger" class="view-panel hidden space-y-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="space-y-1">
+                            <div class="inline-block bg-[#ff4800] text-black text-xs font-black px-3 py-1 uppercase tracking-widest">
+                                PHASES // ARCHIVE
+                            </div>
+                            <h2 class="text-3xl md:text-5xl font-black uppercase tracking-tight">TRANSACTION LEDGER</h2>
+                        </div>
+                        <!-- Filter Tabs -->
+                        <div class="flex gap-2 bg-zinc-950 p-2 border-4 border-white">
+                            <button onclick="filterLedger('all')" class="filter-btn bg-[#ff4800] text-black font-black px-3 py-1 uppercase text-xs">ALL</button>
+                            <button onclick="filterLedger('completed')" class="filter-btn bg-black text-white hover:bg-white hover:text-black font-black px-3 py-1 uppercase text-xs">PAID</button>
+                            <button onclick="filterLedger('pending')" class="filter-btn bg-black text-white hover:bg-white hover:text-black font-black px-3 py-1 uppercase text-xs">PENDING</button>
+                        </div>
+                    </div>
+
+                    <!-- Transaction Ledger Table with Thick Borders -->
+                    <div class="border-4 border-white overflow-x-auto bg-zinc-950">
+                        <table class="w-full text-left border-collapse min-w-[600px]">
+                            <thead>
+                                <tr class="border-b-4 border-white bg-white text-black font-black font-mono text-xs uppercase">
+                                    <th class="p-3 border-r-2 border-black">TXID</th>
+                                    <th class="p-3 border-r-2 border-black">REFERENCE DEAL</th>
+                                    <th class="p-3 border-r-2 border-black">CHANNEL</th>
+                                    <th class="p-3 border-r-2 border-black">AMOUNT</th>
+                                    <th class="p-3">STATUS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ledger-body" class="font-mono text-sm">
+                                <tr class="border-b-2 border-zinc-800 hover:bg-zinc-900 ledger-row" data-status="pending">
+                                    <td class="p-3 border-r-2 border-zinc-800 text-[#ff4800] font-bold">TX-9014</td>
+                                    <td class="p-3 border-r-2 border-zinc-800">APEX LOGISTICS INC. (RECURRING DEPOSIT)</td>
+                                    <td class="p-3 border-r-2 border-zinc-800">ACH (CHASE)</td>
+                                    <td class="p-3 border-r-2 border-zinc-800 font-bold">$4,850.00</td>
+                                    <td class="p-3"><span class="bg-[#ffcc00] text-black font-black px-2 py-0.5 text-xs">PENDING MATCH</span></td>
+                                </tr>
+                                <tr class="border-b-2 border-zinc-800 hover:bg-zinc-900 ledger-row" data-status="pending">
+                                    <td class="p-3 border-r-2 border-zinc-800 text-[#ff4800] font-bold">TX-8942</td>
+                                    <td class="p-3 border-r-2 border-zinc-800">ZETA CAPITAL ADVISORS (ACQUISITION)</td>
+                                    <td class="p-3 border-r-2 border-zinc-800">WIRE (BOA)</td>
+                                    <td class="p-3 border-r-2 border-zinc-800 font-bold">$8,000.00</td>
+                                    <td class="p-3"><span class="bg-white text-black font-black px-2 py-0.5 text-xs">PROCESSING</span></td>
+                                </tr>
+                                <tr class="border-b-2 border-zinc-800 hover:bg-zinc-900 ledger-row" data-status="completed">
+                                    <td class="p-3 border-r-2 border-zinc-800 text-zinc-500 font-bold">TX-7431</td>
+                                    <td class="p-3 border-r-2 border-zinc-800">TITAN FREIGHT SERVICES (BRIDGE FUND)</td>
+                                    <td class="p-3 border-r-2 border-zinc-800">USDC (ERC-20)</td>
+                                    <td class="p-3 border-r-2 border-zinc-800 font-bold text-[#00ff66]">$14,200.00</td>
+                                    <td class="p-3"><span class="bg-[#00ff66] text-black font-black px-2 py-0.5 text-xs">DISBURSED</span></td>
+                                </tr>
+                                <tr class="border-b-2 border-zinc-800 hover:bg-zinc-900 ledger-row" data-status="completed">
+                                    <td class="p-3 border-r-2 border-zinc-800 text-zinc-500 font-bold">TX-6591</td>
+                                    <td class="p-3 border-r-2 border-zinc-800">OAKRIDGE MEDICAL LTD (EQUIPMENT LEASE)</td>
+                                    <td class="p-3 border-r-2 border-zinc-800">WIRE (BOA)</td>
+                                    <td class="p-3 border-r-2 border-zinc-800 font-bold text-[#00ff66]">$70,000.00</td>
+                                    <td class="p-3"><span class="bg-[#00ff66] text-black font-black px-2 py-0.5 text-xs">DISBURSED</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: GATEWAYS & PAYMENT PREFERENCES -->
+                <div id="view-payout-settings" class="view-panel hidden space-y-8">
+                    <div class="space-y-4">
+                        <div class="inline-block bg-[#ff4800] text-black text-xs font-black px-3 py-1 uppercase tracking-widest">
+                            PREFERENCES // CONFIG
+                        </div>
+                        <h2 class="text-3xl md:text-5xl font-black uppercase tracking-tight">GATEWAY & CHANNELS</h2>
+                        <p class="text-zinc-300 font-bold">Select and configure your active payout channels. Clearouts default to the enabled profile below.</p>
+                    </div>
+
+                    <!-- Settings Harsh Non-Rounded Module -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 border-4 border-white bg-zinc-950">
+                        <!-- Wire Tab Select -->
+                        <button onclick="togglePaymentChannel('wire')" id="chan-wire-btn" class="p-4 font-black uppercase text-left border-b-4 md:border-b-0 md:border-r-4 border-white bg-[#ff4800] text-black flex items-center justify-between">
+                            <span>01 / BANK WIRE</span>
+                            <span class="text-xs">⚡ ACTIVE</span>
+                        </button>
+                        <!-- ACH Tab Select -->
+                        <button onclick="togglePaymentChannel('ach')" id="chan-ach-btn" class="p-4 font-black uppercase text-left border-b-4 md:border-b-0 md:border-r-4 border-white text-white hover:bg-zinc-900 flex items-center justify-between">
+                            <span>02 / DIRECT ACH</span>
+                            <span class="text-xs">INACTIVE</span>
+                        </button>
+                        <!-- Crypto Tab Select -->
+                        <button onclick="togglePaymentChannel('crypto')" id="chan-crypto-btn" class="p-4 font-black uppercase text-left text-white hover:bg-zinc-900 flex items-center justify-between">
+                            <span>03 / DIGITAL ASSETS</span>
+                            <span class="text-xs">INACTIVE</span>
+                        </button>
+                    </div>
+
+                    <!-- Config Dynamic Forms -->
+                    <div class="bg-zinc-950 p-6 border-4 border-white">
+                        
+                        <!-- Wire Form fields -->
+                        <div id="form-channel-wire" class="channel-form space-y-4">
+                            <h4 class="font-black text-lg uppercase tracking-wider text-[#ff4800] font-mono">// COMMERCIAL WIRE INSTRUCTIONS</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-mono font-black text-zinc-400 mb-1">RECEIVING INSTITUTION NAME</label>
+                                    <input type="text" value="BANK OF AMERICA, N.A." class="w-full bg-black text-white font-black p-3 border-4 border-white focus:outline-none focus:border-[#ff4800] uppercase font-mono">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-mono font-black text-zinc-400 mb-1">ROUTING NUMBER (9-DIGIT)</label>
+                                    <input type="text" value="021000021" class="w-full bg-black text-white font-black p-3 border-4 border-white focus:outline-none focus:border-[#ff4800] font-mono">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-mono font-black text-zinc-400 mb-1">ACCOUNT NUMBER</label>
+                                    <input type="text" value="********4890" class="w-full bg-black text-white font-black p-3 border-4 border-white focus:outline-none focus:border-[#ff4800] font-mono">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-mono font-black text-zinc-400 mb-1">BENEFICIARY ENTITY NAME</label>
+                                    <input type="text" value="MOONRUNNERS HOLDINGS LLC" class="w-full bg-black text-white font-black p-3 border-4 border-white focus:outline-none focus:border-[#ff4800] uppercase font-mono">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ACH Form fields -->
+                        <div id="form-channel-ach" class="channel-form hidden space-y-4">
+                            <h4 class="font-black text-lg uppercase tracking-wider text-[#ff4800] font-mono">// ACH DIRECT DEPOSIT PARAMETERS</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-mono font-black text-zinc-400 mb-1">INDIVIDUAL/COMPANY ACCOUNT NAME</label>
+                                    <input type="text" placeholder="MOONRUNNERS HOLDINGS LLC" class="w-full bg-black text-white font-black p-3 border-4 border-white focus:outline-none focus:border-[#ff4800] uppercase font-mono">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-mono font-black text-zinc-400 mb-1">ACCOUNT CLASSIFICATION</label>
+                                    <select class="w-full bg-black text-white font-black p-3 border-4 border-white focus:outline-none focus:border-[#ff4800] uppercase font-mono">
+                                        <option>BUSINESS CHECKING</option>
+                                        <option>PERSONAL CHECKING</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-mono font-black text-zinc-400 mb-1">ROUTING CODE</label>
+                                    <input type="text" placeholder="000000000" class="w-full bg-black text-white font-black p-3 border-4 border-white focus:outline-none focus:border-[#ff4800] font-mono">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-mono font-black text-zinc-400 mb-1">ACCOUNT CODES</label>
+                                    <input type="text" placeholder="00000000000" class="w-full bg-black text-white font-black p-3 border-4 border-white focus:outline-none focus:border-[#ff4800] font-mono">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Crypto Form fields -->
+                        <div id="form-channel-crypto" class="channel-form hidden space-y-4">
+                            <h4 class="font-black text-lg uppercase tracking-wider text-[#ff4800] font-mono">// CRYPTOGRAPHIC SETTLE ADDRESS</h4>
+                            <div>
+                                <label class="block text-xs font-mono font-black text-zinc-400 mb-1">STABLECOIN FLAVOR</label>
+                                <select class="w-full bg-black text-white font-black p-3 border-4 border-white focus:outline-none focus:border-[#ff4800] uppercase font-mono">
+                                    <option>USDC - ETHEREUM NET (ERC20)</option>
+                                    <option>USDT - TRON NET (TRC20)</option>
+                                    <option>SOL - SOLANA DIRECT</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-mono font-black text-zinc-400 mb-1">PUBLIC TARGET ADDRESS (DO NOT ENTER PRIVATE KEY)</label>
+                                <input type="text" placeholder="0x..." class="w-full bg-black text-white font-black p-3 border-4 border-white focus:outline-none focus:border-[#ff4800] font-mono">
+                            </div>
+                        </div>
+
+                        <div class="mt-6 border-t-2 border-zinc-800 pt-4">
+                            <button onclick="savePayoutChannel()" class="w-full bg-[#ff4800] hover:bg-white hover:text-black text-black font-black text-lg uppercase py-4 tracking-widest neo-btn">
+                                ENROLL & SAVE ROUTE SETUP 📡
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- MAIN FOOTER CONTROLS -->
+            <div class="border-t-4 border-white mt-8 pt-4 flex flex-col md:flex-row justify-between items-center text-xs font-mono gap-4 relative z-10">
+                <span class="text-zinc-500">LEDGER STATUS: ACTIVE LOCK</span>
+                <span class="bg-white text-black font-black px-2 py-0.5">CYCLE 10/24</span>
+                <span class="text-zinc-500">MOONSHINE CAPITAL LEDGER SYSTEM</span>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- HARSH INVOICE MODAL -->
+    <div id="invoice-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-90">
+        <div class="bg-black text-white border-4 border-white p-6 max-w-lg w-full relative neo-shadow-white">
+            <button onclick="closeInvoiceModal()" class="absolute top-2 right-2 bg-[#ff4800] text-black font-black px-3 py-1 hover:bg-white">
+                CLOSE [X]
+            </button>
+            <div class="space-y-4">
+                <div class="inline-block bg-[#ff4800] text-black text-xs font-black px-3 py-1 uppercase tracking-widest">
+                    SUBMIT COMMISSIONS // MANUAL ENTRY
+                </div>
+                <h3 class="text-2xl font-black uppercase">MANUAL INVOICE GENERATOR</h3>
+                <p class="text-xs text-zinc-400 font-mono">Input completed commercial deal specifications for verification. Manual checking may take 48h.</p>
+                
+                <form id="invoice-form" onsubmit="submitInvoice(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-mono font-black text-zinc-400 mb-1">CLIENT COMPANY NAME</label>
+                        <input required id="inv-client" type="text" placeholder="APEX INFRASTRUCTURE CO." class="w-full bg-black text-white font-black p-2 border-2 border-white focus:outline-none focus:border-[#ff4800] uppercase font-mono text-sm">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-mono font-black text-zinc-400 mb-1">FUNDING TOTAL ($)</label>
+                            <input required id="inv-total" type="number" placeholder="250000" class="w-full bg-black text-white font-black p-2 border-2 border-white focus:outline-none focus:border-[#ff4800] font-mono text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-mono font-black text-zinc-400 mb-1">COMMISSION RATE (%)</label>
+                            <input required id="inv-rate" type="number" step="0.1" value="4.0" class="w-full bg-black text-white font-black p-2 border-2 border-white focus:outline-none focus:border-[#ff4800] font-mono text-sm">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-mono font-black text-zinc-400 mb-1">SETTLEMENT METHOD PREFERENCE</label>
+                        <select id="inv-method" class="w-full bg-black text-white font-black p-2 border-2 border-white focus:outline-none focus:border-[#ff4800] font-mono text-sm uppercase">
+                            <option>WIRE TRANSFER (BOA)</option>
+                            <option>ACH DIRECT DEPOSIT</option>
+                            <option>USDC STABLECOIN TRC20</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full bg-[#00ff66] text-black font-black py-3 uppercase border-4 border-black hover:bg-white transition-colors">
+                        SUBMIT INVOICE TO SECURE CHAIN 📡
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+        // System State
+        let currentView = 'overview';
+        let currentChannel = 'wire';
+
+        function switchView(viewId) {
+            // Hide all views
+            document.querySelectorAll('.view-panel').forEach(panel => {
+                panel.classList.add('hidden');
+            });
+            // Show selected
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+
+            // Reset navigation active styles
+            const navs = {
+                'overview': 'nav-overview',
+                'ledger': 'nav-ledger',
+                'payout-settings': 'nav-settings'
+            };
+
+            for (const [key, id] of Object.entries(navs)) {
+                const btn = document.getElementById(id);
+                if (key === viewId) {
+                    btn.className = "w-full text-left flex items-center gap-4 p-3 bg-black text-white neo-border transition-all";
+                    btn.querySelector('.step-num').className = "bg-[#ff4800] text-black font-black w-8 h-8 flex items-center justify-center border-2 border-black";
+                } else {
+                    btn.className = "w-full text-left flex items-center gap-4 p-3 bg-white text-black border-4 border-black transition-all hover:bg-zinc-100";
+                    btn.querySelector('.step-num').className = "bg-zinc-200 text-black font-black w-8 h-8 flex items-center justify-center border-2 border-black";
+                }
+            }
+            writeToTerminal(`SWITCHED TO ${viewId.toUpperCase()} MODULE.`);
+        }
+
+        function filterLedger(status) {
+            // Filter elements
+            document.querySelectorAll('.ledger-row').forEach(row => {
+                if (status === 'all' || row.dataset.status === status) {
+                    row.classList.remove('hidden');
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+
+            // Adjust filter buttons visually
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(btn => {
+                btn.className = "filter-btn bg-black text-white hover:bg-white hover:text-black font-black px-3 py-1 uppercase text-xs";
+            });
+            event.target.className = "filter-btn bg-[#ff4800] text-black font-black px-3 py-1 uppercase text-xs";
+            writeToTerminal(`FILTERED TRANSACTION RECORDS BY: ${status.toUpperCase()}`);
+        }
+
+        function togglePaymentChannel(channel) {
+            currentChannel = channel;
+            
+            // Toggle form views
+            document.querySelectorAll('.channel-form').forEach(form => {
+                form.classList.add('hidden');
+            });
+            document.getElementById(`form-channel-${channel}`).classList.remove('hidden');
+
+            // Toggle button backgrounds
+            const channels = ['wire', 'ach', 'crypto'];
+            channels.forEach(chan => {
+                const btn = document.getElementById(`chan-${chan}-btn`);
+                const statusSpan = btn.querySelector('span:last-child');
+                if (chan === channel) {
+                    btn.className = "p-4 font-black uppercase text-left border-b-4 md:border-b-0 md:border-r-4 border-white bg-[#ff4800] text-black flex items-center justify-between";
+                    statusSpan.innerText = "⚡ ACTIVE";
+                } else {
+                    btn.className = "p-4 font-black uppercase text-left border-b-4 md:border-b-0 md:border-r-4 border-white text-white hover:bg-zinc-900 flex items-center justify-between";
+                    statusSpan.innerText = "INACTIVE";
+                }
+            });
+            writeToTerminal(`SELECTED SYSTEM ROUTE: ${channel.toUpperCase()}`);
+        }
+
+        function savePayoutChannel() {
+            alert('GATEWAY CONFIGURATION SECURED. SENSITIVE PARAMS LOCKED.');
+            writeToTerminal(`PAYOUT ROUTE: ${currentChannel.toUpperCase()} RE-CONFIGURED SUCCESSFULLY.`);
+        }
+
+        function requestEmergencyPayout() {
+            if (confirm('PROCEED WITH FORCED SETTLEMENT FOR $12,850.00?\nHandling fee of 1.5% applies.')) {
+                writeToTerminal('INITIALIZING EMERGENCY HOT-ROUTE LIQUIDATION...');
+                setTimeout(() => {
+                    alert('SUCCESS: Withdrawal instructions dispatched. Dispatch Ref: HOT-TX-9912');
+                    writeToTerminal('DISPATCH REF HOT-TX-9912 BROADCST TO ROUTE SET.');
+                }, 1000);
+            }
+        }
+
+        // Invoice Modal functions
+        function openInvoiceModal() {
+            document.getElementById('invoice-modal').classList.remove('hidden');
+        }
+
+        function closeInvoiceModal() {
+            document.getElementById('invoice-modal').classList.add('hidden');
+        }
+
+        function submitInvoice(event) {
+            event.preventDefault();
+            const clientName = document.getElementById('inv-client').value.toUpperCase();
+            const total = parseFloat(document.getElementById('inv-total').value);
+            const rate = parseFloat(document.getElementById('inv-rate').value);
+            const method = document.getElementById('inv-method').value;
+            const computedCommissions = (total * (rate / 100)).toFixed(2);
+
+            // Append to table
+            const tbody = document.getElementById('ledger-body');
+            const randomTx = Math.floor(1000 + Math.random() * 9000);
+            
+            const newRow = document.createElement('tr');
+            newRow.className = "border-b-2 border-zinc-800 hover:bg-zinc-900 ledger-row";
+            newRow.dataset.status = "pending";
+            newRow.innerHTML = `
+                <td class="p-3 border-r-2 border-zinc-800 text-[#ff4800] font-bold">TX-${randomTx}</td>
+                <td class="p-3 border-r-2 border-zinc-800">${clientName} (MANUAL SUBMISSION)</td>
+                <td class="p-3 border-r-2 border-zinc-800">${method}</td>
+                <td class="p-3 border-r-2 border-zinc-800 font-bold">$${parseFloat(computedCommissions).toLocaleString()}</td>
+                <td class="p-3"><span class="bg-white text-black font-black px-2 py-0.5 text-xs">UNVERIFIED</span></td>
+            `;
+            tbody.insertBefore(newRow, tbody.firstChild);
+
+            closeInvoiceModal();
+            writeToTerminal(`NEW INVOICE GENERATED: TX-${randomTx} AT RATE ${rate}% - SUBMITTED.`);
+            alert(`Invoice Accepted!\nPending Commission: $${parseFloat(computedCommissions).toLocaleString()}`);
+        }
+
+        // Terminal Operations
+        function writeToTerminal(message) {
+            const container = document.getElementById('terminal-messages');
+            container.innerHTML += `<p><span class="text-[#00ff66] font-bold">SYS_EVENT:</span> ${message}</p>`;
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function sendTerminalCommand() {
+            const input = document.getElementById('terminal-input');
+            const command = input.value.trim().toUpperCase();
+            if (!command) return;
+
+            const container = document.getElementById('terminal-messages');
+            container.innerHTML += `<p><span class="text-white font-bold">EXEC:</span> ${command}</p>`;
+            input.value = '';
+
+            setTimeout(() => {
+                let response = "COMMAND RECOGNIZED. QUERY ENGINE COMPILED WITHOUT ERRORS.";
+                if (command.includes('BALANCE') || command.includes('BAL')) {
+                    response = "REVENUE LEDGER VERIFIED: $12,850.00 ACCRUED.";
+                } else if (command.includes('CLEAR') || command.includes('PAY')) {
+                    response = "EMERGENCY HOT-ROUTE DISPATCH IS ONLINE. DISPATCH MANUAL CODES NOW.";
+                } else if (command.includes('HELP')) {
+                    response = "AVAILABLE STATEMENTS: BALANCE, CLEAR, SYSTEM_INTEGRITY.";
+                }
+                container.innerHTML += `<p><span class="text-[#ff4800] font-bold">SYSTEM:</span> ${response}</p>`;
+                container.scrollTop = container.scrollHeight;
+            }, 600);
+        }
+    </script>
+</body>
+</html>
+```
