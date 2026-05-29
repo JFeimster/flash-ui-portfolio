@@ -24,6 +24,18 @@
       || registry.find(item => normalize(item.path || "").split("/").pop() === slugFromPath);
   }
 
+  function expandVariants(item) {
+    if (Array.isArray(item.variants) && item.variants.length) return item.variants;
+    if (!Array.isArray(item.variantNumbers)) return [];
+    return item.variantNumbers.map(number => ({
+      variantNumber: number,
+      title: `${item.title || titleCase(item.slug)} ${number}`,
+      path: `${item.path}/variant-${number}`,
+      livePath: `${item.livePath || `/sites/${item.slug}/`}variant-${number}/`,
+      hasIndex: true
+    }));
+  }
+
   function renderMissing() {
     const fallbackTitle = titleCase(slugFromPath || "Variant Hub");
     document.title = `${fallbackTitle} | Flash UI Portfolio`;
@@ -38,7 +50,7 @@
   }
 
   function renderHub(item) {
-    const variants = Array.isArray(item.variants) ? item.variants : [];
+    const variants = expandVariants(item);
     const title = item.title || titleCase(slugFromPath);
     document.title = `${title} | Flash UI Variant Hub`;
     const firstVariant = variants.find(variant => variant.livePath);
@@ -109,7 +121,7 @@
         </article>
         <article class="utility-card">
           <h3>Operator note</h3>
-          <p>${escapeHtml(item.notes || "Canonical group hub generated from the filesystem registry.")}</p>
+          <p>${escapeHtml(item.notes || "Canonical group hub generated from the curated registry.")}</p>
         </article>
       </section>
 
