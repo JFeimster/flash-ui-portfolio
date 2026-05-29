@@ -1,0 +1,536 @@
+:root {
+    --step-active: var(--electric-green);
+    --step-pending: var(--graphite);
+    --step-complete: var(--cobalt-blue);
+    --input-focus-glow: 0 0 0 3px rgba(0, 255, 102, 0.15);
+    --input-bg: rgba(6, 9, 15, 0.6);
+}
+
+/* 1. Layout & Grid Structures */
+.generator-section {
+    padding: 60px 0 100px;
+    background-image: 
+        radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.05) 0%, transparent 50%),
+        linear-gradient(rgba(18, 24, 36, 0.2) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(18, 24, 36, 0.2) 1px, transparent 1px);
+    background-size: 100% 100%, 30px 30px, 30px 30px;
+}
+
+.generator-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 40px;
+    align-items: start;
+}
+
+@media (max-width: 1024px) {
+    .generator-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 2. Step Navigator Progress Track */
+.steps-progress {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    position: relative;
+    padding: 0 10px;
+}
+
+.steps-progress::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--graphite);
+    z-index: 1;
+}
+
+.progress-bar-fill {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--cobalt-blue), var(--electric-green));
+    z-index: 2;
+    transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.step-node {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+}
+
+.step-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--matte-black);
+    border: 2px solid var(--step-pending);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-space);
+    font-weight: 700;
+    color: var(--chrome-accent);
+    transition: all 0.3s ease;
+}
+
+.step-node.active .step-circle {
+    border-color: var(--step-active);
+    color: var(--electric-green);
+    box-shadow: var(--neon-glow);
+    transform: scale(1.1);
+}
+
+.step-node.complete .step-circle {
+    border-color: var(--step-complete);
+    background-color: var(--step-complete);
+    color: var(--matte-black);
+}
+
+.step-text {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-top: 8px;
+    color: var(--chrome-accent);
+    transition: color 0.3s ease;
+}
+
+.step-node.active .step-text {
+    color: var(--bone-white);
+}
+
+/* 3. Form Configuration & Step Containers */
+.generator-form-card {
+    border: 2px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 36px;
+    background: var(--glass-bg);
+}
+
+.step-pane {
+    display: none;
+    animation: paneFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.step-pane.active {
+    display: block;
+}
+
+@keyframes paneFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pane-title {
+    font-family: var(--font-space);
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--bone-white);
+}
+
+.pane-desc {
+    font-size: 0.95rem;
+    color: var(--chrome-accent);
+    margin-bottom: 28px;
+}
+
+/* 4. Custom Interactive Input UI Fields */
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-label {
+    display: block;
+    font-family: var(--font-space);
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    color: var(--bone-white);
+    letter-spacing: 0.02em;
+}
+
+.form-input, .form-select, .form-textarea {
+    width: 100%;
+    background-color: var(--input-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    color: var(--bone-white);
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--electric-green);
+    box-shadow: var(--input-focus-glow);
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Dynamic URL Slug Generator Field Layout */
+.slug-input-wrapper {
+    display: flex;
+    align-items: center;
+    background-color: var(--input-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 6px;
+    padding-left: 16px;
+    transition: all 0.2s ease;
+}
+
+.slug-input-wrapper:focus-within {
+    border-color: var(--electric-green);
+    box-shadow: var(--input-focus-glow);
+}
+
+.slug-prefix {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--chrome-accent);
+    user-select: none;
+    padding-right: 2px;
+}
+
+.slug-input-wrapper input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--bone-white);
+    padding: 14px 16px 14px 2px;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    width: 100%;
+}
+
+/* Dynamic Interactive Specialties Tag Selector grid */
+.specialties-selector-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.specialty-tag-checkbox {
+    position: relative;
+    cursor: pointer;
+}
+
+.specialty-tag-checkbox input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.specialty-tag-pill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 10px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--glass-border);
+    border-radius: 6px;
+    font-family: var(--font-space);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--chrome-accent);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    text-align: center;
+    user-select: none;
+}
+
+.specialty-tag-checkbox input:checked + .specialty-tag-pill {
+    background: rgba(0, 255, 102, 0.08);
+    border-color: var(--electric-green);
+    color: var(--electric-green);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 255, 102, 0.1);
+}
+
+/* Custom Interactive Photo Uploader Panel */
+.avatar-uploader {
+    border: 2px dashed var(--glass-border);
+    border-radius: 8px;
+    padding: 32px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.avatar-uploader:hover, .avatar-uploader.dragover {
+    border-color: var(--electric-green);
+    background: rgba(0, 255, 102, 0.02);
+}
+
+.avatar-uploader-icon {
+    font-size: 2rem;
+    margin-bottom: 12px;
+    display: inline-block;
+}
+
+.avatar-uploader-text h4 {
+    font-family: var(--font-space);
+    font-size: 1rem;
+    margin-bottom: 4px;
+}
+
+.avatar-uploader-text p {
+    font-size: 0.8rem;
+    color: var(--chrome-accent);
+}
+
+.avatar-preview-display {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: 0 auto 12px;
+    border: 2px solid var(--electric-green);
+    background-size: cover;
+    background-position: center;
+    display: none;
+}
+
+/* Social Media Input Links Row layout */
+.socials-input-row {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    background-color: var(--input-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 6px;
+    margin-bottom: 12px;
+    padding-left: 14px;
+}
+
+.socials-icon {
+    color: var(--chrome-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+}
+
+.socials-input-row input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--bone-white);
+    padding: 14px 16px;
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    width: 100%;
+}
+
+.socials-input-row:focus-within {
+    border-color: var(--cobalt-blue);
+}
+
+/* 5. Live Preview Sticky Widget Panel styling */
+.preview-sticky-wrap {
+    position: sticky;
+    top: 110px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.preview-badge-status {
+    align-self: flex-start;
+    background-color: rgba(37, 99, 235, 0.1);
+    border: 1px solid rgba(37, 99, 235, 0.3);
+    color: var(--cobalt-blue);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    padding: 4px 12px;
+    border-radius: 100px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.preview-badge-status::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--cobalt-blue);
+    display: inline-block;
+    animation: pulseGlow 1.8s infinite ease-in-out;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.3); }
+}
+
+/* Live Interactive Code Generator Output Panel */
+.code-generator-card {
+    border: 2px solid rgba(37, 99, 235, 0.2);
+    border-radius: 12px;
+    background: #06090F;
+    overflow: hidden;
+}
+
+.code-card-header {
+    background: rgba(37, 99, 235, 0.05);
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--glass-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.code-card-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.code-card-btn {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--chrome-accent);
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.code-card-btn:hover {
+    color: var(--bone-white);
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: var(--chrome-accent);
+}
+
+.code-card-btn.primary {
+    background: var(--cobalt-blue);
+    border-color: var(--cobalt-blue);
+    color: white;
+}
+
+.code-card-btn.primary:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+}
+
+.code-output-container {
+    padding: 24px;
+    position: relative;
+}
+
+.code-output-block {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: #cbd5e1;
+    max-height: 320px;
+    overflow-y: auto;
+    line-height: 1.6;
+}
+
+/* Syntax highlighting tags */
+.code-tag { color: #f43f5e; }
+.code-attr { color: #fb923c; }
+.code-val { color: #34d399; }
+.code-comment { color: #64748b; font-style: italic; }
+
+/* 6. Form Navigation Control Block styling */
+.form-nav-row {
+    margin-top: 36px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--glass-border);
+    padding-top: 24px;
+}
+
+/* Custom Checkbox styles */
+.styled-checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--chrome-accent);
+    user-select: none;
+}
+
+.styled-checkbox-label input {
+    margin-top: 3px;
+    accent-color: var(--electric-green);
+}
+
+/* 7. Success Banner/Overlay elements */
+.success-banner-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(11, 15, 23, 0.95);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    animation: overlayFadeIn 0.3s ease-out;
+}
+
+.success-banner-content {
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+    padding: 40px;
+    border: 2px solid var(--electric-green);
+    box-shadow: var(--neon-glow);
+    border-radius: 12px;
+    background: var(--matte-black);
+}
+
+@keyframes overlayFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.success-icon-badge {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: rgba(0, 255, 102, 0.1);
+    border: 2px solid var(--electric-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--electric-green);
+    font-size: 1.75rem;
+    margin: 0 auto 24px;
+}
