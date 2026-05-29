@@ -1,0 +1,533 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead Submission & Tracking Portal - Moonshine Capital Partners</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #000000;
+            background-image: radial-gradient(#222222 15%, transparent 15%), radial-gradient(#222222 15%, transparent 15%);
+            background-size: 24px 24px;
+            background-position: 0 0, 12px 12px;
+            color: #ffffff;
+        }
+
+        .neo-border {
+            border: 4px solid #000000;
+        }
+
+        .neo-border-white {
+            border: 4px solid #ffffff;
+        }
+
+        .neo-shadow {
+            box-shadow: 8px 8px 0px #000000;
+        }
+
+        .neo-shadow-white {
+            box-shadow: 8px 8px 0px #ff4800;
+        }
+
+        .neo-shadow-green {
+            box-shadow: 8px 8px 0px #00ff66;
+        }
+
+        .neo-shadow-accent {
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .neo-btn {
+            border: 4px solid #000000;
+            box-shadow: 6px 6px 0px #000000;
+            transition: all 0.07s ease-in-out;
+        }
+
+        .neo-btn:active {
+            transform: translate(4px, 4px);
+            box-shadow: 2px 2px 0px #000000;
+        }
+
+        .neo-btn-white {
+            border: 4px solid #ffffff;
+            box-shadow: 6px 6px 0px #ff4800;
+            transition: all 0.07s ease-in-out;
+        }
+
+        .neo-btn-white:active {
+            transform: translate(4px, 4px);
+            box-shadow: 2px 2px 0px #ff4800;
+        }
+
+        /* Custom Scrollbar for Neo-Brutalist look */
+        ::-webkit-scrollbar {
+            width: 16px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000000;
+            border-left: 4px solid #ffffff;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ff4800;
+            border: 4px solid #000000;
+        }
+
+        .blink {
+            animation: blinker 1s linear infinite;
+        }
+        @keyframes blinker {
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex items-center justify-center">
+
+    <!-- Container -->
+    <div class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        
+        <!-- SIDEBAR (4 Cols) - Navigation & Status Stats -->
+        <aside class="lg:col-span-4 bg-[#ffffff] text-[#000000] neo-border-white neo-shadow-white p-6 flex flex-col justify-between relative overflow-hidden min-h-[500px] lg:min-h-[750px]">
+            <!-- Decorative raw stamp -->
+            <div class="absolute top-0 right-0 bg-[#00ff66] text-black font-black px-4 py-2 text-xs uppercase tracking-widest border-b-4 border-l-4 border-black">
+                PIPELINE LIVE
+            </div>
+            
+            <div>
+                <!-- Brand logo / header -->
+                <div class="mb-8">
+                    <span class="bg-[#000000] text-[#ff4800] text-3xl font-black px-4 py-1 inline-block tracking-tighter transform -rotate-1">
+                        MOONSHINE
+                    </span>
+                    <span class="text-xl font-black tracking-widest block mt-2 text-[#000000] underline decoration-[#ff4800] decoration-4">
+                        CAPITAL PARTNERS
+                    </span>
+                </div>
+
+                <!-- Live Pipeline Counters -->
+                <div class="space-y-4 mb-8">
+                    <h3 class="font-black text-sm uppercase tracking-widest text-zinc-500">// NETWORK PERFORMANCE</h3>
+                    
+                    <div class="bg-black text-white p-4 border-4 border-black neo-shadow-white flex justify-between items-center">
+                        <span class="font-black text-xs uppercase tracking-wide">ACTIVE PORTAL PIPELINE</span>
+                        <span id="active-pipeline-value" class="text-2xl font-black text-[#ff4800]">$2,030,000</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="bg-zinc-100 p-3 border-4 border-black flex flex-col justify-between">
+                            <span class="text-[10px] font-black text-zinc-500 uppercase tracking-tight">DEALS IN PLAY</span>
+                            <span id="total-deals-count" class="text-3xl font-black text-black">4</span>
+                        </div>
+                        <div class="bg-[#00ff66] p-3 border-4 border-black flex flex-col justify-between neo-shadow-accent">
+                            <span class="text-[10px] font-black text-black uppercase tracking-tight">COMMISSIONS EARNED</span>
+                            <span id="commissions-value" class="text-xl font-black text-black">$81,200</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Controls / Action Buttons -->
+                <div class="space-y-3">
+                    <h3 class="font-black text-sm uppercase tracking-widest text-zinc-500">// PIPELINE ROUTING FILTER</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="filterLeads('ALL')" id="filter-all" class="bg-black text-white text-xs font-black px-3 py-2 border-2 border-black hover:bg-[#ff4800] hover:text-black transition-all">ALL DEALS</button>
+                        <button onclick="filterLeads('IN_PROGRESS')" id="filter-progress" class="bg-white text-black text-xs font-black px-3 py-2 border-2 border-black hover:bg-[#ff4800] hover:text-black transition-all">IN PROGRESS</button>
+                        <button onclick="filterLeads('CLOSED')" id="filter-closed" class="bg-white text-black text-xs font-black px-3 py-2 border-2 border-black hover:bg-[#ff4800] hover:text-black transition-all">CLOSED-WON</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support Terminal Section inside Sidebar -->
+            <div class="mt-8 border-t-4 border-black pt-6">
+                <div class="bg-black text-[#00ff66] p-4 neo-border font-mono text-xs flex flex-col justify-between h-44">
+                    <div class="overflow-y-auto space-y-2 h-24" id="chat-messages">
+                        <p class="text-zinc-500">// TRACKING TERMINAL ACTIVE</p>
+                        <p><span class="text-[#ff4800] font-bold">SYSTEM:</span> Standard ledger operational. Inject lead data to route payload.</p>
+                    </div>
+                    <div class="flex gap-1 border-t border-zinc-800 pt-2">
+                        <input type="text" id="chat-input" placeholder="CMD_LOGS..." class="bg-black text-[#00ff66] focus:outline-none w-full uppercase placeholder-zinc-700">
+                        <button onclick="sendChatMessage()" class="bg-[#ff4800] text-black font-black px-3 py-1 hover:bg-white transition-colors">SEND</button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN INTERACTIVE WORKSPACE (8 Cols) -->
+        <main class="lg:col-span-8 bg-[#000000] text-[#ffffff] neo-border-white neo-shadow-white p-6 md:p-8 flex flex-col justify-between min-h-[600px] lg:min-h-[750px] relative overflow-hidden">
+            
+            <!-- BACKGROUND GLITCH GRID DECORATION -->
+            <div class="absolute inset-0 pointer-events-none opacity-5 flex flex-col justify-between p-4 font-mono select-none">
+                <div class="flex justify-between text-xs">
+                    <span>SECTOR: LEADS_INBOUND</span>
+                    <span>ROUTE_GATEWAY: MCP_NET_4</span>
+                </div>
+                <div class="text-7xl font-black tracking-widest text-center">SUBMIT_RAW</div>
+                <div class="flex justify-between text-xs">
+                    <span>SECURITY: AES_256</span>
+                    <span>LEDGER: VERIFIED_LOCK</span>
+                </div>
+            </div>
+
+            <!-- CORE WORKSPACE CONTAINER -->
+            <div class="relative z-10 space-y-8 my-auto">
+                
+                <!-- TOP HEADER -->
+                <div class="space-y-2 border-b-4 border-white pb-6">
+                    <div class="inline-block bg-[#ff4800] text-black text-xs font-black px-3 py-1 uppercase tracking-widest">
+                        PHASE 03 // LEAD ENGINE
+                    </div>
+                    <h1 class="text-4xl md:text-5xl font-black tracking-tight leading-none uppercase">
+                        LEAD INTAKE & <span class="text-[#ff4800]">LIFECYCLE LEDGER</span>
+                    </h1>
+                    <p class="text-sm font-bold text-zinc-300">
+                        Manually inject target structures directly into the Moonshine Sales Core. Registered deals track strictly to your partner address.
+                    </p>
+                </div>
+
+                <!-- SUBMISSION FORM AND REAL-TIME TRACKER STACKED -->
+                <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+                    
+                    <!-- LEFT COLUMN: LEAD INTAKE FORM (5 Cols) -->
+                    <div class="xl:col-span-5 bg-zinc-950 p-5 border-4 border-white space-y-4">
+                        <h3 class="font-black text-lg uppercase tracking-tight text-[#ff4800]">// INJECT TARGET PIPELINE</h3>
+                        
+                        <form id="lead-submission-form" onsubmit="registerNewLead(event)" class="space-y-3">
+                            <div>
+                                <label class="block text-[10px] font-black uppercase tracking-wider mb-1 text-zinc-400">Company Legal Name *</label>
+                                <input required type="text" id="lead-company" placeholder="e.g. APEX FREIGHT LLC" 
+                                    class="w-full bg-black text-white font-black p-2 text-sm border-2 border-white focus:outline-none focus:border-[#ff4800] uppercase placeholder-zinc-800">
+                                <span id="err-company" class="hidden text-xs text-[#ff4800] font-black tracking-tighter mt-1 block">INVALID FIELD: ENTER VALID ENTITY</span>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-[10px] font-black uppercase tracking-wider mb-1 text-zinc-400">Capital Needed ($) *</label>
+                                    <input required type="number" id="lead-capital" placeholder="500000" 
+                                        class="w-full bg-black text-white font-black p-2 text-sm border-2 border-white focus:outline-none focus:border-[#ff4800] placeholder-zinc-800">
+                                    <span id="err-capital" class="hidden text-xs text-[#ff4800] font-black tracking-tighter mt-1 block">MUST BE > 10,000</span>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black uppercase tracking-wider mb-1 text-zinc-400">Industry / Sector *</label>
+                                    <select id="lead-sector" class="w-full bg-black text-white font-black p-2 text-sm border-2 border-white focus:outline-none focus:border-[#ff4800] uppercase">
+                                        <option value="LOGISTICS">LOGISTICS</option>
+                                        <option value="CONSTRUCTION">CONSTRUCTION</option>
+                                        <option value="RETAIL / ECOM">RETAIL / ECOM</option>
+                                        <option value="HEALTHCARE">HEALTHCARE</option>
+                                        <option value="SAAS / TECH">SAAS / TECH</option>
+                                        <option value="OTHER">OTHER</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-[10px] font-black uppercase tracking-wider mb-1 text-zinc-400">Primary Contact Email *</label>
+                                <input required type="email" id="lead-email" placeholder="CONTACT@APEXFREIGHT.COM" 
+                                    class="w-full bg-black text-white font-black p-2 text-sm border-2 border-white focus:outline-none focus:border-[#ff4800] uppercase placeholder-zinc-800">
+                                <span id="err-email" class="hidden text-xs text-[#ff4800] font-black tracking-tighter mt-1 block">INVALID ENCRYPTION ROUTE</span>
+                            </div>
+
+                            <div>
+                                <label class="block text-[10px] font-black uppercase tracking-wider mb-1 text-zinc-400">Additional Intelligence / Notes</label>
+                                <textarea id="lead-notes" rows="2" placeholder="THEY NEED IMMEDIATE BRIDGE LOAN TO BUY NEW SEMIS..." 
+                                    class="w-full bg-black text-white font-bold p-2 text-xs border-2 border-white focus:outline-none focus:border-[#ff4800] uppercase placeholder-zinc-800"></textarea>
+                            </div>
+
+                            <button type="submit" class="w-full bg-[#ff4800] hover:bg-white hover:text-black text-black font-black text-sm uppercase py-3 tracking-widest transition-all border-4 border-black neo-shadow-accent">
+                                PUSH TO SALES ROUTER 📡
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- RIGHT COLUMN: REAL-TIME TRACKER LEDGER TABLE (7 Cols) -->
+                    <div class="xl:col-span-7 bg-zinc-950 border-4 border-white overflow-hidden flex flex-col justify-between">
+                        <div class="p-4 border-b-4 border-white bg-black flex justify-between items-center">
+                            <span class="font-black text-sm uppercase tracking-wider text-[#00ff66]">// LIVE LEDGER INDEX</span>
+                            <span class="text-xs font-mono text-zinc-500">SORT: DESCENDING</span>
+                        </div>
+
+                        <!-- Table Area -->
+                        <div class="overflow-x-auto min-h-[310px] max-h-[310px] overflow-y-auto">
+                            <table class="w-full text-left font-mono text-xs">
+                                <thead>
+                                    <tr class="border-b-2 border-zinc-850 text-zinc-400 uppercase">
+                                        <th class="p-3">TARGET ENTITY</th>
+                                        <th class="p-3">CAPITAL</th>
+                                        <th class="p-3">STATUS</th>
+                                        <th class="p-3">PROGRESS</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="leads-table-body" class="divide-y divide-zinc-900">
+                                    <!-- Dynamic Rows Inserted Here -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Quick Guide Footer inside Ledger -->
+                        <div class="bg-black border-t-4 border-white p-3 flex justify-between items-center text-[11px]">
+                            <span class="text-zinc-500 uppercase font-bold">// LEGEND:</span>
+                            <div class="flex gap-2 font-black">
+                                <span class="bg-[#000000] text-[#ff4800] px-1 border border-[#ff4800]">CONTACTED</span>
+                                <span class="bg-white text-black px-1">IN DISCUSSION</span>
+                                <span class="bg-[#00ff66] text-black px-1">CLOSED-WON</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- BOTTOM EXPORT CALLOUT -->
+                <div class="bg-white text-black p-4 border-4 border-black flex flex-col md:flex-row items-center justify-between gap-4 neo-shadow-white">
+                    <div class="space-y-1">
+                        <h3 class="font-black text-xl uppercase leading-none">EXPORT CORRESPONDENCE REPORT</h3>
+                        <p class="text-xs font-mono font-bold tracking-tight text-zinc-600">// DOWNLOAD SECURED SPREADSHEET LOG OF ALL ACTIVE PARTNER COMMISSIONS</p>
+                    </div>
+                    <button onclick="downloadCSV()" class="w-full md:w-auto text-center bg-[#ff4800] hover:bg-black hover:text-white text-black font-black py-2.5 px-5 uppercase border-4 border-black text-xs tracking-widest transition-colors">
+                        EXPORT LEDGER (.CSV)
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- MAIN FOOTER CONTROLS -->
+            <div class="border-t-4 border-white mt-6 pt-4 flex flex-col md:flex-row justify-between items-center text-xs font-mono gap-4 relative z-10">
+                <span class="text-zinc-500">GATEWAY ID: GATE-M1_ONBOARDED_SUCCESS</span>
+                <span class="bg-[#ff4800] text-black font-black px-2 py-0.5">LEADS PORTAL v2.8</span>
+                <span class="text-zinc-500">MOONSHINE CAPITAL © All Rights Retained.</span>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- SCRIPT FOR SYSTEM OPERATION & INTERACTIVITY -->
+    <script>
+        // Default Lead Database Storage
+        let leadsDatabase = [
+            { id: 101, company: 'APEX LOGISTICS INC.', capital: 500000, sector: 'LOGISTICS', email: 'CONTACT@APEXLOGISTICS.COM', status: 'CONTACTED', progress: 30 },
+            { id: 102, company: 'NEXUS CYBERSECURITY', capital: 1200000, sector: 'SAAS / TECH', email: 'FUNDING@NEXUSCYBER.IO', status: 'IN DISCUSSION', progress: 65 },
+            { id: 103, company: 'VOLT ENERGY SYSTEMS', capital: 250000, sector: 'OTHER', email: 'EXPANSION@VOLT.CO', status: 'CLOSED-WON', progress: 100 },
+            { id: 104, company: 'KRAKEN FOODS CORP', capital: 80000, sector: 'RETAIL / ECOM', email: 'OFFICE@KRAKENFOODS.COM', status: 'UNDER REVIEW', progress: 15 }
+        ];
+
+        let currentFilter = 'ALL';
+
+        // Initialize Ledger Data
+        function renderLeads() {
+            const tableBody = document.getElementById('leads-table-body');
+            tableBody.innerHTML = '';
+
+            let filteredLeads = leadsDatabase;
+            if (currentFilter === 'IN_PROGRESS') {
+                filteredLeads = leadsDatabase.filter(lead => lead.status !== 'CLOSED-WON');
+            } else if (currentFilter === 'CLOSED') {
+                filteredLeads = leadsDatabase.filter(lead => lead.status === 'CLOSED-WON');
+            }
+
+            filteredLeads.forEach(lead => {
+                // Determine Status CSS styles
+                let statusBadge = '';
+                if (lead.status === 'CLOSED-WON') {
+                    statusBadge = `<span class="bg-[#00ff66] text-black font-black px-2 py-0.5 border border-black">${lead.status}</span>`;
+                } else if (lead.status === 'IN DISCUSSION') {
+                    statusBadge = `<span class="bg-white text-black font-black px-2 py-0.5 border border-black">${lead.status}</span>`;
+                } else if (lead.status === 'CONTACTED') {
+                    statusBadge = `<span class="bg-[#000000] text-[#ff4800] font-black px-2 py-0.5 border border-[#ff4800]">${lead.status}</span>`;
+                } else {
+                    statusBadge = `<span class="bg-zinc-800 text-zinc-300 font-black px-2 py-0.5 border border-zinc-600">${lead.status}</span>`;
+                }
+
+                // Render dynamic visual progress bar
+                const progressBlocks = Math.round(lead.progress / 10);
+                let barStr = '';
+                for (let i = 0; i < 10; i++) {
+                    if (i < progressBlocks) {
+                        barStr += '█';
+                    } else {
+                        barStr += '░';
+                    }
+                }
+
+                const row = `
+                    <tr class="hover:bg-zinc-900 border-b border-zinc-900 transition-colors">
+                        <td class="p-3 font-black text-white">
+                            <span class="block">${lead.company}</span>
+                            <span class="text-[9px] text-zinc-500 block uppercase font-mono">${lead.sector} // ${lead.email}</span>
+                        </td>
+                        <td class="p-3 font-bold text-zinc-200 font-mono">$${lead.capital.toLocaleString()}</td>
+                        <td class="p-3">${statusBadge}</td>
+                        <td class="p-3 font-mono text-zinc-400">
+                            <span class="block text-[#ff4800] font-black">${lead.progress}%</span>
+                            <span class="text-[9px] leading-none block font-mono select-none">${barStr}</span>
+                        </td>
+                    </tr>
+                `;
+                tableBody.insertAdjacentHTML('beforeend', row);
+            });
+
+            updateGlobalStats();
+        }
+
+        // Live calculation metrics
+        function updateGlobalStats() {
+            let totalPipeline = 0;
+            let activeCount = 0;
+            let commissions = 0;
+
+            leadsDatabase.forEach(lead => {
+                totalPipeline += lead.capital;
+                if (lead.status !== 'CLOSED-WON') {
+                    activeCount++;
+                }
+                if (lead.status === 'CLOSED-WON') {
+                    // 4% commission of successful funding
+                    commissions += (lead.capital * 0.04);
+                }
+            });
+
+            document.getElementById('active-pipeline-value').innerText = `$${totalPipeline.toLocaleString()}`;
+            document.getElementById('total-deals-count').innerText = activeCount;
+            document.getElementById('commissions-value').innerText = `$${commissions.toLocaleString()}`;
+        }
+
+        // Action routing filter
+        function filterLeads(filterType) {
+            currentFilter = filterType;
+
+            // Toggle button styles
+            const buttons = {
+                'ALL': 'filter-all',
+                'IN_PROGRESS': 'filter-progress',
+                'CLOSED': 'filter-closed'
+            };
+
+            Object.keys(buttons).forEach(key => {
+                const btn = document.getElementById(buttons[key]);
+                if (key === filterType) {
+                    btn.className = "bg-black text-white text-xs font-black px-3 py-2 border-2 border-black hover:bg-[#ff4800] hover:text-black transition-all";
+                } else {
+                    btn.className = "bg-white text-black text-xs font-black px-3 py-2 border-2 border-black hover:bg-[#ff4800] hover:text-black transition-all";
+                }
+            });
+
+            renderLeads();
+            logTerminalEvent(`FILTER RECONCILED: ${filterType}`);
+        }
+
+        // Lead registration algorithm with validation warnings
+        function registerNewLead(event) {
+            event.preventDefault();
+
+            const companyInput = document.getElementById('lead-company');
+            const capitalInput = document.getElementById('lead-capital');
+            const emailInput = document.getElementById('lead-email');
+            const sectorInput = document.getElementById('lead-sector');
+            const notesInput = document.getElementById('lead-notes');
+
+            // Reset error validation warnings
+            document.getElementById('err-company').classList.add('hidden');
+            document.getElementById('err-capital').classList.add('hidden');
+            document.getElementById('err-email').classList.add('hidden');
+
+            let isValid = true;
+
+            // Custom Brutalist Validation Checks
+            if (companyInput.value.trim().length < 3) {
+                document.getElementById('err-company').classList.remove('hidden');
+                isValid = false;
+            }
+            if (parseFloat(capitalInput.value) < 10000) {
+                document.getElementById('err-capital').classList.remove('hidden');
+                isValid = false;
+            }
+            if (!emailInput.value.includes('@') || emailInput.value.trim().length < 5) {
+                document.getElementById('err-email').classList.remove('hidden');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                logTerminalEvent("SYSTEM ABORT: INBOUND METRICS FAILED COMPLIANCE CHECK.");
+                return;
+            }
+
+            // Successfully insert and trigger tracking log
+            const newLead = {
+                id: Math.floor(100 + Math.random() * 900),
+                company: companyInput.value.toUpperCase(),
+                capital: parseFloat(capitalInput.value),
+                sector: sectorInput.value,
+                email: emailInput.value.toUpperCase(),
+                status: 'UNDER REVIEW',
+                progress: 10
+            };
+
+            leadsDatabase.unshift(newLead);
+            renderLeads();
+
+            logTerminalEvent(`SYS_EVENT: NEW LEAD REGISTERED -> ${newLead.company} | VAL: $${newLead.capital.toLocaleString()}`);
+
+            // Reset inputs
+            companyInput.value = '';
+            capitalInput.value = '';
+            emailInput.value = '';
+            notesInput.value = '';
+
+            alert('SUCCESS // INBOUND PIPELINE ROUTE SECURED IN REAL-TIME LEDGER.');
+        }
+
+        // Terminal commands output handling
+        function logTerminalEvent(msg) {
+            const chat = document.getElementById('chat-messages');
+            chat.innerHTML += `<p><span class="text-[#00ff66] font-bold">SYS_EVENT:</span> ${msg}</p>`;
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const msgText = input.value.trim().toUpperCase();
+            if (msgText === '') return;
+
+            const chat = document.getElementById('chat-messages');
+            chat.innerHTML += `<p><span class="text-white font-bold">YOU:</span> ${msgText}</p>`;
+            input.value = '';
+            chat.scrollTop = chat.scrollHeight;
+
+            setTimeout(() => {
+                let response = "COMMAND RECOGNIZED. LEDGER SYSTEM SECURED.";
+                if (msgText.includes('HELP')) {
+                    response = "DIAG_CMDS: 'EXPORT' to dump data, 'LEAD_COUNT' to return current targets.";
+                } else if (msgText.includes('EXPORT')) {
+                    downloadCSV();
+                    response = "INITIATING FILE DISK DUMP PROMPT NOW.";
+                } else if (msgText.includes('LEAD_COUNT')) {
+                    response = `CURRENT SYSTEM RECOGNIZES ${leadsDatabase.length} TOTAL TARGETS.`;
+                }
+                chat.innerHTML += `<p><span class="text-[#ff4800] font-bold">SYSTEM:</span> ${response}</p>`;
+                chat.scrollTop = chat.scrollHeight;
+            }, 600);
+        }
+
+        // Data output routine (.csv generation simulated in client browser)
+        function downloadCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,ID,Company,Capital,Sector,ContactEmail,Status,Progress%\n";
+            leadsDatabase.forEach(lead => {
+                csvContent += `${lead.id},"${lead.company}",${lead.capital},"${lead.sector}","${lead.email}","${lead.status}",${lead.progress}\n`;
+            });
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `moonshine_partners_leads_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            logTerminalEvent("COMMISSIONS ARCHIVE EXPORT EXECUTED SECURELY.");
+        }
+
+        // Initial launch sequence
+        renderLeads();
+    </script>
+</body>
+</html>
+```
