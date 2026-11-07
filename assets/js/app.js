@@ -1,196 +1,127 @@
 (() => {
-  const page = document.body.dataset.page || "home";
-  const isCatalog = page === "catalog";
-  const params = new URLSearchParams(window.location.search);
-  const isPublicView = params.get("view") === "public";
-  const repoUrl = "https://github.com/JFeimster/flash-ui-portfolio";
-  const state = { entries: [], groups: [], curation: [], query: "", category: new URLSearchParams(window.location.search).get("category") || "All", availability: "All", sort: "recommended", showArchives: !isPublicView, showApps: !isPublicView };
-  const defaults = { primaryCtaLabel: "Open Project", sourceCtaLabel: "View Source", detailsCtaLabel: "View Details" };
+  const catalog = document.body.dataset.page === "catalog";
+  const params = new URLSearchParams(location.search);
+  const internal = params.get("view") === "internal";
+  const state = { entries: [], groups: [], candidates: [], showcase: {}, query: params.get("q") || "", category: params.get("category") || "All", type: params.get("type") || "All", sort: params.get("sort") || "featured" };
   const $ = selector => document.querySelector(selector);
-  const escapeHtml = value => String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
-  const slugify = value => String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-  const titleFor = item => String(item.displayTitle || item.title || item.path || "Untitled project").replace(/^sites\s+/i, "").replace(/\s+index\.html$/i, "").replace(/\.html$/i, "").replace(/_/g, " ").replace(/\s+/g, " ").trim();
-  const sourceUrl = item => `${repoUrl}/${/\.[a-z0-9]+$/i.test(item.originalPath || item.path || "") ? "blob" : "tree"}/main/${String(item.originalPath || item.path || "").replace(/^\//, "").split("/").map(encodeURIComponent).join("/")}`;
-
-  function getCuration(item) {
-    const keys = [item.slug, item.title, item.displayTitle, item.groupId, slugify(item.title), slugify(item.displayTitle)].filter(Boolean).map(String);
-    return state.curation.find(entry => keys.includes(String(entry.slug)) || keys.includes(String(entry.title)) || keys.includes(slugify(entry.slug)) || keys.includes(slugify(entry.title))) || null;
+  const esc = value => String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+  const cleanTitle = value => String(value || "Project").replace(/^sites\s+/i, "").replace(/\s*index\.html$/i, "").replace(/\.html$/i, "").replace(/[-_]+/g, " ").trim();
+  const available = item => item?.resolutionStatus === "resolved" && Boolean(item.resolvedPath);
+  const categoryCopy = {
+    "Partner Sites": "Partner program pages and referral interface concepts.",
+    "Funding Tools": "Financial planning and funding tool interface concepts.",
+    "AI Agent Libraries": "AI agent browsing and workspace interface concepts.",
+    "Content Hubs": "Content browsing and publishing page layouts.",
+    "Personal Brand Sites": "Personal portfolio and publishing page layouts.",
+    "Static Site Factories": "Site creation and configuration interface concepts.",
+    "Lead Magnets": "Landing pages for introducing a resource and collecting interest.",
+    "Widgets": "Embeddable widget and configuration interface concepts."
+  };
+  function presentation(row) {
+    const copy = state.showcase[row.id] || {};
+    return { ...row, title: copy.title || row.title, description: copy.description || row.item.description || categoryCopy[row.category] || "Static page layout from the interface experiment collection.", audience: copy.audience || "", priority: copy.featuredPriority || 0 };
   }
-
-  function availability(item) {
-    const status = item.resolutionStatus || item.status;
-    if (status === "standalone-app") return { label: "Standalone Deployment Required", tone: "deploy", key: "standalone" };
-    if (status === "archive") return { label: "Archive / Source Only", tone: "archive", key: "archive" };
-    if (status === "unresolved" || status === "missing-entrypoint") return { label: "Needs Repair", tone: "repair", key: "repair" };
-    if (item.productionVerification === "verified") return { label: "Verified Live", tone: "verified", key: "verified" };
-    return { label: "Local Route Valid / Production Unverified", tone: "local", key: "local" };
+  function rows() {
+    const grouped = state.groups.map(group => {
+      const members = state.entries.filter(entry => entry.canonicalGroupId === group.groupId);
+      const variants = members.filter(entry => entry.variantNumber && available(entry));
+      const hub = members.find(entry => entry.type === "group-hub") || members.find(entry => entry.resolvedPath === group.hubPath);
+      const item = hub || variants[0] || members[0] || { resolutionStatus: "unresolved" };
+      return presentation({ id: group.groupId, title: group.displayTitle, category: group.category || "Experiments", item, count: variants.length, path: available(hub) ? hub.resolvedPath : variants[0]?.resolvedPath || (available(item) ? item.resolvedPath : "") });
+    });
+    const seen = new Set(grouped.map(row => row.path).filter(Boolean));
+    const singles = state.entries.filter(entry => !entry.canonicalGroupId).filter(entry => {
+      if (!entry.resolvedPath) return true;
+      if (seen.has(entry.resolvedPath)) return false;
+      seen.add(entry.resolvedPath); return true;
+    }).map(item => presentation({ id: item.slug, title: cleanTitle(item.title), category: item.category || "Experiments", item, count: 0, path: available(item) ? item.resolvedPath : "" }));
+    return [...grouped, ...singles].filter(row => internal || row.path);
   }
-
-  function isVariant(item) { return Boolean(item.canonicalGroupId && /\/variant-\d+\/?$/i.test(item.resolvedPath || "")); }
-  function isVisible(item) {
-    const status = availability(item).key;
-    if (isPublicView && !["verified", "local"].includes(status)) return false;
-    if (!state.showArchives && status === "archive") return false;
-    if (!state.showApps && status === "standalone") return false;
-    return true;
+  const typeOf = row => row.path ? (row.count ? "variants" : "single") : row.item.resolutionStatus === "archive" ? "archive" : row.item.resolutionStatus === "standalone-app" ? "app" : "repair";
+  const statusLabel = row => ({ archive: "Source archive", app: "Separate deployment needed", repair: "Preview needs repair" }[typeOf(row)] || "HTML preview");
+  function matches(row) {
+    const text = [row.title, row.description, row.audience, row.category, internal ? row.item.originalPath : ""].join(" ").toLowerCase();
+    return (!state.query || text.includes(state.query.toLowerCase())) && (state.category === "All" || state.category === row.category) && (state.type === "All" || typeOf(row) === state.type);
   }
-
-  function groupRows() {
-    return state.groups.map(group => {
-      const members = state.entries.filter(item => item.canonicalGroupId === group.groupId);
-      const hub = members.find(item => item.type === "group-hub") || state.entries.find(item => item.slug === group.groupId && item.resolutionStatus === "resolved");
-      const variants = members.filter(isVariant);
-      return { kind: "group", group, hub, variants, variantCount: variants.length || group.variantCount || group.variantNumbers?.length || 0, title: group.displayTitle || titleFor(hub || group) };
-    }).filter(row => row.hub || row.variants.length || row.group.hubPath);
-  }
-
-  function ungroupedRows() { return state.entries.filter(item => !item.canonicalGroupId && !isVariant(item)).map(item => ({ kind: "asset", item, title: titleFor(item) })); }
-  function rowAvailability(row) { return row.kind === "group" ? availability(row.hub || { resolutionStatus: "unresolved" }) : availability(row.item); }
-  function rowCategory(row) { return row.kind === "group" ? row.group.category || "Experiments" : row.item.category || "Experiments"; }
-  function rowText(row) { return row.kind === "group" ? [row.title, row.group.groupId, row.group.category, row.group.groupType, row.group.items?.join(" ")].join(" ").toLowerCase() : [row.title, row.item.slug, row.item.category, row.item.type, row.item.originalPath, row.item.resolutionReason, row.item.notes].join(" ").toLowerCase(); }
-  function rowMatches(row) {
-    const status = rowAvailability(row);
-    return (!state.query || rowText(row).includes(state.query.toLowerCase())) && (state.category === "All" || rowCategory(row) === state.category) && (state.availability === "All" || status.key === state.availability) && isVisible(row.kind === "group" ? (row.hub || { resolutionStatus: "unresolved" }) : row.item);
-  }
-  function sortRows(rows) {
-    return [...rows].sort((a, b) => {
-      if (state.sort === "title") return a.title.localeCompare(b.title);
-      if (state.sort === "variants") return (b.variantCount || 0) - (a.variantCount || 0) || a.title.localeCompare(b.title);
-      if (state.sort === "availability") return rowAvailability(a).label.localeCompare(rowAvailability(b).label) || a.title.localeCompare(b.title);
-      const aFeatured = getCuration(a.group || a.item)?.featured ? 1 : 0;
-      const bFeatured = getCuration(b.group || b.item)?.featured ? 1 : 0;
-      return bFeatured - aFeatured || (b.variantCount || 0) - (a.variantCount || 0) || a.title.localeCompare(b.title);
+  function sorted(list) {
+    return [...list].sort((a, b) => {
+      if (state.sort === "variants") return b.count - a.count || a.title.localeCompare(b.title);
+      if (state.sort === "featured") return (a.priority || Infinity) - (b.priority || Infinity) || a.title.localeCompare(b.title);
+      return a.title.localeCompare(b.title);
     });
   }
-
-  function renderStats() {
-    const stats = {
-      familyCount: groupRows().length,
-      indexedCount: state.entries.length,
-      resolvedCount: state.entries.filter(item => ["local", "verified"].includes(availability(item).key)).length,
-      verifiedCount: state.entries.filter(item => availability(item).key === "verified").length,
-      repairCount: state.entries.filter(item => availability(item).key === "repair").length,
-      appCount: state.entries.filter(item => availability(item).key === "standalone").length,
-      archiveCount: state.entries.filter(item => availability(item).key === "archive").length
-    };
-    Object.entries(stats).forEach(([key, value]) => { const node = $(`[data-stat="${key}"]`); if (node) node.textContent = String(value); });
-    const visibleNode = $("#visibleCount");
-    if (visibleNode) visibleNode.textContent = String(document.querySelectorAll("#cardGrid .card, #featuredGrid .card").length);
+  function details(item) {
+    const fields = [["Source path", item.sourcePath || item.originalPath], ["Preview route", item.resolvedPath || "Unavailable"], ["Resolution", item.resolutionStatus], ["Evidence", item.resolutionReason], ["Production check", item.productionVerification === "verified" ? "Verified in recorded smoke test" : "Not verified"], ["Document title", item.documentTitle], ["Structure", item.structuralValidity ? JSON.stringify(item.structuralValidity) : "Entrypoint existence checked"]];
+    return `<details class="details-panel"><summary>Operator details</summary><dl>${fields.filter(([, value]) => value).map(([label, value]) => `<dt>${esc(label)}</dt><dd>${esc(value)}</dd>`).join("")}</dl>${item.sourceUrl ? `<a href="${esc(item.sourceUrl)}" target="_blank" rel="noreferrer">View source ↗</a>` : "<p>Source location unresolved.</p>"}</details>`;
   }
-
-  function renderFilterControls(rows) {
-    const category = $("#categoryFilter");
-    const availabilitySelect = $("#availabilityFilter");
-    const sort = $("#sortFilter");
-    const categories = ["All", ...new Set(rows.map(rowCategory).sort())];
-    if (category) category.innerHTML = categories.map(value => `<option value="${escapeHtml(value)}" ${state.category === value ? "selected" : ""}>${escapeHtml(value)}</option>`).join("");
-    if (availabilitySelect) {
-      const statuses = ["All", "local", "verified", "repair", "standalone", "archive"];
-      const labels = { local: "Local route valid", verified: "Verified live", repair: "Needs repair", standalone: "Standalone app", archive: "Archive / source only" };
-      availabilitySelect.innerHTML = statuses.map(value => `<option value="${value}" ${state.availability === value ? "selected" : ""}>${escapeHtml(value === "All" ? "All availability" : labels[value])}</option>`).join("");
+  function card(row) {
+    const path = row.path && internal && row.count ? `${row.path}?view=internal` : row.path;
+    return `<article class="card" data-project="${esc(row.id)}"><span class="card-category">${esc(row.category)}</span><h2>${esc(row.title)}</h2><p class="card-description">${esc(row.description)}</p><div class="card-bottom">${row.count ? `<span class="variant-count">${row.count} variant${row.count === 1 ? "" : "s"}</span>` : ""}${path ? `<a class="btn primary" href="${esc(path)}" aria-label="${esc(`${row.count ? "Explore" : "Open"} ${row.title}`)}">${row.count ? "Explore project" : "Open project"}<span aria-hidden="true">↗</span></a>` : `<p class="repair-note">${esc(statusLabel(row))}</p>`}</div>${internal ? details(row.item) : ""}</article>`;
+  }
+  function empty() { return '<section class="empty"><h2>No projects found</h2><p>Try a broader search or clear the filters.</p><button class="btn" id="resetFilters" type="button">Clear filters</button></section>'; }
+  function renderInventory() {
+    const node = $("#internalInventory");
+    if (!internal || !node) return;
+    node.hidden = false;
+    const repairs = state.entries.filter(item => ["unresolved", "missing-entrypoint", "invalid-entrypoint"].includes(item.resolutionStatus));
+    node.innerHTML = `<div class="section-heading"><div><span class="eyebrow">Operator inventory</span><h2>Route evidence & candidates</h2></div><a href="/sites/">Public directory ↗</a></div><p>${state.entries.length} indexed records · ${repairs.length} repair records · ${state.entries.filter(item => item.resolutionStatus === "archive").length} archives. Local HTML checks do not verify production availability.</p><details class="inventory-panel"><summary>${state.candidates.length} variant folders outside the grouped index</summary><p>Preserved candidates for review; these do not create additional canonical projects.</p>${state.candidates.map(candidate => `<section class="candidate"><h3>${esc(cleanTitle(candidate.familyId))}</h3><ul>${state.entries.filter(item => item.canonicalGroupId === candidate.familyId).map(item => `<li>${available(item) ? `<a href="${esc(item.resolvedPath)}">Variant ${item.variantNumber}: ${esc(item.title)}</a>` : `Variant ${item.variantNumber}: preview needs repair`}${details(item)}</li>`).join("")}</ul></section>`).join("")}</details><details class="inventory-panel"><summary>${repairs.length} unresolved or incomplete source records</summary>${repairs.map(item => `<section class="candidate"><h3>${esc(cleanTitle(item.title))}</h3>${details(item)}</section>`).join("")}</details>`;
+  }
+  function render() {
+    const all = rows();
+    if (!catalog) {
+      const featured = all.filter(row => row.priority && row.path).sort((a, b) => a.priority - b.priority).slice(0, 6);
+      $("#featuredGrid").innerHTML = featured.map(card).join("") || '<p>No selected projects are available.</p>';
+      const categories = [...new Set(all.filter(row => row.path).map(row => row.category))].sort();
+      $("#categoryGrid").innerHTML = categories.map(category => `<a class="category-tile" href="/sites/?category=${encodeURIComponent(category)}"><span>${esc(category)}</span><span aria-hidden="true">↗</span></a>`).join("");
+    } else {
+      const result = sorted(all.filter(matches));
+      $("#cardGrid").innerHTML = result.length ? result.map(card).join("") : empty();
+      $("#visibleCount").textContent = `${result.length} project${result.length === 1 ? "" : "s"}`;
     }
-    if (sort) sort.value = state.sort;
   }
-
-  function renderDetails(item, id) {
-    const evidence = item.entrypointEvidence || {};
-    const details = [["Original path", item.originalPath || "None"], ["Resolved path", item.resolvedPath || "None"], ["Resolution", item.resolutionStatus || "Unknown"], ["Reason", item.resolutionReason || "None"], ["Local source", item.sourceFile || "Unknown"], ["Original entrypoint", String(Boolean(evidence.originalEntrypointExists))], ["Resolved entrypoint", String(Boolean(evidence.resolvedEntrypointExists))], ["Production check", item.productionVerification === "verified" ? "Verified" : "Pending"], ["Evidence", (evidence.evidence || []).join("; ") || "None"]];
-    return `<details class="details-panel" id="${escapeHtml(id)}"><summary>Dev details</summary><dl class="detail-grid">${details.map(([label, value]) => `<div class="detail-row"><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join("")}</dl></details>`;
-  }
-
-  function renderActions(item, options = {}) {
-    const status = availability(item);
-    const detailsId = `details-${slugify(item.slug || item.title || item.originalPath)}`;
-    const source = `<a class="btn" href="${escapeHtml(sourceUrl(item))}" target="_blank" rel="noreferrer">${defaults.sourceCtaLabel}</a>`;
-    const openPath = options.hubPath || item.resolvedPath;
-    const copy = openPath ? `<button class="btn" type="button" data-copy-link="${escapeHtml(openPath)}">Copy link</button>` : "";
-    if (options.hubPath && (status.key === "local" || status.key === "verified")) return `<a class="btn primary" href="${escapeHtml(options.hubPath)}">Explore Variants</a>${copy}${source}`;
-    if (status.key === "local" || status.key === "verified") return `<a class="btn primary" href="${escapeHtml(item.resolvedPath)}">${defaults.primaryCtaLabel}</a>${copy}${source}`;
-    return `<span class="btn disabled" aria-disabled="true">${escapeHtml(status.label)}</span>${source}<button class="btn subtle" type="button" data-open-details="${escapeHtml(detailsId)}">${defaults.detailsCtaLabel}</button>`;
-  }
-
-  function renderGroupCard(row) {
-    const group = row.group;
-    const item = row.hub || { resolutionStatus: "unresolved", category: group.category };
-    const status = rowAvailability(row);
-    const description = group.description || `Canonical ${group.category || "project"} family with ${row.variantCount || 0} preserved variant${row.variantCount === 1 ? "" : "s"}. Individual variants stay inside the family hub.`;
-    const details = row.hub ? renderDetails(row.hub, `details-${group.groupId}`) : "";
-    return `<article class="card group-card" data-family="${escapeHtml(group.groupId)}"><div class="card-top"><div class="card-heading"><span class="card-kicker">Project family</span><h2>${escapeHtml(row.title)}</h2><p class="card-description">${escapeHtml(description)}</p></div><span class="badge readiness ${status.tone}">${escapeHtml(status.label)}</span></div><div class="meta viewer-meta"><span class="meta-chip"><span class="meta-label">Category</span><strong>${escapeHtml(group.category || "Experiments")}</strong></span><span class="meta-chip"><span class="meta-label">Variants</span><strong>${escapeHtml(row.variantCount || 0)}</strong></span></div><div class="badge-row"><span class="badge viewer">Canonical hub</span>${group.recommendedPrimary ? `<span class="badge viewer">Recommended primary: ${escapeHtml(group.recommendedPrimary)}</span>` : ""}</div><div class="card-actions">${renderActions(item, { hubPath: group.hubPath || item.resolvedPath })}</div>${!isPublicView ? details : ""}</article>`;
-  }
-
-  function renderAssetCard(row) {
-    const item = row.item;
-    const status = availability(item);
-    const detailsId = `details-${slugify(item.slug || item.title || item.originalPath)}`;
-    const description = item.description || item.notes || item.resolutionReason || "Ungrouped indexed project asset.";
-    return `<article class="card ${status.tone}-card"><div class="card-top"><div class="card-heading"><span class="card-kicker">Ungrouped project</span><h2>${escapeHtml(row.title)}</h2><p class="card-description">${escapeHtml(description)}</p></div><span class="badge readiness ${status.tone}">${escapeHtml(status.label)}</span></div><div class="meta viewer-meta"><span class="meta-chip"><span class="meta-label">Category</span><strong>${escapeHtml(item.category || "Experiments")}</strong></span><span class="meta-chip"><span class="meta-label">Type</span><strong>${escapeHtml(item.type || "Project")}</strong></span></div><div class="badge-row"><span class="badge viewer">${escapeHtml(item.source || "Indexed asset")}</span></div><div class="card-actions">${renderActions(item)}</div>${!isPublicView ? renderDetails(item, detailsId) : ""}</article>`;
-  }
-
-  function renderRows(container, rows, emptyTitle, emptyText) {
-    if (!container) return;
-    const visible = sortRows(rows.filter(rowMatches));
-    container.innerHTML = visible.length ? visible.map(row => row.kind === "group" ? renderGroupCard(row) : renderAssetCard(row)).join("") : `<section class="empty"><h2>${escapeHtml(emptyTitle)}</h2><p>${escapeHtml(emptyText)}</p></section>`;
-  }
-
-  function renderHome() {
-    const groups = groupRows();
-    renderRows($("#featuredGrid"), sortRows(groups).slice(0, 6), "No featured families yet.", "The canonical registry is present, but no family can currently be shown.");
-    const categoryGrid = $("#categoryGrid");
-    if (categoryGrid) {
-      const categories = new Map();
-      groups.forEach(row => { const category = rowCategory(row); if (!categories.has(category)) categories.set(category, []); categories.get(category).push(row); });
-      categoryGrid.innerHTML = [...categories.entries()].sort().map(([category, rows]) => `<a class="category-tile" href="/sites/?category=${encodeURIComponent(category)}"><span>${escapeHtml(category)}</span><strong>${rows.length}</strong><small>${escapeHtml(rows.slice(0, 2).map(row => row.title).join(" · "))}</small></a>`).join("");
+  function setup() {
+    if (catalog) {
+      const all = rows();
+      const categories = ["All", ...new Set(all.map(row => row.category).sort())];
+      if (!categories.includes(state.category)) categories.push(state.category);
+      $("#categoryFilter").innerHTML = categories.map(category => `<option value="${esc(category)}">${esc(category === "All" ? "All categories" : category)}</option>`).join("");
+      const types = [["All", "All projects"], ["variants", "With variants"], ["single", "Single preview"], ...(internal ? [["repair", "Needs repair"], ["app", "Standalone apps"], ["archive", "Archives"]] : [])];
+      $("#typeFilter").innerHTML = types.map(([value, label]) => `<option value="${value}">${label}</option>`).join("");
+      if (!types.some(([value]) => value === state.type)) state.type = "All";
+      if (!["featured", "title", "variants"].includes(state.sort)) state.sort = "featured";
+      for (const key of ["category", "type", "sort"]) $(`#${key}Filter`).value = state[key];
+      $("#searchInput").value = state.query;
+      const update = () => {
+        const url = new URL(location.href);
+        for (const [key, value] of [["q", state.query], ["category", state.category], ["type", state.type], ["sort", state.sort]]) {
+          if (!value || value === "All" || (key === "sort" && value === "featured")) url.searchParams.delete(key); else url.searchParams.set(key, value);
+        }
+        history.replaceState(null, "", url); render();
+      };
+      $("#searchInput").addEventListener("input", event => { state.query = event.target.value.trim(); update(); });
+      document.querySelectorAll("[data-filter]").forEach(node => node.addEventListener("change", event => { state[event.target.dataset.filter] = event.target.value; update(); }));
+      document.addEventListener("click", event => {
+        if (!event.target.closest("#resetFilters")) return;
+        state.query = ""; state.category = "All"; state.type = "All";
+        $("#searchInput").value = ""; $("#categoryFilter").value = "All"; $("#typeFilter").value = "All";
+        update(); $("#searchInput").focus();
+      });
     }
-    renderStats();
+    if (internal) { $("#viewModeNotice").hidden = false; $("#viewModeNotice").textContent = "Operator view · source records and repair details included"; }
+    renderInventory(); render();
   }
-
-  function renderCatalog() {
-    const groups = groupRows();
-    const ungrouped = ungroupedRows();
-    renderFilterControls([...groups, ...ungrouped]);
-    renderRows($("#cardGrid"), groups, "No project families match.", "Clear the search or filters to see the canonical directory.");
-    const ungroupedSection = $("#ungroupedSection");
-    const ungroupedGrid = $("#ungroupedGrid");
-    const rows = sortRows(ungrouped.filter(rowMatches));
-    if (ungroupedSection && ungroupedGrid) { ungroupedSection.hidden = !rows.length; ungroupedGrid.innerHTML = rows.map(renderAssetCard).join(""); }
-    renderStats();
-  }
-
-  function bindEvents() {
-    $("#searchInput")?.addEventListener("input", event => { state.query = event.target.value.trim(); isCatalog ? renderCatalog() : renderHome(); });
-    document.addEventListener("change", event => {
-      const control = event.target.closest("[data-filter]");
-      if (control) { state[control.dataset.filter] = control.value; renderCatalog(); return; }
-      const toggle = event.target.closest("[data-toggle]");
-      if (toggle) { state[toggle.dataset.toggle] = toggle.checked; renderCatalog(); }
-    });
-    document.addEventListener("click", async event => {
-      const copy = event.target.closest("[data-copy-link]");
-      if (copy) { try { await navigator.clipboard.writeText(new URL(copy.dataset.copyLink, window.location.origin).href); copy.textContent = "Copied"; window.setTimeout(() => { copy.textContent = "Copy link"; }, 1400); } catch (error) { console.warn("Copy failed", error); } }
-      const details = event.target.closest("[data-open-details]");
-      if (details) { const panel = document.getElementById(details.dataset.openDetails); if (panel) panel.open = true; }
-    });
-  }
-
-  async function load() {
+  async function init() {
     try {
-      const [routeData, curationData] = await Promise.all([
-        fetch("/data/asset-route-resolution.json", { cache: "no-store" }).then(response => { if (!response.ok) throw new Error(`Route metadata failed: ${response.status}`); return response.json(); }),
-        fetch("/data/asset-curation.json", { cache: "no-store" }).then(response => response.ok ? response.json() : ({ assetCuration: [] })).catch(() => ({ assetCuration: [] }))
+      const [data, showcase] = await Promise.all([
+        fetch("/data/asset-route-resolution.json").then(response => { if (!response.ok) throw new Error("Directory unavailable"); return response.json(); }),
+        fetch("/data/asset-showcase.json").then(response => response.ok ? response.json() : {}).catch(() => ({}))
       ]);
-      state.entries = Array.isArray(routeData.entries) ? routeData.entries : [];
-      state.groups = Array.isArray(routeData.groups) ? routeData.groups : [];
-      state.curation = Array.isArray(curationData.assetCuration) ? curationData.assetCuration : [];
-      document.body.classList.toggle("public-view", isPublicView);
-      const notice = $("#viewModeNotice");
-      if (notice) notice.innerHTML = isPublicView ? `<strong>Public directory</strong><span>Showing locally valid project routes. Production verification remains explicitly separate.</span><a class="btn subtle" href="${isCatalog ? "/sites/" : "/"}">Internal view</a>` : `<strong>Internal directory</strong><span>Archives, repair candidates, and standalone apps are visible for operator review.</span><a class="btn subtle" href="${isCatalog ? "/sites/?view=public" : "/?view=public"}>Public view</a>`;
-      bindEvents();
-      isCatalog ? renderCatalog() : renderHome();
+      state.entries = data.entries || []; state.groups = data.groups || []; state.candidates = data.groupCandidates || []; state.showcase = showcase.projects || {};
+      setup();
     } catch (error) {
       console.error(error);
-      const target = $("#cardGrid") || $("#featuredGrid");
-      if (target) target.innerHTML = `<section class="empty"><h2>Route metadata could not be loaded.</h2><p>Run <code>scripts/generate-route-resolution.ps1</code> and refresh this page.</p></section>`;
+      ($("#cardGrid") || $("#featuredGrid")).innerHTML = '<section class="empty"><h2>Projects could not be loaded</h2><p>Please reload the page to try again.</p></section>';
     }
   }
-  load();
+  init();
 })();

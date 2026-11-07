@@ -1,73 +1,44 @@
 (() => {
   const shell = document.querySelector("#variantHub");
-  const currentPath = window.location.pathname.replace(/\/+$/, "");
-  const slugFromPath = currentPath.split("/").filter(Boolean).pop() || "";
-  const titleCase = value => String(value || "").replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim().replace(/\b\w/g, letter => letter.toUpperCase());
-  const escapeHtml = value => String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
-  const normalize = value => String(value || "").replace(/\/+$/, "");
-  const absoluteUrl = path => new URL(path || "/", window.location.origin).href;
-
-  function availability(item) {
-    if (item.resolutionStatus === "standalone-app") return { label: "Standalone Deployment Required", tone: "review" };
-    if (item.resolutionStatus === "archive") return { label: "Archive / Source Only", tone: "review" };
-    if (item.resolutionStatus === "unresolved" || item.resolutionStatus === "missing-entrypoint") return { label: "Needs Repair", tone: "review" };
-    if (item.productionVerification === "verified") return { label: "Verified Live", tone: "ready" };
-    return { label: "Local Route Valid / Production Unverified", tone: "ready" };
+  const current = location.pathname.replace(/\/+$/, "");
+  const familyId = current.split("/").filter(Boolean).pop();
+  const internal = new URLSearchParams(location.search).get("view") === "internal";
+  const back = `/sites/${internal ? "?view=internal" : ""}`;
+  const esc = value => String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+  const available = item => item?.resolutionStatus === "resolved" && Boolean(item.resolvedPath);
+  function details(item) {
+    return `<details class="details-panel"><summary>Source details</summary><dl><dt>File</dt><dd>${esc(item.sourcePath || item.originalPath || "Not located")}</dd><dt>Resolution</dt><dd>${esc(item.resolutionReason || "No child entrypoint was found.")}</dd><dt>Document title</dt><dd>${esc(item.documentTitle || "No title element")}</dd><dt>Structure</dt><dd>${esc(item.structuralValidity ? JSON.stringify(item.structuralValidity) : "Entrypoint existence checked")}</dd><dt>Production check</dt><dd>${item.productionVerification === "verified" ? "Verified in recorded smoke test" : "Not verified"}</dd></dl>${item.sourceUrl ? `<a href="${esc(item.sourceUrl)}" target="_blank" rel="noreferrer">View source ↗</a>` : ""}</details>`;
   }
-
-  function findHub(data) {
-    const entries = Array.isArray(data.entries) ? data.entries : [];
-    return entries.find(item => item.type === "group-hub" && normalize(item.resolvedPath) === currentPath)
-      || entries.find(item => item.type === "group-hub" && item.slug === slugFromPath)
-      || entries.find(item => item.type === "group-hub" && normalize(item.originalPath) === currentPath);
+  function missing() {
+    document.title = "Project unavailable · Flash UI Portfolio";
+    shell.innerHTML = `<section class="empty"><h1>Project preview unavailable</h1><p>We couldn’t load this project’s preview information.</p><a class="btn primary" href="${back}">Back to all projects</a></section>`;
   }
-
-  function expandVariants(item, data) {
-    const entries = (data.entries || []).filter(entry => entry.canonicalGroupId === item.canonicalGroupId && /\/variant-\d+\/?$/i.test(entry.resolvedPath || ""));
-    if (entries.length) return entries.sort((a, b) => (a.resolvedPath || "").localeCompare(b.resolvedPath || ""));
-    return (item.variantNumbers || []).map(number => ({ title: `${item.title || titleCase(item.slug)} ${number}`, resolvedPath: `/sites/${item.slug}/variant-${number}/`, resolutionStatus: "unresolved", variantNumber: number }));
+  function render(data, showcase) {
+    const group = (data.groups || []).find(item => item.groupId === familyId || item.hubPath.replace(/\/+$/, "") === current);
+    if (!group) return missing();
+    const members = (data.entries || []).filter(item => item.canonicalGroupId === group.groupId);
+    const hub = members.find(item => item.type === "group-hub") || members.find(item => item.resolvedPath?.replace(/\/+$/, "") === current);
+    const unique = new Map(members.filter(item => item.variantNumber).map(item => [item.variantNumber, item]));
+    // Retain known missing variants without inventing launch destinations.
+    for (const number of hub?.variantNumbers || []) if (!unique.has(number)) unique.set(number, { variantNumber: number, title: `Variant ${number}`, resolutionStatus: "missing-entrypoint" });
+    const variants = [...unique.values()].sort((a, b) => a.variantNumber - b.variantNumber);
+    const count = variants.filter(available).length;
+    const copy = showcase.projects?.[group.groupId] || {};
+    const title = copy.title || group.displayTitle;
+    const description = copy.description || group.description || `${group.category || "Interface"} project previews from the Flash UI collection.`;
+    document.title = `${title} · Flash UI Portfolio`;
+    const cards = variants.map(item => `<article class="card variant-card" data-variant="${item.variantNumber}"><span class="card-category">Variant ${item.variantNumber}</span><h3>${esc(item.title || `Variant ${item.variantNumber}`)}</h3>${item.description ? `<p class="card-description">${esc(item.description)}</p>` : ""}<div class="card-bottom">${available(item) ? `<a class="btn primary" href="${esc(item.resolvedPath)}" aria-label="${esc(`Open variant ${item.variantNumber}: ${item.title}`)}">Open variant <span aria-hidden="true">↗</span></a>` : '<p class="repair-note">Preview unavailable · source entrypoint needs repair.</p>'}</div>${internal ? details(item) : ""}</article>`).join("");
+    const single = members.find(item => !item.variantNumber && item.type !== "group-hub" && available(item) && item.resolvedPath.replace(/\/+$/, "") !== current);
+    shell.innerHTML = `<nav class="hub-nav" aria-label="Project navigation"><a href="${back}">← All projects</a><a href="/">Flash UI Portfolio</a></nav><header class="hub-hero"><span class="eyebrow">${esc(group.category || "Project")}</span><h1>${esc(title)}</h1><p>${esc(description)}</p>${count ? `<span class="hub-count">${count} available variant${count === 1 ? "" : "s"}</span>` : ""}</header>${variants.length ? `<section aria-label="Project variants"><div class="section-heading"><h2>Choose a variation</h2></div><div class="grid variant-grid">${cards}</div></section>` : `<section class="single-project">${single ? `<a class="btn primary" href="${esc(single.resolvedPath)}">Open project ↗</a>` : '<p class="repair-note">This project has no separate preview entrypoint available.</p>'}</section>`}${internal && hub ? details(hub) : ""}<footer><a href="${back}">← Back to all projects</a><a href="${esc(current)}/${internal ? "" : "?view=internal"}">${internal ? "Public view" : "Operator view"}</a></footer>`;
   }
-
-  function sourceUrl(item) {
-    const path = String(item.originalPath || item.path || "").replace(/^\//, "");
-    return `https://github.com/JFeimster/flash-ui-portfolio/tree/main/${path.split("/").map(encodeURIComponent).join("/")}`;
-  }
-
-  function renderMissing() {
-    const fallbackTitle = titleCase(slugFromPath || "Variant Hub");
-    document.title = `${fallbackTitle} | Flash UI Portfolio`;
-    shell.innerHTML = `<section class="hub-error"><span class="eyebrow">Flash UI Portfolio</span><h1>${escapeHtml(fallbackTitle)}</h1><p>This canonical hub could not be matched to the additive route metadata.</p><a class="btn primary" href="/sites/">Back to all projects</a></section>`;
-  }
-
-  function renderHub(item, data) {
-    const variants = expandVariants(item, data);
-    const title = item.title || titleCase(slugFromPath);
-    const status = availability(item);
-    document.title = `${title} | Flash UI Variant Hub`;
-    const firstVariant = variants.find(variant => ["resolved"].includes(variant.resolutionStatus) && variant.resolvedPath);
-    const variantCards = variants.length ? variants.map((variant, index) => {
-      const variantStatus = availability(variant);
-      const canOpen = variantStatus.tone === "ready" && variant.resolvedPath;
-      return canOpen
-        ? `<a class="variant-card" href="${escapeHtml(variant.resolvedPath)}"><span class="variant-number">${escapeHtml(variant.variantNumber || index + 1)}</span><h3>${escapeHtml(variant.title || `Variant ${index + 1}`)}</h3><p>Open this preserved Flash UI variation from the canonical family hub.</p><div class="card-footer"><span>Launch variant</span><span>↗</span></div></a>`
-        : `<article class="variant-card"><span class="variant-number">${escapeHtml(variant.variantNumber || index + 1)}</span><h3>${escapeHtml(variant.title || `Variant ${index + 1}`)}</h3><p>${escapeHtml(variantStatus.label)}. Use the source record for operator review.</p><div class="card-footer"><a href="${escapeHtml(sourceUrl(variant))}">View source ↗</a></div></article>`;
-    }).join("") : `<article class="variant-card"><span class="variant-number">!</span><h3>No variant metadata yet</h3><p>This hub exists, but no child entrypoints are present in the route metadata.</p></article>`;
-
-    shell.innerHTML = `<section class="hub-hero"><div class="topline"><span class="pill">Canonical Hub</span><span class="pill gold">${escapeHtml(item.category || "Project family")}</span><span class="pill">${escapeHtml(status.label)}</span></div><div class="hero-grid"><div><span class="eyebrow">Flash UI Variant Command Center</span><h1 class="hub-title">${escapeHtml(title)}</h1><p class="hub-subtitle">A single launch point for related Flash UI outputs. Variants stay preserved, while the portfolio directory stays focused on families.</p><div class="hub-actions">${firstVariant ? `<a class="btn primary" href="${escapeHtml(firstVariant.resolvedPath)}">Open recommended variant</a>` : ""}<a class="btn gold" href="/sites/">Back to all projects</a><a class="btn" href="/">Back to portfolio</a></div></div><aside class="stat-panel"><div class="stat-card"><strong>${escapeHtml(variants.length)}</strong><span>Preserved variants</span></div><div class="stat-card"><strong>${escapeHtml(item.productionVerification === "verified" ? "Yes" : "Pending")}</strong><span>Production verification</span></div><div class="stat-card"><strong>${escapeHtml(item.canonicalGroupId || item.slug || "Unknown")}</strong><span>Canonical family</span></div><div class="stat-card"><strong>Local</strong><span>Route evidence</span></div></aside></div><div class="path-box">${escapeHtml(item.resolvedPath || item.originalPath || currentPath)}</div></section><section><div class="section-head"><div><h2>Available Variants</h2><p>Open, compare, and decide which preserved version deserves to graduate.</p></div></div><div class="variant-grid">${variantCards}</div></section><section class="utility-row"><article class="utility-card"><h3>Canonical URL</h3><p>${escapeHtml(absoluteUrl(item.resolvedPath || window.location.pathname))}</p></article><article class="utility-card"><h3>Source path</h3><p>${escapeHtml(item.originalPath || "Not listed")}</p></article><article class="utility-card"><h3>Operator note</h3><p>${escapeHtml(item.resolutionReason || "Canonical hub resolved from local entrypoint evidence.")}</p></article></section><a class="footer-link" href="/sites/">← Back to all projects</a>`;
-  }
-
   async function init() {
     try {
-      const response = await fetch("/data/asset-route-resolution.json", { cache: "no-store" });
-      if (!response.ok) throw new Error(`Route metadata returned ${response.status}`);
-      const data = await response.json();
-      const item = findHub(data);
-      if (!item) return renderMissing();
-      renderHub(item, data);
-    } catch (error) {
-      console.error("Variant hub render failed", error);
-      renderMissing();
-    }
+      const [data, showcase] = await Promise.all([
+        fetch("/data/asset-route-resolution.json").then(response => { if (!response.ok) throw new Error("Project data unavailable"); return response.json(); }),
+        fetch("/data/asset-showcase.json").then(response => response.ok ? response.json() : {}).catch(() => ({}))
+      ]);
+      render(data, showcase);
+    } catch (error) { console.error(error); missing(); }
   }
   init();
 })();

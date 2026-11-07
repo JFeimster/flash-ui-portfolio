@@ -62,6 +62,30 @@ function Get-Value($Object, [string]$Name, $Default = $null) {
   return $Default
 }
 
+function Plain-Text([string]$Value) {
+  return [System.Net.WebUtility]::HtmlDecode(([regex]::Replace($Value, '<[^>]+>', ' ') -replace '\s+', ' ')).Trim()
+}
+
+function Read-HtmlMetadata([string]$File) {
+  $html = Get-Content -LiteralPath $File -Raw
+  $title = Plain-Text ([regex]::Match($html, '(?is)<title\b[^>]*>(.*?)</title>').Groups[1].Value)
+  $heading = Plain-Text ([regex]::Match($html, '(?is)<h1\b[^>]*>(.*?)</h1>').Groups[1].Value)
+  $description = ''
+  foreach ($meta in [regex]::Matches($html, '(?is)<meta\b[^>]*>')) {
+    if ($meta.Value -match '(?i)\bname\s*=\s*["'']description["'']') {
+      $description = Plain-Text ([regex]::Match($meta.Value, '(?is)\bcontent\s*=\s*(["''])(.*?)\1').Groups[2].Value)
+    }
+  }
+  return @{
+    documentTitle = $title; sourceHeading = $heading; description = $description
+    structuralValidity = [ordered]@{
+      hasHtml = $html -match '(?i)<html\b'; hasBody = $html -match '(?i)<body\b'
+      hasTitle = [bool]$title
+      valid = ($html -match '(?i)<html\b') -and ($html -match '(?i)<body\b') -and ($html -match '(?i)</body\s*>') -and ($html -match '(?i)</html\s*>')
+    }
+  }
+}
+
 $baseRegistry = As-Array (Read-Json "data/site-registry.json")
 $staticRegistry = As-Array (Read-Json "data/site-registry-static-extractions.json")
 $batch = Read-Json "data/site-registry-batch-5-additions.json"
@@ -231,6 +255,70 @@ foreach ($item in $merged.Values) {
   }
 }
 
+# The filesystem is authoritative for child previews. Historical registries are
+# provenance, not an exhaustive list of the HTML that is actually present.
+$candidateFolders = [ordered]@{}
+$variantFiles = Get-ChildItem -LiteralPath (Join-Path $RepoRoot 'sites') -Directory | ForEach-Object {
+  Get-ChildItem -LiteralPath $_.FullName -Directory | Where-Object { $_.Name -match '^variant-\d+$' } | ForEach-Object {
+    $index = Join-Path $_.FullName 'index.html'
+    if (Test-Path -LiteralPath $index -PathType Leaf) { Get-Item -LiteralPath $index }
+  }
+}
+foreach ($file in $variantFiles) {
+  $familyId = $file.Directory.Parent.Name
+  $number = [int]($file.Directory.Name -replace '^variant-', '')
+  $route = "/sites/$familyId/variant-$number/"
+  $sourcePath = "$($route.TrimStart('/'))index.html"
+  $metadata = Read-HtmlMetadata $file.FullName
+  $matches = @($resolvedEntries | Where-Object { $_.resolvedPath.TrimEnd('/') -eq $route.TrimEnd('/') })
+  if ($matches.Count) {
+    $entry = $matches[0]
+    $entry['historicalRecords'] = @($matches | ForEach-Object { [ordered]@{ title = $_.title; originalPath = $_.originalPath; sourceFile = $_.sourceFile } })
+    $resolvedEntries = @($resolvedEntries | Where-Object { $_.resolvedPath.TrimEnd('/') -ne $route.TrimEnd('/') })
+  } else {
+    $entry = [ordered]@{
+      title = "$familyId variant $number"; slug = "$familyId-variant-$number"
+      category = if ($groupDefinitions.ContainsKey($familyId)) { Get-Value $groupDefinitions[$familyId] 'category' 'Experiments' } else { 'Experiments' }
+      type = 'static-site'; source = 'filesystem'; sourceFile = $sourcePath; originalPath = "/$sourcePath"
+      productionVerification = 'pending'; notes = ''; variantNumbers = @()
+      entrypointEvidence = [ordered]@{ originalPathExists = $true; originalEntrypointExists = $true; resolvedEntrypointExists = $true; evidence = @("discovered HTML: $sourcePath") }
+    }
+  }
+  foreach ($key in $metadata.Keys) { $entry[$key] = $metadata[$key] }
+  $entry['canonicalGroupId'] = $familyId
+  $entry['variantNumber'] = $number
+  $entry['resolvedPath'] = $route
+  $entry['sourcePath'] = $sourcePath
+  $entry['resolutionStatus'] = if ($metadata.structuralValidity.valid) { 'resolved' } else { 'invalid-entrypoint' }
+  $entry['resolutionReason'] = if ($metadata.structuralValidity.valid) { 'Canonical child HTML discovered on disk; document structure checked.' } else { 'Child file exists but is missing complete HTML/body structure; repair required.' }
+  if ($metadata.documentTitle -and $metadata.documentTitle -notmatch '^(Flash UI Export|Untitled|Document)$') { $entry['title'] = $metadata.documentTitle }
+  elseif ($metadata.sourceHeading) { $entry['title'] = $metadata.sourceHeading }
+  else { $entry['title'] = "Variant $number" }
+  $resolvedEntries += $entry
+  if (-not $groupDefinitions.ContainsKey($familyId)) {
+    if (-not $candidateFolders.Contains($familyId)) { $candidateFolders[$familyId] = @() }
+    $candidateFolders[$familyId] += $route
+  }
+}
+
+# Source actions must point to the current file, including migrated records.
+foreach ($entry in $resolvedEntries) {
+  if ($entry.resolvedPath) {
+    $local = To-RepoPath $entry.resolvedPath
+    if (Test-Path -LiteralPath $local) {
+      $entry['sourcePath'] = $entry.resolvedPath.TrimStart('/')
+      if ((Get-Item -LiteralPath $local).PSIsContainer) { $entry['sourcePath'] = "$($entry.sourcePath.TrimEnd('/'))/index.html" }
+    }
+  } elseif (Test-Path -LiteralPath (To-RepoPath $entry.originalPath)) {
+    $entry['sourcePath'] = $entry.originalPath.TrimStart('/')
+  }
+  if ($entry.Contains('sourcePath')) {
+    $encoded = ($entry.sourcePath.Split('/') | ForEach-Object { [uri]::EscapeDataString($_) }) -join '/'
+    $kind = if ([IO.Path]::HasExtension($entry.sourcePath)) { 'blob' } else { 'tree' }
+    $entry['sourceUrl'] = "https://github.com/JFeimster/flash-ui-portfolio/$kind/main/$encoded"
+  }
+}
+
 $groups = @()
 foreach ($groupId in $groupDefinitions.Keys) {
   $group = $groupDefinitions[$groupId]
@@ -258,18 +346,22 @@ $summary = [ordered]@{
   resolved = @($resolvedEntries | Where-Object { $_.resolutionStatus -eq "resolved" }).Count
   unresolved = @($resolvedEntries | Where-Object { $_.resolutionStatus -eq "unresolved" }).Count
   missingEntrypoint = @($resolvedEntries | Where-Object { $_.resolutionStatus -eq "missing-entrypoint" }).Count
+  invalidEntrypoint = @($resolvedEntries | Where-Object { $_.resolutionStatus -eq "invalid-entrypoint" }).Count
   standaloneApps = @($resolvedEntries | Where-Object { $_.resolutionStatus -eq "standalone-app" }).Count
   archives = @($resolvedEntries | Where-Object { $_.resolutionStatus -eq "archive" }).Count
   productionVerified = @($resolvedEntries | Where-Object { $_.productionVerification -eq "verified" }).Count
 }
 
 $output = [ordered]@{
-  version = "1.0.0"
+  version = "1.1.0"
   generatedAt = (Get-Date).ToUniversalTime().ToString("o")
   sourceFiles = @("data/site-registry.json", "data/site-registry-static-extractions.json", "data/site-registry-batch-5-additions.json", "data/asset-groups.json", "data/variant-migration-map.json")
   verificationNote = "Local entrypoint evidence is structural only; production availability remains unverified until an authorized deployment smoke test is run."
   summary = $summary
   groups = @($groups | Sort-Object displayTitle)
+  groupCandidates = @($candidateFolders.Keys | Sort-Object | ForEach-Object {
+    [ordered]@{ familyId = $_; paths = @($candidateFolders[$_]); reason = 'Variant folder absent from grouped index; retained for internal review without creating a canonical project.' }
+  })
   entries = @($resolvedEntries | Sort-Object title, originalPath)
 }
 
