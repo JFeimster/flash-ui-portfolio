@@ -1,0 +1,44 @@
+name: Capture Flash UI previews
+on:
+  push:
+    branches:
+      - batch-34-voltage-preview
+    paths:
+      - "scripts/capture-previews.mjs"
+      - ".github/workflows/capture-portfolio-previews.yml"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install screenshot dependencies
+        run: npm install --no-save --no-package-lock playwright@1.56.1 sharp@0.34.4
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Validate JavaScript syntax
+        run: |
+          node --check assets/js/app.js
+          node --check assets/js/voltage-ui.js
+          node --check scripts/capture-previews.mjs
+      - name: Capture real source previews
+        env:
+          PREVIEW_BASE_URL: https://flash-ui-portfolio.vercel.app
+        run: node scripts/capture-previews.mjs
+      - name: Commit preview assets to Batch 34
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- assets/previews/
+          if ! git diff --cached --quiet; then
+            git commit -m "Batch 34: Cache actual interface screenshots [skip ci]"
+            git push origin HEAD:"$GITHUB_REF_NAME"
+          fi
