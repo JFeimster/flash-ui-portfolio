@@ -3,10 +3,14 @@ on:
   push:
     branches:
       - batch-34-voltage-preview
+      - batch-35-visual-discovery
       - main
     paths:
       - "scripts/capture-previews.mjs"
       - ".github/workflows/capture-portfolio-previews.yml"
+      - "data/asset-route-resolution.json"
+      - "data/curated-collections.json"
+      - "sites/**"
   workflow_dispatch:
 permissions:
   contents: write
@@ -25,6 +29,8 @@ jobs:
         run: npm install --no-save --no-package-lock playwright@1.56.1 sharp@0.34.4
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
+      - name: Serve the checked-out static portfolio
+        run: python3 -m http.server 4173 --bind 127.0.0.1 --directory . > /tmp/flash-ui-preview-server.log 2>&1 &
       - name: Validate JavaScript syntax
         run: |
           node --check assets/js/app.js
@@ -32,14 +38,15 @@ jobs:
           node --check scripts/capture-previews.mjs
       - name: Capture real source previews
         env:
-          PREVIEW_BASE_URL: https://flash-ui-portfolio.vercel.app
+          PREVIEW_BASE_URL: http://127.0.0.1:4173
         run: node scripts/capture-previews.mjs
-      - name: Commit preview assets to Batch 34
+      - name: Commit preview assets to Batch 35
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -- assets/previews/
+          git add -- data/asset-previews.json data/preview-capture-report.json
           if ! git diff --cached --quiet; then
-            git commit -m "Batch 34: Cache actual interface screenshots [skip ci]"
+            git commit -m "Batch 35: Cache actual interface screenshots [skip ci]"
             git push origin HEAD:"$GITHUB_REF_NAME"
           fi

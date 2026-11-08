@@ -17,7 +17,7 @@ function Request([string]$Path) {
   } catch {
     $status = 0
     $redirected = $false
-    if ($_.Exception.Response) {
+    if ($_.Exception.PSObject.Properties['Response'] -and $_.Exception.Response) {
       try { $status = [int]$_.Exception.Response.StatusCode; $redirected = $status -ge 300 -and $status -lt 400 } catch {}
     }
     return [pscustomobject]@{ path = $Path; status = $status; contentType = ""; body = ""; redirected = $redirected }
