@@ -19,7 +19,7 @@
   };
   function presentation(row) {
     const copy = state.showcase[row.id] || {};
-    return { ...row, title: copy.title || row.title, description: copy.description || row.item.description || categoryCopy[row.category] || "Static page layout from the interface experiment collection.", audience: copy.audience || "", priority: copy.featuredPriority || 0 };
+    return { ...row, title: copy.title || row.title, description: copy.description || row.description || row.item.description || categoryCopy[row.category] || "Static page layout from the interface experiment collection.", audience: copy.audience || "", priority: copy.featuredPriority || row.priority || 0 };
   }
   function rows() {
     const grouped = state.groups.map(group => {
@@ -27,7 +27,7 @@
       const variants = members.filter(entry => entry.variantNumber && available(entry));
       const hub = members.find(entry => entry.type === "group-hub") || members.find(entry => entry.resolvedPath === group.hubPath);
       const item = hub || variants[0] || members[0] || { resolutionStatus: "unresolved" };
-      return presentation({ id: group.groupId, title: group.displayTitle, category: group.category || "Experiments", item, count: variants.length, path: available(hub) ? hub.resolvedPath : variants[0]?.resolvedPath || (available(item) ? item.resolvedPath : "") });
+      return presentation({ id: group.groupId, title: group.displayTitle, category: group.category || "Experiments", description: group.description || "", priority: group.featuredPriority || 0, item, count: variants.length, path: group.curatedCollection && variants.length ? group.hubPath : (available(hub) ? hub.resolvedPath : variants[0]?.resolvedPath || (available(item) ? item.resolvedPath : "")) });
     });
     const seen = new Set(grouped.map(row => row.path).filter(Boolean));
     const singles = state.entries.filter(entry => !entry.canonicalGroupId).filter(entry => {
@@ -112,11 +112,14 @@
   }
   async function init() {
     try {
-      const [data, showcase] = await Promise.all([
+      const [data, showcase, collections] = await Promise.all([
         fetch("/data/asset-route-resolution.json").then(response => { if (!response.ok) throw new Error("Directory unavailable"); return response.json(); }),
-        fetch("/data/asset-showcase.json").then(response => response.ok ? response.json() : {}).catch(() => ({}))
+        fetch("/data/asset-showcase.json").then(response => response.ok ? response.json() : {}).catch(() => ({})),
+        fetch("/data/curated-collections.json").then(response => response.ok ? response.json() : {}).catch(() => ({}))
       ]);
-      state.entries = data.entries || []; state.groups = data.groups || []; state.candidates = data.groupCandidates || []; state.showcase = showcase.projects || {};
+      const { applyCuratedCollections } = await import("/assets/js/curated-collections.js");
+      const model = applyCuratedCollections(data, collections);
+      state.entries = model.entries || []; state.groups = model.groups || []; state.candidates = model.groupCandidates || []; state.showcase = showcase.projects || {};
       setup();
     } catch (error) {
       console.error(error);

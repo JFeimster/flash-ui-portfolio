@@ -33,11 +33,13 @@
   }
   async function init() {
     try {
-      const [data, showcase] = await Promise.all([
+      const [data, showcase, collections] = await Promise.all([
         fetch("/data/asset-route-resolution.json").then(response => { if (!response.ok) throw new Error("Project data unavailable"); return response.json(); }),
-        fetch("/data/asset-showcase.json").then(response => response.ok ? response.json() : {}).catch(() => ({}))
+        fetch("/data/asset-showcase.json").then(response => response.ok ? response.json() : {}).catch(() => ({})),
+        fetch("/data/curated-collections.json").then(response => response.ok ? response.json() : {}).catch(() => ({}))
       ]);
-      render(data, showcase);
+      const { applyCuratedCollections } = await import("/assets/js/curated-collections.js");
+      render(applyCuratedCollections(data, collections), showcase);
     } catch (error) { console.error(error); missing(); }
   }
   init();
