@@ -22,7 +22,8 @@
   function presentation(row) {
     const copy = state.showcase[row.id] || {};
     const preview = state.previews[row.id] || {};
-    return { ...row, title: copy.title || row.title, description: copy.description || row.description || row.item.description || categoryCopy[row.category] || "Static page layout from the interface experiment collection.", audience: copy.audience || "", priority: copy.featuredPriority || row.priority || 0, visualStyle: preview.style || "", tone: preview.tone || "mint", previewLabel: preview.label || "", previewTarget: preview.target || (row.count ? "" : row.path), image: preview.image || "" };
+    const cachedImage = state.captures?.[row.id]?.image;
+    return { ...row, title: copy.title || row.title, description: copy.description || row.description || row.item.description || categoryCopy[row.category] || "Static page layout from the interface experiment collection.", audience: copy.audience || "", priority: copy.featuredPriority || row.priority || 0, visualStyle: preview.style || "", tone: preview.tone || "mint", previewLabel: preview.label || "", previewTarget: preview.target || (row.count ? "" : row.path), image: cachedImage || preview.image || "" };
   }
   function rows() {
     const grouped = state.groups.map(group => {
@@ -143,6 +144,7 @@
       const { applyCuratedCollections } = await import("/assets/js/curated-collections.js");
       const model = applyCuratedCollections(data, collections);
       state.entries = model.entries || []; state.groups = model.groups || []; state.candidates = model.groupCandidates || []; state.showcase = showcase.projects || {}; state.previews = previews.projects || {}; voltage = voltageModule;
+      state.captures = previews.projects || {};
       setup();
       voltage.mountVoltage({ rows, rerender: () => { render(); if (catalog) { const count = $("#favoritesCount"); if (count) count.textContent = state.favorites.size ? "(" + state.favorites.size + ")" : ""; } }, favorites: state.favorites });
     } catch (error) {
