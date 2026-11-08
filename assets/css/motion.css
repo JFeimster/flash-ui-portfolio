@@ -1,0 +1,54 @@
+/* Batch 33: performance-conscious ambient motion and premium card interactions. */
+body[data-page="home"] { isolation: isolate; }
+.ambient-scene { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; contain: paint; }
+body[data-page="home"] > :not(.ambient-scene) { position: relative; z-index: 1; }
+.ambient-grid {
+  position: absolute; inset: -35%; opacity: .15;
+  background-image: linear-gradient(rgba(164,230,191,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(164,230,191,.18) 1px,transparent 1px);
+  background-size: 68px 68px; transform: rotate(-11deg) scale(1.15);
+  mask-image: radial-gradient(ellipse at 62% 32%,black,transparent 66%);
+  animation: grid-drift 32s ease-in-out infinite alternate;
+}
+.ambient-orb {
+  position: absolute; width: min(55vw,700px); aspect-ratio: 1; border-radius: 50%;
+  filter: blur(82px); opacity: .15; transform: translate3d(0,0,0);
+  animation: orb-drift 24s ease-in-out infinite alternate; will-change: transform;
+}
+.ambient-orb.one { left: -23%; top: -19%; background: radial-gradient(circle,#17bba3 0%,#1a7a96 42%,transparent 72%); }
+.ambient-orb.two { right: -19%; top: 8%; background: radial-gradient(circle,#8c6ceb 0%,#324cb2 46%,transparent 72%); animation-duration: 31s; animation-delay: -9s; }
+.ambient-orb.three { left: 26%; bottom: -32%; background: radial-gradient(circle,#db8c59 0%,#8c375d 43%,transparent 72%); animation-duration: 28s; animation-delay: -13s; }
+.hero-shine {
+  background: linear-gradient(100deg,#effff7 2%,#a4e6bf 28%,#b2c6ff 62%,#effff7 98%);
+  background-size: 200% auto; color: transparent; -webkit-background-clip: text; background-clip: text;
+  animation: headline-glow 11s ease-in-out infinite alternate;
+}
+body[data-page="home"] #featuredGrid > .card {
+  animation: card-arrive .65s cubic-bezier(.16,1,.3,1) both;
+}
+body[data-page="home"] #featuredGrid > .card:nth-child(2),
+body[data-page="home"] #featuredGrid > .card:nth-child(5) { animation-delay: .09s; }
+body[data-page="home"] #featuredGrid > .card:nth-child(3),
+body[data-page="home"] #featuredGrid > .card:nth-child(6) { animation-delay: .17s; }
+.card { position: relative; isolation: isolate; overflow: hidden; transition: transform .3s cubic-bezier(.16,1,.3,1),border-color .3s ease,box-shadow .3s ease; }
+.card::before {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: radial-gradient(ellipse at 15% -12%,rgba(164,230,191,.12),transparent 65%);
+  opacity: 0; transition: opacity .35s ease;
+}
+.card > * { position: relative; z-index: 1; }
+@media (hover: hover) and (pointer: fine) {
+  .card:hover { transform: translateY(-5px); border-color: rgba(164,230,191,.52); box-shadow: 0 22px 65px rgba(0,0,0,.28), 0 0 38px rgba(164,230,191,.06); }
+  .card:hover::before { opacity: 1; }
+  .card .btn.primary { transition: transform .25s ease,box-shadow .25s ease,background .25s ease; }
+  .card:hover .btn.primary { box-shadow: 0 6px 22px rgba(164,230,191,.17); }
+}
+@keyframes card-arrive { from { opacity:0; transform: translateY(17px); } to { opacity:1; transform: translateY(0); } }
+@keyframes orb-drift { from { transform:translate3d(-3%,1%,0) scale(.93); } to { transform:translate3d(12%,-9%,0) scale(1.09); } }
+@keyframes grid-drift { from { transform:rotate(-11deg) translate3d(-2%,0,0) scale(1.15); } to { transform:rotate(-11deg) translate3d(3%,-2%,0) scale(1.15); } }
+@keyframes headline-glow { from {background-position:0% center;} to {background-position:100% center;} }
+@media (prefers-reduced-motion:reduce) {
+  .ambient-grid,.ambient-orb,.hero-shine,body[data-page="home"] #featuredGrid>.card { animation:none !important; }
+  .card,.card::before,.card .btn.primary { transition:none !important; }
+  .card:hover { transform:none !important; }
+}
+@media (max-width:700px) { .ambient-orb { width:85vw;opacity:.11; } .ambient-grid { opacity:.1; } }
