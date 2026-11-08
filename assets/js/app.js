@@ -1,8 +1,10 @@
 (() => {
+  let voltage = null;
   const catalog = document.body.dataset.page === "catalog";
   const params = new URLSearchParams(location.search);
   const internal = params.get("view") === "internal";
-  const state = { entries: [], groups: [], candidates: [], showcase: {}, query: params.get("q") || "", category: params.get("category") || "All", type: params.get("type") || "All", sort: params.get("sort") || "featured" };
+  const storedFavorites = (() => { try { const data = JSON.parse(localStorage.getItem("flash-ui-saved-projects") || "[]"); return new Set(Array.isArray(data) ? data : []); } catch { return new Set(); } })();
+  const state = { entries: [], groups: [], candidates: [], showcase: {}, previews: {}, favorites: storedFavorites, favoritesOnly: params.get("saved") === "1", style: params.get("style") || "All", query: params.get("q") || "", category: params.get("category") || "All", type: params.get("type") || "All", sort: params.get("sort") || "featured" };
   const $ = selector => document.querySelector(selector);
   const esc = value => String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
   const cleanTitle = value => String(value || "Project").replace(/^sites\s+/i, "").replace(/\s*index\.html$/i, "").replace(/\.html$/i, "").replace(/[-_]+/g, " ").trim();
@@ -19,7 +21,8 @@
   };
   function presentation(row) {
     const copy = state.showcase[row.id] || {};
-    return { ...row, title: copy.title || row.title, description: copy.description || row.description || row.item.description || categoryCopy[row.category] || "Static page layout from the interface experiment collection.", audience: copy.audience || "", priority: copy.featuredPriority || row.priority || 0 };
+    const preview = state.previews[row.id] || {};
+    return { ...row, title: copy.title || row.title, description: copy.description || row.description || row.item.description || categoryCopy[row.category] || "Static page layout from the interface experiment collection.", audience: copy.audience || "", priority: copy.featuredPriority || row.priority || 0, visualStyle: preview.style || "", tone: preview.tone || "mint", previewLabel: preview.label || "", previewTarget: preview.target || (row.count ? "" : row.path), image: preview.image || "" };
   }
   function rows() {
     const grouped = state.groups.map(group => {
@@ -41,7 +44,7 @@
   const statusLabel = row => ({ archive: "Source archive", app: "Separate deployment needed", repair: "Preview needs repair" }[typeOf(row)] || "HTML preview");
   function matches(row) {
     const text = [row.title, row.description, row.audience, row.category, internal ? row.item.originalPath : ""].join(" ").toLowerCase();
-    return (!state.query || text.includes(state.query.toLowerCase())) && (state.category === "All" || state.category === row.category) && (state.type === "All" || typeOf(row) === state.type);
+    return (!state.query || text.includes(state.query.toLowerCase())) && (state.category === "All" || state.category === row.category) && (state.type === "All" || typeOf(row) === state.type) && (state.style === "All" || row.visualStyle === state.style) && (!state.favoritesOnly || state.favorites.has(row.id));
   }
   function sorted(list) {
     return [...list].sort((a, b) => {
@@ -55,8 +58,19 @@
     return `<details class="details-panel"><summary>Operator details</summary><dl>${fields.filter(([, value]) => value).map(([label, value]) => `<dt>${esc(label)}</dt><dd>${esc(value)}</dd>`).join("")}</dl>${item.sourceUrl ? `<a href="${esc(item.sourceUrl)}" target="_blank" rel="noreferrer">View source ↗</a>` : "<p>Source location unresolved.</p>"}</details>`;
   }
   function card(row) {
-    const path = row.path && internal && row.count ? `${row.path}?view=internal` : row.path;
-    return `<article class="card" data-project="${esc(row.id)}"><span class="card-category">${esc(row.category)}</span><h2>${esc(row.title)}</h2><p class="card-description">${esc(row.description)}</p><div class="card-bottom">${row.count ? `<span class="variant-count">${row.count} variant${row.count === 1 ? "" : "s"}</span>` : ""}${path ? `<a class="btn primary" href="${esc(path)}" aria-label="${esc(`${row.count ? "Explore" : "Open"} ${row.title}`)}">${row.count ? "Explore project" : "Open project"}<span aria-hidden="true">↗</span></a>` : `<p class="repair-note">${esc(statusLabel(row))}</p>`}</div>${internal ? details(row.item) : ""}</article>`;
+    const path = row.path && internal && row.count ? (row.path + "?view=internal") : row.path;
+    const title = esc(row.title);
+    const category = esc(row.category);
+    const style = row.visualStyle ? '<span class="card-style">' + esc(row.visualStyle) + '</span>' : '';
+    const action = path
+      ? '<a class="btn primary" href="' + esc(path) + '" aria-label="' + esc((row.count ? "Explore variants of " : "Open ") + row.title) + '">' + (row.count ? 'Explore Variants' : '🚀 Open Site') + '<span aria-hidden="true">↗</span></a>'
+      : '<p class="repair-note">' + esc(statusLabel(row)) + '</p>';
+    return '<article class="card voltage-card" data-project="' + esc(row.id) + '">'
+      + (voltage ? voltage.artwork(row,state.favorites.has(row.id)) : '')
+      + '<div class="card-content"><div class="card-topline"><span class="card-category">' + category + '</span>' + style + '</div>'
+      + '<h2>' + title + '</h2><p class="card-description">' + esc(row.description) + '</p>'
+      + '<div class="card-bottom">' + (row.count ? '<span class="variant-count">' + row.count + ' variation' + (row.count === 1 ? '' : 's') + '</span>' : '') + action + '</div></div>'
+      + (internal ? details(row.item) : '') + '</article>';
   }
   function empty() { return '<section class="empty"><h2>No projects found</h2><p>Try a broader search or clear the filters.</p><button class="btn" id="resetFilters" type="button">Clear filters</button></section>'; }
   function renderInventory() {
@@ -87,23 +101,30 @@
       $("#categoryFilter").innerHTML = categories.map(category => `<option value="${esc(category)}">${esc(category === "All" ? "All categories" : category)}</option>`).join("");
       const types = [["All", "All projects"], ["variants", "With variants"], ["single", "Single preview"], ...(internal ? [["repair", "Needs repair"], ["app", "Standalone apps"], ["archive", "Archives"]] : [])];
       $("#typeFilter").innerHTML = types.map(([value, label]) => `<option value="${value}">${label}</option>`).join("");
+      const styles = ["All", ...new Set(all.map(row => row.visualStyle).filter(Boolean))].sort((a,b) => a === "All" ? -1 : b === "All" ? 1 : a.localeCompare(b));
+      if (!styles.includes(state.style)) state.style = "All";
+      $("#styleFilter").innerHTML = styles.map(value => '<option value="' + esc(value) + '">' + esc(value === "All" ? "All visual styles" : value) + '</option>').join("");
       if (!types.some(([value]) => value === state.type)) state.type = "All";
       if (!["featured", "title", "variants"].includes(state.sort)) state.sort = "featured";
-      for (const key of ["category", "type", "sort"]) $(`#${key}Filter`).value = state[key];
+      for (const key of ["category", "type", "style", "sort"]) $(`#${key}Filter`).value = state[key];
+      const favoritesButton = $("#favoritesOnly");
+      const syncFavorites = () => { if (favoritesButton) favoritesButton.setAttribute("aria-pressed", String(state.favoritesOnly)); const count = $("#favoritesCount"); if (count) count.textContent = state.favorites.size ? "(" + state.favorites.size + ")" : ""; };
+      syncFavorites();
       $("#searchInput").value = state.query;
       const update = () => {
         const url = new URL(location.href);
-        for (const [key, value] of [["q", state.query], ["category", state.category], ["type", state.type], ["sort", state.sort]]) {
+        for (const [key, value] of [["q", state.query], ["category", state.category], ["type", state.type], ["style", state.style], ["sort", state.sort], ["saved", state.favoritesOnly ? "1" : ""]]) {
           if (!value || value === "All" || (key === "sort" && value === "featured")) url.searchParams.delete(key); else url.searchParams.set(key, value);
         }
-        history.replaceState(null, "", url); render();
+        history.replaceState(null, "", url); syncFavorites(); render();
       };
       $("#searchInput").addEventListener("input", event => { state.query = event.target.value.trim(); update(); });
       document.querySelectorAll("[data-filter]").forEach(node => node.addEventListener("change", event => { state[event.target.dataset.filter] = event.target.value; update(); }));
+      favoritesButton?.addEventListener("click", () => { state.favoritesOnly = !state.favoritesOnly; update(); });
       document.addEventListener("click", event => {
         if (!event.target.closest("#resetFilters")) return;
-        state.query = ""; state.category = "All"; state.type = "All";
-        $("#searchInput").value = ""; $("#categoryFilter").value = "All"; $("#typeFilter").value = "All";
+        state.query = ""; state.category = "All"; state.type = "All"; state.style = "All"; state.favoritesOnly = false;
+        $("#searchInput").value = ""; $("#categoryFilter").value = "All"; $("#typeFilter").value = "All"; $("#styleFilter").value = "All";
         update(); $("#searchInput").focus();
       });
     }
@@ -112,15 +133,18 @@
   }
   async function init() {
     try {
-      const [data, showcase, collections] = await Promise.all([
+      const [data, showcase, collections, previews, voltageModule] = await Promise.all([
         fetch("/data/asset-route-resolution.json").then(response => { if (!response.ok) throw new Error("Directory unavailable"); return response.json(); }),
         fetch("/data/asset-showcase.json").then(response => response.ok ? response.json() : {}).catch(() => ({})),
-        fetch("/data/curated-collections.json").then(response => response.ok ? response.json() : {}).catch(() => ({}))
+        fetch("/data/curated-collections.json").then(response => response.ok ? response.json() : {}).catch(() => ({})),
+        fetch("/data/asset-previews.json").then(response => response.ok ? response.json() : {}).catch(() => ({})),
+        import("/assets/js/voltage-ui.js")
       ]);
       const { applyCuratedCollections } = await import("/assets/js/curated-collections.js");
       const model = applyCuratedCollections(data, collections);
-      state.entries = model.entries || []; state.groups = model.groups || []; state.candidates = model.groupCandidates || []; state.showcase = showcase.projects || {};
+      state.entries = model.entries || []; state.groups = model.groups || []; state.candidates = model.groupCandidates || []; state.showcase = showcase.projects || {}; state.previews = previews.projects || {}; voltage = voltageModule;
       setup();
+      voltage.mountVoltage({ rows, rerender: () => { render(); if (catalog) { const count = $("#favoritesCount"); if (count) count.textContent = state.favorites.size ? "(" + state.favorites.size + ")" : ""; } }, favorites: state.favorites });
     } catch (error) {
       console.error(error);
       ($("#cardGrid") || $("#featuredGrid")).innerHTML = '<section class="empty"><h2>Projects could not be loaded</h2><p>Please reload the page to try again.</p></section>';
