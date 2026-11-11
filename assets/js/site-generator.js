@@ -581,7 +581,7 @@
       ]);
       if (![libraryResponse, catalogResponse, integrationResponse].every((response) => response.ok)) throw new Error("Generator data is unavailable.");
       const [libraryData, catalogsData, integrationsData] = await Promise.all([libraryResponse.json(), catalogResponse.json(), integrationResponse.json()]);
-      library = Array.isArray(libraryData.entries) ? libraryData.entries : [];
+      library = Array.isArray(libraryData.entries) ? libraryData.entries.map((entry) => ({ ...entry, factory: { kind: "site-idea", ...entry.factory, brief: entry.factory?.brief || {}, output: entry.factory?.output || {} } })) : [];
       factoryResources = libraryData.factory_resources || factoryResources;
       catalogs = catalogsData; integrationCatalog = integrationsData;
       handleEvents(); sourceFilterOptions(); renderAllControls(); renderSourcePicker(); syncFieldsFromState(); updateOutput(true);
