@@ -159,7 +159,7 @@
       const snippet = (entry.prompt || "No source prompt is available.").replace(/\s+/g, " ").trim();
       const preview = snippet.length > 156 ? `${snippet.slice(0, 153)}…` : snippet;
       const format = entry.factory.archetype || entry.factory.starter || "Site idea";
-      return `<button class="source-result-card ${isSelected ? "selected" : ""}" type="button" role="listitem" data-source-id="${escapeHtml(entry.id)}" aria-pressed="${isSelected ? "true" : "false"}"><span class="result-card-top"><span class="result-kind">${escapeHtml(entry.type || (entry.factory.kind === "design-template" ? "Design template" : "Site idea"))}</span><span class="result-format">${escapeHtml(format)}</span></span><strong>${escapeHtml(entry.name)}</strong><span class="source-result-snippet">${escapeHtml(preview)}</span></button>`;
+      return `<button class="source-result-card ${isSelected ? "selected" : ""}" type="button" data-source-id="${escapeHtml(entry.id)}" aria-pressed="${isSelected ? "true" : "false"}"><span class="result-card-top"><span class="result-kind">${escapeHtml(entry.type || (entry.factory.kind === "design-template" ? "Design template" : "Site idea"))}</span><span class="result-format">${escapeHtml(format)}</span></span><strong>${escapeHtml(entry.name)}</strong><span class="source-result-snippet">${escapeHtml(preview)}</span></button>`;
     }).join("");
     $("#sourceResults").innerHTML = customCard + (cards || `<p class="source-empty">No ideas match these filters. Clear a filter or broaden your search.</p>`);
     const ideaCount = options.filter((entry) => entry.factory.kind === "site-idea").length;
