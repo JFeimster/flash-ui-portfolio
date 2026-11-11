@@ -29,6 +29,7 @@
   let state = structuredClone(defaults);
   let promptDirty = false;
   let activeIntegrationCategory = "all";
+  let activeConfigPreview = "studio";
   let currentPrompt = "";
   let noticeTimer;
 
@@ -123,15 +124,48 @@
     $("#presetList").innerHTML = catalogs.presets.map((preset) => `<button class="preset-chip ${state.activePreset === preset.id ? "active" : ""}" type="button" data-preset="${preset.id}" aria-pressed="${state.activePreset === preset.id}"><span>${preset.mark}</span>${preset.name}</button>`).join("");
   }
 
+  function sourceFilterOptions() {
+    const fields = [
+      ["sourceTypeFilter", (entry) => entry.type || "Uncategorized", "All categories"],
+      ["sourceArchetypeFilter", (entry) => entry.factory.archetype || "Unspecified", "All formats"],
+      ["sourceStarterFilter", (entry) => entry.factory.starter || entry.factory.starter_selection?.status || "Unspecified", "All build targets"]
+    ];
+    for (const [id, getter, placeholder] of fields) {
+      const select = $(`#${id}`);
+      const values = [...new Set(library.map(getter).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+      select.innerHTML = `<option value="">${escapeHtml(placeholder)}</option>${values.map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("")}`;
+    }
+  }
+
   function renderSourcePicker() {
     const query = normalized($("#sourceSearch").value.trim());
     const showTemplates = $("#advancedSourceFilter").checked;
-    const options = library.filter((entry) => (showTemplates || entry.factory.kind === "site-idea") && (!query || normalized([entry.name, entry.type, entry.id, entry.prompt].join(" ")).includes(query)));
+    const category = $("#sourceTypeFilter").value;
+    const archetype = $("#sourceArchetypeFilter").value;
+    const starter = $("#sourceStarterFilter").value;
+    const options = library.filter((entry) => {
+      const isTemplate = entry.factory.kind === "design-template";
+      const matchesKind = showTemplates || !isTemplate;
+      const matchesCategory = !category || (entry.type || "Uncategorized") === category;
+      const matchesArchetype = !archetype || (entry.factory.archetype || "Unspecified") === archetype;
+      const matchesStarter = !starter || (entry.factory.starter || entry.factory.starter_selection?.status || "Unspecified") === starter;
+      const matchesQuery = !query || normalized([entry.name, entry.type, entry.id, entry.prompt, entry.factory.archetype, entry.factory.starter].join(" ")).includes(query);
+      return matchesKind && matchesCategory && matchesArchetype && matchesStarter && matchesQuery;
+    });
+    const selectedId = state.sourceId;
+    const customCard = `<button class="source-result-card custom-source-card ${selectedId ? "" : "selected"}" type="button" data-source-id="" aria-pressed="${selectedId ? "false" : "true"}"><span class="result-card-top"><span class="result-kind">START HERE</span><span aria-hidden="true">＋</span></span><strong>Custom project brief</strong><span class="source-result-snippet">Start with your own product, brand, and audience.</span></button>`;
+    const cards = options.map((entry) => {
+      const isSelected = entry.id === selectedId;
+      const snippet = (entry.prompt || "No source prompt is available.").replace(/\s+/g, " ").trim();
+      const preview = snippet.length > 156 ? `${snippet.slice(0, 153)}…` : snippet;
+      const format = entry.factory.archetype || entry.factory.starter || "Site idea";
+      return `<button class="source-result-card ${isSelected ? "selected" : ""}" type="button" data-source-id="${escapeHtml(entry.id)}" aria-pressed="${isSelected ? "true" : "false"}"><span class="result-card-top"><span class="result-kind">${escapeHtml(entry.type || (entry.factory.kind === "design-template" ? "Design template" : "Site idea"))}</span><span class="result-format">${escapeHtml(format)}</span></span><strong>${escapeHtml(entry.name)}</strong><span class="source-result-snippet">${escapeHtml(preview)}</span></button>`;
+    }).join("");
+    $("#sourceResults").innerHTML = customCard + (cards || `<p class="source-empty">No ideas match these filters. Clear a filter or broaden your search.</p>`);
+    const ideaCount = options.filter((entry) => entry.factory.kind === "site-idea").length;
+    const templateCount = options.length - ideaCount;
+    $("#sourceResultCount").textContent = `${options.length} results · ${ideaCount} ideas${showTemplates ? ` · ${templateCount} design templates` : ""}`;
     const selected = getSource();
-    if (selected && !options.some((item) => item.id === selected.id)) options.unshift(selected);
-    const select = $("#sourceSelect");
-    select.innerHTML = `<option value="">＋ Start with a custom project brief</option>${options.map((entry) => `<option value="${escapeHtml(entry.id)}" ${state.sourceId === entry.id ? "selected" : ""}>${escapeHtml(entry.name)} · ${escapeHtml(entry.type || entry.factory.archetype || "Site idea")}</option>`).join("")}`;
-    $("#sourceResultCount").textContent = `${options.length} ${showTemplates ? "ideas + templates" : "site ideas"} shown`;
     const card = $("#sourceCard");
     card.hidden = !selected;
     if (!selected) return;
@@ -144,7 +178,6 @@
     $("#sourceFacts").innerHTML = `<div><small>AUDIENCE</small><span>${escapeHtml(audience)}</span></div><div><small>CTA</small><span>${escapeHtml(cta)}</span></div><div><small>ARCHETYPE</small><span>${escapeHtml(selected.factory.archetype || "Not specified")}</span></div>`;
     $("#sourcePrompt").textContent = selected.prompt || "This source entry does not include a prompt.";
   }
-
   function renderIntegrations() {
     const chosenPreset = integrationCatalog.presets.find((item) => item.id === state.integrationPreset);
     $("#integrationPresets").innerHTML = integrationCatalog.presets.map((preset) => `<button type="button" class="integration-preset ${state.integrationPreset === preset.id ? "active" : ""}" data-integration-preset="${preset.id}" aria-pressed="${state.integrationPreset === preset.id}">${preset.name}</button>`).join("");
@@ -217,7 +250,6 @@
     const source = getSource();
     if (source) setSuggestedFields(source, false, previousSuggestion);
     $("#studioState").textContent = source ? `${source.name} · ${source.id}` : "Custom project · ready to shape";
-    $("#sourceSelect").value = source?.id || "";
     renderSourcePicker();
     syncFieldsFromState();
     updateOutput();
@@ -290,6 +322,7 @@
     const words = $("#promptOutput").value.trim().split(/\s+/).filter(Boolean).length;
     $("#promptStats").textContent = `${words.toLocaleString()} words`;
     updateRunnerExport();
+    renderExportPreviews();
   }
 
   function getStudioConfig() {
@@ -372,6 +405,37 @@
     $("#downloadRunnerBrief").disabled = false;
   }
 
+  function activateOutputTab(key) {
+    const button = $(`[data-output-tab="${key}"]`);
+    if (!button) return;
+    $$(".output-tabs [data-output-tab]").forEach((tab) => {
+      const active = tab === button;
+      tab.classList.toggle("active", active);
+      tab.setAttribute("aria-selected", String(active));
+      tab.tabIndex = active ? 0 : -1;
+      const panel = $(`#${tab.getAttribute("aria-controls")}`);
+      panel.hidden = !active;
+      panel.classList.toggle("active", active);
+    });
+  }
+
+  function renderExportPreviews() {
+    const configNode = $("#configPreview");
+    if (!configNode) return;
+    const studioConfig = JSON.stringify(getStudioConfig(), null, 2);
+    const runnerBrief = getRunnerBrief();
+    const runnerText = runnerBrief
+      ? JSON.stringify(runnerBrief, null, 2)
+      : "Runner brief unavailable. Select a factory-backed site idea, choose Static HTML or Next.js, and provide a project name, brand, audience, and primary CTA.";
+    const showRunner = activeConfigPreview === "runner";
+    configNode.textContent = showRunner ? runnerText : studioConfig;
+    $$(".config-preview-tabs [data-config-preview]").forEach((tab) => {
+      const active = tab.dataset.configPreview === activeConfigPreview;
+      tab.classList.toggle("active", active);
+      tab.setAttribute("aria-pressed", String(active));
+    });
+  }
+
   function downloadFile(filename, contents, type = "application/json") {
     const blob = new Blob([contents], { type: `${type};charset=utf-8` });
     const url = URL.createObjectURL(blob);
@@ -446,8 +510,14 @@
 
   function handleEvents() {
     $("#sourceSearch").addEventListener("input", renderSourcePicker);
+    ["#sourceTypeFilter", "#sourceArchetypeFilter", "#sourceStarterFilter"].forEach((selector) => $(selector).addEventListener("change", renderSourcePicker));
+    $("#clearSourceFilters").addEventListener("click", () => { $("#sourceSearch").value = ""; $("#sourceTypeFilter").value = ""; $("#sourceArchetypeFilter").value = ""; $("#sourceStarterFilter").value = ""; $("#advancedSourceFilter").checked = false; state.sourceMode = "library"; renderSourcePicker(); });
+    $("#sourceResults").addEventListener("click", (event) => { const button = event.target.closest("[data-source-id]"); if (button) selectSource(button.dataset.sourceId); });
+    $(".output-tabs").addEventListener("click", (event) => { const button = event.target.closest("[data-output-tab]"); if (button) activateOutputTab(button.dataset.outputTab); });
+    $(".output-tabs").addEventListener("keydown", (event) => { const current = event.target.closest("[data-output-tab]"); if (!current) return; const tabs = $(".output-tabs [data-output-tab]"); const index = tabs.indexOf(current); const next = event.key === "ArrowRight" ? (index + 1) % tabs.length : event.key === "ArrowLeft" ? (index + tabs.length - 1) % tabs.length : -1; if (next >= 0) { event.preventDefault(); tabs[next].focus(); activateOutputTab(tabs[next].dataset.outputTab); } });
+    document.addEventListener("click", (event) => { const button = event.target.closest("[data-open-output]"); if (button) activateOutputTab(button.dataset.openOutput); });
+    $(".config-preview-tabs").addEventListener("click", (event) => { const button = event.target.closest("[data-config-preview]"); if (button) { activeConfigPreview = button.dataset.configPreview; renderExportPreviews(); } });
     $("#advancedSourceFilter").addEventListener("change", () => { state.sourceMode = $("#advancedSourceFilter").checked ? "all" : "library"; renderSourcePicker(); });
-    $("#sourceSelect").addEventListener("change", (event) => selectSource(event.target.value));
     $("#primarySelectors").addEventListener("change", onOptionChange);
     $("#advancedSelectors").addEventListener("change", onOptionChange);
     document.addEventListener("input", (event) => {
@@ -489,6 +559,7 @@
     $("#copyRunnerCommand").addEventListener("click", () => copyText($("#runnerCommand").textContent, "Runner command copied. Update the brief path if you saved it elsewhere."));
     $("#seeExports").addEventListener("click", (event) => {
       event.preventDefault();
+      activateOutputTab("configuration");
       history.replaceState(null, "", "#exports");
       $("#exports").scrollIntoView({ behavior: "smooth", block: "center" });
       $("#exports").focus({ preventScroll: true });
@@ -513,11 +584,11 @@
       library = Array.isArray(libraryData.entries) ? libraryData.entries : [];
       factoryResources = libraryData.factory_resources || factoryResources;
       catalogs = catalogsData; integrationCatalog = integrationsData;
-      handleEvents(); renderAllControls(); renderSourcePicker(); syncFieldsFromState(); updateOutput(true);
+      handleEvents(); sourceFilterOptions(); renderAllControls(); renderSourcePicker(); syncFieldsFromState(); updateOutput(true);
       $("#sourceResultCount").textContent = `${library.filter((entry) => entry.factory.kind === "site-idea").length} site ideas ready`;
     } catch (error) {
       $("#sourceResultCount").textContent = "Prompt library could not be loaded";
-      $("#sourceSelect").innerHTML = `<option value="">${escapeHtml(error.message || "Generator data is unavailable")}</option>`;
+      $("#sourceResults").innerHTML = `<p class="source-empty">${escapeHtml(error.message || "Generator data is unavailable")}</p>`;
       setStatus("Generator data could not be loaded. Start the static site through its local server and retry.");
     }
   }

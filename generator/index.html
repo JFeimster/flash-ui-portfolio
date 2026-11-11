@@ -45,11 +45,21 @@
         <section class="control-section source-section" aria-labelledby="source-title">
           <div class="section-heading"><div class="section-index">01</div><div><span class="eyebrow">THE STARTING POINT</span><h2 id="source-title">Choose an idea</h2><p>Search 105 site ideas and design templates, or write your own brief.</p></div></div>
           <div class="source-picker">
-            <label class="field-label" for="sourceSearch">Find an idea<span class="field-note">Search by title, type, or prompt text</span></label>
-            <input id="sourceSearch" type="search" placeholder="Try “calculator”, “creator”, “local”…" autocomplete="off">
-            <label class="field-label select-label" for="sourceSelect">Prompt library</label>
-            <select id="sourceSelect" size="5" aria-describedby="sourceResultCount"><option value="">＋ Start with a custom project brief</option></select>
-            <div class="source-meta-line"><span id="sourceResultCount" role="status">Loading prompt library…</span><label class="check-inline"><input id="advancedSourceFilter" type="checkbox"> Include design templates</label></div>
+            <label class="field-label" for="sourceSearch">Find an idea<span class="field-note">Search titles, categories, archetypes, and original prompts</span></label>
+            <input id="sourceSearch" type="search" placeholder="Search 105 ideas: “calculator”, “creator”, “local”…" autocomplete="off">
+            <div class="source-filter-grid">
+              <label class="field-label compact-field" for="sourceTypeFilter">Category<select id="sourceTypeFilter"><option value="">All categories</option></select></label>
+              <label class="field-label compact-field" for="sourceArchetypeFilter">Site format<select id="sourceArchetypeFilter"><option value="">All formats</option></select></label>
+              <label class="field-label compact-field" for="sourceStarterFilter">Build target<select id="sourceStarterFilter"><option value="">All build targets</option></select></label>
+            </div>
+            <div class="source-meta-line">
+              <span id="sourceResultCount" role="status" aria-live="polite">Loading prompt library…</span>
+              <div class="source-library-actions">
+                <label class="check-inline"><input id="advancedSourceFilter" type="checkbox"> Include design templates</label>
+                <button class="text-button" id="clearSourceFilters" type="button">Clear filters</button>
+              </div>
+            </div>
+            <div class="source-results" id="sourceResults" role="group" aria-label="Prompt library ideas"></div>
           </div>
           <div class="source-card" id="sourceCard" hidden>
             <div class="source-card-top"><span class="source-chip" id="sourceKind">Site idea</span><span class="source-id" id="sourceId"></span></div>
@@ -98,23 +108,43 @@
 
           </div>
         </details>
-        <div class="runner-note"><span class="runner-icon">⌘</span><p><strong>Local project factory</strong><span>Export a compatible brief and run PowerShell yourself on your computer. This hosted static page cannot start that process.</span></p><a id="seeExports" href="#exports">See exports ↓</a></div>
+        <div class="runner-note"><span class="runner-icon">⌘</span><p><strong>Local project factory</strong><span>Export a compatible brief and run PowerShell yourself on your computer. This hosted static page cannot start that process.</span></p><a id="seeExports" href="#exports">Open project configuration ↓</a></div>
       </section>
 
       <aside class="output-column" aria-label="Generated output">
-        <section class="output-panel prompt-panel" aria-labelledby="prompt-title">
+        <div class="output-tabs" role="tablist" aria-label="Output workspace">
+          <button class="output-tab active" id="outputTabPrompt" type="button" role="tab" aria-selected="true" aria-controls="promptWorkspace" data-output-tab="prompt">Build prompt</button>
+          <button class="output-tab" id="outputTabConfig" type="button" role="tab" aria-selected="false" aria-controls="exports" data-output-tab="configuration" tabindex="-1">Project configuration</button>
+          <button class="output-tab" id="outputTabCommand" type="button" role="tab" aria-selected="false" aria-controls="runnerWorkspace" data-output-tab="powershell" tabindex="-1">PowerShell</button>
+        </div>
+        <section class="output-panel prompt-panel workspace-panel active" id="promptWorkspace" role="tabpanel" aria-labelledby="outputTabPrompt">
           <div class="output-heading"><div><span class="eyebrow">LIVE OUTPUT · EDITABLE</span><h2 id="prompt-title">Build prompt</h2></div><span class="output-badge"><span></span> READY</span></div>
-          <p class="output-intro">A detailed build brief that follows your selected idea, architecture, visual system, and implementation target.</p>
+          <p class="output-intro">Shape the implementation brief here. Your edits remain visible while you move through the rest of the studio.</p>
           <div class="prompt-toolbar"><span id="promptStats">0 words</span><div><button class="mini-button" id="regeneratePrompt" type="button" title="Rebuild from the current controls">↻ Refresh</button><button class="mini-button primary-mini" id="copyPrompt" type="button">Copy prompt</button><button class="mini-button" id="downloadPrompt" type="button">Download</button></div></div>
           <textarea id="promptOutput" class="prompt-output" spellcheck="false" aria-label="Editable generated build prompt" placeholder="Choose a project idea or start with a custom brief to compose your build prompt."></textarea>
           <div class="prompt-foot"><span>✦</span><span>Changes in the controls refresh this prompt until you edit it. Refresh to rebuild after editing.</span></div>
         </section>
-        <section class="output-panel export-panel" id="exports" tabindex="-1" aria-labelledby="export-title">
+        <section class="output-panel export-panel workspace-panel" id="exports" tabindex="-1" role="tabpanel" aria-labelledby="outputTabConfig" hidden>
           <div class="output-heading"><div><span class="eyebrow">PORTABLE PROJECT BRIEF</span><h2 id="export-title">Project configuration</h2></div><span class="json-mark">{ }</span></div>
-          <p class="output-intro">Download the complete studio configuration and the runner-compatible brief as separate JSON files.</p>
-          <div class="export-actions"><button class="export-button" id="downloadConfig" type="button"><span>↓</span><span><strong>Studio configuration</strong><small>All selected options · .json</small></span></button><button class="export-button" id="downloadRunnerBrief" type="button"><span>↓</span><span><strong>Factory runner brief</strong><small>Supported brief fields · .json</small></span></button></div>
-          <div class="runner-command"><div class="command-heading"><span>LOCAL POWERSHELL COMMAND</span><button class="mini-button" id="copyRunnerCommand" type="button">Copy</button></div><code id="runnerCommand">Select a factory-backed site idea to prepare the command.</code><small>Uses the runner's documented -EntryId and -ProjectBriefFile parameters. It does not run here.</small></div>
+          <p class="output-intro">Inspect the complete studio configuration or the runner-ready brief before downloading either file.</p>
+          <div class="config-preview-tabs" role="tablist" aria-label="Configuration preview">
+            <button class="config-preview-tab active" type="button" aria-pressed="true" data-config-preview="studio">Studio configuration</button>
+            <button class="config-preview-tab" type="button" aria-pressed="false" data-config-preview="runner">Factory runner brief</button>
+          </div>
+          <pre class="structured-preview" id="configPreview" tabindex="0" aria-live="polite">Preparing project configuration…</pre>
+          <div class="export-actions">
+            <button class="export-button" id="downloadConfig" type="button"><span>↓</span><span><strong>Studio configuration</strong><small>All selected options · JSON</small></span></button>
+            <button class="export-button" type="button" data-open-output="powershell"><span>↗</span><span><strong>Open PowerShell command</strong><small>Review the local run command</small></span></button>
+          </div>
           <div class="export-status" id="actionStatus" role="status" aria-live="polite"></div>
+        </section>
+        <section class="output-panel powershell-panel workspace-panel" id="runnerWorkspace" role="tabpanel" aria-labelledby="outputTabCommand" hidden>
+          <div class="output-heading"><div><span class="eyebrow">LOCAL FACTORY · PREPARED COMMAND</span><h2>Run it in PowerShell</h2></div><span class="json-mark">PS</span></div>
+          <p class="output-intro">The command uses the selected factory entry and its runner brief. Save the brief first, then adjust the file path if you saved it elsewhere.</p>
+          <div class="command-toolbar"><span>PowerShell 7 · local machine</span><button class="mini-button" id="copyRunnerCommand" type="button">Copy command</button></div>
+          <pre class="command-preview"><code id="runnerCommand">Select a factory-backed site idea to prepare the command.</code></pre>
+          <p class="runner-disclaimer">This hosted studio prepares the command; it does not execute PowerShell or create a repository.</p>
+          <button class="export-button command-brief-download" id="downloadRunnerBrief" type="button"><span>↓</span><span><strong>Download factory runner brief</strong><small>Required input for the command · JSON</small></span></button>
         </section>
       </aside>
     </div>
