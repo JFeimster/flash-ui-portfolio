@@ -11,6 +11,11 @@ page.on("pageerror", error => pageErrors.push(error.message));
 try {
   const home = await page.goto(new URL("/", base).href, { waitUntil: "domcontentloaded" });
   assert.equal(home?.status(), 200, "portfolio homepage should load");
+  await page.locator(".voltage-card").first().waitFor();
+  assert.equal(await page.locator(".card-artwork .card-art-label").count(), 0, "directory thumbnails should not have a blocking label");
+  assert.equal(await page.locator(".card-artwork [data-quick-preview]").count(), 0, "quick preview should sit below the artwork");
+  assert.ok(await page.locator(".card-bottom [data-quick-preview]").count() > 0, "quick preview should be available in the card actions");
+
   await page.getByRole("link", { name: /site generator/i }).click();
   await page.waitForURL("**/generator/");
   assert.equal(page.url(), new URL("/generator/", base).href);
@@ -26,6 +31,14 @@ try {
   const prompt = page.locator("#promptOutput");
   await prompt.waitFor();
   assert.ok((await prompt.inputValue()).length > 100, "initial prompt should be composed");
+
+  const integrationRect = await page.locator(".integrations-section").boundingBox();
+  const studioRect = await page.locator(".studio-grid").boundingBox();
+  assert.ok(integrationRect && studioRect && integrationRect.width >= studioRect.width * 0.9, "integrations should use the full studio width");
+
+  await page.locator("#seeExports").click();
+  await page.waitForFunction(() => location.hash === "#exports");
+  assert.equal(await page.evaluate(() => document.activeElement?.id), "exports", "See exports should move focus to the export section");
 
   const preset = page.locator("[data-preset]").first();
   await preset.click();

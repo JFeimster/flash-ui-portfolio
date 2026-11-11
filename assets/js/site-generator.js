@@ -487,6 +487,12 @@
     $("#downloadConfig").addEventListener("click", () => { downloadFile(`${slugify(state.values.projectName || "flash-ui-project")}-studio-config.json`, JSON.stringify(getStudioConfig(), null, 2)); setStatus("Studio configuration downloaded as JSON."); });
     $("#downloadRunnerBrief").addEventListener("click", () => { const brief = getRunnerBrief(); if (brief) { downloadFile(`${brief.project_slug}-runner-brief.json`, JSON.stringify(brief, null, 2)); setStatus("Factory runner brief downloaded. Review it before running locally."); } });
     $("#copyRunnerCommand").addEventListener("click", () => copyText($("#runnerCommand").textContent, "Runner command copied. Update the brief path if you saved it elsewhere."));
+    $("#seeExports").addEventListener("click", (event) => {
+      event.preventDefault();
+      history.replaceState(null, "", "#exports");
+      $("#exports").scrollIntoView({ behavior: "smooth", block: "center" });
+      $("#exports").focus({ preventScroll: true });
+    });
   }
 
   function onOptionChange(event) {
