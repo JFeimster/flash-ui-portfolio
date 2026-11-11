@@ -7,14 +7,17 @@ export function artwork(row, saved) {
   const hasPreview = Boolean(localPath(row.previewTarget));
   const thumb = String(row.image || "");
   const safeImage = thumb.startsWith("/assets/previews/") && thumb.endsWith(".webp") ? thumb : "";
-  const label = esc(row.previewLabel || row.visualStyle || row.category);
   let html = '<div class="card-artwork tone-' + cleanTone(row.tone) + '">';
-  html += '<span class="card-art-label">' + label + '</span>';
   html += '<div class="card-art-title" aria-hidden="true">' + title + '</div>';
   if (safeImage) html += '<img data-preview-image src="' + esc(safeImage) + '" alt="" loading="lazy" decoding="async">';
   html += '<button class="favorite-toggle" type="button" data-favorite-id="' + esc(row.id) + '" aria-label="' + (saved ? 'Remove from saved: ' : 'Save project: ') + title + '" aria-pressed="' + (saved ? 'true' : 'false') + '">' + (saved ? '★' : '☆') + '</button>';
-  if (hasPreview) html += '<button class="quick-peek" type="button" data-quick-preview data-preview-url="' + esc(localPath(row.previewTarget)) + '" data-preview-title="' + title + '">◎ Quick Preview</button>';
   return html + '</div>';
+}
+
+export function quickPreview(row) {
+  const path = localPath(row.previewTarget);
+  if (!path) return "";
+  return '<button class="quick-peek" type="button" data-quick-preview data-preview-url="' + esc(path) + '" data-preview-title="' + esc(row.title) + '">◎ Quick Preview</button>';
 }
 export function mountVoltage({ rows, rerender, favorites }) {
   const dialog = document.getElementById("quickPreviewDialog");
@@ -72,8 +75,8 @@ export function mountVoltage({ rows, rerender, favorites }) {
     const safeImg = String(item.image || "");
     const validImg = safeImg.startsWith("/assets/previews/") && safeImg.endsWith(".webp");
     hero.innerHTML = '<div class="showcase-head"><div class="showcase-chrome" aria-hidden="true"><span></span><span></span><span></span></div><span class="showcase-live-label">ACTUAL PROJECT / 0' + (current+1) + '</span></div>'
-      + '<div class="showcase-window"><div class="showcase-live-media" data-live-path="' + esc(path) + '"><div class="showcase-fallback">' + esc(item.title) + '</div>'
-      + (validImg ? '<img data-preview-image data-showcase-preview src="' + esc(safeImg) + '" alt="Screenshot of ' + esc(item.title) + '">' : "")
+      + '<div class="showcase-window"><div class="showcase-live-media" data-live-path="' + esc(path) + '">'
+      + (validImg ? '<img data-preview-image data-showcase-preview src="' + esc(safeImg) + '" alt="Screenshot of ' + esc(item.title) + '">' : '<div class="showcase-fallback">' + esc(item.title) + '</div>')
       + '</div><a class="showcase-open-overlay" href="' + esc(path) + '" aria-label="Open ' + esc(item.title) + '"></a></div>'
       + '<div class="showcase-bottom"><div><strong>' + esc(item.title) + '</strong><span class="showcase-subtitle">' + esc(item.visualStyle || item.category) + ' · Open live project ↗</span></div><div class="showcase-tabs" role="tablist" aria-label="Choose showcase project">'
       + items.map((entry,i) => '<button type="button" role="tab" data-showcase-index="' + i + '" aria-label="Show ' + esc(entry.title) + '" aria-selected="' + (i === current) + '">' + (i+1) + '</button>').join("")

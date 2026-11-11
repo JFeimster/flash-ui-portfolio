@@ -66,11 +66,12 @@
     const action = path
       ? '<a class="btn primary" href="' + esc(path) + '" aria-label="' + esc((row.count ? "Explore variants of " : "Open ") + row.title) + '">' + (row.count ? 'Explore Variants' : '🚀 Open Site') + '<span aria-hidden="true">↗</span></a>'
       : '<p class="repair-note">' + esc(statusLabel(row)) + '</p>';
+    const preview = voltage ? voltage.quickPreview(row) : '';
     return '<article class="card voltage-card" data-project="' + esc(row.id) + '">'
       + (voltage ? voltage.artwork(row,state.favorites.has(row.id)) : '')
-      + '<div class="card-content"><div class="card-topline"><span class="card-category">' + category + '</span>' + style + '</div>'
+      + '<div class="card-content"><div class="card-topline"><span class="card-category">' + category + '</span>' + style + (row.count ? '<span class="variant-count">' + row.count + ' variation' + (row.count === 1 ? '' : 's') + '</span>' : '') + '</div>'
       + '<h2>' + title + '</h2><p class="card-description">' + esc(row.description) + '</p>'
-      + '<div class="card-bottom">' + (row.count ? '<span class="variant-count">' + row.count + ' variation' + (row.count === 1 ? '' : 's') + '</span>' : '') + action + '</div></div>'
+      + '<div class="card-bottom">' + preview + action + '</div></div>'
       + (internal ? details(row.item) : '') + '</article>';
   }
   function empty() { return '<section class="empty"><h2>No projects found</h2><p>Try a broader search or clear the filters.</p><button class="btn" id="resetFilters" type="button">Clear filters</button></section>'; }
