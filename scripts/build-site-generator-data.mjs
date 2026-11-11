@@ -53,6 +53,13 @@ const entries = eligible.map(({ entry, metadata }) => ({
     },
   }));
 
+const additionsPath = path.join(repoRoot, 'data', 'site-generator-prompt-additions.json');
+const additions = JSON.parse(fs.readFileSync(additionsPath, 'utf8'));
+const knownIds = new Set(entries.map((entry) => entry.id));
+for (const entry of additions.entries || []) {
+  if (!knownIds.has(entry.id)) entries.push(entry);
+}
+
 const output = {
   schema_version: 'flash-ui-site-generator-library/v1',
   registry_schema_version: factory.schema_version || null,
