@@ -32,6 +32,12 @@ pwsh -NoProfile -File .\Invoke-FlashUiProjectFactory.ps1 -EntryId <registry-id> 
 
 Run it from the local runner folder after downloading and reviewing the brief. The browser cannot start that process. A custom project without a factory registry ID has no runner command.
 
+## Utility-focused workspace
+
+- Search the full original prompt text and narrow the library by category, site format, and build target. The results are a scannable card grid; design templates can be included or excluded without losing the current brief.
+- The output workspace uses dedicated Build prompt, Project configuration, and PowerShell views. Each view has the full available panel height so long prompts and JSON can be read and edited without squeezing them into a short side card.
+- The configuration view switches between the complete Studio configuration and the runner brief. The PowerShell view shows the complete local command with wrapping and a copy action.
+
 ## Useful local review
 
 - Check the generated prompt in the editable preview before copying or downloading it.
