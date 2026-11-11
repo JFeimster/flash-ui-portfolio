@@ -1,0 +1,55 @@
+name: Site Generator smoke
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "generator/**"
+      - "assets/js/site-generator.js"
+      - "assets/css/generator.css"
+      - "data/site-generator-*.json"
+      - "scripts/smoke-site-generator.mjs"
+      - ".github/workflows/site-generator-smoke.yml"
+  push:
+    branches: [main]
+    paths:
+      - "generator/**"
+      - "assets/js/site-generator.js"
+      - "assets/css/generator.css"
+      - "data/site-generator-*.json"
+      - "scripts/smoke-site-generator.mjs"
+      - ".github/workflows/site-generator-smoke.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site-generator-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  browser-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Playwright
+        run: npm install --no-save --no-package-lock playwright@1.56.1
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Serve the static portfolio
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory . > /tmp/site-generator-http.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:4173/generator/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/site-generator-http.log
+          exit 1
+      - name: Exercise the Site Generator
+        env:
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
+        run: node scripts/smoke-site-generator.mjs
