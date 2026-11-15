@@ -1,0 +1,1 @@
+var e=`jester-quotes:favorites:v1`;function t(){try{let e=JSON.parse(localStorage.getItem(`jester-quotes:favorites:v1`)??`[]`);return new Set(Array.isArray(e)?e.filter(e=>typeof e==`string`&&e.length>0):[])}catch{return new Set}}function n(t){try{return localStorage.setItem(e,JSON.stringify([...t])),!0}catch{return!1}}export{t as n,n as r,e as t};

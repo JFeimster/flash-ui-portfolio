@@ -10,7 +10,7 @@ $dataRoot = Join-Path $RepoRoot "data"
 function Read-Json([string]$RelativePath) {
   $path = Join-Path $RepoRoot $RelativePath
   if (-not (Test-Path -LiteralPath $path)) { return $null }
-  return Get-Content -LiteralPath $path -Raw | ConvertFrom-Json
+  return Get-Content -LiteralPath $path -Raw -Encoding UTF8 | ConvertFrom-Json
 }
 
 function As-Array($Value) {
@@ -67,7 +67,7 @@ function Plain-Text([string]$Value) {
 }
 
 function Read-HtmlMetadata([string]$File) {
-  $html = Get-Content -LiteralPath $File -Raw
+  $html = Get-Content -LiteralPath $File -Raw -Encoding UTF8
   $title = Plain-Text ([regex]::Match($html, '(?is)<title\b[^>]*>(.*?)</title>').Groups[1].Value)
   $heading = Plain-Text ([regex]::Match($html, '(?is)<h1\b[^>]*>(.*?)</h1>').Groups[1].Value)
   $description = ''
