@@ -71,7 +71,7 @@
       + (voltage ? voltage.artwork(row,state.favorites.has(row.id)) : '')
       + '<div class="card-content"><div class="card-topline"><span class="card-category">' + category + '</span>' + style + (row.count ? '<span class="variant-count">' + row.count + ' variation' + (row.count === 1 ? '' : 's') + '</span>' : '') + '</div>'
       + '<h2>' + title + '</h2><p class="card-description">' + esc(row.description) + '</p>'
-      + '<div class="card-bottom">' + preview + action + '</div></div>'
+      + '<div class="card-bottom">' + preview + action + (row.id === 'jester-quotes' ? '<a class="btn" href="/sites/jester-quotes/variants/">Explore Editions ↗</a>' : '') + '</div></div>'
       + (internal ? details(row.item) : '') + '</article>';
   }
   function empty() { return '<section class="empty"><h2>No projects found</h2><p>Try a broader search or clear the filters.</p><button class="btn" id="resetFilters" type="button">Clear filters</button></section>'; }
