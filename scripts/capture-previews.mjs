@@ -37,7 +37,7 @@ const add = (id, item, familyId = "") => {
 for (const group of routeData.groups || []) {
   const familyEntries = (routeData.entries || []).filter(entry => entry.canonicalGroupId === group.groupId);
   const members = familyEntries.filter(entry => entry.variantNumber);
-  const recommended = members.find(entry => entry.title === group.recommendedPrimary);
+  const recommended = familyEntries.find(entry => entry.title === group.recommendedPrimary);
   const primary = recommended || members.find(entry => entry.variantNumber === 1) || members[0] || familyEntries.find(entry => entry.type !== "group-hub");
   if (primary) add(group.groupId, primary, group.groupId);
   for (const variant of members) add(`${group.groupId}--variant-${variant.variantNumber}`, variant, group.groupId);
