@@ -90,6 +90,7 @@ $baseRegistry = As-Array (Read-Json "data/site-registry.json")
 $staticRegistry = As-Array (Read-Json "data/site-registry-static-extractions.json")
 $batch = Read-Json "data/site-registry-batch-5-additions.json"
 $groupsData = Read-Json "data/asset-groups.json"
+$routeContractsData = Read-Json "data/variant-route-contracts.json"
 $migrationData = Read-Json "data/variant-migration-map.json"
 $verificationData = Read-Json "data/live-path-smoke-test.json"
 
@@ -341,6 +342,58 @@ foreach ($groupId in $groupDefinitions.Keys) {
   }
 }
 
+# Fail before writing derived route data if an additive variant contract regresses.
+foreach ($contract in As-Array (Get-Value $routeContractsData "groups" @())) {
+  $groupId = [string](Get-Value $contract "groupId" "")
+  $expectedDisplayTitle = [string](Get-Value $contract "displayTitle" "")
+  $expectedHub = Normalize-Path (Get-Value $contract "hubPath" "")
+  $expectedVariants = As-Array (Get-Value $contract "variants" @())
+  $matches = @($groups | Where-Object { $_.groupId -eq $groupId })
+  if (-not $groupId -or $matches.Count -ne 1) { throw "Variant route contract group missing or duplicated: $groupId" }
+  if ($matches[0].displayTitle -ne $expectedDisplayTitle -or $matches[0].hubPath -ne $expectedHub -or
+      -not (Has-Entrypoint (To-RepoPath $expectedHub))) {
+    throw "Variant route contract hub mismatch: $groupId -> $expectedHub"
+  }
+  $expectedNumbers = @($expectedVariants | ForEach-Object { [int](Get-Value $_ "number" 0) } | Sort-Object -Unique)
+  if ($matches[0].variantCount -ne $expectedVariants.Count -or $expectedNumbers.Count -ne $expectedVariants.Count -or
+      ($matches[0].variantNumbers -join ',') -ne ($expectedNumbers -join ',')) {
+    throw "Variant route contract count mismatch: $groupId"
+  }
+  $hubEntries = @($resolvedEntries | Where-Object { $_.canonicalGroupId -eq $groupId -and $_.resolvedPath -eq $expectedHub })
+  if ($hubEntries.Count -ne 1 -or $hubEntries[0].resolutionStatus -ne "resolved") {
+    throw "Variant route contract directory destination missing: $groupId"
+  }
+  foreach ($variant in $expectedVariants) {
+    $number = [int](Get-Value $variant "number" 0)
+    $expectedPath = Normalize-Path (Get-Value $variant "path" "")
+    $expectedTitle = [string](Get-Value $variant "title" "")
+    $expectedDescription = [string](Get-Value $variant "description" "")
+    $entries = @($resolvedEntries | Where-Object { $_.canonicalGroupId -eq $groupId -and $_['variantNumber'] -eq $number })
+    if ($entries.Count -ne 1 -or $entries[0].resolutionStatus -ne "resolved" -or
+        $entries[0].resolvedPath -ne $expectedPath -or -not $expectedTitle) {
+      throw "Variant route contract mismatch: $groupId variant $number"
+    }
+    $entries[0]['title'] = $expectedTitle
+    if ($expectedDescription) { $entries[0]['description'] = $expectedDescription }
+    foreach ($asset in As-Array (Get-Value $variant "assets" @())) {
+      $assetPath = Normalize-Path "$($expectedPath.TrimEnd('/'))/$asset"
+      if (-not (Test-Path -LiteralPath (To-RepoPath $assetPath) -PathType Leaf)) {
+        throw "Variant route contract asset missing: $assetPath"
+      }
+    }
+  }
+  foreach ($legacyPath in As-Array (Get-Value $contract "preservedPaths" @())) {
+    if (-not (Has-Entrypoint (To-RepoPath $legacyPath))) {
+      throw "Variant route contract legacy page missing: $legacyPath"
+    }
+  }
+  foreach ($legacyAsset in As-Array (Get-Value $contract "preservedAssets" @())) {
+    if (-not (Test-Path -LiteralPath (To-RepoPath $legacyAsset) -PathType Leaf)) {
+      throw "Variant route contract legacy asset missing: $legacyAsset"
+    }
+  }
+}
+
 $summary = [ordered]@{
   totalEntriesExamined = $resolvedEntries.Count
   resolved = @($resolvedEntries | Where-Object { $_.resolutionStatus -eq "resolved" }).Count
@@ -355,7 +408,7 @@ $summary = [ordered]@{
 $output = [ordered]@{
   version = "1.1.0"
   generatedAt = (Get-Date).ToUniversalTime().ToString("o")
-  sourceFiles = @("data/site-registry.json", "data/site-registry-static-extractions.json", "data/site-registry-batch-5-additions.json", "data/asset-groups.json", "data/variant-migration-map.json")
+  sourceFiles = @("data/site-registry.json", "data/site-registry-static-extractions.json", "data/site-registry-batch-5-additions.json", "data/asset-groups.json", "data/variant-route-contracts.json", "data/variant-migration-map.json")
   verificationNote = "Local entrypoint evidence is structural only; production availability remains unverified until an authorized deployment smoke test is run."
   summary = $summary
   groups = @($groups | Sort-Object displayTitle)
