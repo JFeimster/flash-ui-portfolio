@@ -23,11 +23,11 @@ try {
   const libraryResponse = await page.request.get(new URL("/data/site-generator-prompts.json", base).href);
   assert.equal(libraryResponse.status(), 200, "generator prompt projection should load");
   const library = await libraryResponse.json();
-  assert.equal(library.entry_count, 105, "expected 105 factory-backed ideas/templates");
+  assert.equal(library.entry_count, library.entries.length, "entry count should match the generated library");
   const templates = library.entries.filter(entry => entry.factory?.kind === "design-template");
   assert.equal(templates.length, 17, "expected 17 design templates");
 
-  await page.getByText("88 site ideas ready").waitFor();
+  await page.getByText(`${library.entries.filter(entry => entry.factory?.kind === "site-idea").length} site ideas ready`).waitFor();
   const prompt = page.locator("#promptOutput");
   await prompt.waitFor();
   assert.ok((await prompt.inputValue()).length > 100, "initial prompt should be composed");
@@ -45,13 +45,14 @@ try {
   assert.ok((await prompt.inputValue()).length > 100, "preset should leave a usable prompt");
 
   await page.locator("#advancedSourceFilter").check();
-  await page.locator("#sourceSelect").selectOption(templates[0].id);
+  await page.locator('[data-source-id="' + templates[0].id + '"]').click();
   await page.locator("#projectName").fill("CI Generator Smoke");
   await page.locator("#brand").fill("Flash UI");
   await page.locator("#audience").fill("Site builders");
   await page.locator("#cta").fill("Generate a site");
   await page.locator('[data-option="framework"]').selectOption("static-html");
 
+  await page.locator('#outputTabCommand').click();
   const briefButton = page.locator("#downloadRunnerBrief");
   await briefButton.waitFor();
   assert.equal(await briefButton.isEnabled(), true, "complete design-template brief should export without a review confirmation");

@@ -9,7 +9,16 @@ on:
       - "assets/js/voltage-ui.js"
       - "assets/css/voltage.css"
       - "assets/js/site-generator.js"
+      - "assets/js/use-asset.mjs"
+      - "assets/js/zip-store.mjs"
+      - "assets/js/variant-hub.js"
       - "assets/css/generator.css"
+      - "assets/css/use-asset.css"
+      - "sites/index.html"
+      - "use-asset/**"
+      - "data/asset-packages.json"
+      - "scripts/build-asset-packages.mjs"
+      - "scripts/smoke-use-asset.mjs"
       - "data/site-generator-*.json"
       - "scripts/smoke-site-generator.mjs"
       - ".github/workflows/site-generator-smoke.yml"
@@ -22,7 +31,16 @@ on:
       - "assets/js/voltage-ui.js"
       - "assets/css/voltage.css"
       - "assets/js/site-generator.js"
+      - "assets/js/use-asset.mjs"
+      - "assets/js/zip-store.mjs"
+      - "assets/js/variant-hub.js"
       - "assets/css/generator.css"
+      - "assets/css/use-asset.css"
+      - "sites/index.html"
+      - "use-asset/**"
+      - "data/asset-packages.json"
+      - "scripts/build-asset-packages.mjs"
+      - "scripts/smoke-use-asset.mjs"
       - "data/site-generator-*.json"
       - "scripts/smoke-site-generator.mjs"
       - ".github/workflows/site-generator-smoke.yml"
@@ -61,3 +79,11 @@ jobs:
         env:
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
         run: node scripts/smoke-site-generator.mjs
+      - name: Check asset package manifest
+        run: |
+          node scripts/build-asset-packages.mjs
+          git diff --exit-code -- data/asset-packages.json
+      - name: Exercise Use This Asset
+        env:
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
+        run: node scripts/smoke-use-asset.mjs
