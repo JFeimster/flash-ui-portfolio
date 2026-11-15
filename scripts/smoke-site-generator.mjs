@@ -69,8 +69,24 @@ try {
   assert.equal(contents.delivery.push_code, false);
   assert.ok((await prompt.inputValue()).length > 100, "editable prompt preview should remain available");
 
+  await page.goto(new URL('/sites/', base).href);
+  const jesterCard = page.locator('[data-project="jester-quotes"]');
+  await jesterCard.waitFor();
+  await jesterCard.getByRole('link', { name: /explore editions/i }).click();
+  await page.waitForURL('**/sites/jester-quotes/variants/');
+  assert.equal(await page.locator('#editions .card').count(), 8, 'Jester family should show eight editions');
+  assert.equal(await page.getByRole('link', { name: /open design preview/i }).nth(1).getAttribute('href'), 'https://jester-quotes.vercel.app/editions/neo-brutalist/');
+  const screenshots = await page.locator('#editions img').evaluateAll(images => images.map(image => image.getAttribute('src')));
+  assert.equal(screenshots.length, 8);
+  for (const source of screenshots) assert.equal((await page.request.get(new URL(source, base).href)).status(), 200, `edition screenshot should load: ${source}`);
+  await page.setViewportSize({ width: 390, height: 844 });
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 390, 'mobile hub should not overflow horizontally');
+  await page.goBack();
+  await page.waitForURL('**/sites/');
+  assert.equal((await page.goto(new URL('/sites/jester-quotes/', base).href))?.status(), 200, 'Dada Riot static import should remain available');
+
   assert.deepEqual(pageErrors, [], "generator should not throw browser-side errors");
-  console.log("Site Generator CI smoke passed: navigation, registry load, prompt, preset, template brief export.");
+  console.log("Site Generator and Jester editions CI smoke passed: registry, prompt, export, portfolio card, variants, images, mobile, static import.");
 } finally {
   await browser.close();
 }
