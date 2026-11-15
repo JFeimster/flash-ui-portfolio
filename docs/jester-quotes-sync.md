@@ -18,6 +18,6 @@ Manual Actions trigger:
 gh workflow run sync-jester-quotes.yml --repo JFeimster/flash-ui-portfolio --ref main
 ```
 
-The daily scheduled check compares the canonical `main` revision. A changed revision builds and opens one update PR on `codex/jester-quotes-auto-sync`; if that PR is already open, the workflow updates that branch. Nothing merges or deploys automatically.
+The daily scheduled check compares the canonical `main` revision. A changed revision builds and opens one update PR on `codex/jester-quotes-auto-sync`; if that PR is already open, the workflow updates that branch. Nothing merges or deploys automatically. The sync job remains inactive until the repository variable `JESTER_QUOTES_SYNC_ENABLED` is set to `true`; this also gates manual dispatches.
 
-Repository setting prerequisite: Actions must be allowed to create pull requests. As checked on 2026-11-15, the repository currently reports `can_approve_pull_request_reviews: false` and has no Actions secrets. Enable **Settings → Actions → General → Allow GitHub Actions to create and approve pull requests** before running the workflow; the workflow needs PR creation permission but does not approve or merge PRs.
+Repository setting prerequisite: Actions must be allowed to create pull requests. As checked on 2026-11-15, the repository currently reports `can_approve_pull_request_reviews: false` and has no Actions secrets. Enable **Settings → Actions → General → Allow GitHub Actions to create and approve pull requests**, then set **Settings → Secrets and variables → Actions → Variables → `JESTER_QUOTES_SYNC_ENABLED`** to `true` before running the workflow. The workflow needs PR creation permission but does not approve or merge PRs.

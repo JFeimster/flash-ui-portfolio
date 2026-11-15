@@ -12,15 +12,20 @@ const editions = JSON.parse(await readFile(new URL('../data/jester-quotes-editio
 test('all eight selectors retain verified routes and preview images', async () => {
   assert.equal(validateEditions(editions, editions).length, 8);
   for (const edition of editions) {
-    const href = edition.default ? '/sites/jester-quotes/' : `https://jester-quotes.vercel.app${edition.destination}`;
-    assert.match(href, edition.default ? /^\/sites\/jester-quotes\/$/ : /^https:\/\/jester-quotes\.vercel\.app\/editions\//);
+    const href = new URL(edition.destination, 'https://jester-quotes.vercel.app/').href;
+    assert.match(href, edition.default ? /^https:\/\/jester-quotes\.vercel\.app\/$/ : /^https:\/\/jester-quotes\.vercel\.app\/editions\//);
     if (!edition.default) await stat(new URL(`../assets/previews/jester-editions/${edition.slug}.png`, import.meta.url));
   }
   await stat(new URL('../sites/jester-quotes/variants/index.html', import.meta.url));
   const previews = JSON.parse(await readFile(new URL('../data/asset-previews.json', import.meta.url)));
   assert.equal(previews.projects['jester-quotes'].target, '/sites/jester-quotes/');
+  const routes = JSON.parse(await readFile(new URL('../data/asset-route-resolution.json', import.meta.url)));
+  const group = routes.groups.find(item => item.groupId === 'jester-quotes');
+  assert.equal(group?.variantCount, 8);
+  assert.equal(group?.hubPath, '/sites/jester-quotes/variants/');
   const cards = await readFile(new URL('../assets/js/app.js', import.meta.url), 'utf8');
-  assert.match(cards, /row\.id === 'jester-quotes'.*\/sites\/jester-quotes\/variants\//);
+  assert.match(cards, /Explore Variants/);
+  assert.doesNotMatch(cards, /Explore Editions/);
 });
 
 test('nested links are rewritten and resolved under the existing route', () => {
