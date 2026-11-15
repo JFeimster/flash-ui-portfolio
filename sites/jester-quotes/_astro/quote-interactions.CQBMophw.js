@@ -1,0 +1,1 @@
+function e(e,t,n){let r=t.query.trim().toLocaleLowerCase();return(!r||e.searchText.toLocaleLowerCase().includes(r))&&(t.reference===`all`||t.reference===`yes`===e.hasReference)&&(!t.favoritesOnly||n.has(e.id))}function t(e,t=Math.random()){return e.length?e[Math.max(0,Math.min(e.length-1,Math.floor(t*e.length)))]??null:null}export{e as n,t};
