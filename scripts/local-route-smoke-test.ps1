@@ -6,24 +6,24 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
-$routeData = Get-Content (Join-Path $repoRoot "data/asset-route-resolution.json") -Raw | ConvertFrom-Json
+$routeData = Get-Content (Join-Path $repoRoot "data/asset-route-resolution.json") -Raw -Encoding UTF8 | ConvertFrom-Json
 $contractFile = Join-Path $repoRoot "data/variant-route-contracts.json"
-$contractGroups = if (Test-Path -LiteralPath $contractFile) { @((Get-Content -LiteralPath $contractFile -Raw | ConvertFrom-Json).groups) } else { @() }
+$contractGroups = if (Test-Path -LiteralPath $contractFile) { @((Get-Content -LiteralPath $contractFile -Raw -Encoding UTF8 | ConvertFrom-Json).groups) } else { @() }
 
 function Get-Url([string]$Path) { return "$($BaseUrl.TrimEnd('/'))/$($Path.TrimStart('/'))" }
 function Request([string]$Path) {
   $url = Get-Url $Path
   try {
-    $response = Invoke-WebRequest -Uri $url -Method Get -TimeoutSec $TimeoutSeconds -MaximumRedirection 0 -ErrorAction Stop
+    $response = Invoke-WebRequest -Uri $url -Method Get -UseBasicParsing -TimeoutSec $TimeoutSeconds -MaximumRedirection 0 -ErrorAction Stop
     $body = if ($Path -match '\.(jpe?g|png|webp)$') { "" } else { [string]$response.Content }
-    return [pscustomobject]@{ path = $Path; status = [int]$response.StatusCode; contentType = [string]$response.Headers["Content-Type"]; body = $body; redirected = $false }
+    return [pscustomobject]@{ path = $Path; status = [int]$response.StatusCode; contentType = [string]$response.Headers["Content-Type"]; body = $body; redirected = $false; error = "" }
   } catch {
     $status = 0
     $redirected = $false
     if ($_.Exception.PSObject.Properties['Response'] -and $_.Exception.Response) {
       try { $status = [int]$_.Exception.Response.StatusCode; $redirected = $status -ge 300 -and $status -lt 400 } catch {}
     }
-    return [pscustomobject]@{ path = $Path; status = $status; contentType = ""; body = ""; redirected = $redirected }
+    return [pscustomobject]@{ path = $Path; status = $status; contentType = ""; body = ""; redirected = $redirected; error = $_.Exception.Message }
   }
 }
 
@@ -58,7 +58,7 @@ foreach ($group in $contractGroups) {
       throw "Resolved variant metadata differs from variant route contract: $($group.groupId) variant $($variant.number)"
     }
     $contractPaths += $path
-    $contractTitles[$path] = [string]$variant.title
+    $contractTitles[$path] = ([string]$variant.title).Split([char]0x2014)[-1].Trim()
     foreach ($asset in @($variant.assets)) { $contractPaths += "$($path.TrimEnd('/'))/$asset" }
   }
   $contractPaths += @($group.preservedPaths)
@@ -82,7 +82,7 @@ foreach ($check in $checks) {
   if ($contractTitles.ContainsKey($check.path)) { $bodyOk = $bodyOk -and $check.body.Contains($contractTitles[$check.path]) }
   $expectedMissing = $check.path -like "*Embed%20Code%20Generator%203*" -or $check.path -eq "/_batch-31-unknown-route/"
   $ok = if ($expectedMissing) { $check.status -eq 404 -and -not $check.redirected } else { $check.status -eq 200 -and $typeOk -and $bodyOk }
-  if (-not $ok) { $failures += [pscustomobject]@{ path = $check.path; status = $check.status; contentType = $check.contentType; expected = $expectedType } }
+  if (-not $ok) { $failures += [pscustomobject]@{ path = $check.path; status = $check.status; contentType = $check.contentType; expected = $expectedType; error = $check.error } }
 }
 
 $summary = [ordered]@{

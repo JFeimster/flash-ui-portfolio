@@ -4,11 +4,12 @@
   const params = new URLSearchParams(location.search);
   const internal = params.get("view") === "internal";
   const storedFavorites = (() => { try { const data = JSON.parse(localStorage.getItem("flash-ui-saved-projects") || "[]"); return new Set(Array.isArray(data) ? data : []); } catch { return new Set(); } })();
-  const state = { entries: [], groups: [], candidates: [], showcase: {}, previews: {}, favorites: storedFavorites, favoritesOnly: params.get("saved") === "1", style: params.get("style") || "All", query: params.get("q") || "", category: params.get("category") || "All", type: params.get("type") || "All", sort: params.get("sort") || "featured" };
+  const state = { entries: [], groups: [], candidates: [], showcase: {}, previews: {}, packages: {}, favorites: storedFavorites, favoritesOnly: params.get("saved") === "1", style: params.get("style") || "All", query: params.get("q") || "", category: params.get("category") || "All", type: params.get("type") || "All", sort: params.get("sort") || "featured" };
   const $ = selector => document.querySelector(selector);
   const esc = value => String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
   const cleanTitle = value => String(value || "Project").replace(/^sites\s+/i, "").replace(/\s*index\.html$/i, "").replace(/\.html$/i, "").replace(/[-_]+/g, " ").trim();
   const available = item => item?.resolutionStatus === "resolved" && Boolean(item.resolvedPath);
+  const usePath = path => `/use-asset/?asset=${encodeURIComponent(path)}`;
   const categoryCopy = {
     "Partner Sites": "Partner program pages and referral interface concepts.",
     "Funding Tools": "Financial planning and funding tool interface concepts.",
@@ -66,12 +67,13 @@
     const action = path
       ? '<a class="btn primary" href="' + esc(path) + '" aria-label="' + esc((row.count ? "Explore variants of " : "Open ") + row.title) + '">' + (row.count ? 'Explore Variants' : '🚀 Open Site') + '<span aria-hidden="true">↗</span></a>'
       : '<p class="repair-note">' + esc(statusLabel(row)) + '</p>';
+    const useAction = !row.count && state.packages[row.path] ? '<a class="btn" href="' + esc(usePath(row.path)) + '">Use This Asset</a>' : '';
     const preview = voltage ? voltage.quickPreview(row) : '';
     return '<article class="card voltage-card" data-project="' + esc(row.id) + '">'
       + (voltage ? voltage.artwork(row,state.favorites.has(row.id)) : '')
       + '<div class="card-content"><div class="card-topline"><span class="card-category">' + category + '</span>' + style + (row.count ? '<span class="variant-count">' + row.count + ' variation' + (row.count === 1 ? '' : 's') + '</span>' : '') + '</div>'
       + '<h2>' + title + '</h2><p class="card-description">' + esc(row.description) + '</p>'
-      + '<div class="card-bottom">' + preview + action + (row.id === 'jester-quotes' ? '<a class="btn" href="/sites/jester-quotes/variants/">Explore Editions ↗</a>' : '') + '</div></div>'
+      + '<div class="card-bottom">' + preview + action + useAction + (row.id === 'jester-quotes' ? '<a class="btn" href="/sites/jester-quotes/variants/">Explore Editions ↗</a>' : '') + '</div></div>'
       + (internal ? details(row.item) : '') + '</article>';
   }
   function empty() { return '<section class="empty"><h2>No projects found</h2><p>Try a broader search or clear the filters.</p><button class="btn" id="resetFilters" type="button">Clear filters</button></section>'; }
@@ -135,19 +137,29 @@
   }
   async function init() {
     try {
-      const [data, showcase, collections, previews, voltageModule] = await Promise.all([
+      const [data, showcase, collections, previews, packages, voltageModule] = await Promise.all([
         fetch("/data/asset-route-resolution.json").then(response => { if (!response.ok) throw new Error("Directory unavailable"); return response.json(); }),
         fetch("/data/asset-showcase.json").then(response => response.ok ? response.json() : {}).catch(() => ({})),
         fetch("/data/curated-collections.json").then(response => response.ok ? response.json() : {}).catch(() => ({})),
         fetch("/data/asset-previews.json").then(response => response.ok ? response.json() : {}).catch(() => ({})),
+        fetch("/data/asset-packages.json").then(response => response.ok ? response.json() : { entries: {} }).catch(() => ({ entries: {} })),
         import("/assets/js/voltage-ui.js")
       ]);
       const { applyCuratedCollections } = await import("/assets/js/curated-collections.js");
       const model = applyCuratedCollections(data, collections);
-      state.entries = model.entries || []; state.groups = model.groups || []; state.candidates = model.groupCandidates || []; state.showcase = showcase.projects || {}; state.previews = previews.projects || {}; voltage = voltageModule;
+      state.entries = model.entries || []; state.groups = model.groups || []; state.candidates = model.groupCandidates || []; state.showcase = showcase.projects || {}; state.previews = previews.projects || {}; state.packages = packages.entries || {}; voltage = voltageModule;
       state.captures = previews.projects || {};
       setup();
       voltage.mountVoltage({ rows, rerender: () => { render(); if (catalog) { const count = $("#favoritesCount"); if (count) count.textContent = state.favorites.size ? "(" + state.favorites.size + ")" : ""; } }, favorites: state.favorites });
+      document.addEventListener('click', event => {
+        const preview = event.target.closest('[data-quick-preview]');
+        if (!preview) return;
+        const link = $('#quickPreviewUse');
+        if (!link) return;
+        const path = preview.getAttribute('data-preview-url');
+        link.hidden = !state.packages[path];
+        if (state.packages[path]) link.href = usePath(path);
+      });
     } catch (error) {
       console.error(error);
       ($("#cardGrid") || $("#featuredGrid")).innerHTML = '<section class="empty"><h2>Projects could not be loaded</h2><p>Please reload the page to try again.</p></section>';
