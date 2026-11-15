@@ -1,0 +1,112 @@
+name: Sync Jester Quotes static editions
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 10 * * *'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/sync-jester-quotes.mjs'
+      - 'tests/sync-jester-quotes.test.mjs'
+      - 'data/jester-quotes-sync.json'
+      - '.github/workflows/sync-jester-quotes.yml'
+
+permissions: {}
+
+concurrency:
+  group: jester-quotes-upstream-sync
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/sync-jester-quotes.test.mjs
+      - name: Run existing portfolio smoke
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory . > /tmp/jester-sync-http.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:4173/sites/jester-quotes/variants/ > /dev/null; then break; fi
+            sleep 1
+          done
+          PLAYWRIGHT_BASE_URL=http://127.0.0.1:4173 node scripts/smoke-site-generator.mjs
+  sync:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Reuse open sync PR branch
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          number=$(gh pr list --base main --head codex/jester-quotes-auto-sync --state open --json number --jq '.[0].number // empty')
+          if test -n "$number"; then
+            git fetch origin codex/jester-quotes-auto-sync
+            git checkout -B codex/jester-quotes-auto-sync FETCH_HEAD
+            echo "number=$number" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Check canonical revision
+        id: source
+        run: |
+          sha=$(git ls-remote https://github.com/JFeimster/jester-quotes.git refs/heads/main | cut -f1)
+          test "${#sha}" -eq 40
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          if test "$(node -p "require('./data/jester-quotes-sync.json').sourceSha || ''")" = "$sha"; then
+            echo "unchanged=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Install browser for changed edition previews
+        if: steps.source.outputs.unchanged != 'true'
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Build and sync canonical output
+        if: steps.source.outputs.unchanged != 'true'
+        run: node scripts/sync-jester-quotes.mjs --source-sha "${{ steps.source.outputs.sha }}"
+      - name: Verify synced paths and repeat run
+        if: steps.source.outputs.unchanged != 'true'
+        run: node --test tests/sync-jester-quotes.test.mjs
+      - name: Open one update PR
+        if: steps.source.outputs.unchanged != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_SHA: ${{ steps.source.outputs.sha }}
+        run: |
+          if git diff --quiet -- sites/jester-quotes assets/previews/jester-editions data/jester-quotes-editions.json data/jester-quotes-sync.json; then
+            echo 'No exported changes.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if test -z "${{ steps.pr.outputs.number }}"; then
+            git checkout -b codex/jester-quotes-auto-sync
+          fi
+          git add -- sites/jester-quotes assets/previews/jester-editions data/jester-quotes-editions.json data/jester-quotes-sync.json
+          git commit -m "Sync Jester Quotes from ${SOURCE_SHA:0:12} [skip ci]"
+          if test -n "${{ steps.pr.outputs.number }}"; then
+            git push origin HEAD:codex/jester-quotes-auto-sync
+          else
+            git fetch origin refs/heads/codex/jester-quotes-auto-sync:refs/remotes/origin/codex/jester-quotes-auto-sync || true
+            git push --force-with-lease origin HEAD:codex/jester-quotes-auto-sync
+            gh pr create --base main --head codex/jester-quotes-auto-sync --title 'Sync canonical Jester Quotes editions' --body "Updates the existing Jester Quotes static import from canonical source commit $SOURCE_SHA. The editions hub and portfolio registry remain intact."
+          fi
