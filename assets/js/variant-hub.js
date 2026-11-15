@@ -8,6 +8,8 @@
   const available = item => item?.resolutionStatus === "resolved" && Boolean(item.resolvedPath);
   const chosen = new Set();
   let captures = {};
+  let packages = {};
+  const usePath = path => `/use-asset/?asset=${encodeURIComponent(path)}`;
   function details(item) {
     return `<details class="details-panel"><summary>Source details</summary><dl><dt>File</dt><dd>${esc(item.sourcePath || item.originalPath || "Not located")}</dd><dt>Resolution</dt><dd>${esc(item.resolutionReason || "No child entrypoint was found.")}</dd><dt>Document title</dt><dd>${esc(item.documentTitle || "No title element")}</dd><dt>Structure</dt><dd>${esc(item.structuralValidity ? JSON.stringify(item.structuralValidity) : "Entrypoint existence checked")}</dd><dt>Production check</dt><dd>${item.productionVerification === "verified" ? "Verified in recorded smoke test" : "Not verified"}</dd></dl>${item.sourceUrl ? `<a href="${esc(item.sourceUrl)}" target="_blank" rel="noreferrer">View source ↗</a>` : ""}</details>`;
   }
@@ -32,7 +34,7 @@
     const cards = variants.map(item => {
       const key = `${group.groupId}--variant-${item.variantNumber}`;
       const capture = captures[key];
-      return `<article class="card variant-card" data-variant="${item.variantNumber}">${capture?.image ? `<a class="variant-image-link" href="${esc(item.resolvedPath || "#")}" aria-label="Open ${esc(item.title || `Variant ${item.variantNumber}`)}"><img class="variant-image" src="${esc(capture.image)}" alt="Screenshot of ${esc(item.title || `Variant ${item.variantNumber}`)}" loading="lazy"></a>` : ""}<span class="card-category">Variant ${item.variantNumber}</span><h3>${esc(item.title || `Variant ${item.variantNumber}`)}</h3>${item.description ? `<p class="card-description">${esc(item.description)}</p>` : ""}<div class="card-bottom">${available(item) ? `<a class="btn primary" href="${esc(item.resolvedPath)}" aria-label="${esc(`Open variant ${item.variantNumber}: ${item.title}`)}">Open variant <span aria-hidden="true">↗</span></a><button class="btn compare-toggle" type="button" data-compare="${item.variantNumber}" aria-pressed="${chosen.has(item.variantNumber)}">${chosen.has(item.variantNumber) ? "Remove comparison" : "Compare"}</button>` : '<p class="repair-note">Preview unavailable · source entrypoint needs repair.</p>'}</div>${internal ? details(item) : ""}</article>`;
+      return `<article class="card variant-card" data-variant="${item.variantNumber}">${capture?.image ? `<a class="variant-image-link" href="${esc(item.resolvedPath || "#")}" aria-label="Open ${esc(item.title || `Variant ${item.variantNumber}`)}"><img class="variant-image" src="${esc(capture.image)}" alt="Screenshot of ${esc(item.title || `Variant ${item.variantNumber}`)}" loading="lazy"></a>` : ""}<span class="card-category">Variant ${item.variantNumber}</span><h3>${esc(item.title || `Variant ${item.variantNumber}`)}</h3>${item.description ? `<p class="card-description">${esc(item.description)}</p>` : ""}<div class="card-bottom">${available(item) ? `<a class="btn primary" href="${esc(item.resolvedPath)}" aria-label="${esc(`Open variant ${item.variantNumber}: ${item.title}`)}">Open variant <span aria-hidden="true">↗</span></a>${packages[item.resolvedPath] ? `<a class="btn" href="${esc(usePath(item.resolvedPath))}">Use This Asset</a>` : ""}<button class="btn compare-toggle" type="button" data-compare="${item.variantNumber}" aria-pressed="${chosen.has(item.variantNumber)}">${chosen.has(item.variantNumber) ? "Remove comparison" : "Compare"}</button>` : '<p class="repair-note">Preview unavailable · source entrypoint needs repair.</p>'}</div>${internal ? details(item) : ""}</article>`;
     }).join("");
     const comparison = [...chosen].map(number => variants.find(item => item.variantNumber === number)).filter(Boolean);
     const single = members.find(item => !item.variantNumber && item.type !== "group-hub" && available(item) && item.resolvedPath.replace(/\/+$/, "") !== current);
@@ -41,13 +43,15 @@
   }
   async function init() {
     try {
-      const [data, showcase, collections, previewData] = await Promise.all([
+      const [data, showcase, collections, previewData, packageData] = await Promise.all([
         fetch("/data/asset-route-resolution.json").then(response => { if (!response.ok) throw new Error("Project data unavailable"); return response.json(); }),
         fetch("/data/asset-showcase.json").then(response => response.ok ? response.json() : {}).catch(() => ({})),
         fetch("/data/curated-collections.json").then(response => response.ok ? response.json() : {}).catch(() => ({})),
-        fetch("/data/asset-previews.json").then(response => response.ok ? response.json() : {}).catch(() => ({}))
+        fetch("/data/asset-previews.json").then(response => response.ok ? response.json() : {}).catch(() => ({})),
+        fetch("/data/asset-packages.json").then(response => response.ok ? response.json() : { entries: {} }).catch(() => ({ entries: {} }))
       ]);
       captures = previewData.projects || {};
+      packages = packageData.entries || {};
       const { applyCuratedCollections } = await import("/assets/js/curated-collections.js");
       render(applyCuratedCollections(data, collections), showcase);
       shell.addEventListener("click", event => {
