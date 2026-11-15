@@ -27,7 +27,7 @@ try {
   await page.getByRole('heading', { name: 'Partner Academy' }).waitFor();
   const single = page.locator('.card').filter({ has: page.getByRole('heading', { name: 'Partner Academy' }) });
   assert.equal(await single.getByRole('link', { name: 'Use This Asset' }).count(), 1);
-  const app = page.locator('.card').filter({ has: page.getByRole('heading', { name: 'Jester Quotes — Dada Riot' }) });
+  const app = page.locator('.card').filter({ has: page.getByRole('heading', { name: 'Jester Quotes', exact: true }) });
   assert.equal(await app.getByRole('link', { name: 'Use This Asset' }).count(), 0);
 
   await page.getByRole('link', { name: 'Explore variants of The Gentleman Degenerate' }).click();

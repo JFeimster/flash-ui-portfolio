@@ -93,6 +93,7 @@ $groupsData = Read-Json "data/asset-groups.json"
 $routeContractsData = Read-Json "data/variant-route-contracts.json"
 $migrationData = Read-Json "data/variant-migration-map.json"
 $verificationData = Read-Json "data/live-path-smoke-test.json"
+$previousRoutes = Read-Json "data/asset-route-resolution.json"
 
 $batchItems = @()
 foreach ($file in As-Array (Get-Value $batch "rootHtml" @())) {
@@ -209,6 +210,11 @@ foreach ($item in $merged.Values) {
       $status = "resolved"
       $reason = "Canonical group item membership and the matching variant index identify the destination."
       $entrypointEvidence += "canonical variant index: $target"
+    } elseif ($originalEntrypoint) {
+      $resolvedPath = if ((Get-Item -LiteralPath $originalRepoPath).PSIsContainer) { "$(Normalize-Path $path)/" } else { Normalize-Path $path }
+      $status = "resolved"
+      $reason = "The source path has a local HTML entrypoint."
+      $entrypointEvidence += "source entrypoint exists"
     }
   } elseif (Is-Archive $item) {
     $status = "archive"
@@ -320,13 +326,62 @@ foreach ($entry in $resolvedEntries) {
   }
 }
 
+# The Jester source metadata owns its eight destinations. Represent those
+# destinations as members of the existing portfolio group without copying the
+# records into another hand-maintained registry.
+$jesterGroupId = 'jester-quotes'
+$jesterEditions = As-Array (Read-Json 'data/jester-quotes-editions.json')
+if ($groupDefinitions.ContainsKey($jesterGroupId)) {
+  if ($jesterEditions.Count -ne 8) { throw 'Jester Quotes must have eight canonical variations.' }
+  $jesterOrigin = [uri]'https://jester-quotes.vercel.app/'
+  $seenDestinations = @{}
+  for ($index = 0; $index -lt $jesterEditions.Count; $index++) {
+    $edition = $jesterEditions[$index]
+    $destination = [string](Get-Value $edition 'destination' '')
+    $slug = [string](Get-Value $edition 'slug' '')
+    $name = [string](Get-Value $edition 'name' '')
+    $isDefault = [bool](Get-Value $edition 'default' $false)
+    $expected = if ($isDefault) { '/' } else { "/editions/$slug/" }
+    if (-not $name -or -not $slug -or $destination -ne $expected -or $seenDestinations.ContainsKey($destination)) {
+      throw "Invalid Jester Quotes canonical variation: $slug"
+    }
+    $seenDestinations[$destination] = $true
+    $screenshot = if ($isDefault) { 'assets/previews/jester-quotes.webp' } else { "assets/previews/jester-editions/$slug.png" }
+    if (-not (Test-Path -LiteralPath (Join-Path $RepoRoot $screenshot) -PathType Leaf)) {
+      throw "Jester Quotes screenshot missing: $screenshot"
+    }
+    $canonical = [uri]::new($jesterOrigin, $destination).AbsoluteUri
+    $resolvedEntries += [ordered]@{
+      title = if ($isDefault) { "$name — Default" } else { $name }
+      slug = "jester-quotes-$slug"
+      category = 'Content Hubs'
+      type = 'external-variation'
+      source = 'canonical-jester-metadata'
+      sourceFile = 'data/jester-quotes-editions.json'
+      originalPath = $destination
+      resolvedPath = $canonical
+      canonicalGroupId = $jesterGroupId
+      variantNumber = $index + 1
+      resolutionStatus = 'resolved'
+      resolutionReason = 'Canonical destination supplied by Jester Quotes variation metadata.'
+      productionVerification = 'pending'
+      description = [string](Get-Value $edition 'description' '')
+      variationStatus = [string](Get-Value $edition 'status' '')
+      screenshot = "/$screenshot"
+      sourcePath = 'data/jester-quotes-editions.json'
+      sourceUrl = 'https://github.com/JFeimster/flash-ui-portfolio/blob/main/data/jester-quotes-editions.json'
+      entrypointEvidence = [ordered]@{ originalPathExists = $false; originalEntrypointExists = $false; resolvedEntrypointExists = $false; evidence = @('canonical Jester Quotes metadata destination') }
+    }
+  }
+}
+
 $groups = @()
 foreach ($groupId in $groupDefinitions.Keys) {
   $group = $groupDefinitions[$groupId]
   $hubPath = [string](Get-Value $group "hubPath" "/sites/$groupId/")
   $items = @(Get-Value $group "items" @())
-  $variants = @($resolvedEntries | Where-Object { $_.canonicalGroupId -eq $groupId -and $_.resolutionStatus -eq "resolved" -and $_.resolvedPath -match "/variant-\d+/?$" })
-  $variantNumbers = @($variants | ForEach-Object { if ($_.resolvedPath -match "/variant-(\d+)/") { [int]$Matches[1] } } | Sort-Object -Unique)
+  $variants = @($resolvedEntries | Where-Object { $_.canonicalGroupId -eq $groupId -and $_.resolutionStatus -eq "resolved" -and $_.Contains('variantNumber') -and $_.variantNumber })
+  $variantNumbers = @($variants | ForEach-Object { [int]$_.variantNumber } | Sort-Object -Unique)
   if (-not $items.Count) { $items = @($variants | ForEach-Object { $_.title }) }
   $groups += [ordered]@{
     groupId = $groupId
@@ -405,17 +460,45 @@ $summary = [ordered]@{
   productionVerified = @($resolvedEntries | Where-Object { $_.productionVerification -eq "verified" }).Count
 }
 
+# Keep existing directory order stable when adding or updating a family.
+$groupOrder = @{}
+$entryOrder = @{}
+$previousEntryByKey = @{}
+$position = 0
+foreach ($group in As-Array (Get-Value $previousRoutes 'groups' @())) { $groupOrder[[string]$group.groupId] = $position++ }
+$position = 0
+foreach ($entry in As-Array (Get-Value $previousRoutes 'entries' @())) {
+  $key = "$($entry.slug)|$($entry.originalPath)"
+  $entryOrder[$key] = $position++
+  $previousEntryByKey[$key] = $entry
+}
+$orderedGroups = @($groups | Sort-Object @{ Expression = { if ($groupOrder.ContainsKey($_['groupId'])) { $groupOrder[$_['groupId']] } else { [int]::MaxValue } } }, @{ Expression = { $_['displayTitle'] } })
+$orderedEntries = @($resolvedEntries | Sort-Object @{ Expression = { $key = "$($_['slug'])|$($_['originalPath'])"; if ($entryOrder.ContainsKey($key)) { $entryOrder[$key] } else { [int]::MaxValue } } }, @{ Expression = { $_['title'] } })
+$stableEntries = @($orderedEntries | ForEach-Object {
+  $entry = $_
+  $key = "$($entry['slug'])|$($entry['originalPath'])"
+  if (-not $previousEntryByKey.ContainsKey($key)) { return $entry }
+  $stable = [ordered]@{}
+  foreach ($name in $previousEntryByKey[$key].PSObject.Properties.Name) {
+    if ($entry.Contains($name)) { $stable[$name] = $entry[$name] }
+  }
+  foreach ($name in $entry.Keys) {
+    if (-not $stable.Contains($name)) { $stable[$name] = $entry[$name] }
+  }
+  $stable
+})
+
 $output = [ordered]@{
   version = "1.1.0"
   generatedAt = (Get-Date).ToUniversalTime().ToString("o")
-  sourceFiles = @("data/site-registry.json", "data/site-registry-static-extractions.json", "data/site-registry-batch-5-additions.json", "data/asset-groups.json", "data/variant-route-contracts.json", "data/variant-migration-map.json")
+  sourceFiles = @("data/site-registry.json", "data/site-registry-static-extractions.json", "data/site-registry-batch-5-additions.json", "data/asset-groups.json", "data/variant-route-contracts.json", "data/variant-migration-map.json", "data/jester-quotes-editions.json")
   verificationNote = "Local entrypoint evidence is structural only; production availability remains unverified until an authorized deployment smoke test is run."
   summary = $summary
-  groups = @($groups | Sort-Object displayTitle)
+  groups = $orderedGroups
   groupCandidates = @($candidateFolders.Keys | Sort-Object | ForEach-Object {
     [ordered]@{ familyId = $_; paths = @($candidateFolders[$_]); reason = 'Variant folder absent from grouped index; retained for internal review without creating a canonical project.' }
   })
-  entries = @($resolvedEntries | Sort-Object title, originalPath)
+  entries = $stableEntries
 }
 
 $output | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath (Join-Path $dataRoot "asset-route-resolution.json") -Encoding UTF8

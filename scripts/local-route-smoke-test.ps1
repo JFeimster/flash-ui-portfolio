@@ -38,7 +38,10 @@ $checks += Request "/sites/Embed%20Code%20Generator%203/"
 $checks += Request "/_batch-31-unknown-route/"
 
 $resolved = @($routeData.entries | Where-Object { $_.resolutionStatus -eq "resolved" -and $_.resolvedPath })
-foreach ($entry in $resolved) { $checks += Request ([string]$entry.resolvedPath) }
+foreach ($entry in $resolved) {
+  if ([string]$entry.resolvedPath -match '^https?://') { continue }
+  $checks += Request ([string]$entry.resolvedPath)
+}
 
 $contractTitles = @{}
 $contractPaths = @()
