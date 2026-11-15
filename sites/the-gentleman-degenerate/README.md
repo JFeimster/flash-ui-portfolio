@@ -31,3 +31,7 @@ the-gentleman-degenerate/
 The original root `index.html` remains the Dark Luxe live page to preserve its URL and anchors. Open `variations/index.html` to choose a variation. Each variation can also be opened directly and is self-contained for a later static deployment. No build step is required.
 
 The Dada Riot and Neo-Brutalist Jester designs follow their entries in `transferable-design-themes.json`. The newsletter forms are visual prototypes: they validate email addresses but do not send or store them.
+
+## Flash UI Portfolio variant hub
+
+The portfolio groups this project at `variants/` with numbered routes: `variant-1/` is Dada Riot, `variant-2/` is Neo-Brutalist Jester, and `variant-3/` is Dark Luxe. The original root and the earlier `variations/` selector and routes remain available.
