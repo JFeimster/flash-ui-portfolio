@@ -7,11 +7,11 @@ const errors=[];page.on('pageerror',e=>errors.push(e.message));
 try{
  const response=await page.goto(new URL('/ideas/',base).href,{waitUntil:'domcontentloaded'});
  assert.equal(response?.status(),200,'/ideas/ should load');
- await page.locator('#totalIdeas').getByText('370').waitFor();
- assert.match(await page.locator('#count').textContent(),/370 matching ideas/);
+ await page.locator('#totalIdeas').getByText('390').waitFor();
+ assert.match(await page.locator('#count').textContent(),/390 matching ideas/);
  assert.equal(await page.locator('.idea-card').count(),24,'progressive rendering avoids an endless scroll');
  await page.locator('#source').selectOption('external');
- assert.match(await page.locator('#count').textContent(),/201 matching ideas/);
+ assert.match(await page.locator('#count').textContent(),/221 matching ideas/);
  await page.locator('#source').selectOption('');
  await page.locator('#q').fill('Logline Lab');
  const count=await page.locator('.idea-card').count();
@@ -28,11 +28,11 @@ try{
  assert.ok(await page.locator('#variant option').count()>=1,'prompt versions available');
  await page.getByRole('button',{name:'Close prompt'}).click();
  await page.reload({waitUntil:'domcontentloaded'});
- await page.locator('#totalIdeas').getByText('370').waitFor();
+ await page.locator('#totalIdeas').getByText('390').waitFor();
  assert.match(await page.locator('#count').textContent(),/1 matching idea/,'saved-only filter persists in URL');
  await page.locator('#clear').click();
  await page.setViewportSize({width:390,height:844});
  assert.ok((await page.evaluate(()=>document.documentElement.scrollWidth))<=390,'mobile page must not scroll horizontally');
  assert.deepEqual(errors,[],'no browser runtime errors');
- console.log('Ideas smoke passed: 370 concepts, external filter, search, saved ideas, full prompts, URL state, mobile.');
+ console.log('Ideas smoke passed: 390 concepts, external filter, search, saved ideas, full prompts, URL state, mobile.');
 }finally{await browser.close();}
