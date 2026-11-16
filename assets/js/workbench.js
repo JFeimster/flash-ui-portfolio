@@ -191,7 +191,23 @@
 
   async function init() {
     try {
-      if (!id) throw new Error('No idea selected');
+      if (!id) {
+        const response = await fetch('/data/ideas-discovery-index.json');
+        if (!response.ok) throw new Error('Idea catalog unavailable');
+        const catalog = await response.json();
+        $('#ideaTitle').textContent = 'Choose an idea to work on';
+        $('#ideaSummary').textContent = 'Open a canonical idea to read, customize, and export its prompt.';
+        $('.mode-tabs').hidden = true;
+        const list = node('div', 'workbench-picker');
+        for (const item of catalog.ideas) {
+          const a = node('a', 'workbench-picker-item', item.title);
+          a.href = `/workbench/?idea=${encodeURIComponent(item.id)}`;
+          list.append(a);
+        }
+        $('#overviewMode').hidden = false;
+        $('#overviewMode').replaceChildren(node('h2', '', `${catalog.ideas.length} prompts ready`), list);
+        return;
+      }
       const [catalogResponse, recipeResponse] = await Promise.all([
         fetch('/data/ideas-discovery-index.json'), fetch('/data/prompt-recipes.public.json')]);
       if (!catalogResponse.ok || !recipeResponse.ok) throw new Error('Workbench data unavailable');
