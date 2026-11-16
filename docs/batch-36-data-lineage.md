@@ -8,4 +8,6 @@ Crosswalk matches use normalized exact titles only. The 100 title overlaps are r
 
 The three Notion registry pages and their source JSON were read. Their public candidate files contain IDs, names, source file references, and review status only; they omit internal prompt prose. All 28 vertical candidates remain draft because their source rows contain TODO fields. Source dates and URLs are in `data/idea-source-index.json`.
 
-The exact uploaded v2 schema and template files and `flash-ui-data-import-opportunities.json` were not available in this task workspace. No substitutes were created. Archived ZIP demo values were not imported. External project references contain verified GitHub links only, without copying private JSON or asserting production deployment.
+The four **exact uploaded** FLASH-UI Ideas v2 JSON Schema/template files were recovered and added at `data/schemas/` and `data/templates/`. Both Draft 2020-12 schemas and both blank templates were validated before import. The source-inventory report is now at `docs/flash-ui-data-import-opportunities.json`; it remains a candidate list, not an instruction to promote every row. These are reference materials, not deployed-site records or additional generator entries.
+
+Archived ZIP demo values were not imported. External project references contain verified GitHub links only, without copying private JSON or asserting production deployment.

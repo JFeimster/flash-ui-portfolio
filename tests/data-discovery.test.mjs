@@ -91,3 +91,20 @@ test('canonical site registry and every published route remain intact', async ()
     await stat(join(root, decodeURIComponent(site.livePath.slice(1)), 'index.html'));
   }
 });
+
+test('uploaded FLASH-UI Ideas v2 schemas, templates and inventory are intact', async () => {
+  const single = await load('schemas/flash-ui-ideas.schema.json');
+  const collection = await load('schemas/flash-ui-ideas.collection.schema.json');
+  const blank = await load('templates/flash-ui-ideas.blank.json');
+  const blankCollection = await load('templates/flash-ui-ideas.collection.blank.json');
+  const research = JSON.parse(await readFile(join(root, 'docs/flash-ui-data-import-opportunities.json'), 'utf8'));
+  assert.equal(single.$schema, 'https://json-schema.org/draft/2020-12/schema');
+  assert.equal(collection.$schema, single.$schema);
+  assert.equal(single.title, 'FLASH-UI Ideas');
+  assert.equal(collection.title, 'FLASH-UI Ideas Collection');
+  assert.equal(single.properties.custom_fields.additionalProperties, true);
+  assert.equal(blank.schema_version, '2.0.0');
+  assert.equal(blankCollection.schema_version, '2.0.0');
+  assert.deepEqual(blankCollection.ideas, []);
+  assert.equal(research.candidates.length, 20);
+});
