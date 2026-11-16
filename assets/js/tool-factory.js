@@ -1,0 +1,90 @@
+import { createZip } from './zip-store.mjs';
+
+const E = globalThis.ToolFactoryEngine;
+document.body.dataset.mobileView = 'editor';
+document.querySelectorAll('[data-view]').forEach(button => button.addEventListener('click', () => { document.body.dataset.mobileView = button.dataset.view; document.querySelectorAll('[data-view]').forEach(b => b.setAttribute('aria-selected', String(b === button))); }));
+const $ = id => document.getElementById(id);
+const text = (id, value) => { $(id).textContent = value; };
+const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+const download = (name, blob) => { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1500); };
+const presets = {
+  calculator: {
+    title: 'Cash Gap Estimator', problem: 'Estimate a short-term cash gap from expected expenses and available cash.', outcome: 'A transparent gap estimate',
+    inputs: [{ id: 'expenses', label: 'Expected expenses', type: 'number', min: 0, max: 100000000, sample: 12000 }, { id: 'cash', label: 'Available cash', type: 'number', min: 0, max: 100000000, sample: 7500 }],
+    calculation: { mode: 'deterministic', operation: 'difference' }, outputs: [{ id: 'gap', label: 'Estimated gap', type: 'number' }],
+    assumptions: 'Simple difference only; a negative result indicates a surplus. This is not a lending decision.'
+  },
+  scorecard: {
+    title: 'Launch Readiness Scorecard', problem: 'Identify which launch basics need attention.', outcome: 'An explainable readiness recommendation', inputs: [], calculation: { mode: 'deterministic', rules: ['sum selected option points'] }, outputs: [{ id: 'score', label: 'Readiness score', type: 'number' }],
+    questions: [{ id: 'audience', label: 'How clear is your target audience?', options: [{ id: 'early', label: 'Still exploring', points: 0 }, { id: 'defined', label: 'Clearly defined', points: 2 }] }, { id: 'offer', label: 'Is the offer tested with real users?', options: [{ id: 'no', label: 'Not yet', points: 0 }, { id: 'yes', label: 'Yes', points: 2 }] }, { id: 'measure', label: 'Can you measure the primary action?', options: [{ id: 'no', label: 'Not yet', points: 0 }, { id: 'yes', label: 'Yes', points: 2 }] }],
+    tiers: [{ min: 0, label: 'Start with the basics', recommendation: 'Define the audience and test the offer.' }, { min: 4, label: 'Ready to pilot', recommendation: 'Run a small launch and review the results.' }, { min: 6, label: 'Ready to launch', recommendation: 'Publish and monitor the primary action.' }]
+  },
+  checklist: {
+    title: 'Tool Launch Checklist', problem: 'Turn a tool idea into a practical launch plan.', outcome: 'A copyable launch checklist', inputs: [], calculation: { mode: 'deterministic', rules: ['include selected items'] }, outputs: [{ id: 'plan', label: 'Shareable checklist', type: 'text' }],
+    sections: [{ id: 'build', label: 'Build', items: [{ id: 'logic', label: 'Verify the core logic with boundary examples' }, { id: 'mobile', label: 'Check the mobile interaction' }, { id: 'access', label: 'Test keyboard and screen reader labels' }] }, { id: 'launch', label: 'Launch', items: [{ id: 'copy', label: 'Write the problem and outcome clearly' }, { id: 'embed', label: 'Test the embed on the destination site' }, { id: 'measure', label: 'Define a useful success measure' }] }]
+  }
+};
+const baseSpec = kind => ({ schema_version: E.VERSION, id: E.safeId(presets[kind].title), source_refs: [], title: presets[kind].title, archetype: kind, target_persona: 'Small business operator', problem: presets[kind].problem, measurable_outcome: presets[kind].outcome, bleeding_neck_problem: presets[kind].problem, seo_use_case: '', lead_capture_opportunity: '', distribution_model: 'Standalone microsite', ...structuredClone(presets[kind]), cta: { label: 'Explore options', url: null }, export_targets: ['static-site', 'iframe-widget', 'lead-magnet', 'build-brief'], integration_candidates: [], status: 'prototype' });
+let library = [], source = null, built = null, spec = baseSpec('calculator');
+const syncFields = () => { $('title').value = spec.title; $('persona').value = spec.target_persona; $('problem').value = spec.problem; $('outcome').value = spec.measurable_outcome; $('ctaLabel').value = spec.cta.label || ''; $('ctaUrl').value = spec.cta.url || ''; $('seo').value = spec.seo_use_case || ''; $('lead').value = spec.lead_capture_opportunity || ''; $('distribution').value = spec.distribution_model || ''; $('archetype').value = spec.archetype; $('specEditor').value = JSON.stringify(spec, null, 2); };
+function readSpec() {
+  let candidate;
+  try { candidate = JSON.parse($('specEditor').value); } catch (err) { throw new Error(`Invalid JSON: ${err.message}`); }
+  candidate.title = $('title').value.trim(); candidate.id = candidate.source_refs?.[0]?.id || E.safeId(candidate.title); candidate.target_persona = $('persona').value.trim(); candidate.problem = $('problem').value.trim(); candidate.bleeding_neck_problem = candidate.problem; candidate.measurable_outcome = $('outcome').value.trim(); candidate.cta = { label: $('ctaLabel').value.trim(), url: $('ctaUrl').value.trim() || null }; candidate.seo_use_case = $('seo').value.trim(); candidate.lead_capture_opportunity = $('lead').value.trim(); candidate.distribution_model = $('distribution').value.trim();
+  if (!Array.isArray(candidate.source_refs)) throw new Error('Source references must be an array.');
+  if (candidate.source_refs.some(ref => ref.type !== 'idea' || !library.some(item => item.id === ref.id && visibleIdea(item)))) throw new Error('Source reference must match a public idea in the library.');
+  if (candidate.cta.url && !/^https?:\/\//i.test(candidate.cta.url)) throw new Error('CTA URL must start with http:// or https://.');
+  const errors = E.validate(candidate); if (errors.length) throw new Error(errors.join(' '));
+  return candidate;
+}
+function visibleIdea(item) { return item.factory?.kind === 'site-idea' && item.visibility !== 'private' && item.visibility !== 'hidden' && item.is_private !== true && item.hidden !== true && item.public !== false && item.status !== 'private'; }
+function results() {
+  const q = $('sourceSearch').value.trim().toLowerCase();
+  const matches = library.filter(visibleIdea).filter(item => { const words = `${item.name} ${item.type} ${item.factory?.archetype} ${item.prompt}`.toLowerCase(); return (!q || words.includes(q)) && (q || /calculator|estimator|assessment|quiz|scorecard|generator|checklist|decision tree|directory|widget/i.test(words)); }).slice(0, 24);
+  const host = $('sourceResults'); host.replaceChildren();
+  for (const item of matches) { const b = document.createElement('button'); b.type = 'button'; b.dataset.sourceId = item.id; b.textContent = item.name; const sub = document.createElement('small'); sub.textContent = `${item.type} · ${item.id}`; b.append(sub); b.addEventListener('click', () => selectSource(item)); host.append(b); }
+  text('sourceStatus', `${matches.length} matching ideas${q ? ` for “${q}”` : ''}.`);
+}
+function selectSource(item) {
+  source = item;
+  const kind = /calculator|estimator/i.test(`${item.type} ${item.name}`) ? 'calculator' : /quiz|scorecard|assessment/i.test(`${item.type} ${item.name}`) ? 'scorecard' : 'checklist';
+  spec = baseSpec(kind); spec.id = item.id; spec.title = item.name; spec.target_persona = item.visitor_psychology || spec.target_persona; spec.source_refs = [{ type: 'idea', id: item.id }]; spec.cta.label = item.primary_cta || spec.cta.label; spec.problem = `A working ${kind} prototype based on ${item.name}.`; spec.bleeding_neck_problem = spec.problem;
+  $('sourceSearch').value = item.name; syncFields(); results(); text('status', `Selected ${item.name}. Review the sample rules before exporting.`);
+}
+function buildBrief(s) {
+  return `# ${s.title} — full build brief\n\nStatus: functional local prototype\nSource references: ${s.source_refs.map(r => `${r.type}:${r.id}`).join(', ') || 'custom brief'}\nTarget Persona: ${s.target_persona || 'To define'}\nBleeding Neck Problem: ${s.bleeding_neck_problem || 'To define'}\nMeasurable outcome: ${s.measurable_outcome || 'To define'}\nCore Logic / Function: ${JSON.stringify(s.calculation)}\nOutput (Shareable Artifact): ${s.outputs.map(o => o.label).join(', ')}\nSEO / search use case: ${s.seo_use_case || 'To define'}\nLead-capture opportunity: ${s.lead_capture_opportunity || 'Optional; no submission in demo'}\nDistribution model: ${s.distribution_model || 'Standalone microsite'}\nPrimary CTA: ${s.cta.label || 'None'}${s.cta.url ? ` — ${s.cta.url}` : ' (unlinked demo)'}\n\nInputs / questions / sections:\n${JSON.stringify({ inputs: s.inputs, questions: s.questions, sections: s.sections }, null, 2)}\n\nValidation: ${s.archetype === 'calculator' ? 'Finite numeric inputs, configured ranges, division by zero' : s.archetype === 'scorecard' ? 'Every question answered before results' : 'At least one item selected'}\n\nDelivery: static site, iframe widget, lead magnet, and this brief. Extract the ZIP and open index.html. Host the folder before embedding. No backend, lead submission, or external API is included.\n\nFuture classifications: component inside an existing app; API scaffold; MCP tool planned. These require separate implementation.\n`;
+}
+function operations(s) {
+  const inputSchema = s.archetype === 'calculator' ? { type: 'object', required: s.inputs.map(i => i.id), properties: Object.fromEntries(s.inputs.map(i => [i.id, { type: 'number', minimum: i.min, maximum: i.max }])) } : s.archetype === 'scorecard' ? { type: 'object', required: s.questions.map(q => q.id), properties: Object.fromEntries(s.questions.map(q => [q.id, { type: 'string', enum: q.options.map(o => o.id) }])) } : { type: 'object', required: ['selected'], properties: { selected: { type: 'array', items: { type: 'string' } } } };
+  return { schema_version: 'flash-ui-tool-operations/v1', status: 'scaffold', operation_id: s.id, input_schema: inputSchema, output_schema: { type: 'object', properties: s.archetype === 'checklist' ? { text: { type: 'string' }, errors: { type: 'array', items: { type: 'string' } } } : { value: { type: 'number' }, errors: { type: 'array', items: { type: 'string' } } } }, processing_rules: s.calculation, error_cases: s.archetype === 'calculator' ? ['missing or non-finite number', 'out of range', 'division by zero'] : s.archetype === 'scorecard' ? ['unanswered question'] : ['no items selected'], example_request: s.archetype === 'calculator' ? Object.fromEntries(s.inputs.map(i => [i.id, i.sample ?? 0])) : s.archetype === 'scorecard' ? Object.fromEntries(s.questions.map(q => [q.id, q.options[0].id])) : { selected: [s.sections[0].items[0].id] }, example_response: s.archetype === 'calculator' ? E.calculate(s, Object.fromEntries(s.inputs.map(i => [i.id, i.sample ?? 0]))) : s.archetype === 'scorecard' ? E.score(s, Object.fromEntries(s.questions.map(q => [q.id, q.options[0].id]))) : E.checklist(s, [s.sections[0].items[0].id]) };
+}
+const exportedCss = `*{box-sizing:border-box}body{margin:0;background:#f6f8f5;color:#17231e;font-family:system-ui,sans-serif}#tool-root{max-width:720px;margin:auto;padding:32px 24px}.tool-title{font-size:clamp(2rem,5vw,3.2rem);line-height:1.05}p{line-height:1.5}form{display:grid;gap:12px;margin:25px 0}label{display:block;font-weight:650}input[type=number]{display:block;width:100%;padding:12px;border:1px solid #60746a;border-radius:6px;font:inherit}input[type=radio],input[type=checkbox]{margin-right:8px}button,.tool-cta{display:inline-block;width:max-content;border:0;border-radius:6px;background:#164c36;color:white;padding:11px 18px;font:inherit;cursor:pointer;text-decoration:none}.secondary{background:#e2e9e2;color:#173a2a}.artifact-actions{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.artifact-actions button{font-size:.85rem}button:disabled{opacity:.5}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #317f5c;outline-offset:2px}.tool-result{white-space:pre-wrap;border-top:2px solid #164c36;padding:16px 0;min-height:64px}.tool-result.error{color:#a42323}@media(max-width:500px){#tool-root{padding:22px 16px}button{width:100%}}@media print{form,.artifact-actions,.tool-cta{display:none}body{background:white;color:black}}`;
+const sourceText = Promise.all([fetch('/assets/js/tool-factory-engine.js').then(r => r.text()), fetch('/assets/js/tool-factory-runtime.js').then(r => r.text())]);
+function html(s, inline = false, script = '') {
+  const json = JSON.stringify(s).replace(/</g, '\\u003c');
+  return `<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${escapeHtml(s.title)} · Local demo</title>${inline ? `<style>${exportedCss}</style>` : '<link rel="stylesheet" href="styles.css">'}</head><body><main id="tool-root"></main><script type="application/json" id="tool-spec">${json}</script>${inline ? `<script>${script.replace(/<\/script/gi, '<\\/script')}<\\/script>` : '<script src="script.js"><\\/script>'}</body></html>`.replaceAll('<\\/script>', '</script>');
+}
+function readme(s) { return `# ${s.title}\n\nFunctional local demo (${s.archetype}). Extract this ZIP and open index.html in a browser. No server, account, or API key is needed.\n\nFiles: index.html (tool), styles.css (isolated styles), script.js (portable logic and UI), tool-spec.json (versioned spec), README.md (this file).\n\nTo embed: host the extracted folder over HTTPS, then use an iframe with src pointing to its index.html. Suggested snippet:\n<iframe src="https://YOUR-HOST/${s.id}/index.html" title="${s.title.replace(/"/g, '')}" loading="lazy" style="width:100%;min-height:560px;border:0" sandbox="allow-scripts allow-forms allow-downloads"></iframe>\n\nThe page runs entirely in the visitor's browser. It does not collect leads, store answers, or make lending decisions. If a CTA URL was supplied, the link opens it in a new tab.\n`; }
+async function build() {
+  try {
+    const s = readSpec(); s.delivery_target = $('target').value; const [engine, runtime] = await sourceText; const script = `${engine}\n${runtime}`;
+    built = { spec: s, script, files: [{ name: 'index.html', bytes: html(s) }, { name: 'styles.css', bytes: exportedCss }, { name: 'script.js', bytes: script }, { name: 'tool-spec.json', bytes: JSON.stringify(s, null, 2) }, { name: 'README.md', bytes: readme(s) }] };
+    $('preview').srcdoc = html(s, true, script); $('codeOutput').value = built.files[0].bytes; $('briefOutput').value = buildBrief(s); $('handoffOutput').value = JSON.stringify(operations(s), null, 2); text('status', `Working ${s.archetype} preview ready. ${$('target').selectedOptions[0].text} selected.`);
+    $('openGenerator').href = '/generator/';
+  } catch (err) { text('status', err.message); }
+}
+function requireBuilt() { if (!built) throw new Error('Build a preview first.'); return built; }
+function action(fn) { return async () => { try { await fn(); } catch (err) { text('status', err.message); } }; }
+$('sourceSearch').addEventListener('input', results);
+$('clearSource').addEventListener('click', () => { source = null; spec = baseSpec($('archetype').value); $('sourceSearch').value = ''; syncFields(); results(); text('status', 'Custom brief ready.'); });
+$('archetype').addEventListener('change', ev => { const current = { persona: $('persona').value }; spec = baseSpec(ev.target.value); spec.title = source?.name || spec.title; spec.target_persona = current.persona; spec.source_refs = source ? [{ type: 'idea', id: source.id }] : []; syncFields(); text('status', 'Starter rules loaded. Review before building.'); });
+$('validate').addEventListener('click', action(() => { readSpec(); text('status', 'Specification is valid.'); }));
+$('build').addEventListener('click', build);
+document.querySelectorAll('[data-tab]').forEach(button => button.addEventListener('click', () => { document.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', String(b === button))); document.querySelectorAll('.tab-panel').forEach(p => p.hidden = p.id !== `${button.dataset.tab}Panel`); }));
+$('downloadZip').addEventListener('click', action(() => { const b = requireBuilt(); download(`${b.spec.id}-${$('target').value}.zip`, createZip(b.files)); text('status', 'ZIP downloaded.'); }));
+$('downloadSpec').addEventListener('click', action(() => { const b = requireBuilt(); download(`${b.spec.id}-tool-spec.json`, new Blob([JSON.stringify(b.spec, null, 2)], { type: 'application/json' })); text('status', 'Specification downloaded.'); }));
+$('copyBrief').addEventListener('click', action(async () => { requireBuilt(); await navigator.clipboard.writeText($('briefOutput').value); text('status', 'Full brief copied.'); }));
+$('copyCode').addEventListener('click', action(async () => { requireBuilt(); await navigator.clipboard.writeText($('codeOutput').value); text('status', 'HTML code copied. The ZIP includes its CSS and JavaScript dependencies.'); }));
+$('copyEmbed').addEventListener('click', action(async () => { const b = requireBuilt(); const snippet = `<iframe src="https://YOUR-HOST/${b.spec.id}/index.html" title="${escapeHtml(b.spec.title)}" loading="lazy" style="width:100%;min-height:560px;border:0" sandbox="allow-scripts allow-forms allow-downloads"></iframe>`; await navigator.clipboard.writeText(snippet); text('status', 'Embed snippet copied. Replace YOUR-HOST after hosting the exported folder.'); }));
+try { const response = await fetch('/data/site-generator-prompts.json'); if (!response.ok) throw new Error('Library unavailable'); library = (await response.json()).entries || []; const id = new URLSearchParams(location.search).get('idea'); const selected = library.find(item => item.id === id && visibleIdea(item)); if (selected) selectSource(selected); else { syncFields(); results(); } } catch (err) { syncFields(); text('sourceStatus', 'Idea library unavailable. Custom brief still works.'); }
+await build();
