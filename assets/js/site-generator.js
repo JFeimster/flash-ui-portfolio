@@ -577,7 +577,7 @@
   async function init() {
     try {
       const [libraryResponse, catalogResponse, integrationResponse] = await Promise.all([
-        fetch("/data/site-generator-prompts.json"), fetch("/data/site-generator-catalogs.json"), fetch("/data/site-generator-integrations.json")
+        fetch("/data/site-generator-public.json"), fetch("/data/site-generator-catalogs.json"), fetch("/data/site-generator-integrations.json")
       ]);
       if (![libraryResponse, catalogResponse, integrationResponse].every((response) => response.ok)) throw new Error("Generator data is unavailable.");
       const [libraryData, catalogsData, integrationsData] = await Promise.all([libraryResponse.json(), catalogResponse.json(), integrationResponse.json()]);
@@ -585,6 +585,20 @@
       factoryResources = libraryData.factory_resources || factoryResources;
       catalogs = catalogsData; integrationCatalog = integrationsData;
       handleEvents(); sourceFilterOptions(); renderAllControls(); renderSourcePicker(); syncFieldsFromState(); updateOutput(true);
+      const requestedIdea = new URLSearchParams(location.search).get('idea');
+      if (requestedIdea && library.some(item => item.id === requestedIdea)) selectSource(requestedIdea);
+      if (requestedIdea && new URLSearchParams(location.search).get('handoff') === '1') {
+        try {
+          const payload = JSON.parse(sessionStorage.getItem('flash-ui-generator-handoff:v1') || 'null');
+          if (payload?.ideaId === requestedIdea && typeof payload.prompt === 'string') {
+            $('#promptOutput').value = payload.prompt;
+            promptDirty = true;
+            updateOutput();
+            sessionStorage.removeItem('flash-ui-generator-handoff:v1');
+            setStatus('Workbench draft loaded locally. Review it before export.');
+          }
+        } catch { setStatus('Workbench handoff could not be loaded.'); }
+      }
       $("#sourceResultCount").textContent = `${library.filter((entry) => entry.factory.kind === "site-idea").length} site ideas ready`;
     } catch (error) {
       $("#sourceResultCount").textContent = "Prompt library could not be loaded";

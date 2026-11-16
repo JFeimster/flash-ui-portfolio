@@ -20,7 +20,7 @@ try {
   await page.waitForURL("**/generator/");
   assert.equal(page.url(), new URL("/generator/", base).href);
 
-  const libraryResponse = await page.request.get(new URL("/data/site-generator-prompts.json", base).href);
+  const libraryResponse = await page.request.get(new URL("/data/site-generator-public.json", base).href);
   assert.equal(libraryResponse.status(), 200, "generator prompt projection should load");
   const library = await libraryResponse.json();
   assert.equal(library.entry_count, library.entries.length, "entry count should match the generated library");
