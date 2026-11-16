@@ -585,19 +585,27 @@
       factoryResources = libraryData.factory_resources || factoryResources;
       catalogs = catalogsData; integrationCatalog = integrationsData;
       handleEvents(); sourceFilterOptions(); renderAllControls(); renderSourcePicker(); syncFieldsFromState(); updateOutput(true);
-      const requestedIdea = new URLSearchParams(location.search).get('idea');
-      if (requestedIdea && library.some(item => item.id === requestedIdea)) selectSource(requestedIdea);
-      if (requestedIdea && new URLSearchParams(location.search).get('handoff') === '1') {
+      const params = new URLSearchParams(window.location.search);
+      const requestedSourceId = params.get("idea") || params.get("source");
+      const requestedSource = library.find((entry) => entry.id === requestedSourceId);
+      if (requestedSource) {
+        if (requestedSource.factory.kind === "design-template") {
+          $("#advancedSourceFilter").checked = true;
+          state.sourceMode = "all";
+        }
+        selectSource(requestedSource.id);
+      }
+      if (requestedSource && params.get("handoff") === "1") {
         try {
-          const payload = JSON.parse(sessionStorage.getItem('flash-ui-generator-handoff:v1') || 'null');
-          if (payload?.ideaId === requestedIdea && typeof payload.prompt === 'string') {
-            $('#promptOutput').value = payload.prompt;
+          const payload = JSON.parse(sessionStorage.getItem("flash-ui-generator-handoff:v1") || "null");
+          if (payload?.ideaId === requestedSource.id && typeof payload.prompt === "string") {
+            $("#promptOutput").value = payload.prompt;
             promptDirty = true;
             updateOutput();
-            sessionStorage.removeItem('flash-ui-generator-handoff:v1');
-            setStatus('Workbench draft loaded locally. Review it before export.');
+            sessionStorage.removeItem("flash-ui-generator-handoff:v1");
+            setStatus("Workbench draft loaded locally. Review it before export.");
           }
-        } catch { setStatus('Workbench handoff could not be loaded.'); }
+        } catch { setStatus("Workbench handoff could not be loaded."); }
       }
       $("#sourceResultCount").textContent = `${library.filter((entry) => entry.factory.kind === "site-idea").length} site ideas ready`;
     } catch (error) {
