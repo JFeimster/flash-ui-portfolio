@@ -51,7 +51,7 @@ try {
     await page.close();
   }
   const hidden = await browser.newPage();
-  await hidden.route('**/data/site-generator-prompts.json', async route => route.fulfill({ json: { entries: [{ id: 'secret-tool', name: 'Secret Tool', type: 'Calculator', factory: { kind: 'site-idea' }, visibility: 'private' }, { id: 'public-tool', name: 'Public Tool', type: 'Calculator', factory: { kind: 'site-idea' } }] } }));
+  await hidden.route('**/data/site-generator-public.json', async route => route.fulfill({ json: { entries: [{ id: 'secret-tool', name: 'Secret Tool', type: 'Calculator', factory: { kind: 'site-idea' }, visibility: 'private' }, { id: 'public-tool', name: 'Public Tool', type: 'Calculator', factory: { kind: 'site-idea' } }] } }));
   await hidden.goto(`${base}/factory/`); await hidden.locator('#sourceSearch').fill('Tool');
   assert.equal(await hidden.locator('[data-source-id="secret-tool"]').count(), 0);
   assert.equal(await hidden.locator('[data-source-id="public-tool"]').count(), 1);
