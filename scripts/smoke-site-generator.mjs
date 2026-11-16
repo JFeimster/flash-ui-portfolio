@@ -20,7 +20,7 @@ try {
   await page.waitForURL("**/generator/");
   assert.equal(page.url(), new URL("/generator/", base).href);
 
-  const libraryResponse = await page.request.get(new URL("/data/site-generator-prompts.json", base).href);
+  const libraryResponse = await page.request.get(new URL("/data/site-generator-public.json", base).href);
   assert.equal(libraryResponse.status(), 200, "generator prompt projection should load");
   const library = await libraryResponse.json();
   assert.equal(library.entry_count, library.entries.length, "entry count should match the generated library");
@@ -71,6 +71,7 @@ try {
 
   await page.goto(new URL('/sites/', base).href);
   const jesterCard = page.locator('[data-project="jester-quotes"]');
+  await jesterCard.waitFor();
   assert.equal(await jesterCard.count(), 1, 'Jester Quotes should have one project card');
   assert.equal(await jesterCard.getByRole('heading', { name: 'Jester Quotes', exact: true }).count(), 1);
   assert.match(await jesterCard.textContent(), /8 variations/);
