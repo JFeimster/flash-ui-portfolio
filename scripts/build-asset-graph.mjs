@@ -44,11 +44,20 @@ for (const r of sites.records) {
 }
 
 const prompts = source('site-generator-prompts.json', [path.join(root, 'data/site-generator-prompts.json')]);
+const ideaMetadata = read(path.join(root, 'data/ideas-metadata.json')) || {};
+const isHiddenPrompt = r => {
+  const flags = [r.visibility, r.publication?.visibility, r.factory?.visibility, ideaMetadata.ideas?.[r.id]?.visibility];
+  return r.hidden === true || r.private === true || r.publication?.hidden === true || r.publication?.private === true ||
+    flags.some(value => ['hidden', 'private'].includes(String(value || '').toLowerCase()));
+};
 for (const r of prompts.records) {
   const id = slug(r.id);
-  if (!id) continue;
-  addNode({ id: `idea:${id}`, type: 'idea', name: safeText(r.name), category: safeText(r.type), summary: safeText(r.factory?.brief?.title ? `${r.brand || ''} · ${r.type || 'Idea'}` : r.type), audience: safeText(r.visitor_psychology), ecosystem: safeText(r.brand), url: '/generator/', route: '/generator/', maturity: 'prompt', source: 'site-generator-prompts' });
-  if (nodes.has(`site:${id}`)) addEdge(`idea:${id}`, `site:${id}`, 'implements', 'exact canonical slug in portfolio and prompt registries');
+  if (!id || isHiddenPrompt(r)) continue;
+  const type = r.type === 'Prompt Template' ? 'template' : 'idea';
+  const route = type === 'template' ? '/generator/' : `/ideas/${id}/`;
+  const url = type === 'template' ? `/generator/?idea=${encodeURIComponent(r.id)}` : route;
+  addNode({ id: `${type}:${id}`, type, name: safeText(r.name), category: type === 'template' ? 'Design template' : safeText(r.type), summary: safeText(r.factory?.brief?.title ? `${r.brand || ''} · ${r.type || 'Idea'}` : r.type), audience: safeText(r.visitor_psychology), ecosystem: safeText(r.brand), url, route, maturity: type === 'template' ? 'template' : 'prompt', source: 'site-generator-prompts' });
+  if (type === 'idea' && nodes.has(`site:${id}`)) addEdge(`idea:${id}`, `site:${id}`, 'implements', 'exact canonical slug in portfolio and prompt registries');
 }
 
 const github = source('github-repos.registry.json');

@@ -1,5 +1,5 @@
 import { filterAssets } from './asset-explorer-core.mjs';
-const labels = { idea: 'Ideas', site: 'Sites', github: 'Repos', vercel: 'Vercel Projects', tool: 'Tools / Widgets', gpt: 'GPTs', capability: 'Plugins / MCP / API' };
+const labels = { idea: 'Ideas', template: 'Design Templates', site: 'Sites', github: 'Repos', vercel: 'Vercel Projects', tool: 'Tools / Widgets', gpt: 'GPTs', capability: 'Plugins / MCP / API' };
 const params = new URLSearchParams(location.search);
 const $ = id => document.getElementById(id);
 const el = (tag, className, content) => { const n = document.createElement(tag); if (className) n.className = className; if (content != null) n.textContent = content; return n; };
@@ -39,7 +39,7 @@ function showDetail() {
   if (n.summary) box.append(el('p','summary',n.summary));
   const meta = el('dl','meta'); for (const [k,v] of [['Source',n.source],['Category',n.category],['Maturity',n.maturity],['URL status',n.urlStatus]]) if (v) { meta.append(el('dt','',k),el('dd','',v)); } box.append(meta);
   const actions = el('div','detail-actions');
-  const primary = link(n.type === 'idea' ? 'Remix prompt' : n.type === 'vercel' ? 'Visit recorded URL' : n.type === 'github' ? 'Open repo' : n.type === 'gpt' ? 'Open GPT' : n.type === 'site' ? 'Open site' : 'Open source',n.url);
+  const primary = link(n.type === 'idea' ? 'Explore idea' : n.type === 'template' ? 'Use template' : n.type === 'vercel' ? 'Visit recorded URL' : n.type === 'github' ? 'Open repo' : n.type === 'gpt' ? 'Open GPT' : n.type === 'site' ? 'Open site' : 'Open source',n.url);
   if (primary) actions.append(primary);
   actions.append(button(saved.has(n.id) ? '★ Saved' : '☆ Save',saved.has(n.id),() => { saved.has(n.id) ? saved.delete(n.id) : saved.add(n.id); localStorage.setItem('flash-ui-ecosystem-saved',JSON.stringify([...saved])); render(); }));
   actions.append(button('Copy reference',false,async () => { await navigator.clipboard.writeText(n.id); })); box.append(actions);

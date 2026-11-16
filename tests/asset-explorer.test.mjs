@@ -14,7 +14,7 @@ test('public export has safe URLs, stable IDs, and resolvable edges', () => {
   const ids = new Set(graph.nodes.map(n => n.id));
   assert.equal(ids.size, graph.nodes.length);
   for (const node of graph.nodes) {
-    assert.match(node.id, /^(idea|site|github|vercel|gpt|tool|capability):[a-z0-9-]+$/);
+    assert.match(node.id, /^(idea|template|site|github|vercel|gpt|tool|capability):[a-z0-9-]+$/);
     if (node.url) assert.ok(node.url.startsWith('/') || node.url.startsWith('https://'));
     assert.doesNotMatch(JSON.stringify(node), /vercel\.com\/|chatgpt\.com\/gpts\/editor/i);
     if (node.type === 'site') assert.ok(fs.existsSync(path.join(root, node.url, 'index.html')));
@@ -23,6 +23,13 @@ test('public export has safe URLs, stable IDs, and resolvable edges', () => {
     assert.ok(ids.has(edge.from) && ids.has(edge.to));
     assert.ok(edge.provenance && edge.confidence && edge.status);
   }
+});
+
+test('canonical public ideas and design templates stay distinct', () => {
+  const discovery=JSON.parse(fs.readFileSync(path.join(root,'data/ideas-discovery-index.json'),'utf8'));
+  assert.equal(graph.nodes.filter(n=>n.type==='idea').length,discovery.public_idea_count);
+  assert.equal(graph.nodes.filter(n=>n.type==='template').length,17);
+  assert.ok(graph.nodes.filter(n=>n.type==='idea').every(n=>n.url.startsWith('/ideas/')));
 });
 
 test('private records, editor URLs, unsafe URLs and duplicate records are excluded', () => {
