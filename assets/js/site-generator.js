@@ -585,6 +585,15 @@
       factoryResources = libraryData.factory_resources || factoryResources;
       catalogs = catalogsData; integrationCatalog = integrationsData;
       handleEvents(); sourceFilterOptions(); renderAllControls(); renderSourcePicker(); syncFieldsFromState(); updateOutput(true);
+      const requestedSourceId = new URLSearchParams(window.location.search).get("source");
+      const requestedSource = library.find((entry) => entry.id === requestedSourceId);
+      if (requestedSource) {
+        if (requestedSource.factory.kind === "design-template") {
+          $("#advancedSourceFilter").checked = true;
+          state.sourceMode = "all";
+        }
+        selectSource(requestedSource.id);
+      }
       $("#sourceResultCount").textContent = `${library.filter((entry) => entry.factory.kind === "site-idea").length} site ideas ready`;
     } catch (error) {
       $("#sourceResultCount").textContent = "Prompt library could not be loaded";
