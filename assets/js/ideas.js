@@ -26,7 +26,12 @@ function makeCard(item){const card=node('article','idea-card');card.dataset.idea
 function render(){if(!state.loaded)return;const matches=sorted(state.entries.filter(eligible));$('count').textContent=matches.length+' matching ideas / '+state.entries.length+' total';$('empty').hidden=matches.length>0;$('loadMore').hidden=matches.length<=state.visible;
  const grid=$('ideaGrid');grid.classList.toggle('list-view',state.list);const fragment=document.createDocumentFragment();for(const item of matches.slice(0,state.visible))fragment.append(makeCard(item));grid.replaceChildren(fragment);syncUrl();}
 function reset(){for(const id of ['q','source','type','brand','style','group'])$(id).value='';$('sort').value='name';$('onlySaved').setAttribute('aria-pressed','false');state.visible=PER_PAGE;render();$('q').focus();}
-async function getSource(which){if(state.cache[which])return state.cache[which];const url=which==='canonical'?'/data/site-generator-public.json':'/data/external-prompt-library.json';const r=await fetch(url);if(!r.ok)throw Error('Prompt source unavailable');const v=await r.json();state.cache[which]=v;return v;}
+async function getSource(which){if(state.cache[which])return state.cache[which];if(which==='external'){
+ const responses=await Promise.all(['/data/external-prompt-library.json','/data/idea-prompt-additions.json'].map(url=>fetch(url)));
+ if(responses.some(r=>!r.ok))throw Error('Prompt source unavailable');
+ const [upstream,additions]=await Promise.all(responses.map(r=>r.json()));
+ state.cache[which]={items:[...upstream.items,...additions.items]};return state.cache[which];
+ }const r=await fetch('/data/site-generator-public.json');if(!r.ok)throw Error('Prompt source unavailable');const v=await r.json();state.cache[which]=v;return v;}
 async function showPromptVersion(){const selected=state.selected;const choice=value('variant');$('copyStatus').textContent='';$('promptText').textContent='Loading prompt…';$('copyPrompt').disabled=true;
  try{let record;if(choice==='canonical'){const library=await getSource('canonical');record=library.entries.find(x=>x.id===selected.canonical_prompt_id);state.prompt=record?.prompt;}else{const library=await getSource('external');record=library.items.find(x=>x.id===choice.slice('external:'.length));state.prompt=record?.flash_ui_prompt;}
   if(!state.prompt)throw Error('Prompt not found');

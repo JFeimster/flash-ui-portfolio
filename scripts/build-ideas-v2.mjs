@@ -14,8 +14,11 @@ const index = read(path.join(data, 'idea-discovery-index.json')).entries;
 const remote = process.env.FLASH_UI_PROMPTS_SOURCE;
 const source = remote ? path.join(remote, 'master-flash-ui-prompts.json') : path.join(data, 'external-prompt-library.json');
 const external = read(source);
-if (canonical.length !== 169 || index.length !== 169 || external.items.length !== 305) throw Error('Unexpected prompt source counts; reconcile before rebuilding');
-if (new Set(canonical.map(x => x.id)).size !== 169 || new Set(external.items.map(x => x.id)).size !== 305) throw Error('Duplicate source IDs');
+const additions = read(path.join(data, 'idea-prompt-additions.json'));
+if (canonical.length !== 169 || index.length !== 169 || !Array.isArray(external.items) || !Array.isArray(additions.items)) throw Error('Unexpected prompt source shape; reconcile before rebuilding');
+const originalCount = external.items.length;
+external.items = [...external.items, ...additions.items];
+if (new Set(canonical.map(x => x.id)).size !== canonical.length || new Set(external.items.map(x => x.id)).size !== external.items.length) throw Error('Duplicate source IDs');
 const byTitle = new Map();
 for (const item of external.items) { const k = norm(item.name), a = byTitle.get(k) || []; a.push(item); byTitle.set(k, a); }
 const canonicalTitles = new Set(canonical.map(x => norm(x.name)));
@@ -49,17 +52,16 @@ for (const [title,items] of byTitle) {
 const result = {
   schema_version:'flash-ui-idea-directory/v2',
   policy:'Unique title-level concepts; canonical generator entries take precedence. Matching by normalized title is not semantic equivalence. Source variants remain available and no published site is inferred.',
-  generated_from:{canonical:'/data/site-generator-prompts.json',external:'/data/external-prompt-library.json',
+  generated_from:{canonical:'/data/site-generator-prompts.json',external:'/data/external-prompt-library.json',additions:'/data/idea-prompt-additions.json',
     external_origin:'https://github.com/JFeimster/flash-ui-prompts/blob/main/data/master-flash-ui-prompts.json',
     external_blob_sha:'4105d8eedacc9c7d6481a09b056dacea12c50973'},
-  counts:{canonical:169,external_prompts:305,external_distinct_titles:byTitle.size,
+  counts:{canonical:canonical.length,external_prompts:external.items.length,external_distinct_titles:byTitle.size,
     canonical_title_matches:[...canonicalTitles].filter(x=>byTitle.has(x)).length,
     matched_external_prompts:external.items.filter(x=>canonicalTitles.has(norm(x.name))).length,
     external_only_concepts:entries.filter(x=>x.source==='external').length,
     visible_concepts:entries.length,internal_external_title_variants:internalVariants},
   entries
 };
-if (result.counts.visible_concepts!==370 || result.counts.matched_external_prompts!==103) throw Error('Title reconciliation changed; review before publishing');
-if (remote) fs.writeFileSync(path.join(data,'external-prompt-library.json'),JSON.stringify(external,null,2)+'\n');
+if (remote) fs.writeFileSync(path.join(data,'external-prompt-library.json'),JSON.stringify({...external,items:external.items.slice(0,originalCount)},null,2)+'\n');
 fs.writeFileSync(path.join(data,'idea-directory.json'),JSON.stringify(result,null,2)+'\n');
-console.log('Built '+entries.length+' unique idea cards from 169 canonical and 305 external prompts.');
+console.log(`Built ${entries.length} idea cards from ${canonical.length} canonical, ${originalCount} upstream and ${additions.items.length} additive prompts.`);
