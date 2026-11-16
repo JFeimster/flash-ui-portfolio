@@ -22,6 +22,7 @@ try{
  assert.match(await page.locator('#count').textContent(),/1 matching idea/);
  await first.getByRole('button',{name:/view prompt/i}).click();
  await page.locator('#promptDialog[open]').waitFor();
+ await page.locator('#copyPrompt:enabled').waitFor();
  const text=await page.locator('#promptText').textContent();
  assert.ok(text.length>100,'original prompt available in modal');
  assert.ok(await page.locator('#variant option').count()>=1,'prompt versions available');
