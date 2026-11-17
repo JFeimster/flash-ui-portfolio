@@ -12,12 +12,14 @@ test('Agent network batch retains every source prompt as a distinct discoverable
  assert.equal(canonical.entries.length,169);
  assert.equal(discovery.entry_count,169);
  assert.equal(external.items.length,305);
- assert.equal(additions.items.length,20);
- assert.equal(catalog.entries.length,390);
- assert.deepEqual(catalog.counts,{canonical:169,external_prompts:325,external_distinct_titles:321,canonical_title_matches:100,matched_external_prompts:103,external_only_concepts:221,visible_concepts:390,internal_external_title_variants:1});
+ assert.equal(additions.items.length,88);
+ assert.equal(additions.items.filter(x=>x.source_kind==='template-pattern').length,68);
+ assert.ok(additions.items.some(x=>x.source_order===78&&x.name==='Landing Page Wireframe Builder'));
+ assert.equal(catalog.entries.length,458);
+ assert.deepEqual(catalog.counts,{canonical:169,external_prompts:393,external_distinct_titles:389,canonical_title_matches:100,matched_external_prompts:103,external_only_concepts:289,visible_concepts:458,internal_external_title_variants:1});
  const ids=new Set(catalog.entries.map(x=>x.id));
- assert.equal(ids.size,390);
- assert.equal(new Set(catalog.entries.map(x=>norm(x.name))).size,390);
+ assert.equal(ids.size,458);
+ assert.equal(new Set(catalog.entries.map(x=>norm(x.name))).size,458);
  assert.ok(Array.isArray(legacy)&&legacy.length>0,'legacy deployed registry remains available');
  assert.deepEqual(catalog.entries.slice(0,169).map(x=>x.id),canonical.entries.map(x=>x.id),'canonical IDs and ordering preserved');
  const cids=new Set(canonical.entries.map(x=>x.id)),eids=new Set([...external.items,...additions.items].map(x=>x.id));
@@ -29,8 +31,8 @@ test('Agent network batch retains every source prompt as a distinct discoverable
    assert.ok(entry.external_prompt_ids.every(x=>eids.has(x)),entry.id);
  }
  const used=catalog.entries.flatMap(x=>x.external_prompt_ids);
- assert.equal(used.length,325,'every source prompt must appear in exactly one concept');
- assert.equal(new Set(used).size,325,'source variants must not be double-counted');
+ assert.equal(used.length,393,'every source prompt must appear in exactly one concept');
+ assert.equal(new Set(used).size,393,'source variants must not be double-counted');
  assert.ok(additions.items.every(x=>catalog.entries.some(y=>y.external_prompt_ids.includes(x.id)&&y.match_status==='external-only')));
  assert.ok(catalog.entries.some(x=>x.external_prompt_ids.length>1),'duplicated external titles retained as prompt variants');
 });
@@ -40,7 +42,7 @@ test('Source matches are provisional; full prompts preserved',async()=>{
  assert.match(catalog.policy,/not semantic equivalence/i);
  assert.ok(external.items.every(x=>typeof x.flash_ui_prompt==='string'&&x.flash_ui_prompt.trim().length>30));
  assert.equal(catalog.entries.filter(x=>x.source==='canonical').length,169);
- assert.equal(catalog.entries.filter(x=>x.source==='external').length,221);
+ assert.equal(catalog.entries.filter(x=>x.source==='external').length,289);
  const files=['ideas/index.html','assets/js/ideas.js','assets/css/ideas.css','scripts/build-ideas-v2.mjs'];
  await Promise.all(files.map(x=>readFile(join(root,x),'utf8').then(text=>assert.ok(text.length>100,x))));
 });
