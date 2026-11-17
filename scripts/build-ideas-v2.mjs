@@ -44,7 +44,7 @@ for (const [title,items] of byTitle) {
     id:'external:'+first.id,name:first.name,source:'external',kind:'site-idea',type:first.type||'Site idea',
     category:first.type||'Site idea',brand:first.brand||'',visual_style:first.visual_style||'',use_case:first.use_case||'',
     source_group:first.group_name||'',primary_cta:first.primary_cta||'',summary:cut(first.use_case||first.flash_ui_prompt,230),
-    search_text:cut([first.name,first.type,first.visual_style,first.visitor_psychology,first.primary_cta,first.use_case,first.flash_ui_prompt,first.group_name].join(' '),1500).toLowerCase(),
+    search_text:cut(first.source_kind==='template-pattern' ? [first.name,first.type,first.visual_style,first.visitor_psychology,first.primary_cta,first.use_case,first.industry,first.layout_pattern,first.group_name,first.flash_ui_prompt].join(' ') : [first.name,first.type,first.visual_style,first.visitor_psychology,first.primary_cta,first.use_case,first.flash_ui_prompt,first.group_name].join(' '),1500).toLowerCase(),
     canonical_prompt_id:null,external_prompt_ids:items.map(x=>x.id),related_site_group_ids:[],
     match_status:items.length>1?'internal-title-variants':'external-only'
   });
