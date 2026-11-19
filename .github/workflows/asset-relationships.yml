@@ -1,0 +1,27 @@
+name: Asset relationship validation
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/build-asset-graph.mjs'
+      - 'assets/js/asset-groups.mjs'
+      - 'assets/js/asset-explorer.mjs'
+      - 'data/asset-links.public.json'
+      - 'data/asset-graph.public.json'
+      - 'tests/asset-relationships.test.mjs'
+      - 'tests/asset-explorer.test.mjs'
+      - '.github/workflows/asset-relationships.yml'
+permissions:
+  contents: read
+jobs:
+  relationships:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check changed JavaScript modules
+        run: node --check scripts/build-asset-graph.mjs && node --check assets/js/asset-groups.mjs && node --check assets/js/asset-explorer.mjs
+      - name: Run focused asset relationship tests
+        run: node --test tests/asset-explorer.test.mjs tests/asset-relationships.test.mjs
