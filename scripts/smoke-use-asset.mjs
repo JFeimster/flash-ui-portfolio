@@ -6,7 +6,8 @@ import { chromium } from 'playwright';
 
 const base = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:4173';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const manifest = JSON.parse(await readFile(new URL('../data/asset-packages.json', import.meta.url), 'utf8')).entries;
+const packageData = JSON.parse(await readFile(new URL('../data/asset-packages.json', import.meta.url), 'utf8'));
+const manifest = packageData.entries;
 assert.ok(Object.keys(manifest).length > 0, 'at least one asset must be eligible');
 for (const [route, entry] of Object.entries(manifest)) {
   assert.equal(entry.previewPath, route);
@@ -30,6 +31,7 @@ try {
   const app = page.locator('.card').filter({ has: page.getByRole('heading', { name: 'Jester Quotes', exact: true }) });
   assert.equal(await app.getByRole('link', { name: 'Use This Asset' }).count(), 0);
 
+  await page.locator('#searchInput').fill('The Gentleman Degenerate');
   await page.getByRole('link', { name: 'Explore variants of The Gentleman Degenerate' }).click();
   await page.getByRole('heading', { name: 'The Gentleman Degenerate — Dada Riot' }).waitFor();
   const variant = page.locator('.variant-card').first();
@@ -50,6 +52,19 @@ try {
   assert.ok(zip.includes(Buffer.from('CUSTOMIZE.md')) && zip.includes(Buffer.from('README.md')), 'download must include instructions');
   assert.ok(zip.includes(Buffer.from('lounge.jpg')) && zip.includes(Buffer.from('styles.css')), 'download must include source assets');
   assert.match(await page.locator('#assetStatus').textContent(), /Project ZIP ready/);
+  assert.ok(await page.locator('.source-files a').count() >= 4, 'source files are inspectable');
+  await page.locator('#briefBrand').fill('Example Brand');
+  assert.match(await page.locator('#promptText').textContent(), /New brand: Example Brand/);
+  assert.match(await page.locator('#embedText').textContent(), /<iframe/);
+  await page.goto(new URL('/use-asset/?asset=' + encodeURIComponent('/sites/embed-widget-studio/variant-2/'), base).href);
+  await page.getByRole('heading', { name: /Inspect/ }).waitFor();
+  assert.equal(await page.locator('#downloadAsset').count(), 0, 'partial source is not exportable');
+  assert.ok(await page.locator('.source-inspection code').count() > 0, 'missing files are identified');
+  const externalRoute = Object.keys(packageData.review).find(key => key.startsWith('https://'));
+  assert.ok(externalRoute, 'external application review entry exists');
+  await page.goto(new URL('/use-asset/?asset=' + encodeURIComponent(externalRoute), base).href);
+  assert.equal(await page.locator('#downloadAsset').count(), 0, 'external application is not exportable');
+  assert.equal(await page.getByRole('link', { name: 'Open external application ↗' }).count(), 1);
   assert.deepEqual(errors, [], 'asset workflow should not raise browser errors');
   console.log(`Use This Asset smoke passed: ${Object.keys(manifest).length} eligible packages, single/variant actions, preview, and ZIP download.`);
 } finally { await browser.close(); }

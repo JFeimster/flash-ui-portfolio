@@ -177,6 +177,11 @@ function actionApplyToCard(card, system) {
     .filter(Boolean)
     .map(action => actionButtonHtml(action, context))
     .filter(Boolean);
+  const reuseRoute = context.livePath;
+  if (reuseRoute && (system.packageRoutes?.has(reuseRoute) || system.reviewRoutes?.has(reuseRoute))) {
+    const label = system.packageRoutes.has(reuseRoute) ? "Use This Asset" : "Inspect for Reuse";
+    actions.push(`<a class="btn asset-action" href="/use-asset/?asset=${encodeURIComponent(reuseRoute)}">${label}</a>`);
+  }
 
   if (!actions.length && system.defaultRules?.preserveExistingCardActions) return;
   const row = card.querySelector(".card-actions");
@@ -214,6 +219,14 @@ async function initAssetActions() {
   } catch (error) {
     console.warn("Asset action metadata unavailable; preserving default card actions.", error);
   }
+  try {
+    const response = await fetch("/data/asset-packages.json");
+    if (response.ok) {
+      const manifest = await response.json();
+      system.packageRoutes = new Set(Object.keys(manifest.entries || {}));
+      system.reviewRoutes = new Set(Object.keys(manifest.review || {}));
+    }
+  } catch { /* Existing card actions still work without reuse metadata. */ }
   actionObserveCards(system);
 }
 

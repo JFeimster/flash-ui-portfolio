@@ -4,7 +4,7 @@
   const params = new URLSearchParams(location.search);
   const internal = params.get("view") === "internal";
   const storedFavorites = (() => { try { const data = JSON.parse(localStorage.getItem("flash-ui-saved-projects") || "[]"); return new Set(Array.isArray(data) ? data : []); } catch { return new Set(); } })();
-  const state = { entries: [], groups: [], candidates: [], showcase: {}, previews: {}, packages: {}, favorites: storedFavorites, favoritesOnly: params.get("saved") === "1", style: params.get("style") || "All", query: params.get("q") || "", category: params.get("category") || "All", type: params.get("type") || "All", browse: params.get("browse") || "all", sort: params.get("sort") || "featured", limit: 24 };
+  const state = { entries: [], groups: [], candidates: [], showcase: {}, previews: {}, packages: {}, review: {}, favorites: storedFavorites, favoritesOnly: params.get("saved") === "1", style: params.get("style") || "All", query: params.get("q") || "", category: params.get("category") || "All", type: params.get("type") || "All", browse: params.get("browse") || "all", sort: params.get("sort") || "featured", limit: 24 };
   const $ = selector => document.querySelector(selector);
   const esc = value => String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
   const cleanTitle = value => String(value || "Project").replace(/^sites\s+/i, "").replace(/\s*index\.html$/i, "").replace(/\.html$/i, "").replace(/[-_]+/g, " ").trim();
@@ -68,7 +68,8 @@
     const action = path
       ? '<a class="btn primary" href="' + esc(path) + '" aria-label="' + esc((row.count > 1 ? "Explore variants of " : "Open ") + row.title) + '">' + (row.count > 1 ? 'Explore Variants' : '🚀 Open Site') + '<span aria-hidden="true">↗</span></a>'
       : '<p class="repair-note">' + esc(statusLabel(row)) + '</p>';
-    const useAction = !row.count && state.packages[row.path] ? '<a class="btn" href="' + esc(usePath(row.path)) + '">Use This Asset</a>' : '';
+    const reuseRoute = row.previewPath || row.path;
+    const useAction = row.count <= 1 && (state.packages[reuseRoute] || state.review[reuseRoute]) ? '<a class="btn" href="' + esc(usePath(reuseRoute)) + '">' + (state.packages[reuseRoute] ? 'Use This Asset' : 'Inspect for Reuse') + '</a>' : '';
     const preview = voltage ? voltage.quickPreview(row) : '';
     return '<article class="card voltage-card" data-project="' + esc(row.id) + '">'
       + (voltage ? voltage.artwork(row,state.favorites.has(row.id)) : '')
@@ -151,7 +152,7 @@
       ]);
       const { applyCuratedCollections } = await import("/assets/js/curated-collections.js");
       const model = applyCuratedCollections(data, collections);
-      state.entries = model.entries || []; state.groups = model.groups || []; state.candidates = model.groupCandidates || []; state.showcase = showcase.projects || {}; state.previews = previews.projects || {}; state.packages = packages.entries || {}; voltage = voltageModule;
+      state.entries = model.entries || []; state.groups = model.groups || []; state.candidates = model.groupCandidates || []; state.showcase = showcase.projects || {}; state.previews = previews.projects || {}; state.packages = packages.entries || {}; state.review = packages.review || {}; voltage = voltageModule;
       state.captures = previews.projects || {};
       setup();
       voltage.mountVoltage({ rows, rerender: () => { render(); if (catalog) { const count = $("#favoritesCount"); if (count) count.textContent = state.favorites.size ? "(" + state.favorites.size + ")" : ""; } }, favorites: state.favorites });
@@ -161,8 +162,8 @@
         const link = $('#quickPreviewUse');
         if (!link) return;
         const path = preview.getAttribute('data-preview-url');
-        link.hidden = !state.packages[path];
-        if (state.packages[path]) link.href = usePath(path);
+        link.hidden = !state.packages[path] && !state.review[path];
+        if (!link.hidden) link.href = usePath(path);
       });
     } catch (error) {
       console.error(error);
