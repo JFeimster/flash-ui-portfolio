@@ -58,6 +58,10 @@ function Is-Standalone($Item) {
 
 function Get-Value($Object, [string]$Name, $Default = $null) {
   if ($null -eq $Object) { return $Default }
+  if ($Object -is [System.Collections.IDictionary]) {
+    if ($Object.Contains($Name) -and $null -ne $Object[$Name]) { return $Object[$Name] }
+    return $Default
+  }
   if ($Object.PSObject.Properties.Name -contains $Name -and $null -ne $Object.$Name) { return $Object.$Name }
   return $Default
 }
