@@ -1,0 +1,2041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash UI Export</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- Interactive Backdrop Elements -->
+  <div class="bg-grid"></div>
+  <div class="bg-prism-glow-1"></div>
+  <div class="bg-prism-glow-2"></div>
+
+  <!-- Animated Toast Notification Container -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 max-w-sm pointer-events-none"></div>
+
+  <!-- Responsive Horizontal Mega-Menu Navigation bar -->
+  <header class="w-full border-b border-borderThin bg-prismSurface/90 backdrop-blur-xl z-30 sticky top-0">
+    <div class="max-w-[1600px] mx-auto px-6 h-16 flex items-center justify-between">
+      
+      <!-- Left side: Brand Logo -->
+      <div class="flex items-center gap-4">
+        <div class="brand-logo w-9 h-9 bg-gradient-to-br from-prismCyan via-prismViolet to-prismMagenta flex items-center justify-center relative p-[2px]">
+          <div class="w-full h-full bg-prismBg brand-logo flex items-center justify-center">
+            <div class="w-3 h-3 bg-gradient-to-r from-prismCyan via-prismViolet to-prismMagenta rotate-45"></div>
+          </div>
+        </div>
+        <span class="font-space font-bold text-lg tracking-wider text-textPrimary">PRISM // <span class="bg-gradient-to-r from-prismCyan to-prismMagenta bg-clip-text text-transparent">LOGIC</span></span>
+      </div>
+
+      <!-- Center: Responsive Horizontal Mega-Menu Navigation links -->
+      <nav class="hidden lg:flex items-center gap-8">
+        <button onclick="switchTab('dashboard')" class="text-xs font-semibold uppercase tracking-wider text-textSecondary hover:text-prismCyan transition-all">Overview</button>
+        <button onclick="switchTab('directory')" class="text-xs font-semibold uppercase tracking-wider text-textSecondary hover:text-prismCyan transition-all">Capital Vault</button>
+        <button onclick="switchTab('kanban')" class="text-xs font-semibold uppercase tracking-wider text-textSecondary hover:text-prismCyan transition-all">Pipeline Routes</button>
+        
+        <!-- Interactive Mega Menu Trigger -->
+        <div class="relative mega-menu-trigger py-5">
+          <button class="text-xs font-semibold uppercase tracking-wider text-textSecondary hover:text-prismViolet flex items-center gap-1 transition-all">
+            System Channels
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          
+          <!-- Dropdown Mega Menu -->
+          <div class="absolute top-full left-1/2 -translate-x-1/2 w-[600px] bg-prismSurfaceElevated border border-borderThin rounded-2xl p-6 shadow-2xl mega-menu grid grid-cols-2 gap-6 z-50 backdrop-blur-2xl">
+            <div class="space-y-4">
+              <span class="text-[10px] font-mono tracking-widest text-prismCyan uppercase block">Database Groundings</span>
+              <div class="space-y-3">
+                <div class="flex items-start gap-3 p-2 hover:bg-white/5 rounded-xl transition-all cursor-pointer" onclick="toggleGSheetsGrounding()">
+                  <div class="p-2 bg-emerald-500/10 rounded-lg text-emerald-400">📊</div>
+                  <div>
+                    <h4 class="text-xs font-bold text-textPrimary">G-Sheets Grounding</h4>
+                    <p class="text-[10px] text-textSecondary">Ground active databases using a dynamic sheet link.</p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-3 p-2 hover:bg-white/5 rounded-xl transition-all cursor-pointer" onclick="toggleSupabaseRealtime()">
+                  <div class="p-2 bg-prismViolet/10 rounded-lg text-prismViolet">⚡</div>
+                  <div>
+                    <h4 class="text-xs font-bold text-textPrimary">Supabase Realtime</h4>
+                    <p class="text-[10px] text-textSecondary">PostgreSQL direct row-level replication channels.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-4 border-l border-white/5 pl-6">
+              <span class="text-[10px] font-mono tracking-widest text-prismMagenta uppercase block">Enterprise Syncs</span>
+              <div class="space-y-3">
+                <div class="flex items-start gap-3 p-2 hover:bg-white/5 rounded-xl transition-all cursor-pointer" onclick="simulateGitCommit()">
+                  <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400">📁</div>
+                  <div>
+                    <h4 class="text-xs font-bold text-textPrimary">GitHub Commit Pipeline</h4>
+                    <p class="text-[10px] text-textSecondary">Pushes dynamic configurations directly to your repository.</p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-3 p-2 hover:bg-white/5 rounded-xl transition-all cursor-pointer" onclick="simulateHubspotSync()">
+                  <div class="p-2 bg-orange-500/10 rounded-lg text-orange-400">🤝</div>
+                  <div>
+                    <h4 class="text-xs font-bold text-textPrimary">HubSpot Direct CRM</h4>
+                    <p class="text-[10px] text-textSecondary">Synchronizes partners, leads and pipeline tickets dynamically.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button onclick="switchTab('uploader')" class="text-xs font-semibold uppercase tracking-wider text-textSecondary hover:text-prismCyan transition-all">Bulk Loader</button>
+        <button onclick="switchTab('onboarding')" class="text-xs font-semibold uppercase tracking-wider text-textSecondary hover:text-prismCyan transition-all">Onboarding</button>
+        <button onclick="switchTab('faq')" class="text-xs font-semibold uppercase tracking-wider text-textSecondary hover:text-prismCyan transition-all">System FAQ</button>
+      </nav>
+
+      <!-- Right side: Session State, Webhook Switch & Settings Button -->
+      <div class="flex items-center gap-4">
+        <div class="hidden md:flex items-center gap-3 bg-white/5 border border-borderThin rounded-full px-4 py-1.5 text-xs">
+          <span class="w-2 h-2 rounded-full bg-prismGreen status-indicator"></span>
+          <span class="font-mono text-textSecondary">SSO: <span class="text-prismCyan font-bold">SECURE_ACTIVE</span></span>
+        </div>
+        
+        <button onclick="toggleSettingsModal()" class="p-2.5 bg-white/5 hover:bg-white/10 rounded-xl border border-borderThin transition-all" title="User Configurations">
+          <svg class="w-5 h-5 text-textSecondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        </button>
+
+        <!-- Mobile hamburger menu toggle -->
+        <button onclick="toggleMobileSidebar()" class="lg:hidden p-2.5 bg-white/5 border border-borderThin rounded-xl text-textSecondary hover:bg-white/10 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Base Shell Layout -->
+  <div class="flex-1 flex min-h-0 relative">
+
+    <!-- Slide-over Navigation Rail with Collapsing Control -->
+    <div id="navigation-rail" class="w-16 border-r border-borderThin bg-black/80 flex flex-col items-center justify-between py-6 shrink-0 z-20 transition-all duration-300">
+      <div class="flex flex-col items-center gap-6 w-full">
+        <!-- Rail toggle button -->
+        <button onclick="toggleSidebarCollapse()" class="p-2.5 hover:bg-white/10 rounded-xl transition-all text-textSecondary hover:text-prismCyan" title="Toggle Sidebar Expand">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        
+        <!-- Rail Shortcuts -->
+        <div class="h-px w-8 bg-borderThin"></div>
+        
+        <button onclick="switchTab('dashboard')" class="p-3 text-textSecondary hover:text-prismCyan hover:bg-white/5 rounded-xl transition-all" title="Console Overview">
+          📊
+        </button>
+        <button onclick="switchTab('directory')" class="p-3 text-textSecondary hover:text-prismViolet hover:bg-white/5 rounded-xl transition-all" title="Capital Vault Grid">
+          📁
+        </button>
+        <button onclick="switchTab('kanban')" class="p-3 text-textSecondary hover:text-prismOrange hover:bg-white/5 rounded-xl transition-all" title="Logistics Routes">
+          🚚
+        </button>
+        <button onclick="switchTab('uploader')" class="p-3 text-textSecondary hover:text-prismMagenta hover:bg-white/5 rounded-xl transition-all" title="Bulk Loader">
+          📥
+        </button>
+        <button onclick="switchTab('onboarding')" class="p-3 text-textSecondary hover:text-prismGreen hover:bg-white/5 rounded-xl transition-all" title="Partner Onboarder">
+          👥
+        </button>
+      </div>
+
+      <!-- Settings at bottom -->
+      <button onclick="toggleSettingsModal()" class="p-3 text-textSecondary hover:text-prismCyan hover:bg-white/5 rounded-xl transition-all" title="Credentials & Keys">
+        ⚙️
+      </button>
+    </div>
+
+    <!-- Responsive Navigation Sidebar (Drilldown options & Real-Time Sync Controllers) -->
+    <aside id="sidebar-nav" class="w-64 border-r border-borderThin bg-prismSurface backdrop-blur-xl flex flex-col justify-between shrink-0 transition-all duration-300 z-10">
+      <div class="flex-1 overflow-y-auto">
+        <!-- Connection Health Hub -->
+        <div class="p-5 border-b border-borderThin bg-white/[0.01]">
+          <div class="flex items-center justify-between text-xs font-mono mb-3">
+            <span class="text-textSecondary">SYSTEM INTEGRATIONS</span>
+            <span class="text-emerald-400 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-prismGreen status-indicator"></span> LIVE
+            </span>
+          </div>
+          
+          <!-- Sync controls integration stencils visually configured -->
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between text-[11px] font-mono text-textSecondary">
+              <span>SUPABASE REALTIME</span>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="realtime-toggle" onchange="toggleSupabaseRealtime()" class="sr-only peer" checked>
+                <div class="w-7 h-4 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-textPrimary after:border-gray-300 after:border after:rounded-full after:height-3 after:w-3 after:transition-all peer-checked:bg-prismViolet"></div>
+              </label>
+            </div>
+            <div class="flex items-center justify-between text-[11px] font-mono text-textSecondary">
+              <span>GSHEETS GROUNDING</span>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="gsheets-toggle" onchange="toggleGSheetsGrounding()" class="sr-only peer">
+                <div class="w-7 h-4 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-textPrimary after:border-gray-300 after:border after:rounded-full after:height-3 after:w-3 after:transition-all peer-checked:bg-prismCyan"></div>
+              </label>
+            </div>
+            <div class="flex items-center justify-between text-[11px] font-mono text-textSecondary">
+              <span>CRM PIPELINE SYNC</span>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="zapier-toggle" onchange="triggerToast('Zapier automation channels synchronized.', 'info')" class="sr-only peer" checked>
+                <div class="w-7 h-4 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-textPrimary after:border-gray-300 after:border after:rounded-full after:height-3 after:w-3 after:transition-all peer-checked:bg-prismOrange"></div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="p-3 space-y-1">
+          <button onclick="switchTab('dashboard')" class="nav-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all text-textSecondary hover:text-textPrimary hover:bg-white/5" id="btn-dashboard">
+            <span class="text-sm">📈</span> Console Overview
+          </button>
+          
+          <button onclick="switchTab('directory')" class="nav-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all text-textSecondary hover:text-textPrimary hover:bg-white/5" id="btn-directory">
+            <span class="text-sm">📁</span> Capital Vault Grid
+          </button>
+
+          <button onclick="switchTab('kanban')" class="nav-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all text-textSecondary hover:text-textPrimary hover:bg-white/5" id="btn-kanban">
+            <span class="text-sm">🚚</span> Pipeline Logistics
+          </button>
+
+          <button onclick="switchTab('uploader')" class="nav-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all text-textSecondary hover:text-textPrimary hover:bg-white/5" id="btn-uploader">
+            <span class="text-sm">📥</span> Bulk Loader
+          </button>
+
+          <button onclick="switchTab('onboarding')" class="nav-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all text-textSecondary hover:text-textPrimary hover:bg-white/5" id="btn-onboarding">
+            <span class="text-sm">👥</span> Partner Onboarder
+          </button>
+          
+          <button onclick="switchTab('faq')" class="nav-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all text-textSecondary hover:text-textPrimary hover:bg-white/5" id="btn-faq">
+            <span class="text-sm">💡</span> System FAQ & APIs
+          </button>
+        </nav>
+
+        <!-- Real-time Event Log Ticker -->
+        <div class="px-5 py-4 mx-3 mt-4 bg-black/40 border border-borderThin rounded-xl">
+          <div class="flex items-center justify-between text-[10px] font-mono text-prismViolet mb-2">
+            <span>LIVE WEBHOOK STREAM</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-prismViolet status-indicator"></span>
+          </div>
+          <div id="realtime-log-container" class="space-y-1.5 h-36 overflow-y-auto text-[9px] font-mono text-textMuted">
+            <div class="text-textSecondary">[Listening] Replication services primed...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Profile Card -->
+      <div class="p-4 border-t border-borderThin bg-black/20">
+        <div class="bg-white/5 p-3 rounded-xl flex items-center gap-3 relative overflow-hidden">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-prismViolet to-prismMagenta flex items-center justify-center font-bold text-sm text-white relative">
+            AD
+            <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-prismGreen rounded-full border-2 border-prismBg"></div>
+          </div>
+          <div class="flex-1 overflow-hidden">
+            <h4 class="text-xs font-bold text-textPrimary truncate">Core Administrator</h4>
+            <p class="text-[10px] font-mono text-textMuted truncate">auth0_usr_49a9f2</p>
+          </div>
+          <button onclick="toggleSettingsModal()" class="text-textSecondary hover:text-prismCyan transition-colors p-1" title="Open Settings">
+            ⚙️
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Work Area -->
+    <main class="flex-1 min-w-0 flex flex-col overflow-y-auto">
+      
+      <!-- Top Dynamic Header with Datepicker -->
+      <header class="navbar border-b border-borderThin bg-prismSurface/80 backdrop-blur-md p-6 flex flex-col lg:flex-row gap-4 items-center justify-between z-10">
+        <div>
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="text-[10px] px-2 py-0.5 rounded border border-prismCyan/30 bg-prismCyan/10 text-prismCyan font-mono uppercase tracking-wider">VERSION 2.4 SECURED</span>
+            <span class="text-[10px] px-2 py-0.5 rounded border border-prismViolet/30 bg-prismViolet/10 text-prismViolet font-mono uppercase tracking-wider">MFA SHIELD ON</span>
+          </div>
+          <h1 class="text-2xl font-space font-bold tracking-tight text-textPrimary flex items-center gap-3">
+            PRISM CORE CONTROL PANEL
+          </h1>
+          <p class="text-xs text-textSecondary">Real-time matching parameters, dynamic partner streams and secure transaction routing pipelines.</p>
+        </div>
+
+        <!-- Comprehensive Date Range Picker & Connection Indicators -->
+        <div class="flex items-center gap-3 flex-wrap justify-end">
+          <div class="bg-white/5 border border-borderThin rounded-xl p-1.5 flex items-center gap-1.5 text-xs font-mono">
+            <span class="text-textMuted px-2">DYNAMIC RANGE:</span>
+            <input type="date" id="date-from" class="bg-transparent text-textPrimary focus:outline-none border-none p-1 text-xs" value="2024-01-01">
+            <span class="text-textMuted">&mdash;</span>
+            <input type="date" id="date-to" class="bg-transparent text-textPrimary focus:outline-none border-none p-1 text-xs" value="2024-12-31">
+            <button onclick="applyDateFilter()" class="bg-prismCyan/20 text-prismCyan hover:bg-prismCyan/30 px-3 py-1 rounded-lg transition-all font-semibold">Sync Date</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- TAB CONTENT: SYSTEM CONSOLE OVERVIEW -->
+      <div id="tab-dashboard" class="tab-content active p-6 space-y-8">
+        
+        <!-- Interactive Stats Overview Bento Grid -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          
+          <!-- Bento Card 1: G-Sheets Grounding Status -->
+          <div class="bg-prismSurface border border-borderThin rounded-2xl p-6 relative overflow-hidden group hover:border-prismCyan/40 transition-all flex flex-col justify-between">
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="text-[10px] font-mono text-textMuted tracking-wider block uppercase">G-SHEETS INTEGRATED LENDERS</span>
+                <span class="text-3xl font-space font-bold mt-2 block text-textPrimary" id="bento-total-lenders">10</span>
+              </div>
+              <span class="p-2 rounded-xl bg-prismCyan/10 text-prismCyan text-[10px] font-semibold" id="bento-gsheets-badge">STREAMING</span>
+            </div>
+            <!-- Dynamic Micro-Sparkline Chart -->
+            <div class="mt-6">
+              <div class="flex items-center gap-2 mb-1.5">
+                <span class="text-prismGreen text-xs font-bold">▲ +12%</span>
+                <span class="text-[10px] font-mono text-textMuted">vs last week</span>
+              </div>
+              <svg class="w-full h-12 stroke-prismCyan" viewBox="0 0 100 20" fill="none">
+                <path d="M0,15 Q15,3 30,12 T60,4 T90,16 T120,5" stroke-width="2" stroke-linecap="round"></path>
+                <circle cx="90" cy="16" r="3.5" fill="#00f0ff"></circle>
+              </svg>
+            </div>
+            <div class="mt-4 flex items-center justify-between text-xs font-mono text-textSecondary pt-3 border-t border-white/5">
+              <span>DB INTEGRITY</span>
+              <span class="text-prismGreen font-semibold">100% SECURE</span>
+            </div>
+          </div>
+
+          <!-- Bento Card 2: Supabase Realtime Stream -->
+          <div class="bg-prismSurface border border-borderThin rounded-2xl p-6 relative overflow-hidden group hover:border-prismViolet/40 transition-all flex flex-col justify-between">
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="text-[10px] font-mono text-textMuted tracking-wider block uppercase">ACTIVE SYSTEM STATES</span>
+                <span class="text-3xl font-space font-bold mt-2 block text-textPrimary" id="bento-states">2</span>
+              </div>
+              <span class="p-2 rounded-xl bg-prismViolet/10 text-prismViolet text-[10px] font-semibold">ACTIVE</span>
+            </div>
+            <!-- Dynamic Micro-Sparkline Chart -->
+            <div class="mt-6">
+              <div class="flex items-center gap-2 mb-1.5">
+                <span class="text-prismGreen text-xs font-bold">▲ +8.5%</span>
+                <span class="text-[10px] font-mono text-textMuted">transaction index</span>
+              </div>
+              <svg class="w-full h-12 stroke-prismViolet" viewBox="0 0 100 20" fill="none">
+                <path d="M0,8 Q20,18 40,8 T80,14 T100,2" stroke-width="2" stroke-linecap="round"></path>
+                <circle cx="100" cy="2" r="3.5" fill="#8b5cf6"></circle>
+              </svg>
+            </div>
+            <div class="mt-4 flex items-center justify-between text-xs font-mono text-textSecondary pt-3 border-t border-white/5">
+              <span>REALTIME CHANNELS</span>
+              <span class="text-prismViolet font-semibold">STABLE STATE</span>
+            </div>
+          </div>
+
+          <!-- Bento Card 3: Auth0 & Security Sessions -->
+          <div class="bg-prismSurface border border-borderThin rounded-2xl p-6 relative overflow-hidden group hover:border-prismMagenta/40 transition-all flex flex-col justify-between">
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="text-[10px] font-mono text-textMuted tracking-wider block uppercase">MFA AUTHENTICATED KEY</span>
+                <span class="text-3xl font-space font-bold mt-2 block text-textPrimary">MFA <span class="text-sm font-normal text-textMuted">SECURED</span></span>
+              </div>
+              <span class="p-2 rounded-xl bg-prismMagenta/10 text-prismMagenta text-[10px] font-semibold">SHIELDED</span>
+            </div>
+            <!-- Dynamic Micro-Sparkline Chart -->
+            <div class="mt-6">
+              <div class="flex items-center gap-2 mb-1.5">
+                <span class="text-prismGreen text-xs font-bold">🛡️ AUTH0 SSO</span>
+                <span class="text-[10px] font-mono text-textMuted">active session token</span>
+              </div>
+              <svg class="w-full h-12 stroke-prismMagenta" viewBox="0 0 100 20" fill="none">
+                <path d="M0,15 L15,10 L30,12 L50,4 L70,8 L100,5" stroke-width="2" stroke-linecap="round"></path>
+                <circle cx="100" cy="5" r="3.5" fill="#ff007f"></circle>
+              </svg>
+            </div>
+            <div class="mt-4 flex items-center justify-between text-xs font-mono text-textSecondary pt-3 border-t border-white/5">
+              <span>EXPIRATION STAGE</span>
+              <span class="text-prismMagenta font-semibold">3600s SECURE</span>
+            </div>
+          </div>
+
+          <!-- Bento Card 4: Automated triggers -->
+          <div class="bg-prismSurface border border-borderThin rounded-2xl p-6 relative overflow-hidden group hover:border-prismOrange/40 transition-all flex flex-col justify-between">
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="text-[10px] font-mono text-textMuted tracking-wider block uppercase">ZAPIER TRIGGER ENGINE</span>
+                <span class="text-3xl font-space font-bold mt-2 block text-textPrimary">4 <span class="text-sm font-normal text-textMuted">HOOKED</span></span>
+              </div>
+              <span class="p-2 rounded-xl bg-prismOrange/10 text-prismOrange text-[10px] font-semibold">AUTOMATED</span>
+            </div>
+            <!-- Dynamic Micro-Sparkline Chart -->
+            <div class="mt-6">
+              <div class="flex items-center gap-2 mb-1.5">
+                <span class="text-prismGreen text-xs font-bold">▲ 99.8%</span>
+                <span class="text-[10px] font-mono text-textMuted">delivery reliability</span>
+              </div>
+              <svg class="w-full h-12 stroke-prismOrange" viewBox="0 0 100 20" fill="none">
+                <path d="M0,5 Q20,15 40,5 T80,12 T100,8" stroke-width="2" stroke-linecap="round"></path>
+                <circle cx="100" cy="8" r="3.5" fill="#f97316"></circle>
+              </svg>
+            </div>
+            <div class="mt-4 flex items-center justify-between text-xs font-mono text-textSecondary pt-3 border-t border-white/5">
+              <span>ACTIVE LISTENER TRIPPED</span>
+              <span class="text-prismOrange font-semibold">READY</span>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- Advanced External API Integrations (GitHub Repository API & HubSpot Sync) -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          
+          <!-- GitHub Integration Panel -->
+          <div class="bg-prismSurface border border-borderThin rounded-2xl p-6 space-y-5">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-space font-bold text-textPrimary flex items-center gap-2">
+                <span class="w-2.5 h-2.5 bg-prismCyan rounded-full"></span>
+                GitHub Deployment API & Sync Webhooks
+              </h3>
+              <span class="text-[10px] font-mono text-textMuted">github.api_v4</span>
+            </div>
+            <p class="text-xs text-textSecondary">Automatically commit active matching nodes directly into your storage repositories or raise custom pull requests whenever configurations update.</p>
+            
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div class="space-y-1">
+                <label class="block text-[10px] font-mono text-textMuted uppercase">GitHub Repository</label>
+                <input type="text" id="gh-repo-input" class="w-full bg-white/5 border border-borderThin rounded-xl p-2.5 text-xs text-textPrimary focus:outline-none focus:border-prismCyan" value="org/prism-vault-repo">
+              </div>
+              <div class="space-y-1">
+                <label class="block text-[10px] font-mono text-textMuted uppercase">Target Branch</label>
+                <input type="text" id="gh-branch-input" class="w-full bg-white/5 border border-borderThin rounded-xl p-2.5 text-xs text-textPrimary focus:outline-none focus:border-prismCyan" value="main">
+              </div>
+            </div>
+
+            <div class="bg-black/40 p-4 rounded-xl border border-borderThin">
+              <pre class="text-[11px] font-mono text-prismCyan overflow-x-auto">
+// Stencil for Git direct commit of Active Vault Database
+async function pushToGitRepository(vaultPayload) {
+  const GITHUB_ACCESS_TOKEN = document.getElementById('setting-gh-key').value;
+  const repo = document.getElementById('gh-repo-input').value;
+  const branch = document.getElementById('gh-branch-input').value;
+  const endpoint = `https://api.github.com/repos/${repo}/contents/database.json`;
+  
+  const response = await fetch(endpoint, {
+    method: "PUT",
+    headers: {
+      "Authorization": `Bearer ${GITHUB_ACCESS_TOKEN}`,
+      "Accept": "application/vnd.github.v3+json"
+    },
+    body: JSON.stringify({
+      message: "Sync: Live Vault configuration node added.",
+      content: btoa(JSON.stringify(vaultPayload)),
+      branch: branch
+    })
+  });
+  return response.json();
+}</pre>
+            </div>
+
+            <div class="flex gap-2">
+              <button onclick="simulateGitCommit()" class="px-4 py-2 bg-gradient-to-r from-prismCyan to-prismViolet text-white text-xs font-bold rounded-xl hover:opacity-90 transition-all flex items-center gap-2">
+                <span>⚡ Test Direct GitHub Commit</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- HubSpot Sync Panel -->
+          <div class="bg-prismSurface border border-borderThin rounded-2xl p-6 space-y-5">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-space font-bold text-textPrimary flex items-center gap-2">
+                <span class="w-2.5 h-2.5 bg-prismMagenta rounded-full"></span>
+                HubSpot CRM & Sync API
+              </h3>
+              <span class="text-[10px] font-mono text-textMuted">hubspot_crm_v3</span>
+            </div>
+            <p class="text-xs text-textSecondary">Synchronize registered onboarding clients, contact parameters, transaction values, and active matching rules directly to corporate CRM pipelines.</p>
+            
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div class="space-y-1">
+                <label class="block text-[10px] font-mono text-textMuted uppercase">Sync Association Stage</label>
+                <select id="hubspot-stage-input" class="w-full bg-white/5 border border-borderThin rounded-xl p-2.5 text-xs text-textPrimary focus:outline-none focus:border-prismMagenta">
+                  <option value="lead">Lead Creation Phase</option>
+                  <option value="underwriting">Underwriting Evaluation</option>
+                  <option value="term_sheet">Issued Term Sheets</option>
+                </select>
+              </div>
+              <div class="space-y-1">
+                <label class="block text-[10px] font-mono text-textMuted uppercase">Contact Owner Email</label>
+                <input type="text" id="hubspot-owner" class="w-full bg-white/5 border border-borderThin rounded-xl p-2.5 text-xs text-textPrimary focus:outline-none focus:border-prismMagenta" value="agent@prismlogic.io">
+              </div>
+            </div>
+
+            <div class="bg-black/40 p-4 rounded-xl border border-borderThin">
+              <pre class="text-[11px] font-mono text-prismMagenta overflow-x-auto">
+// Stencil for HubSpot Lead Creation Webhook trigger
+async function syncPartnerToHubspot(partnerDetails) {
+  const HUBSPOT_API_KEY = "pat-na1-xxxxxx"; // Configured on secure proxy
+  const endpoint = "https://api.hubapi.com/crm/v3/objects/contacts";
+  const stage = document.getElementById('hubspot-stage-input').value;
+  
+  return fetch(endpoint, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${HUBSPOT_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      properties: {
+        "firstname": partnerDetails.Lender,
+        "website": partnerDetails["Lender Website"],
+        "phone": partnerDetails["Lender Phone"],
+        "association_stage": stage,
+        "lending_cap": partnerDetails["Ltv"]
+      }
+    })
+  });
+}</pre>
+            </div>
+
+            <div class="flex gap-2">
+              <button onclick="simulateHubspotSync()" class="px-4 py-2 bg-gradient-to-r from-prismMagenta to-prismOrange text-white text-xs font-bold rounded-xl hover:opacity-90 transition-all flex items-center gap-2">
+                <span>⚡ Dispatch HubSpot Live Test</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Pipeline Route Logistics -->
+        <section class="space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-lg font-space font-bold text-textPrimary flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-prismOrange"></span> Core Active Routing Pipeline (Interactive Drag/Drop & Shifting)
+              </h2>
+              <p class="text-xs text-textSecondary">Manage active real-time transaction routes across logical operational stages.</p>
+            </div>
+            <button onclick="createNewPipelineCard()" class="px-4 py-2.5 bg-gradient-to-r from-prismCyan via-prismViolet to-prismMagenta text-white font-semibold text-xs rounded-xl hover:opacity-90 transition-all flex items-center gap-2">
+              <span>+ Generate Mock Deal Card</span>
+            </button>
+          </div>
+
+          <!-- Drag and drop stencil representation inside Pipeline Columns -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-6" id="kanban-board">
+            <!-- Dynamically populated -->
+          </div>
+        </section>
+
+      </div>
+
+      <!-- TAB CONTENT: DIRECTORY VAULT & INTERACTIVE TABLE -->
+      <div id="tab-directory" class="tab-content p-6 space-y-6">
+        
+        <!-- Filter Bar Panel -->
+        <section class="bg-prismSurface border border-borderThin rounded-2xl p-6 backdrop-blur-xl space-y-6">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            
+            <!-- Core Search bar with Multi-attribute support -->
+            <div class="lg:col-span-4 relative flex items-center">
+              <span class="absolute left-4 text-textMuted">🔍</span>
+              <input type="text" id="dir-search" oninput="applyAllFilters()" class="w-full bg-white/5 border border-borderThin rounded-xl pl-12 pr-4 py-3 text-sm text-textPrimary focus:outline-none focus:border-prismCyan transition-all" placeholder="Search entity databases, states, LTV params...">
+            </div>
+
+            <!-- Program Selector -->
+            <div class="lg:col-span-3">
+              <select id="dir-loan" onchange="applyAllFilters()" class="w-full bg-prismBg border border-borderThin rounded-xl px-4 py-3 text-sm text-textSecondary focus:outline-none focus:border-prismViolet">
+                <option value="ALL">All Programs (Show All)</option>
+                <option value="Bridge Loans">Bridge Loans Only</option>
+                <option value="Fix and Flip Loans">Fix & Flip Focus</option>
+                <option value="Investment Property Loans">Rental / Investment</option>
+                <option value="Refinance / Cash Out Loans">Refinance / Cash Out</option>
+              </select>
+            </div>
+
+            <!-- Asset Class Selector -->
+            <div class="lg:col-span-3">
+              <select id="dir-property" onchange="applyAllFilters()" class="w-full bg-prismBg border border-borderThin rounded-xl px-4 py-3 text-sm text-textSecondary focus:outline-none focus:border-prismMagenta">
+                <option value="ALL">All Property Focus</option>
+                <option value="Single Family">Single Family</option>
+                <option value="Multi Family">Multi Family</option>
+                <option value="Apartment">Apartment</option>
+              </select>
+            </div>
+
+            <!-- View Toggle Controllers -->
+            <div class="lg:col-span-2 flex gap-2">
+              <button onclick="setViewMode('grid')" id="btn-view-grid" class="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-borderThin rounded-xl text-xs font-semibold text-textPrimary transition-all flex items-center justify-center gap-1.5">
+                📊 Grid View
+              </button>
+              <button onclick="setViewMode('table')" id="btn-view-table" class="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-borderThin rounded-xl text-xs font-semibold text-textSecondary transition-all flex items-center justify-center gap-1.5">
+                📁 Table View
+              </button>
+            </div>
+
+          </div>
+
+          <!-- Dynamic sorting control metrics -->
+          <div class="flex items-center justify-between flex-wrap gap-2 pt-4 border-t border-white/5 text-xs">
+            <div class="flex items-center gap-3">
+              <span class="font-mono text-textMuted">SORT BY:</span>
+              <button onclick="toggleSortDirection('Lender')" class="px-2.5 py-1 bg-white/5 hover:bg-white/10 border border-borderThin rounded text-[11px] font-mono text-textSecondary hover:text-textPrimary transition-all">
+                Lender Name <span id="sort-icon-Lender">↕</span>
+              </button>
+              <button onclick="toggleSortDirection('Ltv')" class="px-2.5 py-1 bg-white/5 hover:bg-white/10 border border-borderThin rounded text-[11px] font-mono text-textSecondary hover:text-textPrimary transition-all">
+                LTV Target <span id="sort-icon-Ltv">↕</span>
+              </button>
+            </div>
+
+            <div id="dir-active-pills" class="flex flex-wrap gap-2"></div>
+            <button onclick="resetDirectoryFilters()" class="text-xs text-prismCyan hover:underline font-mono">Reset Active Filters</button>
+          </div>
+        </section>
+
+        <!-- Multi-Column Responsive Grid View & Live Data Table View -->
+        <section id="directory-content-wrapper" class="space-y-4">
+          
+          <!-- Dynamic Google Sheets Context Banner -->
+          <div id="gsheets-indicator-banner" class="hidden bg-emerald-950/40 border border-emerald-500/30 rounded-2xl p-4 flex items-center justify-between animate-pulse">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl">📊</span>
+              <div>
+                <h4 class="text-xs font-bold text-emerald-400 font-mono">GOOGLE SHEETS REALTIME SYNC ACTIVE</h4>
+                <p class="text-[10px] text-textSecondary">Symmetric database tables pulling directly from active spreadsheet matrix <span class="text-prismCyan font-semibold">"Prism_Vault_Primary"</span></p>
+              </div>
+            </div>
+            <button onclick="toggleGSheetsGrounding()" class="px-3 py-1 text-[10px] font-mono border border-emerald-500/30 text-emerald-400 bg-emerald-500/10 rounded-lg hover:bg-emerald-500/20">Disconnect Sync</button>
+          </div>
+
+          <!-- Responsive Grid View Container -->
+          <div id="directory-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Rendered Dynamically -->
+          </div>
+
+          <!-- Data Table View Container -->
+          <div id="directory-table-container" class="hidden overflow-x-auto bg-prismSurface border border-borderThin rounded-2xl">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-white/5 border-b border-borderThin font-mono text-xs text-textSecondary uppercase">
+                <tr>
+                  <th scope="col" class="px-6 py-4">Lender Entity Profile</th>
+                  <th scope="col" class="px-6 py-4">HQ City</th>
+                  <th scope="col" class="px-6 py-4">Coverage Parameters</th>
+                  <th scope="col" class="px-6 py-4">Max Loan-To-Value</th>
+                  <th scope="col" class="px-6 py-4 text-right">Details</th>
+                </tr>
+              </thead>
+              <tbody id="directory-table-rows" class="divide-y divide-white/5">
+                <!-- Rendered Dynamically -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Panel -->
+          <div class="flex items-center justify-between mt-8 pt-4 border-t border-white/5 text-xs font-mono">
+            <span class="text-textSecondary" id="pagination-status">Showing index range 0 — 0 of 0</span>
+            <div class="flex gap-2">
+              <button onclick="adjustPage(-1)" id="btn-page-prev" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-borderThin rounded-xl text-textPrimary disabled:opacity-40 disabled:cursor-not-allowed">Previous Node</button>
+              <button onclick="adjustPage(1)" id="btn-page-next" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-borderThin rounded-xl text-textPrimary disabled:opacity-40 disabled:cursor-not-allowed">Next Node</button>
+            </div>
+          </div>
+
+          <!-- Fallback Empty State -->
+          <div id="directory-empty-state" class="hidden bg-prismSurface border border-dashed border-borderThin rounded-2xl p-16 text-center max-w-lg mx-auto space-y-4">
+            <span class="text-4xl text-prismMagenta">♢</span>
+            <h3 class="font-space font-bold text-xl text-textPrimary">Refraction Signal Broken</h3>
+            <p class="text-sm text-textSecondary">No capital nodes matches detected under the current active settings. Restructure filter guidelines.</p>
+            <button onclick="resetDirectoryFilters()" class="px-6 py-2 bg-gradient-to-r from-prismCyan to-prismViolet text-white font-semibold text-xs rounded-xl hover:opacity-90">Reset Metrics</button>
+          </div>
+
+        </section>
+
+      </div>
+
+      <!-- TAB CONTENT: PIPELINE KANBAN MODULE -->
+      <div id="tab-kanban" class="tab-content p-6 space-y-6">
+        <div class="bg-prismSurface border border-borderThin rounded-2xl p-6 backdrop-blur-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h2 class="text-xl font-space font-bold text-textPrimary flex items-center gap-3">
+              <span class="w-3 h-3 rounded-full bg-gradient-to-br from-prismCyan to-prismMagenta"></span>
+              Dynamic Route Logistics Pipeline
+            </h2>
+            <p class="text-sm text-textSecondary mt-1">Visualize deal movement. Drag configurations or shift states dynamically to execute connected webhooks.</p>
+          </div>
+          <button onclick="createNewPipelineCard()" class="px-4 py-2 bg-gradient-to-r from-prismCyan to-prismViolet text-white font-semibold text-xs rounded-xl hover:opacity-90 transition-all">
+            + Insert Deal Instance
+          </button>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6" id="kanban-full-board">
+          <!-- Populated Dynamically with enhanced drag/drop stencils -->
+        </div>
+      </div>
+
+      <!-- TAB CONTENT: CSV / JSON DATA UPLOADER -->
+      <div id="tab-uploader" class="tab-content p-6 space-y-6">
+        <div class="bg-prismSurface border border-borderThin rounded-2xl p-6 space-y-4">
+          <h2 class="text-xl font-space font-bold text-textPrimary flex items-center gap-2">
+            📥 Dynamic Data Packet Loader
+          </h2>
+          <p class="text-sm text-textSecondary">Load new partner configuration packages into local runtime caches. Directly parse JSON objects or comma-separated value matrices.</p>
+          
+          <!-- Dropzone and Textarea elements -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <div class="border-2 border-dashed border-borderThin hover:border-prismCyan/50 rounded-2xl p-8 flex flex-col items-center justify-center text-center transition-all cursor-pointer relative bg-white/[0.02]" id="dropzone">
+              <input type="file" id="file-uploader-input" class="absolute inset-0 opacity-0 cursor-pointer" accept=".json,.csv" onchange="handleFileSelect(event)">
+              <div class="p-4 bg-prismCyan/10 rounded-full text-prismCyan mb-4 text-2xl">📁</div>
+              <h3 class="font-semibold text-textPrimary text-sm mb-1">Drag and Drop Data Packet</h3>
+              <p class="text-xs text-textSecondary">Accepts validated .json or structured .csv. Maximum file size up to 10MB.</p>
+              <div class="mt-4 px-3 py-1 bg-white/5 rounded-lg border border-borderThin text-[10px] text-textMuted font-mono uppercase tracking-wider">CLIENT-SIDE SHIELD ACTIVE</div>
+            </div>
+
+            <div class="space-y-3">
+              <label class="block text-xs font-mono text-textMuted tracking-wider uppercase">Or Inject Raw Structural Coordinates</label>
+              <textarea id="raw-uploader-paste" class="w-full h-40 bg-white/5 border border-borderThin rounded-xl p-4 font-mono text-xs text-textPrimary focus:outline-none focus:border-prismMagenta" placeholder='[{"Lender": "Global Yield Corp", "City": "Denver", "State": "Colorado", "Ltv": 85}]'></textarea>
+              <div class="flex gap-3">
+                <button onclick="parsePasteInput()" class="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-borderThin rounded-xl text-xs font-semibold text-textPrimary transition-all">Dry-Run Parse Data</button>
+                <button onclick="importTestData()" class="flex-1 py-3 bg-gradient-to-r from-prismViolet to-prismMagenta text-white text-xs font-semibold rounded-xl hover:opacity-90 transition-all">Load Standard Node Template</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Parse Preview Table Panel -->
+        <div class="bg-prismSurface border border-borderThin rounded-2xl p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-space font-bold text-textPrimary">Data Stream Decryption Output Preview</h3>
+            <span class="text-xs font-mono text-textMuted" id="preview-row-count">0 Staged Records</span>
+          </div>
+          
+          <div class="overflow-x-auto max-h-80 border border-borderThin rounded-xl">
+            <table class="w-full text-left text-xs font-mono">
+              <thead class="bg-white/5 border-b border-borderThin text-textSecondary uppercase text-[10px] tracking-wider">
+                <tr>
+                  <th class="px-6 py-3">Lender Profile</th>
+                  <th class="px-6 py-3">HQ Geographic State</th>
+                  <th class="px-6 py-3">Target Leverage Max</th>
+                  <th class="px-6 py-3">Asset Profiles Scope</th>
+                </tr>
+              </thead>
+              <tbody id="preview-rows" class="divide-y divide-white/5">
+                <tr>
+                  <td colspan="4" class="px-6 py-8 text-center text-textMuted italic">No active streams staged inside parsing queues. Select templates above.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="flex justify-end gap-3 pt-4 border-t border-white/5">
+            <button onclick="clearStagedData()" class="px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-borderThin rounded-xl text-xs font-semibold text-textPrimary transition-all">Wipe Stream Cache</button>
+            <button onclick="commitStagedToDatabase()" class="px-5 py-2.5 bg-gradient-to-r from-prismCyan to-prismViolet text-white text-xs font-semibold rounded-xl hover:opacity-90 transition-all">Commit Stream to Live Vault Directory</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB CONTENT: ADVANCED MULTI-STEP ONBOARDING PORTAL -->
+      <div id="tab-onboarding" class="tab-content p-6 space-y-6">
+        <div class="bg-prismSurface border border-borderThin rounded-2xl p-8 space-y-8 max-w-4xl mx-auto relative overflow-hidden">
+          
+          <!-- Decorative refractive gradient divider -->
+          <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-prismCyan via-prismViolet to-prismMagenta"></div>
+
+          <!-- Wizard Heading & Progress Map -->
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-xl font-space font-bold text-textPrimary">Prism Onboarding Portal</h2>
+                <p class="text-xs text-textSecondary">Enroll your capital firm details and underwriting metrics inside the central index.</p>
+              </div>
+              <span class="text-xs font-mono text-prismCyan border border-prismCyan/30 bg-prismCyan/10 px-2.5 py-1 rounded">AUTH0_VERIFIED_SESSION</span>
+            </div>
+
+            <!-- Steps indicators -->
+            <div class="grid grid-cols-4 gap-4">
+              <div class="text-center space-y-2">
+                <div class="step-indicator-bar h-1 bg-prismCyan rounded-full transition-all duration-300"></div>
+                <span class="block text-[10px] font-mono font-semibold text-prismCyan uppercase">1. Corporate Profile</span>
+              </div>
+              <div class="text-center space-y-2">
+                <div class="step-indicator-bar h-1 bg-white/10 rounded-full transition-all duration-300"></div>
+                <span class="block text-[10px] font-mono font-semibold text-textMuted uppercase">2. Area Scope</span>
+              </div>
+              <div class="text-center space-y-2">
+                <div class="step-indicator-bar h-1 bg-white/10 rounded-full transition-all duration-300"></div>
+                <span class="block text-[10px] font-mono font-semibold text-textMuted uppercase">3. Operational Limits</span>
+              </div>
+              <div class="text-center space-y-2">
+                <div class="step-indicator-bar h-1 bg-white/10 rounded-full transition-all duration-300"></div>
+                <span class="block text-[10px] font-mono font-semibold text-textMuted uppercase">4. Node Verification</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Wizard Form Contents -->
+          <form id="onboarding-form" onsubmit="event.preventDefault();" class="space-y-6">
+            
+            <!-- Step 1 Layout -->
+            <div class="onboarding-step space-y-4 transition-all duration-300" id="step-1">
+              <h3 class="text-sm font-space font-bold text-textPrimary uppercase tracking-wider">Company Identity Matrix</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-mono text-textSecondary">Lender Legal Entity Name</label>
+                  <input type="text" id="ob-lender-name" class="w-full bg-white/5 border border-borderThin rounded-xl px-4 py-3 text-sm text-textPrimary focus:outline-none focus:border-prismCyan" placeholder="e.g. Paramount Funding LLC">
+                </div>
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-mono text-textSecondary">Corporate Domain / Website</label>
+                  <input type="url" id="ob-lender-web" class="w-full bg-white/5 border border-borderThin rounded-xl px-4 py-3 text-sm text-textPrimary focus:outline-none focus:border-prismCyan" placeholder="https://domain.com">
+                </div>
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-mono text-textSecondary">Active Office Phone</label>
+                  <input type="text" id="ob-lender-phone" class="w-full bg-white/5 border border-borderThin rounded-xl px-4 py-3 text-sm text-textPrimary focus:outline-none focus:border-prismCyan" placeholder="(555) 000-0000">
+                </div>
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-mono text-textSecondary">Principal Office Street Address</label>
+                  <input type="text" id="ob-lender-addr" class="w-full bg-white/5 border border-borderThin rounded-xl px-4 py-3 text-sm text-textPrimary focus:outline-none focus:border-prismCyan" placeholder="100 Wall Street, 24th Floor">
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 2 Layout -->
+            <div class="onboarding-step space-y-4 hidden transition-all duration-300" id="step-2">
+              <h3 class="text-sm font-space font-bold text-textPrimary uppercase tracking-wider">Geographic Operational Scope</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-mono text-textSecondary">Principal Hub City</label>
+                  <input type="text" id="ob-lender-city" class="w-full bg-white/5 border border-borderThin rounded-xl px-4 py-3 text-sm text-textPrimary focus:outline-none focus:border-prismViolet" placeholder="e.g. New York">
+                </div>
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-mono text-textSecondary">Core Lending State focus</label>
+                  <input type="text" id="ob-lender-state" class="w-full bg-white/5 border border-borderThin rounded-xl px-4 py-3 text-sm text-textPrimary focus:outline-none focus:border-prismViolet" placeholder="e.g. California, Oregon">
+                </div>
+                <div class="space-y-1.5 md:col-span-2">
+                  <label class="block text-xs font-mono text-textSecondary">Asset Class Profiles Focus (Comma separated)</label>
+                  <input type="text" id="ob-lender-assets" class="w-full bg-white/5 border border-borderThin rounded-xl px-4 py-3 text-sm text-textPrimary focus:outline-none focus:border-prismViolet" placeholder="Single Family, Multi Family, Apartment">
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 3 Layout -->
+            <div class="onboarding-step space-y-4 hidden transition-all duration-300" id="step-3">
+              <h3 class="text-sm font-space font-bold text-textPrimary uppercase tracking-wider">Loan-To-Value operational parameters</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-mono text-textSecondary">Maximum Permissible leverage (Max LTV %)</label>
+                  <input type="number" id="ob-lender-ltv" class="w-full bg-white/5 border border-borderThin rounded-xl px-4 py-3 text-sm text-textPrimary focus:outline-none focus:border-prismMagenta" placeholder="80" min="50" max="95">
+                </div>
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-mono text-textSecondary">Active Programs Offered (Comma separated)</label>
+                  <input type="text" id="ob-lender-programs" class="w-full bg-white/5 border border-borderThin rounded-xl px-4 py-3 text-sm text-textPrimary focus:outline-none focus:border-prismMagenta" placeholder="Bridge Loans, Fix and Flip Loans">
+                </div>
+                <div class="space-y-1.5 md:col-span-2">
+                  <label class="block text-xs font-mono text-textSecondary">Company Synopsis & Underwriting Philosophy</label>
+                  <textarea id="ob-lender-desc" class="w-full h-32 bg-white/5 border border-borderThin rounded-xl p-4 text-sm text-textPrimary focus:outline-none focus:border-prismMagenta" placeholder="Provide summaries of active guidelines, funding limits..."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 4 Layout -->
+            <div class="onboarding-step space-y-4 hidden transition-all duration-300" id="step-4">
+              <div class="text-center p-8 space-y-4">
+                <span class="text-5xl">⚡</span>
+                <h3 class="text-lg font-space font-bold text-textPrimary">Configuration Schema Verified</h3>
+                <p class="text-sm text-textSecondary max-w-md mx-auto">Confirm information below to deploy this active partner configuration directly to secure routing networks.</p>
+                
+                <div class="bg-white/5 border border-borderThin rounded-xl p-4 max-w-sm mx-auto text-left font-mono text-xs text-textSecondary space-y-2">
+                  <div>LENDER ENTITY: <span id="summary-name" class="text-textPrimary font-bold">-</span></div>
+                  <div>BASE HUB: <span id="summary-city" class="text-textPrimary font-semibold">-</span></div>
+                  <div>LTV CRITERIA: <span id="summary-ltv" class="text-prismCyan font-bold">-</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Control Actions -->
+            <div class="flex justify-between items-center pt-6 border-t border-white/5">
+              <button type="button" id="btn-ob-prev" onclick="advanceOnboarding(-1)" class="px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-borderThin rounded-xl text-xs font-semibold text-textPrimary disabled:opacity-40 disabled:cursor-not-allowed" disabled>Previous Step</button>
+              <button type="button" id="btn-ob-next" onclick="advanceOnboarding(1)" class="px-5 py-2.5 bg-gradient-to-r from-prismCyan to-prismViolet text-white text-xs font-semibold rounded-xl hover:opacity-90 transition-all">Advance Step</button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+
+      <!-- TAB CONTENT: SYSTEM FAQ & ACCORDION SECTION -->
+      <div id="tab-faq" class="tab-content p-6 space-y-6">
+        <div class="max-w-4xl mx-auto space-y-6">
+          <div class="text-center space-y-2">
+            <h2 class="text-2xl font-space font-bold text-textPrimary">System Directory FAQ Reference</h2>
+            <p class="text-sm text-textSecondary">General operational answers concerning index calculations, Auth0 configurations, and Webhook dispatching.</p>
+          </div>
+
+          <div class="space-y-4">
+            
+            <!-- Accordion FAQ Card 1 -->
+            <div class="bg-prismSurface border border-borderThin rounded-2xl overflow-hidden transition-all duration-200">
+              <button onclick="toggleAccordion('faq-1')" class="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.02] transition-all">
+                <span class="font-space font-semibold text-textPrimary text-sm">How is the automatic LTV scoring generated?</span>
+                <span class="text-prismCyan font-mono text-sm" id="faq-1-icon">[+]</span>
+              </button>
+              <div id="faq-1" class="hidden px-6 pb-6 text-xs text-textSecondary leading-relaxed border-t border-white/5 pt-4">
+                The indexing engine scores registered nodes using historic dynamic leverage factors. Maximum LTV caps are strictly cross-referenced with regional geographic risk parameters stored inside local Supabase shards.
+              </div>
+            </div>
+
+            <!-- Accordion FAQ Card 2 -->
+            <div class="bg-prismSurface border border-borderThin rounded-2xl overflow-hidden transition-all duration-200">
+              <button onclick="toggleAccordion('faq-2')" class="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.02] transition-all">
+                <span class="font-space font-semibold text-textPrimary text-sm">Can I ground multiple spreadsheet coordinates?</span>
+                <span class="text-prismCyan font-mono text-sm" id="faq-2-icon">[+]</span>
+              </button>
+              <div id="faq-2" class="hidden px-6 pb-6 text-xs text-textSecondary leading-relaxed border-t border-white/5 pt-4">
+                Absolutely. Multiple custom Google Spreadsheet ranges can be specified inside your Admin panel. Realtime listeners monitor cell updates on G-Sheets to mirror index updates within seconds.
+              </div>
+            </div>
+
+            <!-- Accordion FAQ Card 3 -->
+            <div class="bg-prismSurface border border-borderThin rounded-2xl overflow-hidden transition-all duration-200">
+              <button onclick="toggleAccordion('faq-3')" class="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.02] transition-all">
+                <span class="font-space font-semibold text-textPrimary text-sm">What protocols protect active webhook streams?</span>
+                <span class="text-prismCyan font-mono text-sm" id="faq-3-icon">[+]</span>
+              </button>
+              <div id="faq-3" class="hidden px-6 pb-6 text-xs text-textSecondary leading-relaxed border-t border-white/5 pt-4">
+                Every external endpoint execution (e.g. HubSpot contacts insertion or GitHub commits) runs inside specialized cloud proxies verified through standard Auth0 credentials. Encryption keeps secret keys completely protected.
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Stencil/API Structure block -->
+          <div class="bg-prismSurface border border-borderThin rounded-2xl p-6 space-y-4">
+            <h3 class="text-sm font-space font-bold text-textPrimary">Direct System API Integration Reference</h3>
+            <div class="bg-white/5 p-4 rounded-xl border border-borderThin">
+              <pre class="text-xs font-mono text-prismCyan overflow-x-auto">
+// Set dynamic keys into authorization headers
+const prismClient = axios.create({
+  baseURL: 'https://api.prismlogic.io/v1/vault',
+  headers: { 'Authorization': 'Bearer YOUR_PRISM_LOGIC_KEY' }
+});
+
+// Trigger matching records index
+async function triggerMatch(state, loanType) {
+  const response = await prismClient.get('/nodes/match', {
+    params: { state, program: loanType }
+  });
+  return response.data;
+}</pre>
+            </div>
+            <p class="text-[11px] text-textMuted font-mono">Note: Coordinate credentials updates inside the settings window below.</p>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Sliding Drawer Display Overlay -->
+  <div id="drawer-overlay" onclick="closeLenderDrawer()" class="fixed inset-0 bg-prismBg/80 backdrop-blur-md z-40 hidden transition-all"></div>
+  <div id="detail-drawer" class="fixed top-0 right-0 h-full w-full max-w-xl bg-prismSurfaceElevated border-l border-borderThin z-50 transform translate-x-full transition-transform duration-300 ease-out flex flex-col justify-between shadow-2xl">
+    
+    <!-- Drawer Header -->
+    <div class="p-6 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
+      <div class="flex items-center gap-3">
+        <div class="brand-logo w-6 h-6 bg-gradient-to-br from-prismCyan to-prismViolet"></div>
+        <span class="font-space font-bold text-sm tracking-wider text-textPrimary">PRISM // METRIC_INSPECTION</span>
+      </div>
+      <button onclick="closeLenderDrawer()" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-textSecondary hover:text-textPrimary transition-all">
+        ✕
+      </button>
+    </div>
+
+    <!-- Drawer Content Body -->
+    <div class="p-6 overflow-y-auto flex-1 space-y-6" id="drawer-content-body">
+      <!-- Loaded Dynamically -->
+    </div>
+
+    <!-- Drawer Footer Actions -->
+    <div class="p-6 border-t border-white/10 bg-white/[0.02] flex gap-3" id="drawer-content-actions">
+      <!-- Loaded Dynamically -->
+    </div>
+  </div>
+
+  <!-- Clean User Settings Modal -->
+  <div id="settings-modal" class="fixed inset-0 bg-prismBg/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-prismSurfaceElevated border border-borderThin w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl flex flex-col">
+      <div class="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.01]">
+        <h3 class="text-lg font-space font-bold text-textPrimary flex items-center gap-2">
+          ⚙️ User Credentials & API Management
+        </h3>
+        <button onclick="toggleSettingsModal()" class="text-textSecondary hover:text-textPrimary">
+          ✕
+        </button>
+      </div>
+
+      <!-- Settings Forms Tabs -->
+      <div class="p-6 space-y-6">
+        
+        <!-- Profile info section -->
+        <div class="space-y-4">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-prismCyan to-prismViolet flex items-center justify-center font-bold text-lg text-white">AD</div>
+            <div>
+              <h4 class="text-sm font-space font-bold text-textPrimary">System Administrator</h4>
+              <p class="text-xs text-textSecondary">Active Profile Configuration & Webhook Permissions</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-1.5">
+              <label class="block text-xs text-textSecondary">Contact Full Name</label>
+              <input type="text" id="setting-admin-name" class="w-full bg-white/5 border border-borderThin rounded-xl px-4 py-2.5 text-xs text-textPrimary focus:outline-none focus:border-prismCyan" value="System Admin Core">
+            </div>
+            <div class="space-y-1.5">
+              <label class="block text-xs text-textSecondary">Coordinate Notification Email</label>
+              <input type="email" id="setting-admin-email" class="w-full bg-white/5 border border-borderThin rounded-xl px-4 py-2.5 text-xs text-textPrimary focus:outline-none focus:border-prismCyan" value="admin@prismlogic.io">
+            </div>
+          </div>
+        </div>
+
+        <!-- Auth0 & SSO Identity Token settings -->
+        <div class="space-y-4 border-t border-white/5 pt-4">
+          <h4 class="text-xs font-mono text-prismViolet uppercase tracking-widest">Auth0 Config Coordinates</h4>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-1.5">
+              <label class="block text-xs text-textSecondary">SSO Domain Link</label>
+              <input type="text" id="setting-auth0-domain" class="w-full bg-white/5 border border-borderThin rounded-xl px-4 py-2.5 text-xs text-textPrimary font-mono" value="auth.prismlogic.io">
+            </div>
+            <div class="space-y-1.5">
+              <label class="block text-xs text-textSecondary">Tenant Client ID Key</label>
+              <input type="text" id="setting-auth0-id" class="w-full bg-white/5 border border-borderThin rounded-xl px-4 py-2.5 text-xs text-textPrimary font-mono" value="client_live_99a8d29b0">
+            </div>
+          </div>
+        </div>
+
+        <!-- External Integrations (GitHub & HubSpot Tokens) -->
+        <div class="space-y-4 border-t border-white/5 pt-4">
+          <h4 class="text-xs font-mono text-prismCyan uppercase tracking-widest font-bold">Integration Access Credentials</h4>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-1.5">
+              <label class="block text-xs text-textSecondary">GitHub Personal Access Token</label>
+              <input type="password" id="setting-gh-key" class="w-full bg-white/5 border border-borderThin rounded-xl px-4 py-2.5 text-xs text-textPrimary font-mono" value="ghp_xxxxxxxxxxxxxxxxxxxx">
+            </div>
+            <div class="space-y-1.5">
+              <label class="block text-xs text-textSecondary">HubSpot Private App Key</label>
+              <input type="password" id="setting-hubspot-key" class="w-full bg-white/5 border border-borderThin rounded-xl px-4 py-2.5 text-xs text-textPrimary font-mono" value="pat-na1-xxxxxxxxxxxxxxxx">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-6 border-t border-white/5 bg-white/[0.02] flex justify-end gap-3">
+        <button onclick="toggleSettingsModal()" class="px-5 py-2 bg-white/5 border border-borderThin rounded-xl text-xs font-semibold text-textPrimary">Cancel</button>
+        <button onclick="saveAdminSettings()" class="px-5 py-2 bg-gradient-to-r from-prismCyan to-prismViolet text-white text-xs font-semibold rounded-xl hover:opacity-90">Apply Coordinates</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Core JavaScript Block -->
+  <script>
+    // Selected rich direct database curated from attached dataset
+    const directDatabase = [
+      {
+        "Lender": "Colony American Finance",
+        "About the Lender": "Colony American Finance is a private money lender in Los Angeles, CA providing funding all across the country. They provide loans for a variety of needs and situations, including loans for rental properties and refinancing. Their lending parameters are versatile, including terms between 5 years and 10 years and loan amounts ranging from $500,000 to $100,000,000 with a maximum LTV of 75%.",
+        "City": "Anchorage",
+        "Lender City & State": "Los Angeles, CA 90071",
+        "Lender Phone": "(844) 223-2231",
+        "Lender Street Address": "515 South Flower Street, 44th Floor",
+        "Lender Website": "https://www.colonyamericanfinance.com",
+        "Lending Location": "National",
+        "Loan Types Offered": "Investment Property Loans, Refinance / Cash Out Loans",
+        "Property Types": "Multi Family, Single Family",
+        "State": "Alaska",
+        "Ltv": 75
+      },
+      {
+        "Lender": "Asset Avenue",
+        "About the Lender": "Asset Avenue is private money lender based in Los Angeles, CA. They provide loans in 44 states across the United States. They provide loans for a variety of needs and situations, including short term loans, investment property loans, cash out hard money loans, and fix and flip hard money loans. Maximum LTV of 85%.",
+        "City": "Birmingham",
+        "Lender City & State": "Los Angeles, CA 90024",
+        "Lender Phone": "(800) 555-0199",
+        "Lender Street Address": "1100 Glendon Ave, 18th Floor",
+        "Lender Website": "https://www.assetavenue.com/",
+        "Lending Location": "National",
+        "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans, Refinance / Cash Out Loans",
+        "Property Types": "Multi Family, Single Family",
+        "State": "Alabama",
+        "Ltv": 85
+      },
+      {
+        "Lender": "Source Capital",
+        "About the Lender": "Source Capital is an asset-based lender headquartered in Los Angeles, CA offering loans in California, Arizona, and Minnesota. They provide loans for a variety of situations and needs, including bridge loans, fix-and-flip loans, hard money refinancing, and loans for rental properties. Maximum LTV of 70%, with rates starting at 7.99%.",
+        "City": "Phoenix",
+        "Lender City & State": "Los Angeles, CA 90071",
+        "Lender Phone": "(323) 352-9292",
+        "Lender Street Address": "445 S. Figueroa Street, Suite 3199",
+        "Lender Website": "http://www.hardmoneyfirst.com",
+        "Lending Location": "CA, AZ, MN",
+        "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans, Refinance / Cash Out Loans",
+        "Property Types": "Apartment, Mixed Use, Multi Family, Office, Retail, Single Family",
+        "State": "Arizona",
+        "Ltv": 70
+      },
+      {
+        "Lender": "Green Oak Capital",
+        "About the Lender": "Green Oak Capital is a Bala Cynwyd, PA based private money lender. They offer loans throughout Philadelphia County, Chester County, Montgomery County, and Delaware County. They offer rental property loans, short term fix and flip loans, short term loans, and private refinancing. Flexible loan amounts ranging from $100,000 to $1,000,000.",
+        "City": "Philadelphia",
+        "Lender City & State": "Bala Cynwyd, PA 19004",
+        "Lender Phone": "(610) 555-0120",
+        "Lender Street Address": "20 Penarth Road",
+        "Lender Website": "http://www.greatoakcapital.com/",
+        "Lending Location": "PA",
+        "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans, Refinance / Cash Out Loans",
+        "Property Types": "Land, Multi Family, Single Family",
+        "State": "Pennsylvania",
+        "Ltv": 80
+      },
+      {
+        "Lender": "CIVIC Private Money Lending",
+        "About the Lender": "CIVIC Private Money Lending is a Redondo Beach, CA based hard money lender offering funding in 10 states throughout the country. They provide loans for a variety of scenarios, including private refinancing, fix and flip hard money loans, hard money bridge loans, and buy and hold loans. Terms between 12 months and 48 months, up to 80% LTV, rates 8.5% - 10.5%.",
+        "City": "Mesa",
+        "Lender City & State": "Redondo Beach, CA 92678",
+        "Lender Phone": "(310) 555-0144",
+        "Lender Street Address": "2015 Manhattan Beach Blvd",
+        "Lender Website": "http://www.civicfs.com/",
+        "Lending Location": "AZ, CA, CO, FL, GA, HI, NV, OR, TX, WA",
+        "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans, Refinance / Cash Out Loans",
+        "Property Types": "Multi Family, Single Family",
+        "State": "Arizona",
+        "Ltv": 80
+      },
+      {
+        "Lender": "Corevest",
+        "About the Lender": "Corevest is an Irvine, CA based private lender. They provide funding all across the United States. They provide loans for investments properties, refinancing, bridge loans, and fix and flip hard money loans. Terms between 5 years and 10 years and loan amounts ranging from $500,000 to $100,000,000 with a maximum LTV of 75%.",
+        "City": "Palmer",
+        "Lender City & State": "Irvine, CA 92614",
+        "Lender Phone": "(844) 223-2231",
+        "Lender Street Address": "1920 Main Street, Suite 850",
+        "Lender Website": "https://www.corevestfinance.com",
+        "Lending Location": "National",
+        "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans, Refinance / Cash Out Loans",
+        "Property Types": "Multi Family, Single Family",
+        "State": "Alaska",
+        "Ltv": 75
+      },
+      {
+        "Lender": "Texas Mortgage Place",
+        "About the Lender": "Texas Mortgage Place is a private lender based in Garland, TX offering funding throughout Dallas and Fort Worth. They offer lending solutions for many different situations, including short term loans, long term rental property loans, fix-and-flip loans, and refinancing. Terms between 6 months and 1 year, LTV up to 80%.",
+        "City": "Dallas",
+        "Lender City & State": "Garland, TX 75041",
+        "Lender Phone": "(214) 824-0417",
+        "Lender Street Address": "1795 Northwest Hwy",
+        "Lender Website": "http://www.texasmortgageplace.com/",
+        "Lending Location": "Dallas, Fort Worth",
+        "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans, Refinance / Cash Out Loans",
+        "Property Types": "Multi Family, Single Family",
+        "State": "Texas",
+        "Ltv": 80
+      },
+      {
+        "Lender": "Bridge Well Capital",
+        "About the Lender": "Bridge Well Capital is a hard money lender in Orlando, FL offering funding in 40 states throughout the United States. They provide loans for investments properties, cash out hard money loans, and fix-and-flip hard money loans. Loan amounts ranging from $75,000 to $5,000,000 with a maximum LTV of 85%.",
+        "City": "Anchorage",
+        "Lender City & State": "Orlando, FL 32801",
+        "Lender Phone": "(407) 447-1000",
+        "Lender Street Address": "496 Delaney Ave #408",
+        "Lender Website": "https://www.bridgewellcapital.com",
+        "Lending Location": "National",
+        "Loan Types Offered": "Fix and Flip Loans, Investment Property Loans, Refinance / Cash Out Loans",
+        "Property Types": "Multi Family, Single Family",
+        "State": "Alaska",
+        "Ltv": 85
+      },
+      {
+        "Lender": "Manhattan Bridge Capital",
+        "About the Lender": "Manhattan Bridge Capital is a Great Neck, NY based private money lender who offers funding throughout New York City. They provide long term rental property loans, ground-up construction loans, fix and flip loans, and hard money bridge loans. Terms up to 1 year and loan amounts ranging from $100,000 to $2,000,000 with a maximum LTV of 65%.",
+        "City": "Stamford",
+        "Lender City & State": "Great Neck, NY 11021",
+        "Lender Phone": "(516) 444-3400",
+        "Lender Street Address": "60 Cutter Mill Rd, Suite 205",
+        "Lender Website": "http://manhattanbridgecapital.com/",
+        "Lending Location": "New York City",
+        "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans, New Construction Loans",
+        "Property Types": "Multi Family, Single Family",
+        "State": "Connecticut",
+        "Ltv": 65
+      },
+      {
+        "Lender": "The Norris Group",
+        "About the Lender": "The Norris Group is private money lender headquartered in Riverside, CA. They provide funding in Los Angeles County, Orange County, San Diego County, Riverside County, San Bernardino County, and Kern County. They offer lending solutions for many different situations and needs, including short term fix and flip loans, rental property loans, and ground up construction loans.",
+        "City": "Los Angeles",
+        "Lender City & State": "Riverside, CA 92507",
+        "Lender Phone": "(951) 780-5856",
+        "Lender Street Address": "1845 Chicago Avenue, Suite C",
+        "Lender Website": "http://www.thenorrisgroup.com",
+        "Lending Location": "CA",
+        "Loan Types Offered": "Fix and Flip Loans, Investment Property Loans, New Construction Loans",
+        "Property Types": "Apartment, Multi Family, Single Family",
+        "State": "California",
+        "Ltv": 75
+      }
+    ];
+
+    // Google Sheets Grounded Mock Data Set
+    const gsheetsGroundedDatabase = [
+      {
+        "Lender": "G-Sheets: Vanguard Capital",
+        "About the Lender": "Retrieved dynamically via grounded sheet. High leverage commercial projects, expedited underwriting logic, optimized asset allocation thresholds.",
+        "City": "San Francisco",
+        "Lender City & State": "San Francisco, CA 94104",
+        "Lender Phone": "(415) 555-0130",
+        "Lender Street Address": "55 2nd Street",
+        "Lender Website": "https://sheets.google.com/prism-logical-sync",
+        "Lending Location": "CA, OR, WA",
+        "Loan Types Offered": "Bridge Loans, New Construction Loans",
+        "Property Types": "Multi Family, Office, Industrial",
+        "State": "California",
+        "Ltv": 80
+      },
+      {
+        "Lender": "G-Sheets: Keystone Liquidity",
+        "About the Lender": "Direct cell replication node. Specializes in rental portfolio properties, asset refinancing, and structured fix & flips.",
+        "City": "Pittsburgh",
+        "Lender City & State": "Pittsburgh, PA 15219",
+        "Lender Phone": "(412) 555-0182",
+        "Lender Street Address": "400 Fifth Ave",
+        "Lender Website": "https://sheets.google.com/prism-logical-sync",
+        "Lending Location": "PA, NY, OH",
+        "Loan Types Offered": "Investment Property Loans, Refinance / Cash Out Loans, Fix and Flip Loans",
+        "Property Types": "Single Family, Multi Family",
+        "State": "Pennsylvania",
+        "Ltv": 85
+      }
+    ];
+
+    // Mutable runtime Databases
+    let runtimeDatabase = [...directDatabase];
+    let filteredDatabase = [...runtimeDatabase];
+
+    // Sort parameters
+    let currentSortColumn = 'Lender';
+    let currentSortDirection = 'asc';
+
+    // Pipeline Kanban Model Data
+    let kanbanDeals = [
+      { id: 'deal-1', lender: 'Colony American Finance', value: '$2,400,000', program: 'Bridge Loan', state: 'Lead' },
+      { id: 'deal-2', lender: 'Source Capital', value: '$850,000', program: 'Fix & Flip', state: 'Underwriting' },
+      { id: 'deal-3', lender: 'Asset Avenue', value: '$1,200,000', program: 'Rental Focus', state: 'Term Sheet' },
+      { id: 'deal-4', lender: 'Green Oak Capital', value: '$650,000', program: 'New Const.', state: 'Funded' }
+    ];
+
+    // View State Params
+    let currentTab = 'dashboard';
+    let viewMode = 'grid'; // grid or table
+    let currentPage = 1;
+    const itemsPerPage = 6;
+
+    // Toast Notification logic
+    function triggerToast(message, type = 'info') {
+      const colors = {
+        success: 'border-prismGreen text-prismGreen bg-prismGreen/10',
+        error: 'border-prismMagenta text-prismMagenta bg-prismMagenta/10',
+        info: 'border-prismCyan text-prismCyan bg-prismCyan/10'
+      };
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `p-4 border rounded-xl backdrop-blur-xl ${colors[type]} shadow-2xl transition-all duration-300 transform translate-y-2 opacity-0 pointer-events-auto flex items-center justify-between min-w-[300px] z-50`;
+      toast.innerHTML = `
+        <span class="text-xs font-mono font-semibold">${message}</span>
+        <button onclick="this.parentElement.remove()" class="text-[10px] uppercase font-mono ml-4 opacity-50 hover:opacity-100">✕</button>
+      `;
+      container.appendChild(toast);
+      
+      // Animation entrance
+      setTimeout(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      }, 50);
+
+      // Dismiss timer
+      setTimeout(() => {
+        toast.classList.add('translate-y-2', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    // Toggle Sidebar & Rail Collapse state
+    function toggleSidebarCollapse() {
+      const sidebar = document.getElementById('sidebar-nav');
+      sidebar.classList.toggle('sidebar-collapsed');
+      triggerToast('Navigation layout shifted.', 'info');
+    }
+
+    // Toggle Supabase Realtime Simulation
+    let realtimeLoggerInterval = null;
+    function toggleSupabaseRealtime() {
+      const toggle = document.getElementById('realtime-toggle');
+      const logContainer = document.getElementById('realtime-log-container');
+      
+      if (toggle.checked) {
+        triggerToast('Supabase Realtime Channel Enabled. Replication streams active.', 'success');
+        realtimeLoggerInterval = setInterval(() => {
+          const simulatedEvents = [
+            'INSERT INTO capital_vault (lender, state, ltv) VALUES ("Apex Capital", "Texas", 80)',
+            'UPDATE routing_pipeline SET stage="Term Sheet" WHERE id="deal-1"',
+            'SYNC_EVENT: HubSpot payload dispatched successfully',
+            'GITHUB_API_REF: Direct repository content synced cleanly'
+          ];
+          const randomEvent = simulatedEvents[Math.floor(Math.random() * simulatedEvents.length)];
+          const log = document.createElement('div');
+          log.className = 'text-white/60 border-b border-white/5 pb-1';
+          log.textContent = `[Replication ${new Date().toLocaleTimeString()}] ${randomEvent}`;
+          logContainer.prepend(log);
+          
+          if (logContainer.children.length > 10) {
+            logContainer.lastElementChild.remove();
+          }
+        }, 5000);
+      } else {
+        triggerToast('Supabase Live replication channel suspended.', 'info');
+        clearInterval(realtimeLoggerInterval);
+        logContainer.innerHTML = `<div class="text-textMuted">[Suspended] Realtime subscription paused...</div>`;
+      }
+    }
+
+    // Google Sheets Grounding Control
+    function toggleGSheetsGrounding() {
+      const toggleBox = document.getElementById('gsheets-toggle');
+      const banner = document.getElementById('gsheets-indicator-banner');
+      const bentoBadge = document.getElementById('bento-gsheets-badge');
+
+      if (toggleBox.checked === false) {
+        toggleBox.checked = true;
+        runtimeDatabase = [...gsheetsGroundedDatabase, ...directDatabase];
+        banner.classList.remove('hidden');
+        bentoBadge.textContent = "GS_GROUNDED";
+        bentoBadge.className = "p-2 rounded-xl bg-emerald-500/10 text-emerald-400 text-[10px] font-semibold";
+        triggerToast('G-Sheets parameters grounded. Active entries updated.', 'success');
+      } else {
+        toggleBox.checked = false;
+        runtimeDatabase = [...directDatabase];
+        banner.classList.add('hidden');
+        bentoBadge.textContent = "STREAMING";
+        bentoBadge.className = "p-2 rounded-xl bg-prismCyan/10 text-prismCyan text-[10px] font-semibold";
+        triggerToast('G-Sheets grounded reference link removed.', 'info');
+      }
+      applyAllFilters();
+    }
+
+    // GitHub Commits simulation triggering
+    function simulateGitCommit() {
+      const repo = document.getElementById('gh-repo-input').value;
+      const branch = document.getElementById('gh-branch-input').value;
+      triggerToast(`GitHub integration target: ${repo}/${branch}`, 'info');
+      setTimeout(() => {
+        triggerToast('GitHub content validation verified. Deploying commit...', 'info');
+        setTimeout(() => {
+          triggerToast('Commited 1 JSON configuration node file to GitHub!', 'success');
+        }, 1200);
+      }, 8000000 ? 500 : 1000); // quick simulation feel
+    }
+
+    // HubSpot sync simulator
+    function simulateHubspotSync() {
+      const stageName = document.getElementById('hubspot-stage-input').value.toUpperCase();
+      const owner = document.getElementById('hubspot-owner').value;
+      triggerToast(`Syncing contact profiles and active pipeline routes to HubSpot CRM...`, 'info');
+      setTimeout(() => {
+        triggerToast(`HubSpot Sync Successful: Active contacts updated on CRM (${stageName}) owned by ${owner}`, 'success');
+      }, 1500);
+    }
+
+    // Tab Router Switcher
+    function switchTab(tabId) {
+      currentTab = tabId;
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+
+      // Highlight navigation btn
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('text-textPrimary', 'bg-white/5', 'border-l-2', 'border-prismCyan');
+        btn.classList.add('text-textSecondary');
+      });
+      const activeBtn = document.getElementById(`btn-${tabId}`);
+      if (activeBtn) {
+        activeBtn.classList.add('text-textPrimary', 'bg-white/5', 'border-l-2', 'border-prismCyan');
+        activeBtn.classList.remove('text-textSecondary');
+      }
+
+      triggerToast(`Console Module: ${tabId.toUpperCase()}`, 'info');
+
+      if (tabId === 'kanban') {
+        setupKanban();
+      }
+    }
+
+    // Toggle Settings modal
+    function toggleSettingsModal() {
+      const modal = document.getElementById('settings-modal');
+      modal.classList.toggle('hidden');
+    }
+
+    function saveAdminSettings() {
+      triggerToast('Auth0, Supabase, GitHub & HubSpot keys updated successfully.', 'success');
+      toggleSettingsModal();
+    }
+
+    // FAQ Accordion handling
+    function toggleAccordion(faqId) {
+      const body = document.getElementById(faqId);
+      const icon = document.getElementById(`${faqId}-icon`);
+      body.classList.toggle('hidden');
+      if (body.classList.contains('hidden')) {
+        icon.textContent = '[+]';
+      } else {
+        icon.textContent = '[-]';
+      }
+    }
+
+    // Toggle Mobile Sidebar
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById('sidebar-nav');
+      sidebar.classList.toggle('hidden');
+    }
+
+    // Sorting functionality
+    function toggleSortDirection(column) {
+      if (currentSortColumn === column) {
+        currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        currentSortColumn = column;
+        currentSortDirection = 'asc';
+      }
+      
+      // Update Sort Icons
+      document.getElementById('sort-icon-Lender').textContent = '↕';
+      document.getElementById('sort-icon-Ltv').textContent = '↕';
+      document.getElementById(`sort-icon-${column}`).textContent = currentSortDirection === 'asc' ? '▲' : '▼';
+
+      applyAllFilters();
+    }
+
+    // Directory Filtration Engine
+    function applyAllFilters() {
+      const searchQuery = document.getElementById('dir-search').value.toLowerCase().trim();
+      const programQuery = document.getElementById('dir-loan').value;
+      const propertyQuery = document.getElementById('dir-property').value;
+
+      filteredDatabase = runtimeDatabase.filter(item => {
+        const matchSearch = !searchQuery || 
+          item.Lender.toLowerCase().includes(searchQuery) ||
+          item.City.toLowerCase().includes(searchQuery) ||
+          item.State.toLowerCase().includes(searchQuery) ||
+          (item["About the Lender"] && item["About the Lender"].toLowerCase().includes(searchQuery));
+
+        const matchProgram = programQuery === 'ALL' || 
+          (item["Loan Types Offered"] && item["Loan Types Offered"].includes(programQuery));
+
+        const matchProperty = propertyQuery === 'ALL' || 
+          (item["Property Types"] && item["Property Types"].includes(propertyQuery));
+
+        return matchSearch && matchProgram && matchProperty;
+      });
+
+      // Apply sorting logic
+      filteredDatabase.sort((a, b) => {
+        let valA = a[currentSortColumn];
+        let valB = b[currentSortColumn];
+
+        if (typeof valA === 'string') {
+          valA = valA.toLowerCase();
+          valB = valB.toLowerCase();
+        }
+
+        if (valA < valB) return currentSortDirection === 'asc' ? -1 : 1;
+        if (valA > valB) return currentSortDirection === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      currentPage = 1;
+      renderDirectory();
+      renderActivePills();
+      updateBentoMetrics();
+    }
+
+    function resetDirectoryFilters() {
+      document.getElementById('dir-search').value = '';
+      document.getElementById('dir-loan').value = 'ALL';
+      document.getElementById('dir-property').value = 'ALL';
+      applyAllFilters();
+      triggerToast('Filter configurations set to default range.', 'success');
+    }
+
+    function renderActivePills() {
+      const container = document.getElementById('dir-active-pills');
+      container.innerHTML = '';
+
+      const program = document.getElementById('dir-loan').value;
+      const property = document.getElementById('dir-property').value;
+
+      if (program !== 'ALL') {
+        container.appendChild(createPill(`Program: ${program}`, () => {
+          document.getElementById('dir-loan').value = 'ALL';
+          applyAllFilters();
+        }));
+      }
+      if (property !== 'ALL') {
+        container.appendChild(createPill(`Property: ${property}`, () => {
+          document.getElementById('dir-property').value = 'ALL';
+          applyAllFilters();
+        }));
+      }
+    }
+
+    function createPill(text, onDismiss) {
+      const div = document.createElement('div');
+      div.className = "flex items-center gap-2 px-3 py-1 bg-white/5 border border-borderThin rounded-lg text-xs font-mono text-prismCyan";
+      div.innerHTML = `
+        <span>${text}</span>
+        <button class="hover:text-white" onclick="(${onDismiss})()">✕</button>
+      `;
+      return div;
+    }
+
+    // Toggle View modes
+    function setViewMode(mode) {
+      viewMode = mode;
+      const gridBtn = document.getElementById('btn-view-grid');
+      const tableBtn = document.getElementById('btn-view-table');
+
+      if (mode === 'grid') {
+        gridBtn.classList.add('text-textPrimary', 'bg-white/5');
+        gridBtn.classList.remove('text-textSecondary');
+        tableBtn.classList.add('text-textSecondary');
+        tableBtn.classList.remove('text-textPrimary', 'bg-white/5');
+
+        document.getElementById('directory-grid-container').classList.remove('hidden');
+        document.getElementById('directory-table-container').classList.add('hidden');
+      } else {
+        tableBtn.classList.add('text-textPrimary', 'bg-white/5');
+        tableBtn.classList.remove('text-textSecondary');
+        gridBtn.classList.add('text-textSecondary');
+        gridBtn.classList.remove('text-textPrimary', 'bg-white/5');
+
+        document.getElementById('directory-grid-container').classList.add('hidden');
+        document.getElementById('directory-table-container').classList.remove('hidden');
+      }
+      renderDirectory();
+    }
+
+    // Render Database directory entries
+    function renderDirectory() {
+      const gridContainer = document.getElementById('directory-grid-container');
+      const tableBody = document.getElementById('directory-table-rows');
+      const emptyState = document.getElementById('directory-empty-state');
+
+      gridContainer.innerHTML = '';
+      tableBody.innerHTML = '';
+
+      if (filteredDatabase.length === 0) {
+        emptyState.classList.remove('hidden');
+        document.getElementById('pagination-status').textContent = "Showing range 0 of 0";
+        document.getElementById('btn-page-prev').disabled = true;
+        document.getElementById('btn-page-next').disabled = true;
+        return;
+      }
+      emptyState.classList.add('hidden');
+
+      const start = (currentPage - 1) * itemsPerPage;
+      const end = Math.min(start + itemsPerPage, filteredDatabase.length);
+      const items = filteredDatabase.slice(start, end);
+
+      items.forEach(item => {
+        // Render Responsive Grid Item
+        const card = document.createElement('div');
+        card.className = "bg-prismSurface border border-borderThin rounded-2xl p-6 flex flex-col justify-between space-y-4 hover:border-prismCyan/50 hover:shadow-[0_0_15px_rgba(0,240,255,0.05)] transition-all cursor-pointer";
+        card.onclick = () => openLenderDrawer(item);
+        card.innerHTML = `
+          <div class="flex items-start justify-between">
+            <div class="space-y-1">
+              <span class="text-[10px] font-mono border border-prismViolet/30 bg-prismViolet/10 px-2 py-0.5 rounded text-prismViolet">${item.State}</span>
+              <h3 class="font-space font-bold text-textPrimary text-lg">${item.Lender}</h3>
+            </div>
+            <span class="text-xs font-mono text-prismCyan">${item.Ltv ? item.Ltv : 80}% LTV</span>
+          </div>
+          <p class="text-xs text-textSecondary leading-relaxed line-clamp-3">"${item["About the Lender"]}"</p>
+          <div class="flex items-center justify-between text-xs pt-4 border-t border-white/5 font-mono text-textMuted">
+            <span>HQ Hub: ${item.City}</span>
+            <span class="text-prismMagenta hover:underline">Inspect Node &rarr;</span>
+          </div>
+        `;
+        gridContainer.appendChild(card);
+
+        // Render Table Row
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-white/[0.02] cursor-pointer";
+        tr.onclick = () => openLenderDrawer(item);
+        tr.innerHTML = `
+          <td class="px-6 py-4 font-space font-semibold text-textPrimary">${item.Lender}</td>
+          <td class="px-6 py-4 text-xs font-mono text-textSecondary">${item.City}</td>
+          <td class="px-6 py-4 text-xs text-textSecondary">${item.State}</td>
+          <td class="px-6 py-4 text-xs font-mono text-prismCyan">${item.Ltv || 80}% LTV</td>
+          <td class="px-6 py-4 text-right text-xs font-mono text-prismMagenta">Inspect</td>
+        `;
+        tableBody.appendChild(tr);
+      });
+
+      // Pagination details
+      document.getElementById('pagination-status').textContent = `Showing range ${start + 1} &mdash; ${end} of ${filteredDatabase.length} entries`;
+      document.getElementById('btn-page-prev').disabled = currentPage === 1;
+      document.getElementById('btn-page-next').disabled = end >= filteredDatabase.length;
+    }
+
+    function adjustPage(delta) {
+      currentPage += delta;
+      renderDirectory();
+    }
+
+    // Dynamic metrics updating
+    function updateBentoMetrics() {
+      document.getElementById('bento-total-lenders').textContent = filteredDatabase.length;
+      const uniqueStates = [...new Set(filteredDatabase.map(item => item.State))].length;
+      document.getElementById('bento-states').textContent = uniqueStates;
+    }
+
+    function applyDateFilter() {
+      const from = document.getElementById('date-from').value;
+      const to = document.getElementById('date-to').value;
+      triggerToast(`Matching indexes mapped to: ${from} &rarr; ${to}`, 'info');
+    }
+
+    // Drawer Inspector Details Implementation
+    function openLenderDrawer(lender) {
+      const body = document.getElementById('drawer-content-body');
+      const actions = document.getElementById('drawer-content-actions');
+
+      body.innerHTML = `
+        <div class="space-y-2">
+          <span class="text-xs font-mono text-prismCyan bg-prismCyan/10 border border-prismCyan/30 px-2.5 py-0.5 rounded">STABLE_COORDINATE // NODE_ACTIVE</span>
+          <h2 class="text-2xl font-space font-bold text-textPrimary">${lender.Lender}</h2>
+        </div>
+
+        <div class="p-4 bg-white/5 border border-borderThin rounded-xl text-xs text-textSecondary leading-relaxed italic">
+          "${lender["About the Lender"]}"
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="p-3 bg-white/[0.02] border border-borderThin rounded-xl font-mono text-xs">
+            <span class="block text-textMuted text-[10px] uppercase">Headquarters</span>
+            <span class="text-textPrimary font-semibold mt-1 block">${lender.City}, ${lender.State}</span>
+          </div>
+          <div class="p-3 bg-white/[0.02] border border-borderThin rounded-xl font-mono text-xs">
+            <span class="block text-textMuted text-[10px] uppercase">Operational state</span>
+            <span class="text-textPrimary font-semibold mt-1 block">${lender["Lending Location"] || 'National'}</span>
+          </div>
+          <div class="p-3 bg-white/[0.02] border border-borderThin rounded-xl font-mono text-xs">
+            <span class="block text-textMuted text-[10px] uppercase">Phone Line</span>
+            <span class="text-textPrimary font-semibold mt-1 block">${lender["Lender Phone"] || '(555) 0122'}</span>
+          </div>
+          <div class="p-3 bg-white/[0.02] border border-borderThin rounded-xl font-mono text-xs">
+            <span class="block text-textMuted text-[10px] uppercase">Operational LTV Target</span>
+            <span class="text-prismCyan font-bold mt-1 block text-sm">${lender.Ltv ? lender.Ltv : 80}%</span>
+          </div>
+        </div>
+
+        <!-- Predictive Leverage Cost Forecast Panel -->
+        <div class="p-5 bg-gradient-to-br from-prismViolet/10 to-transparent border border-prismViolet/30 rounded-2xl space-y-4">
+          <div class="flex items-center gap-2">
+            <span class="text-prismViolet">⚡</span>
+            <h4 class="font-space font-bold text-sm text-textPrimary">Leverage & Monthly Interest Predictor</h4>
+          </div>
+
+          <div class="space-y-3">
+            <div class="flex justify-between text-xs font-mono text-textSecondary">
+              <span>Estimated Asset Appraisal</span>
+              <span id="calc-val-display">$500,000</span>
+            </div>
+            <input type="range" id="calc-asset-slider" oninput="calculateDrawerForecast(${lender.Ltv || 80})" class="w-full accent-prismCyan bg-white/10 rounded-lg appearance-none h-1" min="100000" max="3000000" step="50000" value="500000">
+
+            <div class="flex justify-between text-xs font-mono text-textSecondary">
+              <span>Target Leverage (LTV)</span>
+              <span id="calc-ltv-display">${lender.Ltv || 80}%</span>
+            </div>
+            <input type="range" id="calc-ltv-slider" oninput="calculateDrawerForecast(${lender.Ltv || 80})" class="w-full accent-prismMagenta bg-white/10 rounded-lg appearance-none h-1" min="50" max="${lender.Ltv || 85}" step="5" value="${lender.Ltv || 80}">
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 pt-3 border-t border-white/5 text-xs font-mono">
+            <div>
+              <span class="text-textMuted text-[10px]">Estimated Principal</span>
+              <div class="text-prismCyan font-bold text-base mt-1" id="calc-loan-amount">$400,000</div>
+            </div>
+            <div>
+              <span class="text-textMuted text-[10px]">Predicted Interest Payment</span>
+              <div class="text-prismMagenta font-bold text-base mt-1" id="calc-monthly-cost">$3,333</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      actions.innerHTML = `
+        <a href="${lender["Lender Website"]}" target="_blank" class="flex-1 py-3 bg-gradient-to-r from-prismCyan to-prismViolet text-white font-semibold text-center text-xs rounded-xl hover:opacity-90 transition-all">Establish Handshake Link</a>
+        <button onclick="addLenderToPipeline('${lender.Lender}', '${lender.Ltv || 80}%')" class="px-4 py-3 bg-white/5 hover:bg-white/10 border border-borderThin rounded-xl text-xs font-semibold text-textSecondary hover:text-textPrimary transition-all">Add to Routes</button>
+      `;
+
+      document.getElementById('detail-drawer').classList.remove('translate-x-full');
+      document.getElementById('drawer-overlay').classList.remove('hidden');
+      
+      calculateDrawerForecast(lender.Ltv || 80);
+    }
+
+    function addLenderToPipeline(lenderName, ltvString) {
+      const id = `deal-${Date.now()}`;
+      const newDeal = {
+        id: id,
+        lender: lenderName,
+        value: '$1,500,000',
+        program: `LTV Limit: ${ltvString}`,
+        state: 'Lead'
+      };
+      kanbanDeals.push(newDeal);
+      triggerToast(`${lenderName} added to Pipeline Routes Lead stage.`, 'success');
+      closeLenderDrawer();
+      setupKanban();
+    }
+
+    function calculateDrawerForecast(maxLtv) {
+      const assetVal = parseInt(document.getElementById('calc-asset-slider').value);
+      const ltvVal = parseInt(document.getElementById('calc-ltv-slider').value);
+
+      document.getElementById('calc-val-display').textContent = `$${assetVal.toLocaleString()}`;
+      document.getElementById('calc-ltv-display').textContent = `${ltvVal}%`;
+
+      const loanCapital = assetVal * (ltvVal / 100);
+      document.getElementById('calc-loan-amount').textContent = `$${Math.round(loanCapital).toLocaleString()}`;
+
+      // Calculate simple estimated monthly payments assuming 10% base pricing rate
+      const monthlyRate = (loanCapital * 0.10) / 12;
+      document.getElementById('calc-monthly-cost').textContent = `$${Math.round(monthlyRate).toLocaleString()}`;
+    }
+
+    function closeLenderDrawer() {
+      document.getElementById('detail-drawer').classList.add('translate-x-full');
+      document.getElementById('drawer-overlay').classList.add('hidden');
+    }
+
+    // Drag-And-Drop Logistics Pipeline Logic
+    function setupKanban() {
+      const board1 = document.getElementById('kanban-board');
+      const board2 = document.getElementById('kanban-full-board');
+
+      [board1, board2].forEach(b => {
+        if (b) b.innerHTML = '';
+      });
+
+      const columns = ['Lead', 'Underwriting', 'Term Sheet', 'Funded'];
+
+      columns.forEach(col => {
+        const colDeals = kanbanDeals.filter(d => d.state === col);
+
+        const colHtml = `
+          <div class="bg-white/[0.02] border border-borderThin rounded-2xl p-4 flex flex-col gap-4 min-h-[400px]" 
+               ondragover="allowDrop(event, this)" 
+               ondragleave="clearDragVisuals(this)" 
+               ondrop="handleDrop(event, '${col}', this)">
+            <div class="flex items-center justify-between border-b border-white/5 pb-3">
+              <span class="font-space font-bold text-xs text-textPrimary uppercase tracking-wider">${col} Stage</span>
+              <span class="px-2 py-0.5 bg-white/5 border border-borderThin rounded text-[10px] font-mono text-textSecondary">${colDeals.length}</span>
+            </div>
+            <div class="space-y-3 flex-1">
+              ${colDeals.map(deal => `
+                <div class="bg-prismSurface border border-borderThin hover:border-prismCyan/30 rounded-xl p-4 space-y-3 relative group transition-all" 
+                     draggable="true" 
+                     ondragstart="handleDragStart(event, '${deal.id}')">
+                  <div>
+                    <h4 class="font-space font-bold text-sm text-textPrimary">${deal.lender}</h4>
+                    <span class="text-[10px] font-mono text-textMuted">${deal.program}</span>
+                  </div>
+                  <div class="flex justify-between items-center text-xs font-mono pt-2 border-t border-white/5">
+                    <span class="text-prismCyan font-bold">${deal.value}</span>
+                    <button onclick="advanceDealState('${deal.id}')" class="px-2 py-1 bg-white/5 hover:bg-prismCyan/20 hover:text-prismCyan rounded text-[10px] transition-colors">Shift</button>
+                  </div>
+                </div>
+              `).join('')}
+              ${colDeals.length === 0 ? '<div class="text-[10px] font-mono text-textMuted italic text-center py-8">Drag / Droppable stage zone</div>' : ''}
+            </div>
+          </div>
+        `;
+
+        if (board1) board1.insertAdjacentHTML('beforeend', colHtml);
+        if (board2) board2.insertAdjacentHTML('beforeend', colHtml);
+      });
+    }
+
+    // Drag-and-drop mechanics
+    let activeDraggedId = null;
+    function handleDragStart(e, dealId) {
+      activeDraggedId = dealId;
+      e.dataTransfer.setData('text/plain', dealId);
+    }
+    function allowDrop(e, targetEl) {
+      e.preventDefault();
+      targetEl.classList.add('kanban-dropzone-active');
+    }
+    function clearDragVisuals(targetEl) {
+      targetEl.classList.remove('kanban-dropzone-active');
+    }
+    function handleDrop(e, stageName, targetEl) {
+      e.preventDefault();
+      targetEl.classList.remove('kanban-dropzone-active');
+      const dealId = activeDraggedId || e.dataTransfer.getData('text/plain');
+      const deal = kanbanDeals.find(d => d.id === dealId);
+      if (deal) {
+        deal.state = stageName;
+        triggerToast(`Deal relocated to: ${stageName}`, 'success');
+        setupKanban();
+      }
+    }
+
+    function advanceDealState(dealId) {
+      const deal = kanbanDeals.find(d => d.id === dealId);
+      if (deal) {
+        const states = ['Lead', 'Underwriting', 'Term Sheet', 'Funded'];
+        const idx = states.indexOf(deal.state);
+        if (idx < states.length - 1) {
+          deal.state = states[idx + 1];
+          triggerToast(`Deal progressed directly to ${deal.state}`, 'success');
+        } else {
+          deal.state = 'Lead';
+          triggerToast('Cycle recycled back to initial Lead stage.', 'info');
+        }
+        setupKanban();
+      }
+    }
+
+    function createNewPipelineCard() {
+      const lenders = ['CIVIC Private Money Lending', 'Green Oak Capital', 'Texas Mortgage Place', 'Vanguard Capital'];
+      const programOptions = ['Bridge Loans', 'Rental Multi', 'Fix and Flip Loans', 'Construction Options'];
+      const randomLender = lenders[Math.floor(Math.random() * lenders.length)];
+      const randomProgram = programOptions[Math.floor(Math.random() * programOptions.length)];
+      const randomValue = `$${(Math.floor(Math.random() * 20) + 1) * 150},000`;
+      
+      const newDeal = {
+        id: `deal-${Date.now()}`,
+        lender: randomLender,
+        value: randomValue,
+        program: randomProgram,
+        state: 'Lead'
+      };
+
+      kanbanDeals.push(newDeal);
+      triggerToast('Generated pipeline route simulation deal.', 'success');
+      setupKanban();
+    }
+
+    // CSV & JSON Parser Engine
+    let stagedNodes = [];
+
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const content = evt.target.result;
+        try {
+          if (file.name.endsWith('.json')) {
+            stagedNodes = JSON.parse(content);
+          } else if (file.name.endsWith('.csv')) {
+            stagedNodes = parseCSV(content);
+          }
+          triggerToast(`Extracted ${stagedNodes.length} nodes from packet. Staged for merge.`, 'success');
+          renderStagedPreview();
+        } catch (err) {
+          triggerToast('Strict parsing validation fail: Check array schema layout.', 'error');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function parsePasteInput() {
+      const raw = document.getElementById('raw-uploader-paste').value.trim();
+      if (!raw) {
+        triggerToast('No input details detected inside paste panel.', 'error');
+        return;
+      }
+      try {
+        stagedNodes = JSON.parse(raw);
+        if (!Array.isArray(stagedNodes)) stagedNodes = [stagedNodes];
+        triggerToast(`Parsed ${stagedNodes.length} nodes successfully. Staging parameters complete.`, 'success');
+        renderStagedPreview();
+      } catch (err) {
+        triggerToast('Incorrect JSON mapping schema. Verify bracket closure.', 'error');
+      }
+    }
+
+    function importTestData() {
+      stagedNodes = [
+        {
+          "Lender": "Global Yield Corp",
+          "About the Lender": "Global Yield Corp targets luxury commercial construction bridges and institutional ground up loans nationwide.",
+          "City": "Denver",
+          "State": "Colorado",
+          "Property Types": "Apartment, Industrial",
+          "Ltv": 85
+        },
+        {
+          "Lender": "Apex Mutual Trust",
+          "About the Lender": "Apex Mutual provides expedited refinance options, cash out bridges, and portfolio real estate consolidation products.",
+          "City": "Austin",
+          "State": "Texas",
+          "Property Types": "Single Family, Multi Family",
+          "Ltv": 80
+        }
+      ];
+      triggerToast('Reference testing parameters injected inside cache structures.', 'info');
+      renderStagedPreview();
+    }
+
+    function renderStagedPreview() {
+      const tbody = document.getElementById('preview-rows');
+      const counter = document.getElementById('preview-row-count');
+
+      tbody.innerHTML = '';
+      counter.textContent = `${stagedNodes.length} Nodes Staged`;
+
+      if (stagedNodes.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-8 text-center text-textMuted italic">No active streams staged inside parsing queues. Select templates above.</td></tr>`;
+        return;
+      }
+
+      stagedNodes.forEach(node => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-white/[0.02]";
+        tr.innerHTML = `
+          <td class="px-6 py-3 font-semibold text-textPrimary">${node.Lender || 'Unspecified Name'}</td>
+          <td class="px-6 py-3 text-textSecondary">${node.State || 'National'}</td>
+          <td class="px-6 py-3 text-prismCyan font-mono">${node.Ltv || 80}% LTV</td>
+          <td class="px-6 py-3 text-textMuted">${node["Property Types"] || 'General Asset Focus'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function clearStagedData() {
+      stagedNodes = [];
+      renderStagedPreview();
+      triggerToast('Local staging caches cleared.', 'info');
+    }
+
+    function commitStagedToDatabase() {
+      if (stagedNodes.length === 0) {
+        triggerToast('No valid parameters available inside parser buffer.', 'error');
+        return;
+      }
+      runtimeDatabase = [...stagedNodes, ...runtimeDatabase];
+      applyAllFilters();
+      clearStagedData();
+      triggerToast('Configurations synchronized. Parameters injected to active indexes.', 'success');
+      switchTab('directory');
+    }
+
+    function parseCSV(text) {
+      const lines = text.split('\n');
+      const result = [];
+      const headers = lines[0].split(',');
+
+      for(let i=1; i<lines.length; i++) {
+        if(!lines[i].trim()) continue;
+        const obj = {};
+        const currentline = lines[i].split(',');
+        for(let j=0; j<headers.length; j++) {
+          obj[headers[j].trim()] = currentline[j] ? currentline[j].trim() : '';
+        }
+        result.push(obj);
+      }
+      return result;
+    }
+
+    // Onboarding Wizard Stepper
+    let onboardingStep = 1;
+
+    function advanceOnboarding(delta) {
+      const nextStep = onboardingStep + delta;
+      if (nextStep < 1 || nextStep > 4) return;
+
+      if (onboardingStep === 1 && delta === 1) {
+        const name = document.getElementById('ob-lender-name').value;
+        if (!name) {
+          triggerToast('Identity verification error: Target corporate name required.', 'error');
+          return;
+        }
+      }
+
+      document.getElementById(`step-${onboardingStep}`).classList.add('hidden');
+      document.getElementById(`step-${nextStep}`).classList.remove('hidden');
+
+      const indicators = document.querySelectorAll('.step-indicator-bar');
+      indicators.forEach((ind, index) => {
+        if (index < nextStep) {
+          ind.classList.remove('bg-white/10');
+          ind.classList.add('bg-prismCyan');
+        } else {
+          ind.classList.add('bg-white/10');
+          ind.classList.remove('bg-prismCyan');
+        }
+      });
+
+      onboardingStep = nextStep;
+
+      if (onboardingStep === 4) {
+        document.getElementById('summary-name').textContent = document.getElementById('ob-lender-name').value || '-';
+        document.getElementById('summary-city').textContent = document.getElementById('ob-lender-city').value || 'National';
+        document.getElementById('summary-ltv').textContent = (document.getElementById('ob-lender-ltv').value || '80') + '% LTV';
+        
+        const nextBtn = document.getElementById('btn-ob-next');
+        nextBtn.textContent = "Deploy Active Node";
+        nextBtn.onclick = commitPartnerOnboarding;
+      } else {
+        const nextBtn = document.getElementById('btn-ob-next');
+        nextBtn.textContent = "Advance Step";
+        nextBtn.onclick = () => advanceOnboarding(1);
+      }
+
+      document.getElementById('btn-ob-prev').disabled = onboardingStep === 1;
+    }
+
+    function commitPartnerOnboarding() {
+      const partner = {
+        Lender: document.getElementById('ob-lender-name').value,
+        "About the Lender": document.getElementById('ob-lender-desc').value || "No detailed parameters declared.",
+        City: document.getElementById('ob-lender-city').value || "Metro Hub",
+        State: document.getElementById('ob-lender-state').value || "National Focus",
+        "Lender Phone": document.getElementById('ob-lender-phone').value || "(555) 0199",
+        "Lender Website": document.getElementById('ob-lender-web').value || "#",
+        "Property Types": document.getElementById('ob-lender-assets').value || "Single Family",
+        "Loan Types Offered": document.getElementById('ob-lender-programs').value || "General Bridge",
+        Ltv: parseInt(document.getElementById('ob-lender-ltv').value) || 80
+      };
+
+      runtimeDatabase.unshift(partner);
+      applyAllFilters();
+      triggerToast('Identity verified. Corporate parameters initialized.', 'success');
+
+      // Reset Form State
+      document.getElementById('onboarding-form').reset();
+      document.getElementById(`step-${onboardingStep}`).classList.add('hidden');
+      onboardingStep = 1;
+      document.getElementById('step-1').classList.remove('hidden');
+      
+      const indicators = document.querySelectorAll('.step-indicator-bar');
+      indicators.forEach((ind, index) => {
+        if(index === 0) ind.classList.add('bg-prismCyan');
+        else ind.classList.remove('bg-prismCyan');
+      });
+
+      const nextBtn = document.getElementById('btn-ob-next');
+      nextBtn.textContent = "Advance Step";
+      nextBtn.onclick = () => advanceOnboarding(1);
+      document.getElementById('btn-ob-prev').disabled = true;
+
+      switchTab('directory');
+    }
+
+    // Core Initialization
+    window.addEventListener('DOMContentLoaded', () => {
+      applyAllFilters();
+      setupKanban();
+      toggleSupabaseRealtime();
+    });
+  </script>
+    <script src="script.js"></script>
+</body>
+</html>

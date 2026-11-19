@@ -1,0 +1,336 @@
+:root {
+    --cyber-bg: #07090e;
+    --cyber-card: #0e131f;
+    --cyber-border: #1e293b;
+    --cyber-accent: #00f0ff;
+    --cyber-purple: #bd00ff;
+    --cyber-emerald: #05ffc4;
+    --cyber-gold: #ffd700;
+    --cyber-red: #ff0055;
+    --cyber-glow: rgba(0, 240, 255, 0.15);
+    --cyber-glow-purple: rgba(189, 0, 255, 0.15);
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    --font-sans: 'Plus Jakarta Sans', 'Inter', sans-serif;
+}
+
+/* Base Integration & Custom Scaffolding */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1-fraction);
+    gap: 1.5rem;
+}
+
+/* Cybernetic Glass Panels */
+.cyber-panel {
+    background: rgba(14, 19, 31, 0.85);
+    border: 1px solid var(--cyber-border);
+    backdrop-filter: blur(12px);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cyber-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at top right, rgba(0, 240, 255, 0.03), transparent 60%);
+    pointer-events: none;
+}
+
+.cyber-panel:hover {
+    border-color: rgba(0, 240, 255, 0.4);
+    box-shadow: 0 8px 32px rgba(0, 240, 255, 0.05);
+}
+
+/* Edge Clip Variations for Storage/Workspace widgets */
+.edge-clip-sm {
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
+}
+
+.edge-clip-lg {
+    clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 24px 100%, 0 calc(100% - 24px));
+}
+
+.corner-accent-cyan::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    background: var(--cyber-accent);
+    clip-path: polygon(100% 0, 0 0, 100% 100%);
+}
+
+.corner-accent-purple::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    background: var(--cyber-purple);
+    clip-path: polygon(100% 0, 0 0, 100% 100%);
+}
+
+/* Storage Metrics Ring Indicator */
+.storage-ring-svg {
+    transform: rotate(-90deg);
+}
+
+.storage-ring-bg {
+    fill: none;
+    stroke: rgba(30, 41, 59, 0.5);
+    stroke-width: 8;
+}
+
+.storage-ring-progress-cyan {
+    fill: none;
+    stroke: var(--cyber-accent);
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 251.2;
+    stroke-dashoffset: 251.2;
+    transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: drop-shadow(0 0 4px var(--cyber-accent));
+}
+
+.storage-ring-progress-purple {
+    fill: none;
+    stroke: var(--cyber-purple);
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-dasharray: 188.4;
+    stroke-dashoffset: 188.4;
+    transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: drop-shadow(0 0 4px var(--cyber-purple));
+}
+
+/* File Activity Upload & Dropzone Area */
+.cyber-dropzone {
+    border: 2px dashed rgba(30, 41, 59, 0.8);
+    background: rgba(7, 9, 14, 0.6);
+    transition: all 0.2s ease-in-out;
+}
+
+.cyber-dropzone.dragover {
+    border-color: var(--cyber-accent);
+    background: rgba(0, 240, 255, 0.03);
+    box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.1);
+}
+
+/* Custom Telemetry Scanning Line Anim */
+@keyframes cyber-scan {
+    0% { transform: translateY(-100%); opacity: 0.1; }
+    50% { opacity: 0.8; }
+    100% { transform: translateY(100%); opacity: 0.1; }
+}
+
+.scanner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, transparent 0%, rgba(0, 240, 255, 0.1) 50%, transparent 100%);
+    pointer-events: none;
+    animation: cyber-scan 4s infinite linear;
+}
+
+/* Real-Time Upload Progression Bars */
+.progress-container {
+    width: 100%;
+    height: 4px;
+    background: rgba(30, 41, 59, 0.6);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-bar-fill-cyan {
+    height: 100%;
+    background: linear-gradient(90deg, var(--cyber-accent), #00bcff);
+    box-shadow: 0 0 8px var(--cyber-accent);
+    transition: width 0.4s cubic-bezier(0.1, 0.8, 0.25, 1);
+}
+
+.progress-bar-fill-purple {
+    height: 100%;
+    background: linear-gradient(90deg, var(--cyber-purple), #9d00ff);
+    box-shadow: 0 0 8px var(--cyber-purple);
+    transition: width 0.4s cubic-bezier(0.1, 0.8, 0.25, 1);
+}
+
+/* Pipeline Status Connectors & Tree Elements */
+.review-pipeline {
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.review-pipeline::before {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: repeating-linear-gradient(
+        180deg,
+        var(--cyber-border) 0px,
+        var(--cyber-border) 8px,
+        transparent 8px,
+        transparent 16px
+    );
+}
+
+.pipeline-node {
+    position: relative;
+    padding-bottom: 1.5rem;
+}
+
+.pipeline-node-marker {
+    position: absolute;
+    left: -24px;
+    top: 4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--cyber-border);
+    border: 2px solid var(--cyber-bg);
+    transition: all 0.3s ease;
+}
+
+.pipeline-node-active .pipeline-node-marker {
+    background: var(--cyber-accent);
+    box-shadow: 0 0 8px var(--cyber-accent);
+    transform: scale(1.2);
+}
+
+.pipeline-node-complete .pipeline-node-marker {
+    background: var(--cyber-emerald);
+    box-shadow: 0 0 8px var(--cyber-emerald);
+}
+
+.pipeline-node-flagged .pipeline-node-marker {
+    background: var(--cyber-red);
+    box-shadow: 0 0 8px var(--cyber-red);
+}
+
+/* File Type Asset Badge Icons styling */
+.file-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.file-badge-pdf {
+    background: rgba(255, 0, 85, 0.1);
+    color: var(--cyber-red);
+    border: 1px solid rgba(255, 0, 85, 0.3);
+}
+
+.file-badge-zip {
+    background: rgba(189, 0, 255, 0.1);
+    color: var(--cyber-purple);
+    border: 1px solid rgba(189, 0, 255, 0.3);
+}
+
+.file-badge-data {
+    background: rgba(0, 240, 255, 0.1);
+    color: var(--cyber-accent);
+    border: 1px solid rgba(0, 240, 255, 0.3);
+}
+
+.file-badge-doc {
+    background: rgba(5, 255, 196, 0.1);
+    color: var(--cyber-emerald);
+    border: 1px solid rgba(5, 255, 196, 0.3);
+}
+
+/* Mini telemetry activity status feed */
+.activity-feed-scroller {
+    max-height: 380px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+/* Interactive Pinned Projects Grid */
+.pin-grid-card {
+    background: rgba(7, 9, 14, 0.8);
+    border: 1px solid var(--cyber-border);
+    transition: all 0.25s ease;
+}
+
+.pin-grid-card:hover {
+    background: rgba(14, 19, 31, 0.95);
+    border-color: var(--cyber-accent);
+    transform: translateY(-2px);
+}
+
+/* Hologram grid lines for specific background indicators */
+.hologram-grid {
+    background-image: 
+        linear-gradient(rgba(0, 240, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 240, 255, 0.02) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+/* Glow indicators and pulses */
+@keyframes glow-pulse-cyan {
+    0%, 100% { box-shadow: 0 0 4px rgba(0, 240, 255, 0.2); }
+    50% { box-shadow: 0 0 12px rgba(0, 240, 255, 0.5); }
+}
+
+@keyframes glow-pulse-emerald {
+    0%, 100% { box-shadow: 0 0 4px rgba(5, 255, 196, 0.2); }
+    50% { box-shadow: 0 0 12px rgba(5, 255, 196, 0.5); }
+}
+
+.pulse-indicator-cyan {
+    animation: glow-pulse-cyan 2s infinite alternate;
+}
+
+.pulse-indicator-emerald {
+    animation: glow-pulse-emerald 2.5s infinite alternate;
+}
+
+/* Terminal Console Log Module */
+.terminal-output {
+    background: #030508;
+    border: 1px solid rgba(0, 240, 255, 0.15);
+    font-family: var(--font-mono);
+    color: #a1b0cb;
+}
+
+.terminal-line::before {
+    content: ">>";
+    margin-right: 8px;
+    color: var(--cyber-accent);
+    font-weight: bold;
+}
+
+.terminal-line.error::before {
+    content: "ERR_";
+    color: var(--cyber-red);
+}
+
+.terminal-line.success::before {
+    content: "OK_";
+    color: var(--cyber-emerald);
+}
+
+/* Responsive Custom Sizing Hooks */
+@media (max-width: 1024px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}

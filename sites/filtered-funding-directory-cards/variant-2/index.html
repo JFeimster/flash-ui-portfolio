@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash UI Export</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- Glow Accents in Background -->
+  <div class="absolute top-0 left-1/4 w-96 h-96 bg-brand-indigo/10 rounded-full blur-[120px] pointer-events-none"></div>
+  <div class="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-brand-cyan/5 rounded-full blur-[150px] pointer-events-none"></div>
+  <div class="absolute bottom-10 left-10 w-80 h-80 bg-brand-violet/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+  <!-- Main Container -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
+    
+    <!-- Top Global HUD & Header -->
+    <header class="mb-10">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 border-b border-slate-800/80 pb-8">
+        <div>
+          <!-- Core Flow Branding Badge -->
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-indigo/10 border border-brand-indigo/30 text-xs font-mono text-brand-indigo tracking-wider uppercase mb-3">
+            <span class="w-1.5 h-1.5 rounded-full bg-brand-indigo pulse-dot"></span>
+            Core Flow Engine Active
+          </div>
+          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+            Funding Path <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-indigo via-brand-cyan to-emerald-400">Card Catalog</span>
+          </h1>
+          <p class="mt-2 text-sm sm:text-base text-slate-400 max-w-2xl">
+            Interactive routing dashboard equipped with algorithmic target fit analysis, real-time checklist tracking, and outbound dynamic partner UTM telemetry layers.
+          </p>
+        </div>
+
+        <!-- Dynamic UTM Control Center (HUD) -->
+        <div class="bg-brand-dark/90 border border-slate-800 rounded-xl p-4 lg:w-96 glow-indigo relative overflow-hidden">
+          <div class="absolute top-0 right-0 px-2 py-0.5 bg-brand-indigo text-[9px] font-mono text-white rounded-bl border-l border-b border-slate-800">
+            UTM TELEMETRY
+          </div>
+          <div class="flex items-center gap-2 mb-3">
+            <svg class="w-4 h-4 text-brand-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+            </svg>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 font-mono">Telemetry Variables</h3>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div>
+              <label class="block text-[10px] text-slate-500 font-mono uppercase mb-1">utm_source</label>
+              <input id="global-utm-source" type="text" value="coreflow_portal" class="w-full bg-brand-black border border-slate-800 rounded px-2 py-1 text-slate-200 focus:outline-none focus:border-brand-indigo transition-all font-mono text-[11px]" oninput="updateAllUTMs()">
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500 font-mono uppercase mb-1">utm_medium</label>
+              <input id="global-utm-medium" type="text" value="card_catalog" class="w-full bg-brand-black border border-slate-800 rounded px-2 py-1 text-slate-200 focus:outline-none focus:border-brand-indigo transition-all font-mono text-[11px]" oninput="updateAllUTMs()">
+            </div>
+          </div>
+          <div class="mt-3 pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
+            <span class="text-slate-400 font-mono">Dynamic Checklist Param:</span>
+            <span class="text-brand-cyan font-mono font-medium">enabled (&amp;readiness_pct)</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Filters and Real-time Search Panel -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <!-- Filter Chips Container -->
+      <div class="flex flex-wrap gap-2 items-center" id="filter-container">
+        <span class="text-xs font-mono text-slate-500 uppercase tracking-wider mr-2">Filter paths:</span>
+        <button onclick="filterCards('all')" data-filter="all" class="px-4 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200 bg-brand-indigo border-brand-indigo text-white shadow-lg shadow-brand-indigo/20">
+          All Paths
+        </button>
+        <button onclick="filterCards('startup')" data-filter="startup" class="px-4 py-1.5 rounded-full text-xs font-semibold border border-slate-800 text-slate-400 bg-brand-dark/40 hover:text-white hover:border-slate-700 transition-all duration-200">
+          Startup Scale
+        </button>
+        <button onclick="filterCards('working-cap')" data-filter="working-cap" class="px-4 py-1.5 rounded-full text-xs font-semibold border border-slate-800 text-slate-400 bg-brand-dark/40 hover:text-white hover:border-slate-700 transition-all duration-200">
+          Working Capital
+        </button>
+        <button onclick="filterCards('real-estate')" data-filter="real-estate" class="px-4 py-1.5 rounded-full text-xs font-semibold border border-slate-800 text-slate-400 bg-brand-dark/40 hover:text-white hover:border-slate-700 transition-all duration-200">
+          Real Estate
+        </button>
+        <button onclick="filterCards('equipment')" data-filter="equipment" class="px-4 py-1.5 rounded-full text-xs font-semibold border border-slate-800 text-slate-400 bg-brand-dark/40 hover:text-white hover:border-slate-700 transition-all duration-200">
+          Equipment Lease
+        </button>
+      </div>
+
+      <!-- Live Counters -->
+      <div class="flex items-center gap-3 text-xs bg-brand-dark/60 border border-slate-800/60 rounded-lg px-3 py-2 font-mono">
+        <span class="text-slate-400">Catalog matching:</span>
+        <span id="active-count" class="text-brand-cyan font-bold">6</span>
+        <span class="text-slate-600">/</span>
+        <span class="text-slate-500">6 Available</span>
+      </div>
+    </div>
+
+    <!-- CARDS GRID -->
+    <main id="catalog-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-all duration-300">
+      
+      <!-- CARD 1: SaaS Recurring Revenue Advance -->
+      <div class="funding-card bg-brand-dark/80 border border-slate-800/80 rounded-2xl p-6 transition-all-custom hover:border-brand-indigo/60 hover:-translate-y-1 relative flex flex-col justify-between glow-indigo" 
+           data-categories="['startup', 'working-cap']" 
+           data-id="saas_arr"
+           data-base-campaign="saas_arr_advance"
+           data-base-content="fit_98">
+        
+        <div>
+          <!-- Card Header -->
+          <div class="flex items-start justify-between gap-4 mb-4">
+            <div>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono tracking-wider bg-brand-indigo/10 text-brand-indigo border border-brand-indigo/20 uppercase">SaaS ARR Advance</span>
+              <h2 class="text-xl font-bold text-white mt-1.5">SaaS Growth Engine</h2>
+            </div>
+            
+            <!-- Mini Dial Chart -->
+            <div class="relative flex items-center justify-center w-12 h-12 flex-shrink-0" title="Funding Speed: Fast">
+              <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path class="text-brand-cyan transition-all duration-500" stroke-dasharray="90, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center text-[9px] font-mono leading-none">
+                <span class="font-bold text-white">24h</span>
+                <span class="text-slate-500 scale-90">speed</span>
+              </div>
+            </div>
+          </div>
+
+          <p class="text-xs text-slate-400 mb-5">
+            Non-dilutive funding structured specifically for subscription products. Instantly draw down against recurring contracts.
+          </p>
+
+          <!-- Target Fit Metrics Grid -->
+          <div class="bg-brand-black/60 border border-slate-800/60 rounded-xl p-3 mb-5 grid grid-cols-3 gap-2">
+            <div class="text-center border-r border-slate-800/60">
+              <span class="block text-[9px] font-mono text-slate-500 uppercase tracking-tight">Min Revenue</span>
+              <span class="text-[12px] font-bold text-brand-cyan">$20k/mo</span>
+            </div>
+            <div class="text-center border-r border-slate-800/60">
+              <span class="block text-[9px] font-mono text-slate-500 uppercase tracking-tight">Credit Rating</span>
+              <span class="text-[12px] font-bold text-slate-200">620+</span>
+            </div>
+            <div class="text-center">
+              <span class="block text-[9px] font-mono text-slate-500 uppercase tracking-tight">Time in Biz</span>
+              <span class="text-[12px] font-bold text-slate-200">6+ Mos</span>
+            </div>
+          </div>
+
+          <!-- Interactive Documentation Checklist -->
+          <div class="mb-6">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">Required Verification</span>
+              <span class="text-[10px] font-mono text-brand-cyan bg-brand-cyan/10 px-1.5 py-0.5 rounded checklist-counter">0/3 Ready</span>
+            </div>
+            <div class="space-y-2">
+              <label class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-brand-black/40 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer">
+                <input type="checkbox" class="checklist-checkbox rounded bg-brand-black border-slate-700 text-brand-indigo focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5" onchange="evaluateChecklist(this)">
+                <span class="text-xs text-slate-300">Stripe or subscription billing integration</span>
+              </label>
+              <label class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-brand-black/40 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer">
+                <input type="checkbox" class="checklist-checkbox rounded bg-brand-black border-slate-700 text-brand-indigo focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5" onchange="evaluateChecklist(this)">
+                <span class="text-xs text-slate-300">3 Months primary business bank statements</span>
+              </label>
+              <label class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-brand-black/40 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer">
+                <input type="checkbox" class="checklist-checkbox rounded bg-brand-black border-slate-700 text-brand-indigo focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5" onchange="evaluateChecklist(this)">
+                <span class="text-xs text-slate-300">Verified customer MRR ledger proof</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Area with Dynamic UTM Outflow -->
+        <div class="pt-4 border-t border-slate-800/80">
+          <div class="bg-brand-black/50 rounded-lg p-2.5 mb-3 border border-slate-800/80 flex flex-col gap-1">
+            <div class="flex items-center justify-between">
+              <span class="text-[9px] font-mono text-slate-500 uppercase tracking-widest">UTM Outbound Link Spec</span>
+              <span class="text-[8px] bg-brand-emerald/10 text-brand-emerald border border-brand-emerald/20 px-1 rounded font-mono">Active</span>
+            </div>
+            <div class="text-[10px] font-mono text-slate-400 break-all select-all hover:text-white transition-colors cursor-pointer tracking-tight whitespace-nowrap overflow-hidden text-ellipsis utm-preview" title="Dynamic UTM Preview">
+              Loading parameters...
+            </div>
+          </div>
+          
+          <a href="#" target="_blank" onclick="simulateOutboundClick(event, this)" class="cta-btn flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-gradient-to-r from-brand-indigo to-brand-violet text-white font-semibold text-xs tracking-wide hover:from-brand-indigo/90 hover:to-brand-violet/90 transition-all shadow-lg hover:shadow-brand-indigo/20">
+            Get Funded
+            <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- CARD 2: Fast-Track Commercial Bridge -->
+      <div class="funding-card bg-brand-dark/80 border border-slate-800/80 rounded-2xl p-6 transition-all-custom hover:border-brand-indigo/60 hover:-translate-y-1 relative flex flex-col justify-between glow-indigo" 
+           data-categories="['real-estate', 'working-cap']" 
+           data-id="com_bridge"
+           data-base-campaign="commercial_bridge"
+           data-base-content="real_estate">
+        
+        <div>
+          <!-- Card Header -->
+          <div class="flex items-start justify-between gap-4 mb-4">
+            <div>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono tracking-wider bg-brand-cyan/10 text-brand-cyan border border-brand-cyan/20 uppercase">Commercial Bridge</span>
+              <h2 class="text-xl font-bold text-white mt-1.5">Asset-Backed Bridge</h2>
+            </div>
+            
+            <!-- Mini Dial Chart -->
+            <div class="relative flex items-center justify-center w-12 h-12 flex-shrink-0" title="Funding Speed: Moderate">
+              <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path class="text-brand-cyan transition-all duration-500" stroke-dasharray="45, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center text-[9px] font-mono leading-none">
+                <span class="font-bold text-white">5d</span>
+                <span class="text-slate-500 scale-90">speed</span>
+              </div>
+            </div>
+          </div>
+
+          <p class="text-xs text-slate-400 mb-5">
+            Short-term capital options designed to bridge transactions and secure real estate positions quickly before permanent financing.
+          </p>
+
+          <!-- Target Fit Metrics Grid -->
+          <div class="bg-brand-black/60 border border-slate-800/60 rounded-xl p-3 mb-5 grid grid-cols-3 gap-2">
+            <div class="text-center border-r border-slate-800/60">
+              <span class="block text-[9px] font-mono text-slate-500 uppercase tracking-tight">Deal Size</span>
+              <span class="text-[12px] font-bold text-brand-cyan">$150k+</span>
+            </div>
+            <div class="text-center border-r border-slate-800/60">
+              <span class="block text-[9px] font-mono text-slate-500 uppercase tracking-tight">Credit Rating</span>
+              <span class="text-[12px] font-bold text-slate-200">650+</span>
+            </div>
+            <div class="text-center">
+              <span class="block text-[9px] font-mono text-slate-500 uppercase tracking-tight">LTV Ratio</span>
+              <span class="text-[12px] font-bold text-slate-200">Up to 75%</span>
+            </div>
+          </div>
+
+          <!-- Interactive Documentation Checklist -->
+          <div class="mb-6">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">Required Verification</span>
+              <span class="text-[10px] font-mono text-brand-cyan bg-brand-cyan/10 px-1.5 py-0.5 rounded checklist-counter">0/3 Ready</span>
+            </div>
+            <div class="space-y-2">
+              <label class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-brand-black/40 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer">
+                <input type="checkbox" class="checklist-checkbox rounded bg-brand-black border-slate-700 text-brand-indigo focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5" onchange="evaluateChecklist(this)">
+                <span class="text-xs text-slate-300">Commercial property appraisal report</span>
+              </label>
+              <label class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-brand-black/40 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer">
+                <input type="checkbox" class="checklist-checkbox rounded bg-brand-black border-slate-700 text-brand-indigo focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5" onchange="evaluateChecklist(this)">
+                <span class="text-xs text-slate-300">Corporate entity structure docs</span>
+              </label>
+              <label class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-brand-black/40 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer">
+                <input type="checkbox" class="checklist-checkbox rounded bg-brand-black border-slate-700 text-brand-indigo focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5" onchange="evaluateChecklist(this)">
+                <span class="text-xs text-slate-300">Personal Financial Statement (PFS)</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Area with Dynamic UTM Outflow -->
+        <div class="pt-4 border-t border-slate-800/80">
+          <div class="bg-brand-black/50 rounded-lg p-2.5 mb-3 border border-slate-800/80 flex flex-col gap-1">
+            <div class="flex items-center justify-between">
+              <span class="text-[9px] font-mono text-slate-500 uppercase tracking-widest">UTM Outbound Link Spec</span>
+              <span class="text-[8px] bg-brand-emerald/10 text-brand-emerald border border-brand-emerald/20 px-1 rounded font-mono">Active</span>
+            </div>
+            <div class="text-[10px] font-mono text-slate-400 break-all select-all hover:text-white transition-colors cursor-pointer tracking-tight whitespace-nowrap overflow-hidden text-ellipsis utm-preview" title="Dynamic UTM Preview">
+              Loading parameters...
+            </div>
+          </div>
+          
+          <a href="#" target="_blank" onclick="simulateOutboundClick(event, this)" class="cta-btn flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-gradient-to-r from-brand-indigo to-brand-violet text-white font-semibold text-xs tracking-wide hover:from-brand-indigo/90 hover:to-brand-violet/90 transition-all shadow-lg hover:shadow-brand-indigo/20">
+            Get Funded
+            <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- CARD 3: Revenue Share Growth Capital -->
+      <div class="funding-card bg-brand-dark/80 border border-slate-800/80 rounded-2xl p-6 transition-all-custom hover:border-brand-cyan/60 hover:-translate-y-1 relative flex flex-col justify-between glow-cyan" 
+           data-categories="['startup', 'working-cap']" 
+           data-id="rev_share"
+           data-base-campaign="rev_share_growth"
+           data-base-content="growth_capital">
+        
+        <div>
+          <!-- Card Header -->
+          <div class="flex items-start justify-between gap-4 mb-4">
+            <div>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono tracking-wider bg-brand-cyan/10 text-brand-cyan border border-brand-cyan/20 uppercase">Revenue Share</span>
+              <h2 class="text-xl font-bold text-white mt-1.5">Rev-Share Expansion</h2>
+            </div>
+            
+            <!-- Mini Dial Chart -->
+            <div class="relative flex items-center justify-center w-12 h-12 flex-shrink-0" title="Funding Speed: Fast">
+              <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path class="text-brand-cyan transition-all duration-500" stroke-dasharray="80, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center text-[9px] font-mono leading-none">
+                <span class="font-bold text-white">48h</span>
+                <span class="text-slate-500 scale-90">speed</span>
+              </div>
+            </div>
+          </div>
+
+          <p class="text-xs text-slate-400 mb-5">
+            Fuel your online growth, marketing channels, and inventory requirements with zero capital-based collateral risks or ownership loss.
+          </p>
+
+          <!-- Target Fit Metrics Grid -->
+          <div class="bg-brand-black/60 border border-slate-800/60 rounded-xl p-3 mb-5 grid grid-cols-3 gap-2">
+            <div class="text-center border-r border-slate-800/60">
+              <span class="block text-[9px] font-mono text-slate-500 uppercase tracking-tight">Min Revenue</span>
+              <span class="text-[12px] font-bold text-brand-cyan">$10k/mo</span>
+            </div>
+            <div class="text-center border-r border-slate-800/60">
+              <span class="block text-[9px] font-mono text-slate-500 uppercase tracking-tight">Credit Rating</span>
+              <span class="text-[12px] font-bold text-slate-200">No Min</span>
+            </div>
+            <div class="text-center">
+              <span class="block text-[9px] font-mono text-slate-500 uppercase tracking-tight">Time in Biz</span>
+              <span class="text-[12px] font-bold text-slate-200">3+ Mos</span>
+            </div>
+          </div>
+
+          <!-- Interactive Documentation Checklist -->
+          <div class="mb-6">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">Required Verification</span>
+              <span class="text-[10px] font-mono text-brand-cyan bg-brand-cyan/10 px-1.5 py-0.5 rounded checklist-counter">0/3 Ready</span>
+            </div>
+            <div class="space-y-2">
+              <label class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-brand-black/40 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer">
+                <input type="checkbox" class="checklist-checkbox rounded bg-brand-black border-slate-700 text-brand-indigo focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5" onchange="evaluateChecklist(this)">
+                <span class="text-xs text-slate-300">Secure digital bank ledger connection</span>
+              </label>
+              <label class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-brand-black/40 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer">
+                <input type="checkbox" class="checklist-checkbox rounded bg-brand-black border-slate-700 text-brand-indigo focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5" onchange="evaluateChecklist(this)">
+                <span class="text-xs text-slate-300">Google/Meta advertising account read-only access</span>
+              </label>
+              <label class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-brand-black/40 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer">
+                <input type="checkbox" class="checklist-checkbox rounded bg-brand-black border-slate-700 text-brand-indigo focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5" onchange="evaluateChecklist(this)">
+                <span class="text-xs text-slate-300">Most recent fiscal year tax returns</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Area with Dynamic UTM Outflow -->
+        <div class="pt-4 border-t border-slate-800/80">
+          <div class="bg-brand-black/50 rounded-lg p-2.5 mb-3 border border-slate-800/80 flex flex-col gap-1">
+            <div class="flex items-center justify-between">
+              <span class="text-[9px] font-mono text-slate-500 uppercase tracking-widest">UTM Outbound Link Spec</span>
+              <span class="text-[8px] bg-brand-emerald/10 text-brand-emerald border border-brand-emerald/20 px-1 rounded font-mono">Active</span>
+            </div>
+            <div class="text-[10px] font-mono text-slate-400 break-all select-all hover:text-white transition-colors cursor-pointer tracking-tight whitespace-nowrap overflow-hidden text-ellipsis utm-preview" title="Dynamic UTM Preview">
+              Loading parameters...
+            </div>
+          </div>
+          
+          <a href="#" target="_blank" onclick="simulateOutboundClick(event, this)" class="cta-btn flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-gradient-to-r from-brand-indigo to-brand-violet text-white font-semibold text-xs tracking-wide hover:from-brand-indigo/90 hover:to-brand-violet/90 transition-all shadow-lg hover:shadow-brand-indigo/20">
+            Get Funded
+            <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- CARD 4: Heavy Equipment Leaseback -->
+      <div class="funding-card bg-brand-dark/80 border border-slate-800/80 rounded-2xl p-6 transition-all-custom hover:border-brand-indigo/60 hover:-translate-y-1 relative flex flex-col justify-between glow-indigo" 
+           data-categories="['equipment', 'working-cap']" 
+           data-id="equip_lease"
+           data-base-campaign="equipment_leaseback"
+           data-base-content="heavy_machinery">
+        
+        <div>
+          <!-- Card Header -->
+          <div class="flex items-start justify-between gap-4 mb-4">
+            <div>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono tracking-wider bg-brand-cyan/10 text-brand-cyan border border-brand-cyan/20 uppercase">Equipment Lease</span>
+              <h2 class="text-xl font-bold text-white mt-1.5">Asset-Backed Leaseback</h2>
+            </div>
+            
+            <!-- Mini Dial Chart -->
+            <div class="relative flex items-center justify-center w-12 h-12 flex-shrink-0" title="Funding Speed: Moderate">
+              <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path class="text-brand-cyan transition-all duration-500" stroke-dasharray="55, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center text-[9px] font-mono leading-none">
+                <span class="font-bold text-white">4d</span>
+                <span class="text-slate-500 scale-90">speed</span>
+              </div>
+            </div>
+          </div>
+
+          <p class="text-xs text-slate-400 mb-5">
+            Turn your outstanding machinery, systems, and vehicle ownership footprints back into ready working capital.
+          </p>
+
+          <!-- Target Fit Metrics Grid -->
+          <div class="bg-brand-black/60 border border-slate-800/60 rounded-xl p-3 mb-5 grid grid-cols-3 gap-2">
+            <div class="text-center border-r border-slate-800/60">
+              <span class="block text-[9px] font-mono text-slate-500 uppercase tracking-tight">Asset Value</span>
+              <span class="text-[12px] font-bold text-brand-cyan">$50k+</span>
+            </div>
+            <div class="text-center border-r border-slate-800/60">
+              <span class="block text-[9px] font-mono text-slate-500 uppercase tracking-tight">Credit Rating</span>
+              <span class="text-[12px] font-bold text-slate-200">600+</span>
+            </div>
+            <div class="text-center">
+              <span class="block text-[9px] font-mono text-slate-500 uppercase tracking-tight">Time in Biz</span>
+              <span class="text-[12px] font-bold text-slate-200">1+ Year</span>
+            </div>
+          </div>
+
+          <!-- Interactive Documentation Checklist -->
+          <div class="mb-6">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">Required Verification</span>
+              <span class="text-[10px] font-mono text-brand-cyan bg-brand-cyan/10 px-1.5 py-0.5 rounded checklist-counter">0/3 Ready</span>
+            </div>
+            <div class="space-y-2">
+              <label class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-brand-black/40 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer">
+                <input type="checkbox" class="checklist-checkbox rounded bg-brand-black border-slate-700 text-brand-indigo focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5" onchange="evaluateChecklist(this)">
+                <span class="text-xs text-slate-300">Machinery purchase invoices & valuations</span>
+              </label>
+              <label class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-brand-black/40 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer">
+                <input type="checkbox" class="checklist-checkbox rounded bg-brand-black border-slate-700 text-brand-indigo focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5" onchange="evaluateChecklist(this)">
+                <span class="text-xs text-slate-300">Active regional business license status</span>
+              </label>
+              <label class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-brand-black/40 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer">
+                <input type="checkbox" class="checklist-checkbox rounded bg-brand-black border-slate-700 text-brand-indigo focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5" onchange="evaluateChecklist(this)">
+                <span class="text-xs text-slate-300">6 Months business banking logs</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Area with Dynamic UTM Outflow -->
+        <div class="pt-4 border-t border-slate-800/80">
+          <div class="bg-brand-black/50 rounded-lg p-2.5 mb-3 border border-slate-800/80 flex flex-col gap-1">
+            <div class="flex items-center justify-between">
+              <span class="text-[9px] font-mono text-slate-500 uppercase tracking-widest">UTM Outbound Link Spec</span>
+              <span class="text-[8px] bg-brand-emerald/10 text-brand-emerald border border-brand-emerald/20 px-1 rounded font-mono">Active</span>
+            </div>
+            <div class="text-[10px] font-mono text-slate-400 break-all select-all hover:text-white transition-colors cursor-pointer tracking-tight whitespace-nowrap overflow-hidden text-ellipsis utm-preview" title="Dynamic UTM Preview">
+              Loading parameters...
+            </div>
+          </div>
+          
+          <a href="#" target="_blank" onclick="simulateOutboundClick(event, this)" class="cta-btn flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-gradient-to-r from-brand-indigo to-brand-violet text-white font-semibold text-xs tracking-wide hover:from-brand-indigo/90 hover:to-brand-violet/90 transition-all shadow-lg hover:shadow-brand-indigo/20">
+            Get Funded
+            <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- CARD 5: Enterprise Unsecured Capital -->
+      <div class="funding-card bg-brand-dark/80 border border-slate-800/80 rounded-2xl p-6 transition-all-custom hover:border-brand-indigo/60 hover:-translate-y-1 relative flex flex-col justify-between glow-indigo" 
+           data-categories="['working-cap']" 
+           data-id="ent_unsecured"
+           data-base-campaign="enterprise_working_cap"
+           data-base-content="unsecured_line">
+        
+        <div>
+          <!-- Card Header -->
+          <div class="flex items-start justify-between gap-4 mb-4">
+            <div>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono tracking-wider bg-brand-indigo/10 text-brand-indigo border border-brand-indigo/20 uppercase">Enterprise Line</span>
+              <h2 class="text-xl font-bold text-white mt-1.5">Unsecured Working Capital</h2>
+            </div>
+            
+            <!-- Mini Dial Chart -->
+            <div class="relative flex items-center justify-center w-12 h-12 flex-shrink-0" title="Funding Speed: Fast">
+              <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path class="text-brand-cyan transition-all duration-500" stroke-dasharray="72, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center text-[9px] font-mono leading-none">
+                <span class="font-bold text-white">72h</span>
+                <span class="text-slate-500 scale-90">speed</span>
+              </div>
+            </div>
+          </div>
+
+          <p class="text-xs text-slate-400 mb-5">
+            Institutional capital injections targeting mature mid-market companies needing scale liquidity without covenants.
+          </p>
+
+          <!-- Target Fit Metrics Grid -->
+          <div class="bg-brand-black/60 border border-slate-800/60 rounded-xl p-3 mb-5 grid grid-cols-3 gap-2">
+            <div class="text-center border-r border-slate-800/60">
+              <span class="block text-[9px] font-mono text-slate-500 uppercase tracking-tight">Min Revenue</span>
+              <span class="text-[12px] font-bold text-brand-cyan">$1.2M/yr</span>
+            </div>
+            <div class="text-center border-r border-slate-800/60">
+              <span class="block text-[9px] font-mono text-slate-500 uppercase tracking-tight">Credit Rating</span>
+              <span class="text-[12px] font-bold text-slate-200">680+</span>
+            </div>
+            <div class="text-center">
+              <span class="block text-[9px] font-mono text-slate-500 uppercase tracking-tight">Time in Biz</span>
+              <span class="text-[12px] font-bold text-slate-200">2+ Years</span>
+            </div>
+          </div>
+
+          <!-- Interactive Documentation Checklist -->
+          <div class="mb-6">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">Required Verification</span>
+              <span class="text-[10px] font-mono text-brand-cyan bg-brand-cyan/10 px-1.5 py-0.5 rounded checklist-counter">0/3 Ready</span>
+            </div>
+            <div class="space-y-2">
+              <label class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-brand-black/40 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer">
+                <input type="checkbox" class="checklist-checkbox rounded bg-brand-black border-slate-700 text-brand-indigo focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5" onchange="evaluateChecklist(this)">
+                <span class="text-xs text-slate-300">2 Years certified audited financials</span>
+              </label>
+              <label class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-brand-black/40 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer">
+                <input type="checkbox" class="checklist-checkbox rounded bg-brand-black border-slate-700 text-brand-indigo focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5" onchange="evaluateChecklist(this)">
+                <span class="text-xs text-slate-300">Corporate structure tax records</span>
+              </label>
+              <label class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-brand-black/40 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer">
+                <input type="checkbox" class="checklist-checkbox rounded bg-brand-black border-slate-700 text-brand-indigo focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5" onchange="evaluateChecklist(this)">
+                <span class="text-xs text-slate-300">Outstanding Accounts Receivable ledger</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Area with Dynamic UTM Outflow -->
+        <div class="pt-4 border-t border-slate-800/80">
+          <div class="bg-brand-black/50 rounded-lg p-2.5 mb-3 border border-slate-800/80 flex flex-col gap-1">
+            <div class="flex items-center justify-between">
+              <span class="text-[9px] font-mono text-slate-500 uppercase tracking-widest">UTM Outbound Link Spec</span>
+              <span class="text-[8px] bg-brand-emerald/10 text-brand-emerald border border-brand-emerald/20 px-1 rounded font-mono">Active</span>
+            </div>
+            <div class="text-[10px] font-mono text-slate-400 break-all select-all hover:text-white transition-colors cursor-pointer tracking-tight whitespace-nowrap overflow-hidden text-ellipsis utm-preview" title="Dynamic UTM Preview">
+              Loading parameters...
+            </div>
+          </div>
+          
+          <a href="#" target="_blank" onclick="simulateOutboundClick(event, this)" class="cta-btn flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-gradient-to-r from-brand-indigo to-brand-violet text-white font-semibold text-xs tracking-wide hover:from-brand-indigo/90 hover:to-brand-violet/90 transition-all shadow-lg hover:shadow-brand-indigo/20">
+            Get Funded
+            <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- CARD 6: Angel-Backed Runway Extension -->
+      <div class="funding-card bg-brand-dark/80 border border-slate-800/80 rounded-2xl p-6 transition-all-custom hover:border-brand-cyan/60 hover:-translate-y-1 relative flex flex-col justify-between glow-cyan" 
+           data-categories="['startup']" 
+           data-id="angel_runway"
+           data-base-campaign="angel_runway_ext"
+           data-base-content="equity_backed">
+        
+        <div>
+          <!-- Card Header -->
+          <div class="flex items-start justify-between gap-4 mb-4">
+            <div>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono tracking-wider bg-brand-cyan/10 text-brand-cyan border border-brand-cyan/20 uppercase">Runway Extension</span>
+              <h2 class="text-xl font-bold text-white mt-1.5">Angel-Backed Extension</h2>
+            </div>
+            
+            <!-- Mini Dial Chart -->
+            <div class="relative flex items-center justify-center w-12 h-12 flex-shrink-0" title="Funding Speed: Structured">
+              <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path class="text-brand-cyan transition-all duration-500" stroke-dasharray="30, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center text-[9px] font-mono leading-none">
+                <span class="font-bold text-white">7d</span>
+                <span class="text-slate-500 scale-90">speed</span>
+              </div>
+            </div>
+          </div>
+
+          <p class="text-xs text-slate-400 mb-5">
+            Venture-backed debt pipelines to extend capital runway, structured with minimal warrant requirements.
+          </p>
+
+          <!-- Target Fit Metrics Grid -->
+          <div class="bg-brand-black/60 border border-slate-800/60 rounded-xl p-3 mb-5 grid grid-cols-3 gap-2">
+            <div class="text-center border-r border-slate-800/60">
+              <span class="block text-[9px] font-mono text-slate-500 uppercase tracking-tight">Venture Capital</span>
+              <span class="text-[12px] font-bold text-brand-cyan">$500k+ Raised</span>
+            </div>
+            <div class="text-center border-r border-slate-800/60">
+              <span class="block text-[9px] font-mono text-slate-500 uppercase tracking-tight">Credit Rating</span>
+              <span class="text-[12px] font-bold text-slate-200">No Minimum</span>
+            </div>
+            <div class="text-center">
+              <span class="block text-[9px] font-mono text-slate-500 uppercase tracking-tight">Lead Angel</span>
+              <span class="text-[12px] font-bold text-slate-200">Required</span>
+            </div>
+          </div>
+
+          <!-- Interactive Documentation Checklist -->
+          <div class="mb-6">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">Required Verification</span>
+              <span class="text-[10px] font-mono text-brand-cyan bg-brand-cyan/10 px-1.5 py-0.5 rounded checklist-counter">0/3 Ready</span>
+            </div>
+            <div class="space-y-2">
+              <label class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-brand-black/40 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer">
+                <input type="checkbox" class="checklist-checkbox rounded bg-brand-black border-slate-700 text-brand-indigo focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5" onchange="evaluateChecklist(this)">
+                <span class="text-xs text-slate-300">Clean institutional capitalization table</span>
+              </label>
+              <label class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-brand-black/40 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer">
+                <input type="checkbox" class="checklist-checkbox rounded bg-brand-black border-slate-700 text-brand-indigo focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5" onchange="evaluateChecklist(this)">
+                <span class="text-xs text-slate-300">Last equity valuation round term sheet</span>
+              </label>
+              <label class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-brand-black/40 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer">
+                <input type="checkbox" class="checklist-checkbox rounded bg-brand-black border-slate-700 text-brand-indigo focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5" onchange="evaluateChecklist(this)">
+                <span class="text-xs text-slate-300">Cash burn financial forecast model</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Area with Dynamic UTM Outflow -->
+        <div class="pt-4 border-t border-slate-800/80">
+          <div class="bg-brand-black/50 rounded-lg p-2.5 mb-3 border border-slate-800/80 flex flex-col gap-1">
+            <div class="flex items-center justify-between">
+              <span class="text-[9px] font-mono text-slate-500 uppercase tracking-widest">UTM Outbound Link Spec</span>
+              <span class="text-[8px] bg-brand-emerald/10 text-brand-emerald border border-brand-emerald/20 px-1 rounded font-mono">Active</span>
+            </div>
+            <div class="text-[10px] font-mono text-slate-400 break-all select-all hover:text-white transition-colors cursor-pointer tracking-tight whitespace-nowrap overflow-hidden text-ellipsis utm-preview" title="Dynamic UTM Preview">
+              Loading parameters...
+            </div>
+          </div>
+          
+          <a href="#" target="_blank" onclick="simulateOutboundClick(event, this)" class="cta-btn flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-gradient-to-r from-brand-indigo to-brand-violet text-white font-semibold text-xs tracking-wide hover:from-brand-indigo/90 hover:to-brand-violet/90 transition-all shadow-lg hover:shadow-brand-indigo/20">
+            Get Funded
+            <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Console Logging Telemetry Interface at the Bottom -->
+    <div class="mt-12 bg-brand-dark/90 border border-slate-800/80 rounded-2xl p-5 glow-indigo">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/60 pb-4 mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-2.5 h-2.5 rounded-full bg-brand-emerald pulse-dot"></div>
+          <h2 class="text-sm font-bold uppercase tracking-wider font-mono text-slate-200">System Telemetry Live Stream</h2>
+        </div>
+        <div class="text-[11px] font-mono text-slate-400 bg-brand-black/80 px-2.5 py-1 rounded border border-slate-800">
+          Receiver Host: <span class="text-brand-cyan">api.coreflow.io/v1/lead</span>
+        </div>
+      </div>
+      <div class="bg-brand-black/85 rounded-xl p-4 font-mono text-xs text-slate-400 h-32 overflow-y-auto space-y-2" id="console-logs">
+        <p class="text-slate-500">[SYSTEM] Initializing telemetry log system...</p>
+        <p class="text-slate-500">[SYSTEM] Listening on UTM mutations...</p>
+        <p class="text-emerald-400">[READY] Core Flow funding matchers ready.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Initialize components & state
+    document.addEventListener("DOMContentLoaded", () => {
+      updateAllUTMs();
+    });
+
+    // Filtering logic
+    function filterCards(category) {
+      const cards = document.querySelectorAll('.funding-card');
+      const buttons = document.querySelectorAll('#filter-container button');
+      let matchingCount = 0;
+
+      // Update Active Button Style
+      buttons.forEach(btn => {
+        if (btn.getAttribute('data-filter') === category) {
+          btn.className = "px-4 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200 bg-brand-indigo border-brand-indigo text-white shadow-lg shadow-brand-indigo/20";
+        } else {
+          btn.className = "px-4 py-1.5 rounded-full text-xs font-semibold border border-slate-800 text-slate-400 bg-brand-dark/40 hover:text-white hover:border-slate-700 transition-all duration-200";
+        }
+      });
+
+      // Show/Hide Cards with smooth transitions
+      cards.forEach(card => {
+        const categories = eval(card.getAttribute('data-categories'));
+        if (category === 'all' || categories.includes(category)) {
+          card.classList.remove('card-hidden');
+          card.classList.add('card-visible');
+          matchingCount++;
+        } else {
+          card.classList.remove('card-visible');
+          card.classList.add('card-hidden');
+        }
+      });
+
+      // Update counters
+      document.getElementById('active-count').innerText = matchingCount;
+      logConsole(`Filtered catalog views to category: [${category.toUpperCase()}] (${matchingCount} items)`);
+    }
+
+    // Dynamic checklist updates
+    function evaluateChecklist(checkbox) {
+      const card = checkbox.closest('.funding-card');
+      const totalChecks = card.querySelectorAll('.checklist-checkbox').length;
+      const checkedCount = card.querySelectorAll('.checklist-checkbox:checked').length;
+      
+      // Update badge indicator
+      const badge = card.querySelector('.checklist-counter');
+      badge.innerText = `${checkedCount}/${totalChecks} Ready`;
+      
+      if (checkedCount === totalChecks) {
+        badge.className = "text-[10px] font-mono text-brand-emerald bg-brand-emerald/10 px-1.5 py-0.5 rounded checklist-counter border border-brand-emerald/20 font-bold";
+        logConsole(`Card [${card.getAttribute('data-id')}] status: [READY FOR SUBMISSION]`);
+      } else {
+        badge.className = "text-[10px] font-mono text-brand-cyan bg-brand-cyan/10 px-1.5 py-0.5 rounded checklist-counter";
+      }
+
+      // Re-trigger UTM dynamic path calculation
+      updateCardUTM(card);
+    }
+
+    // Standard Link Tracking Mutator Engine
+    function updateAllUTMs() {
+      const cards = document.querySelectorAll('.funding-card');
+      cards.forEach(card => {
+        updateCardUTM(card);
+      });
+    }
+
+    function updateCardUTM(card) {
+      // Fetch dynamic telemetry components
+      const globalSource = document.getElementById('global-utm-source').value || "coreflow";
+      const globalMedium = document.getElementById('global-utm-medium').value || "catalog";
+      const campaign = card.getAttribute('data-base-campaign');
+      const content = card.getAttribute('data-base-content');
+      
+      // Document integration metrics
+      const totalChecks = card.querySelectorAll('.checklist-checkbox').length;
+      const checkedCount = card.querySelectorAll('.checklist-checkbox:checked').length;
+      const readinessPct = Math.round((checkedCount / totalChecks) * 100);
+
+      // Assemble tracked URL parameters
+      const baseUrl = `https://apply.coreflow.finance/path/${card.getAttribute('data-id')}`;
+      const trackedUrl = `${baseUrl}?utm_source=${encodeURIComponent(globalSource)}&utm_medium=${encodeURIComponent(globalMedium)}&utm_campaign=${encodeURIComponent(campaign)}&utm_content=${encodeURIComponent(content)}&readiness_pct=${readinessPct}`;
+
+      // Insert back to target preview elements
+      const previewEl = card.querySelector('.utm-preview');
+      previewEl.innerText = trackedUrl;
+      previewEl.setAttribute('title', trackedUrl);
+
+      const ctaBtn = card.querySelector('.cta-btn');
+      ctaBtn.setAttribute('href', trackedUrl);
+    }
+
+    // Simulated action flow logging
+    function simulateOutboundClick(event, element) {
+      event.preventDefault();
+      const card = element.closest('.funding-card');
+      const destUrl = element.getAttribute('href');
+      
+      logConsole(`[CLICK TRANSACTION] Initiating transfer for: ${card.getAttribute('data-id')}`);
+      logConsole(`[OUTFLOW PAYLOAD] URI Destination -> ${destUrl}`);
+      
+      // Alert with visually striking alert element modal emulation
+      const modal = document.createElement('div');
+      modal.className = "fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-black/80 backdrop-blur-md";
+      modal.innerHTML = `
+        <div class="bg-brand-dark border border-brand-indigo rounded-2xl max-w-md w-full p-6 text-center shadow-2xl relative overflow-hidden">
+          <div class="absolute -right-16 -top-16 w-32 h-32 bg-brand-indigo/10 rounded-full blur-xl"></div>
+          <div class="w-12 h-12 bg-brand-emerald/10 border border-brand-emerald/30 text-brand-emerald rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">Simulated Outbound Event</h3>
+          <p class="text-xs text-slate-400 mb-4 leading-relaxed">
+            Outbound redirect intercepted. The partner node registered the telemetry signatures with UTM variables matching your selection configurations.
+          </p>
+          <div class="bg-brand-black border border-slate-800 rounded-lg p-3 text-left mb-5">
+            <span class="block text-[9px] font-mono text-slate-500 uppercase mb-1">Outflow Address Payload</span>
+            <div class="text-[10px] font-mono text-brand-cyan break-all select-all">${destUrl}</div>
+          </div>
+          <button onclick="this.closest('.fixed').remove()" class="w-full py-2 bg-brand-indigo hover:bg-brand-indigo/90 text-white rounded-lg text-xs font-semibold tracking-wide transition-all">
+            Dismiss Connection Diagnostic
+          </button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+
+    // Telemetry log simulator
+    function logConsole(message) {
+      const consoleContainer = document.getElementById('console-logs');
+      const timeStamp = new Date().toISOString().slice(11, 19);
+      const logElement = document.createElement('p');
+      logElement.className = "text-brand-cyan font-mono text-[11px] leading-relaxed border-l border-brand-cyan/20 pl-2";
+      logElement.innerHTML = `<span class="text-slate-500">[${timeStamp}]</span> ${message}`;
+      consoleContainer.appendChild(logElement);
+      consoleContainer.scrollTop = consoleContainer.scrollHeight;
+    }
+  </script>
+    <script src="script.js"></script>
+</body>
+</html>
