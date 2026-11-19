@@ -58,6 +58,10 @@ function Is-Standalone($Item) {
 
 function Get-Value($Object, [string]$Name, $Default = $null) {
   if ($null -eq $Object) { return $Default }
+  if ($Object -is [System.Collections.IDictionary]) {
+    if ($Object.Contains($Name) -and $null -ne $Object[$Name]) { return $Object[$Name] }
+    return $Default
+  }
   if ($Object.PSObject.Properties.Name -contains $Name -and $null -ne $Object.$Name) { return $Object.$Name }
   return $Default
 }
@@ -323,6 +327,89 @@ foreach ($entry in $resolvedEntries) {
     $encoded = ($entry.sourcePath.Split('/') | ForEach-Object { [uri]::EscapeDataString($_) }) -join '/'
     $kind = if ([IO.Path]::HasExtension($entry.sourcePath)) { 'blob' } else { 'tree' }
     $entry['sourceUrl'] = "https://github.com/JFeimster/flash-ui-portfolio/$kind/main/$encoded"
+  }
+}
+
+# Apply explicit cross-folder ownership using the existing route contracts.
+# Keep source URLs unchanged even when an asset belongs to a different catalog group.
+foreach ($override in As-Array (Get-Value $routeContractsData 'sourceOwnershipOverrides' @())) {
+  $source = [string](Get-Value $override 'sourcePath' '')
+  $groupId = [string](Get-Value $override 'groupId' '')
+  $number = [int](Get-Value $override 'variantNumber' 0)
+  $route = Normalize-Path ($source -replace '/index\.html$', '/')
+  if (-not $source -or -not $groupDefinitions.ContainsKey($groupId) -or $number -lt 1 -or
+      -not (Test-Path -LiteralPath (To-RepoPath $source) -PathType Leaf)) {
+    throw "Invalid source ownership override: $source"
+  }
+  $matches = @($resolvedEntries | Where-Object {
+    $recordSource = [string](Get-Value $_ 'sourcePath' '')
+    $recordOriginal = [string](Get-Value $_ 'originalPath' '')
+    $recordResolved = [string](Get-Value $_ 'resolvedPath' '')
+    $recordSource -eq $source -or $recordOriginal.TrimEnd('/') -eq $route.TrimEnd('/') -or
+    $recordResolved.TrimEnd('/') -eq $route.TrimEnd('/')
+  })
+  if ($matches.Count -ne 1) { throw "Ownership override must match exactly one source: $source (found $($matches.Count))" }
+  $entry = $matches[0]
+  $entry['canonicalGroupId'] = $groupId
+  $entry['variantNumber'] = $number
+  $entry['resolvedPath'] = $route
+  $entry['sourcePath'] = $source
+  $encodedSource = ($source.Split('/') | ForEach-Object { [uri]::EscapeDataString($_) }) -join '/'
+  $entry['sourceUrl'] = "https://github.com/JFeimster/flash-ui-portfolio/blob/main/$encodedSource"
+  $entry['category'] = [string](Get-Value $groupDefinitions[$groupId] 'category' 'Widgets')
+  $entry['title'] = [string](Get-Value $override 'title' $entry.title)
+  $entry['description'] = [string](Get-Value $override 'description' '')
+  $entry['resolutionStatus'] = 'resolved'
+  $entry['resolutionReason'] = 'Explicit source ownership contract; public route unchanged.'
+}
+foreach ($groupId in @('embed-widget-studio', 'embed-code-generator')) {
+  $owned = @($resolvedEntries | Where-Object { $_.canonicalGroupId -eq $groupId -and $_.Contains('variantNumber') -and $_.variantNumber })
+  $uniqueNumbers = @($owned | ForEach-Object { [int](Get-Value $_ 'variantNumber' 0) } | Sort-Object -Unique)
+  if ($uniqueNumbers.Count -ne $owned.Count) {
+    throw "Duplicate variant ownership in $groupId"
+  }
+}
+
+# Opt-in additive hubs avoid mutating the immutable canonical registry.
+# Only groups with an explicit route contract may request this generated hub.
+foreach ($contract in As-Array (Get-Value $routeContractsData 'groups' @())) {
+  if (-not [bool](Get-Value $contract 'generateHubEntry' $false)) { continue }
+  $groupId = [string](Get-Value $contract 'groupId' '')
+  $hub = Normalize-Path (Get-Value $contract 'hubPath' '')
+  if (-not $groupId -or -not $groupDefinitions.ContainsKey($groupId) -or
+      -not (Has-Entrypoint (To-RepoPath $hub))) {
+    throw "Invalid additive hub contract: $groupId -> $hub"
+  }
+  $existingHubs = @($resolvedEntries | Where-Object {
+    (Get-Value $_ 'canonicalGroupId' '') -eq $groupId -and
+    (Get-Value $_ 'resolvedPath' '') -eq $hub
+  })
+  if ($existingHubs.Count -gt 0) { throw "Additive hub already represented: $groupId" }
+  $group = $groupDefinitions[$groupId]
+  $relative = $hub.TrimStart('/').TrimEnd('/')
+  $resolvedEntries += [ordered]@{
+    title = [string](Get-Value $contract 'displayTitle' $groupId)
+    slug = $groupId
+    category = [string](Get-Value $group 'category' 'Experiments')
+    type = 'group-hub'
+    source = 'variant-route-contract'
+    sourceFile = 'data/variant-route-contracts.json'
+    originalPath = $hub
+    resolvedPath = $hub
+    canonicalGroupId = $groupId
+    resolutionStatus = 'resolved'
+    resolutionReason = 'Additive route contract for existing hub index; canonical registry unchanged.'
+    productionVerification = 'pending'
+    notes = 'Source files and public URLs preserved.'
+    variantNumbers = @(As-Array (Get-Value $contract 'variants' @()) | ForEach-Object { [int](Get-Value $_ 'number' 0) })
+    entrypointEvidence = [ordered]@{
+      originalPathExists = $true
+      originalEntrypointExists = $true
+      resolvedEntrypointExists = $true
+      evidence = @("contract hub index: $hub")
+    }
+    sourcePath = "$relative/index.html"
+    sourceUrl = "https://github.com/JFeimster/flash-ui-portfolio/blob/main/$relative/index.html"
   }
 }
 
