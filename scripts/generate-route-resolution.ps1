@@ -364,7 +364,8 @@ foreach ($override in As-Array (Get-Value $routeContractsData 'sourceOwnershipOv
 }
 foreach ($groupId in @('embed-widget-studio', 'embed-code-generator')) {
   $owned = @($resolvedEntries | Where-Object { $_.canonicalGroupId -eq $groupId -and $_.Contains('variantNumber') -and $_.variantNumber })
-  if (@($owned | Select-Object -ExpandProperty variantNumber -Unique).Count -ne $owned.Count) {
+  $uniqueNumbers = @($owned | ForEach-Object { [int](Get-Value $_ 'variantNumber' 0) } | Sort-Object -Unique)
+  if ($uniqueNumbers.Count -ne $owned.Count) {
     throw "Duplicate variant ownership in $groupId"
   }
 }
