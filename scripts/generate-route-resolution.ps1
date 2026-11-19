@@ -181,7 +181,11 @@ foreach ($item in $merged.Values) {
   $groupId = if ($migration) { $migration.groupId } elseif ($groupByKey.ContainsKey($titleKey)) { $groupByKey[$titleKey] } elseif ($groupByKey.ContainsKey($pathKey)) { $groupByKey[$pathKey] } else { "" }
   $group = if ($groupId -and $groupDefinitions.ContainsKey($groupId)) { $groupDefinitions[$groupId] } else { $null }
   $originalRepoPath = if ($path) { To-RepoPath $path } else { "" }
-  $originalExists = if ($originalRepoPath) { Test-Path -LiteralPath $originalRepoPath } else { $false }
+  $originalExists = $false
+  if ($originalRepoPath -and (Test-Path -LiteralPath $originalRepoPath)) {
+    $sourceItem = Get-Item -LiteralPath $originalRepoPath
+    $originalExists = -not $sourceItem.PSIsContainer -or [bool](Get-ChildItem -LiteralPath $originalRepoPath -Force | Select-Object -First 1)
+  }
   $originalEntrypoint = if ($originalRepoPath) { Has-Entrypoint $originalRepoPath } else { $false }
   $resolvedPath = ""
   $status = "unresolved"
@@ -320,7 +324,7 @@ foreach ($entry in $resolvedEntries) {
       $entry['sourcePath'] = $entry.resolvedPath.TrimStart('/')
       if ((Get-Item -LiteralPath $local).PSIsContainer) { $entry['sourcePath'] = "$($entry.sourcePath.TrimEnd('/'))/index.html" }
     }
-  } elseif (Test-Path -LiteralPath (To-RepoPath $entry.originalPath)) {
+  } elseif ($entry.entrypointEvidence.originalPathExists -and (Test-Path -LiteralPath (To-RepoPath $entry.originalPath))) {
     $entry['sourcePath'] = $entry.originalPath.TrimStart('/')
   }
   if ($entry.Contains('sourcePath')) {
@@ -462,6 +466,33 @@ if ($groupDefinitions.ContainsKey($jesterGroupId)) {
   }
 }
 
+# Contracted nested pages are projected before group counts are computed.
+foreach ($contract in As-Array (Get-Value $routeContractsData "groups" @())) {
+  $groupId = [string](Get-Value $contract "groupId" "")
+  foreach ($variant in As-Array (Get-Value $contract "variants" @())) {
+    $path = Normalize-Path (Get-Value $variant "path" "")
+    $number = [int](Get-Value $variant "number" 0)
+    if (-not $path -or -not (Has-Entrypoint (To-RepoPath $path))) { continue }
+    $existing = @($resolvedEntries | Where-Object { $_.canonicalGroupId -eq $groupId -and $_.Contains('variantNumber') -and $_.variantNumber -eq $number })
+    if ($existing.Count) { continue }
+    $sourcePath = "$($path.TrimStart('/').TrimEnd('/'))/index.html"
+    $metadata = Read-HtmlMetadata (To-RepoPath $sourcePath)
+    if (-not $metadata.structuralValidity.valid) { throw "Invalid contracted source page: $sourcePath" }
+    $encoded = ($sourcePath.Split('/') | ForEach-Object { [uri]::EscapeDataString($_) }) -join '/'
+    $resolvedEntries += [ordered]@{
+      title = [string](Get-Value $variant 'title' $groupId); slug = "$groupId-variant-$number"
+      category = [string](Get-Value $groupDefinitions[$groupId] 'category' 'Experiments')
+      type = 'static-site'; source = 'variant-route-contract'; sourceFile = $sourcePath
+      originalPath = $path; resolvedPath = $path; canonicalGroupId = $groupId; variantNumber = $number
+      resolutionStatus = 'resolved'; resolutionReason = 'Existing nested source page named by route contract.'
+      productionVerification = 'pending'; sourcePath = $sourcePath
+      sourceUrl = "https://github.com/JFeimster/flash-ui-portfolio/blob/main/$encoded"
+      documentTitle = $metadata.documentTitle; sourceHeading = $metadata.sourceHeading
+      structuralValidity = $metadata.structuralValidity
+      entrypointEvidence = [ordered]@{ originalPathExists = $true; originalEntrypointExists = $true; resolvedEntrypointExists = $true; evidence = @("contract source index: $sourcePath") }
+    }
+  }
+}
 $groups = @()
 foreach ($groupId in $groupDefinitions.Keys) {
   $group = $groupDefinitions[$groupId]
@@ -575,9 +606,10 @@ $stableEntries = @($orderedEntries | ForEach-Object {
   $stable
 })
 
+$catalogGeneratedAt = if ($previousRoutes -and $previousRoutes.generatedAt) { ([datetime]$previousRoutes.generatedAt).ToUniversalTime().ToString('o') } else { (Get-Date).ToUniversalTime().ToString('o') }
 $output = [ordered]@{
   version = "1.1.0"
-  generatedAt = (Get-Date).ToUniversalTime().ToString("o")
+  generatedAt = $catalogGeneratedAt
   sourceFiles = @("data/site-registry.json", "data/site-registry-static-extractions.json", "data/site-registry-batch-5-additions.json", "data/asset-groups.json", "data/variant-route-contracts.json", "data/variant-migration-map.json", "data/jester-quotes-editions.json")
   verificationNote = "Local entrypoint evidence is structural only; production availability remains unverified until an authorized deployment smoke test is run."
   summary = $summary

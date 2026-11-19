@@ -1,0 +1,1252 @@
+```html
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PRISM LOGIC // Batch File Transfer Composer</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            prism: {
+              black: '#030712',
+              charcoal: '#0b0f19',
+              slate: '#1e293b',
+              red: '#ff2e93',
+              blue: '#00f0ff',
+              green: '#00ff87',
+              yellow: '#ffde43',
+              purple: '#8b5cf6'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #030712;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1f2937;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #374151;
+    }
+
+    /* Prism Grid Background */
+    .prism-grid {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
+
+    /* Chromatic Aberration & Glow Effects */
+    .prism-glow-blue {
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.15);
+      border: 1px solid rgba(0, 240, 255, 0.25);
+    }
+    
+    .prism-glow-red {
+      box-shadow: 0 0 30px rgba(255, 46, 147, 0.15);
+      border: 1px solid rgba(255, 46, 147, 0.25);
+    }
+
+    .prism-glow-green {
+      box-shadow: 0 0 30px rgba(0, 255, 135, 0.15);
+      border: 1px solid rgba(0, 255, 135, 0.25);
+    }
+
+    .prism-glow-purple {
+      box-shadow: 0 0 30px rgba(139, 92, 246, 0.15);
+      border: 1px solid rgba(139, 92, 246, 0.25);
+    }
+
+    .prism-glass {
+      background: rgba(11, 15, 25, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .prism-glass-hover:hover {
+      background: rgba(11, 15, 25, 0.85);
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: translateY(-2px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes refract {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .rainbow-border {
+      position: relative;
+    }
+    .rainbow-border::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(90deg, #ff2e93, #00f0ff, #00ff87, #ffde43, #ff2e93);
+      background-size: 300% 300%;
+      animation: refract 8s ease infinite;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    .status-pulse {
+      box-shadow: 0 0 0 0 rgba(0, 255, 135, 0.7);
+      animation: pulse 1.8s infinite cubic-bezier(0.66, 0, 0, 1);
+    }
+
+    @keyframes pulse {
+      to {
+        box-shadow: 0 0 0 8px rgba(0, 255, 135, 0);
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-prism-black text-slate-100 font-sans min-h-screen relative overflow-x-hidden prism-grid">
+
+  <!-- Glow Elements in Background -->
+  <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-prism-blue/10 rounded-full blur-[120px] pointer-events-none"></div>
+  <div class="absolute bottom-[20%] right-[-10%] w-[45%] h-[45%] bg-prism-red/10 rounded-full blur-[140px] pointer-events-none"></div>
+  <div class="absolute top-[40%] left-[30%] w-[35%] h-[35%] bg-prism-purple/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+  <!-- Main Grid Wrapper -->
+  <div class="min-h-screen flex flex-col justify-between z-10 relative">
+    
+    <!-- Top Navigation Header -->
+    <header class="border-b border-white/5 prism-glass sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        
+        <!-- Logo / Branding -->
+        <div class="flex items-center space-x-3">
+          <div class="relative w-8 h-8 flex items-center justify-center rainbow-border rounded-lg">
+            <svg class="w-4 h-4 text-white animate-spin-slow" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 22H22L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div>
+            <span class="font-mono text-xs text-prism-blue tracking-[0.3em] font-semibold block">PRISM LOGIC</span>
+            <h1 class="text-sm font-bold tracking-tight text-white flex items-center gap-1.5 uppercase">
+              Transfer Composer <span class="text-[9px] bg-prism-purple/20 text-prism-purple px-1.5 py-0.5 rounded font-mono border border-prism-purple/30">BATCH V4</span>
+            </h1>
+          </div>
+        </div>
+
+        <!-- Quick Stats Banner -->
+        <div class="hidden md:flex items-center space-x-6 text-xs font-mono border-l border-white/10 pl-6">
+          <div>
+            <span class="text-white/40 block">STAGING SLOTS</span>
+            <span id="stagedStats" class="text-prism-blue font-bold text-sm">3 / 7 FILES</span>
+          </div>
+          <div>
+            <span class="text-white/40 block">TOTAL VOLUME</span>
+            <span id="totalSizeStats" class="text-prism-green font-bold text-sm">18.4 MB</span>
+          </div>
+          <div>
+            <span class="text-white/40 block">SECURITY PROTOCOL</span>
+            <span class="text-prism-yellow font-bold text-sm">AES-GCM-256</span>
+          </div>
+          <div>
+            <span class="text-white/40 block">STAGED EXPIRY</span>
+            <span id="expiryStats" class="text-prism-red font-bold text-sm">24 HOURS</span>
+          </div>
+        </div>
+
+        <!-- Action Controls -->
+        <div class="flex items-center space-x-3">
+          <button onclick="resetComposer()" class="p-2 rounded-lg bg-white/5 border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition text-xs font-mono flex items-center gap-1.5">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+            <span class="hidden sm:inline">Reset</span>
+          </button>
+          
+          <button onclick="toggleFaq()" class="p-2 rounded-lg bg-white/5 border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition">
+            <i data-lucide="help-circle" class="w-4.5 h-4.5"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Interactive Cryptographic Core Hero Component -->
+    <section class="border-b border-white/5 relative overflow-hidden bg-prism-charcoal/50 py-8">
+      <!-- Interactive Light Control Indicator -->
+      <div class="absolute top-4 right-4 z-20 flex items-center space-x-2 bg-black/60 px-3 py-1.5 rounded-full border border-white/10">
+        <span class="w-1.5 h-1.5 rounded-full bg-prism-green animate-ping"></span>
+        <span class="text-[10px] font-mono text-white/60 uppercase tracking-widest">Spectral Encryption Node Active</span>
+      </div>
+      
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          
+          <!-- Column 1: Copy/Intro -->
+          <div class="lg:col-span-5 space-y-4">
+            <div class="inline-flex items-center space-x-2 bg-white/5 border border-white/10 px-3 py-1 rounded-full">
+              <span class="w-2 h-2 rounded-full bg-prism-purple"></span>
+              <span class="text-[10px] font-mono tracking-widest text-white/80 uppercase">Quantum Handshake Protocol</span>
+            </div>
+            
+            <h2 class="text-2xl md:text-4xl font-black text-white leading-tight tracking-tight uppercase">
+              Secure <span class="text-transparent bg-clip-text bg-gradient-to-r from-prism-purple via-prism-blue to-prism-green">Multiplex</span> Staging Engine
+            </h2>
+            
+            <p class="text-white/60 text-xs md:text-sm leading-relaxed">
+              Stage up to exactly 7 sensitive files into high-dispersion memory buffers. Configure zero-knowledge password keyframes, select atomic decay expiration limits, and distribute encrypted download portals to verified recipient manifest lists.
+            </p>
+
+            <div class="flex flex-wrap gap-2.5">
+              <div class="bg-white/5 border border-white/5 p-2.5 rounded-xl flex-1 min-w-[110px]">
+                <span class="text-[9px] font-mono text-white/40 block">SHARDING METHOD</span>
+                <span class="text-xs font-semibold text-white">7-Node Splitting</span>
+              </div>
+              <div class="bg-white/5 border border-white/5 p-2.5 rounded-xl flex-1 min-w-[110px]">
+                <span class="text-[9px] font-mono text-white/40 block">ZERO KNOWLEDGE</span>
+                <span class="text-xs font-semibold text-prism-green">100% Client-Side</span>
+              </div>
+              <div class="bg-white/5 border border-white/5 p-2.5 rounded-xl flex-1 min-w-[110px]">
+                <span class="text-[9px] font-mono text-white/40 block">DESTRUCT SYSTEM</span>
+                <span class="text-xs font-semibold text-prism-blue">Decay Verified</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 2: Live CSS/JS Quantum Dispatch Matrix -->
+          <div class="lg:col-span-7 h-[220px] md:h-[240px] prism-glass rounded-2xl relative overflow-hidden flex items-center justify-center border border-white/10">
+            <!-- Canvas for dispersion simulation -->
+            <canvas id="quantumDispersionCanvas" class="absolute inset-0 w-full h-full pointer-events-auto"></canvas>
+            
+            <!-- Floating Tech Overlay -->
+            <div class="absolute bottom-3 left-3 z-20 pointer-events-none bg-black/50 p-2.5 rounded-lg border border-white/5 font-mono text-[9px] text-white/60 space-y-1">
+              <div>// DISPERSION VECTOR STATUS:</div>
+              <div>STAGED SLOTS: <span id="canvasStagedCount" class="text-prism-blue">3 ACTIVE</span></div>
+              <div>TRANSFER INTEGRITY: <span class="text-prism-green">99.987% PASS</span></div>
+              <div class="text-[8px] text-white/30 italic">Drag node coordinates to re-vector dispersion lasers</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content Area: Composer Board -->
+    <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Left: Interactive Attachment Grid (The 7 Slots) -->
+        <div class="lg:col-span-7 space-y-4">
+          <div class="flex justify-between items-center">
+            <h3 class="text-sm font-bold tracking-wider text-white uppercase flex items-center gap-2">
+              <i data-lucide="layers" class="w-4 h-4 text-prism-purple"></i>
+              Attachment Staging Matrix (7 Slots Max)
+            </h3>
+            <span class="text-[10px] font-mono text-white/40 uppercase">Select slots to modify payload</span>
+          </div>
+
+          <!-- The Grid containing exactly 7 slots -->
+          <div id="stagingGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Generated dynamically via Javascript (Slots 1 to 7) -->
+          </div>
+        </div>
+
+        <!-- Right: Control Panel / Handshake Options -->
+        <div class="lg:col-span-5 space-y-6">
+          
+          <!-- Section Heading -->
+          <div class="flex justify-between items-center pb-2 border-b border-white/5">
+            <h3 class="text-sm font-bold tracking-wider text-white uppercase flex items-center gap-2">
+              <i data-lucide="sliders" class="w-4 h-4 text-prism-blue"></i>
+              Lockdown Configuration
+            </h3>
+            <span class="text-[10px] font-mono text-white/40">STEP 2 OF 3</span>
+          </div>
+
+          <!-- Options Wrapper -->
+          <div class="prism-glass p-5 rounded-2xl border border-white/10 space-y-5">
+            
+            <!-- Option A: Expiration Decay Timers -->
+            <div class="space-y-2.5">
+              <label class="block text-xs font-mono font-bold text-white/70 uppercase tracking-wider flex items-center justify-between">
+                <span>Atomic Expiration Rate</span>
+                <span id="expiryBadge" class="text-prism-red bg-prism-red/10 border border-prism-red/20 px-1.5 py-0.5 rounded text-[9px]">24h Self-Destruct</span>
+              </label>
+              
+              <div class="grid grid-cols-4 gap-2 text-xs font-mono">
+                <button onclick="setExpiry(1, '1 Hour')" id="btn-exp-1" class="py-2 rounded-lg bg-black/40 border border-white/10 text-white/60 hover:text-white hover:border-white/30 transition">1 HOUR</button>
+                <button onclick="setExpiry(12, '12 Hours')" id="btn-exp-12" class="py-2 rounded-lg bg-black/40 border border-white/10 text-white/60 hover:text-white hover:border-white/30 transition">12 HOURS</button>
+                <button onclick="setExpiry(24, '24 Hours')" id="btn-exp-24" class="py-2 rounded-lg bg-prism-red/25 border border-prism-red/50 text-white font-bold transition">24 HOURS</button>
+                <button onclick="setExpiry(168, '7 Days')" id="btn-exp-168" class="py-2 rounded-lg bg-black/40 border border-white/10 text-white/60 hover:text-white hover:border-white/30 transition">7 DAYS</button>
+              </div>
+            </div>
+
+            <!-- Option B: Password Key Frame Protection -->
+            <div class="space-y-3 pt-3 border-t border-white/5">
+              <div class="flex justify-between items-center">
+                <label for="passwordToggle" class="text-xs font-mono font-bold text-white/70 uppercase tracking-wider flex items-center gap-1.5 cursor-pointer">
+                  <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-prism-yellow"></i>
+                  Password Isolation Key
+                </label>
+                <!-- Custom Checkbox Toggle -->
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="passwordToggle" onchange="togglePasswordField()" class="sr-only peer" checked>
+                  <div class="w-8 h-4 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-prism-yellow"></div>
+                </label>
+              </div>
+
+              <div id="passwordFieldContainer" class="space-y-2 transition-all duration-300">
+                <div class="relative">
+                  <input 
+                    type="text" 
+                    id="passwordInput" 
+                    value="PRISM-ALPHA-88F"
+                    placeholder="Enter manual override password..." 
+                    class="w-full bg-black/40 border border-white/10 rounded-lg py-2.5 pl-3 pr-24 text-xs font-mono text-white placeholder-white/20 focus:outline-none focus:border-prism-yellow"
+                  >
+                  <button 
+                    onclick="generateRandomPassword()" 
+                    class="absolute right-1.5 top-1.5 bg-prism-yellow/10 border border-prism-yellow/30 text-prism-yellow hover:bg-prism-yellow/20 rounded px-2 py-1 text-[9px] font-mono tracking-wider transition uppercase"
+                  >
+                    GENERATE
+                  </button>
+                </div>
+                <p class="text-[9px] font-mono text-white/40">// This passkey is hashed locally using pbkdf2 prior to memory staging.</p>
+              </div>
+            </div>
+
+            <!-- Option C: Recipient Manifest List -->
+            <div class="space-y-3 pt-3 border-t border-white/5">
+              <label class="block text-xs font-mono font-bold text-white/70 uppercase tracking-wider flex items-center justify-between">
+                <span>Distribution Manifest</span>
+                <span class="text-white/40 font-mono text-[9px]">Optional</span>
+              </label>
+
+              <div class="flex gap-2">
+                <div class="relative flex-1">
+                  <i data-lucide="mail" class="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 w-3.5 h-3.5"></i>
+                  <input 
+                    type="email" 
+                    id="recipientInput" 
+                    placeholder="underwriting@prism.logic" 
+                    class="w-full bg-black/40 border border-white/10 rounded-lg py-2 pl-9 pr-3 text-xs text-white placeholder-white/20 focus:outline-none focus:border-prism-blue"
+                    onkeypress="if(event.key === 'Enter') addRecipient()"
+                  >
+                </div>
+                <button onclick="addRecipient()" class="px-3 rounded-lg bg-prism-blue/15 border border-prism-blue/30 text-prism-blue hover:bg-prism-blue/25 text-xs font-mono transition font-bold">
+                  ADD
+                </button>
+              </div>
+
+              <!-- Recipient Badges Grid -->
+              <div id="recipientBadges" class="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1 bg-black/20 rounded-lg border border-white/5">
+                <!-- Badges rendered via javascript -->
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Section 3: High-Voltage Transmission Deployer -->
+          <div class="space-y-3">
+            <button onclick="triggerDispatchHandshake()" id="dispatchBtn" class="w-full relative flex items-center justify-center space-x-2 bg-gradient-to-r from-prism-purple to-prism-blue hover:brightness-110 text-white font-bold uppercase tracking-widest py-4 px-6 rounded-2xl border border-white/10 transition-all font-mono shadow-xl shadow-prism-blue/10">
+              <i data-lucide="send" class="w-4 h-4 animate-pulse"></i>
+              <span>Compile Secure Package</span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Live Handshake Console Output Log & Result Window -->
+      <section id="handshakeResultSection" class="mt-8 transition-all duration-500 hidden opacity-0">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+          
+          <!-- Column A: Animated Process Terminal -->
+          <div class="lg:col-span-5 bg-black/90 p-5 rounded-2xl border border-white/10 font-mono text-xs text-white/80 space-y-4 flex flex-col justify-between">
+            <div class="flex justify-between items-center border-b border-white/5 pb-2">
+              <span class="text-[10px] text-prism-blue font-bold tracking-wider">// LOCAL_ENGINE_LOG</span>
+              <span class="w-2 h-2 rounded-full bg-prism-blue animate-pulse"></span>
+            </div>
+
+            <!-- Scrollable Terminal Block -->
+            <div id="terminalLog" class="space-y-2 h-44 overflow-y-auto text-[10px] text-white/60 scrollbar-thin">
+              <!-- Logs appended here -->
+            </div>
+
+            <!-- Small indicators -->
+            <div class="border-t border-white/5 pt-2 flex justify-between text-[9px] text-white/30">
+              <span>SHA-256 BUFFER INTEGRITY: OK</span>
+              <span>PRISM-LOGIC GATEWAY ROUTE: 10.82.11.2</span>
+            </div>
+          </div>
+
+          <!-- Column B: The Secured Dispatch Asset Package Card (Output Portal) -->
+          <div class="lg:col-span-7 prism-glass p-6 rounded-2xl border border-prism-green/30 relative overflow-hidden flex flex-col justify-between shadow-2xl">
+            <!-- Neon Accent Corner -->
+            <div class="absolute top-0 right-0 w-24 h-24 bg-prism-green/5 blur-xl pointer-events-none"></div>
+            
+            <div class="space-y-4">
+              <div class="flex justify-between items-start">
+                <div>
+                  <span class="text-[9px] font-mono tracking-widest text-prism-green uppercase font-semibold block">Secure Delivery Vault Prepared</span>
+                  <h3 class="text-xl font-black text-white uppercase tracking-tight">Active Transfer Portal</h3>
+                </div>
+                <div class="flex items-center space-x-1.5 bg-prism-green/10 border border-prism-green/20 text-prism-green text-[10px] px-2.5 py-1 rounded-full font-mono">
+                  <span class="w-1.5 h-1.5 rounded-full bg-prism-green status-pulse"></span>
+                  <span>ONLINE & SECURED</span>
+                </div>
+              </div>
+
+              <!-- Real Clipboard Copy Box -->
+              <div class="space-y-1.5">
+                <span class="text-[10px] font-mono text-white/40 uppercase block">Share Link URL</span>
+                <div class="relative">
+                  <input 
+                    type="text" 
+                    id="packageUrlInput" 
+                    readonly 
+                    value="https://prism.link/f/8f9a2b7c-de01-447a-9e22-6b3a0c4f8d22" 
+                    class="w-full bg-black/60 border border-prism-green/20 rounded-xl py-3 pl-4 pr-24 text-xs font-mono text-prism-green focus:outline-none"
+                  >
+                  <button 
+                    onclick="copyLinkToClipboard()" 
+                    class="absolute right-2 top-2 bg-prism-green/20 hover:bg-prism-green/30 text-prism-green border border-prism-green/30 rounded-lg px-3 py-1.5 text-xs font-mono transition"
+                  >
+                    COPY LINK
+                  </button>
+                </div>
+              </div>
+
+              <!-- Quick Meta Grid -->
+              <div class="grid grid-cols-3 gap-4 py-3.5 border-y border-white/5 font-mono text-xs">
+                <div>
+                  <span class="text-[10px] text-white/40 block">CONSOLIDATED FILES</span>
+                  <span id="resultFileCount" class="text-white font-bold">3 Files</span>
+                </div>
+                <div>
+                  <span class="text-[10px] text-white/40 block">EXPIRES AT</span>
+                  <span id="resultExpiryText" class="text-white font-bold">24 Hours (Manual Decay)</span>
+                </div>
+                <div>
+                  <span class="text-[10px] text-white/40 block">PASSPHRASE LOCK</span>
+                  <span id="resultPasswordStatus" class="text-prism-yellow font-bold">Enabled</span>
+                </div>
+              </div>
+
+              <!-- Embedded QR Code Mock & Downloader Quick-View -->
+              <div class="flex items-center space-x-4 bg-black/40 p-3 rounded-xl border border-white/5">
+                <!-- QR Mock SVG -->
+                <div class="w-12 h-12 bg-white flex items-center justify-center rounded p-1 shrink-0">
+                  <svg class="w-10 h-10 text-black" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M2 2h8v8H2V2zm2 2v4h4V4H4zm14-2h8v8h-8V2zm2 2v4h4V4h-4zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm14 0h4v2h-4v-2zm4 4h2v2h-2v-2zm-4 2h2v2h-2v-2zm0-4h2v2h-2v-2zm2-2h2v2h-2v-2zm2 2h2v2h-2v-2z"/>
+                  </svg>
+                </div>
+                <div>
+                  <span class="text-[10px] font-mono text-white/60 block">// TRANSFER KEY HASH</span>
+                  <span id="resultKeyHash" class="text-[9px] font-mono text-white/30 truncate block max-w-[280px]">e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</span>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- Detailed FAQ/Guide Accordion Drawers -->
+    <section id="faqSection" class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-12 border-t border-white/5 bg-prism-charcoal/20 hidden">
+      <div class="max-w-3xl mx-auto space-y-6">
+        <div class="text-center space-y-2">
+          <span class="text-[10px] font-mono tracking-widest text-prism-purple uppercase">System Specifications</span>
+          <h2 class="text-2xl font-black text-white uppercase tracking-tight font-mono">Transfer Operations Handbook</h2>
+          <p class="text-sm text-white/40">Zero-Knowledge multi-attachment dispatch parameters & network topography guidelines.</p>
+        </div>
+
+        <div class="space-y-4 font-sans">
+          <div class="p-5 prism-glass rounded-xl border border-white/5">
+            <h3 class="text-sm font-bold text-white mb-2 font-mono">// Why is there a 7-file boundary limit?</h3>
+            <p class="text-xs text-white/60 leading-relaxed">
+              Prism Logic distributes client-side data segments across exactly seven geometric memory vertices on the blockchain node stack. Allocating data vectors into exactly 7 slots stabilizes spectral entropy loops and permits client-side recovery.
+            </p>
+          </div>
+          <div class="p-5 prism-glass rounded-xl border border-white/5">
+            <h3 class="text-sm font-bold text-white mb-2 font-mono">// Is the cryptographic password shared with servers?</h3>
+            <p class="text-xs text-white/60 leading-relaxed">
+              No. Prism employs local zero-knowledge proofs. The encryption hash key binds to the URL fragment identifier (following the `#` token), which is physically withheld from servers in standard HTTP transmissions.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/5 py-8 bg-prism-black/95 text-xs font-mono relative z-20">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-white/40">
+        
+        <div class="flex items-center space-x-2">
+          <span class="text-white/80 font-bold tracking-widest">PRISM LOGIC</span>
+          <span>© <span id="currentYear"></span>. Zero-Knowledge Cryptographic Dispatch.</span>
+        </div>
+
+        <div class="flex items-center space-x-6 text-[11px]">
+          <a href="#" class="hover:text-prism-blue transition">DATA LICENSE</a>
+          <a href="#" class="hover:text-prism-red transition">TRANSFER API</a>
+          <a href="#" class="hover:text-prism-green transition">TERMS OF SHARDING</a>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <span class="w-2 h-2 rounded-full bg-prism-green status-pulse"></span>
+          <span class="text-[10px] uppercase">Nodes Active: Multiplex Connected</span>
+        </div>
+
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- STAGE FILE MODAL -->
+  <div id="stage-file-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
+    <div class="prism-glass max-w-md w-full rounded-2xl border border-prism-purple/30 overflow-hidden relative shadow-2xl">
+      
+      <!-- Top banner status line -->
+      <div class="h-1 bg-gradient-to-r from-prism-red via-prism-blue to-prism-green"></div>
+
+      <div class="p-6 space-y-6">
+        <div class="flex justify-between items-start">
+          <div>
+            <span class="text-[9px] font-mono tracking-widest text-prism-purple uppercase">Select Dispatch Specimen</span>
+            <h3 class="text-lg font-black text-white uppercase tracking-tight font-mono">Stage Memory Slot</h3>
+          </div>
+          <button onclick="closeModal('stage-file-modal')" class="p-1 rounded-lg bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10">
+            <i data-lucide="x" class="w-4.5 h-4.5"></i>
+          </button>
+        </div>
+
+        <!-- Hidden input for staging actual native files -->
+        <div class="space-y-4 text-xs font-sans">
+          
+          <!-- Method 1: Interactive Presets (Highly aesthetic for rapid flow) -->
+          <div class="space-y-2">
+            <span class="block text-white/50 uppercase font-mono text-[10px]">Method A: Deploy Prism Presets</span>
+            <div class="grid grid-cols-1 gap-2">
+              <button onclick="choosePreset('audit_matrices_q1.xlsx', '12.4 MB', 'spreadsheets')" class="flex items-center justify-between bg-white/5 hover:bg-white/10 text-white border border-white/5 rounded-lg p-3 text-left transition font-mono">
+                <span class="truncate block max-w-[240px]">audit_matrices_q1.xlsx</span>
+                <span class="text-prism-green text-[10px]">12.4 MB</span>
+              </button>
+              <button onclick="choosePreset('quantum_ledger_v2.db', '342.1 MB', 'database')" class="flex items-center justify-between bg-white/5 hover:bg-white/10 text-white border border-white/5 rounded-lg p-3 text-left transition font-mono">
+                <span class="truncate block max-w-[240px]">quantum_ledger_v2.db</span>
+                <span class="text-prism-red text-[10px]">342.1 MB</span>
+              </button>
+              <button onclick="choosePreset('spectral_refraction_manifest.dwg', '84.5 MB', 'vector')" class="flex items-center justify-between bg-white/5 hover:bg-white/10 text-white border border-white/5 rounded-lg p-3 text-left transition font-mono">
+                <span class="truncate block max-w-[240px]">spectral_refraction_manifest.dwg</span>
+                <span class="text-prism-blue text-[10px]">84.5 MB</span>
+              </button>
+              <button onclick="choosePreset('verification_key_hash_aes.pem', '1.2 KB', 'key')" class="flex items-center justify-between bg-white/5 hover:bg-white/10 text-white border border-white/5 rounded-lg p-3 text-left transition font-mono">
+                <span class="truncate block max-w-[240px]">verification_key_hash_aes.pem</span>
+                <span class="text-prism-yellow text-[10px]">1.2 KB</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="relative flex py-2 items-center">
+            <div class="flex-grow border-t border-white/5"></div>
+            <span class="flex-shrink mx-4 text-white/30 font-mono text-[9px]">OR</span>
+            <div class="flex-grow border-t border-white/5"></div>
+          </div>
+
+          <!-- Method 2: Native file attachment -->
+          <div class="space-y-2">
+            <span class="block text-white/50 uppercase font-mono text-[10px]">Method B: Direct Local Drive Payload</span>
+            <input 
+              type="file" 
+              id="nativeFileInput" 
+              onchange="handleNativeFileChange()"
+              class="w-full text-xs font-mono text-white/60 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-prism-purple/20 file:text-prism-purple file:border-prism-purple/30 file:border hover:file:bg-prism-purple/30 file:cursor-pointer"
+            >
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPLICATION DATA AND CORE SCRIPT LOGIC -->
+  <script>
+    // Max capacity slots strictly limited to 7 elements
+    const MAX_SLOTS = 7;
+    let currentTargetSlotIndex = null;
+
+    // Default staging payload structures representing files in memory slots
+    let slots = [
+      {
+        index: 0,
+        filename: "underwriting_ratios_california.xlsx",
+        size: "18.2 MB",
+        bytes: 18200000,
+        type: "spreadsheets",
+        active: true,
+        glowClass: "prism-glow-blue"
+      },
+      {
+        index: 1,
+        filename: "direct_lender_matrix_v3.pdf",
+        size: "4.8 MB",
+        bytes: 4800000,
+        type: "document",
+        active: true,
+        glowClass: "prism-glow-purple"
+      },
+      {
+        index: 2,
+        filename: "handshake_signature_nodes.crt",
+        size: "244 KB",
+        bytes: 244000,
+        type: "key",
+        active: true,
+        glowClass: "prism-glow-green"
+      },
+      {
+        index: 3,
+        filename: null,
+        size: null,
+        bytes: 0,
+        type: null,
+        active: false,
+        glowClass: "border-dashed"
+      },
+      {
+        index: 4,
+        filename: null,
+        size: null,
+        bytes: 0,
+        type: null,
+        active: false,
+        glowClass: "border-dashed"
+      },
+      {
+        index: 5,
+        filename: null,
+        size: null,
+        bytes: 0,
+        type: null,
+        active: false,
+        glowClass: "border-dashed"
+      },
+      {
+        index: 6,
+        filename: null,
+        size: null,
+        bytes: 0,
+        type: null,
+        active: false,
+        glowClass: "border-dashed"
+      }
+    ];
+
+    let recipients = ["compliance@prism-logic.net"];
+    let expirationHours = 24;
+    let expirationLabel = "24 Hours";
+
+    // Initialize Year in Footer
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+    // Trigger on startup
+    window.addEventListener('DOMContentLoaded', () => {
+      renderStagingMatrix();
+      renderRecipientManifest();
+      updateAggregateMetrics();
+    });
+
+    // Helper functions for formatting bytes
+    function formatBytes(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const dm = 1;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+
+    // Modal Operations
+    function openModal(id, targetSlot = null) {
+      if (targetSlot !== null) {
+        currentTargetSlotIndex = targetSlot;
+      }
+      const modal = document.getElementById(id);
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+      }, 50);
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      modal.classList.add('opacity-0');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 300);
+    }
+
+    // Modal choice responses
+    function choosePreset(name, size, type) {
+      if (currentTargetSlotIndex === null) return;
+      
+      let byteEstimate = 500000;
+      if (size.includes('MB')) byteEstimate = parseFloat(size) * 1000000;
+      if (size.includes('KB')) byteEstimate = parseFloat(size) * 1000;
+
+      slots[currentTargetSlotIndex] = {
+        index: currentTargetSlotIndex,
+        filename: name,
+        size: size,
+        bytes: byteEstimate,
+        type: type,
+        active: true,
+        glowClass: getRandomGlowClass()
+      };
+
+      closeModal('stage-file-modal');
+      renderStagingMatrix();
+      updateAggregateMetrics();
+    }
+
+    function handleNativeFileChange() {
+      const input = document.getElementById('nativeFileInput');
+      if (!input.files || input.files.length === 0 || currentTargetSlotIndex === null) return;
+
+      const file = input.files[0];
+      slots[currentTargetSlotIndex] = {
+        index: currentTargetSlotIndex,
+        filename: file.name,
+        size: formatBytes(file.size),
+        bytes: file.size,
+        type: getFileIconCategory(file.name),
+        active: true,
+        glowClass: getRandomGlowClass()
+      };
+
+      closeModal('stage-file-modal');
+      renderStagingMatrix();
+      updateAggregateMetrics();
+      input.value = ''; // Reset input element
+    }
+
+    function getRandomGlowClass() {
+      const glows = ["prism-glow-blue", "prism-glow-red", "prism-glow-green", "prism-glow-purple"];
+      return glows[Math.floor(Math.random() * glows.length)];
+    }
+
+    function getFileIconCategory(fname) {
+      const ext = fname.split('.').pop().toLowerCase();
+      if (['xlsx', 'xls', 'csv'].includes(ext)) return 'spreadsheets';
+      if (['pdf', 'doc', 'docx'].includes(ext)) return 'document';
+      if (['crt', 'pem', 'key'].includes(ext)) return 'key';
+      return 'vector';
+    }
+
+    // Erase Slot Payload
+    function clearSlot(index) {
+      slots[index] = {
+        index: index,
+        filename: null,
+        size: null,
+        bytes: 0,
+        type: null,
+        active: false,
+        glowClass: "border-dashed"
+      };
+      renderStagingMatrix();
+      updateAggregateMetrics();
+    }
+
+    // Set Expiration Rate
+    function setExpiry(hours, label) {
+      expirationHours = hours;
+      expirationLabel = label;
+      
+      // Update stats badge
+      document.getElementById('expiryBadge').textContent = `${label} Self-Destruct`;
+      document.getElementById('expiryStats').textContent = label.toUpperCase();
+
+      // Clear old active button borders
+      const hoursArray = [1, 12, 24, 168];
+      hoursArray.forEach(h => {
+        const btn = document.getElementById(`btn-exp-${h}`);
+        if (h === hours) {
+          btn.className = "py-2 rounded-lg bg-prism-red/25 border border-prism-red/50 text-white font-bold transition";
+        } else {
+          btn.className = "py-2 rounded-lg bg-black/40 border border-white/10 text-white/60 hover:text-white hover:border-white/30 transition";
+        }
+      });
+    }
+
+    // Dynamic Recipient Array Functions
+    function addRecipient() {
+      const input = document.getElementById('recipientInput');
+      const email = input.value.trim();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!email) return;
+      if (!emailRegex.test(email)) {
+        alert("Please format recipient as standard routing structure: e.g. nodes@prism.logic");
+        return;
+      }
+
+      if (!recipients.includes(email)) {
+        recipients.push(email);
+        renderRecipientManifest();
+      }
+      input.value = '';
+    }
+
+    function removeRecipient(email) {
+      recipients = recipients.filter(r => r !== email);
+      renderRecipientManifest();
+    }
+
+    function renderRecipientManifest() {
+      const container = document.getElementById('recipientBadges');
+      if (recipients.length === 0) {
+        container.innerHTML = `<span class="text-white/30 text-[9px] font-mono italic p-1.5">// No dispatch addresses selected. Dynamic link share only.</span>`;
+        return;
+      }
+
+      container.innerHTML = recipients.map(r => `
+        <span class="inline-flex items-center space-x-1.5 px-2 py-1 bg-white/5 hover:bg-white/10 text-white/80 rounded-lg text-[10px] font-mono border border-white/10">
+          <span>${r}</span>
+          <button onclick="removeRecipient('${r}')" class="text-white/40 hover:text-prism-red transition">
+            <i data-lucide="x" class="w-3 h-3"></i>
+          </button>
+        </span>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    // Password control field
+    function togglePasswordField() {
+      const container = document.getElementById('passwordFieldContainer');
+      const checkbox = document.getElementById('passwordToggle');
+      if (checkbox.checked) {
+        container.classList.remove('opacity-30', 'pointer-events-none');
+      } else {
+        container.classList.add('opacity-30', 'pointer-events-none');
+      }
+    }
+
+    function generateRandomPassword() {
+      const parts = ["ALPHA", "DELTA", "OMEGA", "KAPPA", "SPECTRAL", "MATRIX", "LOCK", "SHARD", "QUANTUM"];
+      const randomString = () => Math.floor(1000 + Math.random() * 9000);
+      const chosenWord = parts[Math.floor(Math.random() * parts.length)];
+      document.getElementById('passwordInput').value = `PRISM-${chosenWord}-${randomString()}`;
+    }
+
+    // Recalculate metrics
+    function updateAggregateMetrics() {
+      const activeSlots = slots.filter(s => s.active);
+      const totalBytes = activeSlots.reduce((sum, s) => sum + s.bytes, 0);
+
+      // Render top header metrics
+      document.getElementById('stagedStats').textContent = `${activeSlots.length} / ${MAX_SLOTS} FILES`;
+      document.getElementById('totalSizeStats').textContent = formatBytes(totalBytes);
+      document.getElementById('canvasStagedCount').textContent = `${activeSlots.length} ACTIVE`;
+    }
+
+    // Reset whole composer
+    function resetComposer() {
+      slots = slots.map((s, idx) => ({
+        index: idx,
+        filename: null,
+        size: null,
+        bytes: 0,
+        type: null,
+        active: false,
+        glowClass: "border-dashed"
+      }));
+
+      // Pre-add 1 simple demo payload so screen doesn't look absolutely barren
+      slots[0] = {
+        index: 0,
+        filename: "empty_refraction_manifest.json",
+        size: "45 KB",
+        bytes: 45000,
+        type: "vector",
+        active: true,
+        glowClass: "prism-glow-blue"
+      };
+
+      recipients = [];
+      setExpiry(24, '24 Hours');
+      document.getElementById('passwordToggle').checked = true;
+      togglePasswordField();
+      generateRandomPassword();
+
+      renderStagingMatrix();
+      renderRecipientManifest();
+      updateAggregateMetrics();
+
+      // Hide results frame
+      const section = document.getElementById('handshakeResultSection');
+      section.classList.add('hidden', 'opacity-0');
+    }
+
+    // Generate Staging Matrix Cards HTML
+    function renderStagingMatrix() {
+      const container = document.getElementById('stagingGrid');
+      
+      container.innerHTML = slots.map(s => {
+        if (!s.active) {
+          return `
+            <div 
+              onclick="openModal('stage-file-modal', ${s.index})"
+              class="border border-white/10 hover:border-prism-purple/50 bg-black/25 cursor-pointer p-4 rounded-xl flex flex-col justify-between h-[115px] group transition-all duration-300 relative border-dashed"
+            >
+              <div class="absolute top-2 right-2 text-[9px] font-mono text-white/20">SLOT 0${s.index + 1}</div>
+              <div class="flex items-center space-x-2.5">
+                <div class="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-prism-purple/15 flex items-center justify-center text-white/40 group-hover:text-prism-purple transition">
+                  <i data-lucide="plus" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <span class="text-[10px] font-mono text-white/40 block">STAGED PAYLOAD EMPTY</span>
+                  <span class="text-xs font-semibold text-white/70 tracking-tight group-hover:text-white transition">Deploy Storage Buffer</span>
+                </div>
+              </div>
+              <div class="text-[9px] font-mono text-white/30 mt-4 leading-none">// CLICK TO CONSOLIDATE MEMORY VERTEX</div>
+            </div>
+          `;
+        }
+
+        // Active State Card
+        let iconMarkup = '<i data-lucide="file-text" class="w-4 h-4 text-prism-blue"></i>';
+        if (s.type === 'spreadsheets') iconMarkup = '<i data-lucide="sheet" class="w-4 h-4 text-prism-green"></i>';
+        if (s.type === 'database') iconMarkup = '<i data-lucide="database" class="w-4 h-4 text-prism-red"></i>';
+        if (s.type === 'key') iconMarkup = '<i data-lucide="key" class="w-4 h-4 text-prism-yellow"></i>';
+
+        return `
+          <div class="prism-glass p-4 rounded-xl relative overflow-hidden flex flex-col justify-between h-[115px] transition-all duration-300 border border-white/10 shadow-lg ${s.glowClass}">
+            <div class="absolute top-2 right-2 text-[9px] font-mono text-white/40">SLOT 0${s.index + 1}</div>
+            
+            <div class="space-y-1 pr-6">
+              <div class="flex items-center space-x-2">
+                <span class="p-1 rounded bg-white/5 flex items-center justify-center">
+                  ${iconMarkup}
+                </span>
+                <span class="text-xs font-bold font-mono text-white truncate max-w-[170px]" title="${s.filename}">${s.filename}</span>
+              </div>
+              <span class="text-[9px] font-mono text-white/50 block">${s.size} // LATENCY SYNC PASS</span>
+            </div>
+
+            <div class="flex justify-between items-center mt-3 pt-2 border-t border-white/5">
+              <span class="text-[8px] font-mono text-prism-green uppercase font-semibold">Ready for payload sync</span>
+              
+              <button onclick="clearSlot(${s.index})" class="text-white/40 hover:text-prism-red transition p-1 rounded hover:bg-white/5">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    // Toggle FAQ Navigation section
+    function toggleFaq() {
+      const faq = document.getElementById('faqSection');
+      faq.classList.toggle('hidden');
+      if (!faq.classList.contains('hidden')) {
+        faq.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    // Handshake execution triggered by Dispatch
+    function triggerDispatchHandshake() {
+      const activeFiles = slots.filter(s => s.active);
+      if (activeFiles.length === 0) {
+        alert("Composer cannot compile package without at least 1 active staged file payload.");
+        return;
+      }
+
+      const terminal = document.getElementById('terminalLog');
+      const handshakeSection = document.getElementById('handshakeResultSection');
+      const passwordEnabled = document.getElementById('passwordToggle').checked;
+      const dispatchBtn = document.getElementById('dispatchBtn');
+
+      // Scroll to visual view first
+      handshakeSection.classList.remove('hidden');
+      setTimeout(() => {
+        handshakeSection.classList.remove('opacity-0');
+        handshakeSection.scrollIntoView({ behavior: 'smooth' });
+      }, 50);
+
+      // Reset Terminal
+      terminal.innerHTML = "";
+      dispatchBtn.disabled = true;
+      dispatchBtn.classList.add('opacity-50');
+
+      // Simulate output logs with timeouts
+      const logLines = [
+        "Initializing Prism secure buffer dispatch...",
+        "Searching for adjacent sharding vectors...",
+        `Located ${activeFiles.length} payloads with metadata headers.`,
+        "Encrypting sharded vectors via client-side AES-GCM-256...",
+        passwordEnabled ? "Embedding Argon2 passphrase wrapper: ACTIVE" : "Skip manual security lock: LINK READABLE BY ANY BEARER",
+        `Configuring decay timers: Target destruction in ${expirationHours} Hours.`,
+        recipients.length > 0 ? `Assembling manifest distribution target routing [${recipients.length} destinations]...` : "Distribution routing: Portal share URL only",
+        "Uploading cryptographic signatures to key rings...",
+        "Handshake completed! Dispersion core is active and operational."
+      ];
+
+      logLines.forEach((line, index) => {
+        setTimeout(() => {
+          const p = document.createElement('div');
+          p.className = index === logLines.length - 1 ? "text-prism-green font-bold animate-pulse" : "";
+          p.innerHTML = `<span class="text-white/30">[${new Date().toLocaleTimeString()}]</span> > ${line}`;
+          terminal.appendChild(p);
+          terminal.scrollTop = terminal.scrollHeight;
+
+          // If last line, release buttons and update cards
+          if (index === logLines.length - 1) {
+            dispatchBtn.disabled = false;
+            dispatchBtn.classList.remove('opacity-50');
+            finalizeResultCard();
+          }
+        }, index * 400);
+      });
+    }
+
+    // Fill outcome text card
+    function finalizeResultCard() {
+      const activeFiles = slots.filter(s => s.active);
+      const totalBytes = activeFiles.reduce((sum, s) => sum + s.bytes, 0);
+      const passwordEnabled = document.getElementById('passwordToggle').checked;
+      const pass = document.getElementById('passwordInput').value;
+
+      // Random UUID replacement for unique mock outputs
+      const rndPackageId = Array.from({length: 4}, () => Math.random().toString(16).substring(2, 6)).join('-');
+      document.getElementById('packageUrlInput').value = `https://prism.link/f/${rndPackageId}`;
+
+      document.getElementById('resultFileCount').textContent = `${activeFiles.length} Files (${formatBytes(totalBytes)})`;
+      document.getElementById('resultExpiryText').textContent = `${expirationLabel} (Decay Active)`;
+      document.getElementById('resultPasswordStatus').textContent = passwordEnabled ? `Enabled (${pass})` : "Disabled / Public";
+
+      // Mock dynamic encryption SHA-256 representation
+      const characters = '0123456789abcdef';
+      let hexMock = '';
+      for (let i = 0; i < 64; i++) {
+        hexMock += characters[Math.floor(Math.random() * 16)];
+      }
+      document.getElementById('resultKeyHash').textContent = hexMock;
+    }
+
+    function copyLinkToClipboard() {
+      const input = document.getElementById('packageUrlInput');
+      input.select();
+      input.setSelectionRange(0, 99999); // For mobile devices
+      navigator.clipboard.writeText(input.value);
+      alert("Portal link successfully cloned to clipboard. Forward with high classification clearance.");
+    }
+  </script>
+
+  <!-- QUANTUM SPECTRAL DISPERSION SIMULATOR -->
+  <script>
+    const canvas = document.getElementById('quantumDispersionCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Resize tracker
+    function resizeCanvas() {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Orbital parameters
+    let angleOffset = 0;
+    
+    // Interactive mouse trackers
+    let mouse = { x: canvas.width * 0.5, y: canvas.height * 0.5, isDragging: false, activeNode: null };
+    
+    // Nodes generated matching 7 attachments
+    const nodes = [];
+    for (let i = 0; i < MAX_SLOTS; i++) {
+      const angle = (i * Math.PI * 2) / MAX_SLOTS;
+      nodes.push({
+        id: i,
+        angle: angle,
+        baseRadius: 65,
+        radius: 65,
+        x: 0,
+        y: 0,
+        size: 5,
+        pulseOffset: Math.random() * Math.PI
+      });
+    }
+
+    // Intersect listeners
+    canvas.addEventListener('mousedown', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+
+      nodes.forEach(node => {
+        const dx = clickX - node.x;
+        const dy = clickY - node.y;
+        if (Math.sqrt(dx * dx + dy * dy) < 15) {
+          mouse.isDragging = true;
+          mouse.activeNode = node;
+        }
+      });
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const hoverX = e.clientX - rect.left;
+      const hoverY = e.clientY - rect.top;
+
+      if (mouse.isDragging && mouse.activeNode) {
+        // Drag active node relative offset
+        const cx = canvas.width * 0.5;
+        const cy = canvas.height * 0.5;
+        const dx = hoverX - cx;
+        const dy = hoverY - cy;
+        mouse.activeNode.radius = Math.min(Math.max(Math.sqrt(dx * dx + dy * dy), 30), 120);
+        mouse.activeNode.angle = Math.atan2(dy, dx) - angleOffset;
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      mouse.isDragging = false;
+      mouse.activeNode = null;
+    });
+
+    // Drawing Beam helper
+    function drawLaserLine(x1, y1, x2, y2, color, width = 1) {
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.stroke();
+    }
+
+    function renderQuantumMatrix() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Micro background coordinate grid text
+      ctx.fillStyle = "rgba(255,255,255,0.015)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const cx = canvas.width * 0.5;
+      const cy = canvas.height * 0.5;
+
+      angleOffset += 0.003;
+
+      // Draw structural matrix core
+      ctx.beginPath();
+      ctx.arc(cx, cy, 32, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255, 46, 147, 0.15)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Draw dynamic center refracting prism core
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - 14);
+      ctx.lineTo(cx - 12, cy + 8);
+      ctx.lineTo(cx + 12, cy + 8);
+      ctx.closePath();
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.7)';
+      ctx.fillStyle = 'rgba(0, 240, 255, 0.1)';
+      ctx.fill();
+      ctx.stroke();
+
+      // Plot nodes with dynamic connection matrices
+      nodes.forEach((node, idx) => {
+        const isStaged = slots[node.id] && slots[node.id].active;
+        const speedMultiplier = isStaged ? 2 : 0.5;
+        const currentAngle = node.angle + angleOffset;
+        
+        // Calculate coordinates
+        node.x = cx + Math.cos(currentAngle) * node.radius;
+        node.y = cy + Math.sin(currentAngle) * node.radius;
+
+        // Visual pulsers
+        const pulse = Math.sin(Date.now() * 0.004 * speedMultiplier + node.pulseOffset) * 2;
+        const dynamicSize = isStaged ? node.size + 2 + pulse : node.size + pulse * 0.5;
+
+        // Color coding depending on state
+        const laserColor = isStaged 
+          ? (idx % 2 === 0 ? 'rgba(0, 240, 255, 0.75)' : 'rgba(139, 92, 246, 0.75)') 
+          : 'rgba(255, 255, 255, 0.07)';
+
+        const nodeColor = isStaged 
+          ? (idx % 2 === 0 ? '#00f0ff' : '#8b5cf6') 
+          : 'rgba(255, 255, 255, 0.15)';
+
+        // Inner connectors: Lasers converging on core
+        drawLaserLine(cx, cy, node.x, node.y, laserColor, isStaged ? 1.5 : 0.5);
+
+        // Render orbits
+        ctx.beginPath();
+        ctx.arc(cx, cy, node.radius, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(255,255,255,0.012)';
+        ctx.stroke();
+
+        // Draw node entity
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, dynamicSize, 0, Math.PI * 2);
+        ctx.fillStyle = nodeColor;
+        ctx.fill();
+
+        // Node ID tag floating alongside
+        ctx.fillStyle = isStaged ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.2)';
+        ctx.font = '8px monospace';
+        ctx.fillText(`M-0${node.id + 1}`, node.x + 8, node.y + 3);
+      });
+
+      requestAnimationFrame(renderQuantumMatrix);
+    }
+
+    renderQuantumMatrix();
+  </script>
+</body>
+</html>
+```

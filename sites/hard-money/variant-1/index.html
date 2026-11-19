@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspace Matrix | Activity & Storage Dashboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            bg: '#07090e',
+                            card: '#0e131f',
+                            border: '#1e293b',
+                            accent: '#00f0ff',
+                            purple: '#bd00ff',
+                            emerald: '#05ffc4',
+                            glow: 'rgba(0, 240, 255, 0.15)'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Fira Code', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #07090e;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(189, 0, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 240, 255, 0.05) 0%, transparent 40%),
+                linear-gradient(rgba(255, 255, 255, 0.003) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.003) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+        }
+
+        /* Dynamic Edge Clip Paths & Visual Flourishes */
+        .edge-clip {
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+        }
+        
+        .edge-clip-reverse {
+            clip-path: polygon(12px 0, 100% 0, 100% 100%, 0 100%, 0 12px);
+        }
+
+        .edge-accent-line {
+            position: relative;
+        }
+        .edge-accent-line::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #00f0ff 0%, #bd00ff 100%);
+        }
+
+        /* Glassmorphism & Cyber glows */
+        .cyber-glow-hover:hover {
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.25);
+            border-color: #00f0ff;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #07090e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f0ff;
+        }
+
+        /* Custom range styling */
+        .slider-thumb-custom::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #00f0ff;
+            border: 2px solid #07090e;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px #00f0ff;
+            transition: all 0.2s ease;
+        }
+        .slider-thumb-custom::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 15px #00f0ff;
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen overflow-x-hidden antialiased selection:bg-cyber-accent selection:text-black">
+
+    <!-- TOP TELEMETRY STRIP -->
+    <div class="border-b border-cyber-border bg-black/60 backdrop-blur-md sticky top-0 z-50 transition-all duration-300">
+        <div class="max-w-[1400px] mx-auto px-4 py-2 flex items-center justify-between text-[11px] font-mono tracking-wider text-slate-400">
+            <div class="flex items-center gap-6">
+                <span class="flex items-center gap-1.5">
+                    <span class="h-2 w-2 rounded-full bg-cyber-emerald animate-ping"></span>
+                    <span class="text-cyber-emerald">SECURE PROTOCOL ACTIVE</span>
+                </span>
+                <span class="hidden md:inline">ENCRYPTED STORAGE: <strong id="topStorageCapacityText" class="text-slate-200">254.8 MB / 1.0 GB USED</strong></span>
+                <span class="hidden lg:inline">SUBMISSIONS PIPELINE: <strong class="text-slate-200">4 PACKETS ACTIVE</strong></span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="hidden sm:inline">INDEXED FILE SYSTEM: <strong class="text-cyber-accent" id="topFileCount">7 VERIFIED ELEMENTS</strong></span>
+                <div class="h-4 w-px bg-cyber-border"></div>
+                <button onclick="toggleCapacityForecaster()" class="flex items-center gap-1.5 hover:text-cyber-accent transition-colors duration-200">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    <span>ALLOCATION ESTIMATOR</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN HERO & BRAND HEADER -->
+    <header class="relative overflow-hidden pt-12 pb-8 border-b border-cyber-border/40">
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-cyber-bg pointer-events-none"></div>
+        <div class="max-w-[1400px] mx-auto px-4 relative z-10">
+            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+                <div>
+                    <!-- Cybernetic tag -->
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-cyber-purple/30 bg-cyber-purple/5 mb-4 text-xs font-mono text-cyber-purple uppercase tracking-widest">
+                        <span class="w-1.5 h-1.5 rounded-full bg-cyber-purple"></span>
+                        WORKSPACE METRICS DIRECTORY V4.1
+                    </div>
+                    <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight leading-none mb-4">
+                        DECENTRALIZED ARCHIVE <br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyber-accent via-blue-500 to-cyber-purple">
+                            WORKSPACE & REVIEWS
+                        </span>
+                    </h1>
+                    <p class="text-slate-400 text-sm md:text-base max-w-2xl font-light">
+                        Aggregate underwriter-grade file payloads, track review handshakes across lending institutions, pin active assets, and monitor decentralized file synchronization thresholds in real time.
+                    </p>
+                </div>
+                
+                <!-- Performance / Storage Status Module -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 w-full lg:max-w-md font-mono">
+                    <div class="bg-cyber-card border border-cyber-border p-3 rounded-lg edge-clip">
+                        <span class="block text-[10px] text-slate-500 uppercase">ACTIVE SUBMISSIONS</span>
+                        <span class="text-lg font-bold text-slate-200">4 Packets</span>
+                    </div>
+                    <div class="bg-cyber-card border border-cyber-border p-3 rounded-lg edge-clip">
+                        <span class="block text-[10px] text-slate-500 uppercase">AVG RESPONSE SPEED</span>
+                        <span class="text-lg font-bold text-cyber-emerald">1.8h</span>
+                    </div>
+                    <div class="bg-cyber-card border border-cyber-border p-3 rounded-lg edge-clip col-span-2 sm:col-span-1">
+                        <span class="block text-[10px] text-slate-500 uppercase">INTEGRITY LOCK</span>
+                        <span class="text-lg font-bold text-cyber-accent">SHA-256</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- CORE WORKSPACE CONTAINER -->
+    <main class="max-w-[1400px] mx-auto px-4 py-8">
+        
+        <!-- ROW 1: ACTIVE CONTROLS, INTAKE & SYSTEM METERS -->
+        <section class="mb-8 grid grid-cols-1 lg:grid-cols-4 gap-6 items-stretch">
+            
+            <!-- Storage Dashboard & Payload Ingester (3 Cols wide) -->
+            <div class="lg:col-span-3 bg-cyber-card border border-cyber-border p-6 rounded-xl relative overflow-hidden flex flex-col justify-between">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-cyber-accent/5 rounded-full filter blur-2xl pointer-events-none"></div>
+                
+                <div>
+                    <div class="flex items-center justify-between mb-6 pb-4 border-b border-cyber-border/40">
+                        <h3 class="font-mono text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                            <span class="w-1.5 h-3 bg-cyber-accent inline-block"></span>
+                            Decentralized Data Ingestion & Search
+                        </h3>
+                        <div class="flex items-center gap-4">
+                            <button onclick="triggerUploadModal()" class="text-xs bg-cyber-accent/10 border border-cyber-accent/30 text-cyber-accent hover:bg-cyber-accent/20 px-3 py-1 rounded font-mono transition-colors">
+                                + Ingest New Payload
+                            </button>
+                            <button onclick="resetSystemFilters()" class="text-xs text-slate-400 hover:text-cyber-accent flex items-center gap-1 transition-colors">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 12H16M16 5h5v5"></path></svg>
+                                Clear Search
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <!-- Query Input -->
+                        <div>
+                            <label class="block text-xs font-mono text-slate-400 uppercase mb-2">Search Decrypted Payloads</label>
+                            <div class="relative">
+                                <input id="fileSearchInput" type="text" oninput="applyFilters()" placeholder="e.g. Underwriting, Sponsor..." 
+                                    class="w-full bg-black/40 border border-cyber-border rounded-lg py-2 px-3 pl-9 text-sm text-slate-200 focus:outline-none focus:border-cyber-accent/80 transition-all duration-150">
+                                <svg class="absolute left-3 top-2.5 h-4 w-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- Asset Class Selector -->
+                        <div>
+                            <label class="block text-xs font-mono text-slate-400 uppercase mb-2">Workspace Segment</label>
+                            <select id="fileSegmentFilter" onchange="applyFilters()" class="w-full bg-black/40 border border-cyber-border rounded-lg py-2 px-3 text-sm text-slate-200 focus:outline-none focus:border-cyber-accent/80 transition-all duration-150">
+                                <option value="ALL">All Segments</option>
+                                <option value="underwriting">Underwriting Models</option>
+                                <option value="due_diligence">Due Diligence PDFs</option>
+                                <option value="legal">Legal & Deeds</option>
+                                <option value="media">Site Media / Assets</option>
+                            </select>
+                        </div>
+
+                        <!-- Review status -->
+                        <div>
+                            <label class="block text-xs font-mono text-slate-400 uppercase mb-2">Handshake Hand-Off Status</label>
+                            <select id="fileStatusFilter" onchange="applyFilters()" class="w-full bg-black/40 border border-cyber-border rounded-lg py-2 px-3 text-sm text-slate-200 focus:outline-none focus:border-cyber-accent/80 transition-all duration-150">
+                                <option value="ALL">All States</option>
+                                <option value="Approved">Verified (Approved)</option>
+                                <option value="Under Review">Active Analysis (Under Review)</option>
+                                <option value="Action Required">Flagged (Action Required)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Interactive Capacity Breakdown Slider Section -->
+                <div class="mt-6 pt-6 border-t border-cyber-border/40 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-mono text-slate-400 uppercase">Live Threshold Cutoff Filter</span>
+                            <span id="fileSizeLabel" class="text-sm font-mono text-cyber-accent font-bold">All Payload Sizes</span>
+                        </div>
+                        <input id="fileSizeSlider" type="range" min="1" max="250" step="5" value="250" 
+                            oninput="updateFileSizeSlider(this.value)" 
+                            class="w-full h-1 bg-cyber-border rounded-lg appearance-none cursor-pointer slider-thumb-custom">
+                        <div class="flex justify-between text-[10px] text-slate-500 font-mono mt-1">
+                            <span>1.0 MB Min</span>
+                            <span>125 MB</span>
+                            <span>250+ MB Payload</span>
+                        </div>
+                    </div>
+
+                    <!-- Current Storage Metrics Display -->
+                    <div class="flex flex-col justify-end">
+                        <div class="flex justify-between text-xs text-slate-400 mb-2 font-mono">
+                            <span>REMAINING SECTOR CAPACITY:</span>
+                            <strong class="text-cyber-emerald" id="storagePercentageLeft">74.5%</strong>
+                        </div>
+                        <div class="h-2 bg-slate-950 rounded-full overflow-hidden border border-cyber-border">
+                            <div id="storageBarElement" class="h-full bg-gradient-to-r from-cyber-purple via-blue-500 to-cyber-accent transition-all duration-500" style="width: 25.48%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Side Interactive Forecast Panel -->
+            <div id="forecasterPanel" class="bg-gradient-to-br from-cyber-card to-slate-950 border border-cyber-border/80 p-6 rounded-xl flex flex-col justify-between relative overflow-hidden transition-all duration-300">
+                <!-- Border accents -->
+                <div class="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-cyber-purple"></div>
+                <div class="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-cyber-purple"></div>
+                <div class="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-cyber-purple"></div>
+                <div class="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-cyber-purple"></div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-xs font-mono text-cyber-purple uppercase tracking-wider">PAYLOAD ESTIMATOR</span>
+                        <span class="h-2 w-2 rounded-full bg-cyber-purple animate-pulse"></span>
+                    </div>
+                    <h4 class="text-base font-bold text-slate-200 mb-4">Underwriting Sizer</h4>
+
+                    <!-- Dynamic Payload Sizer Inputs -->
+                    <div class="space-y-3 mb-4">
+                        <div>
+                            <label class="block text-[10px] font-mono text-slate-400 uppercase mb-1">Target Package Files</label>
+                            <input id="calcFileCount" type="number" value="5" oninput="recalculatePayloadSize()" 
+                                class="w-full bg-black/60 border border-cyber-border rounded py-1.5 px-2.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-cyber-purple">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-mono text-slate-400 uppercase mb-1">Estimated Avg File Size (MB)</label>
+                            <input id="calcAvgSize" type="number" step="0.5" value="12.5" oninput="recalculatePayloadSize()" 
+                                class="w-full bg-black/60 border border-cyber-border rounded py-1.5 px-2.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-cyber-purple">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Forecast live metrics output -->
+                <div class="bg-black/40 p-4 border border-cyber-border/60 rounded-lg">
+                    <div class="flex justify-between text-xs text-slate-400 mb-2">
+                        <span>Total Projected Package:</span>
+                        <strong id="outProjectedSize" class="font-mono text-slate-200">62.5 MB</strong>
+                    </div>
+                    <div class="flex justify-between text-xs text-slate-400 mb-2">
+                        <span>Est. Compiling Speed:</span>
+                        <strong id="outCompileSpeed" class="font-mono text-cyber-accent">1.2 Seconds</strong>
+                    </div>
+                    <div class="flex justify-between text-xs text-slate-400">
+                        <span>Sector Capacity Post-Upload:</span>
+                        <strong id="outProjectedCapacity" class="font-mono text-cyber-emerald">68.2%</strong>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ROW 2: FILTERS & BULK MULTI-REVIEW OPERATIONS -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+            <div class="flex items-center gap-3">
+                <span class="text-xs font-mono text-slate-500 uppercase">Workspace Index:</span>
+                <span id="resultsCountBadge" class="bg-cyber-purple/10 border border-cyber-purple/30 text-cyber-purple px-2.5 py-0.5 rounded text-xs font-mono">
+                    7 Payloads Mapped
+                </span>
+            </div>
+            
+            <!-- Quick Workspace Selector Badges -->
+            <div class="flex flex-wrap gap-2">
+                <button onclick="quickFilterSegment('ALL')" class="px-3 py-1 text-xs font-mono rounded-md border border-cyber-border bg-cyber-card text-slate-400 hover:border-cyber-accent transition-all duration-200">
+                    ALL REGISTERS
+                </button>
+                <button onclick="quickFilterSegment('underwriting')" class="px-3 py-1 text-xs font-mono rounded-md border border-cyber-border bg-cyber-card text-slate-400 hover:border-cyber-accent transition-all duration-200">
+                    UNDERWRITING MODELS
+                </button>
+                <button onclick="quickFilterSegment('due_diligence')" class="px-3 py-1 text-xs font-mono rounded-md border border-cyber-border bg-cyber-card text-slate-400 hover:border-cyber-accent transition-all duration-200">
+                    DUE DILIGENCE
+                </button>
+                <button onclick="quickFilterSegment('legal')" class="px-3 py-1 text-xs font-mono rounded-md border border-cyber-border bg-cyber-card text-slate-400 hover:border-cyber-accent transition-all duration-200">
+                    LEGAL RECORDS
+                </button>
+            </div>
+        </div>
+
+        <!-- ROW 3: DETAILED FILE & PIPELINE GRID -->
+        <section class="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
+            
+            <!-- LEFT & CENTER: ACTIVE PAYLOAD REGISTRY TABLE (2 Cols Wide on Large, Full on Smaller) -->
+            <div class="xl:col-span-2 space-y-4">
+                <div class="bg-cyber-card border border-cyber-border rounded-xl overflow-hidden">
+                    <div class="p-5 border-b border-cyber-border/40 bg-black/30 flex justify-between items-center">
+                        <div class="flex items-center gap-2">
+                            <span class="w-1.5 h-3 bg-cyber-accent"></span>
+                            <h3 class="font-mono text-xs font-bold uppercase tracking-wider text-slate-300">Target File Registries</h3>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-slate-500 font-mono">Select Files to Compile Package Submission</span>
+                        </div>
+                    </div>
+
+                    <!-- Files Table container -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="border-b border-cyber-border text-slate-500 font-mono text-[10px] uppercase bg-black/10">
+                                    <th class="py-3 px-4 w-12 text-center">Compile</th>
+                                    <th class="py-3 px-4">Payload Name</th>
+                                    <th class="py-3 px-4">Workspace Category</th>
+                                    <th class="py-3 px-4">File Size</th>
+                                    <th class="py-3 px-4">Sync Status</th>
+                                    <th class="py-3 px-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fileRegistryTableBody" class="divide-y divide-cyber-border/40 font-mono">
+                                <!-- Rendered dynamically by javascript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: ACTIVE HANDSHAKE REVIEW STATIONS & PINNED PACKETS -->
+            <div class="space-y-6">
+                <!-- Submission reviews tracker -->
+                <div class="bg-cyber-card border border-cyber-border p-5 rounded-xl relative edge-clip">
+                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-cyber-border/40">
+                        <div class="flex items-center gap-2">
+                            <span class="w-1.5 h-3 bg-cyber-emerald"></span>
+                            <h4 class="text-xs font-bold font-mono uppercase tracking-wider text-slate-300">Multi-File Handshakes</h4>
+                        </div>
+                        <span class="text-[10px] font-mono text-cyber-emerald animate-pulse">4 CHANNELS</span>
+                    </div>
+
+                    <div class="space-y-3" id="reviewStationsList">
+                        <!-- Instantiated Dynamically via JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Pinned projects list / reference metrics -->
+                <div class="bg-cyber-card border border-cyber-border p-5 rounded-xl relative edge-clip-reverse">
+                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-cyber-border/40">
+                        <div class="flex items-center gap-2">
+                            <span class="w-1.5 h-3 bg-cyber-purple"></span>
+                            <h4 class="text-xs font-bold font-mono uppercase tracking-wider text-slate-300">Pinned Asset Classes</h4>
+                        </div>
+                        <span class="text-[10px] font-mono text-cyber-purple">STATIC MAP</span>
+                    </div>
+
+                    <div class="space-y-2 text-xs font-mono text-slate-400">
+                        <div class="p-2 bg-black/40 border border-cyber-border rounded hover:border-cyber-purple/50 transition-colors flex justify-between items-center">
+                            <span>Apex SFR Portfolio (CA)</span>
+                            <span class="text-cyber-accent font-bold">12 Elements</span>
+                        </div>
+                        <div class="p-2 bg-black/40 border border-cyber-border rounded hover:border-cyber-purple/50 transition-colors flex justify-between items-center">
+                            <span>Commercial Plaza (FL)</span>
+                            <span class="text-cyber-emerald font-bold">4 Elements</span>
+                        </div>
+                        <div class="p-2 bg-black/40 border border-cyber-border rounded hover:border-cyber-purple/50 transition-colors flex justify-between items-center">
+                            <span>Raw Development Land (TX)</span>
+                            <span class="text-slate-500">Empty Register</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- FLOATING MULTI-FILE COMPILER COMPARE BAR -->
+    <div id="compilerCompareBar" class="fixed bottom-0 left-0 right-0 bg-black/95 border-t border-cyber-accent/40 translate-y-full transition-transform duration-300 z-40 backdrop-blur-md">
+        <div class="max-w-[1400px] mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <span class="h-2 w-2 rounded-full bg-cyber-accent animate-ping"></span>
+                <p class="text-sm font-mono text-slate-200">
+                    Active Multi-File Compilation Buffer: <span id="compilerCompareCount" class="text-cyber-accent font-bold">0 Items Selected</span>
+                </p>
+            </div>
+            <div class="flex gap-4">
+                <button onclick="clearCompilerCompare()" class="text-xs font-mono text-slate-400 hover:text-white transition-colors">
+                    Reset Queue
+                </button>
+                <button onclick="triggerCompileModal()" class="edge-clip bg-cyber-accent hover:bg-cyan-400 text-black px-5 py-2 text-xs font-bold uppercase transition-all">
+                    Compile Handshake Package
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- COMPILE MODAL DIALOG -->
+    <div id="compileModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-cyber-card border border-cyber-accent w-full max-w-4xl p-6 rounded-xl edge-clip relative max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6 pb-4 border-b border-cyber-border">
+                <h3 class="font-mono text-lg text-cyber-accent uppercase flex items-center gap-2">
+                    <span class="w-1.5 h-4 bg-cyber-accent inline-block"></span>
+                    Underwriter Handshake Package Compiler
+                </h3>
+                <button onclick="closeCompileModal()" class="text-slate-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Left Hand Details compilation info -->
+                <div class="md:col-span-1 bg-black/60 border border-cyber-border p-4 rounded-lg">
+                    <span class="text-[10px] font-mono text-cyber-purple uppercase">SUBMISSION TARGET</span>
+                    <h4 class="text-base font-bold text-white mt-1 mb-4">Underwriting Handshake System</h4>
+                    
+                    <form id="handshakeTargetForm" onsubmit="handleHandshakeSubmission(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-[10px] font-mono text-slate-400 uppercase mb-1">Destination Lender / Institution</label>
+                            <input required type="text" id="targetLender" placeholder="e.g. Apex Velocity Capital" class="w-full bg-black/60 border border-cyber-border rounded px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyber-purple">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-mono text-slate-400 uppercase mb-1">Target Project Title</label>
+                            <input required type="text" id="targetProject" placeholder="e.g. Apex Multifamily Phase 1" class="w-full bg-black/60 border border-cyber-border rounded px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyber-purple">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-mono text-slate-400 uppercase mb-1">Secured Transmission Handshake Note</label>
+                            <textarea id="targetNotes" rows="3" placeholder="Identify package sensitivity details..." class="w-full bg-black/60 border border-cyber-border rounded px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyber-purple"></textarea>
+                        </div>
+                        <button type="submit" class="w-full py-2 bg-gradient-to-r from-cyber-purple to-pink-600 hover:from-purple-600 hover:to-pink-500 text-white font-bold text-xs font-mono uppercase edge-clip tracking-wider">
+                            Handshake Final Package
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Right Hand Columns mapping selected files inside package -->
+                <div class="md:col-span-2">
+                    <h4 class="text-sm font-mono text-slate-300 mb-2">Payload Packets Queued in Compilation Pipeline:</h4>
+                    <div class="space-y-3 max-h-[300px] overflow-y-auto pr-2" id="compileSelectedFilesContent">
+                        <!-- Instantiated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-cyber-border flex justify-between items-center">
+                <p class="text-[10px] font-mono text-slate-500">Ready to route packages into decrypted handshake nodes.</p>
+                <button onclick="closeCompileModal()" class="border border-cyber-border text-slate-300 hover:border-cyber-accent hover:text-cyber-accent px-6 py-2 text-sm font-mono rounded transition-colors">
+                    Close Compiler Panel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOCK PAYLOAD DETAILS VIEW MODAL -->
+    <div id="detailsModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-[#0e131f] border border-cyber-purple/60 w-full max-w-2xl p-6 rounded-xl relative edge-clip-reverse">
+            <!-- Tech design element -->
+            <div class="absolute top-0 right-12 w-16 h-1 bg-gradient-to-r from-cyber-accent to-cyber-purple"></div>
+            
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h3 id="modalFileName" class="text-2xl font-bold text-slate-100">File Registry Entry</h3>
+                    <p id="modalFileHash" class="text-xs font-mono text-cyber-accent">SHA-256: Hash Generating...</p>
+                </div>
+                <button onclick="closeDetailsModal()" class="text-slate-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Program highlights inside program -->
+            <div class="grid grid-cols-3 gap-3 bg-black/40 p-3 rounded-lg border border-cyber-border mb-6 font-mono">
+                <div>
+                    <span class="block text-[10px] text-slate-500">PAYLOAD SIZE</span>
+                    <span id="modalFileSize" class="text-sm font-bold text-slate-200">24.5 MB</span>
+                </div>
+                <div>
+                    <span class="block text-[10px] text-slate-500">HANDSHAKE STATE</span>
+                    <span id="modalFileStatus" class="text-sm font-bold text-cyber-emerald">Approved</span>
+                </div>
+                <div>
+                    <span class="block text-[10px] text-slate-500">WORKSPACE ORIGIN</span>
+                    <span id="modalFileCategory" class="text-sm font-bold text-cyber-accent">Underwriting</span>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <h4 class="text-xs font-mono text-slate-400 uppercase mb-1">Payload Audit Trail</h4>
+                    <p id="modalFileDesc" class="text-sm text-slate-300 font-light leading-relaxed">
+                        No description audit metadata has been generated for this payload package. Let's populate details...
+                    </p>
+                </div>
+                
+                <div class="flex items-center gap-2 text-xs font-mono text-slate-500 border-t border-cyber-border/40 pt-4">
+                    <svg class="w-4 h-4 text-cyber-emerald" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    <span>Checksum matched with absolute decentralized workspace index state.</span>
+                </div>
+
+                <div class="flex justify-between items-center pt-2">
+                    <button type="button" onclick="closeDetailsModal()" class="text-xs font-mono text-slate-400 hover:text-white">Exit Details Inspector</button>
+                    <button onclick="downloadFilePayload()" class="bg-gradient-to-r from-cyber-purple to-pink-600 hover:from-purple-600 hover:to-pink-500 text-white font-bold px-6 py-2.5 rounded text-xs font-mono uppercase edge-clip tracking-wider">
+                        Decrypted Download Node
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOCK INGEST FILE MODAL (Add File Form) -->
+    <div id="ingestModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-[#0e131f] border border-cyber-accent/60 w-full max-w-lg p-6 rounded-xl relative edge-clip">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h3 class="text-xl font-bold text-slate-100 uppercase font-mono">Workspace Payload Ingestion</h3>
+                    <p class="text-xs font-mono text-cyber-accent">Insert mock files to index live metrics</p>
+                </div>
+                <button onclick="closeIngestModal()" class="text-slate-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <form id="ingestPayloadForm" onsubmit="handleIngestPayloadSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-mono text-slate-400 uppercase mb-1">Payload Title / Filename</label>
+                    <input required type="text" id="ingestFileName" placeholder="e.g. Apex_Phase1_SponsorSummary.pdf" class="w-full bg-black/60 border border-cyber-border rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyber-accent">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-mono text-slate-400 uppercase mb-1">Category Segment</label>
+                        <select id="ingestFileCategory" class="w-full bg-black/60 border border-cyber-border rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyber-accent">
+                            <option value="underwriting">Underwriting Models</option>
+                            <option value="due_diligence">Due Diligence PDFs</option>
+                            <option value="legal">Legal & Deeds</option>
+                            <option value="media">Site Media / Assets</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-mono text-slate-400 uppercase mb-1">Payload Size (MB)</label>
+                        <input required type="number" id="ingestFileSize" value="12" step="0.1" class="w-full bg-black/60 border border-cyber-border rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyber-accent">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-mono text-slate-400 uppercase mb-1">Payload System Status State</label>
+                    <select id="ingestFileStatus" class="w-full bg-black/60 border border-cyber-border rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyber-accent">
+                        <option value="Under Review">Active Analysis (Under Review)</option>
+                        <option value="Approved">Verified (Approved)</option>
+                        <option value="Action Required">Flagged (Action Required)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-mono text-slate-400 uppercase mb-1">Description / Audit Metadata Note</label>
+                    <textarea rows="3" id="ingestFileDesc" placeholder="Describe the physical asset underpinnings or review status conditions..." class="w-full bg-black/60 border border-cyber-border rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyber-accent"></textarea>
+                </div>
+                <div class="flex justify-between items-center pt-2">
+                    <button type="button" onclick="closeIngestModal()" class="text-xs font-mono text-slate-400 hover:text-white">Discard Entry</button>
+                    <button type="submit" class="bg-gradient-to-r from-cyber-accent to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black font-bold px-6 py-2.5 rounded text-xs font-mono uppercase edge-clip tracking-wider">
+                        Inject File Payload
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCRIPT LOGIC -->
+    <script>
+        // DECENTRALIZED RECENT FILE DATABASE
+        let filesDatabase = [
+            {
+                id: 1,
+                name: "Apex_Executive_Summary_v2.pdf",
+                category: "due_diligence",
+                sizeMB: 12.4,
+                status: "Under Review",
+                hash: "a4f89d31d9237ecf01bc4906f2e861d84988029fb13aef19f939e8ab9d0124fe",
+                desc: "High-level underwriting and summary packet for the Phase 1 Pacific Rim acquisition portfolio. Awaiting principal counterparty validation."
+            },
+            {
+                id: 2,
+                name: "Emberstone_Sponsor_Track_Record.pdf",
+                category: "due_diligence",
+                sizeMB: 4.8,
+                status: "Approved",
+                hash: "e29e92cf1a02fb101daefec9137baefcc01dcbaef193f0b938f081734918f09d",
+                desc: "Audited multi-year performance parameters confirming operational capabilities of Emberstone Capital group."
+            },
+            {
+                id: 3,
+                name: "Fortress_Commercial_Underwriting_v4.xlsx",
+                category: "underwriting",
+                sizeMB: 45.2,
+                status: "Approved",
+                hash: "f3c872d8a4e321bf2300bcfde03164fe0d12e98fa01bcda90c8abff7a01cd203",
+                desc: "Dynamic debt optimization structures and macro scenario simulations compiled on balance sheet performance variables."
+            },
+            {
+                id: 4,
+                name: "Keystone_Site_Media_Drone_Compilation.zip",
+                category: "media",
+                sizeMB: 180.5,
+                status: "Action Required",
+                hash: "bc490c01a73bd2fe09d31a1bcda8eef9a721345ef01a89cde930129bcfe14371",
+                desc: "Warning: High volume zip package. High density site media mapping non-stabilized elements in Keystones conversion zones."
+            },
+            {
+                id: 5,
+                name: "Deed_Security_Escrow_Vanguard.docx",
+                category: "legal",
+                sizeMB: 3.5,
+                status: "Under Review",
+                hash: "d41289fe93ba47ef012cbfe01da984efcde92bcfa12a7bf89d02fc4e30aefdc9",
+                desc: "Legally compliant operational escrow parameters and mortgage notes mapping the primary Texas/AZ locations."
+            },
+            {
+                id: 6,
+                name: "Sovereign_Construction_Takeout_Calculators.xlsx",
+                category: "underwriting",
+                sizeMB: 8.4,
+                status: "Approved",
+                hash: "01fca34ed2029bf3c8eafe01dc823da719cb0faef38bfa9319803bfcd10d9fa3",
+                desc: "Pro forma construction parameters matching long term debt structures for prime regional centers."
+            },
+            {
+                id: 7,
+                name: "Pacific_Rim_Zoning_Verification_Deed.pdf",
+                category: "legal",
+                sizeMB: 2.1,
+                status: "Under Review",
+                hash: "2e9facd83ba01ef9ac3bfcd9a239bfae8d721bcfa29ef8a098cbef2c7a38fe41",
+                desc: "Certified zoning permissions issued by local California authorities allowing high-density developments to initiate."
+            }
+        ];
+
+        // MOCK MULTI-FILE PIPELINE HANDSHAKES
+        let handshakesDatabase = [
+            {
+                id: 101,
+                targetLender: "Apex Velocity Capital",
+                projectTitle: "Multifamily Phase 1",
+                status: "Active Handshake",
+                lastActive: "12 Minutes Ago",
+                iconColor: "text-cyber-accent",
+                filesCompiled: [1, 7]
+            },
+            {
+                id: 102,
+                targetLender: "Fortress Commercial Trust",
+                projectTitle: "Sponsor Verification Run",
+                status: "Completed Review",
+                lastActive: "1.5 Hours Ago",
+                iconColor: "text-cyber-emerald",
+                filesCompiled: [2, 3]
+            },
+            {
+                id: 103,
+                targetLender: "Vanguard Land Alliance",
+                projectTitle: "Escrow Secure Transfer",
+                status: "Awaiting Action",
+                lastActive: "2 Days Ago",
+                iconColor: "text-cyber-purple",
+                filesCompiled: [5]
+            },
+            {
+                id: 104,
+                targetLender: "Keystone Bridge Fund",
+                projectTitle: "Media Pipeline Payload",
+                status: "Flagged Transfer",
+                lastActive: "4 Hours Ago",
+                iconColor: "text-rose-500",
+                filesCompiled: [4]
+            }
+        ];
+
+        // System Configuration Map
+        const CATEGORIES_MAPPING = {
+            underwriting: "Underwriting Models",
+            due_diligence: "Due Diligence PDFs",
+            legal: "Legal & Deeds",
+            media: "Site Media / Assets"
+        };
+
+        // Live States Tracker
+        let activeFilters = {
+            searchQuery: "",
+            segment: "ALL",
+            status: "ALL",
+            maxSizeMB: 250
+        };
+
+        let compilerCompareList = [];
+
+        // App Initializations
+        document.addEventListener("DOMContentLoaded", () => {
+            renderFileRegistry();
+            renderHandshakePipelines();
+            recalculatePayloadSize();
+            updateWorkspaceCapacityMetrics();
+        });
+
+        // Search & Filter Operations
+        function applyFilters() {
+            activeFilters.searchQuery = document.getElementById("fileSearchInput").value.toLowerCase();
+            activeFilters.segment = document.getElementById("fileSegmentFilter").value;
+            activeFilters.status = document.getElementById("fileStatusFilter").value;
+            renderFileRegistry();
+        }
+
+        function quickFilterSegment(segment) {
+            document.getElementById("fileSegmentFilter").value = segment;
+            applyFilters();
+        }
+
+        function updateFileSizeSlider(value) {
+            activeFilters.maxSizeMB = parseInt(value);
+            document.getElementById("fileSizeLabel").innerText = value >= 250 ? "All Payload Sizes" : `Under ${value} MB`;
+            renderFileRegistry();
+        }
+
+        function resetSystemFilters() {
+            document.getElementById("fileSearchInput").value = "";
+            document.getElementById("fileSegmentFilter").value = "ALL";
+            document.getElementById("fileStatusFilter").value = "ALL";
+            
+            document.getElementById("fileSizeSlider").value = 250;
+            document.getElementById("fileSizeLabel").innerText = "All Payload Sizes";
+            activeFilters.maxSizeMB = 250;
+
+            applyFilters();
+        }
+
+        // Global Capacity Calculations
+        function updateWorkspaceCapacityMetrics() {
+            const totalUsed = filesDatabase.reduce((acc, file) => acc + file.sizeMB, 0);
+            const totalCap = 1000; // 1 GB Max
+            const percentageUsed = (totalUsed / totalCap) * 100;
+
+            document.getElementById("topStorageCapacityText").innerText = `${totalUsed.toFixed(1)} MB / 1.0 GB USED`;
+            document.getElementById("storagePercentageLeft").innerText = `${(100 - percentageUsed).toFixed(1)}%`;
+            document.getElementById("storageBarElement").style.width = `${percentageUsed}%`;
+            document.getElementById("topFileCount").innerText = `${filesDatabase.length} VERIFIED ELEMENTS`;
+        }
+
+        // Table Render Logic
+        function renderFileRegistry() {
+            const tableBody = document.getElementById("fileRegistryTableBody");
+            tableBody.innerHTML = "";
+
+            const filteredFiles = filesDatabase.filter(file => {
+                const matchesSearch = file.name.toLowerCase().includes(activeFilters.searchQuery) || file.desc.toLowerCase().includes(activeFilters.searchQuery);
+                const matchesSegment = activeFilters.segment === "ALL" || file.category === activeFilters.segment;
+                const matchesStatus = activeFilters.status === "ALL" || file.status === activeFilters.status;
+                const matchesSize = file.sizeMB <= activeFilters.maxSizeMB;
+
+                return matchesSearch && matchesSegment && matchesStatus && matchesSize;
+            });
+
+            // Update Count Badge
+            document.getElementById("resultsCountBadge").innerText = `${filteredFiles.length} Payload${filteredFiles.length !== 1 ? 's' : ''} Mapped`;
+
+            if (filteredFiles.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="py-12 text-center text-slate-500 font-mono border-t border-cyber-border/40">
+                            0 WORKSPACE ELEMENTS DETECTED IN SELECTED PARAMETERS
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            filteredFiles.forEach(file => {
+                const row = document.createElement("tr");
+                row.className = "hover:bg-slate-900/40 border-b border-cyber-border/20 transition-all duration-150";
+
+                // Map category styling colors
+                let categoryLabel = CATEGORIES_MAPPING[file.category] || file.category;
+                
+                // Status mapping color tags
+                let statusBadge = "";
+                if (file.status === "Approved") {
+                    statusBadge = `<span class="bg-cyber-emerald/10 border border-cyber-emerald/30 text-cyber-emerald px-2 py-0.5 rounded text-[10px]">VERIFIED</span>`;
+                } else if (file.status === "Under Review") {
+                    statusBadge = `<span class="bg-cyber-accent/10 border border-cyber-accent/30 text-cyber-accent px-2 py-0.5 rounded text-[10px]">UNDER REVIEW</span>`;
+                } else {
+                    statusBadge = `<span class="bg-rose-500/10 border border-rose-500/30 text-rose-500 px-2 py-0.5 rounded text-[10px]">FLAGGED</span>`;
+                }
+
+                const isChecked = compilerCompareList.includes(file.id) ? 'checked' : '';
+
+                row.innerHTML = `
+                    <td class="py-3 px-4 text-center">
+                        <input type="checkbox" onchange="toggleCompilerQueue(${file.id}, this.checked)" ${isChecked} class="rounded border-cyber-border bg-black text-cyber-accent focus:ring-0 cursor-pointer">
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="flex flex-col">
+                            <span class="text-slate-200 font-semibold text-xs truncate max-w-[200px] hover:text-cyber-accent cursor-pointer" onclick="openDetailsModal(${file.id})">${file.name}</span>
+                            <span class="text-[9px] text-slate-500 font-mono truncate max-w-[150px]">${file.hash}</span>
+                        </div>
+                    </td>
+                    <td class="py-3 px-4 text-slate-400 font-mono text-[11px]">
+                        ${categoryLabel}
+                    </td>
+                    <td class="py-3 px-4 font-bold text-slate-300">
+                        ${file.sizeMB.toFixed(1)} MB
+                    </td>
+                    <td class="py-3 px-4">
+                        ${statusBadge}
+                    </td>
+                    <td class="py-3 px-4 text-right">
+                        <div class="flex items-center justify-end gap-3 font-mono">
+                            <button onclick="openDetailsModal(${file.id})" class="text-[11px] text-cyber-accent hover:text-white transition-colors">Inspect</button>
+                            <span class="text-slate-700">|</span>
+                            <button onclick="deletePayloadItem(${file.id})" class="text-[11px] text-rose-500 hover:text-rose-400 transition-colors">Purge</button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Render Handshaking Reviews Status right col
+        function renderHandshakePipelines() {
+            const list = document.getElementById("reviewStationsList");
+            list.innerHTML = "";
+
+            handshakesDatabase.forEach(h => {
+                const totalPackageSize = h.filesCompiled.reduce((acc, fileId) => {
+                    const matchedFile = filesDatabase.find(f => f.id === fileId);
+                    return acc + (matchedFile ? matchedFile.sizeMB : 0);
+                }, 0);
+
+                const div = document.createElement("div");
+                div.className = "bg-black/40 border border-cyber-border p-3.5 rounded hover:border-cyber-accent/40 transition-all duration-200 flex flex-col justify-between";
+                
+                div.innerHTML = `
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <span class="text-[9px] font-mono text-slate-500 block uppercase">TARGET HANDSHAKE DECK</span>
+                            <h5 class="text-xs font-bold text-slate-200 font-mono">${h.targetLender}</h5>
+                            <span class="text-[10px] text-slate-400 italic">${h.projectTitle}</span>
+                        </div>
+                        <span class="h-2 w-2 rounded-full bg-cyber-accent ${h.status === 'Active Handshake' ? 'animate-ping' : ''}"></span>
+                    </div>
+
+                    <div class="mt-3 pt-3 border-t border-cyber-border/20 flex justify-between items-center text-[10px] font-mono">
+                        <div>
+                            <span class="text-slate-500 block uppercase">PACKAGE WEIGHT</span>
+                            <strong class="text-slate-300">${totalPackageSize.toFixed(1)} MB (${h.filesCompiled.length} files)</strong>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-slate-500 block uppercase">LAST METRIC</span>
+                            <strong class="${h.iconColor}">${h.lastActive}</strong>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        // Live Ingester Calculations
+        function recalculatePayloadSize() {
+            const fileCount = parseFloat(document.getElementById("calcFileCount").value) || 0;
+            const avgSize = parseFloat(document.getElementById("calcAvgSize").value) || 0;
+
+            const totalProjected = fileCount * avgSize;
+            const compileSpeedSeconds = fileCount * 0.24; // Static average factor
+
+            const totalUsed = filesDatabase.reduce((acc, file) => acc + file.sizeMB, 0);
+            const totalCap = 1000;
+            const futurePercentage = ((totalCap - (totalUsed + totalProjected)) / totalCap) * 100;
+
+            document.getElementById("outProjectedSize").innerText = `${totalProjected.toFixed(1)} MB`;
+            document.getElementById("outCompileSpeed").innerText = `${compileSpeedSeconds.toFixed(1)} Seconds`;
+            document.getElementById("outProjectedCapacity").innerText = `${futurePercentage.toFixed(1)}%`;
+        }
+
+        // Compiler Buffers & compare selectors
+        function toggleCompilerQueue(fileId, isChecked) {
+            if (isChecked) {
+                if (!compilerCompareList.includes(fileId)) {
+                    compilerCompareList.push(fileId);
+                }
+            } else {
+                compilerCompareList = compilerCompareList.filter(id => id !== fileId);
+            }
+            updateCompareCompilerBar();
+        }
+
+        function updateCompareCompilerBar() {
+            const bar = document.getElementById("compilerCompareBar");
+            const count = document.getElementById("compilerCompareCount");
+
+            if (compilerCompareList.length > 0) {
+                bar.classList.remove("translate-y-full");
+                count.innerText = `${compilerCompareList.length} File${compilerCompareList.length !== 1 ? 's' : ''} Selected`;
+            } else {
+                bar.classList.add("translate-y-full");
+            }
+        }
+
+        function clearCompilerCompare() {
+            compilerCompareList = [];
+            updateCompareCompilerBar();
+            renderFileRegistry();
+        }
+
+        // Modals trigger & compiles
+        function triggerCompileModal() {
+            const modal = document.getElementById("compileModal");
+            const fileWrapper = document.getElementById("compileSelectedFilesContent");
+            fileWrapper.innerHTML = "";
+
+            const selectedFiles = filesDatabase.filter(f => compilerCompareList.includes(f.id));
+
+            selectedFiles.forEach(file => {
+                const row = document.createElement("div");
+                row.className = "p-3 bg-black/40 border border-cyber-border rounded flex justify-between items-center text-xs font-mono";
+                row.innerHTML = `
+                    <div>
+                        <strong class="text-slate-100 block truncate max-w-[280px]">${file.name}</strong>
+                        <span class="text-[10px] text-slate-500">Workspace Segment: ${CATEGORIES_MAPPING[file.category]}</span>
+                    </div>
+                    <div class="text-right flex items-center gap-4">
+                        <strong class="text-cyber-accent font-bold">${file.sizeMB.toFixed(1)} MB</strong>
+                        <button onclick="removeSelectedFileFromCompiler(${file.id})" class="text-rose-500 hover:text-white transition-colors">Remove</button>
+                    </div>
+                `;
+                fileWrapper.appendChild(row);
+            });
+
+            modal.classList.remove("hidden");
+        }
+
+        function removeSelectedFileFromCompiler(fileId) {
+            compilerCompareList = compilerCompareList.filter(id => id !== fileId);
+            updateCompareCompilerBar();
+            triggerCompileModal();
+            renderFileRegistry();
+        }
+
+        function closeCompileModal() {
+            document.getElementById("compileModal").classList.add("hidden");
+        }
+
+        // Form Submission Handlers
+        function handleHandshakeSubmission(e) {
+            e.preventDefault();
+            const targetLender = document.getElementById("targetLender").value;
+            const targetProject = document.getElementById("targetProject").value;
+
+            // Generate a fresh mock Handshake channel
+            const newHandshake = {
+                id: Date.now(),
+                targetLender: targetLender,
+                projectTitle: targetProject,
+                status: "Active Handshake",
+                lastActive: "Just Now",
+                iconColor: "text-cyber-accent",
+                filesCompiled: [...compilerCompareList]
+            };
+
+            handshakesDatabase.unshift(newHandshake);
+            renderHandshakePipelines();
+            
+            alert(`COMPILATION EXPORT: A handshake payload containing ${compilerCompareList.length} files has been compiled and dispatched securely to ${targetLender}.`);
+            
+            clearCompilerCompare();
+            closeCompileModal();
+            document.getElementById("handshakeTargetForm").reset();
+        }
+
+        // Inspectors modals details
+        function openDetailsModal(fileId) {
+            closeCompileModal();
+            const file = filesDatabase.find(f => f.id === fileId);
+            if (!file) return;
+
+            document.getElementById("modalFileName").innerText = file.name;
+            document.getElementById("modalFileHash").innerText = `SHA-256 CHECK: [ ${file.hash} ]`;
+            document.getElementById("modalFileSize").innerText = `${file.sizeMB.toFixed(1)} MB Payload`;
+            document.getElementById("modalFileStatus").innerText = file.status;
+            document.getElementById("modalFileCategory").innerText = CATEGORIES_MAPPING[file.category] || file.category;
+            document.getElementById("modalFileDesc").innerText = file.desc || "Audit Trail Log entries suggest this is a verified package container.";
+
+            document.getElementById("detailsModal").classList.remove("hidden");
+        }
+
+        function closeDetailsModal() {
+            document.getElementById("detailsModal").classList.add("hidden");
+        }
+
+        function downloadFilePayload() {
+            alert("HANDSHAKE SYNAPSE: Initiating secure point-to-point decrypt extraction. Decrypting SHA packet blocks...");
+            closeDetailsModal();
+        }
+
+        // Add File/Ingest Modals
+        function triggerUploadModal() {
+            document.getElementById("ingestModal").classList.remove("hidden");
+        }
+
+        function closeIngestModal() {
+            document.getElementById("ingestModal").classList.add("hidden");
+            document.getElementById("ingestPayloadForm").reset();
+        }
+
+        function handleIngestPayloadSubmit(e) {
+            e.preventDefault();
+
+            const name = document.getElementById("ingestFileName").value;
+            const category = document.getElementById("ingestFileCategory").value;
+            const size = parseFloat(document.getElementById("ingestFileSize").value);
+            const status = document.getElementById("ingestFileStatus").value;
+            const desc = document.getElementById("ingestFileDesc").value;
+
+            // Simple random Hash Generator mock
+            const hash = Array.from({length: 64}, () => Math.floor(Math.random()*16).toString(16)).join("");
+
+            const newFile = {
+                id: Date.now(),
+                name: name,
+                category: category,
+                sizeMB: size,
+                status: status,
+                hash: hash,
+                desc: desc || `Mock metadata profile injected at user system clock.`
+            };
+
+            filesDatabase.unshift(newFile);
+            
+            renderFileRegistry();
+            updateWorkspaceCapacityMetrics();
+            closeIngestModal();
+
+            alert(`INGEST SUCCESS: Decrypted workspace payload [${name}] loaded successfully.`);
+        }
+
+        function deletePayloadItem(fileId) {
+            if (confirm("PURGE CONFIRMATION: Confirm irreversible deletion from decentralized directories?")) {
+                filesDatabase = filesDatabase.filter(f => f.id !== fileId);
+                compilerCompareList = compilerCompareList.filter(id => id !== fileId);
+                
+                renderFileRegistry();
+                updateCompareCompilerBar();
+                updateWorkspaceCapacityMetrics();
+            }
+        }
+
+        // Telemetry toggler
+        function toggleCapacityForecaster() {
+            const panel = document.getElementById("forecasterPanel");
+            panel.classList.toggle("scale-95");
+            panel.classList.toggle("opacity-50");
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash UI Export</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- Interactive Backdrop Elements -->
+  <div class="bg-grid"></div>
+  <div class="bg-prism-glow-1"></div>
+  <div class="bg-prism-glow-2"></div>
+
+  <!-- Animated Toast Notification Container -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 max-w-sm pointer-events-none"></div>
+
+  <!-- Base Shell Layout -->
+  <div class="flex min-h-screen">
+
+    <!-- Responsive Navigation Sidebar -->
+    <aside class="w-64 border-r border-borderThin bg-prismSurface backdrop-blur-xl flex flex-col justify-between shrink-0 hidden md:flex">
+      <div>
+        <!-- Brand & Logo -->
+        <div class="p-6 border-b border-borderThin flex items-center gap-3">
+          <div class="brand-logo w-8 h-8 bg-gradient-to-br from-prismCyan to-prismViolet flex items-center justify-center relative p-[2px]">
+            <div class="w-full h-full bg-prismBg brand-logo flex items-center justify-center">
+              <div class="w-3 h-3 bg-gradient-to-r from-prismCyan via-prismViolet to-prismMagenta rotate-45"></div>
+            </div>
+          </div>
+          <span class="font-space font-bold text-lg tracking-wider text-textPrimary">PRISM // <span class="bg-gradient-to-r from-prismCyan to-prismMagenta bg-clip-text text-transparent">LOGIC</span></span>
+        </div>
+
+        <!-- Directory/Node Status Widget -->
+        <div class="px-6 py-4 border-b border-borderThin bg-white/5">
+          <div class="flex items-center justify-between text-xs font-mono mb-2">
+            <span class="text-textSecondary">SYSTEM NODE</span>
+            <span class="text-prismCyan flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-prismGreen status-indicator"></span> ONLINE
+            </span>
+          </div>
+          <div class="text-[11px] font-mono text-textMuted select-all break-all">API_ENDPOINT: prsm_clv_v1.7</div>
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="p-4 space-y-1.5">
+          <button onclick="switchTab('dashboard')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-textSecondary hover:text-textPrimary hover:bg-white/5" id="btn-dashboard">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z"/></svg>
+            Dashboard Overview
+          </button>
+          
+          <button onclick="switchTab('directory')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-textSecondary hover:text-textPrimary hover:bg-white/5" id="btn-directory">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            Capital Vault
+          </button>
+
+          <button onclick="switchTab('kanban')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-textSecondary hover:text-textPrimary hover:bg-white/5" id="btn-kanban">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+            Pipeline Kanban
+          </button>
+
+          <button onclick="switchTab('uploader')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-textSecondary hover:text-textPrimary hover:bg-white/5" id="btn-uploader">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+            CSV/JSON Uploader
+          </button>
+
+          <button onclick="switchTab('onboarding')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-textSecondary hover:text-textPrimary hover:bg-white/5" id="btn-onboarding">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+            Partner Onboarding
+          </button>
+          
+          <button onclick="switchTab('faq')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-textSecondary hover:text-textPrimary hover:bg-white/5" id="btn-faq">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            System FAQ
+          </button>
+        </nav>
+      </div>
+
+      <!-- User Profile Box & Controls -->
+      <div class="p-4 border-t border-borderThin">
+        <div class="bg-white/5 p-3 rounded-2xl flex items-center gap-3 relative overflow-hidden group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-prismViolet to-prismMagenta flex items-center justify-center font-bold text-sm">
+            PL
+          </div>
+          <div class="flex-1 overflow-hidden">
+            <h4 class="text-xs font-semibold text-textPrimary truncate">Prism Admin</h4>
+            <p class="text-[10px] font-mono text-textMuted truncate">auth_tier: MASTER</p>
+          </div>
+          <button onclick="toggleSettingsModal()" class="text-textSecondary hover:text-prismCyan transition-colors p-1" title="Open Settings">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Work Area -->
+    <main class="flex-1 min-w-0 flex flex-col">
+      
+      <!-- Top Dynamic Header with Datepicker -->
+      <header class="navbar border-b border-borderThin bg-prismSurface/80 backdrop-blur-md p-6 flex flex-col md:flex-row gap-4 items-center justify-between z-10">
+        <div>
+          <h1 class="text-2xl font-space font-bold tracking-tight text-textPrimary flex items-center gap-3">
+            <span class="md:hidden inline-block brand-logo w-6 h-6 bg-gradient-to-br from-prismCyan to-prismViolet"></span>
+            PRISM CORE CENTRAL <span class="text-xs px-2 py-0.5 rounded border border-prismCyan/30 bg-prismCyan/10 text-prismCyan font-mono">STABLE_RELEASE</span>
+          </h1>
+          <p class="text-sm text-textSecondary mt-0.5">Real-time matching index, system metrics, and transaction pipeline stencils.</p>
+        </div>
+
+        <!-- Comprehensive Date Range Picker and Tools -->
+        <div class="flex items-center gap-3 flex-wrap">
+          <div class="bg-white/5 border border-borderThin rounded-xl p-1.5 flex items-center gap-1.5 text-xs font-mono">
+            <span class="text-textMuted px-2">RANGE:</span>
+            <input type="date" id="date-from" class="bg-transparent text-textPrimary focus:outline-none border-none p-1 text-xs" value="2024-01-01">
+            <span class="text-textMuted">&mdash;</span>
+            <input type="date" id="date-to" class="bg-transparent text-textPrimary focus:outline-none border-none p-1 text-xs" value="2024-12-31">
+            <button onclick="applyDateFilter()" class="bg-prismCyan/20 text-prismCyan hover:bg-prismCyan/40 px-3 py-1 rounded-md transition-all">Filter</button>
+          </div>
+          <!-- Mobile menu fallback triggers Settings -->
+          <button onclick="toggleSettingsModal()" class="md:hidden p-2.5 bg-white/5 border border-borderThin rounded-xl text-textSecondary hover:text-textPrimary">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- TAB CONTENT: DASHBOARD OVERVIEW -->
+      <div id="tab-dashboard" class="tab-content active p-6 space-y-8">
+        
+        <!-- Interactive Stats Bento Grid -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          
+          <!-- Bento Card 1 -->
+          <div class="bg-prismSurface border border-borderThin rounded-2xl p-6 relative overflow-hidden group hover:border-prismCyan/40 transition-all flex flex-col justify-between">
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="text-xs font-mono text-textMuted tracking-widest block uppercase">MATCH NODES</span>
+                <span class="text-3xl font-space font-bold mt-1 block text-textPrimary" id="bento-total-lenders">20</span>
+              </div>
+              <span class="p-2 rounded-xl bg-prismCyan/10 text-prismCyan text-sm font-semibold">+12%</span>
+            </div>
+            <!-- Micro-Sparkline Chart -->
+            <div class="mt-6">
+              <svg class="w-full h-12 stroke-prismCyan" viewBox="0 0 100 20" fill="none">
+                <path d="M0,15 Q15,5 30,12 T60,5 T90,15" stroke-width="2" stroke-linecap="round"></path>
+                <circle cx="90" cy="15" r="3" fill="#00f0ff"></circle>
+              </svg>
+            </div>
+            <div class="mt-4 flex items-center justify-between text-xs font-mono text-textSecondary">
+              <span>ACTIVE CAP_LENDERS</span>
+              <span class="text-prismCyan">LIVE PARSING</span>
+            </div>
+          </div>
+
+          <!-- Bento Card 2 -->
+          <div class="bg-prismSurface border border-borderThin rounded-2xl p-6 relative overflow-hidden group hover:border-prismViolet/40 transition-all flex flex-col justify-between">
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="text-xs font-mono text-textMuted tracking-widest block uppercase">GLOBAL COVERAGE</span>
+                <span class="text-3xl font-space font-bold mt-1 block text-textPrimary" id="bento-states">12</span>
+              </div>
+              <span class="p-2 rounded-xl bg-prismViolet/10 text-prismViolet text-sm font-semibold">MAX STATE</span>
+            </div>
+            <!-- Micro-Sparkline Chart -->
+            <div class="mt-6">
+              <svg class="w-full h-12 stroke-prismViolet" viewBox="0 0 100 20" fill="none">
+                <path d="M0,10 Q20,18 40,8 T80,14 T100,2" stroke-width="2" stroke-linecap="round"></path>
+                <circle cx="100" cy="2" r="3" fill="#8b5cf6"></circle>
+              </svg>
+            </div>
+            <div class="mt-4 flex items-center justify-between text-xs font-mono text-textSecondary">
+              <span>GEOGRAPHICAL NODES</span>
+              <span class="text-prismViolet">STABLE</span>
+            </div>
+          </div>
+
+          <!-- Bento Card 3 -->
+          <div class="bg-prismSurface border border-borderThin rounded-2xl p-6 relative overflow-hidden group hover:border-prismMagenta/40 transition-all flex flex-col justify-between">
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="text-xs font-mono text-textMuted tracking-widest block uppercase">OPTIMAL LEVERAGE</span>
+                <span class="text-3xl font-space font-bold mt-1 block text-textPrimary">85% <span class="text-sm font-normal text-textMuted">MAX LTV</span></span>
+              </div>
+              <span class="p-2 rounded-xl bg-prismMagenta/10 text-prismMagenta text-sm font-semibold">REFRACTED</span>
+            </div>
+            <!-- Micro-Sparkline Chart -->
+            <div class="mt-6">
+              <svg class="w-full h-12 stroke-prismMagenta" viewBox="0 0 100 20" fill="none">
+                <path d="M0,15 L15,10 L30,12 L50,4 L70,8 L100,5" stroke-width="2" stroke-linecap="round"></path>
+                <circle cx="100" cy="5" r="3" fill="#ff007f"></circle>
+              </svg>
+            </div>
+            <div class="mt-4 flex items-center justify-between text-xs font-mono text-textSecondary">
+              <span>LEVERAGE MATRIX</span>
+              <span class="text-prismMagenta">OPTIMIZED</span>
+            </div>
+          </div>
+
+          <!-- Bento Card 4 -->
+          <div class="bg-prismSurface border border-borderThin rounded-2xl p-6 relative overflow-hidden group hover:border-prismOrange/40 transition-all flex flex-col justify-between">
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="text-xs font-mono text-textMuted tracking-widest block uppercase">SYS INDEX RATE</span>
+                <span class="text-3xl font-space font-bold mt-1 block text-textPrimary">6.5% <span class="text-sm font-normal text-textMuted">MIN APY</span></span>
+              </div>
+              <span class="p-2 rounded-xl bg-prismOrange/10 text-prismOrange text-sm font-semibold">INDEXED</span>
+            </div>
+            <!-- Micro-Sparkline Chart -->
+            <div class="mt-6">
+              <svg class="w-full h-12 stroke-prismOrange" viewBox="0 0 100 20" fill="none">
+                <path d="M0,5 Q20,15 40,5 T80,12 T100,8" stroke-width="2" stroke-linecap="round"></path>
+                <circle cx="100" cy="8" r="3" fill="#f97316"></circle>
+              </svg>
+            </div>
+            <div class="mt-4 flex items-center justify-between text-xs font-mono text-textSecondary">
+              <span>INDEX CAPITAL FEES</span>
+              <span class="text-prismOrange">DYNAMIC</span>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- Pipeline Kanban Board with Status Stencils -->
+        <section class="space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-lg font-space font-bold text-textPrimary flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-prismCyan"></span> Active Pipeline Kanban
+              </h2>
+              <p class="text-xs text-textSecondary">Transaction routing states. Click the card action buttons to shift columns.</p>
+            </div>
+            <button onclick="createNewPipelineCard()" class="px-4 py-2 bg-gradient-to-r from-prismCyan via-prismViolet to-prismMagenta text-white font-semibold text-xs rounded-xl hover:opacity-90 transition-all flex items-center gap-2">
+              <span>+ Generate Mock Deal Card</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-6" id="kanban-board">
+            <!-- Columns generated via JS -->
+          </div>
+        </section>
+
+      </div>
+
+      <!-- TAB CONTENT: DIRECTORY VAULT & INTERACTIVE TABLE -->
+      <div id="tab-directory" class="tab-content p-6 space-y-6">
+        
+        <!-- Filter Bar Panel -->
+        <section class="bg-prismSurface border border-borderThin rounded-2xl p-6 backdrop-blur-xl space-y-6">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            
+            <!-- Core Search bar -->
+            <div class="lg:col-span-6 relative flex items-center">
+              <span class="absolute left-4 text-textMuted">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+              </span>
+              <input type="text" id="dir-search" oninput="applyAllFilters()" class="w-full bg-white/5 border border-borderThin rounded-xl pl-12 pr-4 py-3 text-sm text-textPrimary focus:outline-none focus:border-prismCyan transition-all" placeholder="Search lender databases, state parameters, or investment profiles...">
+            </div>
+
+            <!-- Program Selector -->
+            <div class="lg:col-span-2">
+              <select id="dir-loan" onchange="applyAllFilters()" class="w-full bg-prismBg border border-borderThin rounded-xl px-4 py-3 text-sm text-textSecondary focus:outline-none focus:border-prismViolet">
+                <option value="ALL">All Programs</option>
+                <option value="Bridge Loans">Bridge Loans</option>
+                <option value="Fix and Flip Loans">Fix & Flip</option>
+                <option value="Investment Property Loans">Rental / Investment</option>
+                <option value="New Construction Loans">New Construction</option>
+                <option value="Refinance / Cash Out Loans">Refinance / Cash Out</option>
+                <option value="Commercial Hard Money Loans">Commercial Hard Money</option>
+              </select>
+            </div>
+
+            <!-- Asset Class Selector -->
+            <div class="lg:col-span-2">
+              <select id="dir-property" onchange="applyAllFilters()" class="w-full bg-prismBg border border-borderThin rounded-xl px-4 py-3 text-sm text-textSecondary focus:outline-none focus:border-prismMagenta">
+                <option value="ALL">All Asset Focus</option>
+                <option value="Single Family">Single Family</option>
+                <option value="Multi Family">Multi Family</option>
+                <option value="Apartment">Apartment</option>
+                <option value="Office">Office</option>
+                <option value="Retail">Retail</option>
+                <option value="Industrial">Industrial</option>
+                <option value="Land">Undeveloped Land</option>
+              </select>
+            </div>
+
+            <!-- View Toggle Controllers -->
+            <div class="lg:col-span-2 flex gap-2">
+              <button onclick="setViewMode('grid')" id="btn-view-grid" class="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-borderThin rounded-xl text-xs font-semibold text-textPrimary transition-all flex items-center justify-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z"/></svg>
+                Grid
+              </button>
+              <button onclick="setViewMode('table')" id="btn-view-table" class="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-borderThin rounded-xl text-xs font-semibold text-textSecondary transition-all flex items-center justify-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                Table
+              </button>
+            </div>
+
+          </div>
+
+          <!-- Active Filter Pill Badges -->
+          <div class="flex items-center justify-between flex-wrap gap-2 pt-4 border-t border-white/5">
+            <div id="dir-active-pills" class="flex flex-wrap gap-2"></div>
+            <button onclick="resetDirectoryFilters()" class="text-xs text-prismCyan hover:underline font-mono">Reset Parameters</button>
+          </div>
+        </section>
+
+        <!-- Multi-Column Responsive Grid View & Live Data Table View -->
+        <section id="directory-content-wrapper">
+          
+          <!-- Responsive Grid View Container -->
+          <div id="directory-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Rendered Dynamically -->
+          </div>
+
+          <!-- Data Table View Container (Initially hidden) -->
+          <div id="directory-table-container" class="hidden overflow-x-auto bg-prismSurface border border-borderThin rounded-2xl">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-white/5 border-b border-borderThin font-mono text-xs text-textSecondary uppercase">
+                <tr>
+                  <th scope="col" class="px-6 py-4">Lender / Entity</th>
+                  <th scope="col" class="px-6 py-4">Base City</th>
+                  <th scope="col" class="px-6 py-4">State Coverage</th>
+                  <th scope="col" class="px-6 py-4">Program Types</th>
+                  <th scope="col" class="px-6 py-4 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="directory-table-rows" class="divide-y divide-white/5">
+                <!-- Rendered Dynamically -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Panel -->
+          <div class="flex items-center justify-between mt-8 pt-4 border-t border-white/5 text-xs font-mono">
+            <span class="text-textSecondary" id="pagination-status">Showing index range 0 — 0 of 0</span>
+            <div class="flex gap-2">
+              <button onclick="adjustPage(-1)" id="btn-page-prev" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-borderThin rounded-xl text-textPrimary disabled:opacity-40 disabled:cursor-not-allowed">Previous Node</button>
+              <button onclick="adjustPage(1)" id="btn-page-next" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-borderThin rounded-xl text-textPrimary disabled:opacity-40 disabled:cursor-not-allowed">Next Node</button>
+            </div>
+          </div>
+
+          <!-- Fallback Empty Match Frame -->
+          <div id="directory-empty-state" class="hidden bg-prismSurface border border-dashed border-borderThin rounded-2xl p-16 text-center max-w-lg mx-auto space-y-4">
+            <span class="text-4xl text-prismMagenta">♢</span>
+            <h3 class="font-space font-bold text-xl text-textPrimary">Refraction Signal Expired</h3>
+            <p class="text-sm text-textSecondary">No capital matches detected under current settings. Restructure filter metrics.</p>
+            <button onclick="resetDirectoryFilters()" class="px-6 py-2 bg-gradient-to-r from-prismCyan to-prismViolet text-white font-semibold text-xs rounded-xl hover:opacity-90">Reset Index</button>
+          </div>
+
+        </section>
+
+      </div>
+
+      <!-- TAB CONTENT: PIPELINE KANBAN (DIRECT VIEW IN NAV) -->
+      <div id="tab-kanban" class="tab-content p-6 space-y-6">
+        <div class="bg-prismSurface border border-borderThin rounded-2xl p-6 backdrop-blur-xl">
+          <h2 class="text-xl font-space font-bold text-textPrimary flex items-center gap-3">
+            <span class="w-3 h-3 rounded-full bg-gradient-to-br from-prismCyan to-prismMagenta"></span>
+            Comprehensive Route Logistics Kanban
+          </h2>
+          <p class="text-sm text-textSecondary mt-1">This module demonstrates pipeline underwriting routing configurations. Direct lenders can be matched to transaction nodes.</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6" id="kanban-full-board">
+          <!-- Loaded Dynamically via setupKanban() -->
+        </div>
+      </div>
+
+      <!-- TAB CONTENT: CSV / JSON DATA UPLOADER -->
+      <div id="tab-uploader" class="tab-content p-6 space-y-6">
+        <div class="bg-prismSurface border border-borderThin rounded-2xl p-6 space-y-4">
+          <h2 class="text-xl font-space font-bold text-textPrimary flex items-center gap-2">
+            <svg class="w-6 h-6 text-prismCyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            System Data Uploader
+          </h2>
+          <p class="text-sm text-textSecondary">Inject new liquid nodes into the cache database. Upload standard structured JSON or structured CSV directory arrays.</p>
+          
+          <!-- Dropzone and Textarea block -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <div class="border-2 border-dashed border-borderThin hover:border-prismCyan/50 rounded-2xl p-8 flex flex-col items-center justify-center text-center transition-all cursor-pointer relative bg-white/[0.02]" id="dropzone">
+              <input type="file" id="file-uploader-input" class="absolute inset-0 opacity-0 cursor-pointer" accept=".json,.csv" onchange="handleFileSelect(event)">
+              <svg class="w-12 h-12 text-textMuted mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+              <h3 class="font-semibold text-textPrimary text-sm mb-1">Drag and Drop Data Packet</h3>
+              <p class="text-xs text-textSecondary">Accepts .json or .csv. Maximum file sizes up to 12MB.</p>
+              <div class="mt-4 px-3 py-1 bg-white/5 rounded-lg border border-borderThin text-[10px] text-textMuted font-mono">CLIENT SIDE DECRYPTION SYSTEM ACTIVE</div>
+            </div>
+
+            <div class="space-y-3">
+              <label class="block text-xs font-mono text-textMuted tracking-wider uppercase">OR PASTE RAW DATA DIRECTLY</label>
+              <textarea id="raw-uploader-paste" class="w-full h-40 bg-white/5 border border-borderThin rounded-xl p-4 font-mono text-xs text-textPrimary focus:outline-none focus:border-prismMagenta" placeholder='[{"Lender": "Example Capital Node", "City": "Chicago", "State": "Illinois"}]'></textarea>
+              <div class="flex gap-3">
+                <button onclick="parsePasteInput()" class="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-borderThin rounded-xl text-xs font-semibold text-textPrimary transition-all">Dry-Run Parsing</button>
+                <button onclick="importTestData()" class="flex-1 py-3 bg-gradient-to-r from-prismViolet to-prismMagenta text-white text-xs font-semibold rounded-xl hover:opacity-90 transition-all">Mock-Load Standard Node Pack</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Parse Preview Table Panel -->
+        <div class="bg-prismSurface border border-borderThin rounded-2xl p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-space font-bold text-textPrimary">Live Raw-Data Packet Preview</h3>
+            <span class="text-xs font-mono text-textMuted" id="preview-row-count">0 Nodes Staged</span>
+          </div>
+          
+          <div class="overflow-x-auto max-h-80 border border-borderThin rounded-xl">
+            <table class="w-full text-left text-xs font-mono">
+              <thead class="bg-white/5 border-b border-borderThin text-textSecondary">
+                <tr>
+                  <th class="px-4 py-3">Lender Name</th>
+                  <th class="px-4 py-3">HQ State</th>
+                  <th class="px-4 py-3">LTV Parameter</th>
+                  <th class="px-4 py-3">Asset Profile Scope</th>
+                </tr>
+              </thead>
+              <tbody id="preview-rows" class="divide-y divide-white/5">
+                <tr>
+                  <td colspan="4" class="px-4 py-8 text-center text-textMuted italic">No staged parsing configurations detected. Drag standard assets into directory queue.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="flex justify-end gap-3 pt-4 border-t border-white/5">
+            <button onclick="clearStagedData()" class="px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-borderThin rounded-xl text-xs font-semibold text-textPrimary transition-all">Wipe Stream</button>
+            <button onclick="commitStagedToDatabase()" class="px-5 py-2.5 bg-gradient-to-r from-prismCyan to-prismViolet text-white text-xs font-semibold rounded-xl hover:opacity-90 transition-all">Merge Stream to Capital Directory</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB CONTENT: PARTNER REGISTRATION ONBOARDING WIZARD -->
+      <div id="tab-onboarding" class="tab-content p-6 space-y-6">
+        <div class="bg-prismSurface border border-borderThin rounded-2xl p-6 space-y-8 max-w-4xl mx-auto">
+          
+          <!-- Wizard Heading & Progress Map -->
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-xl font-space font-bold text-textPrimary">Secure Onboarding Portal</h2>
+                <p class="text-xs text-textSecondary">Register your direct lending company node and parameters within the central PRISM algorithm.</p>
+              </div>
+              <span class="text-xs font-mono text-prismCyan border border-prismCyan/30 bg-prismCyan/10 px-2.5 py-1 rounded">SYS_AUTH_READY</span>
+            </div>
+
+            <!-- Steps indicators -->
+            <div class="grid grid-cols-4 gap-4">
+              <div class="text-center space-y-2">
+                <div class="step-indicator-bar h-1 bg-prismCyan rounded-full transition-all"></div>
+                <span class="block text-[10px] font-mono font-semibold text-prismCyan uppercase">1. Company profile</span>
+              </div>
+              <div class="text-center space-y-2">
+                <div class="step-indicator-bar h-1 bg-white/10 rounded-full transition-all"></div>
+                <span class="block text-[10px] font-mono font-semibold text-textMuted uppercase">2. Area Scope</span>
+              </div>
+              <div class="text-center space-y-2">
+                <div class="step-indicator-bar h-1 bg-white/10 rounded-full transition-all"></div>
+                <span class="block text-[10px] font-mono font-semibold text-textMuted uppercase">3. Program LTV</span>
+              </div>
+              <div class="text-center space-y-2">
+                <div class="step-indicator-bar h-1 bg-white/10 rounded-full transition-all"></div>
+                <span class="block text-[10px] font-mono font-semibold text-textMuted uppercase">4. Verification</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Wizard Form Contents -->
+          <form id="onboarding-form" onsubmit="event.preventDefault();" class="space-y-6">
+            
+            <!-- Step 1 Layout -->
+            <div class="onboarding-step space-y-4" id="step-1">
+              <h3 class="text-sm font-space font-bold text-textPrimary uppercase tracking-wider">Company Identity Matrix</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-mono text-textSecondary">Lender Legal Entity Name</label>
+                  <input type="text" id="ob-lender-name" class="w-full bg-white/5 border border-borderThin rounded-xl px-4 py-3 text-sm text-textPrimary focus:outline-none focus:border-prismCyan" placeholder="e.g. Paramount Funding LLC">
+                </div>
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-mono text-textSecondary">Digital Domain / Website</label>
+                  <input type="url" id="ob-lender-web" class="w-full bg-white/5 border border-borderThin rounded-xl px-4 py-3 text-sm text-textPrimary focus:outline-none focus:border-prismCyan" placeholder="https://domain.com">
+                </div>
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-mono text-textSecondary">Secure Business Phone</label>
+                  <input type="text" id="ob-lender-phone" class="w-full bg-white/5 border border-borderThin rounded-xl px-4 py-3 text-sm text-textPrimary focus:outline-none focus:border-prismCyan" placeholder="(555) 000-0000">
+                </div>
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-mono text-textSecondary">Principal Office Address</label>
+                  <input type="text" id="ob-lender-addr" class="w-full bg-white/5 border border-borderThin rounded-xl px-4 py-3 text-sm text-textPrimary focus:outline-none focus:border-prismCyan" placeholder="100 Wall Street, 24th Floor">
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 2 Layout -->
+            <div class="onboarding-step space-y-4 hidden" id="step-2">
+              <h3 class="text-sm font-space font-bold text-textPrimary uppercase tracking-wider">Geographic Lending Footprint</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-mono text-textSecondary">Primary Office City</label>
+                  <input type="text" id="ob-lender-city" class="w-full bg-white/5 border border-borderThin rounded-xl px-4 py-3 text-sm text-textPrimary focus:outline-none focus:border-prismViolet" placeholder="e.g. New York">
+                </div>
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-mono text-textSecondary">Lending State Focus</label>
+                  <input type="text" id="ob-lender-state" class="w-full bg-white/5 border border-borderThin rounded-xl px-4 py-3 text-sm text-textPrimary focus:outline-none focus:border-prismViolet" placeholder="e.g. New York, California">
+                </div>
+                <div class="space-y-1.5 md:col-span-2">
+                  <label class="block text-xs font-mono text-textSecondary">Asset Class Profiles Focus (Comma separated)</label>
+                  <input type="text" id="ob-lender-assets" class="w-full bg-white/5 border border-borderThin rounded-xl px-4 py-3 text-sm text-textPrimary focus:outline-none focus:border-prismViolet" placeholder="Single Family, Multi Family, Apartment, Retail">
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 3 Layout -->
+            <div class="onboarding-step space-y-4 hidden" id="step-3">
+              <h3 class="text-sm font-space font-bold text-textPrimary uppercase tracking-wider">LTV Parameter Constraints</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-mono text-textSecondary">Optimal leverage (Max LTV %)</label>
+                  <input type="number" id="ob-lender-ltv" class="w-full bg-white/5 border border-borderThin rounded-xl px-4 py-3 text-sm text-textPrimary focus:outline-none focus:border-prismMagenta" placeholder="80" min="50" max="95">
+                </div>
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-mono text-textSecondary">Loan Programs Offered (Comma separated)</label>
+                  <input type="text" id="ob-lender-programs" class="w-full bg-white/5 border border-borderThin rounded-xl px-4 py-3 text-sm text-textPrimary focus:outline-none focus:border-prismMagenta" placeholder="Bridge Loans, Fix and Flip Loans">
+                </div>
+                <div class="space-y-1.5 md:col-span-2">
+                  <label class="block text-xs font-mono text-textSecondary">Company Synopsis & Parameter Disclosures</label>
+                  <textarea id="ob-lender-desc" class="w-full h-32 bg-white/5 border border-borderThin rounded-xl p-4 text-sm text-textPrimary focus:outline-none focus:border-prismMagenta" placeholder="Provide summary of guidelines, funding track records..."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 4 Layout -->
+            <div class="onboarding-step space-y-4 hidden" id="step-4">
+              <div class="text-center p-8 space-y-4">
+                <span class="text-5xl">⚡</span>
+                <h3 class="text-lg font-space font-bold text-textPrimary">Onboarding Parameters Configured</h3>
+                <p class="text-sm text-textSecondary max-w-md mx-auto">Please confirm below that all provided details are correct to secure the active matching node registration protocol.</p>
+                <div class="bg-white/5 border border-borderThin rounded-xl p-4 max-w-sm mx-auto text-left font-mono text-xs text-textSecondary space-y-2">
+                  <div>ENTITY: <span id="summary-name" class="text-textPrimary font-semibold">-</span></div>
+                  <div>BASE HUB: <span id="summary-city" class="text-textPrimary font-semibold">-</span></div>
+                  <div>MAX LTV: <span id="summary-ltv" class="text-prismCyan font-semibold">-</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Control Actions -->
+            <div class="flex justify-between items-center pt-6 border-t border-white/5">
+              <button type="button" id="btn-ob-prev" onclick="advanceOnboarding(-1)" class="px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-borderThin rounded-xl text-xs font-semibold text-textPrimary disabled:opacity-40 disabled:cursor-not-allowed" disabled>Back Node</button>
+              <button type="button" id="btn-ob-next" onclick="advanceOnboarding(1)" class="px-5 py-2.5 bg-gradient-to-r from-prismCyan to-prismViolet text-white text-xs font-semibold rounded-xl hover:opacity-90 transition-all">Advance Node</button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+
+      <!-- TAB CONTENT: COLLAPSIBLE FAQ ACCORDION -->
+      <div id="tab-faq" class="tab-content p-6 space-y-6">
+        <div class="max-w-4xl mx-auto space-y-6">
+          <div class="text-center space-y-2">
+            <h2 class="text-2xl font-space font-bold text-textPrimary">Collapsible FAQ Section</h2>
+            <p class="text-sm text-textSecondary">Prism logic capital directory matching processes, API integrations and network rules.</p>
+          </div>
+
+          <div class="space-y-4">
+            <!-- FAQ 1 -->
+            <div class="bg-prismSurface border border-borderThin rounded-2xl overflow-hidden">
+              <button onclick="toggleAccordion('faq-1')" class="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.02] transition-all">
+                <span class="font-space font-semibold text-textPrimary">How does the capital node matching system prioritize lenders?</span>
+                <span class="text-prismCyan font-mono" id="faq-1-icon">[+]</span>
+              </button>
+              <div id="faq-1" class="hidden px-6 pb-6 text-sm text-textSecondary leading-relaxed border-t border-white/5 pt-4">
+                The central PRISM algorithm analyzes asset parameters (maximum Loan-To-Value thresholds, focus states, and program profiles) against dynamic tenant requests. Priority nodes are generated based on alignment metrics.
+              </div>
+            </div>
+
+            <!-- FAQ 2 -->
+            <div class="bg-prismSurface border border-borderThin rounded-2xl overflow-hidden">
+              <button onclick="toggleAccordion('faq-2')" class="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.02] transition-all">
+                <span class="font-space font-semibold text-textPrimary">Is there an API trigger framework?</span>
+                <span class="text-prismCyan font-mono" id="faq-2-icon">[+]</span>
+              </button>
+              <div id="faq-2" class="hidden px-6 pb-6 text-sm text-textSecondary leading-relaxed border-t border-white/5 pt-4">
+                Yes, our developer systems expose full Axios or standard fetch request endpoints. Staged datasets can be synced in real-time. See the reference endpoints block in system dashboard for details.
+              </div>
+            </div>
+
+            <!-- FAQ 3 -->
+            <div class="bg-prismSurface border border-borderThin rounded-2xl overflow-hidden">
+              <button onclick="toggleAccordion('faq-3')" class="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.02] transition-all">
+                <span class="font-space font-semibold text-textPrimary">How are custom LTV calculations optimized?</span>
+                <span class="text-prismCyan font-mono" id="faq-3-icon">[+]</span>
+              </button>
+              <div id="faq-3" class="hidden px-6 pb-6 text-sm text-textSecondary leading-relaxed border-t border-white/5 pt-4">
+                The integrated Calculator predicts loan capital and monthly cost dynamics based on current index benchmark rates (base: 6.5% - 10%). Standard models allow direct estimation adjustability.
+              </div>
+            </div>
+          </div>
+
+          <!-- Stencil/API Structure block -->
+          <div class="bg-prismSurface border border-borderThin rounded-2xl p-6 space-y-4">
+            <h3 class="text-sm font-space font-bold text-textPrimary">API INTEGRATION REFERENCE (Axios/Fetch Stencils)</h3>
+            <div class="bg-white/5 p-4 rounded-xl border border-borderThin">
+              <pre class="text-xs font-mono text-prismCyan overflow-x-auto">
+// Set dynamic keys into authorization headers
+const prismClient = axios.create({
+  baseURL: 'https://api.prismlogic.io/v1/vault',
+  headers: { 'Authorization': 'Bearer YOUR_PRISM_LOGIC_KEY' }
+});
+
+// Trigger matching records index
+async function triggerMatch(state, loanType) {
+  const response = await prismClient.get('/nodes/match', {
+    params: { state, program: loanType }
+  });
+  return response.data;
+}</pre>
+            </div>
+            <p class="text-[11px] text-textMuted font-mono">Note: Update access coordinates inside the User Settings modal.</p>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Sliding Drawer Display Overlay -->
+  <div id="drawer-overlay" onclick="closeLenderDrawer()" class="fixed inset-0 bg-prismBg/80 backdrop-blur-md z-40 hidden transition-all"></div>
+  <div id="detail-drawer" class="fixed top-0 right-0 h-full w-full max-w-xl bg-prismSurfaceElevated border-l border-borderThin z-50 transform translate-x-full transition-transform duration-300 ease-out flex flex-col justify-between shadow-2xl">
+    
+    <!-- Drawer Header -->
+    <div class="p-6 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
+      <div class="flex items-center gap-3">
+        <div class="brand-logo w-6 h-6 bg-gradient-to-br from-prismCyan to-prismViolet"></div>
+        <span class="font-space font-bold text-sm tracking-wider text-textPrimary">PRISM // DIRECTORY_DETAIL</span>
+      </div>
+      <button onclick="closeLenderDrawer()" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-textSecondary hover:text-textPrimary transition-all">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- Drawer Content Body -->
+    <div class="p-6 overflow-y-auto flex-1 space-y-6" id="drawer-content-body">
+      <!-- Loaded Dynamically -->
+    </div>
+
+    <!-- Drawer Footer Actions -->
+    <div class="p-6 border-t border-white/10 bg-white/[0.02] flex gap-3" id="drawer-content-actions">
+      <!-- Loaded Dynamically -->
+    </div>
+  </div>
+
+  <!-- User Settings Modal -->
+  <div id="settings-modal" class="fixed inset-0 bg-prismBg/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-prismSurfaceElevated border border-borderThin w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl flex flex-col">
+      <div class="p-6 border-b border-white/5 flex justify-between items-center">
+        <h3 class="text-lg font-space font-bold text-textPrimary flex items-center gap-2">
+          <svg class="w-5 h-5 text-prismCyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          User Configuration Settings
+        </h3>
+        <button onclick="toggleSettingsModal()" class="text-textSecondary hover:text-textPrimary">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Settings Forms -->
+      <div class="p-6 space-y-6">
+        <div class="space-y-4">
+          <h4 class="text-xs font-mono text-textSecondary uppercase tracking-widest">Admin Profile Specs</h4>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-1.5">
+              <label class="block text-xs text-textSecondary">Primary Admin Name</label>
+              <input type="text" class="w-full bg-white/5 border border-borderThin rounded-xl px-4 py-2.5 text-xs text-textPrimary" value="Prism System Admin">
+            </div>
+            <div class="space-y-1.5">
+              <label class="block text-xs text-textSecondary">Notification Coordinate</label>
+              <input type="email" class="w-full bg-white/5 border border-borderThin rounded-xl px-4 py-2.5 text-xs text-textPrimary" value="admin@prismlogic.io">
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4 border-t border-white/5 pt-4">
+          <h4 class="text-xs font-mono text-prismViolet uppercase tracking-widest">System Integration Tokens</h4>
+          <div class="space-y-3">
+            <div class="flex items-center justify-between text-xs font-mono text-textMuted bg-white/5 p-3 rounded-xl border border-borderThin">
+              <span>ACTIVE_API_TOKEN_KEY: prsm_live_9921xx_x90</span>
+              <button onclick="triggerToast('Copied API Token!', 'success')" class="text-prismCyan hover:underline">COPY</button>
+            </div>
+            <div class="flex items-center gap-3">
+              <input type="password" class="flex-1 bg-white/5 border border-borderThin rounded-xl px-4 py-2.5 text-xs text-textPrimary font-mono" value="••••••••••••••••••••••••">
+              <button onclick="triggerToast('API access updated', 'success')" class="px-4 py-2.5 bg-prismViolet hover:bg-opacity-80 rounded-xl text-xs font-semibold">Update Key</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4 border-t border-white/5 pt-4">
+          <h4 class="text-xs font-mono text-prismMagenta uppercase tracking-widest">Interface Theme Presets</h4>
+          <div class="flex gap-4">
+            <label class="flex items-center gap-2 text-xs text-textSecondary cursor-pointer">
+              <input type="radio" name="theme-radio" checked class="accent-prismCyan"> Prismatic Dark Mode
+            </label>
+            <label class="flex items-center gap-2 text-xs text-textSecondary cursor-pointer">
+              <input type="radio" name="theme-radio" class="accent-prismMagenta" disabled> Cyberpunk Neon (Locked)
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-6 border-t border-white/5 bg-white/[0.02] flex justify-end gap-3">
+        <button onclick="toggleSettingsModal()" class="px-5 py-2 bg-white/5 border border-borderThin rounded-xl text-xs font-semibold text-textPrimary">Cancel</button>
+        <button onclick="saveAdminSettings()" class="px-5 py-2 bg-gradient-to-r from-prismCyan to-prismViolet text-white text-xs font-semibold rounded-xl hover:opacity-90">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Core JavaScript Block -->
+  <script>
+    // Selected rich direct database curated from attached dataset
+    const directDatabase = [
+      {
+        "Lender": "Colony American Finance",
+        "About the Lender": "Colony American Finance is a private money lender in Los Angeles, CA providing funding all across the country. They provide loans for a variety of needs and situations, including loans for rental properties and refinancing. Their lending parameters are versatile, including terms between 5 years and 10 years and loan amounts ranging from $500,000 to $100,000,000 with a maximum LTV of 75%.",
+        "City": "Anchorage",
+        "Lender City & State": "Los Angeles, CA 90071",
+        "Lender Phone": "(844) 223-2231",
+        "Lender Street Address": "515 South Flower Street, 44th Floor",
+        "Lender Website": "https://www.colonyamericanfinance.com",
+        "Lending Location": "National",
+        "Loan Types Offered": "Investment Property Loans, Refinance / Cash Out Loans",
+        "Property Types": "Multi Family, Single Family",
+        "State": "Alaska",
+        "Ltv": 75
+      },
+      {
+        "Lender": "Asset Avenue",
+        "About the Lender": "Asset Avenue is private money lender based in Los Angeles, CA. They provide loans in 44 states across the United States. They provide loans for a variety of needs and situations, including short term loans, investment property loans, cash out hard money loans, and fix and flip hard money loans. Maximum LTV of 85%.",
+        "City": "Birmingham",
+        "Lender City & State": "Los Angeles, CA 90024",
+        "Lender Phone": "(800) 555-0199",
+        "Lender Street Address": "1100 Glendon Ave, 18th Floor",
+        "Lender Website": "https://www.assetavenue.com/",
+        "Lending Location": "National",
+        "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans, Refinance / Cash Out Loans",
+        "Property Types": "Multi Family, Single Family",
+        "State": "Alabama",
+        "Ltv": 85
+      },
+      {
+        "Lender": "Source Capital",
+        "About the Lender": "Source Capital is an asset-based lender headquartered in Los Angeles, CA offering loans in California, Arizona, and Minnesota. They provide loans for a variety of situations and needs, including bridge loans, fix-and-flip loans, hard money refinancing, and loans for rental properties. Maximum LTV of 70%, with rates starting at 7.99%.",
+        "City": "Phoenix",
+        "Lender City & State": "Los Angeles, CA 90071",
+        "Lender Phone": "(323) 352-9292",
+        "Lender Street Address": "445 S. Figueroa Street, Suite 3199",
+        "Lender Website": "http://www.hardmoneyfirst.com",
+        "Lending Location": "CA, AZ, MN",
+        "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans, Refinance / Cash Out Loans",
+        "Property Types": "Apartment, Assisted Living, Hotel, Industrial, Mixed Use, Multi Family, Office, Retail, Single Family, Storage, Warehouse",
+        "State": "Arizona",
+        "Ltv": 70
+      },
+      {
+        "Lender": "Green Oak Capital",
+        "About the Lender": "Green Oak Capital is a Bala Cynwyd, PA based private money lender. They offer loans throughout Philadelphia County, Chester County, Montgomery County, and Delaware County. They offer rental property loans, short term fix and flip loans, short term loans, and private refinancing. Flexible loan amounts ranging from $100,000 to $1,000,000.",
+        "City": "Philadelphia",
+        "Lender City & State": "Bala Cynwyd, PA 19004",
+        "Lender Phone": "(610) 555-0120",
+        "Lender Street Address": "20 Penarth Road",
+        "Lender Website": "http://www.greatoakcapital.com/",
+        "Lending Location": "PA",
+        "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans, Refinance / Cash Out Loans",
+        "Property Types": "Land, Multi Family, Single Family",
+        "State": "Pennsylvania",
+        "Ltv": 80
+      },
+      {
+        "Lender": "CIVIC Private Money Lending",
+        "About the Lender": "CIVIC Private Money Lending is a Redondo Beach, CA based hard money lender offering funding in 10 states throughout the country. They provide loans for a variety of scenarios, including private refinancing, fix and flip hard money loans, hard money bridge loans, and buy and hold loans. Terms between 12 months and 48 months, up to 80% LTV, rates 8.5% - 10.5%.",
+        "City": "Mesa",
+        "Lender City & State": "Redondo Beach, CA 90278",
+        "Lender Phone": "(310) 555-0144",
+        "Lender Street Address": "2015 Manhattan Beach Blvd",
+        "Lender Website": "http://www.civicfs.com/",
+        "Lending Location": "AZ, CA, CO, FL, GA, HI, NV, OR, TX, WA",
+        "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans, Refinance / Cash Out Loans",
+        "Property Types": "Multi Family, Single Family",
+        "State": "Arizona",
+        "Ltv": 80
+      },
+      {
+        "Lender": "Corevest",
+        "About the Lender": "Corevest is an Irvine, CA based private lender. They provide funding all across the United States. They provide loans for investments properties, refinancing, bridge loans, and fix and flip hard money loans. Terms between 5 years and 10 years and loan amounts ranging from $500,000 to $100,000,000 with a maximum LTV of 75%.",
+        "City": "Palmer",
+        "Lender City & State": "Irvine, CA 92614",
+        "Lender Phone": "(844) 223-2231",
+        "Lender Street Address": "1920 Main Street, Suite 850",
+        "Lender Website": "https://www.corevestfinance.com",
+        "Lending Location": "National",
+        "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans, Refinance / Cash Out Loans",
+        "Property Types": "Multi Family, Single Family",
+        "State": "Alaska",
+        "Ltv": 75
+      },
+      {
+        "Lender": "Texas Mortgage Place",
+        "About the Lender": "Texas Mortgage Place is a private lender based in Garland, TX offering funding throughout Dallas and Fort Worth. They offer lending solutions for many different situations, including short term loans, long term rental property loans, fix-and-flip loans, and refinancing. Terms between 6 months and 1 year, LTV up to 80%.",
+        "City": "Dallas",
+        "Lender City & State": "Garland, TX 75041",
+        "Lender Phone": "(214) 824-0417",
+        "Lender Street Address": "1795 Northwest Hwy",
+        "Lender Website": "http://www.texasmortgageplace.com/",
+        "Lending Location": "Dallas, Fort Worth",
+        "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans, Refinance / Cash Out Loans",
+        "Property Types": "Multi Family, Single Family",
+        "State": "Texas",
+        "Ltv": 80
+      },
+      {
+        "Lender": "Bridge Well Capital",
+        "About the Lender": "Bridge Well Capital is a hard money lender in Orlando, FL offering funding in 40 states throughout the United States. They provide loans for investments properties, cash out hard money loans, and fix-and-flip hard money loans. Loan amounts ranging from $75,000 to $5,000,000 with a maximum LTV of 85%.",
+        "City": "Anchorage",
+        "Lender City & State": "Orlando, FL 32801",
+        "Lender Phone": "(407) 447-1000",
+        "Lender Street Address": "496 Delaney Ave #408",
+        "Lender Website": "https://www.bridgewellcapital.com",
+        "Lending Location": "National",
+        "Loan Types Offered": "Fix and Flip Loans, Investment Property Loans, Refinance / Cash Out Loans",
+        "Property Types": "Multi Family, Single Family",
+        "State": "Alaska",
+        "Ltv": 85
+      },
+      {
+        "Lender": "Manhattan Bridge Capital",
+        "About the Lender": "Manhattan Bridge Capital is a Great Neck, NY based private money lender who offers funding throughout New York City. They provide long term rental property loans, ground-up construction loans, fix and flip loans, and hard money bridge loans. Terms up to 1 year and loan amounts ranging from $100,000 to $2,000,000 with a maximum LTV of 65%.",
+        "City": "Stamford",
+        "Lender City & State": "Great Neck, NY 11021",
+        "Lender Phone": "(516) 444-3400",
+        "Lender Street Address": "60 Cutter Mill Rd, Suite 205",
+        "Lender Website": "http://manhattanbridgecapital.com/",
+        "Lending Location": "New York City",
+        "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans, New Construction Loans",
+        "Property Types": "Multi Family, Single Family",
+        "State": "Connecticut",
+        "Ltv": 65
+      },
+      {
+        "Lender": "The Norris Group",
+        "About the Lender": "The Norris Group is private money lender headquartered in Riverside, CA. They provide funding in Los Angeles County, Orange County, San Diego County, Riverside County, San Bernardino County, and Kern County. They offer lending solutions for many different situations and needs, including short term fix and flip loans, rental property loans, and ground up construction loans.",
+        "City": "Los Angeles",
+        "Lender City & State": "Riverside, CA 92507",
+        "Lender Phone": "(951) 780-5856",
+        "Lender Street Address": "1845 Chicago Avenue, Suite C",
+        "Lender Website": "http://www.thenorrisgroup.com",
+        "Lending Location": "CA",
+        "Loan Types Offered": "Fix and Flip Loans, Investment Property Loans, New Construction Loans",
+        "Property Types": "Apartment, Multi Family, Single Family",
+        "State": "California",
+        "Ltv": 75
+      }
+    ];
+
+    // Mutable runtime Database
+    let runtimeDatabase = [...directDatabase];
+    let filteredDatabase = [...runtimeDatabase];
+
+    // Pipeline Kanban Model Data
+    let kanbanDeals = [
+      { id: 'deal-1', lender: 'Colony American Finance', value: '$2,400,000', program: 'Bridge Loan', state: 'Lead' },
+      { id: 'deal-2', lender: 'Source Capital', value: '$850,000', program: 'Fix & Flip', state: 'Underwriting' },
+      { id: 'deal-3', lender: 'Asset Avenue', value: '$1,200,000', program: 'Rental Focus', state: 'Term Sheet' },
+      { id: 'deal-4', lender: 'Green Oak Capital', value: '$650,000', program: 'New Const.', state: 'Funded' }
+    ];
+
+    // Active View Settings
+    let currentTab = 'dashboard';
+    let viewMode = 'grid'; // grid or table
+    let currentPage = 1;
+    const itemsPerPage = 6;
+
+    // Toast Notification generator
+    function triggerToast(message, type = 'info') {
+      const colors = {
+        success: 'border-prismGreen text-prismGreen bg-prismGreen/10',
+        error: 'border-prismMagenta text-prismMagenta bg-prismMagenta/10',
+        info: 'border-prismCyan text-prismCyan bg-prismCyan/10'
+      };
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `p-4 border rounded-xl backdrop-blur-xl ${colors[type]} shadow-2xl transition-all duration-300 transform translate-y-2 opacity-0 pointer-events-auto flex items-center justify-between min-w-[280px]`;
+      toast.innerHTML = `
+        <span class="text-xs font-mono font-medium">${message}</span>
+        <button onclick="this.parentElement.remove()" class="text-[10px] uppercase font-mono ml-3 opacity-50 hover:opacity-100">✕</button>
+      `;
+      container.appendChild(toast);
+      
+      // Animate Entrance
+      setTimeout(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      }, 50);
+
+      // Dismiss automatically
+      setTimeout(() => {
+        toast.classList.add('translate-y-2', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    // Tab Router Switcher
+    function switchTab(tabId) {
+      currentTab = tabId;
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+
+      // Highlight navigation btn
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('text-textPrimary', 'bg-white/5', 'border-l-2', 'border-prismCyan');
+        btn.classList.add('text-textSecondary');
+      });
+      const activeBtn = document.getElementById(`btn-${tabId}`);
+      if (activeBtn) {
+        activeBtn.classList.add('text-textPrimary', 'bg-white/5', 'border-l-2', 'border-prismCyan');
+        activeBtn.classList.remove('text-textSecondary');
+      }
+
+      triggerToast(`Loaded Module: ${tabId.toUpperCase()}`, 'info');
+
+      if (tabId === 'kanban') {
+        setupKanban();
+      }
+    }
+
+    // Toggle Admin Settings Modal
+    function toggleSettingsModal() {
+      const modal = document.getElementById('settings-modal');
+      modal.classList.toggle('hidden');
+    }
+
+    function saveAdminSettings() {
+      triggerToast('System credentials and keys stored to registry.', 'success');
+      toggleSettingsModal();
+    }
+
+    // FAQ Accordion handling
+    function toggleAccordion(faqId) {
+      const body = document.getElementById(faqId);
+      const icon = document.getElementById(`${faqId}-icon`);
+      body.classList.toggle('hidden');
+      if (body.classList.contains('hidden')) {
+        icon.textContent = '[+]';
+      } else {
+        icon.textContent = '[-]';
+      }
+    }
+
+    // Directory Filtration Engine
+    function applyAllFilters() {
+      const searchQuery = document.getElementById('dir-search').value.toLowerCase().trim();
+      const programQuery = document.getElementById('dir-loan').value;
+      const propertyQuery = document.getElementById('dir-property').value;
+
+      filteredDatabase = runtimeDatabase.filter(item => {
+        const matchSearch = !searchQuery || 
+          item.Lender.toLowerCase().includes(searchQuery) ||
+          item.City.toLowerCase().includes(searchQuery) ||
+          item.State.toLowerCase().includes(searchQuery) ||
+          (item["About the Lender"] && item["About the Lender"].toLowerCase().includes(searchQuery));
+
+        const matchProgram = programQuery === 'ALL' || 
+          (item["Loan Types Offered"] && item["Loan Types Offered"].includes(programQuery));
+
+        const matchProperty = propertyQuery === 'ALL' || 
+          (item["Property Types"] && item["Property Types"].includes(propertyQuery));
+
+        return matchSearch && matchProgram && matchProperty;
+      });
+
+      currentPage = 1;
+      renderDirectory();
+      renderActivePills();
+      updateBentoMetrics();
+    }
+
+    function resetDirectoryFilters() {
+      document.getElementById('dir-search').value = '';
+      document.getElementById('dir-loan').value = 'ALL';
+      document.getElementById('dir-property').value = 'ALL';
+      applyAllFilters();
+      triggerToast('Refraction indicators set to factory default.', 'success');
+    }
+
+    function renderActivePills() {
+      const container = document.getElementById('dir-active-pills');
+      container.innerHTML = '';
+
+      const program = document.getElementById('dir-loan').value;
+      const property = document.getElementById('dir-property').value;
+
+      if (program !== 'ALL') {
+        container.appendChild(createPill(`Program: ${program}`, () => {
+          document.getElementById('dir-loan').value = 'ALL';
+          applyAllFilters();
+        }));
+      }
+      if (property !== 'ALL') {
+        container.appendChild(createPill(`Asset Focus: ${property}`, () => {
+          document.getElementById('dir-property').value = 'ALL';
+          applyAllFilters();
+        }));
+      }
+    }
+
+    function createPill(text, onDismiss) {
+      const div = document.createElement('div');
+      div.className = "flex items-center gap-2 px-3 py-1 bg-white/5 border border-borderThin rounded-lg text-xs font-mono text-prismCyan";
+      div.innerHTML = `
+        <span>${text}</span>
+        <button class="hover:text-white" onclick="(${onDismiss})()">✕</button>
+      `;
+      return div;
+    }
+
+    // Toggle View modes between responsive Grid & Custom Data Table
+    function setViewMode(mode) {
+      viewMode = mode;
+      const gridBtn = document.getElementById('btn-view-grid');
+      const tableBtn = document.getElementById('btn-view-table');
+
+      if (mode === 'grid') {
+        gridBtn.classList.add('text-textPrimary', 'bg-white/5');
+        gridBtn.classList.remove('text-textSecondary');
+        tableBtn.classList.add('text-textSecondary');
+        tableBtn.classList.remove('text-textPrimary', 'bg-white/5');
+
+        document.getElementById('directory-grid-container').classList.remove('hidden');
+        document.getElementById('directory-table-container').classList.add('hidden');
+      } else {
+        tableBtn.classList.add('text-textPrimary', 'bg-white/5');
+        tableBtn.classList.remove('text-textSecondary');
+        gridBtn.classList.add('text-textSecondary');
+        gridBtn.classList.remove('text-textPrimary', 'bg-white/5');
+
+        document.getElementById('directory-grid-container').classList.add('hidden');
+        document.getElementById('directory-table-container').classList.remove('hidden');
+      }
+      renderDirectory();
+    }
+
+    // Render Data to Active View Node
+    function renderDirectory() {
+      const gridContainer = document.getElementById('directory-grid-container');
+      const tableBody = document.getElementById('directory-table-rows');
+      const emptyState = document.getElementById('directory-empty-state');
+
+      gridContainer.innerHTML = '';
+      tableBody.innerHTML = '';
+
+      if (filteredDatabase.length === 0) {
+        emptyState.classList.remove('hidden');
+        document.getElementById('pagination-status').textContent = "Showing index range 0 of 0";
+        document.getElementById('btn-page-prev').disabled = true;
+        document.getElementById('btn-page-next').disabled = true;
+        return;
+      }
+      emptyState.classList.add('hidden');
+
+      const start = (currentPage - 1) * itemsPerPage;
+      const end = Math.min(start + itemsPerPage, filteredDatabase.length);
+      const items = filteredDatabase.slice(start, end);
+
+      items.forEach(item => {
+        // Render Responsive Grid Item
+        const card = document.createElement('div');
+        card.className = "bg-prismSurface border border-borderThin rounded-2xl p-6 flex flex-col justify-between space-y-4 hover:border-prismCyan/50 hover:shadow-[0_0_15px_rgba(0,240,255,0.05)] transition-all cursor-pointer";
+        card.onclick = () => openLenderDrawer(item);
+        card.innerHTML = `
+          <div class="flex items-start justify-between">
+            <div class="space-y-1">
+              <span class="text-[10px] font-mono border border-prismViolet/30 bg-prismViolet/10 px-2 py-0.5 rounded text-prismViolet">${item.State}</span>
+              <h3 class="font-space font-bold text-textPrimary text-lg">${item.Lender}</h3>
+            </div>
+            <span class="text-xs font-mono text-prismCyan">${item.Ltv ? item.Ltv : 80}% LTV</span>
+          </div>
+          <p class="text-xs text-textSecondary leading-relaxed line-clamp-3">"${item["About the Lender"]}"</p>
+          <div class="flex items-center justify-between text-xs pt-4 border-t border-white/5 font-mono text-textMuted">
+            <span>HQ Hub: ${item.City}</span>
+            <span class="text-prismMagenta hover:underline">Inspect Node &rarr;</span>
+          </div>
+        `;
+        gridContainer.appendChild(card);
+
+        // Render Table Row
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-white/[0.02] cursor-pointer";
+        tr.onclick = () => openLenderDrawer(item);
+        tr.innerHTML = `
+          <td class="px-6 py-4 font-space font-semibold text-textPrimary">${item.Lender}</td>
+          <td class="px-6 py-4 text-xs font-mono text-textSecondary">${item.City}</td>
+          <td class="px-6 py-4 text-xs text-textSecondary">${item.State}</td>
+          <td class="px-6 py-4 text-xs max-w-xs truncate text-textMuted">${item["Loan Types Offered"] || 'Custom'}</td>
+          <td class="px-6 py-4 text-right text-xs font-mono text-prismCyan">View Node</td>
+        `;
+        tableBody.appendChild(tr);
+      });
+
+      // Pagination Updates
+      document.getElementById('pagination-status').textContent = `Showing range ${start + 1} &mdash; ${end} of ${filteredDatabase.length} records`;
+      document.getElementById('btn-page-prev').disabled = currentPage === 1;
+      document.getElementById('btn-page-next').disabled = end >= filteredDatabase.length;
+    }
+
+    function adjustPage(delta) {
+      currentPage += delta;
+      renderDirectory();
+    }
+
+    // Dynamic metrics updating across Dashboard
+    function updateBentoMetrics() {
+      document.getElementById('bento-total-lenders').textContent = filteredDatabase.length;
+      const uniqueStates = [...new Set(filteredDatabase.map(item => item.State))].length;
+      document.getElementById('bento-states').textContent = uniqueStates;
+    }
+
+    // Date Picker Filter simulation
+    function applyDateFilter() {
+      const from = document.getElementById('date-from').value;
+      const to = document.getElementById('date-to').value;
+      triggerToast(`Central index limited to dynamic period: ${from} to ${to}`, 'info');
+    }
+
+    // Sliding Detail Drawer Implementation
+    function openLenderDrawer(lender) {
+      const body = document.getElementById('drawer-content-body');
+      const actions = document.getElementById('drawer-content-actions');
+
+      body.innerHTML = `
+        <div class="space-y-2">
+          <span class="text-xs font-mono text-prismCyan bg-prismCyan/10 border border-prismCyan/30 px-2.5 py-0.5 rounded">NODE MATCH // STABLE</span>
+          <h2 class="text-2xl font-space font-bold text-textPrimary">${lender.Lender}</h2>
+        </div>
+
+        <div class="p-4 bg-white/5 border border-borderThin rounded-xl text-xs text-textSecondary leading-relaxed italic">
+          "${lender["About the Lender"]}"
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="p-3 bg-white/[0.02] border border-borderThin rounded-xl font-mono text-xs">
+            <span class="block text-textMuted text-[10px] uppercase">Primary Headquarters</span>
+            <span class="text-textPrimary font-semibold mt-1 block">${lender.City}, ${lender.State}</span>
+          </div>
+          <div class="p-3 bg-white/[0.02] border border-borderThin rounded-xl font-mono text-xs">
+            <span class="block text-textMuted text-[10px] uppercase">Lending Locations</span>
+            <span class="text-textPrimary font-semibold mt-1 block">${lender["Lending Location"] || 'National'}</span>
+          </div>
+          <div class="p-3 bg-white/[0.02] border border-borderThin rounded-xl font-mono text-xs">
+            <span class="block text-textMuted text-[10px] uppercase">Physical Coordinates</span>
+            <span class="text-textPrimary font-semibold mt-1 block break-all text-[11px]">${lender["Lender Street Address"] || 'Custom Address'}</span>
+          </div>
+          <div class="p-3 bg-white/[0.02] border border-borderThin rounded-xl font-mono text-xs">
+            <span class="block text-textMuted text-[10px] uppercase">Optimal LTV Max</span>
+            <span class="text-prismCyan font-bold mt-1 block text-sm">${lender.Ltv ? lender.Ltv : 80}%</span>
+          </div>
+        </div>
+
+        <!-- Interactive Predictive Leverage Calculator -->
+        <div class="p-5 bg-gradient-to-br from-prismViolet/10 to-transparent border border-prismViolet/30 rounded-2xl space-y-4">
+          <div class="flex items-center gap-2">
+            <span class="text-prismViolet">⚡</span>
+            <h4 class="font-space font-bold text-sm text-textPrimary">Leverage & Monthly Cost Predictor</h4>
+          </div>
+
+          <div class="space-y-3">
+            <div class="flex justify-between text-xs font-mono text-textSecondary">
+              <span>Estimated Asset Value</span>
+              <span id="calc-val-display">$500,000</span>
+            </div>
+            <input type="range" id="calc-asset-slider" oninput="calculateDrawerForecast(${lender.Ltv || 80})" class="w-full accent-prismCyan bg-white/10 rounded-lg appearance-none h-1" min="100000" max="3000000" step="50000" value="500000">
+
+            <div class="flex justify-between text-xs font-mono text-textSecondary">
+              <span>Target Leverage (LTV)</span>
+              <span id="calc-ltv-display">${lender.Ltv || 80}%</span>
+            </div>
+            <input type="range" id="calc-ltv-slider" oninput="calculateDrawerForecast(${lender.Ltv || 80})" class="w-full accent-prismMagenta bg-white/10 rounded-lg appearance-none h-1" min="50" max="${lender.Ltv || 85}" step="5" value="${lender.Ltv || 80}">
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 pt-3 border-t border-white/5 text-xs font-mono">
+            <div>
+              <span class="text-textMuted text-[10px]">Predicted Loan Capital</span>
+              <div class="text-prismCyan font-bold text-base mt-1" id="calc-loan-amount">$400,000</div>
+            </div>
+            <div>
+              <span class="text-textMuted text-[10px]">Est. Monthly Interest</span>
+              <div class="text-prismMagenta font-bold text-base mt-1" id="calc-monthly-cost">$3,333</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      actions.innerHTML = `
+        <a href="${lender["Lender Website"]}" target="_blank" class="flex-1 py-3 bg-gradient-to-r from-prismCyan to-prismViolet text-white font-semibold text-center text-xs rounded-xl hover:opacity-90 transition-all">Secure Web Handshake</a>
+        <a href="tel:${lender["Lender Phone"] || '555-0100'}" class="px-4 py-3 bg-white/5 hover:bg-white/10 border border-borderThin rounded-xl text-textSecondary hover:text-textPrimary transition-all flex items-center justify-center">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+        </a>
+      `;
+
+      document.getElementById('detail-drawer').classList.remove('translate-x-full');
+      document.getElementById('drawer-overlay').classList.remove('hidden');
+      
+      calculateDrawerForecast(lender.Ltv || 80);
+    }
+
+    function calculateDrawerForecast(maxLtv) {
+      const assetVal = parseInt(document.getElementById('calc-asset-slider').value);
+      const ltvVal = parseInt(document.getElementById('calc-ltv-slider').value);
+
+      document.getElementById('calc-val-display').textContent = `$${assetVal.toLocaleString()}`;
+      document.getElementById('calc-ltv-display').textContent = `${ltvVal}%`;
+
+      const loanCapital = assetVal * (ltvVal / 100);
+      document.getElementById('calc-loan-amount').textContent = `$${Math.round(loanCapital).toLocaleString()}`;
+
+      // Assume approximate 10% interest rate
+      const monthlyRate = (loanCapital * 0.10) / 12;
+      document.getElementById('calc-monthly-cost').textContent = `$${Math.round(monthlyRate).toLocaleString()}`;
+    }
+
+    function closeLenderDrawer() {
+      document.getElementById('detail-drawer').classList.add('translate-x-full');
+      document.getElementById('drawer-overlay').classList.add('hidden');
+    }
+
+    // Kanban Routing Engine logic
+    function setupKanban() {
+      const board1 = document.getElementById('kanban-board');
+      const board2 = document.getElementById('kanban-full-board');
+
+      [board1, board2].forEach(b => {
+        if (b) b.innerHTML = '';
+      });
+
+      const columns = ['Lead', 'Underwriting', 'Term Sheet', 'Funded'];
+
+      columns.forEach(col => {
+        const colDeals = kanbanDeals.filter(d => d.state === col);
+
+        const colHtml = `
+          <div class="bg-white/[0.02] border border-borderThin rounded-2xl p-4 flex flex-col gap-4">
+            <div class="flex items-center justify-between border-b border-white/5 pb-3">
+              <span class="font-space font-bold text-xs text-textPrimary uppercase tracking-wider">${col}</span>
+              <span class="px-2 py-0.5 bg-white/5 border border-borderThin rounded text-[10px] font-mono text-textSecondary">${colDeals.length}</span>
+            </div>
+            <div class="space-y-3 flex-1 min-h-[150px]">
+              ${colDeals.map(deal => `
+                <div class="bg-prismSurface border border-borderThin hover:border-prismCyan/30 rounded-xl p-4 space-y-3 relative group transition-all">
+                  <div>
+                    <h4 class="font-space font-bold text-sm text-textPrimary">${deal.lender}</h4>
+                    <span class="text-[10px] font-mono text-textMuted">${deal.program}</span>
+                  </div>
+                  <div class="flex justify-between items-center text-xs font-mono pt-2 border-t border-white/5">
+                    <span class="text-prismCyan font-bold">${deal.value}</span>
+                    <button onclick="advanceDealState('${deal.id}')" class="px-2 py-1 bg-white/5 hover:bg-prismCyan/20 hover:text-prismCyan rounded text-[10px] transition-colors" title="Advance State">Shift State</button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+
+        if (board1) board1.insertAdjacentHTML('beforeend', colHtml);
+        if (board2) board2.insertAdjacentHTML('beforeend', colHtml);
+      });
+    }
+
+    function advanceDealState(dealId) {
+      const deal = kanbanDeals.find(d => d.id === dealId);
+      if (deal) {
+        const states = ['Lead', 'Underwriting', 'Term Sheet', 'Funded'];
+        const idx = states.indexOf(deal.state);
+        if (idx < states.length - 1) {
+          deal.state = states[idx + 1];
+          triggerToast(`Deal route advanced to state: ${deal.state}`, 'success');
+        } else {
+          deal.state = 'Lead'; // Loop back to beginning
+          triggerToast('Deal cycle returned to Lead Node queue.', 'info');
+        }
+        setupKanban();
+      }
+    }
+
+    function createNewPipelineCard() {
+      const randomLenders = ['Green Oak Capital', 'Source Capital', 'CIVIC Lending', 'Corevest', 'RCN Capital'];
+      const randomProg = ['Bridge Loan', 'Fix & Flip', 'Commercial Hard', 'Multifamily Construction'];
+      const randomLender = randomLenders[Math.floor(Math.random() * randomLenders.length)];
+      const randomAmount = `$${(Math.floor(Math.random() * 20) + 1) * 100},000`;
+      const id = `deal-${Date.now()}`;
+
+      kanbanDeals.push({
+        id: id,
+        lender: randomLender,
+        value: randomAmount,
+        program: randomProg[Math.floor(Math.random() * randomProg.length)],
+        state: 'Lead'
+      });
+
+      triggerToast('Mock transaction registered in routing pipeline.', 'success');
+      setupKanban();
+    }
+
+    // CSV & JSON Parser Engine
+    let stagedNodes = [];
+
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const content = evt.target.result;
+        try {
+          if (file.name.endsWith('.json')) {
+            stagedNodes = JSON.parse(content);
+          } else if (file.name.endsWith('.csv')) {
+            stagedNodes = parseCSV(content);
+          }
+          triggerToast(`Correctly parsed ${stagedNodes.length} nodes from packet. Staged for merge.`, 'success');
+          renderStagedPreview();
+        } catch (err) {
+          triggerToast('Parsing failure: Ensure standard schemas matches directories.', 'error');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function parsePasteInput() {
+      const raw = document.getElementById('raw-uploader-paste').value.trim();
+      if (!raw) {
+        triggerToast('No input found inside paste editor.', 'error');
+        return;
+      }
+      try {
+        stagedNodes = JSON.parse(raw);
+        if (!Array.isArray(stagedNodes)) stagedNodes = [stagedNodes];
+        triggerToast(`Correctly parsed ${stagedNodes.length} nodes. Ready for vault merge.`, 'success');
+        renderStagedPreview();
+      } catch (err) {
+        triggerToast('Strict JSON parse exception. Check structure syntax.', 'error');
+      }
+    }
+
+    function importTestData() {
+      stagedNodes = [
+        {
+          "Lender": "Pacifica Trust Holdings",
+          "About the Lender": "Pacifica Trust offers commercial construction financing and high leverage bridge facilities national-wide.",
+          "City": "Seattle",
+          "State": "Washington",
+          "Ltv": 82
+        },
+        {
+          "Lender": "Luminance Real Capital",
+          "About the Lender": "Luminance targets institutional fix and flip guidelines across CA and NV regional markets.",
+          "City": "Reno",
+          "State": "Nevada",
+          "Ltv": 78
+        }
+      ];
+      triggerToast('Standard sample matching packets staged in active cache memory.', 'info');
+      renderStagedPreview();
+    }
+
+    function renderStagedPreview() {
+      const tbody = document.getElementById('preview-rows');
+      const counter = document.getElementById('preview-row-count');
+
+      tbody.innerHTML = '';
+      counter.textContent = `${stagedNodes.length} Nodes Staged`;
+
+      if (stagedNodes.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="px-4 py-8 text-center text-textMuted italic">No staged parsing configurations detected. Drag standard assets into directory queue.</td></tr>`;
+        return;
+      }
+
+      stagedNodes.forEach(node => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-white/[0.02]";
+        tr.innerHTML = `
+          <td class="px-4 py-3 font-semibold text-textPrimary">${node.Lender || 'Unnamed Node'}</td>
+          <td class="px-4 py-3 text-textSecondary">${node.State || 'Unknown'}</td>
+          <td class="px-4 py-3 text-prismCyan">${node.Ltv || 80}% LTV</td>
+          <td class="px-4 py-3 text-textMuted">${node["Property Types"] || 'General Real Estate'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function clearStagedData() {
+      stagedNodes = [];
+      renderStagedPreview();
+      triggerToast('Cache streams wiped cleanly.', 'info');
+    }
+
+    function commitStagedToDatabase() {
+      if (stagedNodes.length === 0) {
+        triggerToast('No valid staged nodes detected inside matching buffer.', 'error');
+        return;
+      }
+      
+      runtimeDatabase = [...stagedNodes, ...runtimeDatabase];
+      applyAllFilters();
+      clearStagedData();
+      triggerToast('Security validated. Node matrices merged into central Capital Vault.', 'success');
+      switchTab('directory');
+    }
+
+    function parseCSV(text) {
+      const lines = text.split('\n');
+      const result = [];
+      const headers = lines[0].split(',');
+
+      for(let i=1; i<lines.length; i++) {
+        if(!lines[i].trim()) continue;
+        const obj = {};
+        const currentline = lines[i].split(',');
+        for(let j=0; j<headers.length; j++) {
+          obj[headers[j].trim()] = currentline[j] ? currentline[j].trim() : '';
+        }
+        result.push(obj);
+      }
+      return result;
+    }
+
+    // Onboarding Wizard Stepper
+    let onboardingStep = 1;
+
+    function advanceOnboarding(delta) {
+      const nextStep = onboardingStep + delta;
+      if (nextStep < 1 || nextStep > 4) return;
+
+      // Simple validation for step 1
+      if (onboardingStep === 1 && delta === 1) {
+        const name = document.getElementById('ob-lender-name').value;
+        if (!name) {
+          triggerToast('Validation error: Lender entity identity name required.', 'error');
+          return;
+        }
+      }
+
+      // Update UI elements visibility
+      document.getElementById(`step-${onboardingStep}`).classList.add('hidden');
+      document.getElementById(`step-${nextStep}`).classList.remove('hidden');
+
+      // Update step indicator bar highlights
+      const indicators = document.querySelectorAll('.step-indicator-bar');
+      indicators.forEach((ind, index) => {
+        if (index < nextStep) {
+          ind.classList.remove('bg-white/10');
+          ind.classList.add('bg-prismCyan');
+        } else {
+          ind.classList.add('bg-white/10');
+          ind.classList.remove('bg-prismCyan');
+        }
+      });
+
+      onboardingStep = nextStep;
+
+      // Update Summary metrics on step 4
+      if (onboardingStep === 4) {
+        document.getElementById('summary-name').textContent = document.getElementById('ob-lender-name').value || '-';
+        document.getElementById('summary-city').textContent = document.getElementById('ob-lender-city').value || 'Unspecified';
+        document.getElementById('summary-ltv').textContent = (document.getElementById('ob-lender-ltv').value || '80') + '%';
+        
+        const nextBtn = document.getElementById('btn-ob-next');
+        nextBtn.textContent = "Commit Partner Node";
+        nextBtn.onclick = commitPartnerOnboarding;
+      } else {
+        const nextBtn = document.getElementById('btn-ob-next');
+        nextBtn.textContent = "Advance Node";
+        nextBtn.onclick = () => advanceOnboarding(1);
+      }
+
+      document.getElementById('btn-ob-prev').disabled = onboardingStep === 1;
+    }
+
+    function commitPartnerOnboarding() {
+      const partner = {
+        Lender: document.getElementById('ob-lender-name').value,
+        "About the Lender": document.getElementById('ob-lender-desc').value || "No detailed parameters declared.",
+        City: document.getElementById('ob-lender-city').value || "Metro",
+        State: document.getElementById('ob-lender-state').value || "National",
+        "Lender Phone": document.getElementById('ob-lender-phone').value || "555-0199",
+        "Lender Website": document.getElementById('ob-lender-web').value || "#",
+        "Property Types": document.getElementById('ob-lender-assets').value || "Single Family",
+        "Loan Types Offered": document.getElementById('ob-lender-programs').value || "General Bridge",
+        Ltv: parseInt(document.getElementById('ob-lender-ltv').value) || 80
+      };
+
+      runtimeDatabase.unshift(partner);
+      applyAllFilters();
+      triggerToast('Registration protocol completed successfully. Node registered.', 'success');
+
+      // Reset Form State
+      document.getElementById('onboarding-form').reset();
+      document.getElementById(`step-${onboardingStep}`).classList.add('hidden');
+      onboardingStep = 1;
+      document.getElementById('step-1').classList.remove('hidden');
+      
+      const indicators = document.querySelectorAll('.step-indicator-bar');
+      indicators.forEach((ind, index) => {
+        if(index === 0) ind.classList.add('bg-prismCyan');
+        else ind.classList.remove('bg-prismCyan');
+      });
+
+      const nextBtn = document.getElementById('btn-ob-next');
+      nextBtn.textContent = "Advance Node";
+      nextBtn.onclick = () => advanceOnboarding(1);
+      document.getElementById('btn-ob-prev').disabled = true;
+
+      switchTab('directory');
+    }
+
+    // Core Initialization Sequence on document load
+    window.addEventListener('DOMContentLoaded', () => {
+      applyAllFilters();
+      setupKanban();
+      triggerToast('Symmetric system environment handshake validated.', 'success');
+    });
+  </script>
+    <script src="script.js"></script>
+</body>
+</html>

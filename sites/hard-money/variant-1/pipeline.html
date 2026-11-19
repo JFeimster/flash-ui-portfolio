@@ -1,0 +1,775 @@
+```html
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Edge | Creative Review & Approval Pipeline</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            bg: '#07090e',
+                            card: '#0e131f',
+                            border: '#1e293b',
+                            accent: '#00f0ff',
+                            purple: '#bd00ff',
+                            emerald: '#05ffc4',
+                            glow: 'rgba(0, 240, 255, 0.15)'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Fira Code', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #07090e;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(189, 0, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 240, 255, 0.05) 0%, transparent 40%),
+                linear-gradient(rgba(255, 255, 255, 0.003) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.003) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+        }
+
+        /* Dynamic Edge Clip Paths & Visual Flourishes */
+        .edge-clip {
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+        }
+        
+        .edge-clip-reverse {
+            clip-path: polygon(12px 0, 100% 0, 100% 100%, 0 100%, 0 12px);
+        }
+
+        .edge-accent-line {
+            position: relative;
+        }
+        .edge-accent-line::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #00f0ff 0%, #bd00ff 100%);
+        }
+
+        /* Glassmorphism & Cyber glows */
+        .cyber-glow-hover:hover {
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.15);
+            border-color: #00f0ff;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #07090e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f0ff;
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen overflow-x-hidden antialiased selection:bg-cyber-accent selection:text-black">
+
+    <!-- TOP TELEMETRY STRIP -->
+    <div class="border-b border-cyber-border bg-black/60 backdrop-blur-md sticky top-0 z-50 transition-all duration-300">
+        <div class="max-w-[1400px] mx-auto px-4 py-2 flex items-center justify-between text-[11px] font-mono tracking-wider text-slate-400">
+            <div class="flex items-center gap-6">
+                <span class="flex items-center gap-1.5">
+                    <span class="h-2 w-2 rounded-full bg-cyber-emerald animate-ping"></span>
+                    <span class="text-cyber-emerald">PIPELINE SYNC: ONLINE</span>
+                </span>
+                <span class="hidden md:inline">ENVELOPE SECURED: <strong class="text-slate-200">128 FILE PARCELS</strong></span>
+                <span class="hidden lg:inline">AVG PROCESS VELOCITY: <strong class="text-slate-200">3.4 HOURS / TASK</strong></span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="hidden sm:inline">AUTHENTICATED REVIEWERS: <strong class="text-cyber-accent">14 ACTIVE</strong></span>
+                <div class="h-4 w-px bg-cyber-border"></div>
+                <button onclick="toggleMetricsPanel()" class="flex items-center gap-1.5 hover:text-cyber-accent transition-colors duration-200">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.003 9.003 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
+                    <span>METRICS PANEL</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="relative overflow-hidden pt-12 pb-8 border-b border-cyber-border/40">
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-cyber-bg pointer-events-none"></div>
+        <div class="max-w-[1400px] mx-auto px-4 relative z-10">
+            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+                <div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-cyber-purple/30 bg-cyber-purple/5 mb-4 text-xs font-mono text-cyber-purple uppercase tracking-widest">
+                        <span class="w-1.5 h-1.5 rounded-full bg-cyber-purple"></span>
+                        Creative Review & Approval Engine V1.4
+                    </div>
+                    <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight leading-none mb-4">
+                        DYNAMIC REVIEW <br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyber-accent via-blue-500 to-cyber-purple">
+                            & WORKFLOW PIPELINE
+                        </span>
+                    </h1>
+                    <p class="text-slate-400 text-sm md:text-base max-w-2xl font-light">
+                        Accelerate deal structuring, collateral design, and legal exhibits. Transition multi-format asset packs through rigorous checkpoints. Sign off, issue adjustments, and lock executions in real time.
+                    </p>
+                </div>
+                
+                <!-- Quick stats modules matching base -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 w-full lg:max-w-md font-mono">
+                    <div class="bg-cyber-card border border-cyber-border p-3 rounded-lg edge-clip">
+                        <span class="block text-[10px] text-slate-500 uppercase">IN PIPELINE</span>
+                        <span id="statInPipeline" class="text-lg font-bold text-slate-200">14 Packages</span>
+                    </div>
+                    <div class="bg-cyber-card border border-cyber-border p-3 rounded-lg edge-clip">
+                        <span class="block text-[10px] text-slate-500 uppercase">REV. REQUIRED</span>
+                        <span id="statRevisions" class="text-lg font-bold text-cyber-purple">4 Packs</span>
+                    </div>
+                    <div class="bg-cyber-card border border-cyber-border p-3 rounded-lg edge-clip col-span-2 sm:col-span-1">
+                        <span class="block text-[10px] text-slate-500 uppercase">SIGNED OFF</span>
+                        <span id="statApproved" class="text-lg font-bold text-cyber-emerald">28 Cleared</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- CORE WORKSPACE -->
+    <main class="max-w-[1400px] mx-auto px-4 py-8">
+        
+        <!-- CONTROL HUB: FILTERS & ATTACHMENT UPLOAD TRIGGER -->
+        <section class="mb-8 bg-cyber-card border border-cyber-border p-6 rounded-xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-cyber-purple/5 rounded-full filter blur-2xl pointer-events-none"></div>
+            
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <!-- Search & Pipeline Selectors -->
+                <div class="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-mono text-slate-400 uppercase mb-2">Filter Package Title</label>
+                        <div class="relative">
+                            <input id="searchQuery" type="text" oninput="applyFilters()" placeholder="Search revisions/deals..." 
+                                class="w-full bg-black/40 border border-cyber-border rounded-lg py-2 px-3 pl-9 text-sm text-slate-200 focus:outline-none focus:border-cyber-accent/80 transition-all duration-150">
+                            <svg class="absolute left-3 top-2.5 h-4 w-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-mono text-slate-400 uppercase mb-2">Deal Origin / Domain</label>
+                        <select id="originFilter" onchange="applyFilters()" class="w-full bg-black/40 border border-cyber-border rounded-lg py-2 px-3 text-sm text-slate-200 focus:outline-none focus:border-cyber-accent/80 transition-all duration-150">
+                            <option value="ALL">All Origins</option>
+                            <option value="Apex Velocity">Apex Velocity</option>
+                            <option value="Fortress Trust">Fortress Commercial</option>
+                            <option value="Emberstone Fund">Emberstone Capital</option>
+                            <option value="Sovereign PE">Sovereign PE</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-mono text-slate-400 uppercase mb-2">Priority Tier</label>
+                        <select id="priorityFilter" onchange="applyFilters()" class="w-full bg-black/40 border border-cyber-border rounded-lg py-2 px-3 text-sm text-slate-200 focus:outline-none focus:border-cyber-accent/80 transition-all duration-150">
+                            <option value="ALL">All Priorities</option>
+                            <option value="CRITICAL">Critical Priority</option>
+                            <option value="HIGH">High Priority</option>
+                            <option value="NORMAL">Normal Priority</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Right Side Actions -->
+                <div class="flex flex-wrap items-center gap-3">
+                    <button onclick="openUploadModal()" class="edge-clip bg-gradient-to-r from-cyber-purple to-pink-600 hover:from-purple-600 hover:to-pink-500 text-white px-5 py-2.5 text-xs font-bold uppercase transition-all flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Ingest New Package
+                    </button>
+                    <button onclick="resetFilters()" class="px-4 py-2 text-xs font-mono border border-cyber-border rounded-lg text-slate-400 hover:text-cyber-accent hover:border-cyber-accent transition-all duration-150">
+                        Reset Workspace
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- DYNAMIC PIPELINE METRICS PANEL (COLLAPSIBLE) -->
+        <section id="metricsPanel" class="mb-8 bg-black/40 border border-cyber-border rounded-xl p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 hidden">
+            <div class="border-l-2 border-cyber-accent pl-4">
+                <span class="block text-xs font-mono text-slate-500 uppercase">SYSTEM APPROVAL RATE</span>
+                <span class="text-2xl font-bold font-mono text-slate-200">92.4%</span>
+                <p class="text-[10px] text-slate-400 mt-1">Calculated over last 200 submissions.</p>
+            </div>
+            <div class="border-l-2 border-cyber-purple pl-4">
+                <span class="block text-xs font-mono text-slate-500 uppercase">ACTIVE DISPUTES / REVISIONS</span>
+                <span class="text-2xl font-bold font-mono text-cyber-purple">4 Packs</span>
+                <p class="text-[10px] text-slate-400 mt-1">Pending designer intervention or comment updates.</p>
+            </div>
+            <div class="border-l-2 border-cyber-emerald pl-4">
+                <span class="block text-xs font-mono text-slate-500 uppercase">SECURE HANDSHAKES</span>
+                <span class="text-2xl font-bold font-mono text-cyber-emerald">100% SECURE</span>
+                <p class="text-[10px] text-slate-400 mt-1">SHA-256 end-to-end telemetry matches.</p>
+            </div>
+            <div class="border-l-2 border-slate-700 pl-4">
+                <span class="block text-xs font-mono text-slate-500 uppercase">SLA COMPLIANCE</span>
+                <span class="text-2xl font-bold font-mono text-slate-200">1.8 HR AGILITY</span>
+                <p class="text-[10px] text-slate-400 mt-1">Exceeding industry benchmark of 12 hours.</p>
+            </div>
+        </section>
+
+        <!-- KANBAN BOARD WRAPPER -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+            
+            <!-- COLUMN 1: PENDING REVIEW -->
+            <div class="bg-cyber-card/60 border border-cyber-border rounded-xl flex flex-col p-4">
+                <div class="flex items-center justify-between pb-3 mb-4 border-b border-cyber-border/60">
+                    <div class="flex items-center gap-2">
+                        <span class="h-2.5 w-2.5 bg-yellow-500 rounded-full"></span>
+                        <h3 class="font-mono text-xs font-bold uppercase tracking-wider text-slate-300">Pending Review</h3>
+                    </div>
+                    <span id="countPending" class="bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 text-[10px] font-mono px-2 py-0.5 rounded">0</span>
+                </div>
+                <div id="colPending" class="space-y-4 flex-1 min-h-[500px]">
+                    <!-- Dynamic Cards -->
+                </div>
+            </div>
+
+            <!-- COLUMN 2: UNDER ANALYSIS -->
+            <div class="bg-cyber-card/60 border border-cyber-border rounded-xl flex flex-col p-4">
+                <div class="flex items-center justify-between pb-3 mb-4 border-b border-cyber-border/60">
+                    <div class="flex items-center gap-2">
+                        <span class="h-2.5 w-2.5 bg-cyber-accent rounded-full animate-pulse"></span>
+                        <h3 class="font-mono text-xs font-bold uppercase tracking-wider text-slate-300">Under Analysis</h3>
+                    </div>
+                    <span id="countAnalysis" class="bg-cyber-accent/10 border border-cyber-accent/30 text-cyber-accent text-[10px] font-mono px-2 py-0.5 rounded">0</span>
+                </div>
+                <div id="colAnalysis" class="space-y-4 flex-1 min-h-[500px]">
+                    <!-- Dynamic Cards -->
+                </div>
+            </div>
+
+            <!-- COLUMN 3: REVISIONS NEEDED -->
+            <div class="bg-cyber-card/60 border border-cyber-border rounded-xl flex flex-col p-4">
+                <div class="flex items-center justify-between pb-3 mb-4 border-b border-cyber-border/60">
+                    <div class="flex items-center gap-2">
+                        <span class="h-2.5 w-2.5 bg-cyber-purple rounded-full"></span>
+                        <h3 class="font-mono text-xs font-bold uppercase tracking-wider text-slate-300">Revision Needed</h3>
+                    </div>
+                    <span id="countRevisions" class="bg-cyber-purple/10 border border-cyber-purple/30 text-cyber-purple text-[10px] font-mono px-2 py-0.5 rounded">0</span>
+                </div>
+                <div id="colRevisions" class="space-y-4 flex-1 min-h-[500px]">
+                    <!-- Dynamic Cards -->
+                </div>
+            </div>
+
+            <!-- COLUMN 4: APPROVED / LOCKED -->
+            <div class="bg-cyber-card/60 border border-cyber-border rounded-xl flex flex-col p-4">
+                <div class="flex items-center justify-between pb-3 mb-4 border-b border-cyber-border/60">
+                    <div class="flex items-center gap-2">
+                        <span class="h-2.5 w-2.5 bg-cyber-emerald rounded-full"></span>
+                        <h3 class="font-mono text-xs font-bold uppercase tracking-wider text-slate-300">Approved / Locked</h3>
+                    </div>
+                    <span id="countApproved" class="bg-cyber-emerald/10 border border-cyber-emerald/30 text-cyber-emerald text-[10px] font-mono px-2 py-0.5 rounded">0</span>
+                </div>
+                <div id="colApproved" class="space-y-4 flex-1 min-h-[500px]">
+                    <!-- Dynamic Cards -->
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- INGEST / NEW PACKAGE POPUP MODAL -->
+    <div id="uploadModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-cyber-card border border-cyber-purple/60 w-full max-w-2xl p-6 rounded-xl relative edge-clip-reverse">
+            <!-- Tech design element -->
+            <div class="absolute top-0 right-12 w-16 h-1 bg-gradient-to-r from-cyber-accent to-cyber-purple"></div>
+            
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h3 class="text-2xl font-bold text-slate-100">Ingest File Envelope</h3>
+                    <p class="text-xs font-mono text-cyber-accent">Establish package telemetry and initiate validation cycles</p>
+                </div>
+                <button onclick="closeUploadModal()" class="text-slate-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <form id="ingestForm" onsubmit="handleIngestSubmit(event)" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-mono text-slate-400 uppercase mb-1">Package / Deal Name</label>
+                        <input id="formPkgName" required type="text" placeholder="e.g. Apex Bridge Redline Rev 3" 
+                            class="w-full bg-black/60 border border-cyber-border rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyber-purple">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-mono text-slate-400 uppercase mb-1">Deal Sponsor Origin</label>
+                        <select id="formPkgOrigin" required class="w-full bg-black/60 border border-cyber-border rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyber-purple">
+                            <option value="Apex Velocity">Apex Velocity</option>
+                            <option value="Fortress Trust">Fortress Trust</option>
+                            <option value="Emberstone Fund">Emberstone Fund</option>
+                            <option value="Sovereign PE">Sovereign PE</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-mono text-slate-400 uppercase mb-1">Priority Classification</label>
+                        <select id="formPkgPriority" required class="w-full bg-black/60 border border-cyber-border rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyber-purple">
+                            <option value="NORMAL">Normal Delivery</option>
+                            <option value="HIGH">High Priority</option>
+                            <option value="CRITICAL">Critical Execution Path</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-mono text-slate-400 uppercase mb-1">Lead Analyst Email</label>
+                        <input id="formPkgAnalyst" required type="email" placeholder="underwriter@dynamicedge.capital" 
+                            class="w-full bg-black/60 border border-cyber-border rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyber-purple">
+                    </div>
+                </div>
+
+                <!-- Simulation of File Upload -->
+                <div>
+                    <label class="block text-xs font-mono text-slate-400 uppercase mb-2">Simulated Secure Attachments</label>
+                    <div class="border border-dashed border-cyber-border/80 bg-black/40 rounded-lg p-6 text-center">
+                        <svg class="w-10 h-10 text-cyber-accent mx-auto mb-2 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        <p class="text-xs font-mono text-slate-300">DRAG & DROP SECURED ARCHIVES HERE</p>
+                        <p class="text-[10px] text-slate-500 mt-1">Supports multi-PDF blueprints, valuation exhibits, & design components (Max 50MB)</p>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-mono text-slate-400 uppercase mb-1">Review Scope & Context Requirements</label>
+                    <textarea id="formPkgDesc" required rows="3" placeholder="Specify terms, outstanding items, and specific visual/legal elements up for review..." 
+                        class="w-full bg-black/60 border border-cyber-border rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyber-purple"></textarea>
+                </div>
+
+                <div class="flex items-center gap-2 text-xs font-mono text-slate-500 border-t border-cyber-border/40 pt-4">
+                    <svg class="w-4 h-4 text-cyber-emerald" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
+                    <span>File integrity matching SHA-256 standard check sequence.</span>
+                </div>
+
+                <div class="flex justify-between items-center pt-2">
+                    <button type="button" onclick="closeUploadModal()" class="text-xs font-mono text-slate-400 hover:text-white">Abort Sequence</button>
+                    <button type="submit" class="bg-gradient-to-r from-cyber-purple to-pink-600 hover:from-purple-600 hover:to-pink-500 text-white font-bold px-6 py-2.5 rounded text-xs font-mono uppercase edge-clip tracking-wider">
+                        Commit To Pipeline
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- PACKAGE DETAIL / ATTACHMENT VIEW MODAL -->
+    <div id="detailsModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-[#0e131f] border border-cyber-accent/60 w-full max-w-3xl p-6 rounded-xl relative edge-clip">
+            <div class="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-cyber-accent"></div>
+            <div class="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-cyber-accent"></div>
+            
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <span id="detailPriority" class="text-[10px] font-mono text-cyber-accent bg-cyber-accent/10 px-2 py-0.5 rounded tracking-wider uppercase">CRITICAL</span>
+                    <h3 id="detailTitle" class="text-2xl font-bold text-slate-100 mt-2">Apex Bridge Redline Rev 3</h3>
+                    <p id="detailMeta" class="text-xs font-mono text-slate-400 mt-1">Origin: Fortress Trust | Lead Analyst: underwriter@capital.com</p>
+                </div>
+                <button onclick="closeDetailsModal()" class="text-slate-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Middle Section: Attachments & Audit Log -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- Attachments Column -->
+                <div>
+                    <h4 class="text-xs font-mono text-slate-400 uppercase tracking-wider mb-3">Enclosed Exhibits (Click to Simulated Download)</h4>
+                    <div class="space-y-2" id="detailAttachments">
+                        <!-- Dynamic list of attachments -->
+                    </div>
+                </div>
+
+                <!-- Scope / Description Column -->
+                <div>
+                    <h4 class="text-xs font-mono text-slate-400 uppercase tracking-wider mb-3">Target Scope Overview</h4>
+                    <div class="bg-black/40 p-4 border border-cyber-border rounded-lg text-slate-300 text-xs leading-relaxed font-light min-h-[140px]" id="detailDesc">
+                        <!-- Dynamic text -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workflow Operations Panel -->
+            <div class="bg-black/40 p-4 border border-cyber-border rounded-lg flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-mono text-slate-400 uppercase">Transition Node:</span>
+                    <select id="detailStatusSelect" class="bg-black/60 border border-cyber-border rounded px-3 py-1.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-cyber-accent">
+                        <option value="pending">Pending Review</option>
+                        <option value="analysis">Under Analysis</option>
+                        <option value="revision">Revision Needed</option>
+                        <option value="approved">Approved & Locked</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="handleStatusTransition()" class="bg-cyber-accent hover:bg-cyan-400 text-black font-bold px-4 py-2 rounded text-xs font-mono uppercase transition-colors">
+                        Process Node Transition
+                    </button>
+                    <button onclick="closeDetailsModal()" class="text-xs font-mono text-slate-400 hover:text-white px-3 py-2">
+                        Dismiss
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT LOGIC -->
+    <script>
+        // MOCK DATA: Dynamic Review Pipeline Entries
+        const pipelineData = [
+            {
+                id: 1,
+                title: "Pacific Rim Acquisition Memo v4",
+                origin: "Apex Velocity",
+                status: "pending",
+                priority: "HIGH",
+                analyst: "e.wright@apexvelocity.com",
+                desc: "Finalized executive summary memo including local environmental evaluation assessments. Seeking final compliance clearance on CA limits.",
+                attachments: [
+                    { name: "Executive_Summary_v4.pdf", size: "4.2 MB", type: "PDF" },
+                    { name: "Environmental_Zoning_Report.zip", size: "14.8 MB", type: "ZIP" }
+                ]
+            },
+            {
+                id: 2,
+                title: "Keystone Commercial Appraisal Pack",
+                origin: "Fortress Trust",
+                status: "analysis",
+                priority: "CRITICAL",
+                analyst: "underwriting@fortress.com",
+                desc: "Full structural inspection audits and multi-tenant cashflow spreadsheets corresponding to the industrial conversion project.",
+                attachments: [
+                    { name: "Inspection_Audit_Schedules.pdf", size: "8.1 MB", type: "PDF" },
+                    { name: "Cashflow_RentRoll.xlsx", size: "2.5 MB", type: "Excel" }
+                ]
+            },
+            {
+                id: 3,
+                title: "Emberstone Site Appraisal Drafts",
+                origin: "Emberstone Fund",
+                status: "revision",
+                priority: "NORMAL",
+                analyst: "m.valenzuela@emberstone.com",
+                desc: "Required adjustments regarding regional zoning guidelines on the Arizona land project. Waiting for updated legal redlines on parcel 14.",
+                attachments: [
+                    { name: "AZ_Zoning_Discrepancies.pdf", size: "1.2 MB", type: "PDF" }
+                ]
+            },
+            {
+                id: 4,
+                title: "Sovereign Construction Underwriting V2",
+                origin: "Sovereign PE",
+                status: "approved",
+                priority: "HIGH",
+                analyst: "p.collins@sovereignpe.com",
+                desc: "Unanimous commitment committee approval received. Capital envelope is officially finalized and locked for disbursement schedules.",
+                attachments: [
+                    { name: "Committee_Resolution_Signed.pdf", size: "1.9 MB", type: "PDF" },
+                    { name: "Disbursement_Escrow_Flows.pdf", size: "3.3 MB", type: "PDF" }
+                ]
+            },
+            {
+                id: 5,
+                title: "Apex Bridge Escrow Redlines",
+                origin: "Apex Velocity",
+                status: "pending",
+                priority: "NORMAL",
+                analyst: "legal@apexvelocity.com",
+                desc: "Submitting the verified title report and initial draft guidelines concerning closing conditions.",
+                attachments: [
+                    { name: "Escrow_Holdback_Clause.docx", size: "410 KB", type: "Word" }
+                ]
+            },
+            {
+                id: 6,
+                title: "Fortress Valuation Exhibit C",
+                origin: "Fortress Trust",
+                status: "analysis",
+                priority: "HIGH",
+                analyst: "p.underwood@fortress.com",
+                desc: "Comprehensive engineering assessments mapping out soil composition stability and foundational weight certifications.",
+                attachments: [
+                    { name: "Structural_Stamina_Cert.pdf", size: "11.1 MB", type: "PDF" },
+                    { name: "Exhibit_C_Seismic_Scan.png", size: "8.9 MB", type: "Image" }
+                ]
+            }
+        ];
+
+        // Global State Filters
+        let activeFilters = {
+            searchQuery: "",
+            origin: "ALL",
+            priority: "ALL"
+        };
+
+        let currentActiveDetailId = null;
+
+        // Initialization
+        document.addEventListener("DOMContentLoaded", () => {
+            renderBoard();
+        });
+
+        // Open Attachment & Detailed View Modal
+        function openDetailsModal(id) {
+            const pkg = pipelineData.find(item => item.id === id);
+            if (!pkg) return;
+
+            currentActiveDetailId = id;
+
+            // Header Elements
+            document.getElementById("detailTitle").innerText = pkg.title;
+            document.getElementById("detailMeta").innerText = `Origin: ${pkg.origin} | Lead: ${pkg.analyst}`;
+            
+            // Priority Tag Style
+            const pBadge = document.getElementById("detailPriority");
+            pBadge.innerText = pkg.priority;
+            if (pkg.priority === "CRITICAL") {
+                pBadge.className = "text-[10px] font-mono text-pink-500 bg-pink-500/10 border border-pink-500/30 px-2 py-0.5 rounded tracking-wider uppercase";
+            } else if (pkg.priority === "HIGH") {
+                pBadge.className = "text-[10px] font-mono text-cyber-purple bg-cyber-purple/10 border border-cyber-purple/30 px-2 py-0.5 rounded tracking-wider uppercase";
+            } else {
+                pBadge.className = "text-[10px] font-mono text-cyber-accent bg-cyber-accent/10 border border-cyber-accent/30 px-2 py-0.5 rounded tracking-wider uppercase";
+            }
+
+            // Target Scope
+            document.getElementById("detailDesc").innerText = pkg.desc;
+
+            // Attachments List Render
+            const container = document.getElementById("detailAttachments");
+            container.innerHTML = "";
+            pkg.attachments.forEach(file => {
+                const item = document.createElement("div");
+                item.className = "bg-black/60 hover:bg-black/80 border border-cyber-border hover:border-cyber-accent/40 p-2.5 rounded-lg flex items-center justify-between text-xs font-mono transition-all cursor-pointer";
+                item.onclick = () => alert(`SIMULATED HANDSHAKE: Initializing decryption and secure download of: ${file.name}`);
+                item.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-cyber-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span class="text-slate-200 font-bold truncate max-w-[180px]">${file.name}</span>
+                    </div>
+                    <span class="text-slate-500 text-[10px]">${file.size} (${file.type})</span>
+                `;
+                container.appendChild(item);
+            });
+
+            // Set current dropdown status match
+            document.getElementById("detailStatusSelect").value = pkg.status;
+
+            document.getElementById("detailsModal").classList.remove("hidden");
+        }
+
+        function closeDetailsModal() {
+            document.getElementById("detailsModal").classList.add("hidden");
+            currentActiveDetailId = null;
+        }
+
+        // Dropdown Transition Trigger logic
+        function handleStatusTransition() {
+            if (!currentActiveDetailId) return;
+            const newStatus = document.getElementById("detailStatusSelect").value;
+            const pkg = pipelineData.find(item => item.id === currentActiveDetailId);
+            if (pkg) {
+                pkg.status = newStatus;
+                renderBoard();
+                closeDetailsModal();
+                showTemporaryNotification(`Node transitioned: ${pkg.title} is now: ${newStatus.toUpperCase()}`);
+            }
+        }
+
+        // Apply Search / Dropdown filters to current active Board State
+        function applyFilters() {
+            activeFilters.searchQuery = document.getElementById("searchQuery").value.toLowerCase();
+            activeFilters.origin = document.getElementById("originFilter").value;
+            activeFilters.priority = document.getElementById("priorityFilter").value;
+
+            renderBoard();
+        }
+
+        function resetFilters() {
+            document.getElementById("searchQuery").value = "";
+            document.getElementById("originFilter").value = "ALL";
+            document.getElementById("priorityFilter").value = "ALL";
+            
+            activeFilters = {
+                searchQuery: "",
+                origin: "ALL",
+                priority: "ALL"
+            };
+
+            renderBoard();
+        }
+
+        // Render Kanban Board Columns and Populate Cards
+        function renderBoard() {
+            const cols = {
+                pending: document.getElementById("colPending"),
+                analysis: document.getElementById("colAnalysis"),
+                revision: document.getElementById("colRevisions"),
+                approved: document.getElementById("colApproved")
+            };
+
+            // Clear columns
+            Object.keys(cols).forEach(k => cols[k].innerHTML = "");
+
+            let totalInPipeline = 0;
+            let totalRevisions = 0;
+            let totalApproved = 0;
+
+            const filteredData = pipelineData.filter(item => {
+                const matchesSearch = item.title.toLowerCase().includes(activeFilters.searchQuery) || item.desc.toLowerCase().includes(activeFilters.searchQuery);
+                const matchesOrigin = activeFilters.origin === "ALL" || item.origin === activeFilters.origin;
+                const matchesPriority = activeFilters.priority === "ALL" || item.priority === activeFilters.priority;
+
+                return matchesSearch && matchesOrigin && matchesPriority;
+            });
+
+            filteredData.forEach(item => {
+                totalInPipeline++;
+                if (item.status === "revision") totalRevisions++;
+                if (item.status === "approved") totalApproved++;
+
+                // Build Card Container
+                const card = document.createElement("div");
+                card.className = "bg-cyber-card border border-cyber-border hover:border-cyber-accent/60 p-4 rounded-lg transition-all duration-300 relative group flex flex-col justify-between cyber-glow-hover cursor-pointer";
+                card.setAttribute("onclick", `openDetailsModal(${item.id})`);
+
+                // Priority Color Assignment
+                let pColor = "text-cyber-accent border-cyber-accent/30 bg-cyber-accent/5";
+                if (item.priority === "CRITICAL") pColor = "text-pink-500 border-pink-500/30 bg-pink-500/5";
+                if (item.priority === "HIGH") pColor = "text-cyber-purple border-cyber-purple/30 bg-cyber-purple/5";
+
+                // Count Attachment Formats
+                const attachmentIconsHTML = item.attachments.map(att => 
+                    `<span class="bg-black/60 text-slate-400 border border-cyber-border px-1.5 py-0.5 rounded text-[9px] font-mono uppercase">${att.type}</span>`
+                ).join(" ");
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[9px] font-mono text-slate-500 tracking-wider uppercase">${item.origin}</span>
+                            <span class="px-1.5 py-0.5 border rounded text-[9px] font-mono ${pColor}">${item.priority}</span>
+                        </div>
+                        <h4 class="text-xs font-bold text-slate-200 group-hover:text-cyber-accent transition-colors duration-200 mb-1 leading-snug">${item.title}</h4>
+                        <p class="text-slate-400 text-[11px] line-clamp-2 leading-relaxed font-light mb-3">${item.desc}</p>
+                    </div>
+
+                    <div class="pt-2 border-t border-cyber-border/40 flex items-center justify-between gap-2">
+                        <div class="flex flex-wrap gap-1">
+                            ${attachmentIconsHTML}
+                        </div>
+                        <span class="text-[10px] font-mono text-cyber-accent flex items-center gap-1 group-hover:text-white transition-colors">
+                            <span>Process File</span>
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </span>
+                    </div>
+                `;
+
+                if (cols[item.status]) {
+                    cols[item.status].appendChild(card);
+                }
+            });
+
+            // Update Column counts
+            document.getElementById("countPending").innerText = document.getElementById("colPending").children.length;
+            document.getElementById("countAnalysis").innerText = document.getElementById("colAnalysis").children.length;
+            document.getElementById("countRevisions").innerText = document.getElementById("colRevisions").children.length;
+            document.getElementById("countApproved").innerText = document.getElementById("colApproved").children.length;
+
+            // Render main Header statistics dynamically
+            document.getElementById("statInPipeline").innerText = `${totalInPipeline} Envelopes`;
+            document.getElementById("statRevisions").innerText = `${totalRevisions} Redlines`;
+            document.getElementById("statApproved").innerText = `${totalApproved} Cleared`;
+        }
+
+        // Upload/Ingest Simulation Trigger
+        function openUploadModal() {
+            document.getElementById("uploadModal").classList.remove("hidden");
+        }
+
+        function closeUploadModal() {
+            document.getElementById("uploadModal").classList.add("hidden");
+            document.getElementById("ingestForm").reset();
+        }
+
+        function handleIngestSubmit(e) {
+            e.preventDefault();
+
+            const name = document.getElementById("formPkgName").value;
+            const origin = document.getElementById("formPkgOrigin").value;
+            const priority = document.getElementById("formPkgPriority").value;
+            const analyst = document.getElementById("formPkgAnalyst").value;
+            const desc = document.getElementById("formPkgDesc").value;
+
+            const newPackage = {
+                id: pipelineData.length + 1,
+                title: name,
+                origin: origin,
+                status: "pending",
+                priority: priority,
+                analyst: analyst,
+                desc: desc,
+                attachments: [
+                    { name: "Uploaded_Secure_Vault.zip", size: "22.4 MB", type: "ZIP" }
+                ]
+            };
+
+            pipelineData.push(newPackage);
+            renderBoard();
+            closeUploadModal();
+            showTemporaryNotification(`Ingest success: Secure envelope '${name}' successfully queued.`);
+        }
+
+        // Collapsible Advanced Metrics Node
+        function toggleMetricsPanel() {
+            const panel = document.getElementById("metricsPanel");
+            panel.classList.toggle("hidden");
+        }
+
+        // UI notification utility
+        function showTemporaryNotification(msg) {
+            const notif = document.createElement("div");
+            notif.className = "fixed bottom-6 right-6 bg-cyber-card border-2 border-cyber-accent text-slate-100 px-5 py-3 rounded-lg z-50 text-xs font-mono shadow-2xl edge-clip";
+            notif.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <span class="h-2 w-2 rounded-full bg-cyber-emerald animate-ping"></span>
+                    <span>${msg}</span>
+                </div>
+            `;
+            document.body.appendChild(notif);
+            setTimeout(() => {
+                notif.remove();
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
+```

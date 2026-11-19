@@ -10,6 +10,7 @@ export function artwork(row, saved) {
   let html = '<div class="card-artwork tone-' + cleanTone(row.tone) + '">';
   html += '<div class="card-art-title" aria-hidden="true">' + title + '</div>';
   if (safeImage) html += '<img data-preview-image src="' + esc(safeImage) + '" alt="" loading="lazy" decoding="async">';
+  else html += '<span class="card-preview-missing">Screenshot unavailable · preview the page</span>';
   html += '<button class="favorite-toggle" type="button" data-favorite-id="' + esc(row.id) + '" aria-label="' + (saved ? 'Remove from saved: ' : 'Save project: ') + title + '" aria-pressed="' + (saved ? 'true' : 'false') + '">' + (saved ? '★' : '☆') + '</button>';
   return html + '</div>';
 }
@@ -51,6 +52,7 @@ export function mountVoltage({ rows, rerender, favorites }) {
     if (!event.target?.matches?.("img[data-preview-image]")) return;
     const img = event.target;
     img.hidden = true;
+    img.insertAdjacentHTML('afterend', '<span class="card-preview-missing">Screenshot unavailable · preview the page</span>');
   }, true);
   if (dialog && frame) {
     dialog.addEventListener("close", () => { frame.removeAttribute("src"); if (launchTrigger?.isConnected) launchTrigger.focus(); });

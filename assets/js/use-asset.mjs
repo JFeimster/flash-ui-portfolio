@@ -5,9 +5,10 @@ const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&a
 const route = new URLSearchParams(location.search).get('asset');
 const slug = value => String(value).toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 55);
 const textFiles = entry => entry.files.map(file => file.name).join(', ');
-function customizationPrompt(entry) {
+function customizationPrompt(entry, config = {}) {
   return `Customize the static site "${entry.title}" using the attached project files.\n\n` +
     `Preview route: ${entry.previewPath}\nCategory: ${entry.category || 'Static site'}\n` +
+    `New brand: ${config.brand || '[your brand]'}\nAudience: ${config.audience || '[your audience]'}\nPrimary action: ${config.action || '[your primary action]'}\n` +
     `${entry.variantNumber ? `Variant: ${entry.variantNumber}\n` : ''}` +
     `${entry.description ? `Current description: ${entry.description}\n` : ''}` +
     `\nActual files in this package: ${textFiles(entry)}.\n\n` +
@@ -15,7 +16,8 @@ function customizationPrompt(entry) {
     `Replace the current branding, copy, imagery, links, and calls to action with my supplied details. ` +
     `If details are missing, mark them as placeholders instead of inventing claims or connected services. ` +
     `Keep the project as static HTML/CSS/JavaScript unless I request another stack. ` +
-    `Check the layout on mobile and desktop, test links and scripts, and list any external fonts or services that still need setup.\n`;
+    `Check the layout on mobile and desktop, test links and scripts, and list any external fonts or services that still need setup.\n` +
+    `External dependencies found in source: ${(entry.externalDependencies || []).join(', ') || 'none detected'}.\n`;
 }
 function readme(entry) {
   return `# ${entry.title}\n\nThis ZIP contains the static source files shown in the Flash UI Portfolio. ` +
@@ -26,7 +28,7 @@ function readme(entry) {
     `## Publish\n\nDeploy the extracted folder as a static site using your preferred host. ` +
     `For Vercel CLI, run npx vercel in this folder, then npx vercel --prod when you are ready to publish. ` +
     `Review links, forms, content, and any external dependencies before publishing.\n\n` +
-    `Source preview: ${entry.previewPath}\nFiles: ${textFiles(entry)}\n`;
+    `Source preview: ${entry.previewPath}\nFiles: ${textFiles(entry)}\nExternal dependencies: ${(entry.externalDependencies || []).join(', ') || 'none detected'}\n`;
 }
 function unavailable() {
   shell.innerHTML = `<nav><a href="/sites/">← Portfolio</a></nav><h1>Asset package unavailable</h1><p>This preview does not have a verified static source package.</p>`;
@@ -34,17 +36,31 @@ function unavailable() {
 async function init() {
   const response = await fetch('/data/asset-packages.json');
   if (!response.ok) throw new Error('Asset package list unavailable.');
-  const entry = (await response.json()).entries?.[route];
-  if (!entry) return unavailable();
+  const manifest = await response.json();
+  const entry = manifest.entries?.[route];
+  const review = manifest.review?.[route];
+  if (!entry && !review) return unavailable();
+  if (review) {
+    document.title = `Inspect ${review.title} · Flash UI Portfolio`;
+    const isExternal = /^https?:\/\//.test(review.previewPath || '');
+    shell.innerHTML = `<nav><a href="/sites/">← Portfolio</a></nav><header><p class="eyebrow">${esc(review.status)}</p><h1>Inspect ${esc(review.title)}</h1><p>${esc(review.reason)}</p><div class="asset-actions">${review.previewPath ? `<a class="asset-link" href="${esc(review.previewPath)}" target="_blank" rel="noopener noreferrer">${isExternal ? 'Open external application' : 'Open preview'} ↗</a>` : ''}${review.sourceUrl ? `<a class="asset-link" href="${esc(review.sourceUrl)}" target="_blank" rel="noopener noreferrer">View source ↗</a>` : ''}</div></header><section class="source-inspection"><h2>Reuse status</h2><p>A downloadable static package is unavailable for this asset.</p>${review.missingFiles?.length ? `<h3>Missing or nonportable references</h3><ul>${review.missingFiles.map(file => `<li><code>${esc(file)}</code></li>`).join('')}</ul>` : ''}${review.externalDependencies?.length ? `<h3>External dependencies</h3><ul>${review.externalDependencies.map(url => `<li><code>${esc(url)}</code></li>`).join('')}</ul>` : ''}</section>`;
+    return;
+  }
   document.title = `Use ${entry.title} · Flash UI Portfolio`;
-  const prompt = customizationPrompt(entry);
+  let prompt = customizationPrompt(entry);
+  const embed = `<iframe title="${entry.title.replaceAll('"', '&quot;')}" src="${new URL(entry.previewPath, location.origin).href}" loading="lazy" style="border:0;width:100%;height:700px"></iframe>`;
   shell.innerHTML = `<nav><a href="/sites/">← Portfolio</a><a href="${esc(entry.previewPath)}" target="_blank" rel="noopener">Open original ↗</a></nav>
-    <header><p class="eyebrow">Static site source</p><h1>Use ${esc(entry.title)}</h1><p>${esc(entry.description || 'Download the source, make it yours, and publish it as a static site.')}</p>
-    <div class="asset-actions"><button type="button" id="downloadAsset">Download project ZIP</button><button type="button" id="copyPrompt">Copy customization prompt</button></div><p id="assetStatus" role="status" aria-live="polite">${entry.files.length} source files included</p></header>
+    <header><p class="eyebrow">Complete static site</p><h1>Use ${esc(entry.title)}</h1><p>${esc(entry.description || 'Download the source, make it yours, and publish it as a static site.')}</p>
+    <div class="asset-actions"><button type="button" id="downloadAsset">Download project ZIP</button><button type="button" id="copyPrompt">Copy implementation brief</button></div><p id="assetStatus" role="status" aria-live="polite">${entry.files.length} source files included</p></header>
     <section class="preview"><div class="section-head"><h2>Live preview</h2><a href="${esc(entry.previewPath)}" target="_blank" rel="noopener">Open full size ↗</a></div><iframe src="${esc(entry.previewPath)}" title="Preview of ${esc(entry.title)}" loading="lazy"></iframe></section>
-    <section class="instructions"><div><h2>Customize</h2><p>Use this prompt with the extracted files. It names the actual source files in this package.</p><pre id="promptText"></pre></div><div><h2>Run locally</h2><ol><li>Extract the ZIP.</li><li>Open a terminal in the extracted folder.</li><li>Run <code>python -m http.server 4173</code>.</li><li>Visit <code>http://127.0.0.1:4173/</code>.</li></ol><h2>Publish</h2><p>Deploy that folder as a static site. With Vercel CLI, run <code>npx vercel</code>, then <code>npx vercel --prod</code> when ready.</p></div></section>`;
+    <section class="source-inspection"><h2>Source files</h2><p>These files are included in the ZIP. Open any file to inspect the source.</p><ul class="source-files">${entry.files.map(file => `<li><a href="${esc(file.source)}" target="_blank" rel="noopener">${esc(file.name)}</a></li>`).join('')}</ul><h3>External dependencies</h3><p>${entry.externalDependencies?.length ? 'These source URLs may require a connection or your own account:' : 'No external URLs detected in the HTML or CSS.'}</p>${entry.externalDependencies?.length ? `<ul>${entry.externalDependencies.map(url => `<li><code>${esc(url)}</code></li>`).join('')}</ul>` : ''}${entry.sourceUrl ? `<a href="${esc(entry.sourceUrl)}" target="_blank" rel="noopener noreferrer">View repository source ↗</a>` : ''}</section>
+    <section class="instructions"><div><h2>Implementation brief</h2><p>Set your destination details, then copy this brief with the source package.</p><div class="brief-fields"><label>Brand<input id="briefBrand" placeholder="Your brand"></label><label>Audience<input id="briefAudience" placeholder="Who it serves"></label><label>Primary action<input id="briefAction" placeholder="What visitors should do"></label></div><pre id="promptText"></pre></div><div><h2>Embed hosted preview</h2><p>This iframe displays the existing hosted page. It does not transfer its source or functionality to your project.</p><button type="button" id="copyEmbed">Copy embed code</button><pre id="embedText"></pre><h2>Run locally</h2><ol><li>Extract the ZIP.</li><li>Open a terminal in the extracted folder.</li><li>Run <code>python -m http.server 4173</code>.</li><li>Visit <code>http://127.0.0.1:4173/</code>.</li></ol></div></section>`;
   document.querySelector('#promptText').textContent = prompt;
+  document.querySelector('#embedText').textContent = embed;
   const status = document.querySelector('#assetStatus');
+  const updatePrompt = () => { prompt = customizationPrompt(entry, { brand: document.querySelector('#briefBrand').value.trim(), audience: document.querySelector('#briefAudience').value.trim(), action: document.querySelector('#briefAction').value.trim() }); document.querySelector('#promptText').textContent = prompt; };
+  for (const id of ['briefBrand', 'briefAudience', 'briefAction']) document.getElementById(id).addEventListener('input', updatePrompt);
+  document.querySelector('#copyEmbed').addEventListener('click', async () => { try { await navigator.clipboard.writeText(embed); status.textContent = 'Embed code copied.'; } catch { status.textContent = 'Copy failed. Select the embed code below instead.'; } });
   document.querySelector('#copyPrompt').addEventListener('click', async () => {
     try { await navigator.clipboard.writeText(prompt); status.textContent = 'Customization prompt copied.'; }
     catch { status.textContent = 'Copy failed. Select the prompt text below instead.'; }

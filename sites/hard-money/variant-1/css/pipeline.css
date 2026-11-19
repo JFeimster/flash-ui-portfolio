@@ -1,0 +1,356 @@
+:root {
+    --cyber-bg: #07090e;
+    --cyber-card: #0e131f;
+    --cyber-border: #1e293b;
+    --cyber-accent: #00f0ff;
+    --cyber-purple: #bd00ff;
+    --cyber-emerald: #05ffc4;
+    --cyber-glow: rgba(0, 240, 255, 0.15);
+    --cyber-glow-purple: rgba(189, 0, 255, 0.15);
+}
+
+/* Pipeline Layout & Scaffolding */
+.pipeline-container {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 1.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--cyber-border) var(--cyber-bg);
+}
+
+.pipeline-board {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(320px, 1fr);
+    gap: 1.5rem;
+    min-height: 650px;
+    padding: 0.5rem;
+}
+
+/* Kanban Columns */
+.pipeline-column {
+    background-color: rgba(14, 19, 31, 0.45);
+    border: 1px solid rgba(30, 41, 59, 0.6);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    backdrop-filter: blur(8px);
+}
+
+.pipeline-column::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--cyber-border), transparent);
+}
+
+.pipeline-column.drag-over {
+    border-color: var(--cyber-accent);
+    box-shadow: 0 0 15px var(--cyber-glow);
+    background-color: rgba(14, 19, 31, 0.7);
+}
+
+/* Column Headers */
+.pipeline-column-header {
+    padding: 1.25rem;
+    border-bottom: 1px solid rgba(30, 41, 59, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.pipeline-column-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #cbd5e1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.pipeline-column-counter {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    color: var(--cyber-accent);
+}
+
+/* Pipeline Cards */
+.pipeline-card-list {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    flex-grow: 1;
+    overflow-y: auto;
+    max-height: 580px;
+}
+
+.pipeline-card {
+    background: var(--cyber-card);
+    border: 1px solid var(--cyber-border);
+    padding: 1rem;
+    border-radius: 8px;
+    cursor: grab;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.pipeline-card:active {
+    cursor: grabbing;
+}
+
+.pipeline-card.dragging {
+    opacity: 0.5;
+    transform: scale(0.98);
+    border-color: var(--cyber-purple);
+    box-shadow: 0 0 15px var(--cyber-glow-purple);
+}
+
+.pipeline-card:hover {
+    border-color: rgba(0, 240, 255, 0.5);
+    box-shadow: 0 4px 20px rgba(0, 240, 255, 0.08);
+}
+
+/* Specialized Clip Path Edge for Cards (Matching Dynamic Edge Theme) */
+.pipeline-card.edge-cut {
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+}
+
+/* Status Variations & Visual Flourishes */
+.pipeline-column[data-status="pending"]::before {
+    background: linear-gradient(90deg, transparent, var(--cyber-purple), transparent);
+}
+.pipeline-column[data-status="review"]::before {
+    background: linear-gradient(90deg, transparent, var(--cyber-accent), transparent);
+}
+.pipeline-column[data-status="revision"]::before {
+    background: linear-gradient(90deg, transparent, #ef4444, transparent);
+}
+.pipeline-column[data-status="approved"]::before {
+    background: linear-gradient(90deg, transparent, var(--cyber-emerald), transparent);
+}
+
+/* Card Metadata Elements */
+.pipeline-card-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    border: 1px solid transparent;
+}
+
+.tag-residential {
+    background: rgba(189, 0, 255, 0.1);
+    color: #d8b4fe;
+    border-color: rgba(189, 0, 255, 0.2);
+}
+
+.tag-commercial {
+    background: rgba(0, 240, 255, 0.1);
+    color: #99f6ff;
+    border-color: rgba(0, 240, 255, 0.2);
+}
+
+.tag-multifamily {
+    background: rgba(5, 255, 196, 0.1);
+    color: #a7f3d0;
+    border-color: rgba(5, 255, 196, 0.2);
+}
+
+/* Attachment Micro-grid within Kanban Card */
+.pipeline-attachment-pack {
+    background: rgba(7, 9, 14, 0.6);
+    border: 1px solid rgba(30, 41, 59, 0.5);
+    border-radius: 6px;
+    padding: 0.65rem;
+    margin-top: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.pipeline-attachment-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+.attachment-name {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.attachment-action-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #64748b;
+    display: inline-block;
+}
+
+.attachment-verified .attachment-action-dot {
+    background: var(--cyber-emerald);
+    box-shadow: 0 0 6px var(--cyber-emerald);
+}
+
+/* Creative File Progress Indicator / Scanline Animation */
+.creative-scan-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.creative-scan-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyber-accent), transparent);
+    animation: scannerLoop 2.5s ease-in-out infinite;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+@keyframes scannerLoop {
+    0% {
+        top: 0%;
+    }
+    50% {
+        top: 100%;
+    }
+    100% {
+        top: 0%;
+    }
+}
+
+/* User Avatars / Sign-off section */
+.pipeline-signoff-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.85rem;
+    padding-top: 0.65rem;
+    border-t: 1px solid rgba(30, 41, 59, 0.3);
+}
+
+.pipeline-signoff-avatars {
+    display: flex;
+    align-items: center;
+    -webkit-space-x-reverse: space-x-reverse;
+    margin-left: 0.25rem;
+}
+
+.pipeline-avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--cyber-border);
+    background: #1e293b;
+    font-size: 0.6rem;
+    font-weight: bold;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: -6px;
+    transition: all 0.2s ease;
+}
+
+.pipeline-avatar:hover {
+    transform: translateY(-2px);
+    border-color: var(--cyber-accent);
+    z-index: 10;
+}
+
+/* Action Dropdown / Context Menu */
+.pipeline-action-menu {
+    position: absolute;
+    right: 0.75rem;
+    top: 0.75rem;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.pipeline-card:hover .pipeline-action-menu {
+    opacity: 1;
+}
+
+/* Interactive Audit Log Sidebar */
+.pipeline-audit-log {
+    background: var(--cyber-card);
+    border-left: 1px solid var(--cyber-border);
+    padding: 1.5rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.audit-item {
+    position: relative;
+    padding-left: 1.25rem;
+    padding-bottom: 1.25rem;
+    border-left: 1px solid rgba(30, 41, 59, 0.8);
+    font-size: 0.75rem;
+}
+
+.audit-item:last-child {
+    border-left-color: transparent;
+}
+
+.audit-item::before {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: 3px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--cyber-border);
+    border: 1px solid var(--cyber-bg);
+}
+
+.audit-item.audit-success::before {
+    background: var(--cyber-emerald);
+    box-shadow: 0 0 6px var(--cyber-emerald);
+}
+
+.audit-item.audit-action::before {
+    background: var(--cyber-accent);
+    box-shadow: 0 0 6px var(--cyber-accent);
+}
+
+.audit-timestamp {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: #64748b;
+}
+
+/* Drag & Drop Overlay Feedback */
+.pipeline-drag-placeholder {
+    border: 2px dashed rgba(0, 240, 255, 0.3);
+    background: rgba(0, 240, 255, 0.02);
+    border-radius: 8px;
+    min-height: 100px;
+    transition: all 0.2s ease;
+}
