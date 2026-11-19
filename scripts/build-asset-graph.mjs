@@ -29,10 +29,14 @@ const warnings = [];
 const nodes = new Map();
 const edges = new Map();
 const addNode = node => { if (node?.id && !nodes.has(node.id)) nodes.set(node.id, node); };
-const addEdge = (from, to, type, provenance, status = 'recorded') => {
-  if (!nodes.has(from) || !nodes.has(to)) { warnings.push(`Unresolved ${type}: ${from} → ${to}`); return; }
+const addEdge = (from, to, type, provenance, status = 'recorded', evidenceUrl = null) => {
+  if (!nodes.has(from) || !nodes.has(to)) { warnings.push('Unresolved ' + type + ': ' + from + ' → ' + to); return; }
   const edge = { from, to, type, provenance, confidence: status === 'verified' ? 1 : 0.8, status };
-  edges.set(`${from}|${to}|${type}`, edge);
+  if (evidenceUrl) edge.evidence_url = evidenceUrl;
+  const key = from + '|' + to + '|' + type;
+  const existing = edges.get(key);
+  if (existing?.status === 'verified' && status !== 'verified') return;
+  edges.set(key, edge);
 };
 
 const sites = source('site-registry.json', [path.join(root, 'data/site-registry.json')]);
@@ -109,12 +113,53 @@ for (const r of entries(read(relations.found || ''))) {
   addEdge(r.from, r.to, r.type, evidence || 'reviewed asset-relations manifest', r.status === 'verified' && !evidence ? 'recorded' : r.status);
 }
 
+// Curated public cross-source links. Suggested links stay out of the confirmed graph.
+const linksPath = path.resolve(option('--links', path.join(root, 'data/asset-links.public.json')));
+const links = read(linksPath);
+if (!links || !Array.isArray(links.assets) || !Array.isArray(links.relationships))
+  throw new Error('Asset relationship overlay is missing or malformed: ' + linksPath);
+const allowedLinks = new Set(['implements', 'source_repository', 'deployed_as', 'variation_of', 'derived_from', 'related_tool', 'powered_by', 'potential_integration']);
+let suggestedCount = 0;
+for (const relation of links.relationships) {
+  if (!relation || !allowedLinks.has(relation.type) ||
+      !['recorded', 'verified', 'suggested'].includes(relation.status) ||
+      typeof relation.provenance !== 'string' || !relation.provenance.trim()) {
+    throw new Error('Invalid public asset relationship overlay entry');
+  }
+  if (relation.status === 'suggested') { suggestedCount++; continue; }
+  if (!nodes.has(relation.from) || !nodes.has(relation.to))
+    throw new Error('Unresolved public asset relationship ID: ' + relation.from + ' → ' + relation.to);
+  const evidence = relation.evidence_url ? publicUrl(relation.evidence_url) : null;
+  if (relation.evidence_url && (!evidence || /(?:\bprivate\b|\/settings\/|\/gpts\/editor|\/login(?:\/|$))/i.test(evidence)))
+    throw new Error('Invalid public relationship evidence URL');
+  if (relation.status === 'verified' && !evidence)
+    throw new Error('Verified relationship needs an accessible public evidence URL');
+  addEdge(relation.from, relation.to, relation.type,
+    'asset-links:' + relation.provenance.trim().slice(0, 150), relation.status, evidence);
+}
+
 const graph = { schema: 'flash-ui-public-asset-graph/v1', generatedFrom: ['site-registry','site-generator-prompts',...['github-repos','vercel-projects','custom-gpts','flash-ui-prompt-commands'].filter(x => ({'github-repos':github,'vercel-projects':vercel,'custom-gpts':gpts,'flash-ui-prompt-commands':commands})[x].found)], nodes: [...nodes.values()].sort((a,b) => a.id.localeCompare(b.id)), edges: [...edges.values()].sort((a,b) => `${a.from}|${a.to}|${a.type}`.localeCompare(`${b.from}|${b.to}|${b.type}`)) };
 const serialized = JSON.stringify(graph, null, 2) + '\n';
+// The checked-in public graph contains external registries that are not always locally available.
+// Never replace it with a truncated rebuild. Non-canonical fixture outputs remain supported.
+const canonicalOutput = path.join(root, 'data/asset-graph.public.json');
+if (output === canonicalOutput && fs.existsSync(canonicalOutput)) {
+  const baseline = read(canonicalOutput);
+  if (!Array.isArray(baseline?.nodes) || !Array.isArray(baseline?.edges))
+    throw new Error('Cannot validate the existing canonical asset graph');
+  const currentIds = new Set(graph.nodes.map(n => n.id));
+  const currentEdges = new Set(graph.edges.map(e => e.from + '|' + e.to + '|' + e.type));
+  const missingNodes = baseline.nodes.filter(n => !currentIds.has(n.id));
+  const missingEdges = baseline.edges.filter(e => !currentEdges.has(e.from + '|' + e.to + '|' + e.type));
+  if (missingNodes.length || missingEdges.length)
+    throw new Error('Refusing incomplete graph rebuild: ' + missingNodes.length +
+      ' existing nodes and ' + missingEdges.length +
+      ' existing edges would be lost. Provide the full public upstream registry inputs (--input-dir).');
+}
 const forbidden = /vercel\.com\/|chatgpt\.com\/gpts\/editor|ghp_[A-Za-z0-9]+|sk-[A-Za-z0-9]{20,}|@(?:gmail|outlook|yahoo)\.com/i;
 if (forbidden.test(serialized)) throw new Error('Public graph leakage check failed');
 const counts = Object.fromEntries([...new Set(graph.nodes.map(n => n.type))].map(type => [type, graph.nodes.filter(n => n.type === type).length]));
-console.log(JSON.stringify({ inputDir, counts, edges: graph.edges.length, sourceCounts: { sites: sites.records.length, prompts: prompts.records.length, github: github.records.length, vercel: vercel.records.length, gpts: gpts.records.length, commands: commands.records.length }, warnings: warnings.slice(0, 20), warningCount: warnings.length }, null, 2));
+console.log(JSON.stringify({ inputDir, counts, edges: graph.edges.length, sourceCounts: { sites: sites.records.length, prompts: prompts.records.length, github: github.records.length, vercel: vercel.records.length, gpts: gpts.records.length, commands: commands.records.length }, curatedRelationships: links.relationships.length - suggestedCount, suggestedRelationships: suggestedCount, warnings: warnings.slice(0, 20), warningCount: warnings.length }, null, 2));
 const reviewOutput = option('--review-output', null);
 if (reviewOutput && !check) { const target = path.resolve(reviewOutput); fs.mkdirSync(path.dirname(target), { recursive:true }); fs.writeFileSync(target, JSON.stringify({ warnings, counts }, null, 2) + '\n'); }
 if (check) { if (!fs.existsSync(output) || fs.readFileSync(output, 'utf8') !== serialized) process.exitCode = 1; }
