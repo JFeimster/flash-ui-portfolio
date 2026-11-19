@@ -33,7 +33,7 @@ const icons={
 function icon(n,size=18){return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true">${icons[n]||icons.grid}</svg>`;}
 const state={
   mobile:false,notifications:false,unread:new Set(),referralFilter:'All',referralSearch:'',referralSort:'updated-desc',
-  commissionFilter:'All',resourceFilter:'All',activeThread:null,draft:'',onboarding:new Set([0,1]),
+  commissionFilter:'All',resourceFilter:'All',activeThread:null,messageUnread:new Set(),draft:'',onboarding:new Set([0,1]),
   activity:{conversations:0,introductions:0,submissions:0,followUps:0},
   goal:{...null},profile:{service:true,marketing:false},threadDraft:''
 };
@@ -52,18 +52,30 @@ function toast(message){const el=document.createElement('div');el.className='toa
 async function init(){
   try{
     const [df,sm]=await Promise.all([fetch('./data/demo.json').then(r=>r.ok?r.json():Promise.reject(r.status)),fetch('./data/status-map.json').then(r=>r.ok?r.json():Promise.reject(r.status))]);
-    fixture=df;statusMap=sm;state.unread=new Set(fixture.notifications.filter(n=>n.unread).map(n=>n.id));state.activeThread=fixture.messages[0]?.id||null;state.goal={...fixture.goalDefaults};
-    window.addEventListener('hashchange',render);render();
+    fixture=df;statusMap=sm;state.unread=new Set(fixture.notifications.filter(n=>n.unread).map(n=>n.id));
+    state.messageUnread=new Set(fixture.messages.filter(m=>m.unread).map(m=>m.id));
+    state.activeThread=fixture.messages[0]?.id||null;state.goal={...fixture.goalDefaults};
+    state.profile={service:fixture.affiliate.serviceEmailEnabled,marketing:fixture.affiliate.marketingEmailEnabled};
+    syncReferralRouteFilter();
+    window.addEventListener('hashchange',()=>{syncReferralRouteFilter();render();});
+    render();
   }catch(error){
     root.innerHTML=`<main class="error-state"><h1>Demo data unavailable</h1><p>Serve this folder over HTTP. Local JSON fixtures could not be loaded.</p><button class="btn btn-dark" onclick="location.reload()">Retry</button></main>`;
   }
+}
+const referralFilters=['All','Needs Action','Submitted','In Progress','Funded','Closed'];
+function syncReferralRouteFilter(){
+  const hash=location.hash.replace(/^#/,'');
+  if(!/^\/referrals(?:\?|$)/.test(hash))return;
+  const requested=new URLSearchParams(hash.split('?')[1]||'').get('filter');
+  state.referralFilter=referralFilters.includes(requested)?requested:'All';
 }
 function route(){const h=location.hash.replace(/^#/,'')||'/start';const parts=h.split('?')[0].replace(/^\/+/,'').split('/');return {name:parts[0]||'start',id:decodeURIComponent(parts[1]||'')};}
 function shell(active,content){
   return `<div class="workspace">${sidebar(active)}<div class="main-column">${topbar(active)}<main class="content">${content}</main>${footer()}</div></div><div class="sidebar-overlay ${state.mobile?'is-open':''}" data-action="close-menu"></div>`;
 }
 function sidebar(active){
-  return `<aside class="sidebar ${state.mobile?'is-open':''}" aria-label="Primary navigation"><a class="brand" href="#/start"><div class="brand-logomark">RD<span>///</span></div><div><strong>REFERRAL</strong><small>DISPATCH</small></div></a><div class="sidebar-rule"></div><div class="sidebar-section-label mono">AFFILIATE / DEMO 001</div><nav class="side-nav">${nav.map(([id,title,ico])=>`<a class="nav-item ${active===id?'active':''}" href="#/${id}" ${active===id?'aria-current="page"':''}>${icon(ico,18)}<span>${title}</span>${id==='messages'&&fixture.messages.some(m=>m.unread)?'<span class="nav-count">NEW</span>':''}</a>`).join('')}</nav><div class="sidebar-spacer"></div><div class="sidebar-help"><span class="mono">DISPATCH SUPPORT</span><strong>Referral workflow help</strong><a href="mailto:admin@distilledfunding.com">admin@distilledfunding.com ${icon('arrow',15)}</a></div><div class="sidebar-footer"><span>MOONSHINE CAPITAL</span><span>DEMO / 2026</span></div></aside>`;
+  return `<aside class="sidebar ${state.mobile?'is-open':''}" aria-label="Primary navigation"><a class="brand" href="#/start"><div class="brand-logomark">RD<span>///</span></div><div><strong>REFERRAL</strong><small>DISPATCH</small></div></a><div class="sidebar-rule"></div><div class="sidebar-section-label mono">AFFILIATE / DEMO 001</div><nav class="side-nav">${nav.map(([id,title,ico])=>`<a class="nav-item ${active===id?'active':''}" href="#/${id}" ${active===id?'aria-current="page"':''}>${icon(ico,18)}<span>${title}</span>${id==='messages'&&state.messageUnread.size?'<span class="nav-count">NEW</span>':''}</a>`).join('')}</nav><div class="sidebar-spacer"></div><div class="sidebar-help"><span class="mono">DISPATCH SUPPORT</span><strong>Referral workflow help</strong><a href="mailto:admin@distilledfunding.com">admin@distilledfunding.com ${icon('arrow',15)}</a></div><div class="sidebar-footer"><span>MOONSHINE CAPITAL</span><span>DEMO / 2026</span></div></aside>`;
 }
 function topbar(active){
   const unread=state.unread.size;
@@ -99,9 +111,7 @@ function filteredReferrals(){
   return rows;
 }
 function referralsPage(){
-  const filters=['All','Needs Action','Submitted','In Progress','Funded','Closed'];
-  const param=new URLSearchParams(location.hash.split('?')[1]||'');
-  if(param.get('filter')&&filters.includes(param.get('filter')))state.referralFilter=param.get('filter');
+  const filters=referralFilters;
   const rows=filteredReferrals();
   const controls=`<button class="btn btn-dark" data-action="submit-referral">${icon('plus',17)} Submit a Referral</button>`;
   const table=rows.length?`<div class="desktop-table-wrap"><table class="data-table"><thead><tr><th>Referral / business</th><th>Channel / provider</th><th>Category</th><th>Submitted / updated</th><th>Status</th><th>Next action</th><th></th></tr></thead><tbody>${rows.map(r=>`<tr><td><a class="table-business" href="#/referrals/${r.id}">${esc(r.alias)}</a><span class="mono table-ref">${r.id}</span></td><td><strong>${esc(r.channel)}</strong><small>${esc(r.provider)}</small></td><td>${esc(r.category)}</td><td><span>${date(r.submittedAt)}</span><small>Updated ${date(r.updatedAt)}</small></td><td>${statusBadge(r.status)}</td><td>${esc(r.nextAction)}</td><td><a class="row-arrow" href="#/referrals/${r.id}" aria-label="Open ${r.id}">${icon('arrow',18)}</a></td></tr>`).join('')}</tbody></table></div><div class="app-mobile-list">${rows.map(r=>`<a class="app-mobile-card" href="#/referrals/${r.id}"><div><span class="mono">${r.id}</span>${statusBadge(r.status)}</div><h3>${esc(r.alias)}</h3><p>${esc(r.provider)} · ${esc(r.category)}</p><b>${esc(r.nextAction)}</b></a>`).join('')}</div>`:`<div class="empty-state"><h3>No referrals found</h3><p>Try another search or status filter.</p><button class="btn btn-outline" data-action="clear-referral-filter">Clear filters</button></div>`;
@@ -152,7 +162,7 @@ function resourcesPage(){
 }
 function messagesPage(){
   const thread=fixture.messages.find(m=>m.id===state.activeThread)||fixture.messages[0];
-  return `${pageHead('AFFILIATE-SAFE SUPPORT','Messages & Support','Fictional support threads; no applicant communications or internal notes.')}<div class="message-layout"><aside class="thread-list"><div class="thread-head mono">SUPPORT THREADS / ${fixture.messages.length}</div>${fixture.messages.map(m=>`<button class="thread ${state.activeThread===m.id?'active':''}" data-thread="${esc(m.id)}"><span><b>${esc(m.subject)}</b><small>${esc(m.referralId)} · ${date(m.date)}</small></span>${m.unread?'<i>NEW</i>':''}</button>`).join('')}</aside><section class="message-thread"><div class="thread-title"><div><span class="mono">${esc(thread.referralId)}</span><h2>${esc(thread.subject)}</h2></div><a class="mini-link" href="mailto:admin@distilledfunding.com">Email general support ${icon('external',14)}</a></div><div class="messages">${thread.messages.map(m=>`<div class="message-bubble ${m.direction==='out'?'out':''}"><span class="mono">${esc(m.from)} · ${date(m.date)}</span><p>${esc(m.body)}</p></div>`).join('')}</div><form class="compose" data-compose><label for="demo-message">Demo draft</label><textarea id="demo-message" rows="4" placeholder="Type a fictional support draft…"></textarea><div><span class="mono">Demo only — no message sent.</span><button class="btn btn-dark" type="submit">${icon('send',16)} Add Demo Draft</button></div></form></section></div>`;
+  return `${pageHead('AFFILIATE-SAFE SUPPORT','Messages & Support','Fictional support threads; no applicant communications or internal notes.')}<div class="message-layout"><aside class="thread-list"><div class="thread-head mono">SUPPORT THREADS / ${fixture.messages.length}</div>${fixture.messages.map(m=>`<button class="thread ${state.activeThread===m.id?'active':''}" data-thread="${esc(m.id)}"><span><b>${esc(m.subject)}</b><small>${esc(m.referralId)} · ${date(m.date)}</small></span>${state.messageUnread.has(m.id)?'<i>NEW</i>':''}</button>`).join('')}</aside><section class="message-thread"><div class="thread-title"><div><span class="mono">${esc(thread.referralId)}</span><h2>${esc(thread.subject)}</h2></div><a class="mini-link" href="mailto:admin@distilledfunding.com">Email general support ${icon('external',14)}</a></div><div class="messages">${thread.messages.map(m=>`<div class="message-bubble ${m.direction==='out'?'out':''}"><span class="mono">${esc(m.from)} · ${date(m.date)}</span><p>${esc(m.body)}</p></div>`).join('')}</div><form class="compose" data-compose><label for="demo-message">Demo draft</label><textarea id="demo-message" rows="4" placeholder="Type a fictional support draft…"></textarea><div><span class="mono">Demo only — no message sent.</span><button class="btn btn-dark" type="submit">${icon('send',16)} Add Demo Draft</button></div></form></section></div>`;
 }
 function settingsPage(){
   const a=fixture.affiliate;
@@ -185,16 +195,28 @@ document.addEventListener('click',event=>{
   if(el.dataset.action==='read-all'){state.unread.clear();state.notifications=false;toast('Demo alerts marked read');render();}
   if(el.dataset.action==='close-dialog'){dialog.close();}
   if(el.dataset.action==='submit-referral'){dialogOpen('Submit a Referral — Integration Placeholder','<div class="placeholder-panel"><span class="mono">INTEGRATION NOT CONNECTED</span><h3>No verified referral intake route is configured.</h3><p>This demo does not collect applicant data or connect to Tally, Supabase, a CRM or a provider system.</p></div>');}
-  if(el.dataset.action==='clear-referral-filter'){state.referralFilter='All';state.referralSearch='';render();}
+  if(el.dataset.action==='clear-referral-filter'){state.referralFilter='All';state.referralSearch='';if(location.hash!=='#/referrals')location.hash='#/referrals';else render();}
   if(el.dataset.action==='clear-commission-filter'){state.commissionFilter='All';render();}
   if(el.dataset.action==='reset-activity'){state.activity={conversations:0,introductions:0,submissions:0,followUps:0};toast('Demo activity reset');render();}
   if(el.dataset.action==='reset-onboarding'){state.onboarding=new Set([0,1]);toast('Onboarding reset');render();}
   if(el.dataset.action==='save-preferences'){toast('Preferences saved in demo memory only');}
-  if(el.dataset.action==='reset-demo'){state.onboarding=new Set([0,1]);state.activity={conversations:0,introductions:0,submissions:0,followUps:0};state.goal={...fixture.goalDefaults};state.profile={service:true,marketing:false};toast('Entire demo reset');render();}
-  if(el.dataset.referralFilter){state.referralFilter=el.dataset.referralFilter;render();}
+  if(el.dataset.action==='reset-demo'){
+    state.mobile=false;state.notifications=false;
+    state.unread=new Set(fixture.notifications.filter(n=>n.unread).map(n=>n.id));
+    state.messageUnread=new Set(fixture.messages.filter(m=>m.unread).map(m=>m.id));
+    state.referralFilter='All';state.referralSearch='';state.referralSort='updated-desc';
+    state.commissionFilter='All';state.resourceFilter='All';
+    state.activeThread=fixture.messages[0]?.id||null;state.draft='';state.threadDraft='';
+    state.onboarding=new Set([0,1]);
+    state.activity={conversations:0,introductions:0,submissions:0,followUps:0};
+    state.goal={...fixture.goalDefaults};
+    state.profile={service:fixture.affiliate.serviceEmailEnabled,marketing:fixture.affiliate.marketingEmailEnabled};
+    toast('Entire demo reset');render();
+  }
+  if(el.dataset.referralFilter){const filter=el.dataset.referralFilter;state.referralFilter=filter;const target='#/referrals'+(filter==='All'?'':'?filter='+encodeURIComponent(filter));if(location.hash!==target)location.hash=target;else render();}
   if(el.dataset.commissionFilter){state.commissionFilter=el.dataset.commissionFilter;render();}
   if(el.dataset.resourceFilter){state.resourceFilter=el.dataset.resourceFilter;render();}
-  if(el.dataset.thread){state.activeThread=el.dataset.thread;render();}
+  if(el.dataset.thread){state.activeThread=el.dataset.thread;state.messageUnread.delete(el.dataset.thread);render();}
   if(el.dataset.resource){const r=fixture.resources.find(v=>v.id===el.dataset.resource);if(r)dialogOpen(r.title,`<div class="resource-dialog"><span class="mono">${esc(r.category)} · ${esc(r.integration)}</span><p>${esc(r.summary)}</p><div class="draft-script"><span class="mono">DEMO DRAFT · NOT PREAPPROVED</span><blockquote>${esc(r.draft)}</blockquote></div></div>`);}
   if(el.dataset.notification){state.unread.delete(el.dataset.notification);}
   if(el.dataset.add){const k=el.dataset.add;state.activity[k]=(state.activity[k]||0)+1;toast(`Demo ${k} activity added`);render();}
