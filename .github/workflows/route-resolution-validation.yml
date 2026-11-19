@@ -1,0 +1,61 @@
+name: Route resolution validation
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'data/asset-route-resolution.json'
+      - 'data/asset-groups.json'
+      - 'data/site-registry.json'
+      - 'data/variant-route-contracts.json'
+      - 'scripts/generate-route-resolution.ps1'
+      - '.github/workflows/route-resolution-validation.yml'
+  push:
+    branches: [main, batch-19a-embed-classification-fixes]
+    paths:
+      - 'data/asset-groups.json'
+      - 'data/site-registry.json'
+      - 'data/variant-route-contracts.json'
+      - 'scripts/generate-route-resolution.ps1'
+      - '.github/workflows/route-resolution-validation.yml'
+permissions:
+  contents: write
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Generate route resolution from source files
+        shell: pwsh
+        run: ./scripts/generate-route-resolution.ps1
+      - name: Verify cross-folder embed variants
+        shell: pwsh
+        run: |
+          $data = Get-Content data/asset-route-resolution.json -Raw | ConvertFrom-Json
+          $expected = @(
+            @{ path='/sites/Embed Widget Studio/'; group='embed-widget-studio'; number=1 },
+            @{ path='/sites/embed-code-generator/variant-3/'; group='embed-widget-studio'; number=2 },
+            @{ path='/sites/embed-widget-studio/variant-2/'; group='embed-code-generator'; number=3 }
+          )
+          foreach ($item in $expected) {
+            $matches = @($data.entries | Where-Object { $_.resolvedPath -eq $item.path -and $_.canonicalGroupId -eq $item.group -and $_.variantNumber -eq $item.number -and $_.resolutionStatus -eq 'resolved' })
+            if ($matches.Count -ne 1) { throw "Invalid embed ownership at $($item.path)" }
+          }
+          foreach ($expectedGroup in @(@{ id='embed-widget-studio'; count=2 }, @{ id='embed-code-generator'; count=3 })) {
+            $matches = @($data.groups | Where-Object { $_.groupId -eq $expectedGroup.id -and $_.variantCount -eq $expectedGroup.count })
+            if ($matches.Count -ne 1) { throw "Invalid variant count: $($expectedGroup.id)" }
+          }
+      - name: Update generated catalog on Batch 19A source branch only
+        if: github.event_name == 'push' && github.ref_name == 'batch-19a-embed-classification-fixes'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/asset-route-resolution.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Batch 19A: Refresh catalog from source contracts [skip ci]"
+            git push origin HEAD:"$GITHUB_REF_NAME"
+          fi
+      - name: Assert generated catalog is committed
+        if: github.event_name != 'push' || github.ref_name != 'batch-19a-embed-classification-fixes'
+        run: git diff --exit-code -- data/asset-route-resolution.json
