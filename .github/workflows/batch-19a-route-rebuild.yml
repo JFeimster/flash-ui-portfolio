@@ -1,0 +1,46 @@
+name: Batch 19A embed route catalog
+on:
+  push:
+    branches: [batch-19a-embed-classification-fixes]
+    paths:
+      - 'data/site-registry.json'
+      - 'data/asset-groups.json'
+      - 'data/variant-route-contracts.json'
+      - 'scripts/generate-route-resolution.ps1'
+      - '.github/workflows/batch-19a-route-rebuild.yml'
+permissions:
+  contents: write
+jobs:
+  rebuild:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Regenerate using established PowerShell script
+        shell: pwsh
+        run: ./scripts/generate-route-resolution.ps1
+      - name: Validate changed ownership and variant groups
+        shell: pwsh
+        run: |
+          $data = Get-Content data/asset-route-resolution.json -Raw | ConvertFrom-Json
+          $expect = @(
+            @{ p='/sites/Embed Widget Studio/'; g='embed-widget-studio'; n=1 },
+            @{ p='/sites/embed-code-generator/variant-3/'; g='embed-widget-studio'; n=2 },
+            @{ p='/sites/embed-widget-studio/variant-2/'; g='embed-code-generator'; n=3 }
+          )
+          foreach ($item in $expect) {
+            $matched = @($data.entries | Where-Object { $_.resolvedPath -eq $item.p -and $_.canonicalGroupId -eq $item.g -and $_.variantNumber -eq $item.n -and $_.resolutionStatus -eq 'resolved' })
+            if ($matched.Count -ne 1) { throw "Incorrect ownership: $($item.p)" }
+          }
+          if (@($data.groups | Where-Object { $_.groupId -eq 'embed-widget-studio' -and $_.variantCount -eq 2 }).Count -ne 1) { throw 'Studio group mismatch' }
+          if (@($data.groups | Where-Object { $_.groupId -eq 'embed-code-generator' -and $_.variantCount -eq 3 }).Count -ne 1) { throw 'Generator group mismatch' }
+      - name: Commit generated catalog
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/asset-route-resolution.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Batch 19A: Regenerate route catalog [skip ci]"
+            git push origin HEAD:"$GITHUB_REF_NAME"
+          fi
