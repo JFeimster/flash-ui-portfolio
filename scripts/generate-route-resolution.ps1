@@ -312,6 +312,48 @@ foreach ($file in $variantFiles) {
   }
 }
 
+# Opt-in additive hubs avoid mutating the immutable canonical registry.
+# Only groups with an explicit route contract may request this generated hub.
+foreach ($contract in As-Array (Get-Value $routeContractsData 'groups' @())) {
+  if (-not [bool](Get-Value $contract 'generateHubEntry' $false)) { continue }
+  $groupId = [string](Get-Value $contract 'groupId' '')
+  $hub = Normalize-Path (Get-Value $contract 'hubPath' '')
+  if (-not $groupId -or -not $groupDefinitions.ContainsKey($groupId) -or
+      -not (Has-Entrypoint (To-RepoPath $hub))) {
+    throw "Invalid additive hub contract: $groupId -> $hub"
+  }
+  $existingHubs = @($resolvedEntries | Where-Object {
+    (Get-Value $_ 'canonicalGroupId' '') -eq $groupId -and
+    (Get-Value $_ 'resolvedPath' '') -eq $hub
+  })
+  if ($existingHubs.Count -gt 0) { throw "Additive hub already represented: $groupId" }
+  $group = $groupDefinitions[$groupId]
+  $relative = $hub.TrimStart('/').TrimEnd('/')
+  $resolvedEntries += [ordered]@{
+    title = [string](Get-Value $contract 'displayTitle' $groupId)
+    slug = $groupId
+    category = [string](Get-Value $group 'category' 'Experiments')
+    type = 'group-hub'
+    source = 'variant-route-contract'
+    sourceFile = 'data/variant-route-contracts.json'
+    originalPath = $hub
+    resolvedPath = $hub
+    canonicalGroupId = $groupId
+    resolutionStatus = 'resolved'
+    resolutionReason = 'Additive route contract for existing hub index; canonical registry unchanged.'
+    productionVerification = 'pending'
+    notes = 'Source files and public URLs preserved.'
+    variantNumbers = @(As-Array (Get-Value $contract 'variants' @()) | ForEach-Object { [int](Get-Value $_ 'number' 0) })
+    entrypointEvidence = [ordered]@{
+      originalPathExists = $true
+      originalEntrypointExists = $true
+      resolvedEntrypointExists = $true
+      evidence = @("contract hub index: $hub")
+    }
+    sourcePath = "$relative/index.html"
+  }
+}
+
 # Source actions must point to the current file, including migrated records.
 foreach ($entry in $resolvedEntries) {
   if ($entry.resolvedPath) {
