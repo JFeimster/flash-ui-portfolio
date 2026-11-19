@@ -181,7 +181,11 @@ foreach ($item in $merged.Values) {
   $groupId = if ($migration) { $migration.groupId } elseif ($groupByKey.ContainsKey($titleKey)) { $groupByKey[$titleKey] } elseif ($groupByKey.ContainsKey($pathKey)) { $groupByKey[$pathKey] } else { "" }
   $group = if ($groupId -and $groupDefinitions.ContainsKey($groupId)) { $groupDefinitions[$groupId] } else { $null }
   $originalRepoPath = if ($path) { To-RepoPath $path } else { "" }
-  $originalExists = if ($originalRepoPath) { Test-Path -LiteralPath $originalRepoPath } else { $false }
+  $originalExists = $false
+  if ($originalRepoPath -and (Test-Path -LiteralPath $originalRepoPath)) {
+    $sourceItem = Get-Item -LiteralPath $originalRepoPath
+    $originalExists = -not $sourceItem.PSIsContainer -or [bool](Get-ChildItem -LiteralPath $originalRepoPath -Force | Select-Object -First 1)
+  }
   $originalEntrypoint = if ($originalRepoPath) { Has-Entrypoint $originalRepoPath } else { $false }
   $resolvedPath = ""
   $status = "unresolved"
@@ -320,7 +324,7 @@ foreach ($entry in $resolvedEntries) {
       $entry['sourcePath'] = $entry.resolvedPath.TrimStart('/')
       if ((Get-Item -LiteralPath $local).PSIsContainer) { $entry['sourcePath'] = "$($entry.sourcePath.TrimEnd('/'))/index.html" }
     }
-  } elseif (Test-Path -LiteralPath (To-RepoPath $entry.originalPath)) {
+  } elseif ($entry.entrypointEvidence.originalPathExists -and (Test-Path -LiteralPath (To-RepoPath $entry.originalPath))) {
     $entry['sourcePath'] = $entry.originalPath.TrimStart('/')
   }
   if ($entry.Contains('sourcePath')) {
@@ -602,9 +606,10 @@ $stableEntries = @($orderedEntries | ForEach-Object {
   $stable
 })
 
+$catalogGeneratedAt = if ($previousRoutes -and $previousRoutes.generatedAt) { ([datetime]$previousRoutes.generatedAt).ToUniversalTime().ToString('o') } else { (Get-Date).ToUniversalTime().ToString('o') }
 $output = [ordered]@{
   version = "1.1.0"
-  generatedAt = (Get-Date).ToUniversalTime().ToString("o")
+  generatedAt = $catalogGeneratedAt
   sourceFiles = @("data/site-registry.json", "data/site-registry-static-extractions.json", "data/site-registry-batch-5-additions.json", "data/asset-groups.json", "data/variant-route-contracts.json", "data/variant-migration-map.json", "data/jester-quotes-editions.json")
   verificationNote = "Local entrypoint evidence is structural only; production availability remains unverified until an authorized deployment smoke test is run."
   summary = $summary
