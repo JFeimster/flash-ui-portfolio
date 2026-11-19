@@ -338,8 +338,11 @@ foreach ($override in As-Array (Get-Value $routeContractsData 'sourceOwnershipOv
     throw "Invalid source ownership override: $source"
   }
   $matches = @($resolvedEntries | Where-Object {
-    $_.sourcePath -eq $source -or $_.originalPath.TrimEnd('/') -eq $route.TrimEnd('/') -or
-    $_.resolvedPath.TrimEnd('/') -eq $route.TrimEnd('/')
+    $recordSource = [string](Get-Value $_ 'sourcePath' '')
+    $recordOriginal = [string](Get-Value $_ 'originalPath' '')
+    $recordResolved = [string](Get-Value $_ 'resolvedPath' '')
+    $recordSource -eq $source -or $recordOriginal.TrimEnd('/') -eq $route.TrimEnd('/') -or
+    $recordResolved.TrimEnd('/') -eq $route.TrimEnd('/')
   })
   if ($matches.Count -ne 1) { throw "Ownership override must match exactly one source: $source (found $($matches.Count))" }
   $entry = $matches[0]
