@@ -16,6 +16,7 @@ try {
   assert.equal(await page.locator(".card-artwork [data-quick-preview]").count(), 0, "quick preview should sit below the artwork");
   assert.ok(await page.locator(".card-bottom [data-quick-preview]").count() > 0, "quick preview should be available in the card actions");
 
+  await page.locator('.portfolio-nav-group').filter({ has: page.locator('summary', { hasText: 'Create' }) }).locator('summary').click();
   await page.getByRole("link", { name: /site generator/i }).click();
   await page.waitForURL("**/generator/");
   assert.equal(page.url(), new URL("/generator/", base).href);
@@ -70,6 +71,7 @@ try {
   assert.ok((await prompt.inputValue()).length > 100, "editable prompt preview should remain available");
 
   await page.goto(new URL('/sites/', base).href);
+  await page.locator('#searchInput').fill('Jester Quotes');
   const jesterCard = page.locator('[data-project="jester-quotes"]');
   await jesterCard.waitFor();
   assert.equal(await jesterCard.count(), 1, 'Jester Quotes should have one project card');
@@ -98,7 +100,7 @@ try {
   await page.setViewportSize({ width: 390, height: 844 });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 390, 'mobile hub should not overflow horizontally');
   await page.goBack();
-  await page.waitForURL('**/sites/');
+  await page.waitForURL(url => url.pathname === '/sites/');
   assert.equal((await page.goto(new URL('/sites/jester-quotes/', base).href))?.status(), 200, 'Dada Riot static import should remain available');
 
   assert.deepEqual(pageErrors, [], "generator should not throw browser-side errors");
