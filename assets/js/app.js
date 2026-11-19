@@ -4,7 +4,7 @@
   const params = new URLSearchParams(location.search);
   const internal = params.get("view") === "internal";
   const storedFavorites = (() => { try { const data = JSON.parse(localStorage.getItem("flash-ui-saved-projects") || "[]"); return new Set(Array.isArray(data) ? data : []); } catch { return new Set(); } })();
-  const state = { entries: [], groups: [], candidates: [], showcase: {}, previews: {}, packages: {}, favorites: storedFavorites, favoritesOnly: params.get("saved") === "1", style: params.get("style") || "All", query: params.get("q") || "", category: params.get("category") || "All", type: params.get("type") || "All", sort: params.get("sort") || "featured" };
+  const state = { entries: [], groups: [], candidates: [], showcase: {}, previews: {}, packages: {}, favorites: storedFavorites, favoritesOnly: params.get("saved") === "1", style: params.get("style") || "All", query: params.get("q") || "", category: params.get("category") || "All", type: params.get("type") || "All", browse: params.get("browse") || "all", sort: params.get("sort") || "featured", limit: 24 };
   const $ = selector => document.querySelector(selector);
   const esc = value => String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
   const cleanTitle = value => String(value || "Project").replace(/^sites\s+/i, "").replace(/\s*index\.html$/i, "").replace(/\.html$/i, "").replace(/[-_]+/g, " ").trim();
@@ -24,7 +24,7 @@
     const copy = state.showcase[row.id] || {};
     const preview = state.previews[row.id] || {};
     const cachedImage = state.captures?.[row.id]?.image;
-    return { ...row, title: copy.title || row.title, description: copy.description || row.description || row.item.description || categoryCopy[row.category] || "Static page layout from the interface experiment collection.", audience: copy.audience || "", priority: copy.featuredPriority || row.priority || 0, visualStyle: preview.style || "", tone: preview.tone || "mint", previewLabel: preview.label || "", previewTarget: preview.target || (row.count ? "" : row.path), image: cachedImage || preview.image || "" };
+    return { ...row, title: copy.title || row.title, description: copy.description || row.description || row.item.description || categoryCopy[row.category] || "Static page layout from the interface experiment collection.", audience: copy.audience || "", purpose: copy.purpose || "", industry: copy.industry || "", priority: copy.featuredPriority || row.priority || 0, visualStyle: preview.style || "", tone: preview.tone || "mint", previewLabel: preview.label || "", previewTarget: preview.target || row.previewPath || row.path, image: cachedImage || preview.image || "" };
   }
   function rows() {
     const grouped = state.groups.map(group => {
@@ -32,7 +32,8 @@
       const variants = members.filter(entry => entry.variantNumber && available(entry));
       const hub = members.find(entry => entry.type === "group-hub") || members.find(entry => entry.resolvedPath === group.hubPath);
       const item = hub || variants[0] || members[0] || { resolutionStatus: "unresolved" };
-      return presentation({ id: group.groupId, title: group.displayTitle, category: group.category || "Experiments", description: group.description || "", priority: group.featuredPriority || 0, item, count: variants.length, path: group.curatedCollection && variants.length ? group.hubPath : (available(hub) ? hub.resolvedPath : variants[0]?.resolvedPath || (available(item) ? item.resolvedPath : "")) });
+      const destination = variants.length === 1 ? variants[0].resolvedPath : group.curatedCollection && variants.length ? group.hubPath : available(hub) ? hub.resolvedPath : variants[0]?.resolvedPath || (available(item) ? item.resolvedPath : "");
+      return presentation({ id: group.groupId, title: group.displayTitle, category: group.category || "Experiments", description: group.description || "", priority: group.featuredPriority || 0, item, count: variants.length, members, previewPath: variants[0]?.resolvedPath || "", path: destination });
     });
     const seen = new Set(grouped.map(row => row.path).filter(Boolean));
     const singles = state.entries.filter(entry => !entry.canonicalGroupId).filter(entry => {
@@ -42,11 +43,11 @@
     }).map(item => presentation({ id: item.slug, title: cleanTitle(item.title), category: item.category || "Experiments", item, count: 0, path: available(item) ? item.resolvedPath : "" }));
     return [...grouped, ...singles].filter(row => internal || row.path);
   }
-  const typeOf = row => row.path ? (row.count ? "variants" : "single") : row.item.resolutionStatus === "archive" ? "archive" : row.item.resolutionStatus === "standalone-app" ? "app" : "repair";
+  const typeOf = row => row.path ? (row.count > 1 ? "variants" : "single") : row.item.resolutionStatus === "archive" ? "archive" : row.item.resolutionStatus === "standalone-app" ? "app" : "repair";
   const statusLabel = row => ({ archive: "Source archive", app: "Separate deployment needed", repair: "Preview needs repair" }[typeOf(row)] || "HTML preview");
   function matches(row) {
-    const text = [row.title, row.description, row.audience, row.category, internal ? row.item.originalPath : ""].join(" ").toLowerCase();
-    return (!state.query || text.includes(state.query.toLowerCase())) && (state.category === "All" || state.category === row.category) && (state.type === "All" || typeOf(row) === state.type) && (state.style === "All" || row.visualStyle === state.style) && (!state.favoritesOnly || state.favorites.has(row.id));
+    const text = [row.title, row.description, row.purpose, row.industry, row.audience, row.category, ...(row.members || []).flatMap(item => [item.title, item.description]), internal ? row.item.originalPath : ""].join(" ").toLowerCase();
+    return (!state.query || text.includes(state.query.toLowerCase())) && (state.category === "All" || state.category === row.category) && (state.type === "All" || typeOf(row) === state.type) && (state.style === "All" || row.visualStyle === state.style) && (state.browse === "all" || row.priority > 0) && (!state.favoritesOnly || state.favorites.has(row.id));
   }
   function sorted(list) {
     return [...list].sort((a, b) => {
@@ -60,18 +61,18 @@
     return `<details class="details-panel"><summary>Operator details</summary><dl>${fields.filter(([, value]) => value).map(([label, value]) => `<dt>${esc(label)}</dt><dd>${esc(value)}</dd>`).join("")}</dl>${item.sourceUrl ? `<a href="${esc(item.sourceUrl)}" target="_blank" rel="noreferrer">View source ↗</a>` : "<p>Source location unresolved.</p>"}</details>`;
   }
   function card(row) {
-    const path = row.path && internal && row.count ? (row.path + "?view=internal") : row.path;
+    const path = row.path && internal && row.count > 1 ? (row.path + "?view=internal") : row.path;
     const title = esc(row.title);
     const category = esc(row.category);
     const style = row.visualStyle ? '<span class="card-style">' + esc(row.visualStyle) + '</span>' : '';
     const action = path
-      ? '<a class="btn primary" href="' + esc(path) + '" aria-label="' + esc((row.count ? "Explore variants of " : "Open ") + row.title) + '">' + (row.count ? 'Explore Variants' : '🚀 Open Site') + '<span aria-hidden="true">↗</span></a>'
+      ? '<a class="btn primary" href="' + esc(path) + '" aria-label="' + esc((row.count > 1 ? "Explore variants of " : "Open ") + row.title) + '">' + (row.count > 1 ? 'Explore Variants' : '🚀 Open Site') + '<span aria-hidden="true">↗</span></a>'
       : '<p class="repair-note">' + esc(statusLabel(row)) + '</p>';
     const useAction = !row.count && state.packages[row.path] ? '<a class="btn" href="' + esc(usePath(row.path)) + '">Use This Asset</a>' : '';
     const preview = voltage ? voltage.quickPreview(row) : '';
     return '<article class="card voltage-card" data-project="' + esc(row.id) + '">'
       + (voltage ? voltage.artwork(row,state.favorites.has(row.id)) : '')
-      + '<div class="card-content"><div class="card-topline"><span class="card-category">' + category + '</span>' + style + (row.count ? '<span class="variant-count">' + row.count + ' variation' + (row.count === 1 ? '' : 's') + '</span>' : '') + '</div>'
+      + '<div class="card-content"><div class="card-topline"><span class="card-category">' + category + '</span>' + style + (row.count ? '<span class="variant-count">' + row.count + (row.count === 1 ? ' preview' : ' variations') + '</span>' : '') + '</div>'
       + '<h2>' + title + '</h2><p class="card-description">' + esc(row.description) + '</p>'
       + '<div class="card-bottom">' + preview + action + useAction + '</div></div>'
       + (internal ? details(row.item) : '') + '</article>';
@@ -93,8 +94,9 @@
       $("#categoryGrid").innerHTML = categories.map(category => `<a class="category-tile" href="/sites/?category=${encodeURIComponent(category)}"><span>${esc(category)}</span><span aria-hidden="true">↗</span></a>`).join("");
     } else {
       const result = sorted(all.filter(matches));
-      $("#cardGrid").innerHTML = result.length ? result.map(card).join("") : empty();
-      $("#visibleCount").textContent = `${result.length} project${result.length === 1 ? "" : "s"}`;
+      $("#cardGrid").innerHTML = result.length ? result.slice(0, state.limit).map(card).join("") : empty();
+      $("#visibleCount").textContent = `${Math.min(result.length, state.limit)} of ${result.length} project${result.length === 1 ? "" : "s"}`;
+      $("#loadMore").hidden = result.length <= state.limit;
     }
   }
   function setup() {
@@ -109,26 +111,28 @@
       if (!styles.includes(state.style)) state.style = "All";
       $("#styleFilter").innerHTML = styles.map(value => '<option value="' + esc(value) + '">' + esc(value === "All" ? "All visual styles" : value) + '</option>').join("");
       if (!types.some(([value]) => value === state.type)) state.type = "All";
+      if (!["all", "featured"].includes(state.browse)) state.browse = "all";
       if (!["featured", "title", "variants"].includes(state.sort)) state.sort = "featured";
-      for (const key of ["category", "type", "style", "sort"]) $(`#${key}Filter`).value = state[key];
+      for (const key of ["browse", "category", "type", "style", "sort"]) $(`#${key}Filter`).value = state[key];
       const favoritesButton = $("#favoritesOnly");
       const syncFavorites = () => { if (favoritesButton) favoritesButton.setAttribute("aria-pressed", String(state.favoritesOnly)); const count = $("#favoritesCount"); if (count) count.textContent = state.favorites.size ? "(" + state.favorites.size + ")" : ""; };
       syncFavorites();
       $("#searchInput").value = state.query;
       const update = () => {
         const url = new URL(location.href);
-        for (const [key, value] of [["q", state.query], ["category", state.category], ["type", state.type], ["style", state.style], ["sort", state.sort], ["saved", state.favoritesOnly ? "1" : ""]]) {
-          if (!value || value === "All" || (key === "sort" && value === "featured")) url.searchParams.delete(key); else url.searchParams.set(key, value);
+        for (const [key, value] of [["q", state.query], ["browse", state.browse], ["category", state.category], ["type", state.type], ["style", state.style], ["sort", state.sort], ["saved", state.favoritesOnly ? "1" : ""]]) {
+          if (!value || value === "All" || (key === "browse" && value === "all") || (key === "sort" && value === "featured")) url.searchParams.delete(key); else url.searchParams.set(key, value);
         }
         history.replaceState(null, "", url); syncFavorites(); render();
       };
-      $("#searchInput").addEventListener("input", event => { state.query = event.target.value.trim(); update(); });
-      document.querySelectorAll("[data-filter]").forEach(node => node.addEventListener("change", event => { state[event.target.dataset.filter] = event.target.value; update(); }));
-      favoritesButton?.addEventListener("click", () => { state.favoritesOnly = !state.favoritesOnly; update(); });
+      $("#searchInput").addEventListener("input", event => { state.query = event.target.value.trim(); state.limit = 24; update(); });
+      document.querySelectorAll("[data-filter]").forEach(node => node.addEventListener("change", event => { state[event.target.dataset.filter] = event.target.value; state.limit = 24; update(); }));
+      favoritesButton?.addEventListener("click", () => { state.favoritesOnly = !state.favoritesOnly; state.limit = 24; update(); });
+      $("#loadMore").addEventListener("click", () => { state.limit += 24; render(); });
       document.addEventListener("click", event => {
         if (!event.target.closest("#resetFilters")) return;
-        state.query = ""; state.category = "All"; state.type = "All"; state.style = "All"; state.favoritesOnly = false;
-        $("#searchInput").value = ""; $("#categoryFilter").value = "All"; $("#typeFilter").value = "All"; $("#styleFilter").value = "All";
+        state.query = ""; state.category = "All"; state.type = "All"; state.style = "All"; state.browse = "all"; state.favoritesOnly = false; state.limit = 24;
+        $("#searchInput").value = ""; $("#browseFilter").value = "all"; $("#categoryFilter").value = "All"; $("#typeFilter").value = "All"; $("#styleFilter").value = "All";
         update(); $("#searchInput").focus();
       });
     }
