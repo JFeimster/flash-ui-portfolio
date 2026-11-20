@@ -3,7 +3,7 @@ export const MCP_SCHEMA='https://agent-plugins.org/schemas/1.0.0/mcp.schema.json
 export const slug=s=>String(s||'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,64);
 export function safePath(path){return typeof path==='string' && path.length>0 && !path.startsWith('/') && !path.includes('\\') && !path.split('/').some(x=>!x||x==='.'||x==='..') && !/[\u0000-\u001f]/.test(path);}
 export function safeEndpoint(input){
-  try{const u=new URL(input);return !u.username&&!u.password&&!u.hash&&((u.protocol==='https:')||(u.protocol==='http:'&&['localhost','127.0.0.1','::1','[::1]'].includes(u.hostname)))&&!/^(?:example\.com|example\.org|your-|placeholder)/i.test(u.hostname)}
+  try{const u=new URL(input);return !u.username&&!u.password&&!u.hash&&((u.protocol==='https:')||(u.protocol==='http:'&&['localhost','127.0.0.1','::1','[::1]'].includes(u.hostname)))&&!/(?:^|\.)example\.(?:com|org|net)$|^(?:your-|placeholder)/i.test(u.hostname)}
   catch{return false}
 }
 export function sensitive(text){
