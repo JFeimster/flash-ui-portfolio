@@ -9,7 +9,7 @@ export function missedCallWorkflow(payload){
  if(!['routine','time-sensitive','urgent'].includes(urgency))throw Error('Choose a valid urgency.');
  const score=urgency==='urgent'?90:urgency==='time-sensitive'?65:35;
  const penalty=Math.min(45,Math.floor(missed/60)*5);
- const priority=score+penalty>=100?'Immediate':score+penalty>=65?'High':'Standard';
+ const priority=urgency==='urgent'||score+penalty>=100?'Immediate':score+penalty>=65?'High':'Standard';
  const reply='Hi '+caller+', thanks for reaching out about '+service+'. Sorry we missed you. Can you share a good time for our team to follow up?';
  const action=urgency==='urgent'?'Review for immediate human callback':'Add to the team callback review queue';
  return {title:'Missed-call recovery',summary:priority+' priority · '+missed+' minutes since missed inquiry',metrics:[['Priority',priority],['Elapsed time',missed+' min'],['Urgency',urgency]],steps:['Verify customer identity and permission before responding',action,'Confirm service need and callback availability','Record result only in an authorized CRM'],drafts:[{type:'Unsent reply draft',text:reply}],payload:{caller,service,missedMinutes:missed,urgency,priority},warning:guard+' Confirm consent before any outbound communication.'};
