@@ -28,7 +28,10 @@ $('assetSelect').addEventListener('change',()=>{
  $('instructions').value='';
  resetOutput();state('Selected '+n.name+'. Paste complete authorized instructions to continue.');
 });
-$('mode').addEventListener('change',()=>{$('mcpField').hidden=$('mode').value!=='remote-mcp';resetOutput()});
+$('mode').addEventListener('change',()=>{$('mcpField').hidden=$('mode').value!=='remote-mcp';resetOutput();state('Mode changed. Generate a new package.')});
+for(const id of ['name','description','instructions','knowledge','contracts','mcpUrl']){
+ $(id).addEventListener('input',()=>{if(files){resetOutput();state('Source or settings changed. Generate again before export.')}});
+}
 $('build').addEventListener('click',()=>{
  resetOutput();
  try{
