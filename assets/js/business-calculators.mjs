@@ -15,7 +15,7 @@ const config={
   calc:agencyPricing,outputs:r=>[['Modeled monthly cost',fmtMoney(r.totalCost)],['Recommended client price',fmtMoney(r.recommendedPrice)],['Profit at recommended price',fmtMoney(r.projectedProfit)],['Profit at current price',r.currentProfit===null?'Not provided':fmtMoney(r.currentProfit)],['Current operating margin',r.currentMargin===null?'—':fmtNum(r.currentMargin)+'%'],['Target margin',fmtNum(r.targetMargin)+'%']]}
 };
 const tool=document.body.dataset.tool;const setup=config[tool];if(!setup)throw Error('Unknown calculator');
-const form=$('calculatorForm');for(const [key,label,defaultValue,min,max,step] of setup.fields){const wrap=document.createElement('label');wrap.textContent=label;const field=document.createElement('input');field.className='calc-input';field.type='number';field.name=key;field.id=key;field.value=defaultValue;field.min=min;field.max=max;field.step=step;field.required=true;wrap.append(field);form.append(wrap)}
+const form=$('calculatorForm');for(const [key,label,defaultValue,min,max,step] of setup.fields){const wrap=document.createElement('label');wrap.textContent=label;const field=document.createElement('input');field.className='calc-input';field.type='number';field.name=key;field.id=key;field.value=defaultValue;field.min=min;field.max=max;field.step=step;field.required=true;wrap.append(field);$('fieldsPlaceholder').append(wrap)}
 function calculate(event){if(event)event.preventDefault();const status=$('resultStatus');const area=$('results');area.replaceChildren();status.textContent='';status.className='note';
  try{if(!form.checkValidity()){form.reportValidity();throw Error('Correct the highlighted input fields.')}
   const data=Object.fromEntries(setup.fields.map(([key])=>[key,$(key).value]));
