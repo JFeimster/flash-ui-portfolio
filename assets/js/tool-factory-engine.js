@@ -8,7 +8,7 @@
     if (spec.schema_version !== VERSION) errors.push('Unsupported schema version.');
     if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(spec.id || '')) errors.push('ID must be a lowercase slug.');
     if (!String(spec.title || '').trim()) errors.push('Title is required.');
-    if (!['calculator', 'scorecard', 'checklist'].includes(spec.archetype)) errors.push('Choose a supported archetype.');
+    if (!['calculator', 'scorecard', 'checklist', 'intake'].includes(spec.archetype)) errors.push('Choose a supported archetype.');
     if (!Array.isArray(spec.inputs) || !Array.isArray(spec.outputs)) errors.push('Inputs and outputs must be arrays.');
     if (spec.archetype === 'calculator') {
       if (!spec.calculation || !['sum', 'difference', 'multiply', 'divide'].includes(spec.calculation.operation)) errors.push('Choose a supported calculation.');
@@ -16,7 +16,23 @@
     }
     if (spec.archetype === 'scorecard' && (!Array.isArray(spec.questions) || !spec.questions.length || spec.questions.some(q => !q.id || !q.label || !Array.isArray(q.options) || q.options.length < 2 || q.options.some(o => !o.label || !Number.isFinite(o.points))))) errors.push('Scorecard needs questions with scored options.');
     if (spec.archetype === 'checklist' && (!Array.isArray(spec.sections) || !spec.sections.length || spec.sections.some(s => !s.label || !Array.isArray(s.items) || !s.items.length))) errors.push('Checklist needs sections and items.');
+    if (spec.archetype === 'intake' && (!Array.isArray(spec.fields) || !spec.fields.length || spec.fields.some(f => !/^[a-z0-9-]+$/.test(f.id || '') || !String(f.label || '').trim() || !['text','email','select'].includes(f.type) || (f.type === 'select' && (!Array.isArray(f.options) || f.options.length < 2 || f.options.some(o => !String(o).trim())))))) errors.push('Intake needs valid text, email, or select fields.');
     return errors;
+  }
+  function intake(spec, answers) {
+    const errors = validate(spec);
+    if (errors.length) return { errors };
+    const lines = [];
+    for (const field of spec.fields) {
+      const value = String(answers[field.id] ?? '').trim();
+      if (field.required && !value) errors.push(field.label + ': required.');
+      if (value.length > 500) errors.push(field.label + ': 500 character limit.');
+      if (field.type === 'email' && value && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(value)) errors.push(field.label + ': invalid email.');
+      if (field.type === 'select' && value && !field.options.includes(value)) errors.push(field.label + ': invalid option.');
+      lines.push(field.label + ': ' + (value || '[not provided]'));
+    }
+    if (errors.length) return { errors };
+    return { text: spec.title + '\\n\\n' + lines.join('\\n') + '\\n\\nLocal draft only. Nothing submitted or stored.', errors: [] };
   }
   function calculate(spec, raw) {
     const errors = validate(spec);
@@ -67,5 +83,5 @@
     if (!lines.length) return { errors: ['Choose at least one item.'] };
     return { text: `${spec.title}\n\n${lines.join('\n').trim()}\n\nDemo checklist. Review before use.`, errors: [] };
   }
-  root.ToolFactoryEngine = { VERSION, safeId, validate, calculate, score, checklist };
+  root.ToolFactoryEngine = { VERSION, safeId, validate, calculate, score, checklist, intake };
 })(globalThis);
