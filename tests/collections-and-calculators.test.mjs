@@ -4,13 +4,13 @@ import {readFile,stat} from 'node:fs/promises';
 import {loanTrueCost,cashRunway,agencyPricing} from '../assets/js/business-calculators-core.mjs';
 const root=new URL('../',import.meta.url);
 const load=async p=>JSON.parse(await readFile(new URL(p,root),'utf8'));
-test('shared collection registry preserves the two existing collections and 55 total ideas',async()=>{
+test('shared registry retains original collections and aggregates all new collections',async()=>{
  const registry=await load('data/collections-registry.json');
  assert.equal(registry.schema,'flash-ui-collections/v1');
- assert.equal(registry.collections.length,3);
- assert.deepEqual(registry.collections.map(x=>x.count),[25,20,10]);
- assert.equal(registry.totalConcepts,55);
- assert.equal(new Set(registry.collections.map(x=>x.id)).size,3);
+ assert.equal(registry.collections.length,20);
+ assert.deepEqual(registry.collections.slice(0,3).map(x=>x.count),[25,20,10]);
+ assert.equal(registry.totalConcepts,178);
+ assert.equal(new Set(registry.collections.map(x=>x.id)).size,20);
  assert.equal((await load('data/mcp-agent-product-ideas.json')).count,25);
  assert.equal((await load('data/funding-agency-automation-ideas.json')).count,20);
  for(const x of registry.collections){
