@@ -1,3 +1,5 @@
+import {qualificationQuiz,roiGenerator,quoteBuilder} from './lead-tools-core.mjs';
+import {agencyLaunchKit} from './agency-kit-core.mjs';
 import {missedCallWorkflow,invoiceFollowupWorkflow,onboardingWorkflow} from './workflow-lab-core.mjs';
 const $=id=>document.getElementById(id);
 const node=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e};
@@ -10,6 +12,15 @@ const schemas={
  onboarding:{title:'Client Onboarding Automation Builder',description:'Build a tailored client delivery checklist with owners, milestones, evidence and unsent welcome copy.',fn:onboardingWorkflow,
  fields:[['client','Client / organization','text','Meridian Advisory'],['service','Service being delivered','text','AI automation implementation'],['owner','Responsible operator','text','Project lead'],['deadlineDays','Delivery timeline (days)','number','30',1,365],['complexity','Complexity','select','standard',['simple','standard','complex']]]}
 };
+schemas.qualify={title:'Smart Qualification Quiz Builder',description:'Score a fictional prospect and create a consent-safe outreach brief.',fn:qualificationQuiz,fields:[
+ ['company','Customer or business name','text','Riverstone Services'],['need','Requested outcome','text','New commercial website'],['budget','Indicative budget ($)','number','3500',0,100000000],['timelineDays','Decision timeline (days)','number','21',0,3650],['readiness','Purchase stage','select','evaluating',['researching','evaluating','ready']]]};
+schemas.roi={title:'ROI Calculator Generator',description:'Model project payback with user-controlled cost and benefits.',fn:roiGenerator,fields:[
+ ['project','Project name','text','CRM Automation'],['investment','One-time investment ($)','number','12000',1,1000000000],['monthlySavings','Estimated monthly cost savings ($)','number','1800',0,1000000000],['monthlyRevenue','Estimated added monthly revenue ($)','number','1500',0,1000000000],['grossMargin','Added revenue contribution margin (%)','number','45',0,100],['months','Projection months','number','12',1,120]]};
+schemas.quote={title:'Instant Quote & Estimate Widget',description:'Calculate an example service quote from costs and target margin.',fn:quoteBuilder,fields:[
+ ['service','Service description','text','Workflow Automation Setup'],['hours','Estimated delivery hours','number','30',0,100000],['rate','Internal labor cost ($/hour)','number','60',0,100000],['materials','External/vendor costs ($)','number','800',0,1000000000],['margin','Target pricing margin (%)','number','40',0,90]]};
+schemas.kit={title:'Agency Launch Kit Composer',description:'Build an agency service offer, pricing assumptions and execution plan.',fn:agencyLaunchKit,fields:[
+ ['name','Agency brand','text','Northstar Automations'],['vertical','Target niche','text','Home services'],['offer','Primary service offering','text','AI customer follow-up automation'],['buyer','Ideal paying customer','text','Owner-operated contracting businesses'],['price','Monthly package price ($)','number','799',1,100000000],['deliveryCost','Monthly fulfillment cost per client ($)','number','220',0,100000000],['targetClients','Initial target clients','number','10',1,10000]]};
+
 const spec=schemas[type];if(!spec)throw Error('Unknown workflow prototype');
 const fields=$('workflowFields');for(const [key,label,kind,initial,min,maximum] of spec.fields){
  const wrapper=node('label','',label);const input=kind==='select'?node('select','calc-input'):node('input','calc-input');
