@@ -18,15 +18,15 @@ test('shared registry retains original collections and aggregates all new collec
   await stat(new URL(x.url.slice(1)+'index.html',root));
  }
 });
-test('calculator idea set has 10 distinct concepts and only 3 working routes',async()=>{
+test('financial collection has ten working routes with distinct specifications',async()=>{
  const catalog=await load('data/business-calculator-ideas.json');
  assert.equal(catalog.schema,'flash-ui-business-calculators/v1');
  assert.equal(catalog.entries.length,10);
  assert.equal(new Set(catalog.entries.map(x=>x.id)).size,10);
  const working=catalog.entries.filter(x=>x.status==='functional-prototype');
- assert.equal(working.length,3);
+ assert.equal(working.length,10);
  for(const x of working)await stat(new URL(x.demoPath.slice(1)+'index.html',root));
- assert.ok(catalog.entries.filter(x=>x.status==='concept').every(x=>x.demoPath===null));
+ assert.equal(catalog.entries.filter(x=>x.status==='concept').length,0);
  assert.ok(catalog.entries.every(x=>x.functionalSpec.inputs.length>0&&x.functionalSpec.acceptanceCriteria.length>0));
 });
 test('loan cost: 0% no fees, 12 monthly payments, nominal APR 0',()=>{
