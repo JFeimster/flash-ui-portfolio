@@ -39,6 +39,20 @@
       }
       form.addEventListener('submit', ev => { ev.preventDefault(); const q = spec.questions[step]; const chosen = new FormData(form).get(q.id); if (!chosen) return show('Choose an answer to continue.', true); answers[q.id] = chosen; if (step < spec.questions.length - 1) { step++; render(); } else { const out = E.score(spec, answers); show(out.errors.length ? out.errors.join(' ') : `${out.label} · ${out.value} points. ${out.recommendation}`, !!out.errors.length); } });
       render();
+    } else if (spec.archetype === 'intake') {
+      for (const field of spec.fields) {
+        const label = add('label', field.label, form);
+        label.htmlFor = 'tool-' + field.id;
+        const input = add(field.type === 'select' ? 'select' : 'input', undefined, form);
+        input.id = label.htmlFor; input.name = field.id; input.required = !!field.required;
+        if (field.type === 'select') {
+          const empty = add('option', 'Choose…', input); empty.value = '';
+          for (const option of field.options) { const o = add('option', option, input); o.value = option; }
+        } else { input.type = field.type; input.maxLength = 500; }
+      }
+      const go = add('button', 'Generate local intake summary', form); go.type = 'submit';
+      form.addEventListener('submit', ev => { ev.preventDefault(); const out = E.intake(spec, Object.fromEntries(new FormData(form))); show(out.errors.length ? out.errors.join(' ') : out.text, !!out.errors.length); });
+      show('Complete the fields to generate a local summary. No submission occurs.');
     } else if (spec.archetype === 'checklist') {
       for (const section of spec.sections) {
         add('h2', section.label, form);
