@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
-const root = path.resolve(import.meta.dirname, '..');
+const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const read = file => JSON.parse(fs.readFileSync(path.join(root, file), 'utf8'));
 export function inspect(record, registries, routeData) {
  const errors = [];
@@ -11,11 +11,11 @@ export function inspect(record, registries, routeData) {
  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) errors.push('slug must be lowercase kebab-case');
  if (!['group-hub','static-site','standalone-app','archive'].includes(record.type)) errors.push('type must identify group-hub, static-site, standalone-app, or archive');
  if (!String(record.source || '').trim()) errors.push('source provenance is required');
- if (!String(record.path || '').startsWith('sites/') || String(record.path).includes('..')) errors.push('path must be a safe sites/ path');
- if (!/^\/sites\/[a-z0-9-]+\/$/.test(record.livePath || '')) errors.push('livePath must be a normalized /sites/slug/ route');
- if (record.livePath !== '/sites/' + slug + '/') errors.push('slug and livePath must agree');
+ if (!/^sites\/[a-z0-9-]+(?:\/variant-[1-9][0-9]*)?$/.test(String(record.path || '')) || String(record.path).includes('..')) errors.push('path must be a safe sites/ path');
+ if (!/^\/sites\/[a-z0-9-]+(?:\/variant-[1-9][0-9]*)?\/$/.test(record.livePath || '')) errors.push('livePath must be a normalized /sites/slug/ route');
+ if (record.livePath !== '/' + record.path + '/') errors.push('path and livePath must agree');
  if (record.type === 'standalone-app' && record.hasIndex === true) errors.push('standalone app cannot be automatically classified as static from hasIndex');
- const records = registries.flat().filter(x=>x && typeof x==='object');
+ const records = registries.flatMap(group => Array.isArray(group) ? group : Array.isArray(group?.entries) ? group.entries : []).filter(x=>x && typeof x==='object');
  if (records.some(x=>x.slug===slug || x.livePath===record.livePath || x.path===record.path)) errors.push('existing registry slug, route, or filesystem path collision');
  const entries = Array.isArray(routeData?.entries) ? routeData.entries : Object.values(routeData?.entries || {});
  if (entries.some(x=>x.slug===slug || x.resolvedPath===record.livePath || x.sourceFile===record.path+'/index.html')) errors.push('existing route resolution collision');
