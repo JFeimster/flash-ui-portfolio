@@ -30,7 +30,9 @@ function extractStoreZip(bytes) {
 async function select(kind) {
   await page.locator('#archetype').selectOption(kind);
   await page.locator('#build').click();
-  await assert.doesNotReject(() => page.locator('#status').getByText(/preview ready/).waitFor({ timeout: 10000 }));
+  await page.waitForTimeout(750);
+  const status = await page.locator('#status').innerText();
+  if (!/preview ready/i.test(status)) throw new Error('Factory '+kind+' failed to build: '+status+'; browser errors: '+failures.join('; '));
   await page.locator('[data-view="output"]').click();
   await page.locator('[data-tab="preview"]').click();
   await page.frameLocator('#preview').locator('.tool-title').waitFor({ timeout: 10000 });
