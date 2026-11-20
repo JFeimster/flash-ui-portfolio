@@ -1,0 +1,26 @@
+name: Capability Factory focused checks
+on:
+  pull_request:
+    paths:
+      - 'capabilities/**'
+      - 'assets/js/capability-factory*.mjs'
+      - 'assets/css/capability-factory.css'
+      - 'data/capability-types.json'
+      - 'scripts/package-capability.mjs'
+      - 'tests/capability-factory.test.mjs'
+      - '.github/workflows/capability-factory.yml'
+jobs:
+  capability-factory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Static JavaScript syntax
+        run: |
+          node --check assets/js/capability-factory-core.mjs
+          node --check assets/js/capability-factory.mjs
+          node --check scripts/package-capability.mjs
+      - name: Focused capability tests
+        run: node --test tests/capability-factory.test.mjs
