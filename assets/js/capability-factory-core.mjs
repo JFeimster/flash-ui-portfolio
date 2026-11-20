@@ -27,13 +27,15 @@ export function validatePackage(files){
  return errors;
 }
 export function buildPackage(input){
- const name=slug(input.name),mode=input.mode||'skill',source=(input.instructions||'').trim();
+ const name=slug(input.packageIdentity||input.name),mode=input.mode||'skill',source=(input.instructions||'').trim();
+ const version=input.version||'0.1.0';
+ if(!/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(version))throw Error('Version must follow MAJOR.MINOR.PATCH (for example 0.1.1).');
  if(!name)throw Error('Enter a package name.');
  if(!source)throw Error('Paste source instructions before generating a package.');
  if(sensitive(source))throw Error('Source contains possible credentials. Remove them before exporting.');
  if(input.mcpUrl&&!safeEndpoint(input.mcpUrl))throw Error('Remote MCP URL must be a real HTTPS endpoint (or loopback HTTP), not a placeholder.');
  const files={},title=(input.name||name).replace(/[\r\n]/g,' ').trim();
- files['plugin.json']=json({$schema:PLUGIN_SCHEMA,name,version:'0.1.0',description:(input.description||'Portable capability package based on operator-supplied source instructions').slice(0,250)});
+ files['plugin.json']=json({$schema:PLUGIN_SCHEMA,name,version,description:(input.description||'Portable capability package based on operator-supplied source instructions').slice(0,250)});
  const notes=['# Compatibility and deployment notes','','Source asset: '+(input.assetId||'Custom source'),'Mode: '+mode,'Status: source-based package; not installed, deployed, or executed.','','## Required verification','- Compare exported instructions against original GPT/source, knowledge files, and privacy expectations.','- Confirm any OAuth scopes and connected accounts with the actual provider.','- Test every action on a staging system before deployment.','- Existing plugin identity should be reused on later updates; do not install duplicates.','- Generated packages do not transfer private GPT knowledge automatically.'];
  if(input.knowledge)notes.push('','## Knowledge inventory',redact(input.knowledge));
  if(input.contracts)notes.push('','## API/tool contracts',redact(input.contracts));
