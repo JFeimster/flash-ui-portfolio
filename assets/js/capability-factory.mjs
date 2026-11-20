@@ -1,4 +1,5 @@
 import {buildPackage,zipBytes,handoff} from './capability-factory-core.mjs';
+import {prefillIdea,validateIdeas} from './capability-ideas-core.mjs';
 const $=id=>document.getElementById(id);
 let nodes=[],files=null,selected='',lastInput=null;
 const fields=['name','mode','description','instructions','knowledge','contracts','mcpUrl'];
@@ -54,3 +55,25 @@ $('handoff').addEventListener('click',async()=>{
 });
 $('clear').addEventListener('click',()=>{for(const field of fields)$(field).value=field==='mode'?'skill':'';selected='';$('assetSearch').value='';$('mcpField').hidden=true;resetOutput();listAssets();state('Cleared. No files or accounts changed.')});
 init();
+
+async function prefillFromLibrary(){
+ const ideaId=new URLSearchParams(location.search).get('idea');
+ if(!ideaId)return;
+ try{
+  const response=await fetch('/data/mcp-agent-product-ideas.json');
+  if(!response.ok)throw Error('Product idea collection unavailable');
+  const catalog=await response.json();
+  const errors=validateIdeas(catalog);if(errors.length)throw Error('Product idea collection failed validation');
+  const idea=catalog.entries.find(x=>x.id===ideaId);
+  if(!idea)throw Error('Unknown product idea ID. Open the idea library and choose a valid concept.');
+  const values=prefillIdea(idea);
+  selected='';$('assetSelect').selectedIndex=-1;
+  for(const [id,value] of Object.entries(values))$(id).value=value;
+  $('mcpField').hidden=true;
+  resetOutput();
+  state('Prefilled draft: '+idea.title+'. Review and edit the synthetic specification, supply real API sources, then generate a scaffold. No server is connected.');
+  const notice=document.getElementById('ideaPrefillNotice');
+  if(notice){notice.hidden=false;notice.textContent='Loaded example: '+idea.title+' — illustrative concept, not recovered source instructions.';}
+ }catch(error){state(error.message,true)}
+}
+prefillFromLibrary();
