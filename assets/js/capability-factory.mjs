@@ -1,5 +1,6 @@
 import {buildPackage,zipBytes,handoff} from './capability-factory-core.mjs';
 import {prefillIdea,validateIdeas} from './capability-ideas-core.mjs';
+import {validateFundingCollection,prefillFundingAgencyIdea} from './funding-agency-core.mjs';
 const $=id=>document.getElementById(id);
 let nodes=[],files=null,selected='',lastInput=null;
 const fields=['name','mode','description','instructions','knowledge','contracts','mcpUrl'];
@@ -77,3 +78,18 @@ async function prefillFromLibrary(){
  }catch(error){state(error.message,true)}
 }
 prefillFromLibrary();
+
+async function prefillFundingFromLibrary(){
+ const id=new URLSearchParams(location.search).get('fundingIdea');if(!id)return;
+ try{
+  const response=await fetch('/data/funding-agency-automation-ideas.json');if(!response.ok)throw Error('Funding agency collection unavailable');
+  const catalog=await response.json();const errors=validateFundingCollection(catalog);if(errors.length)throw Error('Funding agency collection invalid: '+errors.join('; '));
+  const idea=catalog.entries.find(x=>x.id===id);if(!idea)throw Error('Funding agency concept not found');
+  const values=prefillFundingAgencyIdea(idea);selected='';$('assetSelect').selectedIndex=-1;
+  for(const [key,value] of Object.entries(values))$(key).value=value;
+  $('mcpField').hidden=true;resetOutput();
+  state('Loaded funding agency concept: '+idea.title+'. Review the proposed source contracts and adapt the draft before exporting. No funding operations are activated.');
+  const notice=document.getElementById('ideaPrefillNotice');if(notice){notice.hidden=false;notice.textContent='Funding Agency & Automation: '+idea.title+' — synthetic product specification, not existing service instructions.'}
+ }catch(error){state(error.message,true)}
+}
+prefillFundingFromLibrary();
