@@ -1,0 +1,56 @@
+name: Tool Factory focused QA
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "factory/**"
+      - "assets/js/tool-factory*.js"
+      - "assets/js/zip-store.mjs"
+      - "assets/css/tool-factory.css"
+      - "tests/tool-factory*.test.mjs"
+      - "scripts/smoke-tool-factory.mjs"
+      - ".github/workflows/tool-factory.yml"
+  push:
+    branches: [main]
+    paths:
+      - "factory/**"
+      - "assets/js/tool-factory*.js"
+      - "assets/js/zip-store.mjs"
+      - "assets/css/tool-factory.css"
+      - "tests/tool-factory*.test.mjs"
+      - "scripts/smoke-tool-factory.mjs"
+      - ".github/workflows/tool-factory.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: tool-factory-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  factory:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Run versioned factory logic and ZIP tests
+        run: node --test tests/tool-factory.test.mjs tests/tool-factory-2.test.mjs
+      - name: Install headless browser
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Serve local static portfolio
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory . > /tmp/tool-factory-http.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:4173/factory/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/tool-factory-http.log
+          exit 1
+      - name: Run 390px UI, exports and offline ZIP smoke
+        env:
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
+        run: node scripts/smoke-tool-factory.mjs
