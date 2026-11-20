@@ -36,7 +36,7 @@
       return presentation({ id: group.groupId, title: group.displayTitle, category: group.category || "Experiments", description: group.description || "", priority: group.featuredPriority || 0, item, count: variants.length, members, previewPath: variants[0]?.resolvedPath || "", path: destination });
     });
     const seen = new Set(grouped.map(row => row.path).filter(Boolean));
-    const singles = state.entries.filter(entry => !entry.canonicalGroupId).filter(entry => {
+    const singles = state.entries.filter(entry => !entry.canonicalGroupId || !state.groups.some(group => group.groupId === entry.canonicalGroupId)).filter(entry => {
       if (!entry.resolvedPath) return true;
       if (seen.has(entry.resolvedPath)) return false;
       seen.add(entry.resolvedPath); return true;
