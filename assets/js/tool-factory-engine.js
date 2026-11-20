@@ -27,12 +27,12 @@
       const value = String(answers[field.id] ?? '').trim();
       if (field.required && !value) errors.push(field.label + ': required.');
       if (value.length > 500) errors.push(field.label + ': 500 character limit.');
-      if (field.type === 'email' && value && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(value)) errors.push(field.label + ': invalid email.');
+      if (field.type === 'email' && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) errors.push(field.label + ': invalid email.');
       if (field.type === 'select' && value && !field.options.includes(value)) errors.push(field.label + ': invalid option.');
       lines.push(field.label + ': ' + (value || '[not provided]'));
     }
     if (errors.length) return { errors };
-    return { text: spec.title + '\\n\\n' + lines.join('\\n') + '\\n\\nLocal draft only. Nothing submitted or stored.', errors: [] };
+    return { text: spec.title + '\n\n' + lines.join('\n') + '\n\nLocal draft only. Nothing submitted or stored.', errors: [] };
   }
   function calculate(spec, raw) {
     const errors = validate(spec);
