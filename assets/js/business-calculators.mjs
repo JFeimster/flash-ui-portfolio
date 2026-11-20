@@ -1,3 +1,4 @@
+import {acquisitionAffordability,workingCapitalGap,revenueBasedFinancing,creditUtilization,freelanceRate,ecommerceBreakEven,valuationEstimator} from './extra-financial-calculators-core.mjs';
 import {loanTrueCost,cashRunway,agencyPricing} from './business-calculators-core.mjs';
 const $=id=>document.getElementById(id);
 const fmtMoney=v=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2}).format(v);
@@ -14,6 +15,21 @@ const config={
   ['labor','Monthly delivery labor ($)','3200','0','1000000000','1'],['vendors','Monthly vendor & software costs ($)','800','0','1000000000','1'],['overhead','Monthly allocated overhead ($)','1000','0','1000000000','1'],['margin','Target operating margin (%)','35','0','95','0.1'],['actualPrice','Current monthly client price ($)','7000','0','1000000000','1']],
   calc:agencyPricing,outputs:r=>[['Modeled monthly cost',fmtMoney(r.totalCost)],['Recommended client price',fmtMoney(r.recommendedPrice)],['Profit at recommended price',fmtMoney(r.projectedProfit)],['Profit at current price',r.currentProfit===null?'Not provided':fmtMoney(r.currentProfit)],['Current operating margin',r.currentMargin===null?'—':fmtNum(r.currentMargin)+'%'],['Target margin',fmtNum(r.targetMargin)+'%']]}
 };
+config.acquisition={calc:acquisitionAffordability,fields:[
+ ['purchase','Purchase price ($)','1200000','1','10000000000','1'],['equity','Buyer equity ($)','180000','0','10000000000','1'],['rate','Annual interest (%)','10','0','100','0.01'],['years','Loan term (years)','10','1','30','1'],['cashFlow','Annual cash available for debt service ($)','300000','0','10000000000','1']],outputs:r=>r.metrics};
+config.workingCapital={calc:workingCapitalGap,fields:[
+ ['cash','Available cash ($)','50000','0','1000000000000','1'],['receivables','Outstanding receivables expected ($)','70000','0','1000000000000','1'],['collections','Percent collected within period (%)','65','0','100','0.1'],['payables','Payables due ($)','45000','0','1000000000000','1'],['expenses','Expenses due ($)','75000','0','1000000000000','1'],['minimumCash','Required cash buffer ($)','15000','0','1000000000000','1']],outputs:r=>r.metrics};
+config.rbf={calc:revenueBasedFinancing,fields:[
+ ['advance','Funding advance ($)','75000','1','1000000000','1'],['factor','Factor rate','1.25','1','5','0.01'],['monthlySales','Monthly gross sales ($)','60000','1','1000000000000','1'],['holdback','Share of revenue remitted (%)','15','0','100','0.1']],outputs:r=>r.metrics};
+config.utilization={calc:creditUtilization,fields:[
+ ['balance','Account balance ($)','7000','0','1000000000000','1'],['limit','Current credit limit ($)','10000','1','1000000000000','1'],['payment','Planned payment ($)','2500','0','1000000000000','1'],['limitIncrease','Modeled limit increase ($)','0','0','1000000000000','1']],outputs:r=>r.metrics};
+config.freelance={calc:freelanceRate,fields:[
+ ['income','Annual income target ($)','100000','1','1000000000','1'],['overhead','Annual operating costs ($)','15000','0','1000000000000','1'],['weeks','Working weeks per year','46','1','52','1'],['hours','Total hours per week','40','1','168','0.5'],['utilization','Billable utilization (%)','60','0','100','0.1']],outputs:r=>r.metrics};
+config.ecommerce={calc:ecommerceBreakEven,fields:[
+ ['price','Sale price per order ($)','75','0.01','1000000000','0.01'],['unitCost','COGS per order ($)','25','0','1000000000000','0.01'],['shipping','Fulfillment per order ($)','7','0','1000000000000','0.01'],['adSpend','Acquisition spend per order ($)','15','0','1000000000000','0.01'],['fees','Processing/platform fee (%)','3','0','100','0.1'],['returns','Expected refund rate (%)','5','0','100','0.1'],['fixedCosts','Monthly fixed costs ($)','3000','0','1000000000000','1']],outputs:r=>r.metrics};
+config.valuation={calc:valuationEstimator,fields:[
+ ['earnings','Normalized annual earnings ($)','250000','0','1000000000000','1'],['low','Low multiple','2.5','0.1','100','0.1'],['high','High multiple','4.5','0.1','100','0.1'],['adjustments','Enterprise value adjustment (+/- $)','0','-1000000000000','1000000000000','1'],['debt','Debt balance ($)','80000','0','1000000000000','1'],['cash','Excess cash ($)','30000','0','1000000000000','1']],outputs:r=>r.metrics};
+
 const tool=document.body.dataset.tool;const setup=config[tool];if(!setup)throw Error('Unknown calculator');
 const form=$('calculatorForm');for(const [key,label,defaultValue,min,max,step] of setup.fields){const wrap=document.createElement('label');wrap.textContent=label;const field=document.createElement('input');field.className='calc-input';field.type='number';field.name=key;field.id=key;field.value=defaultValue;field.min=min;field.max=max;field.step=step;field.required=true;wrap.append(field);$('fieldsPlaceholder').append(wrap)}
 function calculate(event){if(event)event.preventDefault();const status=$('resultStatus');const area=$('results');area.replaceChildren();status.textContent='';status.className='note';

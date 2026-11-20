@@ -1,0 +1,45 @@
+name: Collection Expansion and Utility Tools
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'data/collections/**'
+      - 'data/collections-registry.json'
+      - 'data/business-calculator-ideas.json'
+      - 'collections/**'
+      - 'tools/**'
+      - 'assets/js/collection-detail.mjs'
+      - 'assets/js/workflow-lab*.mjs'
+      - 'assets/js/lead-tools-core.mjs'
+      - 'assets/js/agency-kit-core.mjs'
+      - 'assets/js/extra-financial-calculators-core.mjs'
+      - 'assets/js/business-calculators*.mjs'
+      - 'assets/css/collections.css'
+      - 'docs/collection-expansion-execution-queue.md'
+      - 'tests/collection-expansion.test.mjs'
+      - 'tests/product-tools.test.mjs'
+      - 'tests/collections-and-calculators.test.mjs'
+      - '.github/workflows/collection-expansion.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check browser JavaScript syntax
+        run: |
+          node --check assets/js/collection-detail.mjs
+          node --check assets/js/workflow-lab-core.mjs
+          node --check assets/js/workflow-lab.mjs
+          node --check assets/js/lead-tools-core.mjs
+          node --check assets/js/agency-kit-core.mjs
+          node --check assets/js/extra-financial-calculators-core.mjs
+          node --check assets/js/business-calculators-core.mjs
+          node --check assets/js/business-calculators.mjs
+          node --check assets/js/collections.mjs
+      - name: Test all collections and 17 working tools
+        run: node --test tests/collections-and-calculators.test.mjs tests/collection-expansion.test.mjs tests/product-tools.test.mjs
