@@ -142,16 +142,32 @@
   }
   async function init() {
     try {
-      const [data, showcase, collections, previews, packages, voltageModule] = await Promise.all([
+      const [data, showcase, collections, previews, packages, registry, voltageModule] = await Promise.all([
         fetch("/data/asset-route-resolution.json").then(response => { if (!response.ok) throw new Error("Directory unavailable"); return response.json(); }),
         fetch("/data/asset-showcase.json").then(response => response.ok ? response.json() : {}).catch(() => ({})),
         fetch("/data/curated-collections.json").then(response => response.ok ? response.json() : {}).catch(() => ({})),
         fetch("/data/asset-previews.json").then(response => response.ok ? response.json() : {}).catch(() => ({})),
         fetch("/data/asset-packages.json").then(response => response.ok ? response.json() : { entries: {} }).catch(() => ({ entries: {} })),
+        fetch("/data/site-registry.json").then(response => response.ok ? response.json() : []).catch(() => []),
         import("/assets/js/voltage-ui.js")
       ]);
       const { applyCuratedCollections } = await import("/assets/js/curated-collections.js");
       const model = applyCuratedCollections(data, collections);
+      // Externally hosted sites use the canonical site registry, not local route resolution.
+      // Keep their real deployment URLs so the directory never invents /sites/ paths.
+      const externalSites = (registry || []).filter(item => item.status === "live-external" && /^https:\/\//.test(item.livePath || ""));
+      const indexedUrls = new Set((model.entries || []).map(item => item.resolvedPath));
+      for (const item of externalSites) {
+        if (indexedUrls.has(item.livePath)) continue;
+        model.entries.push({
+          ...item, originalPath: item.path, sourcePath: item.path,
+          resolvedPath: item.livePath, resolutionStatus: "resolved",
+          resolutionReason: "External deployment linked from site registry",
+          sourceUrl: item.sourceUrl || item.path,
+          productionVerification: "unverified"
+        });
+        indexedUrls.add(item.livePath);
+      }
       state.entries = model.entries || []; state.groups = model.groups || []; state.candidates = model.groupCandidates || []; state.showcase = showcase.projects || {}; state.previews = previews.projects || {}; state.packages = packages.entries || {}; state.review = packages.review || {}; voltage = voltageModule;
       state.captures = previews.projects || {};
       setup();
