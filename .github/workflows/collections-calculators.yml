@@ -1,0 +1,33 @@
+name: Collections and Calculators focused checks
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'collections/**'
+      - 'tools/business-loan-true-cost/**'
+      - 'tools/cash-runway/**'
+      - 'tools/agency-pricing-margin/**'
+      - 'assets/js/business-calculators*.mjs'
+      - 'assets/js/collections.mjs'
+      - 'assets/css/collections.css'
+      - 'data/collections-registry.json'
+      - 'data/business-calculator-ideas.json'
+      - 'tests/collections-and-calculators.test.mjs'
+      - '.github/workflows/collections-calculators.yml'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Static JS syntax
+        run: |
+          node --check assets/js/collections.mjs
+          node --check assets/js/business-calculators-core.mjs
+          node --check assets/js/business-calculators.mjs
+      - name: Verify collection metadata, financial formulas and routes
+        run: node --test tests/collections-and-calculators.test.mjs
