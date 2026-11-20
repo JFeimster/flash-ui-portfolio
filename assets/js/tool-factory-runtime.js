@@ -21,7 +21,26 @@
       form.addEventListener('submit', ev => { ev.preventDefault(); const raw = Object.fromEntries(new FormData(form)); const out = E.calculate(spec, raw); show(out.errors.length ? out.errors.join(' ') : `${spec.outputs[0]?.label || 'Result'}: ${out.value}\n${out.explanation}${spec.assumptions ? `\n${spec.assumptions}` : ''}`, !!out.errors.length); });
       form.addEventListener('reset', () => show('Enter values and calculate.'));
       show('Enter values and calculate.');
-    } else if (spec.archetype === 'scorecard') {
+    } else if (spec.archetype === 'comparison') {
+  const editable=structuredClone(spec);
+  for(const criterion of editable.criteria){const h=add('h2',criterion.label+' · weight '+criterion.weight,form);h.className='criterion-heading';for(const option of editable.options){const label=add('label',option.label,form);label.htmlFor='compare-'+criterion.id+'-'+option.id;const input=add('input',undefined,form);input.id=label.htmlFor;input.type='number';input.name=criterion.id+'__'+option.id;input.min=0;input.max=10;input.step='any';input.required=true;input.value=option.scores[criterion.id];}}
+  const go=add('button','Compare options',form);go.type='submit';
+  const reset=add('button','Reset',form);reset.type='reset';reset.className='secondary';
+  form.addEventListener('submit',ev=>{ev.preventDefault();const data=new FormData(form);for(const c of editable.criteria)for(const o of editable.options){const raw=data.get(c.id+'__'+o.id);o.scores[c.id]=raw===''?NaN:Number(raw);}const out=E.comparison(editable);show(out.errors.length?out.errors.join(' '):out.ranked.map((x,i)=>(i+1)+'. '+x.label+': '+x.score+'/10\\n'+x.explanation).join('\\n\\n')+'\\n\\nWeights are normalized by their total. Illustrative comparison only.',!!out.errors.length);});
+  form.addEventListener('reset',()=>show('Edit example scores and compare.'));
+  show('Edit example scores and compare.');
+} else if (spec.archetype === 'eligibility') {
+  for(const field of spec.inputs){const label=add('label',field.label,form);label.htmlFor='tool-'+field.id;const input=add(field.type==='number'?'input':'select',undefined,form);input.id=label.htmlFor;input.name=field.id;input.required=true;if(field.type==='number'){input.type='number';input.min=field.min;input.max=field.max;input.step='any';input.value=field.sample??field.min;}else{const opts=field.type==='boolean'?['true','false']:field.options;for(const o of opts){const option=add('option',field.type==='boolean'?(o==='true'?'Yes':'No'):o,input);option.value=o;}input.value=String(field.sample??opts[0]);}}
+  const go=add('button','Run illustrative assessment',form);go.type='submit';
+  const reset=add('button','Reset',form);reset.type='reset';reset.className='secondary';
+  form.addEventListener('submit',ev=>{ev.preventDefault();const out=E.eligibility(spec,Object.fromEntries(new FormData(form)));show(out.errors.length?out.errors.join(' '):(out.eligible?'Passes configured example rules':'Does not meet all example rules')+'\\n'+out.details.map(d=>(d.pass?'PASS: ':'CHECK: ')+d.reason).join('\\n')+'\\n\\n'+out.disclosure,!!out.errors.length);});
+  form.addEventListener('reset',()=>show('Review sample inputs and run the illustrative rules. Not a lending decision.'));
+  show('Review sample inputs and run the illustrative rules. Not a lending decision.');
+} else if (spec.archetype === 'decision-tree') {
+  const answers={};let current=spec.start||spec.nodes[0].id;
+  const showNode=()=>{form.replaceChildren();const node=spec.nodes.find(n=>n.id===current);if(node.type==='result'){const out=E.decisionTree(spec,answers);show(out.result+'\\n\\nPath: '+out.steps.join(' | ')+'\\nIllustrative guidance only.');}else{add('h2',node.text,form);node.options.forEach(option=>{const button=add('button',option.label,form);button.type='button';button.addEventListener('click',()=>{answers[current]=option.id||option.label;current=option.next;showNode();});});}const restart=add('button','Start over',form);restart.type='button';restart.className='secondary';restart.addEventListener('click',()=>{Object.keys(answers).forEach(k=>delete answers[k]);current=spec.start||spec.nodes[0].id;show('Choose an answer to continue.');showNode();});};
+  show('Choose an answer to continue.');showNode();
+} else if (spec.archetype === 'scorecard') {
       let step = 0; const answers = {};
       function render() {
         form.replaceChildren(); result.replaceChildren();
