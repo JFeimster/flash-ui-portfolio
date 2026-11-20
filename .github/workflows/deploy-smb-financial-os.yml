@@ -1,0 +1,30 @@
+name: Deploy SMB Financial OS static source
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/deploy-smb-financial-os.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  extract-and-index:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Extract existing ZIP and register site
+        run: python scripts/deploy-smb-financial-os.py
+      - name: Commit only extracted site and metadata
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sites/smb-financial-os data/site-registry.json data/asset-route-resolution.json data/asset-showcase.json data/batch-19c-source-catalog.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Deploy SMB Financial OS and expose in sites catalog"
+            git push origin HEAD:main
+          fi
