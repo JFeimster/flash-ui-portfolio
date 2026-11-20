@@ -121,4 +121,5 @@ async function prefillFromLibrary(){
   const notice=$('ideaPrefillNotice');notice.hidden=false;notice.textContent='Loaded illustrative draft: '+title+' — review source and API requirements before exporting.';
  }catch(error){setStep(3);status(error.message,true)}
 }
-loadData();prefillFromLibrary();
+async function prefillFundingFromLibrary(){return prefillFromLibrary()}
+loadData();prefillFundingFromLibrary();
