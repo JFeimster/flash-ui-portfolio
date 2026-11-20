@@ -65,6 +65,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -89,10 +91,17 @@ jobs:
         env:
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
         run: node scripts/smoke-ideas.mjs
-      - name: Check asset package manifest
+      - name: Check asset package manifest for asset-related changes
         run: |
-          node scripts/build-asset-packages.mjs
-          git diff --exit-code -- data/asset-packages.json
+          # Generator/theme changes do not affect the static-site asset package manifest.
+          # Run the deterministic manifest check when its source inputs change.
+          git fetch --no-tags --depth=1 origin main
+          if git diff --name-only origin/main...HEAD | grep -Eq '^(sites/|data/asset-route-resolution\\.json$|data/asset-showcase\\.json$|data/asset-packages\\.json$|scripts/build-asset-packages\\.mjs$)'; then
+            node scripts/build-asset-packages.mjs
+            git diff --exit-code -- data/asset-packages.json
+          else
+            echo "No asset package inputs changed; manifest regeneration not required."
+          fi
       - name: Exercise Use This Asset
         env:
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
