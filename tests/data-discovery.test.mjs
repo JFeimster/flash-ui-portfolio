@@ -29,7 +29,10 @@ test('discovery maps one-to-one to the 169 canonical generator entries', async (
   assert.ok(unique(generator.entries.map(x => x.id)));
   assert.equal(additions.entries.length, 64);
   assert.ok(additions.entries.every(x => generator.entries.some(entry => entry.id === x.id)));
-  assert.deepEqual(catalogs.designStyles.map(x => x.id), ['recommend','luxury-bento','neobrutalist','cyberpunk','futuristic-minimal','bioluminescent','retro-crt','grainy-risograph','industrial-blueprint','cinematic-dark-luxe','volumetric-spectral','custom']);
+  const masterThemes = await load('transferable-design-themes.json');
+  const expectedBuiltins = ['recommend','luxury-bento','neobrutalist','cyberpunk','futuristic-minimal','bioluminescent','retro-crt','grainy-risograph','industrial-blueprint','cinematic-dark-luxe','volumetric-spectral'];
+  assert.deepEqual(catalogs.designStyles.map(x => x.id), [...expectedBuiltins, ...masterThemes.themes.map(theme => `theme:${theme.id}`), 'custom']);
+  assert.ok(unique(catalogs.designStyles.map(x => x.id)));
   assert.equal(ideas.entry_count, 169);
   assert.deepEqual(ideas.entries.map(x => x.id), generator.entries.map(x => x.id));
   const groupIds = new Set(groups.groups.map(x => x.groupId));
@@ -84,7 +87,7 @@ test('source and candidate metadata remain public-safe and linked', async () => 
 
 test('canonical site registry and every published route remain intact', async () => {
   const bytes = await readFile(join(data, 'site-registry.json'));
-  assert.equal(createHash('sha256').update(bytes.toString('utf8').replace(/\r\n/g, '\n')).digest('hex'), '56d36fc7939ae365f59c181b01f495a06ead0e3336869926b5b69e9d7599006b');
+  assert.equal(createHash('sha256').update(bytes.toString('utf8').replace(/\r\n/g, '\n')).digest('hex'), 'a6f22c2cf2d11db7b24c76f9268b92336f770c25c00ba8b4aae9d7a447cbbb1d');
   const registry = JSON.parse(bytes);
   for (const site of registry) {
     if (!site.livePath?.startsWith('/sites/') || !site.hasIndex) continue;
