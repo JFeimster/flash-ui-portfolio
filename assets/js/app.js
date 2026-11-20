@@ -155,7 +155,7 @@
       const model = applyCuratedCollections(data, collections);
       // Externally hosted sites use the canonical site registry, not local route resolution.
       // Keep their real deployment URLs so the directory never invents /sites/ paths.
-      const externalSites = (registry || []).filter(item => item.status === "live-external" && /^https:\/\//.test(item.livePath || ""));
+      const externalSites = (registry || []).filter(item => (item.status === "live-external" && /^https:\/\//.test(item.livePath || "")) || (item.type === "resource-library" && /^\/sites\//.test(item.livePath || "")));
       const indexedUrls = new Set((model.entries || []).map(item => item.resolvedPath));
       for (const item of externalSites) {
         if (indexedUrls.has(item.livePath)) continue;
