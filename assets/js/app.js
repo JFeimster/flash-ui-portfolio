@@ -142,20 +142,22 @@
   }
   async function init() {
     try {
-      const [data, showcase, collections, previews, packages, registry, voltageModule] = await Promise.all([
+      const [data, showcase, collections, previews, packages, registry, appRegistry, voltageModule] = await Promise.all([
         fetch("/data/asset-route-resolution.json").then(response => { if (!response.ok) throw new Error("Directory unavailable"); return response.json(); }),
         fetch("/data/asset-showcase.json").then(response => response.ok ? response.json() : {}).catch(() => ({})),
         fetch("/data/curated-collections.json").then(response => response.ok ? response.json() : {}).catch(() => ({})),
         fetch("/data/asset-previews.json").then(response => response.ok ? response.json() : {}).catch(() => ({})),
         fetch("/data/asset-packages.json").then(response => response.ok ? response.json() : { entries: {} }).catch(() => ({ entries: {} })),
         fetch("/data/site-registry.json").then(response => response.ok ? response.json() : []).catch(() => []),
+        fetch("/data/app-registry.json").then(response => response.ok ? response.json() : { apps: [] }).catch(() => ({ apps: [] })),
         import("/assets/js/voltage-ui.js")
       ]);
       const { applyCuratedCollections } = await import("/assets/js/curated-collections.js");
       const model = applyCuratedCollections(data, collections);
       // Externally hosted sites use the canonical site registry, not local route resolution.
       // Keep their real deployment URLs so the directory never invents /sites/ paths.
-      const externalSites = (registry || []).filter(item => (item.status === "live-external" && /^https:\/\//.test(item.livePath || "")) || (item.type === "resource-library" && /^\/sites\//.test(item.livePath || "")));
+      const applicationSlugs = new Set((Array.isArray(appRegistry.apps) ? appRegistry.apps : []).map(app => app.sourceRegistrySlug).filter(Boolean));
+      const externalSites = (registry || []).filter(item => !applicationSlugs.has(item.slug) && (item.status === "live-external" && /^https:\/\//.test(item.livePath || "")) || (item.type === "resource-library" && /^\/sites\//.test(item.livePath || "")));
       const indexedUrls = new Set((model.entries || []).map(item => item.resolvedPath));
       for (const item of externalSites) {
         if (indexedUrls.has(item.livePath)) continue;
