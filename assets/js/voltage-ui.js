@@ -6,7 +6,7 @@ export function artwork(row, saved) {
   const title = esc(row.title);
   const hasPreview = Boolean(localPath(row.previewTarget));
   const thumb = String(row.image || "");
-  const safeImage = thumb.startsWith("/assets/previews/") && thumb.endsWith(".webp") ? thumb : "";
+  const safeImage = thumb.startsWith("/assets/previews/") && /\.(webp|svg)$/.test(thumb) ? thumb : "";
   let html = '<div class="card-artwork tone-' + cleanTone(row.tone) + '">';
   html += '<div class="card-art-title" aria-hidden="true">' + title + '</div>';
   if (safeImage) html += '<img data-preview-image src="' + esc(safeImage) + '" alt="" loading="lazy" decoding="async">';
