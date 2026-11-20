@@ -113,9 +113,9 @@ async function prefillFromLibrary(){
  try{
   let settings,title;
   if(params.has('fundingIdea')){
-   const r=await fetch('/data/funding-agency-automation-ideas.json');if(!r.ok)throw Error('Funding ideas unavailable');const d=await r.json();const issues=validateFundingCollection(d);if(issues.length)throw Error(issues.join('; '));const item=d.entries.find(x=>x.id===id);if(!item)throw Error('Funding idea not found');settings=prefillFundingAgencyIdea(item);title=item.title;
+   const r=await fetch('/data/funding-agency-automation-ideas.json');if(!r.ok)throw Error('Funding ideas unavailable');const d=await r.json();const issues=validateFundingCollection(d);if(issues.length)throw Error(issues.join('; '));const idea=d.entries.find(x=>x.id===id);if(!idea)throw Error('Funding idea not found');settings=prefillFundingAgencyIdea(idea);title=idea.title;
   }else{
-   const r=await fetch('/data/mcp-agent-product-ideas.json');if(!r.ok)throw Error('Product ideas unavailable');const d=await r.json();const issues=validateIdeas(d);if(issues.length)throw Error(issues.join('; '));const item=d.entries.find(x=>x.id===id);if(!item)throw Error('Product idea not found');settings=prefillIdea(item);title=item.title;
+   const r=await fetch('/data/mcp-agent-product-ideas.json');if(!r.ok)throw Error('Product ideas unavailable');const d=await r.json();const issues=validateIdeas(d);if(issues.length)throw Error(issues.join('; '));const idea=d.entries.find(x=>x.id===id);if(!idea)throw Error('Product idea not found');settings=prefillIdea(idea);title=idea.title;
   }
   loadDraft({...settings,version:'0.1.0',sourceType:'library-concept'},'library-concept');setStep(2);
   const notice=$('ideaPrefillNotice');notice.hidden=false;notice.textContent='Loaded illustrative draft: '+title+' — review source and API requirements before exporting.';
