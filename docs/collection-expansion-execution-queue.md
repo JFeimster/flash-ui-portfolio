@@ -43,3 +43,15 @@ Authorized by the user to implement the remaining collection roadmap sequentiall
 36. Connect existing authorized app APIs only after real contracts, scopes and test fixtures exist.
 
 Never mistake a concept registry for a working SaaS product.
+## Batch 31–34 implementation record
+- [x] Task 31A: 17 additive product catalogs with 123 concepts; 20 collections and 178 total product ideas.
+- [x] Task 31B: 17 live collection URLs, keyword search, status filters, detailed specifications, export/copy actions.
+- [x] Task 31C: Missed Call Recovery, Invoice Follow-Up and Client Onboarding as functional browser workflows.
+- [x] Task 31D: Registry/source/route unit tests and browser smoke coverage.
+- [x] Task 32: Three working conversion prototypes: Qualification Quiz, ROI Generator and Quote Estimator.
+- [x] Task 33: Functional Agency Launch Kit composer with pricing, revenue scenarios, fulfillment plan and JSON export.
+- [x] Task 34: Seven additional working financial calculators; all 10 financial tools now functional.
+- [ ] Task 35: Evidence-backed, live keyword research/SEO content; requires actual keyword source evidence.
+- [ ] Task 36: Authenticated third-party connectors, only after verified API scopes/contracts and sanctioned test fixtures.
+
+**Release boundaries:** Working tools are browser-side utilities, not third-party automations. No customer data is sent or stored by these tools. No underwriting, lender API, messaging, CRM changes or agency services are activated. Do not count concept-only records as completed SaaS products.
