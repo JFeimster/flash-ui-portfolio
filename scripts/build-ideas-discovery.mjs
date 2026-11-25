@@ -1,3 +1,4 @@
+import { applyPortfolioNav } from '../assets/js/portfolio-nav.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -140,7 +141,7 @@ export function writeIdeaRoutes(index) {
     const directory = path.join(root, 'ideas', idea.slug);
     fs.mkdirSync(directory, { recursive: true });
     const html = `<!doctype html>\n<!-- generated-by: build-ideas-discovery -->\n<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:,"><title>${escapeHtml(idea.title)} · Flash UI Ideas</title><meta name="description" content="${escapeHtml(idea.summary)}"><link rel="stylesheet" href="/assets/css/ideas-workbench-base.css"><link rel="stylesheet" href="/assets/css/idea-detail.css"></head><body data-idea-id="${escapeHtml(idea.id)}"><a class="skip" href="#main">Skip to idea</a><header class="masthead"><nav class="shell nav" aria-label="Main navigation"><a class="brand" href="/ideas/">FLASH UI <span>/ IDEAS</span></a><div><a href="/ideas/">All ideas</a><a href="/generator/">Site Generator</a><a href="/sites/">Sites</a></div></nav></header><main class="shell" id="main"><div id="idea-detail" aria-live="polite"><p>Loading idea…</p></div></main><footer class="shell footer">Flash UI · Concept details are proposals, not deployment claims.</footer><script src="/assets/js/idea-detail.js" defer></script></body></html>\n`;
-    fs.writeFileSync(path.join(directory, 'index.html'), html);
+    fs.writeFileSync(path.join(directory, 'index.html'), applyPortfolioNav(html, idea.detail_url));
     fs.writeFileSync(path.join(promptDir, `${idea.slug}.json`), JSON.stringify({id: idea.id, prompt: byId.get(idea.id).prompt || ''}) + '\n');
   }
   fs.writeFileSync(routeManifestPath, JSON.stringify({schema_version: '1.0.0', slugs: [...current]}, null, 2) + '\n');

@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { groups,isPortfolioPage,pageRoute,renderPortfolioNav,applyPortfolioNav } from '../assets/js/portfolio-nav.mjs';
+const paths=execFileSync('git',['ls-files','-z'],{encoding:'utf8'}).split('\0').filter(Boolean);
+const scope=paths.filter(isPortfolioPage);
+const canonical=['/',...groups.flatMap(g=>g.links.map(([href])=>href))];
+test('all portfolio-owned entrypoints have identical primary navigation and valid destinations',()=>{assert.ok(scope.length>0);assert.equal(new Set(canonical).size,canonical.length);for(const file of scope){const html=fs.readFileSync(file,'utf8');const nav=html.match(/<nav\b[^>]*>[\s\S]*?<\/nav>/i)?.[0];assert.ok(nav?.includes('data-portfolio-nav="v1"'),file);assert.ok(html.includes('/assets/css/portfolio-nav.css'),file);assert.ok(html.includes('/assets/js/portfolio-nav.mjs'),file);const links=[...nav.matchAll(/href="([^"]+)"/g)].map(m=>m[1]);assert.deepEqual(links.slice(0,canonical.length),canonical,file);assert.equal(new Set(links).size,links.length,file);for(const href of links){const url=new URL(href,'https://portfolio.invalid');assert.equal(url.origin,'https://portfolio.invalid');const p=decodeURIComponent(url.pathname);assert.ok(fs.existsSync(p==='/'?'index.html':p.slice(1)+(p.endsWith('/')?'index.html':'')),file+' → '+href);}assert.equal(applyPortfolioNav(html,pageRoute(file)),html,file);}});
+test('nested routes highlight parent group without false current page',()=>{const nav=renderPortfolioNav('/ideas/sample/');assert.match(nav,/data-active="true"><summary>Explore/);assert.doesNotMatch(nav,/aria-current="page"/);assert.match(renderPortfolioNav('/generator/index.html'),/href="\/generator\/" aria-current="page"/);});
+test('source prototypes are outside shared-shell ownership',()=>{assert.equal(isPortfolioPage('sites/sample/index.html'),false);assert.equal(isPortfolioPage('sites/index.html'),true);});

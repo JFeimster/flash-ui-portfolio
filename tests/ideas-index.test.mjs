@@ -105,7 +105,8 @@ test('all twelve imported prompt recipes have reusable instructions', () => {
 test('regeneration removes newly hidden pages and prompt payloads', () => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'flash-ui-idea-build-'));
   try {
-    for (const directory of ['scripts', 'data', 'ideas']) fs.mkdirSync(path.join(temp, directory));
+    for (const directory of ['scripts', 'data', 'ideas', 'assets/js']) fs.mkdirSync(path.join(temp, directory), {recursive:true});
+    fs.copyFileSync(new URL('../assets/js/portfolio-nav.mjs', import.meta.url), path.join(temp, 'assets/js/portfolio-nav.mjs'));
     fs.copyFileSync(new URL('../scripts/build-ideas-discovery.mjs', import.meta.url), path.join(temp, 'scripts/build-ideas-discovery.mjs'));
     fs.writeFileSync(path.join(temp, 'package.json'), '{"type":"module"}');
     fs.writeFileSync(path.join(temp, 'data/site-generator-prompts.json'), JSON.stringify({entries:[

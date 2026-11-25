@@ -4,6 +4,21 @@ on:
     branches: [main]
     paths:
       - "generator/**"
+      - "assets/js/portfolio-nav.mjs"
+      - "assets/css/portfolio-nav.css"
+      - "scripts/sync-portfolio-nav.mjs"
+      - "scripts/smoke-portfolio-navigation.mjs"
+      - "tests/portfolio-navigation.test.mjs"
+      - "scripts/build-ideas-discovery.mjs"
+      - "tests/ideas-index.test.mjs"
+      - "workbench/**"
+      - "factory/**"
+      - "capabilities/**"
+      - "ecosystem/**"
+      - "imports/**"
+      - "build/**"
+      - "data/index.html"
+      - "404.html"
       - "index.html"
       - "collections/**"
       - "data/collections/**"
@@ -44,6 +59,21 @@ on:
     branches: [main]
     paths:
       - "generator/**"
+      - "assets/js/portfolio-nav.mjs"
+      - "assets/css/portfolio-nav.css"
+      - "scripts/sync-portfolio-nav.mjs"
+      - "scripts/smoke-portfolio-navigation.mjs"
+      - "tests/portfolio-navigation.test.mjs"
+      - "scripts/build-ideas-discovery.mjs"
+      - "tests/ideas-index.test.mjs"
+      - "workbench/**"
+      - "factory/**"
+      - "capabilities/**"
+      - "ecosystem/**"
+      - "imports/**"
+      - "build/**"
+      - "data/index.html"
+      - "404.html"
       - "index.html"
       - "assets/js/app.js"
       - "assets/js/voltage-ui.js"
@@ -95,6 +125,28 @@ jobs:
           done
           cat /tmp/site-generator-http.log
           exit 1
+      - name: Check portfolio navigation contract and generated markup
+        run: |
+          node scripts/sync-portfolio-nav.mjs --check
+          node --test tests/portfolio-navigation.test.mjs tests/ideas-index.test.mjs
+      - name: Assert preserved route inventory and protected data for Batch 35
+        if: github.event_name == 'pull_request' && github.head_ref == 'batch-35-shared-navigation'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          git diff --exit-code "$BASE_SHA" HEAD -- data ':(exclude)data/index.html' sites ':(exclude)sites/index.html'
+          python3 - <<'PY'
+          import os, subprocess
+          def html(ref):
+              return {p for p in subprocess.check_output(['git','ls-tree','-r','--name-only',ref],text=True).splitlines() if p.endswith('.html')}
+          missing=html(os.environ['BASE_SHA'])-html('HEAD')
+          assert not missing, f'Existing HTML entrypoints removed: {sorted(missing)}'
+          print(f'{len(html(os.environ["BASE_SHA"]))} baseline HTML entrypoints preserved.')
+          PY
+      - name: Exercise shared navigation on desktop and mobile
+        env:
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
+        run: node scripts/smoke-portfolio-navigation.mjs
       - name: Exercise the Site Generator
         env:
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
