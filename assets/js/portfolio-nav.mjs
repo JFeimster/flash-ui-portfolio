@@ -26,6 +26,10 @@ export const groups = [
       [
         "/data/",
         "Idea Discovery"
+      ],
+      [
+        "/themes/",
+        "Design Themes"
       ]
     ]
   },
@@ -68,6 +72,14 @@ export const groups = [
       [
         "/build/",
         "Asset-to-Product"
+      ],
+      [
+        "/opportunities/",
+        "Opportunity Studio"
+      ],
+      [
+        "/copilot/",
+        "Creation Copilot"
       ]
     ]
   }
@@ -76,7 +88,7 @@ function escapeHtml(value){return String(value).replace(/[&<>"']/g,ch=>({"&":"&a
 
 export function normalizeRoute(value){const clean=String(value||"/").split(/[?#]/,1)[0].replace(/\/index\.html$/,"/");return clean.endsWith("/")||clean.endsWith(".html")?clean:clean+"/";}
 
-export function isPortfolioPage(path){return /^(?:index\.html|404\.html|sites\/index\.html|data\/index\.html|(?:build|capabilities|collections|ecosystem|factory|generator|ideas|imports|tools|use-asset|workbench)(?:\/[^/]+)?\/index\.html)$/.test(path);}
+export function isPortfolioPage(path){return /^(?:index\.html|404\.html|sites\/index\.html|data\/index\.html|(?:build|capabilities|collections|copilot|ecosystem|factory|generator|ideas|imports|opportunities|themes|tools|use-asset|workbench)(?:\/[^/]+)?\/index\.html)$/.test(path);}
 
 export function pageRoute(path){return path==="index.html"?"/":"/"+path.replace(/index\.html$/,"");}
 

@@ -1,5 +1,17 @@
 # Flash UI Portfolio OS — Task Tracker
 
+> Active development program (2026-11-26): see the release ledger below and `PROJECT_STATUS.md`. The historical batch roadmap remains for traceability; its earlier "next execution" text is superseded by this program.
+
+## Active release ledger
+
+- [x] Release 1 — importer v1.1: manifest and variants; duplicate detection; relative dependencies; registration modes; Catalog v2 metadata; preview discovery; rollback; idempotence; bulk intake; isolated apply tests.
+- [x] Release 2 — detailed asset workspace, explainable relationships, comparison, advanced search and saved views; canonical Design Theme Gallery; Integration & MCP Advisor; existing handoffs.
+- [x] Release 3 — offline, provider-neutral Creation Copilot connecting Generator and Workbench with suggestions, prompt drafts, revision history, brief portability, and build handoff.
+- [x] Release 4 — configurable dry-run automation recipes, promotion and product lifecycle, evidence-based opportunity and readiness recommendations, distribution preparation, exportable decisions, and existing handoffs.
+- [x] Focused tests, non-browser navigation contract and syntax checks; protected file hashes match baseline; no removed tracked routes or source assets. Local browser acceptance: not executed — environment blocked (WinError 10013). Production verification pending deployment.
+
+Implementation notes and actual evidence belong in `PROJECT_STATUS.md`; check an item only when its acceptance work is complete.
+
 **Repository:** [JFeimster/flash-ui-portfolio](https://github.com/JFeimster/flash-ui-portfolio)  
 **Production:** https://flash-ui-portfolio.vercel.app/  
 **Status:** Batches 19B–20 squash-merged as PR [#91](https://github.com/JFeimster/flash-ui-portfolio/pull/91). Next priority: import/registry intake, then reusable product pipelines.
@@ -81,3 +93,4 @@
 - [x] Reusable new-thread intake and per-project JSON prompts documented.
 
 **Next execution:** Start with [Issue #92](https://github.com/JFeimster/flash-ui-portfolio/issues/92) and the continuous-import prompt; process one verified import cohort, not the entire backlog at once.
+
