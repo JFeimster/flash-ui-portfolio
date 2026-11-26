@@ -28,6 +28,19 @@ test('missing relative assets and framework source require review',()=>{
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'flash-intake-'));
  try {fs.writeFileSync(path.join(dir,'index.html'),'<html><body><script src="missing.js"></script></body></html>');let result=JSON.parse(run([`--source=${dir}`,'--slug=test-missing']).stdout);assert.ok(result.missingRelativeAssets.includes('missing.js'));fs.writeFileSync(path.join(dir,'package.json'),JSON.stringify({dependencies:{next:'1'}}));result=JSON.parse(run([`--source=${dir}`,'--slug=test-framework']).stdout);assert.equal(result.classification,'framework');assert.ok(result.warnings.length);}finally{fs.rmSync(dir,{recursive:true,force:true});}
 });
+test('dependency validation accepts local directory entrypoints and ignores CSS fragments and template tokens',()=>{
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'flash-intake-refs-'));
+ try{
+  fs.mkdirSync(path.join(dir,'about'));
+  fs.writeFileSync(path.join(dir,'index.html'),'<html><body><a href="./about/">About</a><a href="[APPLICATION_LINK]">Apply</a><link rel="stylesheet" href="style.css"><script src="app.js"></script></body></html>');
+  fs.writeFileSync(path.join(dir,'about/index.html'),'<html><body>About</body></html>');
+  fs.writeFileSync(path.join(dir,'style.css'),'svg { mask: url(%23shape); } .icon { background: url("url("); }');
+  fs.writeFileSync(path.join(dir,'app.js'),'const route = selectedLender?.["route"];');
+  const result=JSON.parse(run([`--source=${dir}`,'--slug=test-safe-reference-scan']).stdout);
+  assert.deepEqual(result.missingRelativeAssets,[]);
+  assert.deepEqual(result.warnings,[]);
+ }finally{fs.rmSync(dir,{recursive:true,force:true});}
+});
 test('unsafe ZIP paths and misleading signatures are rejected before extraction',()=>{
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'flash-zip-'));
  try {const bad=path.join(dir,'bad.zip');const python=process.platform==='win32'?'py':'python3';const script="import zipfile,sys; z=zipfile.ZipFile(sys.argv[1],'w'); z.writestr('../escape.txt','bad'); z.writestr('index.html','<html><body>x</body></html>'); z.close()";assert.equal(spawnSync(python,[...(process.platform==='win32'?['-3']:[]),'-c',script,bad]).status,0);assert.notEqual(run([`--source=${bad}`,'--slug=test-zip']).status,0);fs.writeFileSync(bad,'not a zip');assert.notEqual(run([`--source=${bad}`,'--slug=test-zip']).status,0);}finally{fs.rmSync(dir,{recursive:true,force:true});}

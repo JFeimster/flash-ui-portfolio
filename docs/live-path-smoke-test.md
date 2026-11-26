@@ -1,6 +1,6 @@
 # Canonical Live Path Smoke Test
 
-- Generated: 2026-11-26T13:32:30.5395167Z
+- Generated: 2026-11-26T13:48:09.9914404Z
 - Base URL: https://flash-ui-portfolio.vercel.app
 - Method: GET
 - Route resolution entries: 311

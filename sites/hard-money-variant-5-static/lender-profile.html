@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Source Capital Private Lending | Lender Profile | Capital_Vault</title>
+  
+  <!-- Inter & Plus Jakarta Sans Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#312e81',
+              accent: '#818cf8'
+            },
+            darkbg: '#090D16',
+            panelbg: 'rgba(17, 24, 39, 0.7)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #090D16;
+      color: #F3F4F6;
+      overflow-x: hidden;
+    }
+    
+    .glow-orb-1 {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, rgba(99, 102, 241, 0) 70%);
+      top: -10%;
+      right: -10%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .glow-orb-2 {
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0) 70%);
+      bottom: 20%;
+      left: -10%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.3);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(99, 102, 241, 0.3);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(99, 102, 241, 0.5);
+    }
+
+    .glass-panel {
+      background: rgba(13, 20, 35, 0.65);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .glass-input {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-input:focus {
+      border-color: rgba(99, 102, 241, 0.6);
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+    }
+  </style>
+</head>
+<body class="font-sans antialiased" x-data="lenderProfile()">
+
+  <!-- Background Decorative Orbs -->
+  <div class="glow-orb-1"></div>
+  <div class="glow-orb-2"></div>
+
+  <!-- Main Grid Wrapper -->
+  <div class="relative z-10 flex flex-col min-h-screen">
+    
+    <!-- Top Premium Navigation -->
+    <header class="w-full glass-panel border-b border-gray-800/40 px-6 py-4 sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto flex items-center justify-between">
+        
+        <!-- Logo & Brand -->
+        <a href="index.html" class="flex items-center space-x-3 group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center shadow-lg shadow-brand-500/20 group-hover:scale-105 transition duration-200">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="font-display font-extrabold text-lg tracking-tight flex items-center space-x-2">
+              <span>Capital<span class="text-brand-500">_Vault</span></span>
+            </div>
+            <p class="text-[10px] text-gray-400 tracking-widest uppercase">Back to Pipeline Directory</p>
+          </div>
+        </a>
+
+        <!-- System Active Tags -->
+        <div class="hidden md:flex items-center space-x-6 text-xs font-medium text-gray-300">
+          <div class="flex items-center space-x-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>LENDER STATUS: <span class="font-bold text-emerald-400">LIQUID & ACTIVE</span></span>
+          </div>
+          <div class="h-4 w-px bg-gray-800"></div>
+          <div>
+            <span>VERIFIED DEALS: <span class="font-bold text-white">412 CLOSED</span></span>
+          </div>
+        </div>
+
+        <!-- Quick Contact Button -->
+        <div>
+          <a href="#inquiry-module" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 shadow-lg shadow-brand-600/20">
+            Submit Loan Package
+          </a>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Profile Hero Section -->
+    <section class="max-w-7xl w-full mx-auto px-4 lg:px-6 pt-8 pb-4">
+      <div class="glass-panel rounded-3xl p-6 lg:p-8 relative overflow-hidden">
+        <div class="absolute right-0 top-0 w-96 h-96 bg-brand-600/10 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
+          <!-- Left: Branding & Core Stats -->
+          <div class="space-y-4">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-[10px] bg-brand-500/15 text-brand-300 border border-brand-500/30 px-3 py-1 rounded-full font-bold uppercase tracking-widest">Direct Balance Sheet Lender</span>
+              <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full font-bold uppercase tracking-widest flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> 50 State Coverage
+              </span>
+            </div>
+
+            <h1 class="text-3xl lg:text-5xl font-extrabold text-white tracking-tight font-display">
+              Source Capital <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-indigo-300">Private Lending</span>
+            </h1>
+
+            <p class="text-gray-400 text-sm max-w-2xl leading-relaxed">
+              Premium asset-based financing solutions designed for rapid closing schedules. Providing institutional leverage across residential, multi-family, DSCR rental, and development properties with transparent origination parameters.
+            </p>
+
+            <div class="flex items-center space-x-4 pt-2">
+              <div class="flex items-center space-x-1">
+                <template x-for="i in 5">
+                  <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                  </svg>
+                </template>
+              </div>
+              <span class="text-sm font-bold text-white">4.9 / 5.0</span>
+              <span class="text-xs text-gray-500">(148 Verified Borrower Reviews)</span>
+            </div>
+          </div>
+
+          <!-- Right: Key Terms Summary Matrix -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-4 lg:w-96 shrink-0">
+            <div class="bg-gray-950/50 border border-gray-800/80 rounded-2xl p-4">
+              <span class="text-[9px] text-gray-400 uppercase tracking-wider block">Max LTV</span>
+              <span class="text-xl font-extrabold text-white mt-1 block">Up to 85%</span>
+              <span class="text-[9px] text-emerald-400 font-medium">100% construction costs</span>
+            </div>
+            <div class="bg-gray-950/50 border border-gray-800/80 rounded-2xl p-4">
+              <span class="text-[9px] text-gray-400 uppercase tracking-wider block">Rates Starting At</span>
+              <span class="text-xl font-extrabold text-brand-400 mt-1 block">6.99%</span>
+              <span class="text-[9px] text-gray-500">Interest-Only Options</span>
+            </div>
+            <div class="bg-gray-950/50 border border-gray-800/80 rounded-2xl p-4">
+              <span class="text-[9px] text-gray-400 uppercase tracking-wider block">Loan Limit</span>
+              <span class="text-xl font-extrabold text-white mt-1 block">$15M</span>
+              <span class="text-[9px] text-gray-500">$100k Minimum size</span>
+            </div>
+            <div class="bg-gray-950/50 border border-gray-800/80 rounded-2xl p-4">
+              <span class="text-[9px] text-gray-400 uppercase tracking-wider block">Clear Speed</span>
+              <span class="text-xl font-extrabold text-emerald-400 mt-1 block">5 - 7 Days</span>
+              <span class="text-[9px] text-emerald-400 font-medium">In-house valuations</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Main Workspace Matrix -->
+    <main class="max-w-7xl w-full mx-auto px-4 lg:px-6 py-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- LEFT WORKSPACE: Main Content Tabs (Overview, Loan Programs, Reviews, Map) -->
+      <section class="lg:col-span-8 flex flex-col space-y-6">
+        
+        <!-- Navigation Tabs -->
+        <div class="glass-panel p-1.5 rounded-2xl flex space-x-1 sticky top-[80px] z-30">
+          <button @click="activeTab = 'programs'" class="flex-1 py-3 text-xs uppercase tracking-wider font-bold rounded-xl transition duration-200"
+                  :class="activeTab === 'programs' ? 'bg-brand-600 text-white shadow-lg shadow-brand-600/20' : 'text-gray-400 hover:text-white hover:bg-gray-900/40'">
+            Loan Programs
+          </button>
+          <button @click="activeTab = 'overview'" class="flex-1 py-3 text-xs uppercase tracking-wider font-bold rounded-xl transition duration-200"
+                  :class="activeTab === 'overview' ? 'bg-brand-600 text-white shadow-lg shadow-brand-600/20' : 'text-gray-400 hover:text-white hover:bg-gray-900/40'">
+            Direct Terms
+          </button>
+          <button @click="activeTab = 'reviews'" class="flex-1 py-3 text-xs uppercase tracking-wider font-bold rounded-xl transition duration-200 relative"
+                  :class="activeTab === 'reviews' ? 'bg-brand-600 text-white shadow-lg shadow-brand-600/20' : 'text-gray-400 hover:text-white hover:bg-gray-900/40'">
+            Reviews
+            <span class="absolute -top-1 -right-1 bg-brand-500 text-[9px] text-white px-1.5 py-0.5 rounded-full font-mono">148</span>
+          </button>
+          <button @click="activeTab = 'coverage'" class="flex-1 py-3 text-xs uppercase tracking-wider font-bold rounded-xl transition duration-200"
+                  :class="activeTab === 'coverage' ? 'bg-brand-600 text-white shadow-lg shadow-brand-600/20' : 'text-gray-400 hover:text-white hover:bg-gray-900/40'">
+            Map & Locations
+          </button>
+        </div>
+
+        <!-- TAB CONTENT: Loan Programs -->
+        <div x-show="activeTab === 'programs'" x-transition class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Program 1: Fix-and-Flip -->
+            <div class="glass-panel rounded-3xl p-6 border-l-4 border-brand-500 relative hover:border-brand-400 transition-all">
+              <div class="flex justify-between items-start mb-4">
+                <span class="text-xs bg-brand-500/10 text-brand-300 font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Flips & Renovation</span>
+                <span class="text-xs font-mono font-bold text-emerald-400">Up to 90% LTC</span>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2">Fix & Flip Renovation Loans</h3>
+              <p class="text-xs text-gray-400 leading-relaxed mb-6">Designed specifically for quick transition properties. Offers full allocation of rehab capital funded in staged draws for rapid property turnaround cycles.</p>
+              
+              <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-800/60 text-xs">
+                <div>
+                  <span class="text-[9px] text-gray-500 uppercase font-bold block">INTEREST RATE</span>
+                  <span class="text-white font-semibold">7.49% - 9.99%</span>
+                </div>
+                <div>
+                  <span class="text-[9px] text-gray-500 uppercase font-bold block">LOAN LIMITS</span>
+                  <span class="text-white font-semibold">$150K - $5.0M</span>
+                </div>
+                <div>
+                  <span class="text-[9px] text-gray-500 uppercase font-bold block">REHAB FUNDING</span>
+                  <span class="text-emerald-400 font-semibold">100% of Budget</span>
+                </div>
+                <div>
+                  <span class="text-[9px] text-gray-500 uppercase font-bold block">LOAN TERMS</span>
+                  <span class="text-white font-semibold">12 - 24 Months</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Program 2: Bridge Loans -->
+            <div class="glass-panel rounded-3xl p-6 border-l-4 border-indigo-500 relative hover:border-indigo-400 transition-all">
+              <div class="flex justify-between items-start mb-4">
+                <span class="text-xs bg-indigo-500/10 text-indigo-300 font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Bridge / Liquidity</span>
+                <span class="text-xs font-mono font-bold text-white">75% LTV Max</span>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2">Transactional Bridge Financing</h3>
+              <p class="text-xs text-gray-400 leading-relaxed mb-6">Capitalizing on immediate opportunities. Suitable for opportunistic acquisitions, bank workouts, discounted payoffs (DPOs), or quick refinancing transitions.</p>
+              
+              <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-800/60 text-xs">
+                <div>
+                  <span class="text-[9px] text-gray-500 uppercase font-bold block">INTEREST RATE</span>
+                  <span class="text-white font-semibold">6.99% - 8.99%</span>
+                </div>
+                <div>
+                  <span class="text-[9px] text-gray-500 uppercase font-bold block">LOAN LIMITS</span>
+                  <span class="text-white font-semibold">$500K - $15.0M</span>
+                </div>
+                <div>
+                  <span class="text-[9px] text-gray-500 uppercase font-bold block">PREPAY PENALTY</span>
+                  <span class="text-emerald-400 font-semibold">None / Yield Maint</span>
+                </div>
+                <div>
+                  <span class="text-[9px] text-gray-500 uppercase font-bold block">SPEED TO CLOSE</span>
+                  <span class="text-white font-semibold">5 Business Days</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Program 3: DSCR Rental -->
+            <div class="glass-panel rounded-3xl p-6 border-l-4 border-emerald-500 relative hover:border-emerald-400 transition-all">
+              <div class="flex justify-between items-start mb-4">
+                <span class="text-xs bg-emerald-500/10 text-emerald-300 font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">30-Year DSCR Rental</span>
+                <span class="text-xs font-mono font-bold text-emerald-400">80% LTV Max</span>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2">DSCR Buy & Hold Loans</h3>
+              <p class="text-xs text-gray-400 leading-relaxed mb-6">Optimize cash-flows with DSCR parameters based strictly on property rental yields without requiring complex borrower personal income verification models.</p>
+              
+              <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-800/60 text-xs">
+                <div>
+                  <span class="text-[9px] text-gray-500 uppercase font-bold block">INTEREST RATE</span>
+                  <span class="text-white font-semibold">6.25% - 7.50%</span>
+                </div>
+                <div>
+                  <span class="text-[9px] text-gray-500 uppercase font-bold block">LOAN LIMITS</span>
+                  <span class="text-white font-semibold">$100K - $3.5M</span>
+                </div>
+                <div>
+                  <span class="text-[9px] text-gray-500 uppercase font-bold block">QUALIFY DSCR</span>
+                  <span class="text-emerald-400 font-semibold">As Low as 1.0x</span>
+                </div>
+                <div>
+                  <span class="text-[9px] text-gray-500 uppercase font-bold block">LOAN TERMS</span>
+                  <span class="text-white font-semibold">30 Year Amortized</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Program 4: Ground-Up Construction -->
+            <div class="glass-panel rounded-3xl p-6 border-l-4 border-amber-500 relative hover:border-amber-400 transition-all">
+              <div class="flex justify-between items-start mb-4">
+                <span class="text-xs bg-amber-500/10 text-amber-300 font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Ground-Up Dev</span>
+                <span class="text-xs font-mono font-bold text-white">85% LTC Max</span>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2">Ground-Up Construction</h3>
+              <p class="text-xs text-gray-400 leading-relaxed mb-6">Providing flexible capital lines to single-family spec builders and middle-market developers. Draws approved via institutional grade field inspection processes.</p>
+              
+              <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-800/60 text-xs">
+                <div>
+                  <span class="text-[9px] text-gray-500 uppercase font-bold block">INTEREST RATE</span>
+                  <span class="text-white font-semibold">8.49% - 10.99%</span>
+                </div>
+                <div>
+                  <span class="text-[9px] text-gray-500 uppercase font-bold block">LOAN LIMITS</span>
+                  <span class="text-white font-semibold">$1.0M - $10.0M</span>
+                </div>
+                <div>
+                  <span class="text-[9px] text-gray-500 uppercase font-bold block">MAX ARV CAP</span>
+                  <span class="text-emerald-400 font-semibold">70% ARV Maximum</span>
+                </div>
+                <div>
+                  <span class="text-[9px] text-gray-500 uppercase font-bold block">LOAN TERMS</span>
+                  <span class="text-white font-semibold">18 - 36 Months</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- TAB CONTENT: Detailed Underwriting Guidelines -->
+        <div x-show="activeTab === 'overview'" x-transition class="space-y-6">
+          <div class="glass-panel rounded-3xl p-6 space-y-6">
+            <h3 class="text-lg font-bold text-white border-b border-gray-800/80 pb-4">Core Program Parameters</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              <div>
+                <h4 class="text-xs uppercase tracking-wider text-brand-400 font-bold mb-3">Underwriting & Qualification</h4>
+                <ul class="space-y-3 text-xs text-gray-300">
+                  <li class="flex items-start space-x-2">
+                    <svg class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span><strong>No Credit Score Min:</strong> Approval is asset value based, though rates improve with 660+ FICO.</span>
+                  </li>
+                  <li class="flex items-start space-x-2">
+                    <svg class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span><strong>Experience Track Record:</strong> No experience required for 75% LTV, 3+ deals required for 85%+ leverage level.</span>
+                  </li>
+                  <li class="flex items-start space-x-2">
+                    <svg class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span><strong>Appraisal Requirements:</strong> Independent fast-track valuation panel (Local market valuation within 72 hrs).</span>
+                  </li>
+                  <li class="flex items-start space-x-2">
+                    <svg class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span><strong>Liquid Reserves:</strong> Must demonstrate minimum 3 months of interest payment coverage in bank statements.</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 class="text-xs uppercase tracking-wider text-indigo-400 font-bold mb-3">Approved Property Classes</h4>
+                <div class="grid grid-cols-2 gap-2 text-xs text-gray-400">
+                  <span class="bg-gray-900/60 p-2.5 rounded-xl border border-gray-800 flex items-center space-x-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    <span>Single Family</span>
+                  </span>
+                  <span class="bg-gray-900/60 p-2.5 rounded-xl border border-gray-800 flex items-center space-x-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    <span>Multi-Family</span>
+                  </span>
+                  <span class="bg-gray-900/60 p-2.5 rounded-xl border border-gray-800 flex items-center space-x-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    <span>Mixed Use</span>
+                  </span>
+                  <span class="bg-gray-900/60 p-2.5 rounded-xl border border-gray-800 flex items-center space-x-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    <span>Warehouses</span>
+                  </span>
+                  <span class="bg-gray-900/60 p-2.5 rounded-xl border border-gray-800 flex items-center space-x-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    <span>Commercial Office</span>
+                  </span>
+                  <span class="bg-gray-900/60 p-2.5 rounded-xl border border-gray-800 flex items-center space-x-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+                    <span>Light Industrial</span>
+                  </span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Underwriting Highlight Tip -->
+            <div class="p-4 bg-brand-500/10 border border-brand-500/20 rounded-2xl flex items-start space-x-3 text-xs text-gray-300">
+              <svg class="w-5 h-5 text-brand-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <p>
+                <strong>Closing Acceleration Advisory:</strong> Submitting fully prepared construction plans and standard corporate formation entity documents (Operating Agreement, EIN verification, etc.) directly speeds transaction execution.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB CONTENT: Borrower Reviews -->
+        <div x-show="activeTab === 'reviews'" x-transition class="space-y-6">
+          <div class="glass-panel rounded-3xl p-6 space-y-6">
+            <h3 class="text-lg font-bold text-white border-b border-gray-800/80 pb-4">Aggregate Sentiment Review Tracker</h3>
+
+            <!-- Rating breakdown metrics -->
+            <div class="flex flex-col md:flex-row gap-6 items-center justify-between pb-4">
+              <div class="text-center md:text-left">
+                <div class="text-5xl font-extrabold text-white">4.9</div>
+                <div class="flex items-center space-x-1 justify-center md:justify-start mt-2">
+                  <template x-for="i in 5">
+                    <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                  </template>
+                </div>
+                <div class="text-xs text-gray-500 uppercase mt-1">Based on 148 verified transactions</div>
+              </div>
+
+              <!-- Visual Bars -->
+              <div class="flex-1 max-w-sm space-y-2">
+                <div class="flex items-center space-x-3 text-xs">
+                  <span class="w-12 text-gray-400">5 Star</span>
+                  <div class="flex-1 h-2 bg-gray-900 rounded-full overflow-hidden">
+                    <div class="bg-brand-500 h-full rounded-full" style="width: 92%"></div>
+                  </div>
+                  <span class="w-8 text-right text-gray-300">92%</span>
+                </div>
+                <div class="flex items-center space-x-3 text-xs">
+                  <span class="w-12 text-gray-400">4 Star</span>
+                  <div class="flex-1 h-2 bg-gray-900 rounded-full overflow-hidden">
+                    <div class="bg-brand-500 h-full rounded-full" style="width: 6%"></div>
+                  </div>
+                  <span class="w-8 text-right text-gray-300">6%</span>
+                </div>
+                <div class="flex items-center space-x-3 text-xs">
+                  <span class="w-12 text-gray-400">3 Star</span>
+                  <div class="flex-1 h-2 bg-gray-900 rounded-full overflow-hidden">
+                    <div class="bg-brand-500 h-full rounded-full" style="width: 2%"></div>
+                  </div>
+                  <span class="w-8 text-right text-gray-300">2%</span>
+                </div>
+                <div class="flex items-center space-x-3 text-xs">
+                  <span class="w-12 text-gray-400">2 Star</span>
+                  <div class="flex-1 h-2 bg-gray-900 rounded-full overflow-hidden">
+                    <div class="bg-brand-500 h-full" style="width: 0%"></div>
+                  </div>
+                  <span class="w-8 text-right text-gray-300">0%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Filters for Review categorization -->
+            <div class="flex flex-wrap items-center gap-2 pt-4 border-t border-gray-800/60">
+              <button @click="reviewsFilter = 'all'" :class="reviewsFilter === 'all' ? 'bg-brand-600 text-white' : 'bg-gray-900/60 text-gray-400'" class="px-3.5 py-1.5 rounded-full text-xs font-bold transition">
+                All Verified (3)
+              </button>
+              <button @click="reviewsFilter = 'flips'" :class="reviewsFilter === 'flips' ? 'bg-brand-600 text-white' : 'bg-gray-900/60 text-gray-400'" class="px-3.5 py-1.5 rounded-full text-xs font-bold transition">
+                Fix & Flip (1)
+              </button>
+              <button @click="reviewsFilter = 'dscr'" :class="reviewsFilter === 'dscr' ? 'bg-brand-600 text-white' : 'bg-gray-900/60 text-gray-400'" class="px-3.5 py-1.5 rounded-full text-xs font-bold transition">
+                DSCR Portfolios (1)
+              </button>
+            </div>
+
+            <!-- Review Items List -->
+            <div class="space-y-4">
+              
+              <!-- Review 1 -->
+              <div x-show="reviewsFilter === 'all' || reviewsFilter === 'flips'" class="bg-gray-900/40 p-5 rounded-2xl border border-gray-800/80 space-y-3">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <h4 class="text-sm font-bold text-white">Marcus Sterling, Real Estate Fund Principal</h4>
+                    <p class="text-[10px] text-gray-500 uppercase mt-0.5">Denver, CO Portfolio &bull; Verified Deal Closure</p>
+                  </div>
+                  <div class="flex items-center space-x-1">
+                    <template x-for="i in 5">
+                      <svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                    </template>
+                  </div>
+                </div>
+                <p class="text-xs text-gray-300 leading-relaxed">
+                  "Closed a multi-unit flip acquisition with Source Capital in 6 business days. The valuation model was very fair and they adjusted the rehab schedule draws dynamically based on our real progress. Their team was professional and transparent."
+                </p>
+                <div class="flex items-center space-x-2 text-[10px] text-brand-400 font-bold bg-brand-500/5 px-2.5 py-1 rounded-lg w-max">
+                  <span>LOAN PROGRAM: FIX & FLIP // $1.4M CLOSED</span>
+                </div>
+              </div>
+
+              <!-- Review 2 -->
+              <div x-show="reviewsFilter === 'all' || reviewsFilter === 'dscr'" class="bg-gray-900/40 p-5 rounded-2xl border border-gray-800/80 space-y-3">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <h4 class="text-sm font-bold text-white">Elena Rostova, Property Investor</h4>
+                    <p class="text-[10px] text-gray-500 uppercase mt-0.5">Phoenix, AZ Portfolio &bull; Verified Portfolio Acquisition</p>
+                  </div>
+                  <div class="flex items-center space-x-1">
+                    <template x-for="i in 5">
+                      <svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                    </template>
+                  </div>
+                </div>
+                <p class="text-xs text-gray-300 leading-relaxed">
+                  "Transitioned our entire rental pool under their 30-year DSCR program. It's truly cash-flow based logic without the traditional tax return bottlenecks. Recommended for active buy-and-hold developers who need scale."
+                </p>
+                <div class="flex items-center space-x-2 text-[10px] text-emerald-400 font-bold bg-emerald-500/5 px-2.5 py-1 rounded-lg w-max">
+                  <span>LOAN PROGRAM: PORTFOLIO DSCR RENTAL // $4.2M CLOSED</span>
+                </div>
+              </div>
+
+              <!-- Review 3 -->
+              <div x-show="reviewsFilter === 'all'" class="bg-gray-900/40 p-5 rounded-2xl border border-gray-800/80 space-y-3">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <h4 class="text-sm font-bold text-white">David Miller, Spec Home Builder</h4>
+                    <p class="text-[10px] text-gray-500 uppercase mt-0.5">Tampa, FL spec development &bull; Closedspec deals</p>
+                  </div>
+                  <div class="flex items-center space-x-1">
+                    <template x-for="i in 5">
+                      <svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                    </template>
+                  </div>
+                </div>
+                <p class="text-xs text-gray-300 leading-relaxed">
+                  "Source capital financed our ground-up custom construction when traditional regional banks pulled back their allocation. Draw inspections are efficient and funding reaches the sub-contractors quickly."
+                </p>
+                <div class="flex items-center space-x-2 text-[10px] text-brand-400 font-bold bg-brand-500/5 px-2.5 py-1 rounded-lg w-max">
+                  <span>LOAN PROGRAM: GROUND-UP SPEC // $2.9M CLOSED</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB CONTENT: Coverage Map -->
+        <div x-show="activeTab === 'coverage'" x-transition class="space-y-6">
+          <div class="glass-panel rounded-3xl p-6 space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-800/80 pb-4">
+              <div>
+                <h3 class="text-lg font-bold text-white">Operational Footprint</h3>
+                <p class="text-xs text-gray-400">Direct lending is fully authorized across prime development zones.</p>
+              </div>
+              <div class="flex space-x-4 text-xs text-gray-300">
+                <div class="flex items-center space-x-2">
+                  <span class="w-3 h-3 bg-brand-600 rounded-sm"></span>
+                  <span>Core Direct Markets</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="w-3 h-3 bg-indigo-500/35 rounded-sm"></span>
+                  <span>Indirect Markets</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Beautiful Visual Coverage Map Simulated SVG Layout -->
+            <div class="relative bg-gray-950/60 border border-gray-800 rounded-2xl p-6 min-h-[300px] flex items-center justify-center overflow-hidden">
+              
+              <!-- Abstract Graphic World Map Representation -->
+              <svg class="w-full max-w-lg opacity-80 h-auto" viewBox="0 0 500 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Simple US outline geometry representation -->
+                <path d="M 50,50 L 120,40 L 190,45 L 260,35 L 340,40 L 420,50 L 450,70 L 460,110 L 430,160 L 380,180 L 320,170 L 290,200 L 250,210 L 190,195 L 140,205 L 110,180 L 70,185 L 50,150 L 40,100 Z" fill="rgba(99, 102, 241, 0.08)" stroke="rgba(255, 255, 255, 0.1)" stroke-width="2" />
+                
+                <!-- Highlighted regional hubs -->
+                <circle cx="100" cy="120" r="10" fill="#4f46e5" fill-opacity="0.8" />
+                <circle cx="100" cy="120" r="18" stroke="#4f46e5" stroke-width="1.5" stroke-dasharray="3 3" />
+                
+                <circle cx="280" cy="160" r="8" fill="#4f46e5" fill-opacity="0.8" />
+                <circle cx="280" cy="160" r="15" stroke="#4f46e5" stroke-width="1.5" stroke-dasharray="3 3" />
+
+                <circle cx="390" cy="95" r="9" fill="#4f46e5" fill-opacity="0.8" />
+                <circle cx="390" cy="95" r="16" stroke="#4f46e5" stroke-width="1.5" stroke-dasharray="3 3" />
+
+                <circle cx="410" cy="140" r="11" fill="#4f46e5" fill-opacity="0.8" />
+                <circle cx="410" cy="140" r="20" stroke="#4f46e5" stroke-width="1.5" stroke-dasharray="3 3" />
+              </svg>
+
+              <!-- Absolute Overlay of stats -->
+              <div class="absolute bottom-4 left-4 right-4 grid grid-cols-2 md:grid-cols-4 gap-2 text-center">
+                <div class="bg-gray-900/90 border border-gray-800/80 p-2.5 rounded-xl">
+                  <span class="text-[9px] text-gray-500 block">PACIFIC ZONE</span>
+                  <span class="text-xs text-white font-bold">100% Core Focus</span>
+                </div>
+                <div class="bg-gray-900/90 border border-gray-800/80 p-2.5 rounded-xl">
+                  <span class="text-[9px] text-gray-500 block">MOUNTAIN ZONE</span>
+                  <span class="text-xs text-white font-bold">Active Deployment</span>
+                </div>
+                <div class="bg-gray-900/90 border border-gray-800/80 p-2.5 rounded-xl">
+                  <span class="text-[9px] text-gray-500 block">SOUTH CENTRAL</span>
+                  <span class="text-xs text-white font-bold">High Density</span>
+                </div>
+                <div class="bg-gray-900/90 border border-gray-800/80 p-2.5 rounded-xl">
+                  <span class="text-[9px] text-gray-500 block">EAST COAST</span>
+                  <span class="text-xs text-white font-bold">Priority Portfolios</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- List of regional offices -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              <div class="p-4 bg-gray-900/40 rounded-xl border border-gray-800/50 flex justify-between items-center">
+                <div>
+                  <h4 class="font-bold text-white">West Coast HQ &mdash; Los Angeles</h4>
+                  <p class="text-[10px] text-gray-400 mt-1">445 S. Figueroa Street, Suite 3199, CA 90071</p>
+                </div>
+                <span class="text-[9px] bg-brand-500/10 text-brand-300 px-2 py-0.5 rounded font-bold uppercase">Main Hub</span>
+              </div>
+              <div class="p-4 bg-gray-900/40 rounded-xl border border-gray-800/50 flex justify-between items-center">
+                <div>
+                  <h4 class="font-bold text-white">East Coast Branch &mdash; Miami</h4>
+                  <p class="text-[10px] text-gray-400 mt-1">1110 Brickell Ave, Suite 400, FL 33131</p>
+                </div>
+                <span class="text-[9px] bg-indigo-500/10 text-indigo-300 px-2 py-0.5 rounded font-bold uppercase">Satellite</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+
+      <!-- RIGHT COLUMN: Direct Message Inquiry Form & Interactive Deal Pricing Widget -->
+      <section class="lg:col-span-4 flex flex-col space-y-6">
+        
+        <!-- Direct Message Inquiry Module -->
+        <div id="inquiry-module" class="glass-panel rounded-3xl p-6 border-brand-500/25 relative overflow-hidden">
+          <div class="absolute -right-16 -top-16 w-36 h-36 bg-brand-500/10 rounded-full blur-2xl"></div>
+          
+          <div class="text-xs uppercase tracking-widest text-brand-400 font-bold mb-4">Pipeline Allocation Request</div>
+          <h3 class="text-lg font-bold text-white mb-4">Connect with Deal Desk</h3>
+
+          <!-- Form elements layout -->
+          <div class="space-y-4" x-show="!inquirySubmitted">
+            
+            <div>
+              <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1.5">Desired Loan Program</label>
+              <select x-model="inquiry.program" class="w-full glass-input text-xs rounded-xl px-3.5 py-3 text-white focus:outline-none">
+                <option value="Fix & Flip">Fix & Flip Loans</option>
+                <option value="Bridge Finance">Transactional Bridge</option>
+                <option value="DSCR Rental">DSCR Portfolio Buy/Hold</option>
+                <option value="Ground-Up Construction">Ground-Up Construction</option>
+              </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1.5">Target Loan Amount</label>
+                <div class="relative">
+                  <span class="absolute left-3.5 top-3 text-xs text-gray-500">$</span>
+                  <input type="number" x-model="inquiry.amount" class="w-full glass-input text-xs rounded-xl pl-7 pr-3 py-3 text-white focus:outline-none">
+                </div>
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1.5">LTV Target</label>
+                <div class="relative">
+                  <input type="number" x-model="inquiry.ltv" class="w-full glass-input text-xs rounded-xl px-3.5 py-3 text-white focus:outline-none">
+                  <span class="absolute right-3.5 top-3 text-xs text-gray-500">%</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1.5">Full Name</label>
+              <input type="text" x-model="inquiry.name" placeholder="John Doe" class="w-full glass-input text-xs rounded-xl px-3.5 py-3 text-white focus:outline-none">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1.5">Email Address</label>
+                <input type="email" x-model="inquiry.email" placeholder="john@example.com" class="w-full glass-input text-xs rounded-xl px-3.5 py-3 text-white focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1.5">Phone Number</label>
+                <input type="tel" x-model="inquiry.phone" placeholder="(555) 000-0000" class="w-full glass-input text-xs rounded-xl px-3.5 py-3 text-white focus:outline-none">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1.5">Brief Deal Scenario Details</label>
+              <textarea x-model="inquiry.note" rows="3" placeholder="Address, current ARV target, current construction budget, experience history..." class="w-full glass-input text-xs rounded-xl px-3.5 py-3 text-white focus:outline-none resize-none"></textarea>
+            </div>
+
+            <!-- Warning check -->
+            <div class="flex items-center space-x-2">
+              <input type="checkbox" id="direct-check" class="rounded bg-gray-900 border-gray-800 text-brand-600 focus:ring-brand-500" checked>
+              <label for="direct-check" class="text-[9px] text-gray-500 uppercase font-medium">Auto-create loan package snapshot folder</label>
+            </div>
+
+            <button @click="submitInquiry()" class="w-full py-3.5 bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white text-xs font-bold uppercase rounded-xl tracking-wider shadow-lg shadow-brand-600/20 transition duration-200">
+              Submit Direct Allocation Request
+            </button>
+
+          </div>
+
+          <!-- Successful response visualization -->
+          <div class="text-center py-8 space-y-4" x-show="inquirySubmitted" x-transition>
+            <div class="w-16 h-16 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full flex items-center justify-center mx-auto shadow-inner">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-white uppercase tracking-wider">Allocation Pipeline Registered</h3>
+              <p class="text-xs text-gray-400 mt-2 max-w-xs mx-auto">
+                Your target allocation of <span class="text-white font-bold" x-text="'$' + parseInt(inquiry.amount).toLocaleString()"></span> has reached Source Capital's active pipeline under Ticket ID: <span class="text-brand-400 font-mono font-bold" x-text="ticketId"></span>.
+              </p>
+            </div>
+            <div class="p-4 bg-gray-950/60 rounded-xl border border-gray-800 text-left text-[11px] text-gray-400 space-y-1">
+              <div class="flex justify-between"><span>Assigned Specialist:</span><span class="text-white font-semibold">T. Sterling</span></div>
+              <div class="flex justify-between"><span>Response SLA:</span><span class="text-emerald-400 font-semibold">&lt; 2 Hours</span></div>
+            </div>
+            <button @click="resetInquiry()" class="text-xs text-brand-400 hover:text-brand-300 font-bold transition">Submit Another Scenario</button>
+          </div>
+
+        </div>
+
+        <!-- Deal Pricing Interactive Calculator -->
+        <div class="glass-panel rounded-3xl p-6 space-y-4">
+          <div class="text-xs uppercase tracking-widest text-indigo-400 font-bold">Estimated Cost Estimator</div>
+          <h3 class="text-sm font-bold text-white">LTV & Leverage Calculator</h3>
+
+          <div class="space-y-3">
+            <div>
+              <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Estimated Purchase Price</label>
+              <div class="relative">
+                <span class="absolute left-3.5 top-2.5 text-xs text-gray-500">$</span>
+                <input type="number" x-model="calc.purchase" class="w-full glass-input text-xs rounded-xl pl-7 pr-3 py-2.5 text-white focus:outline-none">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1 flex justify-between">
+                <span>LTV Allocation Range</span>
+                <span class="text-brand-400 font-bold" x-text="calc.ltv + '%'">75%</span>
+              </label>
+              <input type="range" min="50" max="85" step="5" x-model="calc.ltv" class="w-full h-1 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-brand-500">
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Assumed Interest Rate (% APY)</label>
+              <select x-model="calc.rate" class="w-full glass-input text-xs rounded-xl px-3.5 py-2.5 text-white focus:outline-none">
+                <option value="6.99">6.99% &mdash; Tier 1 Prime</option>
+                <option value="7.99">7.99% &mdash; Tier 2 Average</option>
+                <option value="8.99">8.99% &mdash; Tier 3 Specialized</option>
+                <option value="9.99">9.99% &mdash; Non-Standard Asset</option>
+              </select>
+            </div>
+
+            <!-- Calculator Output Box -->
+            <div class="p-4 bg-gray-950/60 rounded-2xl border border-gray-800/80 space-y-3">
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-gray-400">Target Loan Amount:</span>
+                <span class="text-white font-extrabold" x-text="'$' + calculatedLoanAmount.toLocaleString()"></span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-gray-400">Required Capital Down:</span>
+                <span class="text-brand-400 font-extrabold" x-text="'$' + calculatedEquityDown.toLocaleString()"></span>
+              </div>
+              <div class="h-px bg-gray-800/80"></div>
+              <div class="flex justify-between items-center">
+                <span class="text-[10px] text-emerald-400 uppercase font-bold">Est. Monthly Interest:</span>
+                <span class="text-emerald-400 text-lg font-extrabold font-mono" x-text="'$' + calculatedMonthlyInterest.toLocaleString()"></span>
+              </div>
+            </div>
+
+            <p class="text-[9px] text-gray-500 text-center uppercase tracking-wider">Underwriting values represent illustrative estimations only</p>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <script>
+    function lenderProfile() {
+      return {
+        activeTab: 'programs',
+        reviewsFilter: 'all',
+        inquirySubmitted: false,
+        ticketId: '',
+        
+        inquiry: {
+          program: 'Fix & Flip',
+          amount: 550000,
+          ltv: 75,
+          name: '',
+          email: '',
+          phone: '',
+          note: ''
+        },
+
+        calc: {
+          purchase: 350000,
+          ltv: 75,
+          rate: 7.99
+        },
+
+        get calculatedLoanAmount() {
+          const raw = (this.calc.purchase * this.calc.ltv) / 100;
+          return Math.round(raw);
+        },
+
+        get calculatedEquityDown() {
+          return Math.round(this.calc.purchase - this.calculatedLoanAmount);
+        },
+
+        get calculatedMonthlyInterest() {
+          const yearly = this.calculatedLoanAmount * (parseFloat(this.calc.rate) / 100);
+          return Math.round(yearly / 12);
+        },
+
+        submitInquiry() {
+          if (!this.inquiry.name || !this.inquiry.email) {
+            alert('Please supply name and email vectors to request pipeline space.');
+            return;
+          }
+          this.ticketId = 'CV-' + Math.floor(100000 + Math.random() * 900000);
+          this.inquirySubmitted = true;
+        },
+
+        resetInquiry() {
+          this.inquirySubmitted = false;
+          this.inquiry.name = '';
+          this.inquiry.email = '';
+          this.inquiry.phone = '';
+          this.inquiry.note = '';
+        }
+      }
+    }
+  </script>
+
+</body>
+</html>

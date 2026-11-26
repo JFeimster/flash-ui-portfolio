@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonshine Capital Asset Vault</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #000000;
+            background-image: radial-gradient(#222222 15%, transparent 15%), radial-gradient(#222222 15%, transparent 15%);
+            background-size: 24px 24px;
+            background-position: 0 0, 12px 12px;
+            color: #ffffff;
+        }
+
+        .neo-border {
+            border: 4px solid #000000;
+        }
+
+        .neo-border-white {
+            border: 4px solid #ffffff;
+        }
+
+        .neo-shadow {
+            box-shadow: 8px 8px 0px #000000;
+        }
+
+        .neo-shadow-white {
+            box-shadow: 8px 8px 0px #ff4800;
+        }
+
+        .neo-shadow-accent {
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .neo-btn {
+            border: 4px solid #000000;
+            box-shadow: 6px 6px 0px #000000;
+            transition: all 0.07s ease-in-out;
+        }
+
+        .neo-btn:active {
+            transform: translate(4px, 4px);
+            box-shadow: 2px 2px 0px #000000;
+        }
+
+        .neo-btn-white {
+            border: 4px solid #ffffff;
+            box-shadow: 6px 6px 0px #ff4800;
+            transition: all 0.07s ease-in-out;
+        }
+
+        .neo-btn-white:active {
+            transform: translate(4px, 4px);
+            box-shadow: 2px 2px 0px #ff4800;
+        }
+
+        /* Custom Scrollbar for Neo-Brutalist look */
+        ::-webkit-scrollbar {
+            width: 16px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000000;
+            border-left: 4px solid #ffffff;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ff4800;
+            border: 4px solid #000000;
+        }
+
+        .blink {
+            animation: blinker 1s linear infinite;
+        }
+        @keyframes blinker {
+            50% { opacity: 0; }
+        }
+
+        /* Custom high-contrast checkerboard for asset previews */
+        .checkerboard {
+            background-color: #111111;
+            background-image: linear-gradient(45deg, #000 25%, transparent 25%), linear-gradient(-45deg, #000 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #000 75%), linear-gradient(-45deg, transparent 75%, #000 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex items-center justify-center">
+
+    <!-- Container -->
+    <div class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        
+        <!-- SIDEBAR (4 Cols) -->
+        <aside class="lg:col-span-4 bg-[#ffffff] text-[#000000] neo-border-white neo-shadow-white p-6 flex flex-col justify-between relative overflow-hidden min-h-[500px] lg:min-h-[750px]">
+            <!-- Decorative raw corner stamp -->
+            <div class="absolute top-0 right-0 bg-[#ff4800] text-white font-black px-4 py-2 text-xs uppercase tracking-widest border-b-4 border-l-4 border-black">
+                VAULT LOCKER
+            </div>
+            
+            <div>
+                <!-- Brand logo / header -->
+                <div class="mb-10">
+                    <span class="bg-[#000000] text-[#ff4800] text-3xl font-black px-4 py-1 inline-block tracking-tighter transform -rotate-1">
+                        MOONSHINE
+                    </span>
+                    <span class="text-xl font-black tracking-widest block mt-2 text-[#000000] underline decoration-[#ff4800] decoration-4">
+                        ASSET VAULT
+                    </span>
+                </div>
+
+                <!-- Live Affiliate Parameter Box -->
+                <div class="border-4 border-black p-4 bg-[#ff4800] text-black mb-8 space-y-3">
+                    <h4 class="font-black text-sm uppercase tracking-wider">// MY AFFILIATE ID</h4>
+                    <input type="text" id="sidebar-aff-id" value="WILD_CAT_01" oninput="syncAffiliateID()" class="w-full bg-white text-black font-mono font-black p-2 border-2 border-black focus:outline-none uppercase text-center" placeholder="AFFILIATE-ID">
+                    <p class="text-[10px] font-mono leading-tight font-bold">This ID modifies all vault links instantly. Keep it correct to ensure conversion routing.</p>
+                </div>
+
+                <!-- Navigation Quick-Link Checklist -->
+                <div class="space-y-3">
+                    <h3 class="font-black text-xs uppercase tracking-widest text-zinc-500 mb-2">// QUICK FILTER TARGETS</h3>
+                    
+                    <button onclick="switchTab('all')" class="w-full text-left flex items-center justify-between p-3 bg-black text-white neo-border hover:bg-[#ff4800] hover:text-black transition-all group">
+                        <span class="font-bold text-xs uppercase tracking-tight">VIEW DEPLOYED ARCHIVE</span>
+                        <span class="font-black bg-[#ff4800] text-black px-2 py-0.5 text-xs group-hover:bg-black group-hover:text-white" id="count-all">9</span>
+                    </button>
+
+                    <button onclick="switchTab('banners')" class="w-full text-left flex items-center justify-between p-3 bg-white text-black border-4 border-black hover:bg-black hover:text-white transition-all group">
+                        <span class="font-bold text-xs uppercase tracking-tight">SOCIAL BANNERS (PNG)</span>
+                        <span class="font-black bg-zinc-200 text-black px-2 py-0.5 text-xs" id="count-banners">3</span>
+                    </button>
+
+                    <button onclick="switchTab('swipe')" class="w-full text-left flex items-center justify-between p-3 bg-white text-black border-4 border-black hover:bg-black hover:text-white transition-all group">
+                        <span class="font-bold text-xs uppercase tracking-tight">PUNCHY SWIPE COPY</span>
+                        <span class="font-black bg-zinc-200 text-black px-2 py-0.5 text-xs" id="count-swipe">3</span>
+                    </button>
+
+                    <button onclick="switchTab('emails')" class="w-full text-left flex items-center justify-between p-3 bg-white text-black border-4 border-black hover:bg-black hover:text-white transition-all group">
+                        <span class="font-bold text-xs uppercase tracking-tight">EMAIL NUTURE SEQUENCES</span>
+                        <span class="font-black bg-zinc-200 text-black px-2 py-0.5 text-xs" id="count-emails">2</span>
+                    </button>
+
+                    <button onclick="switchTab('builder')" class="w-full text-left flex items-center justify-between p-3 bg-white text-black border-4 border-black hover:bg-black hover:text-white transition-all group">
+                        <span class="font-bold text-xs uppercase tracking-tight">UTM ENGINE BUILDER</span>
+                        <span class="font-black bg-[#ff4800] text-black px-2 py-0.5 text-xs">LIVE</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Asset Engine Log -->
+            <div class="mt-8 border-t-4 border-black pt-6">
+                <div class="bg-black text-[#00ff66] p-4 neo-border font-mono text-xs flex flex-col justify-between h-36">
+                    <div class="overflow-y-auto space-y-1 h-24" id="log-messages">
+                        <p class="text-zinc-500">// ASSET PIPELINE GENERATOR</p>
+                        <p><span class="text-[#ff4800]">SYSTEM:</span> All source files signed with MD5. Ready to copy.</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN INTERACTIVE WORKSPACE (8 Cols) -->
+        <main class="lg:col-span-8 bg-[#000000] text-[#ffffff] neo-border-white neo-shadow-white p-6 md:p-10 flex flex-col justify-between min-h-[600px] lg:min-h-[750px] relative overflow-hidden">
+            
+            <!-- STYLISH BACKGROUND GLITCH GRID DECORATION -->
+            <div class="absolute inset-0 pointer-events-none opacity-5 flex flex-col justify-between p-4 font-mono select-none">
+                <div class="flex justify-between text-xs">
+                    <span>STATUS: ALL_SYSTEMS_GO</span>
+                    <span>ROUTE: ASSETS_VAULT_v3</span>
+                </div>
+                <div class="text-7xl font-black tracking-widest text-center">EXPLOIT</div>
+                <div class="flex justify-between text-xs">
+                    <span>COMPRESSION: RAW</span>
+                    <span>DISTRIBUTION: MASSIVE</span>
+                </div>
+            </div>
+
+            <!-- CONTENT BODY -->
+            <div class="relative z-10 space-y-8 my-auto">
+                
+                <!-- VAULT HEADER -->
+                <div class="space-y-4">
+                    <div class="inline-block bg-[#ff4800] text-black text-xs font-black px-3 py-1 uppercase tracking-widest">
+                        MARKETING RESOURCE CENTRE
+                    </div>
+                    <h1 class="text-4xl md:text-6xl font-black tracking-tight leading-none uppercase">
+                        PROMOTIONAL <span class="text-[#ff4800]">VAULT</span>
+                    </h1>
+                    <p class="text-base font-bold max-w-2xl text-zinc-300 border-l-4 border-[#ff4800] pl-4">
+                        Do not overcomplicate marketing. Deploy our raw, high-converting copy patterns, high-contrast display banners, and personalized URL strings. Fuel the pipeline now.
+                    </p>
+                </div>
+
+                <!-- BLOCKY FILTER TABS -->
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
+                    <button onclick="switchTab('all')" id="tab-all" class="tab-filter bg-[#ff4800] text-black font-black p-2 text-xs uppercase border-4 border-white hover:bg-white hover:text-black transition-colors focus:outline-none">
+                        ALL ASSETS
+                    </button>
+                    <button onclick="switchTab('banners')" id="tab-banners" class="tab-filter bg-black text-white font-black p-2 text-xs uppercase border-4 border-white hover:bg-[#ff4800] hover:text-black transition-colors focus:outline-none">
+                        BANNERS
+                    </button>
+                    <button onclick="switchTab('swipe')" id="tab-swipe" class="tab-filter bg-black text-white font-black p-2 text-xs uppercase border-4 border-white hover:bg-[#ff4800] hover:text-black transition-colors focus:outline-none">
+                        SWIPE COPY
+                    </button>
+                    <button onclick="switchTab('emails')" id="tab-emails" class="tab-filter bg-black text-white font-black p-2 text-xs uppercase border-4 border-white hover:bg-[#ff4800] hover:text-black transition-colors focus:outline-none">
+                        EMAILS
+                    </button>
+                    <button onclick="switchTab('builder')" id="tab-builder" class="tab-filter bg-black text-white font-black p-2 text-xs uppercase border-4 border-white hover:bg-[#ff4800] hover:text-black transition-colors focus:outline-none">
+                        URL BUILDER
+                    </button>
+                </div>
+
+                <!-- ACTIVE VAULT PANEL -->
+                <div class="space-y-6">
+                    
+                    <!-- BANNERS CONTAINER -->
+                    <div id="section-banners" class="vault-section space-y-4">
+                        <h3 class="font-black text-lg tracking-widest text-[#ff4800] uppercase">// SOCIAL BANNERS (HIGH CONTRAST)</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            
+                            <!-- Banner Item 1 -->
+                            <div class="border-4 border-white bg-zinc-950 p-3 flex flex-col justify-between">
+                                <div class="checkerboard aspect-video w-full border-2 border-zinc-800 flex items-center justify-center relative overflow-hidden mb-3">
+                                    <div class="absolute inset-0 bg-[#ff4800]/20 flex flex-col justify-center items-center p-2 text-center">
+                                        <span class="bg-black text-white font-black text-sm px-2 py-0.5 leading-none">CASH IS FUEL</span>
+                                        <span class="text-black font-black text-xs uppercase leading-tight mt-1 bg-white px-1">CAPITAL IN 24H</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <h4 class="font-black text-xs uppercase tracking-tight">01_CASH_IS_FUEL.PNG</h4>
+                                    <p class="text-[10px] font-mono text-zinc-500">1200 x 630px | Standard LinkedIn / Twitter Feed banner.</p>
+                                    <div class="grid grid-cols-2 gap-2 pt-2">
+                                        <button onclick="triggerDownload('01_CASH_IS_FUEL.PNG')" class="bg-white text-black text-xs font-black p-2 border-2 border-black uppercase hover:bg-[#ff4800] transition-colors">RAW FILE</button>
+                                        <button onclick="copyToClipboard('https://moonshine.capital/assets/01_CASH_IS_FUEL.png', this)" class="bg-black text-white text-[10px] font-mono p-2 border-2 border-white uppercase hover:bg-white hover:text-black transition-colors">COPY LINK</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Banner Item 2 -->
+                            <div class="border-4 border-white bg-zinc-950 p-3 flex flex-col justify-between">
+                                <div class="checkerboard aspect-video w-full border-2 border-zinc-800 flex items-center justify-center relative overflow-hidden mb-3">
+                                    <div class="absolute inset-0 bg-white/10 flex flex-col justify-center items-center p-2 text-center">
+                                        <span class="bg-[#ff4800] text-black font-black text-sm px-2 py-0.5 leading-none">NO MIDDLEMEN</span>
+                                        <span class="text-white font-black text-xs uppercase leading-tight mt-1 bg-black px-1">4% REVENUE</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <h4 class="font-black text-xs uppercase tracking-tight">02_NO_MIDDLEMEN.PNG</h4>
+                                    <p class="text-[10px] font-mono text-zinc-500">1200 x 630px | Direct broker/partner focus banner.</p>
+                                    <div class="grid grid-cols-2 gap-2 pt-2">
+                                        <button onclick="triggerDownload('02_NO_MIDDLEMEN.PNG')" class="bg-white text-black text-xs font-black p-2 border-2 border-black uppercase hover:bg-[#ff4800] transition-colors">RAW FILE</button>
+                                        <button onclick="copyToClipboard('https://moonshine.capital/assets/02_NO_MIDDLEMEN.png', this)" class="bg-black text-white text-[10px] font-mono p-2 border-2 border-white uppercase hover:bg-white hover:text-black transition-colors">COPY LINK</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Banner Item 3 -->
+                            <div class="border-4 border-white bg-zinc-950 p-3 flex flex-col justify-between">
+                                <div class="checkerboard aspect-video w-full border-2 border-zinc-800 flex items-center justify-center relative overflow-hidden mb-3">
+                                    <div class="absolute inset-0 bg-black flex flex-col justify-center items-center p-2 text-center border-4 border-dashed border-[#ff4800]">
+                                        <span class="text-[#ff4800] font-black text-base uppercase leading-none tracking-widest animate-pulse">SPEED & LIQUIDITY</span>
+                                        <span class="text-white font-mono text-[9px] mt-1 bg-zinc-800 px-1">MOONSHINE CAPITAL</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <h4 class="font-black text-xs uppercase tracking-tight">03_SPEED_LIQUIDITY.PNG</h4>
+                                    <p class="text-[10px] font-mono text-zinc-500">1200 x 630px | High-octane contrast branding visual.</p>
+                                    <div class="grid grid-cols-2 gap-2 pt-2">
+                                        <button onclick="triggerDownload('03_SPEED_LIQUIDITY.PNG')" class="bg-white text-black text-xs font-black p-2 border-2 border-black uppercase hover:bg-[#ff4800] transition-colors">RAW FILE</button>
+                                        <button onclick="copyToClipboard('https://moonshine.capital/assets/03_SPEED_LIQUIDITY.png', this)" class="bg-black text-white text-[10px] font-mono p-2 border-2 border-white uppercase hover:bg-white hover:text-black transition-colors">COPY LINK</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- SWIPE COPY CONTAINER -->
+                    <div id="section-swipe" class="vault-section space-y-4">
+                        <h3 class="font-black text-lg tracking-widest text-[#ff4800] uppercase">// PUNCHY SWIPE COPY (TEXT ONLY)</h3>
+                        <div class="space-y-4">
+                            
+                            <!-- Swipe Item 1 -->
+                            <div class="bg-zinc-950 p-4 border-4 border-white relative group">
+                                <span class="absolute top-0 right-0 bg-[#ff4800] text-black text-[9px] font-mono font-black px-2 py-0.5">SHORT FORM (X/LINKEDIN)</span>
+                                <p class="text-sm font-mono text-zinc-200 pr-24" id="swipe-text-1">
+                                    Traditional banks run on bureaucratic timelines. Your commercial pipeline runs on speed. Moonshine Capital approves bridge loans and enterprise capital in 24 hours. No delays. No BS. Lock your funding: https://moonshine.capital/?aff=<span class="text-[#ff4800] font-bold active-aff-preview">WILD_CAT_01</span>
+                                </p>
+                                <button onclick="copyTextContainer('swipe-text-1', this)" class="mt-3 bg-white text-black text-xs font-black px-4 py-2 border-2 border-black uppercase hover:bg-[#ff4800] hover:text-black transition-colors">
+                                    COPY SWIPE CODE ⚡
+                                </button>
+                            </div>
+
+                            <!-- Swipe Item 2 -->
+                            <div class="bg-zinc-950 p-4 border-4 border-white relative group">
+                                <span class="absolute top-0 right-0 bg-[#ff4800] text-black text-[9px] font-mono font-black px-2 py-0.5">COMMISSION HIGHLIGHT</span>
+                                <p class="text-sm font-mono text-zinc-200 pr-24" id="swipe-text-2">
+                                    Need commercial financing up to $2,000,000 with zero middlemen headaches? We clear barriers so founders can execute fast. High-velocity funding, direct tracking. Submit your deal parameters now: https://moonshine.capital/?aff=<span class="text-[#ff4800] font-bold active-aff-preview">WILD_CAT_01</span>
+                                </p>
+                                <button onclick="copyTextContainer('swipe-text-2', this)" class="mt-3 bg-white text-black text-xs font-black px-4 py-2 border-2 border-black uppercase hover:bg-[#ff4800] hover:text-black transition-colors">
+                                    COPY SWIPE CODE ⚡
+                                </button>
+                            </div>
+
+                            <!-- Swipe Item 3 -->
+                            <div class="bg-zinc-950 p-4 border-4 border-white relative group">
+                                <span class="absolute top-0 right-0 bg-[#ff4800] text-black text-[9px] font-mono font-black px-2 py-0.5">RAW TRUTH OUTREACH</span>
+                                <p class="text-sm font-mono text-zinc-200 pr-24" id="swipe-text-3">
+                                    Stop begging legacy institutions. Get liquidity based on real-world asset configurations, equipment valuations, and solid invoice pipelines. Fast tracking via Moonshine: https://moonshine.capital/?aff=<span class="text-[#ff4800] font-bold active-aff-preview">WILD_CAT_01</span>
+                                </p>
+                                <button onclick="copyTextContainer('swipe-text-3', this)" class="mt-3 bg-white text-black text-xs font-black px-4 py-2 border-2 border-black uppercase hover:bg-[#ff4800] hover:text-black transition-colors">
+                                    COPY SWIPE CODE ⚡
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- EMAIL TEMPLATES -->
+                    <div id="section-emails" class="vault-section space-y-4">
+                        <h3 class="font-black text-lg tracking-widest text-[#ff4800] uppercase">// EMAIL NUTURE SEQUENCES (HTML/TEXT)</h3>
+                        <div class="space-y-4">
+                            
+                            <!-- Email 1 -->
+                            <div class="bg-zinc-950 border-4 border-white overflow-hidden">
+                                <div class="bg-[#ff4800] p-3 text-black font-black text-xs uppercase flex justify-between items-center">
+                                    <span>EMAIL COLD_SEQUENCE_01 // SPEED PREFERENCE</span>
+                                    <button onclick="copyTextContainer('email-body-1', this)" class="bg-black text-white px-3 py-1 text-[10px] hover:bg-white hover:text-black transition-all">COPY EMAIL BODY</button>
+                                </div>
+                                <div class="p-4 font-mono text-xs text-zinc-300 space-y-2" id="email-body-1">
+                                    <p><strong>SUBJECT:</strong> [Company Name] - Real capital in 24 hours. No delays.</p>
+                                    <hr class="border-zinc-800 my-2">
+                                    <p>Hello [First Name],</p>
+                                    <p>I looked at [Company Name] and noticed you are operating in a sector where immediate working liquidity is paramount. Legacy banks love wasting time with endless credit committee cycles. We do things with velocity.</p>
+                                    <p>At Moonshine Capital, we bypass legacy gates. If you hold equipment, inventory, or reliable cash flow invoices over $20k/month, we can clear bridge financing up to $2M in 24-48 hours flat.</p>
+                                    <p>Ready to check real terms? Check your parameters below:</p>
+                                    <p><strong>https://moonshine.capital/?aff=<span class="active-aff-preview text-[#ff4800] font-bold">WILD_CAT_01</span></strong></p>
+                                    <p>Regards,<br>[Your Name]<br>Strategic Partner, Moonshine Capital</p>
+                                </div>
+                            </div>
+
+                            <!-- Email 2 -->
+                            <div class="bg-zinc-950 border-4 border-white overflow-hidden">
+                                <div class="bg-[#ff4800] p-3 text-black font-black text-xs uppercase flex justify-between items-center">
+                                    <span>EMAIL COLD_SEQUENCE_02 // DIRECT BRIDGE</span>
+                                    <button onclick="copyTextContainer('email-body-2', this)" class="bg-black text-white px-3 py-1 text-[10px] hover:bg-white hover:text-black transition-all">COPY EMAIL BODY</button>
+                                </div>
+                                <div class="p-4 font-mono text-xs text-zinc-300 space-y-2" id="email-body-2">
+                                    <p><strong>SUBJECT:</strong> Fast Liquidity Options for [Company Name]</p>
+                                    <hr class="border-zinc-800 my-2">
+                                    <p>Hello [First Name],</p>
+                                    <p>If you're waiting on slow credit pipelines to execute fleet additions, warehouse expansions, or major inventory acquisitions, you're losing money daily.</p>
+                                    <p>We provide rapid bridge solutions for high-performance builders. No soft corporate handshakes. We secure funding, you drive expansion.</p>
+                                    <p>Submit your parameters on our secure terminal for immediate processing:</p>
+                                    <p><strong>https://moonshine.capital/?aff=<span class="active-aff-preview text-[#ff4800] font-bold">WILD_CAT_01</span></strong></p>
+                                    <p>Best,<br>[Your Name]<br>Strategic Pipeline Specialist</p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- URL BUILDER MODULE -->
+                    <div id="section-builder" class="vault-section space-y-4">
+                        <h3 class="font-black text-lg tracking-widest text-[#ff4800] uppercase">// UTM ENGINE ROUTING BUILDER</h3>
+                        
+                        <div class="bg-zinc-950 p-6 border-4 border-white space-y-6">
+                            <p class="text-xs font-mono text-zinc-400">// GENERATE HIGH-PERFORMANCE PARAMETERS FOR CONVERSIONS TRACKING</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-black uppercase tracking-widest mb-1 text-zinc-400">CAMPAIGN SOURCE (e.g. twitter, linkedin, email)</label>
+                                    <input type="text" id="utm-source" oninput="buildUTMLink()" placeholder="twitter" class="w-full bg-black text-white font-black p-3 border-4 border-white focus:outline-none focus:border-[#ff4800] uppercase placeholder-zinc-800">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-black uppercase tracking-widest mb-1 text-zinc-400">CAMPAIGN MEDIUM (e.g. organic, cpc, newsletter)</label>
+                                    <input type="text" id="utm-medium" oninput="buildUTMLink()" placeholder="organic" class="w-full bg-black text-white font-black p-3 border-4 border-white focus:outline-none focus:border-[#ff4800] uppercase placeholder-zinc-800">
+                                </div>
+                            </div>
+
+                            <div class="border-4 border-dashed border-[#ff4800] p-4 bg-black space-y-2">
+                                <span class="block text-xs font-mono text-[#ff4800]">// GENERATED UTM CAMPAIGN ROUTE URL</span>
+                                <div class="font-mono text-sm md:text-lg font-black break-all select-all text-white bg-zinc-950 p-3 border-2 border-zinc-800 relative">
+                                    <span id="final-utm-url">https://moonshine.capital/?aff=WILD_CAT_01&utm_source=twitter&utm_medium=organic</span>
+                                </div>
+                                <button onclick="copyGeneratedUTM(this)" class="bg-[#ff4800] text-black font-black text-xs px-4 py-2 hover:bg-white transition-colors border-2 border-black uppercase">
+                                    COPY ROUTE URL TO CLIPBOARD ⚡
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- MAIN FOOTER CONTROLS -->
+            <div class="border-t-4 border-white mt-8 pt-4 flex flex-col md:flex-row justify-between items-center text-xs font-mono gap-4 relative z-10">
+                <span class="text-zinc-500">VAULT KEY: PUBLIC-DIST-SECURE-V3</span>
+                <span class="bg-white text-black font-black px-2 py-0.5">MODE: RAW PROMOTIONS</span>
+                <span class="text-zinc-500">MOONSHINE CAPITAL © All Rules Retained.</span>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        let affiliateID = 'WILD_CAT_01';
+
+        // Sync Sidebar input with live elements
+        function syncAffiliateID() {
+            const input = document.getElementById('sidebar-aff-id');
+            // Clean up ID inputs (only alphanumeric and hyphens/underscores)
+            let cleanedVal = input.value.trim().toUpperCase().replace(/[^A-Z0-9-_]/g, '');
+            affiliateID = cleanedVal || 'WILD_CAT_01';
+            
+            // Update preview tags
+            const previews = document.querySelectorAll('.active-aff-preview');
+            previews.forEach(preview => {
+                preview.innerText = affiliateID;
+            });
+
+            // Update log message
+            addLog(`AFFILIATE ROUTE ID REDIRECTED TO: ${affiliateID}`);
+
+            // Rebuild UTM if on that view
+            buildUTMLink();
+        }
+
+        // Live UTM Link builder
+        function buildUTMLink() {
+            const source = document.getElementById('utm-source').value.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '') || 'twitter';
+            const medium = document.getElementById('utm-medium').value.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '') || 'organic';
+            
+            const generatedURL = `https://moonshine.capital/?aff=${affiliateID}&utm_source=${source}&utm_medium=${medium}`;
+            document.getElementById('final-utm-url').innerText = generatedURL;
+        }
+
+        // Copy plain string to clipboard
+        function copyToClipboard(text, btnElement) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = btnElement.innerText;
+                btnElement.innerText = "COPIED! ⚡";
+                btnElement.classList.add('bg-[#00ff66]', 'text-black');
+                addLog(`LINK COPIED: ${text}`);
+                setTimeout(() => {
+                    btnElement.innerText = originalText;
+                    btnElement.classList.remove('bg-[#00ff66]', 'text-black');
+                }, 1200);
+            }).catch(err => {
+                alert('Could not copy link.');
+            });
+        }
+
+        // Copy contents of a text block
+        function copyTextContainer(containerId, btnElement) {
+            const target = document.getElementById(containerId);
+            // get plain text, clean spacing
+            let text = target.innerText || target.textContent;
+            text = text.replace(/\s+/g, ' ').trim();
+
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = btnElement.innerText;
+                btnElement.innerText = "COPIED TO CLIPBOARD! ⚡";
+                btnElement.classList.add('bg-[#00ff66]', 'text-black');
+                addLog(`SWIPE PACK SAVED TO CLIPBOARD.`);
+                setTimeout(() => {
+                    btnElement.innerText = originalText;
+                    btnElement.classList.remove('bg-[#00ff66]', 'text-black');
+                }, 1200);
+            }).catch(err => {
+                alert('Copy failed.');
+            });
+        }
+
+        // Copy generated UTM link
+        function copyGeneratedUTM(btnElement) {
+            const urlText = document.getElementById('final-utm-url').innerText;
+            navigator.clipboard.writeText(urlText).then(() => {
+                const originalText = btnElement.innerText;
+                btnElement.innerText = "ROUTE SECURED! ⚡";
+                btnElement.classList.add('bg-[#00ff66]', 'text-black');
+                addLog(`UTM URL GENERATED & COPIED: ${urlText}`);
+                setTimeout(() => {
+                    btnElement.innerText = originalText;
+                    btnElement.classList.remove('bg-[#00ff66]', 'text-black');
+                }, 1200);
+            });
+        }
+
+        // Switch filter tabs
+        function switchTab(tabType) {
+            // Reset tab styles
+            document.querySelectorAll('.tab-filter').forEach(btn => {
+                btn.className = "tab-filter bg-black text-white font-black p-2 text-xs uppercase border-4 border-white hover:bg-[#ff4800] hover:text-black transition-colors focus:outline-none";
+            });
+
+            // Set active style
+            const activeTabBtn = document.getElementById(`tab-${tabType}`);
+            if (activeTabBtn) {
+                activeTabBtn.className = "tab-filter bg-[#ff4800] text-black font-black p-2 text-xs uppercase border-4 border-white hover:bg-white hover:text-black transition-colors focus:outline-none";
+            }
+
+            // Show/Hide sections
+            const sections = document.querySelectorAll('.vault-section');
+            sections.forEach(section => {
+                section.classList.add('hidden');
+            });
+
+            if (tabType === 'all') {
+                sections.forEach(section => {
+                    section.classList.remove('hidden');
+                });
+                addLog("SHOWING ALL DEPLOYED ASSET CLASSES.");
+            } else {
+                document.getElementById(`section-${tabType}`).classList.remove('hidden');
+                addLog(`FILTER APPLIED: ${tabType.toUpperCase()}`);
+            }
+        }
+
+        // Mock Download Trigger
+        function triggerDownload(fileName) {
+            alert(`Initializing high-speed raw vector/render pull: ${fileName}`);
+            addLog(`DOWNLOADED FILE: ${fileName}`);
+        }
+
+        // Dynamic System Logger helper
+        function addLog(text) {
+            const logBox = document.getElementById('log-messages');
+            logBox.innerHTML += `<p><span class="text-[#00ff66] font-bold">&gt;</span> ${text.toUpperCase()}</p>`;
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        // Init page
+        syncAffiliateID();
+    </script>
+</body>
+</html>

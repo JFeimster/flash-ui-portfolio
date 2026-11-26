@@ -1,0 +1,536 @@
+:root {
+  --matte-black: #0D0D0D;
+  --bone-white: #F4F4F0;
+  --electric-green: #39FF14;
+  --signal-orange: #FF5A09;
+  --cobalt-blue: #0047AB;
+  --graphite-gray: #1C1C1C;
+  --border-gray: #2D2D2D;
+  --text-muted: #8E8E93;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  
+  --neo-border: 3px solid var(--matte-black);
+  --neo-shadow: 6px 6px 0px 0px var(--matte-black);
+  --neo-shadow-sm: 3px 3px 0px 0px var(--matte-black);
+  --neo-shadow-green: 6px 6px 0px 0px var(--electric-green);
+  --neo-shadow-orange: 6px 6px 0px 0px var(--signal-orange);
+  --neo-shadow-blue: 6px 6px 0px 0px var(--cobalt-blue);
+  
+  --transition-fast: 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* --------------------------------------------------------------------------
+   1. DOCUMENT PAGE GRID LAYOUT
+   -------------------------------------------------------------------------- */
+.locker-container {
+  max-width: 1200px;
+  margin: 40px auto 80px auto;
+  padding: 0 24px;
+}
+
+.locker-header-block {
+  background-color: var(--matte-black);
+  color: var(--bone-white);
+  border: var(--neo-border);
+  box-shadow: var(--neo-shadow-orange);
+  padding: 40px;
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.locker-header-block::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 100%;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(255, 90, 9, 0.15),
+    rgba(255, 90, 9, 0.15) 10px,
+    transparent 10px,
+    transparent 20px
+  );
+  pointer-events: none;
+}
+
+.locker-title {
+  font-family: var(--font-sans);
+  font-size: clamp(28px, 4vw, 42px);
+  text-transform: uppercase;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+
+.locker-title span {
+  color: var(--signal-orange);
+  font-family: var(--font-mono);
+  display: inline-block;
+}
+
+.locker-subtitle {
+  font-size: clamp(14px, 1.8vw, 16px);
+  color: rgba(244, 244, 240, 0.8);
+  max-width: 750px;
+  line-height: 1.6;
+}
+
+/* Lane Selector / Tabs System */
+.lane-nav-wrapper {
+  margin-bottom: 32px;
+  border-bottom: 3px solid var(--matte-black);
+  padding-bottom: 2px;
+}
+
+.lane-nav-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.lane-tab-btn {
+  background-color: var(--bone-white);
+  color: var(--matte-black);
+  border: var(--neo-border);
+  border-bottom: none;
+  padding: 14px 24px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+  top: 3px;
+}
+
+.lane-tab-btn:hover {
+  background-color: white;
+  transform: translateY(-2px);
+}
+
+.lane-tab-btn.active {
+  background-color: var(--electric-green);
+  color: var(--matte-black);
+  box-shadow: 4px -4px 0px 0px var(--matte-black);
+  top: 0;
+  padding-bottom: 17px;
+  z-index: 2;
+}
+
+/* Dual Column Locker Engine */
+.locker-engine-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 991px) {
+  .locker-engine-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   2. READINESS GAUGES & SIDEBAR STATS
+   -------------------------------------------------------------------------- */
+.readiness-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: sticky;
+  top: 100px;
+}
+
+.sidebar-card {
+  background-color: white;
+  border: var(--neo-border);
+  box-shadow: var(--neo-shadow);
+  padding: 28px;
+}
+
+.sidebar-card-title {
+  font-size: 18px;
+  font-weight: 900;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--matte-black);
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sidebar-card-title i {
+  color: var(--cobalt-blue);
+}
+
+/* Linear & Circular Progress Indicators */
+.gauge-metric-container {
+  text-align: center;
+  padding: 16px 0;
+}
+
+.gauge-progress-bar-wrap {
+  width: 100%;
+  height: 24px;
+  background-color: var(--bone-white);
+  border: var(--neo-border);
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.gauge-progress-bar-fill {
+  height: 100%;
+  width: 0%;
+  background-color: var(--electric-green);
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gauge-percentage-text {
+  font-family: var(--font-mono);
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--matte-black);
+}
+
+.gauge-status-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-top: 4px;
+  display: block;
+}
+
+/* Mini Statistics Grid */
+.mini-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.mini-stat-box {
+  background-color: var(--bone-white);
+  border: 1px solid var(--matte-black);
+  padding: 12px;
+  text-align: center;
+}
+
+.mini-stat-value {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 800;
+  display: block;
+}
+
+.mini-stat-lbl {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* Interactive Lock Banner */
+.audit-lock-banner {
+  background-color: var(--cobalt-blue);
+  color: var(--bone-white);
+  border: var(--neo-border);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.audit-lock-banner p {
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(244, 244, 240, 0.9);
+}
+
+/* --------------------------------------------------------------------------
+   3. CHECKLIST INTERACTIVE DOCK & CARDS
+   -------------------------------------------------------------------------- */
+.checklist-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.doc-card {
+  background-color: white;
+  border: var(--neo-border);
+  box-shadow: var(--neo-shadow-sm);
+  padding: 28px;
+  transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.doc-card:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: var(--neo-shadow);
+}
+
+/* Finished / Checked state */
+.doc-card.completed {
+  border-color: var(--electric-green);
+  box-shadow: 4px 4px 0px 0px var(--electric-green);
+}
+
+.doc-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+/* Interactive Checkbox Control */
+.doc-checkbox-wrapper {
+  position: relative;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+}
+
+.doc-checkbox-input {
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  z-index: 2;
+  margin: 0;
+}
+
+.doc-custom-box {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: var(--neo-border);
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.doc-checkbox-input:checked + .doc-custom-box {
+  background-color: var(--electric-green);
+  border-color: var(--matte-black);
+}
+
+.doc-checkbox-input:checked + .doc-custom-box::after {
+  content: '\f00c';
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  color: var(--matte-black);
+  font-size: 14px;
+}
+
+.doc-checkbox-input:focus + .doc-custom-box {
+  outline: 2px solid var(--cobalt-blue);
+}
+
+/* Document Meta-text */
+.doc-info {
+  flex: 1;
+}
+
+.doc-title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.doc-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--matte-black);
+}
+
+.doc-badge-required {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  background-color: var(--matte-black);
+  color: var(--bone-white);
+  font-weight: 700;
+}
+
+.doc-badge-optional {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  background-color: var(--bone-white);
+  color: var(--text-muted);
+  border: 1px solid var(--text-muted);
+  font-weight: 700;
+}
+
+.doc-description {
+  font-size: 13px;
+  color: rgba(13, 13, 13, 0.75);
+  line-height: 1.5;
+}
+
+/* Custom Upload Zone */
+.doc-upload-zone {
+  border: 2px dashed var(--matte-black);
+  background-color: var(--bone-white);
+  padding: 20px;
+  text-align: center;
+  position: relative;
+  transition: background-color var(--transition-fast);
+  cursor: pointer;
+}
+
+.doc-upload-zone:hover {
+  background-color: #ECECE6;
+}
+
+.doc-upload-zone input[type="file"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.upload-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+  color: var(--text-muted);
+}
+
+.upload-prompt {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--matte-black);
+}
+
+.upload-prompt span {
+  text-decoration: underline;
+  color: var(--cobalt-blue);
+}
+
+.upload-specs {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Locked Files / Queue Listing */
+.uploaded-files-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.uploaded-file-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background-color: var(--matte-black);
+  color: var(--bone-white);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.uploaded-file-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.uploaded-file-name i {
+  color: var(--electric-green);
+}
+
+.uploaded-file-delete {
+  background: none;
+  border: none;
+  color: var(--signal-orange);
+  cursor: pointer;
+  padding: 4px;
+  font-size: 12px;
+  transition: transform var(--transition-fast);
+}
+
+.uploaded-file-delete:hover {
+  transform: scale(1.15);
+}
+
+/* Underwriting Prep Guidelines block */
+.compliance-tip-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(13, 13, 13, 0.15);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.compliance-tip-row i {
+  color: var(--signal-orange);
+}
+
+/* --------------------------------------------------------------------------
+   4. GENERAL UTILITY STYLES
+   -------------------------------------------------------------------------- */
+.badge-zone-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--matte-black);
+  color: var(--electric-green);
+  border: 1px solid var(--border-gray);
+  padding: 4px 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+/* Lock Action Buttons wrapper */
+.locker-action-buttons {
+  display: flex;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.locker-action-buttons .btn {
+  flex: 1;
+}
+
+@media (max-width: 480px) {
+  .locker-action-buttons {
+    flex-direction: column;
+  }
+}

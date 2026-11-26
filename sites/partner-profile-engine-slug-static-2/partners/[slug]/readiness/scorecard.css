@@ -1,0 +1,240 @@
+:root {
+    --matteblack: #0D0D0D;
+    --bonewhite: #F4F3EF;
+    --electricgreen: #00E676;
+    --signalorange: #FF6D00;
+    --cobaltblue: #2979FF;
+    --graphitegray: #1E1E1E;
+    --softgray: #2C2C2C;
+    --accentgold: #D4AF37;
+    
+    --score-percent: 0;
+}
+
+/* Base Body Modifications for Scorecard */
+.scorecard-container {
+    background-color: var(--matteblack);
+    color: var(--bonewhite);
+}
+
+/* Custom Conic Gradient Radial Gauge */
+.score-radial-gauge {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(closest-side, var(--matteblack) 82%, transparent 83% 100%),
+                conic-gradient(var(--gauge-color, var(--electricgreen)) calc(var(--score-percent) * 1%), var(--softgray) 0);
+    box-shadow: 0 0 0 4px var(--graphitegray), 6px 6px 0px 0px var(--gauge-shadow, var(--electricgreen));
+    transition: background 0.5s cubic-bezier(0.19, 1, 0.22, 1), box-shadow 0.5s ease-out;
+}
+
+.score-radial-gauge::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 2px dashed rgba(244, 243, 239, 0.15);
+    pointer-events: none;
+    animation: rotateDashed 40s linear infinite;
+}
+
+@keyframes rotateDashed {
+    100% { transform: rotate(360deg); }
+}
+
+/* Neobrutalist Range Sliders */
+.neo-range-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 14px;
+    background: var(--graphitegray);
+    border: 2px solid var(--bonewhite);
+    box-shadow: 3px 3px 0px 0px rgba(244, 243, 239, 0.2);
+    outline: none;
+    transition: all 0.15s ease;
+}
+
+.neo-range-slider:focus {
+    box-shadow: 4px 4px 0px 0px var(--electricgreen);
+    border-color: var(--electricgreen);
+}
+
+.neo-range-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 26px;
+    height: 26px;
+    background: var(--bonewhite);
+    border: 2px solid var(--matteblack);
+    cursor: grab;
+    box-shadow: -3px 3px 0px 0px var(--electricgreen);
+    transition: transform 0.1s ease, background-color 0.2s ease;
+}
+
+.neo-range-slider::-webkit-slider-thumb:active {
+    cursor: grabbing;
+    background: var(--electricgreen);
+    transform: scale(0.95);
+}
+
+.neo-range-slider::-moz-range-thumb {
+    width: 26px;
+    height: 26px;
+    background: var(--bonewhite);
+    border: 2px solid var(--matteblack);
+    cursor: grab;
+    box-shadow: -3px 3px 0px 0px var(--electricgreen);
+    transition: transform 0.1s ease, background-color 0.2s ease;
+}
+
+.neo-range-slider::-moz-range-thumb:active {
+    cursor: grabbing;
+    background: var(--electricgreen);
+    transform: scale(0.95);
+}
+
+/* Metric Selection Cards (Radio / Interactive) */
+.metric-option-card {
+    position: relative;
+    background-color: var(--graphitegray);
+    border: 2px solid var(--softgray);
+    box-shadow: 4px 4px 0px 0px var(--matteblack);
+    transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                box-shadow 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                border-color 0.2s ease;
+    cursor: pointer;
+}
+
+.metric-option-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px 0px var(--cobaltblue);
+    border-color: var(--bonewhite);
+}
+
+.metric-option-card.is-selected {
+    transform: translate(-4px, -4px);
+    box-shadow: 8px 8px 0px 0px var(--electricgreen);
+    border-color: var(--electricgreen);
+    background-color: #121815;
+}
+
+/* Active State Badge Indicators */
+.status-indicator-badge {
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.status-indicator-badge::before {
+    content: '';
+    position: absolute;
+    left: 0.35rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--badge-status-color, var(--electricgreen));
+}
+
+.status-indicator-badge.pulse-active::before {
+    animation: scorePulse 2s infinite ease-in-out;
+}
+
+@keyframes scorePulse {
+    0% { box-shadow: 0 0 0 0px rgba(0, 230, 118, 0.7); }
+    100% { box-shadow: 0 0 0 8px rgba(0, 230, 118, 0); }
+}
+
+/* Checklist and Priority Action List Styles */
+.priority-action-item {
+    border-left: 4px solid var(--action-priority-color, var(--signalorange));
+    background: linear-gradient(90deg, rgba(30, 30, 30, 0.6) 0%, rgba(13, 13, 13, 0) 100%);
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.priority-action-item:hover {
+    transform: translateX(4px);
+    background: linear-gradient(90deg, rgba(44, 44, 44, 0.8) 0%, rgba(13, 13, 13, 0.2) 100%);
+}
+
+/* Program Match Overlay & Cards */
+.program-match-card {
+    border: 2px solid var(--graphitegray);
+    box-shadow: 4px 4px 0px var(--matteblack);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.program-match-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--bonewhite);
+    box-shadow: 8px 8px 0px var(--cobaltblue);
+}
+
+.program-match-card.highly-recommended {
+    border-color: var(--electricgreen);
+    box-shadow: 6px 6px 0px var(--electricgreen);
+}
+
+.program-match-card.highly-recommended:hover {
+    box-shadow: 10px 10px 0px var(--electricgreen);
+}
+
+/* Custom Grid Decorative Background */
+.scorecard-grid-bg {
+    background-image: linear-gradient(to right, #1f1f1f 1px, transparent 1px),
+                      linear-gradient(to bottom, #1f1f1f 1px, transparent 1px);
+    background-size: 3rem 3rem;
+    mask-image: radial-gradient(ellipse 60% 50% at 50% 50%, #000 60%, transparent 100%);
+    opacity: 0.15;
+    pointer-events: none;
+}
+
+/* Animation Frameworks */
+.animate-slide-up {
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-number-grow {
+    animation: numberScale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes numberScale {
+    0% { transform: scale(0.9); }
+    100% { transform: scale(1); }
+}
+
+/* Print Styling Support (Clean PDFs of Scores) */
+@media print {
+    body {
+        background: white !important;
+        color: black !important;
+    }
+    .scorecard-container, .metric-option-card, .score-radial-gauge {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+        background: white !important;
+        color: black !important;
+    }
+    .score-radial-gauge {
+        background: conic-gradient(#00E676 calc(var(--score-percent) * 1%), #eee 0) !important;
+    }
+    .no-print {
+        display: none !important;
+    }
+}

@@ -1,0 +1,924 @@
+```html
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capital_Vault | Submit Live Transaction Pipeline</title>
+  
+  <!-- Inter & Plus Jakarta Sans Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#312e81',
+              accent: '#818cf8'
+            },
+            darkbg: '#090D16',
+            panelbg: 'rgba(17, 24, 39, 0.7)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #090D16;
+      color: #F3F4F6;
+      overflow-x: hidden;
+    }
+    
+    .glow-orb-1 {
+      position: absolute;
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, rgba(99, 102, 241, 0) 70%);
+      top: -15%;
+      right: -10%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .glow-orb-2 {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0) 70%);
+      bottom: -10%;
+      left: -10%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .glass-panel {
+      background: rgba(13, 20, 35, 0.65);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .glass-input {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #FFFFFF;
+    }
+    .glass-input:focus {
+      border-color: rgba(99, 102, 241, 0.6);
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+    }
+
+    /* Custom input placeholder styling */
+    .glass-input::placeholder {
+      color: #6B7280;
+    }
+
+    /* Custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.3);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(99, 102, 241, 0.3);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="font-sans antialiased" x-data="dealSubmissionWizard()">
+
+  <!-- Background Decorative Orbs -->
+  <div class="glow-orb-1"></div>
+  <div class="glow-orb-2"></div>
+
+  <!-- Main Grid Wrapper -->
+  <div class="relative z-10 flex flex-col min-h-screen">
+    
+    <!-- Top Premium Navigation -->
+    <header class="w-full glass-panel border-b border-gray-800/40 px-6 py-4 sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto flex items-center justify-between">
+        
+        <!-- Logo & Brand -->
+        <a href="index.html" class="flex items-center space-x-3 group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-all duration-350">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="font-display font-extrabold text-lg tracking-tight flex items-center space-x-2">
+              <span>Capital<span class="text-brand-500">_Vault</span></span>
+            </div>
+            <p class="text-[10px] text-gray-400 tracking-widest uppercase">Institutional Capital Pipeline</p>
+          </div>
+        </a>
+
+        <!-- Directory Metrics Banner -->
+        <div class="hidden lg:flex items-center space-x-8 text-xs font-medium text-gray-300">
+          <div class="flex items-center space-x-2">
+            <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+            <span>DEAL PIPELINE: <span class="font-bold text-white">LIVE MULTI-QUOTE REQUEST</span></span>
+          </div>
+          <div class="h-4 w-px bg-gray-800"></div>
+          <div>
+            <span>AVERAGE OFFERS: <span class="font-bold text-emerald-400">4.2 CO-SHEETS / DEAL</span></span>
+          </div>
+          <div class="h-4 w-px bg-gray-800"></div>
+          <div>
+            <span>SYSTEM AUDIT: <span class="font-bold text-white">SECURE 256-BIT PIPELINE</span></span>
+          </div>
+        </div>
+
+        <!-- Custom Action / Settings -->
+        <div class="flex items-center space-x-4">
+          <a href="index.html" class="px-4 py-2 bg-gray-800/80 text-gray-300 hover:bg-gray-700/80 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200">
+            <span class="flex items-center space-x-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+              </svg>
+              <span>Back to Directory</span>
+            </span>
+          </a>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Main Workspace Content -->
+    <main class="flex-1 max-w-5xl w-full mx-auto px-4 lg:px-6 py-8 lg:py-12">
+      
+      <!-- Stepper Progress Header -->
+      <div class="mb-10" x-show="step <= 4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+          <div>
+            <span class="text-xs font-extrabold text-brand-400 uppercase tracking-widest">Multi-Lender Quote Engine</span>
+            <h1 class="text-2xl lg:text-3.5xl font-extrabold text-white font-display mt-1">Broadcast Your Transaction</h1>
+          </div>
+          <div class="text-xs text-gray-400 font-mono">
+            Transaction Identifier: <span class="text-brand-400 font-bold" x-text="dealId"></span>
+          </div>
+        </div>
+
+        <!-- Progress Nodes Matrix -->
+        <div class="grid grid-cols-4 gap-2 relative">
+          <!-- Step 1 Indicator -->
+          <div class="relative py-3 border-t-2 transition-all duration-300" 
+               :class="step >= 1 ? 'border-brand-500' : 'border-gray-800'">
+            <p class="text-[10px] font-bold uppercase tracking-wider" :class="step >= 1 ? 'text-brand-400' : 'text-gray-500'">Step 01</p>
+            <p class="text-xs font-semibold text-white mt-1 hidden sm:block">Deal Profile</p>
+          </div>
+
+          <!-- Step 2 Indicator -->
+          <div class="relative py-3 border-t-2 transition-all duration-300"
+               :class="step >= 2 ? 'border-brand-500' : 'border-gray-800'">
+            <p class="text-[10px] font-bold uppercase tracking-wider" :class="step >= 2 ? 'text-brand-400' : 'text-gray-500'">Step 02</p>
+            <p class="text-xs font-semibold text-white mt-1 hidden sm:block">Capital Metrics</p>
+          </div>
+
+          <!-- Step 3 Indicator -->
+          <div class="relative py-3 border-t-2 transition-all duration-300"
+               :class="step >= 3 ? 'border-brand-500' : 'border-gray-800'">
+            <p class="text-[10px] font-bold uppercase tracking-wider" :class="step >= 3 ? 'text-brand-400' : 'text-gray-500'">Step 03</p>
+            <p class="text-xs font-semibold text-white mt-1 hidden sm:block">Underwriting Files</p>
+          </div>
+
+          <!-- Step 4 Indicator -->
+          <div class="relative py-3 border-t-2 transition-all duration-300"
+               :class="step >= 4 ? 'border-brand-500' : 'border-gray-800'">
+            <p class="text-[10px] font-bold uppercase tracking-wider" :class="step >= 4 ? 'text-brand-400' : 'text-gray-500'">Step 04</p>
+            <p class="text-xs font-semibold text-white mt-1 hidden sm:block">Lender Match</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 1: TRANSACTION PROFILE -->
+      <div x-show="step === 1" x-transition class="glass-panel rounded-3xl p-6 lg:p-10 space-y-8">
+        <div>
+          <h2 class="text-xl font-bold text-white tracking-tight">Tell us about the transaction</h2>
+          <p class="text-sm text-gray-400 mt-1">Specify transaction parameters to query appropriate high-liquidity capital providers.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- Loan Type -->
+          <div>
+            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Loan Program Type</label>
+            <select x-model="deal.loanType" class="w-full glass-input text-sm rounded-xl px-4 py-3.5 focus:outline-none appearance-none cursor-pointer">
+              <option value="" disabled selected>Select active program...</option>
+              <option value="Fix and Flip Loans">Fix and Flip Loans</option>
+              <option value="Bridge Loans">Bridge Loans</option>
+              <option value="Investment Property Loans">Investment Property / Buy and Hold</option>
+              <option value="New Construction Loans">New Construction Loans</option>
+              <option value="Refinance / Cash Out Loans">Refinance / Cash Out Loans</option>
+            </select>
+          </div>
+
+          <!-- Property Class -->
+          <div>
+            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Property Asset Class</label>
+            <select x-model="deal.propertyClass" class="w-full glass-input text-sm rounded-xl px-4 py-3.5 focus:outline-none appearance-none cursor-pointer">
+              <option value="" disabled selected>Select property class...</option>
+              <option value="Single Family">Single Family Residence</option>
+              <option value="Multi Family">Multi Family Residence</option>
+              <option value="Apartment">Apartment Complex</option>
+              <option value="Office">Commercial Office</option>
+              <option value="Retail">Retail Storefront</option>
+              <option value="Industrial">Industrial / Warehouse</option>
+              <option value="Land">Raw Land / Development</option>
+            </select>
+          </div>
+
+          <!-- Deal Street Address -->
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Property Address</label>
+            <input type="text" x-model="deal.address" placeholder="e.g. 515 South Flower Street, 44th Floor" class="w-full glass-input text-sm rounded-xl px-4 py-3.5 focus:outline-none">
+          </div>
+
+          <!-- City -->
+          <div>
+            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">City</label>
+            <input type="text" x-model="deal.city" placeholder="e.g. Los Angeles" class="w-full glass-input text-sm rounded-xl px-4 py-3.5 focus:outline-none">
+          </div>
+
+          <!-- State -->
+          <div>
+            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Target Geographic State</label>
+            <select x-model="deal.state" class="w-full glass-input text-sm rounded-xl px-4 py-3.5 focus:outline-none appearance-none cursor-pointer">
+              <option value="" disabled selected>Select state...</option>
+              <template x-for="state in statesList" :key="state">
+                <option :value="state" x-text="state"></option>
+              </template>
+            </select>
+          </div>
+
+          <!-- Brief Summary -->
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Executive Overview of the Transaction</label>
+            <textarea x-model="deal.description" rows="4" placeholder="Detail any critical factors such as purchase urgency, sponsor experience, exit strategy..." class="w-full glass-input text-sm rounded-xl p-4 focus:outline-none"></textarea>
+          </div>
+
+        </div>
+
+        <!-- Wizard Navigation Actions -->
+        <div class="pt-6 border-t border-gray-800/40 flex justify-end">
+          <button @click="nextStep(2)" :disabled="!validateStep1()" class="px-6 py-3.5 bg-brand-600 hover:bg-brand-500 disabled:opacity-40 disabled:hover:bg-brand-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all duration-200 shadow-lg shadow-brand-600/20">
+            Proceed to Capital Metrics
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 2: CAPITAL METRICS & FINANCIALS -->
+      <div x-show="step === 2" x-transition class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Form Fields -->
+        <div class="lg:col-span-2 glass-panel rounded-3xl p-6 lg:p-10 space-y-8">
+          <div>
+            <h2 class="text-xl font-bold text-white tracking-tight">Financial Pipeline Architecture</h2>
+            <p class="text-sm text-gray-400 mt-1">Provide exact asset valuations to dynamically calculate leverage limits.</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            
+            <!-- Purchase Price -->
+            <div>
+              <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Purchase Price ($)</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 font-bold">$</span>
+                <input type="number" x-model.number="deal.purchasePrice" placeholder="0.00" class="w-full glass-input pl-8 pr-4 py-3.5 text-sm rounded-xl focus:outline-none">
+              </div>
+            </div>
+
+            <!-- Requested Loan Amount -->
+            <div>
+              <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Requested Capital / Loan Amount ($)</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 font-bold">$</span>
+                <input type="number" x-model.number="deal.loanAmount" placeholder="0.00" class="w-full glass-input pl-8 pr-4 py-3.5 text-sm rounded-xl focus:outline-none">
+              </div>
+            </div>
+
+            <!-- Estimated Rehab Budget -->
+            <div>
+              <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2 flex justify-between">
+                <span>Estimated Rehab Cost ($)</span>
+                <span class="text-gray-500 text-[10px]">Optional</span>
+              </label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 font-bold">$</span>
+                <input type="number" x-model.number="deal.rehabBudget" placeholder="0.00" class="w-full glass-input pl-8 pr-4 py-3.5 text-sm rounded-xl focus:outline-none">
+              </div>
+            </div>
+
+            <!-- Estimated After Repair Value (ARV) -->
+            <div>
+              <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2 flex justify-between">
+                <span>Est. ARV / Valuation ($)</span>
+                <span class="text-gray-500 text-[10px]">Required</span>
+              </label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 font-bold">$</span>
+                <input type="number" x-model.number="deal.arv" placeholder="0.00" class="w-full glass-input pl-8 pr-4 py-3.5 text-sm rounded-xl focus:outline-none">
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Wizard Navigation Actions -->
+          <div class="pt-6 border-t border-gray-800/40 flex justify-between items-center">
+            <button @click="step = 1" class="px-5 py-3.5 bg-gray-900 hover:bg-gray-800 text-gray-300 text-xs font-bold uppercase tracking-wider rounded-xl transition duration-200">
+              Previous Step
+            </button>
+            <button @click="nextStep(3)" :disabled="!validateStep2()" class="px-6 py-3.5 bg-brand-600 hover:bg-brand-500 disabled:opacity-40 disabled:hover:bg-brand-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all duration-200 shadow-lg shadow-brand-600/20">
+              Proceed to Underwriting Files
+            </button>
+          </div>
+        </div>
+
+        <!-- Realtime Calculators Sandbox Widget (Highly interactive!) -->
+        <div class="space-y-6">
+          <div class="glass-panel rounded-3xl p-6 border-brand-500/15 relative overflow-hidden">
+            <div class="absolute -right-16 -top-16 w-32 h-32 bg-brand-500/10 rounded-full blur-2xl"></div>
+            
+            <h3 class="text-xs uppercase tracking-widest text-brand-400 font-bold mb-5">Estimated Underwriting Limits</h3>
+            
+            <div class="space-y-5">
+              
+              <!-- Calculated Loan-To-Value (LTV) -->
+              <div class="p-4 bg-gray-900/60 rounded-2xl border border-gray-800/50">
+                <div class="flex justify-between items-baseline">
+                  <span class="text-[10px] text-gray-400 uppercase tracking-wider">Loan-to-Value (LTV)</span>
+                  <span class="text-xl font-extrabold" :class="calculateLTV() > 85 ? 'text-amber-400' : 'text-emerald-400'" x-text="calculateLTV() > 0 ? calculateLTV() + '%' : '0.0%'"></span>
+                </div>
+                <!-- Mini Progress Bar -->
+                <div class="w-full bg-gray-800 h-1.5 rounded-full mt-3 overflow-hidden">
+                  <div class="h-full rounded-full transition-all duration-500"
+                       :class="calculateLTV() > 85 ? 'bg-amber-400' : 'bg-emerald-400'"
+                       :style="'width: ' + Math.min(calculateLTV(), 100) + '%'"></div>
+                </div>
+                <p class="text-[10px] text-gray-500 mt-2" x-text="calculateLTV() > 85 ? 'Highly leveraged. Eligible for premium yield programs.' : 'Good equity margin. Broad lender matching likelihood.'"></p>
+              </div>
+
+              <!-- Calculated Loan-to-Cost (LTC) -->
+              <div class="p-4 bg-gray-900/60 rounded-2xl border border-gray-800/50">
+                <div class="flex justify-between items-baseline">
+                  <span class="text-[10px] text-gray-400 uppercase tracking-wider">Loan-to-Cost (LTC)</span>
+                  <span class="text-xl font-extrabold text-indigo-400" x-text="calculateLTC() > 0 ? calculateLTC() + '%' : '0.0%'"></span>
+                </div>
+                <!-- Mini Progress Bar -->
+                <div class="w-full bg-gray-800 h-1.5 rounded-full mt-3 overflow-hidden">
+                  <div class="h-full bg-indigo-500 rounded-full transition-all duration-500"
+                       :style="'width: ' + Math.min(calculateLTC(), 100) + '%'"></div>
+                </div>
+              </div>
+
+              <!-- Total Transaction Cost -->
+              <div class="p-4 bg-gray-900/40 rounded-2xl border border-gray-800/30 flex justify-between items-center text-xs">
+                <span class="text-gray-400 uppercase">Capital Leverage Limit</span>
+                <span class="font-bold text-white font-mono" x-text="'$' + formatCurrency(deal.loanAmount)"></span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- STEP 3: UNDERWRITING FILES & PHOTOS -->
+      <div x-show="step === 3" x-transition class="glass-panel rounded-3xl p-6 lg:p-10 space-y-8">
+        <div>
+          <h2 class="text-xl font-bold text-white tracking-tight">Property Media & Underwriting Files</h2>
+          <p class="text-sm text-gray-400 mt-1">Upload property photos, purchase agreements, or appraisal reports to increase conversion speeds.</p>
+        </div>
+
+        <!-- Interactive Drag & Drop Area -->
+        <div class="relative border-2 border-dashed border-gray-800 rounded-2xl p-10 text-center hover:border-brand-500/50 transition duration-200 cursor-pointer"
+             @dragover.prevent="dragover = true"
+             @dragleave.prevent="dragover = false"
+             @drop.prevent="dragover = false; handleDrop($event)"
+             :class="dragover ? 'border-brand-500/80 bg-brand-500/5' : ''"
+             @click="$refs.fileInput.click()">
+          
+          <input type="file" x-ref="fileInput" class="hidden" multiple @change="handleFileSelect($event)">
+          
+          <div class="w-16 h-16 bg-gray-900/80 text-brand-400 rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-800">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+            </svg>
+          </div>
+          <h3 class="text-sm font-bold text-white">Drag & drop files here, or <span class="text-brand-400">browse folders</span></h3>
+          <p class="text-xs text-gray-500 mt-2">Support PNG, JPG, JPEG, and PDF formatting up to 25MB.</p>
+        </div>
+
+        <!-- Uploaded files list simulated visual reactive states -->
+        <div class="space-y-2" x-show="uploadedFiles.length > 0">
+          <p class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Files Queue (<span x-text="uploadedFiles.length"></span>)</p>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <template x-for="(file, index) in uploadedFiles" :key="index">
+              <div class="flex items-center justify-between p-3.5 bg-gray-950/60 rounded-xl border border-gray-900 text-xs">
+                <div class="flex items-center space-x-3 overflow-hidden">
+                  <!-- File Icon type -->
+                  <div class="p-2 bg-gray-900 rounded-lg text-brand-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                  </div>
+                  <div class="truncate">
+                    <p class="font-bold text-gray-200" x-text="file.name"></p>
+                    <p class="text-[10px] text-gray-500" x-text="file.size"></p>
+                  </div>
+                </div>
+                <button @click="removeFile(index)" class="p-1.5 rounded bg-gray-900 hover:bg-gray-850 text-red-400 hover:text-red-300 transition">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                </button>
+              </div>
+            </template>
+          </div>
+        </div>
+
+        <!-- Wizard Navigation Actions -->
+        <div class="pt-6 border-t border-gray-800/40 flex justify-between items-center">
+          <button @click="step = 2" class="px-5 py-3.5 bg-gray-900 hover:bg-gray-800 text-gray-300 text-xs font-bold uppercase tracking-wider rounded-xl transition duration-200">
+            Previous Step
+          </button>
+          <button @click="calculateMatchingLenders(); step = 4" class="px-6 py-3.5 bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all duration-200 shadow-lg shadow-brand-600/20">
+            Proceed to Lender Selection
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 4: LENDER SELECTION MATCHMAKER BOARD -->
+      <div x-show="step === 4" x-transition class="glass-panel rounded-3xl p-6 lg:p-10 space-y-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-white tracking-tight">Select Capital Targets to Broadcast</h2>
+            <p class="text-sm text-gray-400 mt-1">Our algorithm selected the absolute premium lenders compatible with your <span class="text-brand-400 font-semibold" x-text="deal.state"></span> project.</p>
+          </div>
+          <div>
+            <button @click="toggleSelectAllLenders()" class="text-xs bg-gray-900 hover:bg-gray-800 border border-gray-800 px-4 py-2 rounded-xl text-gray-300 font-bold uppercase transition" x-text="selectedLenders.length === matchingLenders.length ? 'Deselect All' : 'Select All matching'"></button>
+          </div>
+        </div>
+
+        <!-- Matching Lenders Grid Selection Frame -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <template x-for="lender in matchingLenders" :key="lender.Lender">
+            <div class="p-5 rounded-2xl border transition duration-150 relative cursor-pointer flex flex-col justify-between"
+                 :class="selectedLenders.includes(lender.Lender) ? 'bg-brand-500/5 border-brand-500/60 shadow-lg shadow-brand-500/5' : 'bg-gray-950/40 border-gray-800 hover:border-gray-700'"
+                 @click="toggleLenderSelection(lender.Lender)">
+              
+              <!-- Checkbox circle indicators -->
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-[10px] bg-brand-500/10 text-brand-300 border border-brand-500/20 px-2 py-0.5 rounded font-bold uppercase" x-text="lender.State || 'National'"></span>
+                
+                <div class="w-5 h-5 rounded-full border flex items-center justify-center transition"
+                     :class="selectedLenders.includes(lender.Lender) ? 'bg-brand-500 border-brand-500 text-white' : 'border-gray-700'">
+                  <svg x-show="selectedLenders.includes(lender.Lender)" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Content details -->
+              <div>
+                <h4 class="text-md font-bold text-white" x-text="lender.Lender"></h4>
+                <p class="text-xs text-gray-400 mt-1 line-clamp-2 leading-relaxed" x-text="lender['About the Lender']"></p>
+              </div>
+
+              <!-- Mini metrics summary footer -->
+              <div class="flex space-x-4 pt-4 mt-4 border-t border-gray-800/40 text-[10px] text-gray-400">
+                <div>
+                  <span class="block text-gray-500 uppercase">CATEGORY</span>
+                  <span class="font-semibold text-gray-200" x-text="lender.LoanType"></span>
+                </div>
+                <div>
+                  <span class="block text-gray-500 uppercase">LOCATION</span>
+                  <span class="font-semibold text-gray-200" x-text="lender.City"></span>
+                </div>
+              </div>
+
+            </div>
+          </template>
+        </div>
+
+        <!-- Wizard Navigation Actions -->
+        <div class="pt-6 border-t border-gray-800/40 flex justify-between items-center">
+          <button @click="step = 3" class="px-5 py-3.5 bg-gray-900 hover:bg-gray-800 text-gray-300 text-xs font-bold uppercase tracking-wider rounded-xl transition duration-200">
+            Previous Step
+          </button>
+          
+          <button @click="startBroadcastRequest()" :disabled="selectedLenders.length === 0" class="px-8 py-4 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:hover:bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition duration-200 shadow-lg shadow-emerald-600/20 flex items-center space-x-2">
+            <svg class="w-4 h-4 text-emerald-100" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            <span x-text="'Broadcast Quote request (' + selectedLenders.length + ')'"></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 5: BROADCASTING ENGINE TERMINAL & SUCCESS SCREEN -->
+      <div x-show="step === 5" x-transition class="glass-panel rounded-3xl p-6 lg:p-10 space-y-8 max-w-2xl mx-auto text-center">
+        
+        <!-- Live Status indicator -->
+        <div class="mx-auto w-24 h-24 rounded-full flex items-center justify-center relative bg-gray-900 border border-gray-800">
+          <template x-if="broadcastSuccess">
+            <div class="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+          </template>
+
+          <template x-if="!broadcastSuccess">
+            <div class="w-16 h-16 bg-brand-500/10 text-brand-400 rounded-full flex items-center justify-center animate-spin">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18"></path>
+              </svg>
+            </div>
+          </template>
+        </div>
+
+        <div>
+          <h2 class="text-2xl font-extrabold text-white tracking-tight" x-text="broadcastSuccess ? 'Transaction Transmitted successfully' : 'Broadcasting Live Quote Request...'"></h2>
+          <p class="text-sm text-gray-400 mt-2 max-w-md mx-auto" x-text="broadcastSuccess ? 'Lenders are auditing your transaction parameters. Expect initial competitive co-sheets within 3 business hours.' : 'Establishing encrypted handshake with direct lending decision systems...'"></p>
+        </div>
+
+        <!-- Simulated live transmission terminal console logs -->
+        <div class="p-5 bg-gray-950/80 border border-gray-900 text-left font-mono rounded-2xl text-xs text-gray-300 space-y-3">
+          <p class="text-gray-500 uppercase tracking-widest text-[10px] border-b border-gray-900 pb-2 mb-2">Secure Broadcast Log Stream</p>
+          <template x-for="log in broadcastLogs" :key="log">
+            <p class="flex items-center space-x-2">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span x-text="log"></span>
+            </p>
+          </template>
+        </div>
+
+        <!-- Success CTA navigation -->
+        <div class="pt-6 border-t border-gray-800/40 flex flex-col sm:flex-row justify-center items-center gap-4" x-show="broadcastSuccess">
+          <a href="index.html" class="px-6 py-3.5 bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition duration-200 shadow-lg shadow-brand-600/20">
+            Return to Pipeline Directory
+          </a>
+          <button @click="resetWizard()" class="px-6 py-3.5 bg-gray-900 hover:bg-gray-800 text-gray-300 text-xs font-bold uppercase tracking-wider rounded-xl transition duration-200">
+            Submit New Deal
+          </button>
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <script>
+    function dealSubmissionWizard() {
+      return {
+        step: 1,
+        dragover: false,
+        dealId: 'TX-' + Math.floor(100000 + Math.random() * 900000),
+        
+        deal: {
+          loanType: '',
+          propertyClass: '',
+          address: '',
+          city: '',
+          state: '',
+          purchasePrice: null,
+          loanAmount: null,
+          rehabBudget: null,
+          arv: null,
+          description: ''
+        },
+
+        uploadedFiles: [],
+        matchingLenders: [],
+        selectedLenders: [],
+        
+        // Broadcast simulation parameters
+        broadcastLogs: [],
+        broadcastSuccess: false,
+
+        statesList: [
+          'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 
+          'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 
+          'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 
+          'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 
+          'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 
+          'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 
+          'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 
+          'Wisconsin', 'Wyoming'
+        ],
+
+        // Comprehensive Lenders Database integrated from original app code
+        lenders: [
+          {
+            "Lender": "Colony American Finance",
+            "About the Lender": "Colony American Finance is a private money lender in Los Angeles, CA providing funding all across the country. They provide loans for a variety of needs and situations, including loans for rental properties and refinancing. Their lending parameters are versatile, including terms between 5 years and 10 years and loan amounts ranging from $500,000 to $100,000,000 with a maximum LTV of 75%. They do not require their borrowers to have a minimum credit rating to obtain a loan. The focus of their lending is for single family and multi-family.",
+            "City": "Anchorage",
+            "Lending Location": "National",
+            "LoanType": "Investment Property Loans",
+            "Property Types": "Multi Family, Single Family",
+            "State": "Alaska"
+          },
+          {
+            "Lender": "Asset Avenue",
+            "About the Lender": "Asset Avenue is private money lender based in Los Angeles, CA. They provide loans in 44 states across the United States. They provide loans for a variety of needs and situations, including short term loans, investment property loans, cash out hard money loans, and fix and flip hard money loans. Their lending guidelines are versatile, including loan amounts ranging from $150,000 to $2,000,000 with a maximum LTV of 85%. They primarily offer funding for single family and multi-family units.",
+            "City": "Birmingham",
+            "Lending Location": "AL, AR, CA, CO, CT, DC, DE, FL, GA, HI, IA, ID, IL, IN, KS, KY, LA, MA, MD, ME, MI, MN, MO, MS, MT, NC, NE, NH, NJ, NM, NY, OH, OK, PA, RI, SC, TN, TX, UT, VA, WA, WI, WV, WY",
+            "LoanType": "Hard Money Loans",
+            "Property Types": "Multi Family, Single Family",
+            "State": "Alabama"
+          },
+          {
+            "Lender": "Source Capital",
+            "About the Lender": "Source Capital is an asset-based lender headquartered in Los Angeles, CA offering loans in California, Arizona, and Minnesota. They provide loans for a variety of situations and needs, including bridge loans, fix-and-flip loans, hard money refinancing, and loans for rental properties. They provide terms up to 3 years, loans with a maximum LTV of 70%, and rates starting at 7.99%. They lend money to all borrowers based on the property value and not on a minimum credit score.",
+            "City": "Phoenix",
+            "Lending Location": "CA, AZ, MN",
+            "LoanType": "Hard Money Loans",
+            "Property Types": "Apartment, Assisted Living, Hotel, Industrial, Medical, Mixed Use, Multi Family, Office, Retail, Single Family, Storage, Warehouse",
+            "State": "Arizona"
+          },
+          {
+            "Lender": "Great Oak Capital",
+            "About the Lender": "Green Oak Capital is a Bala Cynwyd, PA based private money lender. They offer loans throughout Philadelphia County, Chester County, Montgomery County, and Delaware County. They offer rental property loans, short term fix and flip loans, short term loans, and private refinancing. Their lending parameters are flexible, including loan amounts ranging from $100,000 to $1,000,000.",
+            "City": "Philadelphia",
+            "Lending Location": "Philadelphia County, Chester County, Montgomery County, Delaware County",
+            "LoanType": "Hard Money Loans",
+            "Property Types": "Land, Multi Family, Single Family",
+            "State": "Pennsylvania"
+          },
+          {
+            "Lender": "CIVIC Private Money Lending",
+            "About the Lender": "CIVIC Private Money Lending is a Redondo Beach, CA based hard money lender offering funding in 10 states throughout the country. They provide loans for a variety of scenarios, including private refinancing, fix and flip hard money loans, hard money bridge loans, and buy and hold loans. Their loan guidelines are flexible, including terms between 12 months and 48 months, loan amounts ranging from $100,000 to $5,000,000 with a maximum LTV of 80%, and rates ranging between 8.5% and 10.5%.",
+            "City": "Mesa",
+            "Lending Location": "AZ, CA, CO, FL, GA, HI, NV, OR, TX, WA",
+            "LoanType": "Hard Money Loans",
+            "Property Types": "Multi Family, Single Family",
+            "State": "Arizona"
+          },
+          {
+            "Lender": "Corevest",
+            "About the Lender": "Corevest is an Irvine, CA based private lender. They provide funding all across the United States. They provide loans for investments properties, refinancing, bridge loans, and fix and flip hard money loans. Their loan parameters are versatile, including terms between 5 years and 10 years and loan amounts ranging from $500,000 to $100,000,000 with a maximum LTV of 75%.",
+            "City": "Palmer",
+            "Lending Location": "National",
+            "LoanType": "Investment Property Loans",
+            "Property Types": "Multi Family, Single Family",
+            "State": "Alaska"
+          },
+          {
+            "Lender": "Charleston Private Lending",
+            "About the Lender": "Charleston Private Lending is a private money lender headquartered in Charletson, SC offering funding throughout Charleston. They offer buy and hold loans, private refinancing, hard money bridge loans, and fix-and-flip hard money loans. They issue loans with a maximum LTV of 80%, terms up to 12 months, and rates starting at 7%.",
+            "City": "Charleston",
+            "Lending Location": "Charleston",
+            "LoanType": "Hard Money Loans",
+            "Property Types": "Multi Family, Single Family",
+            "State": "South Carolina"
+          },
+          {
+            "Lender": "Texas Mortgage Place",
+            "About the Lender": "Texas Mortgage Place is a private lender based in Garland, TX offering funding throughout Dallas and Fort Worth. They offer lending solutions for many different situations, including short term loans, long term rental property loans, fix-and-flip loans, and refinancing. They issue terms between 6 months and 1 year and loan amounts ranging from $70,000 to $400,000 with a maximum LTV of 80%.",
+            "City": "Dallas",
+            "Lending Location": "Dallas, Fort Worth",
+            "LoanType": "Investment Property Loans",
+            "Property Types": "Multi Family, Single Family",
+            "State": "Texas"
+          },
+          {
+            "Lender": "Rental Home Financing",
+            "About the Lender": "Rental Home Financing is a private money lender headquartered in Indianapolis, IN offering funding in 26 states across the country. They provide lending solutions for a variety of scenarios, including refinancing, fix-and-flip loans, and loans for investments properties. Their loan parameters are versatile, including loan amounts starting from $75,000 with a maximum LTV of 75%, rates starting at 6.5%, and terms between 5 years and 10 years.",
+            "City": "Birmingham",
+            "Lending Location": "AL, CA, CT, DC, DE, FL, GA, IL, IN, ND, MN, NC, NJ, NV, NY, OH, OR, PA, SC, TN, TX, VA, VT, WA, WI, UT",
+            "LoanType": "Hard Money Loans",
+            "Property Types": "Multi Family, Single Family",
+            "State": "Alabama"
+          },
+          {
+            "Lender": "Bridge Well Capital",
+            "About the Lender": "Bridge Well Capital is a hard money lender in Orlando, FL offering funding in 40 states throughout the United States. They provide loans for investments properties, cash out hard money loans, and fix-and-flip hard money loans. Their lending parameters are versatile, including loan amounts ranging from $75,000 to $5,000,000 with a maximum LTV of 85% and terms between 24 months and 360 months.",
+            "City": "Anchorage",
+            "Lending Location": "AK, AL, AR, CO, CT, DC, DE, FL, GA, HI, IA, ID, IL, IN, KS, KY, MA, MD, ME, MI, MO, MS, MT, NC, NE, NH, NJ, NM, NY, OH, OK, RI, SC, TN, TX, VA, WA, WI, WV, WY",
+            "LoanType": "Hard Money Loans",
+            "Property Types": "Multi Family, Single Family",
+            "State": "Alaska"
+          },
+          {
+            "Lender": "Angel Oak Prime Bridge",
+            "About the Lender": "Based in Atlanta, GA, Angel Oak Prime Bridge is an asset-based lender offering loans throughout Georgia. They provide loans for many different scenarios, including fix-and-flip hard money loans, short term bridge loans, construction loans, and investment property loans. They offer loan amounts starting at $50,000, terms up to 360 months, and rates starting at 9.99%.",
+            "City": "Denver",
+            "Lending Location": "GA, CO, FL, SC, TN, NC, NJ, IL, TX, MD, OH, VA, PA, IN, MS",
+            "LoanType": "Hard Money Loans",
+            "Property Types": "Multi Family, Single Family",
+            "State": "Colorado"
+          },
+          {
+            "Lender": "Manhattan Bridge Capital",
+            "About the Lender": "Manhattan Bridge Capital is a Great Neck, NY based private money lender who offers funding throughout New York City. They provide long term rental property loans, ground-up construction loans, fix and flip loans, and hard money bridge loans. Their lending guidelines are versatile, including terms up to 1 year and loan amounts ranging from $100,000 to $2,000,000 with a maximum LTV of 65%.",
+            "City": "Stamford",
+            "Lending Location": "New York City",
+            "LoanType": "Hard Money Loans",
+            "Property Types": "Multi Family, Single Family",
+            "State": "Connecticut"
+          },
+          {
+            "Lender": "The Norris Group",
+            "About the Lender": "The Norris Group is private money lender headquartered in Riverside, CA. They provide funding in Los Angeles County, Orange County, San Diego County, Riverside County, San Bernardino County, and Kern County. They offer lending solutions for many different situations and needs, including short term fix and flip loans, rental property loans, and ground up construction loans. They primarily offer loans on single family units, multi-family, and apartments.",
+            "City": "Los Angeles",
+            "Lending Location": "Los Angeles County, Orange County, San Diego County, Riverside County, San Bernardino County, Kern County",
+            "LoanType": "Hard Money Loans",
+            "Property Types": "Apartment, Multi Family, Single Family",
+            "State": "California"
+          },
+          {
+            "Lender": "Tidal Loans",
+            "About the Lender": "Tidal Loans is a hard money lender based in Houston, Texas. They issue loans throughout the Houston, Austin, and San Antonio real estate markets. They offer flexible loan terms for fix and flip, longer term 'temp to perm' loans for rental properties, loan refinancing, and new construction loans. Their rates start at just 9.99% with terms from three months up to one year. Their maximum loan-to-value (LTV) for loans is 70% and their loan-to-cost (LTC) may be up to 100%.",
+            "City": "Houston",
+            "Lending Location": "Houston, Austin, San Antonio",
+            "LoanType": "Hard Money Loans",
+            "Property Types": "Multi Family, Single Family",
+            "State": "Texas"
+          }
+        ],
+
+        // Step 1 validation
+        validateStep1() {
+          return this.deal.loanType && this.deal.propertyClass && this.deal.address && this.deal.city && this.deal.state;
+        },
+
+        // Step 2 validation
+        validateStep2() {
+          return this.deal.purchasePrice > 0 && this.deal.loanAmount > 0 && this.deal.arv > 0;
+        },
+
+        nextStep(targetStep) {
+          this.step = targetStep;
+        },
+
+        // Mathematical helper calculations
+        calculateLTV() {
+          if (!this.deal.loanAmount || !this.deal.purchasePrice) return 0;
+          return Math.round((this.deal.loanAmount / this.deal.purchasePrice) * 100);
+        },
+
+        calculateLTC() {
+          const totalCost = (this.deal.purchasePrice || 0) + (this.deal.rehabBudget || 0);
+          if (!this.deal.loanAmount || totalCost === 0) return 0;
+          return Math.round((this.deal.loanAmount / totalCost) * 100);
+        },
+
+        formatCurrency(num) {
+          if (!num) return '0.00';
+          return Number(num).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        },
+
+        // File handling mock interface logic
+        handleFileSelect(event) {
+          const files = event.target.files;
+          for (let i = 0; i < files.length; i++) {
+            this.uploadedFiles.push({
+              name: files[i].name,
+              size: (files[i].size / 1024 / 1024).toFixed(2) + ' MB'
+            });
+          }
+        },
+
+        handleDrop(event) {
+          const files = event.dataTransfer.files;
+          for (let i = 0; i < files.length; i++) {
+            this.uploadedFiles.push({
+              name: files[i].name,
+              size: (files[i].size / 1024 / 1024).toFixed(2) + ' MB'
+            });
+          }
+        },
+
+        removeFile(index) {
+          this.uploadedFiles.splice(index, 1);
+        },
+
+        // Real-time directory sorting matchmaker logic based on state selection & state properties
+        calculateMatchingLenders() {
+          const targetState = this.deal.state;
+          const targetType = this.deal.propertyClass;
+
+          // Filter lenders matching state criteria
+          this.matchingLenders = this.lenders.filter(l => {
+            // Match geographic location
+            if (l.State === targetState) return true;
+            if (l.LendingLocation && l.LendingLocation.includes(targetState)) return true;
+            if (l.LendingLocation === 'National') return true;
+            return false;
+          });
+
+          // Fallback to all lenders if matching filter is too restrictive for mock state
+          if (this.matchingLenders.length === 0) {
+            this.matchingLenders = this.lenders.slice(0, 4);
+          }
+
+          // Automatically select matching lenders initially
+          this.selectedLenders = this.matchingLenders.map(l => l.Lender);
+        },
+
+        toggleLenderSelection(lenderName) {
+          const index = this.selectedLenders.indexOf(lenderName);
+          if (index > -1) {
+            this.selectedLenders.splice(index, 1);
+          } else {
+            this.selectedLenders.push(lenderName);
+          }
+        },
+
+        toggleSelectAllLenders() {
+          if (this.selectedLenders.length === this.matchingLenders.length) {
+            this.selectedLenders = [];
+          } else {
+            this.selectedLenders = this.matchingLenders.map(l => l.Lender);
+          }
+        },
+
+        // Simulated highly functional API Broadcasting Sequence with UI logs
+        startBroadcastRequest() {
+          this.step = 5;
+          this.broadcastLogs = [];
+          this.broadcastSuccess = false;
+
+          const logs = [
+            'System initiating 256-Bit SSL Pipeline encryption...',
+            'Compiling transaction parameters into structured JSON schemas...',
+            'Injecting calculated LTV ratios and underwriting limits...',
+            `Connecting to database channels for ${this.selectedLenders.length} selected vaults...`,
+          ];
+
+          // Push standard logs
+          logs.forEach((log, index) => {
+            setTimeout(() => {
+              this.broadcastLogs.push(log);
+            }, index * 700);
+          });
+
+          // Dynamically push selected lender transmission logs
+          setTimeout(() => {
+            this.selectedLenders.forEach((lender, index) => {
+              setTimeout(() => {
+                this.broadcastLogs.push(`Pipeline secure link active -> Transmitted to: ${lender}`);
+              }, index * 400);
+            });
+          }, logs.length * 700);
+
+          // Finalize success screen
+          const totalDelay = (logs.length * 700) + (this.selectedLenders.length * 400) + 1000;
+          setTimeout(() => {
+            this.broadcastLogs.push('System broadcast finalized. Awaiting co-sheet generations.');
+            this.broadcastSuccess = true;
+          }, totalDelay);
+        },
+
+        resetWizard() {
+          this.step = 1;
+          this.dealId = 'TX-' + Math.floor(100000 + Math.random() * 900000);
+          this.deal = {
+            loanType: '',
+            propertyClass: '',
+            address: '',
+            city: '',
+            state: '',
+            purchasePrice: null,
+            loanAmount: null,
+            rehabBudget: null,
+            arv: null,
+            description: ''
+          };
+          this.uploadedFiles = [];
+          this.selectedLenders = [];
+          this.broadcastLogs = [];
+          this.broadcastSuccess = false;
+        }
+      }
+    }
+  </script>
+</body>
+</html>
+```

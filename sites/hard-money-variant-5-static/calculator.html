@@ -1,0 +1,881 @@
+```html
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capital_Vault | Interactive Loan & Match Calculator</title>
+  
+  <!-- Inter & Plus Jakarta Sans Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Alpine.js (for reactive math & data calculations) -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#312e81',
+              accent: '#818cf8'
+            },
+            darkbg: '#090D16',
+            panelbg: 'rgba(17, 24, 39, 0.7)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #090D16;
+      color: #F3F4F6;
+      overflow-x: hidden;
+    }
+    
+    /* Elegant Mesh Glow Effects */
+    .glow-orb-1 {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0) 70%);
+      top: -10%;
+      right: -10%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .glow-orb-2 {
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.12) 0%, rgba(139, 92, 246, 0) 70%);
+      bottom: 20%;
+      left: -10%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Glassmorphism scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.3);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(99, 102, 241, 0.3);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(99, 102, 241, 0.5);
+    }
+
+    .glass-panel {
+      background: rgba(13, 20, 35, 0.65);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .glass-input {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-input:focus {
+      border-color: rgba(99, 102, 241, 0.6);
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+    }
+  </style>
+</head>
+<body class="font-sans antialiased" x-data="loanCalculator()">
+
+  <!-- Background Decorative Orbs -->
+  <div class="glow-orb-1"></div>
+  <div class="glow-orb-2"></div>
+
+  <!-- Main Grid Wrapper -->
+  <div class="relative z-10 flex flex-col min-h-screen">
+    
+    <!-- Top Premium Navigation -->
+    <header class="w-full glass-panel border-b border-gray-800/40 px-6 py-4 sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto flex items-center justify-between">
+        
+        <!-- Logo & Brand -->
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center shadow-lg shadow-brand-500/20">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 7h-6a2 2 0 00-2 2v9a2 2 0 002 2h9a2 2 0 002-2v-6m-4-3l3-3m0 0l3 3m-3-3v12"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="font-display font-extrabold text-lg tracking-tight flex items-center space-x-2">
+              <span>Capital<span class="text-brand-500">_Vault</span></span>
+            </div>
+            <p class="text-[10px] text-gray-400 tracking-widest uppercase">Underwriting & Match Matrix</p>
+          </div>
+        </div>
+
+        <!-- Metric Summary -->
+        <div class="hidden md:flex items-center space-x-6 text-xs font-medium text-gray-300">
+          <div class="flex items-center space-x-2">
+            <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+            <span>MODEL: <span class="font-bold text-white">HARD MONEY & REHAB</span></span>
+          </div>
+          <div class="h-4 w-px bg-gray-800"></div>
+          <div>
+            <span>SYSTEM CONSTRAINTS: <span class="font-bold text-brand-400">MAX 85% LTV / 90% LTC</span></span>
+          </div>
+        </div>
+
+        <!-- Navigation / Actions -->
+        <div class="flex items-center space-x-4">
+          <a href="index.html" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-gray-800/80 text-gray-300 hover:bg-gray-700/80 transition-all duration-200 flex items-center space-x-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            <span>Lender Directory</span>
+          </a>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Main Workspace Content -->
+    <div class="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-6 py-6 lg:py-10 grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- LEFT COLUMN: Advanced Financial Input Dashboard & Visual Analytics -->
+      <section class="lg:col-span-7 flex flex-col space-y-6">
+        
+        <!-- Interactive Inputs Panel -->
+        <div class="glass-panel rounded-3xl p-6 relative overflow-hidden">
+          <div class="absolute -right-16 -top-16 w-36 h-36 bg-brand-500/10 rounded-full blur-2xl"></div>
+          
+          <div class="flex justify-between items-center mb-6">
+            <div>
+              <h2 class="text-lg font-bold text-white font-display">Project Parameters</h2>
+              <p class="text-xs text-gray-400">Adjust the dials to simulate instant project underwriting metrics.</p>
+            </div>
+            <span class="text-[10px] bg-brand-500/10 text-brand-400 px-3 py-1 rounded-full font-bold uppercase tracking-wider">LTC / LTV Engine v1.4</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Purchase Price -->
+            <div class="space-y-2">
+              <label class="flex justify-between text-xs font-semibold text-gray-300 uppercase">
+                <span>Purchase Price</span>
+                <span class="text-brand-400 font-bold font-mono" x-text="formatCurrency(purchasePrice)"></span>
+              </label>
+              <input type="range" min="50000" max="2500000" step="10000" x-model.number="purchasePrice" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-brand-500">
+              <input type="number" x-model.number="purchasePrice" class="w-full glass-input text-sm rounded-xl px-4 py-2.5 text-white focus:outline-none font-mono">
+            </div>
+
+            <!-- Rehab Budget -->
+            <div class="space-y-2">
+              <label class="flex justify-between text-xs font-semibold text-gray-300 uppercase">
+                <span>Rehab Budget</span>
+                <span class="text-brand-400 font-bold font-mono" x-text="formatCurrency(rehabBudget)"></span>
+              </label>
+              <input type="range" min="0" max="1000000" step="5000" x-model.number="rehabBudget" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-brand-500">
+              <input type="number" x-model.number="rehabBudget" class="w-full glass-input text-sm rounded-xl px-4 py-2.5 text-white focus:outline-none font-mono">
+            </div>
+
+            <!-- After Repair Value (ARV) -->
+            <div class="space-y-2">
+              <label class="flex justify-between text-xs font-semibold text-gray-300 uppercase">
+                <span>After Repair Value (ARV)</span>
+                <span class="text-emerald-400 font-bold font-mono" x-text="formatCurrency(arv)"></span>
+              </label>
+              <input type="range" min="100000" max="4000000" step="15000" x-model.number="arv" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-brand-500">
+              <input type="number" x-model.number="arv" class="w-full glass-input text-sm rounded-xl px-4 py-2.5 text-white focus:outline-none font-mono">
+            </div>
+
+            <!-- Project Timeline -->
+            <div class="space-y-2">
+              <label class="flex justify-between text-xs font-semibold text-gray-300 uppercase">
+                <span>Project Term (Timeline)</span>
+                <span class="text-brand-400 font-bold" x-text="timeline + ' Months'">12 Months</span>
+              </label>
+              <input type="range" min="3" max="36" step="1" x-model.number="timeline" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-brand-500">
+              <select x-model.number="timeline" class="w-full glass-input text-sm rounded-xl px-4 py-2.5 text-white focus:outline-none">
+                <option value="6">Short-Term Flip (6 Months)</option>
+                <option value="12" selected>Standard Rehab (12 Months)</option>
+                <option value="18">Mid-term Bridge (18 Months)</option>
+                <option value="24">Multi-Family Transition (24 Months)</option>
+                <option value="36">Extensive Construction (36 Months)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Leverages & Loan Request Model Toggle -->
+          <div class="mt-8 pt-6 border-t border-gray-800/60 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-xs font-semibold text-gray-300 uppercase mb-3">Underwriting Mode</label>
+              <div class="grid grid-cols-2 gap-2 bg-gray-900/60 p-1.5 rounded-xl border border-gray-800/60">
+                <button @click="loanSizingMode = 'leverage'" :class="loanSizingMode === 'leverage' ? 'bg-brand-600 text-white shadow-md' : 'text-gray-400 hover:text-white'" class="py-2 text-xs font-bold rounded-lg transition duration-150">Max Leverage</button>
+                <button @click="loanSizingMode = 'manual'" :class="loanSizingMode === 'manual' ? 'bg-brand-600 text-white shadow-md' : 'text-gray-400 hover:text-white'" class="py-2 text-xs font-bold rounded-lg transition duration-150">Manual Loan</button>
+              </div>
+            </div>
+
+            <!-- Contextual Sizing Value Slider -->
+            <div class="space-y-2" x-show="loanSizingMode === 'leverage'">
+              <label class="flex justify-between text-xs font-semibold text-gray-300 uppercase">
+                <span>Leverage Target (ARV limit)</span>
+                <span class="text-brand-400 font-bold" x-text="maxLTVLimit + '%'">75%</span>
+              </label>
+              <input type="range" min="50" max="85" step="5" x-model.number="maxLTVLimit" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-brand-500">
+              <span class="text-[10px] text-gray-500 block">Sized up to the lesser of ARV limit or 90% of LTC.</span>
+            </div>
+
+            <div class="space-y-2" x-show="loanSizingMode === 'manual'">
+              <label class="flex justify-between text-xs font-semibold text-gray-300 uppercase">
+                <span>Requested Loan Amount</span>
+                <span class="text-brand-400 font-bold font-mono" x-text="formatCurrency(manualLoanAmount)"></span>
+              </label>
+              <input type="range" :min="10000" :max="purchasePrice + rehabBudget" step="10000" x-model.number="manualLoanAmount" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-brand-500">
+              <input type="number" x-model.number="manualLoanAmount" class="w-full glass-input text-sm rounded-xl px-4 py-2 text-white focus:outline-none font-mono">
+            </div>
+          </div>
+
+          <!-- Project State Focus -->
+          <div class="mt-6 pt-6 border-t border-gray-800/60">
+            <label class="block text-xs font-semibold text-gray-300 uppercase mb-2">Project Location (State)</label>
+            <div class="relative">
+              <select x-model="projectState" class="w-full glass-input text-sm rounded-xl px-4 py-3 text-white focus:outline-none appearance-none cursor-pointer">
+                <option value="">National Coverage Zone (Any State)</option>
+                <template x-for="state in availableStates" :key="state">
+                  <option :value="state" x-text="state"></option>
+                </template>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Calculated Live KPI Matrix -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          <div class="glass-panel rounded-3xl p-5 relative overflow-hidden">
+            <span class="text-[9px] uppercase tracking-widest text-gray-500 font-bold block mb-1">TOTAL LOAN SIZING</span>
+            <div class="text-2xl font-extrabold text-white tracking-tight font-mono" x-text="formatCurrency(computedLoanAmount)">$0</div>
+            <div class="flex items-center space-x-1 mt-2 text-[10px]" :class="computedLTV > 75 ? 'text-amber-400' : 'text-emerald-400'">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span x-text="computedLTV > 75 ? 'Highly leveraged bracket' : 'Underwriter safety greenzone'"></span>
+            </div>
+          </div>
+
+          <div class="glass-panel rounded-3xl p-5 relative overflow-hidden">
+            <span class="text-[9px] uppercase tracking-widest text-gray-500 font-bold block mb-1">LOAN-TO-COST (LTC)</span>
+            <div class="text-2xl font-extrabold tracking-tight font-mono" :class="computedLTC > 90 ? 'text-red-400' : 'text-indigo-400'" x-text="computedLTC.toFixed(1) + '%'">0.0%</div>
+            <div class="w-full bg-gray-900 rounded-full h-1.5 mt-2.5">
+              <div class="h-1.5 rounded-full transition-all duration-300" :class="computedLTC > 90 ? 'bg-red-500' : 'bg-brand-500'" :style="'width: ' + Math.min(computedLTC, 100) + '%'"></div>
+            </div>
+          </div>
+
+          <div class="glass-panel rounded-3xl p-5 relative overflow-hidden">
+            <span class="text-[9px] uppercase tracking-widest text-gray-500 font-bold block mb-1">LOAN-TO-VALUE (LTV)</span>
+            <div class="text-2xl font-extrabold tracking-tight font-mono" :class="computedLTV > 80 ? 'text-amber-400' : 'text-emerald-400'" x-text="computedLTV.toFixed(1) + '%'">0.0%</div>
+            <div class="w-full bg-gray-900 rounded-full h-1.5 mt-2.5">
+              <div class="h-1.5 rounded-full transition-all duration-300" :class="computedLTV > 80 ? 'bg-amber-500' : 'bg-emerald-500'" :style="'width: ' + Math.min(computedLTV, 100) + '%'"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Detailed Underwriting Fee Sheet -->
+        <div class="glass-panel rounded-3xl p-6">
+          <div class="text-xs uppercase tracking-widest text-brand-400 font-bold mb-4">Underwriting Ledger Estimate</div>
+          
+          <div class="space-y-3 font-mono text-sm">
+            <div class="flex justify-between py-2 border-b border-gray-800/40">
+              <span class="text-gray-400 text-xs uppercase">Total Acquisition & Rehab Cost</span>
+              <span class="text-gray-200 font-bold" x-text="formatCurrency(totalProjectCost)">$0</span>
+            </div>
+            
+            <div class="flex justify-between py-2 border-b border-gray-800/40">
+              <span class="text-gray-400 text-xs uppercase">Initial Investor Out-Of-Pocket Equity</span>
+              <span class="text-brand-300 font-bold" x-text="formatCurrency(outOfPocketEquity)">$0</span>
+            </div>
+
+            <div class="flex justify-between py-2 border-b border-gray-800/40">
+              <span class="text-gray-400 text-xs uppercase">Estimated Points / Origination Cost (2%)</span>
+              <span class="text-gray-300" x-text="formatCurrency(originationPointsCost)">$0</span>
+            </div>
+
+            <div class="flex justify-between py-2 border-b border-gray-800/40">
+              <div class="flex items-center space-x-1.5">
+                <span class="text-gray-400 text-xs uppercase">Interest Carry Reserve</span>
+                <span class="text-[10px] bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded" x-text="'@ ' + avgRate + '%'"></span>
+              </div>
+              <span class="text-gray-300" x-text="formatCurrency(totalInterestCarry)">$0</span>
+            </div>
+
+            <div class="flex justify-between py-3 text-white font-extrabold text-base">
+              <span class="text-xs uppercase tracking-wider text-emerald-400 flex items-center space-x-1">
+                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>Estimated Liquid Capital Needed</span>
+              </span>
+              <span class="text-emerald-400 text-lg" x-text="formatCurrency(liquidCapitalRequired)">$0</span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- RIGHT COLUMN: Matching Directory Vault Capital Streams -->
+      <section class="lg:col-span-5 flex flex-col space-y-6">
+        
+        <!-- Live Matching Summary Title -->
+        <div class="glass-panel rounded-3xl p-6">
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-xs uppercase tracking-widest text-emerald-400 font-bold">Dynamic Sourced matches</span>
+            <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2.5 py-0.5 rounded-full font-mono font-bold" x-text="matchingLenders.length + ' VAULTS ACTIVE'">0 ACTIVE</span>
+          </div>
+          <p class="text-xs text-gray-400 leading-relaxed">The algorithm isolates lenders offering loan packages fitting your calculated metrics, filtered by local coverage maps &amp; stated max LTV targets.</p>
+        </div>
+
+        <!-- Scrollable Matching Lenders List -->
+        <div class="space-y-4 max-h-[750px] overflow-y-auto pr-1">
+          <template x-for="(lender, index) in matchingLenders" :key="index">
+            <div class="glass-panel rounded-2xl p-5 hover:border-brand-500/60 transition-all duration-300 relative group cursor-pointer" @click="viewLender(lender)">
+              
+              <!-- Match score pill -->
+              <div class="absolute right-4 top-4 flex items-center space-x-1">
+                <span class="text-[9px] font-bold bg-brand-500/10 text-brand-300 px-2 py-0.5 rounded-full" x-text="'Score: ' + computeMatchScore(lender) + '%'"></span>
+              </div>
+
+              <div class="space-y-3">
+                <!-- Location map -->
+                <div class="flex items-center space-x-1 text-[10px] text-gray-500 uppercase font-bold tracking-wider">
+                  <span class="text-brand-400" x-text="lender.State"></span>
+                  <span>•</span>
+                  <span x-text="lender.City || 'Multi-state'"></span>
+                </div>
+
+                <!-- Title & Program -->
+                <div>
+                  <h4 class="text-md font-extrabold text-white group-hover:text-brand-400 transition" x-text="lender.Lender"></h4>
+                  <p class="text-xs text-indigo-300 font-medium mt-1" x-text="lender.LoanType"></p>
+                </div>
+
+                <!-- Parameters Snip -->
+                <p class="text-xs text-gray-400 line-clamp-2" x-text="lender['About the Lender']"></p>
+
+                <!-- Action Footers -->
+                <div class="pt-3 border-t border-gray-800/40 flex items-center justify-between">
+                  <div class="text-[10px] text-gray-500 font-semibold font-mono">
+                    MAX PROFILER LTV: <span class="text-white font-bold" x-text="extractLtv(lender) + '%'">75%</span>
+                  </div>
+                  <span class="text-xs text-brand-400 font-bold group-hover:text-white transition flex items-center space-x-1">
+                    <span>Underwrite Profile</span>
+                    <svg class="w-3.5 h-3.5 transform group-hover:translate-x-1 transition duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                  </span>
+                </div>
+
+              </div>
+
+            </div>
+          </template>
+
+          <!-- Empty matching state -->
+          <div class="glass-panel rounded-3xl p-10 text-center space-y-4" x-show="matchingLenders.length === 0">
+            <div class="w-12 h-12 bg-gray-800/40 text-brand-500 rounded-full flex items-center justify-center mx-auto border border-gray-700/60 shadow-inner">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            </div>
+            <div>
+              <h4 class="text-sm font-bold text-white uppercase tracking-tight">Constraints Exceeded</h4>
+              <p class="text-xs text-gray-400 mt-1 max-w-xs mx-auto">None of the currently mapped capital pools accommodate this loan sizing criteria. Try reducing purchase leverage parameters or maximum LTV limit.</p>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+
+    <!-- HIGH-FIDELITY SIDE DRAWER FOR SELECTED MATCHING LENDER -->
+    <div class="fixed inset-0 overflow-hidden z-50" x-show="selectedLender !== null" x-cloak style="display: none;">
+      <div class="absolute inset-0 overflow-hidden">
+        
+        <!-- Drawer backdrop blur -->
+        <div class="absolute inset-0 bg-darkbg/60 backdrop-blur-sm transition-opacity" @click="closeLender()"></div>
+
+        <!-- Sliding panel content container -->
+        <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+          <div class="pointer-events-auto w-screen max-w-xl">
+            <div class="flex h-full flex-col bg-[#0d1423] border-l border-gray-800 shadow-2xl relative overflow-hidden" 
+                 x-show="selectedLender !== null"
+                 x-transition:enter="transform transition ease-in-out duration-300"
+                 x-transition:enter-start="translate-x-full"
+                 x-transition:enter-end="translate-x-0"
+                 x-transition:leave="transform transition ease-in-out duration-300"
+                 x-transition:leave-start="translate-x-0"
+                 x-transition:leave-end="translate-x-full">
+              
+              <!-- Abstract mesh glowing layout in drawer -->
+              <div class="absolute -right-32 -bottom-32 w-80 h-80 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+              <!-- Drawer Header -->
+              <div class="p-6 border-b border-gray-800/80 flex items-center justify-between sticky top-0 bg-[#0d1423]/90 backdrop-blur-md z-10">
+                <div class="flex items-center space-x-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                  <span class="text-xs uppercase tracking-widest text-emerald-400 font-bold">Lender Alignment Underwritten</span>
+                </div>
+                <button @click="closeLender()" class="p-2 rounded-lg bg-gray-800/80 hover:bg-gray-700 text-gray-300 transition">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+              </div>
+
+              <!-- Drawer Body Content scrollable -->
+              <div class="flex-1 overflow-y-auto p-8 space-y-8 relative z-10">
+                
+                <!-- Main Header Meta -->
+                <div>
+                  <span class="text-xs bg-brand-500/10 text-brand-300 px-3 py-1 rounded-full font-bold uppercase tracking-wider" x-text="selectedLender?.State"></span>
+                  <h2 class="text-3xl font-extrabold text-white mt-4 font-display" x-text="selectedLender?.Lender"></h2>
+                  
+                  <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray-400">
+                    <span class="flex items-center space-x-1" x-show="selectedLender?.City">
+                      <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                      <span x-text="selectedLender?.City"></span>
+                    </span>
+                    <span class="flex items-center space-x-1" x-show="selectedLender?.['Lending Location']">
+                      <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 002 2h2m-4-3h1.5a2.5 2.5 0 012.5 2.5V12"></path></svg>
+                      <span x-text="'Lending Zone: ' + selectedLender?.['Lending Location']"></span>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Live Deal Underwriting Sizing Match Details -->
+                <div class="p-6 bg-brand-900/40 rounded-3xl border border-brand-500/20 space-y-4">
+                  <h4 class="text-xs uppercase tracking-widest text-brand-300 font-bold">Simulated Terms for Your Deal</h4>
+                  <div class="grid grid-cols-2 gap-4 text-xs">
+                    <div>
+                      <span class="text-gray-500 block">PROPOSED LOAN AMOUNT</span>
+                      <span class="text-white font-mono font-bold text-base" x-text="formatCurrency(computedLoanAmount)"></span>
+                    </div>
+                    <div>
+                      <span class="text-gray-500 block">EST. INTEREST RATE</span>
+                      <span class="text-white font-mono font-bold text-base" x-text="avgRate + '%'"></span>
+                    </div>
+                    <div>
+                      <span class="text-gray-500 block">EST. MONTHLY DEBT PAYMENT</span>
+                      <span class="text-brand-300 font-mono font-bold text-base" x-text="formatCurrency((computedLoanAmount * (avgRate / 100)) / 12)"></span>
+                    </div>
+                    <div>
+                      <span class="text-gray-500 block">EST. LOAN CLOSING POINTS</span>
+                      <span class="text-brand-300 font-mono font-bold text-base" x-text="formatCurrency(originationPointsCost)"></span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Snapshot Matrix -->
+                <div class="grid grid-cols-2 gap-4 text-xs">
+                  <div class="p-4 bg-gray-900/60 rounded-2xl border border-gray-800/80">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Programs Offered</p>
+                    <p class="text-sm font-semibold text-white mt-1" x-text="selectedLender?.['Loan Types Offered'] || 'Investment, Bridge, Refinance'"></p>
+                  </div>
+                  <div class="p-4 bg-gray-900/60 rounded-2xl border border-gray-800/80">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Primary Category</p>
+                    <p class="text-sm font-semibold text-white mt-1" x-text="selectedLender?.['LoanType']"></p>
+                  </div>
+                  <div class="p-4 bg-gray-900/60 rounded-2xl border border-gray-800/80 col-span-2">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Property Classes Supported</p>
+                    <p class="text-sm font-semibold text-brand-300 mt-1" x-text="selectedLender?.['Property Types']"></p>
+                  </div>
+                </div>
+
+                <!-- Deep-Dive Program Info -->
+                <div class="space-y-3">
+                  <h4 class="text-xs uppercase tracking-widest text-brand-400 font-bold">Program Overview</h4>
+                  <div class="p-5 bg-gray-900/40 rounded-2xl border border-gray-800/50 leading-relaxed text-sm text-gray-300" x-text="selectedLender?.['About the Lender']"></div>
+                </div>
+
+                <!-- Direct Action Phase -->
+                <div class="space-y-4 pt-4 border-t border-gray-800/40">
+                  <h4 class="text-xs uppercase tracking-widest text-emerald-400 font-bold">Direct Capital Pipeline Action</h4>
+                  
+                  <div class="space-y-3">
+                    <template x-if="selectedLender?.['Lender Phone']">
+                      <a :href="'tel:' + selectedLender?.['Lender Phone']" class="w-full flex items-center justify-center space-x-3 py-4 bg-gray-800 hover:bg-gray-700 text-white rounded-2xl font-bold transition duration-200">
+                        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                        <span x-text="selectedLender?.['Lender Phone']"></span>
+                      </a>
+                    </template>
+
+                    <template x-if="selectedLender?.['Lender Website']">
+                      <a :href="selectedLender?.['Lender Website']" target="_blank" class="w-full flex items-center justify-center space-x-3 py-4 bg-brand-600 hover:bg-brand-500 text-white rounded-2xl font-bold shadow-lg shadow-brand-600/25 transition duration-200">
+                        <svg class="w-5 h-5 text-indigo-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        <span>Submit Project Package</span>
+                      </a>
+                    </template>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function loanCalculator() {
+      return {
+        // Financial Inputs
+        purchasePrice: 420000,
+        rehabBudget: 85000,
+        arv: 620000,
+        timeline: 12,
+        originationFeePct: 2.0,
+        avgRate: 9.5,
+        
+        loanSizingMode: 'leverage', // leverage vs manual
+        maxLTVLimit: 75, // target % of ARV
+        maxLTCLimit: 90, // computed absolute maximum % of total project cost
+        manualLoanAmount: 300000,
+        
+        projectState: '', // Filter results geographically
+        selectedLender: null,
+
+        // Static Master Database mapped from Directory Component
+        lenders: [
+          {
+            "Lender": "Colony American Finance",
+            "About the Lender": "Colony American Finance is a private money lender in Los Angeles, CA providing funding all across the country. They provide loans for a variety of needs and situations, including loans for rental properties and refinancing. Their lending parameters are versatile, including terms between 5 years and 10 years and loan amounts ranging from $500,000 to $100,000,000 with a maximum LTV of 75%. They do not require their borrowers to have a minimum credit rating to obtain a loan. The focus of their lending is for single family and multi-family.",
+            "City": "Anchorage",
+            "Lender City & State": "Los Angeles, CA 90071",
+            "Lender Phone": "(844) 223-2231",
+            "Lender Street Address": "515 South Flower Street, 44th Floor",
+            "Lender Website": "https://www.colonyamericanfinance.com",
+            "Lending Location": "National",
+            "Loan Types Offered": "Investment Property Loans, Refinance / Cash Out Loans",
+            "LoanType": "Investment Property Loans",
+            "Property Types": "Multi Family, Single Family",
+            "State": "Alaska"
+          },
+          {
+            "Lender": "Asset Avenue",
+            "About the Lender": "Asset Avenue is private money lender based in Los Angeles, CA. They provide loans in 44 states across the United States. They provide loans for a variety of needs and situations, including short term loans, investment property loans, cash out hard money loans, and fix and flip hard money loans. Their lending guidelines are versatile, including loan amounts ranging from $150,000 to $2,000,000 with a maximum LTV of 85%. They primarily offer funding for single family and multi-family units.",
+            "City": "Birmingham",
+            "Lender City & State": "Los Angeles, CA 90024",
+            "Lender Phone": "(800) 555-0199",
+            "Lender Street Address": "1100 Glendon Ave, 18th Floor",
+            "Lender Website": "https://www.assetavenue.com/",
+            "Lending Location": "AL, AR, CA, CO, CT, DC, DE, FL, GA, HI, IA, ID, IL, IN, KS, KY, LA, MA, MD, ME, MI, MN, MO, MS, MT, NC, NE, NH, NJ, NM, NY, OH, OK, PA, RI, SC, TN, TX, UT, VA, WA, WI, WV, WY",
+            "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans, Refinance / Cash Out Loans",
+            "LoanType": "Hard Money Loans",
+            "Property Types": "Multi Family, Single Family",
+            "State": "Alabama"
+          },
+          {
+            "Lender": "Source Capital",
+            "About the Lender": "Source Capital is an asset-based lender headquartered in Los Angeles, CA offering loans in California, Arizona, and Minnesota. They provide loans for a variety of situations and needs, including bridge loans, fix-and-flip loans, hard money refinancing, and loans for rental properties. They provide terms up to 3 years, loans with a maximum LTV of 70%, and rates starting at 7.99%. They lend money to all borrowers based on the property value and not on a minimum credit score. They will make loans on most types of properties, including single family residences, multi-family, apartment buildings, office units, retail spaces, hotels, storage buildings, senior housing communities, mixed use, warehouse buildings, industrial buildings, and medical buildings.",
+            "City": "Phoenix",
+            "Lender City & State": "Los Angeles, CA 90071",
+            "Lender Phone": "(323) 352-9292",
+            "Lender Street Address": "445 S. Figueroa Street, Suite 3199",
+            "Lender Website": "http://www.hardmoneyfirst.com",
+            "Lending Location": "CA, AZ, MN",
+            "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans, Refinance / Cash Out Loans",
+            "LoanType": "Hard Money Loans",
+            "Property Types": "Apartment, Assisted Living, Hotel, Industrial, Medical, Mixed Use, Multi Family, Office, Retail, Single Family, Storage, Warehouse",
+            "State": "Arizona"
+          },
+          {
+            "Lender": "Great Oak Capital",
+            "About the Lender": "Green Oak Capital is a Bala Cynwyd, PA based private money lender. They offer loans throughout Philadelphia County, Chester County, Montgomery County, and Delaware County. They offer rental property loans, short term fix and flip loans, short term loans, and private refinancing. Their lending parameters are flexible, including loan amounts ranging from $100,000 to $1,000,000. They primarily make loans on single family residences, multi-family, and undeveloped land. Stated parameter up to LTV of 75%.",
+            "City": "Philadelphia",
+            "Lender City & State": "Bala Cynwyd, PA 19004",
+            "Lender Phone": "(215) 555-0145",
+            "Lender Street Address": "20 Penarth Road",
+            "Lender Website": "http://www.greatoakcapital.com/",
+            "Lending Location": "Philadelphia County, Chester County, Montgomery County, Delaware County",
+            "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans, Refinance / Cash Out Loans",
+            "LoanType": "Hard Money Loans",
+            "Property Types": "Land, Multi Family, Single Family",
+            "State": "Pennsylvania"
+          },
+          {
+            "Lender": "CIVIC Private Money Lending",
+            "About the Lender": "CIVIC Private Money Lending is a Redondo Beach, CA based hard money lender offering funding in 10 states throughout the country. They provide loans for a variety of scenarios, including private refinancing, fix and flip hard money loans, hard money bridge loans, and buy and hold loans. Their loan guidelines are flexible, including terms between 12 months and 48 months, loan amounts ranging from $100,000 to $5,000,000 with a maximum LTV of 80%, and rates ranging between 8.5% and 10.5%. They do not require a minimum FICO score to receive a loan. They will consider varying loan requests but usually focus on single family residences and multi family residences.",
+            "City": "Mesa",
+            "Lender City & State": "Redondo Beach, CA 90278",
+            "Lender Phone": "(800) 555-0122",
+            "Lender Street Address": "2015 Manhattan Beach Blvd",
+            "Lender Website": "http://www.civicfs.com/",
+            "Lending Location": "AZ, CA, CO, FL, GA, HI, NV, OR, TX, WA",
+            "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans, Refinance / Cash Out Loans",
+            "LoanType": "Hard Money Loans",
+            "Property Types": "Multi Family, Single Family",
+            "State": "Arizona"
+          },
+          {
+            "Lender": "Corevest",
+            "About the Lender": "Corevest is an Irvine, CA based private lender. They provide funding all across the United States. They provide loans for investments properties, refinancing, bridge loans, and fix and flip hard money loans. Their loan parameters are versatile, including terms between 5 years and 10 years and loan amounts ranging from $500,000 to $100,000,000 with a maximum LTV of 75%. The focus of their loans is on single family homes and multi family residences.",
+            "City": "Palmer",
+            "Lender City & State": "Irvine, CA 92614",
+            "Lender Phone": "(844) 333-0101",
+            "Lender Street Address": "1920 Main Street, Suite 850",
+            "Lender Website": "https://www.corevestfinance.com",
+            "Lending Location": "National",
+            "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans, Refinance / Cash Out Loans",
+            "LoanType": "Investment Property Loans",
+            "Property Types": "Multi Family, Single Family",
+            "State": "Alaska"
+          },
+          {
+            "Lender": "Charleston Private Lending",
+            "About the Lender": "Charleston Private Lending is a private money lender headquartered in Charletson, SC offering funding throughout Charleston. They offer buy and hold loans, private refinancing, hard money bridge loans, and fix-and-flip hard money loans. They issue loans with a maximum LTV of 80%, terms up to 12 months, and rates starting at 7%. The focus of their lending is for single family units and multi family.",
+            "City": "Charleston",
+            "Lender City & State": "Charletson, SC",
+            "Lender Phone": "(843) 779-5626",
+            "Lender Street Address": "15 Broad Street",
+            "Lender Website": "http://www.charlestonprivatelending.com/",
+            "Lending Location": "Charleston",
+            "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans, Refinance / Cash Out Loans",
+            "LoanType": "Hard Money Loans",
+            "Property Types": "Multi Family, Single Family",
+            "State": "South Carolina"
+          },
+          {
+            "Lender": "Texas Mortgage Place",
+            "About the Lender": "Texas Mortgage Place is a private lender based in Garland, TX offering funding throughout Dallas and Fort Worth. They offer lending solutions for many different situations, including short term loans, long term rental property loans, fix-and-flip loans, and refinancing. They issue terms between 6 months and 1 year and loan amounts ranging from $70,000 to $400,000 with a maximum LTV of 80%. They do not require borrowers to have a minimum credit rating to receive a loan. They primarily make loans for single family and multi-family.",
+            "City": "Dallas",
+            "Lender City & State": "Garland, TX 75041",
+            "Lender Phone": "(214) 824-0417",
+            "Lender Street Address": "1795 Northwest Hwy",
+            "Lender Website": "http://www.texasmortgageplace.com/",
+            "Lending Location": "Dallas, Fort Worth",
+            "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans, Refinance / Cash Out Loans",
+            "LoanType": "Investment Property Loans",
+            "Property Types": "Multi Family, Single Family",
+            "State": "Texas"
+          },
+          {
+            "Lender": "Rental Home Financing",
+            "About the Lender": "Rental Home Financing is a private money lender headquartered in Indianapolis, IN offering funding in 26 states across the country. They provide lending solutions for a variety of scenarios, including refinancing, fix-and-flip loans, and loans for investments properties. Their loan parameters are versatile, including loan amounts starting from $75,000 with a maximum LTV of 75%, rates starting at 6.5%, and terms between 5 years and 10 years. They require a minimum FICO rating of 620 to receive a loan. The focus of their loans is on single family units and multi-family units.",
+            "City": "Birmingham",
+            "Lender City & State": "Indianapolis, IN 46240",
+            "Lender Phone": "(888) 375-7977",
+            "Lender Street Address": "496 Delaney Ave #408",
+            "Lender Website": "http://www.rentalhomefinancing.com/",
+            "Lending Location": "AL, CA, CT, DC, DE, FL, GA, IL, IN, ND, MN, NC, NJ, NV, NY, OH, OR, PA, SC, TN, TX, VA, VT, WA, WI, UT",
+            "Loan Types Offered": "Fix and Flip Loans, Investment Property Loans, Refinance / Cash Out Loans",
+            "LoanType": "Hard Money Loans",
+            "Property Types": "Multi Family, Single Family",
+            "State": "Alabama"
+          },
+          {
+            "Lender": "Bridge Well Capital",
+            "About the Lender": "Bridge Well Capital is a hard money lender in Orlando, FL offering funding in 40 states throughout the United States. They provide loans for investments properties, cash out hard money loans, and fix-and-flip hard money loans. Their lending parameters are versatile, including loan amounts ranging from $75,000 to $5,000,000 with a maximum LTV of 85% and terms between 24 months and 360 months. They will consider different lending scenarios but mainly focus on single family homes and multi family residences.",
+            "City": "Anchorage",
+            "Lender City & State": "Orlando, FL 32801",
+            "Lender Phone": "(407) 447-1000",
+            "Lender Street Address": "496 Delaney Ave #408",
+            "Lender Website": "https://www.bridgewellcapital.com",
+            "Lending Location": "AK, AL, AR, CO, CT, DC, DE, FL, GA, HI, IA, ID, IL, IN, KS, KY, MA, MD, ME, MI, MO, MS, MT, NC, NE, NH, NJ, NM, NY, OH, OK, RI, SC, TN, TX, VA, WA, WI, WV, WY",
+            "Loan Types Offered": "Fix and Flip Loans, Investment Property Loans, Refinance / Cash Out Loans",
+            "LoanType": "Hard Money Loans",
+            "Property Types": "Multi Family, Single Family",
+            "State": "Alaska"
+          },
+          {
+            "Lender": "Angel Oak Prime Bridge",
+            "About the Lender": "Based in Atlanta, GA, Angel Oak Prime Bridge is an asset-based lender offering loans throughout Georgia. They provide loans for many different scenarios, including fix-and-flip hard money loans, short term bridge loans, construction loans, and investment property loans. They offer loan amounts starting at $50,000, terms up to 360 months, and rates starting at 9.99%. They require a minimum FICO score of 560 to receive a loan. The focus of their loans is on single family residences and multi-family units. Stated target LTV of 75%.",
+            "City": "Denver",
+            "Lender City & State": "Atlanta, GA 30328",
+            "Lender Phone": "(888) 209-1333",
+            "Lender Street Address": "980 Hammond Drive, Suite 850",
+            "Lender Website": "http://www.angeloakprimebridge.com/",
+            "Lending Location": "GA, CO, FL, SC, TN, NC, NJ, IL, TX, MD, OH, VA, PA, IN, MS",
+            "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans, New Construction Loans",
+            "LoanType": "Hard Money Loans",
+            "Property Types": "Multi Family, Single Family",
+            "State": "Colorado"
+          },
+          {
+            "Lender": "Manhattan Bridge Capital",
+            "About the Lender": "Manhattan Bridge Capital is a Great Neck, NY based private money lender who offers funding throughout New York City. They provide long term rental property loans, ground-up construction loans, fix and flip loans, and hard money bridge loans. Their lending guidelines are versatile, including terms up to 1 year and loan amounts ranging from $100,000 to $2,000,000 with a maximum LTV of 65%. They primarily make funding on single family residences and multi family residences.",
+            "City": "Stamford",
+            "Lender City & State": "Great Neck, NY 11021",
+            "Lender Phone": "(516) 444-3400",
+            "Lender Street Address": "60 Cutter Mill Rd, Suite 205",
+            "Lender Website": "http://manhattanbridgecapital.com/",
+            "Lending Location": "New York City",
+            "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans, New Construction Loans",
+            "LoanType": "Hard Money Loans",
+            "Property Types": "Multi Family, Single Family",
+            "State": "Connecticut"
+          },
+          {
+            "Lender": "The Norris Group",
+            "About the Lender": "The Norris Group is private money lender headquartered in Riverside, CA. They provide funding in Los Angeles County, Orange County, San Diego County, Riverside County, San Bernardino County, and Kern County. They offer lending solutions for many different situations and needs, including short term fix and flip loans, rental property loans, and ground up construction loans. They lend funds to any borrower based on the value of the property and do not require a minimum FICO score. They primarily offer loans on single family units, multi-family, and apartments. Maximum target LTV of 75%.",
+            "City": "Los Angeles",
+            "Lender City & State": "Riverside, CA 92507",
+            "Lender Phone": "(951) 780-5856",
+            "Lender Street Address": "1845 Chicago Avenue, Suite C",
+            "Lender Website": "http://www.thenorrisgroup.com",
+            "Lending Location": "Los Angeles County, Orange County, San Diego County, Riverside County, San Bernardino County, Kern County",
+            "Loan Types Offered": "Fix and Flip Loans, Investment Property Loans, New Construction Loans",
+            "LoanType": "Hard Money Loans",
+            "Property Types": "Apartment, Multi Family, Single Family",
+            "State": "California"
+          },
+          {
+            "Lender": "Tidal Loans",
+            "About the Lender": "Tidal Loans is a hard money lender based in Houston, Texas. They issue loans throughout the Houston, Austin, and San Antonio real estate markets. They offer flexible loan terms for fix and flip, longer term 'temp to perm' loans for rental properties, loan refinancing, and new construction loans. Their rates start at just 9.99% with terms from three months up to one year. Their maximum loan-to-value (LTV) for loans is 70% and their loan-to-cost (LTC) may be up to 100%.",
+            "City": "Houston",
+            "Lender City & State": "Houston, TX 77054",
+            "Lender Phone": "(832) 757-1262",
+            "Lender Street Address": "2616 South Loop W Suite #505",
+            "Lender Website": "http://www.tidalloans.com/",
+            "Lending Location": "Houston, Austin, San Antonio",
+            "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Hard Money Loans, Investment Property Loans, New Construction Loans, Refinance / Cash Out Loans",
+            "LoanType": "Hard Money Loans",
+            "Property Types": "Multi Family, Single Family",
+            "State": "Texas"
+          }
+        ],
+
+        // Sizing & Underwriting Calculations
+        get totalProjectCost() {
+          return this.purchasePrice + this.rehabBudget;
+        },
+
+        get computedLoanAmount() {
+          if (this.loanSizingMode === 'leverage') {
+            // Calculated as the minimum of Max target LTV % of ARV OR 90% of LTC limit
+            const sizeByLTV = this.arv * (this.maxLTVLimit / 100);
+            const sizeByLTC = this.totalProjectCost * (this.maxLTCLimit / 100);
+            return Math.round(Math.min(sizeByLTV, sizeByLTC));
+          } else {
+            return Math.min(this.manualLoanAmount, this.totalProjectCost);
+          }
+        },
+
+        get computedLTV() {
+          if (!this.arv) return 0;
+          return (this.computedLoanAmount / this.arv) * 100;
+        },
+
+        get computedLTC() {
+          if (!this.totalProjectCost) return 0;
+          return (this.computedLoanAmount / this.totalProjectCost) * 100;
+        },
+
+        get outOfPocketEquity() {
+          return Math.max(0, this.totalProjectCost - this.computedLoanAmount);
+        },
+
+        get originationPointsCost() {
+          return this.computedLoanAmount * (this.originationFeePct / 100);
+        },
+
+        get totalInterestCarry() {
+          // Carry calculation based on timeline & rate
+          return this.computedLoanAmount * (this.avgRate / 100) * (this.timeline / 12);
+        },
+
+        get liquidCapitalRequired() {
+          return this.outOfPocketEquity + this.originationPointsCost;
+        },
+
+        get availableStates() {
+          const states = this.lenders.map(l => l.State).filter(Boolean);
+          return [...new Set(states)].sort();
+        },
+
+        // Extraction utility to grab max LTV numbers from text description
+        extractLtv(lender) {
+          const text = lender['About the Lender'] || '';
+          const match = text.match(/LTV of (\d+)%/i);
+          return match ? parseInt(match[1]) : 75; // fallback default
+        },
+
+        // Algorithm determining direct ranking / scores based on underwriting fit
+        computeMatchScore(lender) {
+          let score = 100;
+          const maxLtv = this.extractLtv(lender);
+
+          // 1. Check LTV constraint
+          if (this.computedLTV > maxLtv) {
+            score -= (this.computedLTV - maxLtv) * 5;
+          }
+
+          // 2. Adjust for State coverage zone
+          if (this.projectState && lender.State !== this.projectState && lender.LendingLocation !== 'National') {
+            score -= 20;
+          }
+
+          return Math.max(10, Math.min(Math.round(score), 100));
+        },
+
+        // Reactive computed list of ranked and matching lenders
+        get matchingLenders() {
+          let filtered = this.lenders;
+
+          // Location match
+          if (this.projectState !== '') {
+            filtered = filtered.filter(l => 
+              l.State === this.projectState || 
+              l['Lending Location'] === 'National' ||
+              (l['Lending Location'] && l['Lending Location'].includes(this.projectState))
+            );
+          }
+
+          // Ensure lender accommodates computed LTV safely (within 5% range limit of maximum capacity)
+          filtered = filtered.filter(l => {
+            const maxLtv = this.extractLtv(l);
+            return this.computedLTV <= maxLtv + 5; 
+          });
+
+          // Sort by computed score
+          return filtered.sort((a, b) => this.computeMatchScore(b) - this.computeMatchScore(a));
+        },
+
+        viewLender(lender) {
+          this.selectedLender = lender;
+        },
+
+        closeLender() {
+          this.selectedLender = null;
+        },
+
+        formatCurrency(num) {
+          return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(num);
+        }
+      }
+    }
+  </script>
+</body>
+</html>
+```

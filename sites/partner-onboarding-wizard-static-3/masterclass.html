@@ -1,0 +1,615 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonshine Capital Partners - Masterclass & Support</title>
+    <!-- Tailwind CSS CDN for structure/layout utility -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Neo-Brutalist Custom Styles matching Prism Logic aesthetic */
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&family=Syne:wght@700;800&display=swap');
+
+        :root {
+            --bg-color: #000000;
+            --card-bg: #ffffff;
+            --accent: #E2FF00; /* Toxic Neon Volt Yellow */
+            --accent-muted: #b5cc00;
+            --accent-pink: #FF0055; /* Hot Neon Pink secondary */
+            --border-width: 4px;
+            --shadow-offset: 8px;
+            --font-display: 'Syne', 'Space Grotesk', sans-serif;
+            --font-body: 'Space Grotesk', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: #000000;
+            font-family: var(--font-body);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(226, 255, 0, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(255, 0, 85, 0.1) 0%, transparent 40%),
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 20px 20px, 20px 20px;
+        }
+
+        h1, h2, h3, h4, h5, .brutalist-header {
+            font-family: var(--font-display);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.03em;
+        }
+
+        /* Thick Border & Hard Shadow Custom Utility classes */
+        .brutalist-border {
+            border: var(--border-width) solid #000000;
+        }
+
+        .brutalist-shadow-accent {
+            box-shadow: var(--shadow-offset) var(--shadow-offset) 0px 0px var(--accent);
+        }
+
+        .brutalist-shadow-black {
+            box-shadow: var(--shadow-offset) var(--shadow-offset) 0px 0px #000000;
+        }
+
+        .brutalist-shadow-pink {
+            box-shadow: var(--shadow-offset) var(--shadow-offset) 0px 0px var(--accent-pink);
+        }
+
+        .brutalist-btn {
+            border: var(--border-width) solid #000000;
+            font-weight: 900;
+            text-transform: uppercase;
+            transition: all 0.1s ease;
+            position: relative;
+        }
+
+        .brutalist-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 10px 10px 0px 0px #000000;
+        }
+
+        .brutalist-btn:active {
+            transform: translate(4px, 4px);
+            box-shadow: 2px 2px 0px 0px #000000;
+        }
+
+        .brutalist-btn-accent {
+            background-color: var(--accent);
+            color: #000000;
+        }
+
+        .brutalist-btn-accent:hover {
+            box-shadow: 10px 10px 0px 0px var(--accent-pink);
+        }
+
+        .brutalist-btn-pink {
+            background-color: var(--accent-pink);
+            color: #ffffff;
+        }
+
+        .brutalist-btn-black {
+            background-color: #000000;
+            color: #ffffff;
+        }
+
+        .brutalist-btn-black:hover {
+            background-color: var(--accent-pink);
+            color: #ffffff;
+            box-shadow: 10px 10px 0px 0px var(--accent);
+        }
+
+        .brutalist-btn-white {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        /* Input styling */
+        .brutalist-input {
+            border: var(--border-width) solid #000000;
+            font-weight: 700;
+            outline: none;
+            transition: all 0.15s ease;
+        }
+
+        .brutalist-input:focus {
+            background-color: #fafdf0;
+            box-shadow: 4px 4px 0px 0px var(--accent);
+            transform: translate(-2px, -2px);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000000;
+            border-left: var(--border-width) solid #ffffff;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border: 3px solid #000000;
+        }
+
+        /* Raw vector pattern */
+        .brutalist-pattern {
+            background-color: #ffffff;
+            background-image: radial-gradient(#000000 20%, transparent 20%),
+                              radial-gradient(#000000 20%, transparent 20%);
+            background-size: 8px 8px;
+            background-position: 0 0, 4px 4px;
+        }
+
+        /* Blink indicator for live feeling */
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .live-blink {
+            animation: blink 1s infinite;
+        }
+
+        /* Collapsible Accordion Transition Styling */
+        .faq-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .faq-item.active .faq-content {
+            max-height: 500px;
+        }
+
+        .faq-item.active .faq-header {
+            background-color: var(--accent);
+        }
+
+        /* Custom scanlines style for video box */
+        .scanlines {
+            position: relative;
+            overflow: hidden;
+        }
+        .scanlines::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col justify-between">
+
+    <!-- Top Navigation Header -->
+    <header class="w-full bg-white brutalist-border brutalist-shadow-accent p-4 mb-8 flex flex-col sm:flex-row justify-between items-center gap-4 z-10">
+        <div class="flex items-center gap-4">
+            <div class="bg-black text-white p-2 brutalist-border flex items-center justify-center font-black text-xl tracking-tighter">
+                MC⚡️
+            </div>
+            <div>
+                <h1 class="text-2xl md:text-3xl font-black tracking-tight leading-none">MOONSHINE CAPITAL</h1>
+                <p class="text-xs font-bold tracking-widest text-gray-500 uppercase mt-1">// AFFILIATE MASTERCLASS & SUPPORT TERMINAL</p>
+            </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+            <a href="index.html" class="brutalist-btn brutalist-btn-white px-4 py-2 text-xs font-black tracking-wider flex items-center gap-1">
+                ← BACK TO ONBOARDING
+            </a>
+            <span class="inline-block w-3 h-3 bg-red-500 rounded-none border border-black live-blink"></span>
+            <span class="text-xs font-black uppercase tracking-wider bg-black text-[#FF0055] px-3 py-1 brutalist-border">
+                MASTERCLASS PORTAL: ONLINE
+            </span>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-8">
+        
+        <!-- Left Column: Video Masterclass and Resources (8 cols) -->
+        <section class="lg:col-span-8 flex flex-col gap-8 w-full">
+            
+            <!-- Video Masterclass Screen -->
+            <div class="bg-white brutalist-border brutalist-shadow-black overflow-hidden flex flex-col">
+                <div class="w-full bg-black text-[#E2FF00] p-3 border-b-4 border-black flex justify-between items-center font-mono text-xs">
+                    <span>LIVE TRAINING ENGINE: //MOD_0<span id="current-mod-num">1</span>_ACTIVE</span>
+                    <span class="bg-red-600 text-white font-black px-2 py-0.5 brutalist-border border-[#E2FF00] live-blink">RECORDED FEED</span>
+                </div>
+
+                <!-- Styled CRT Simulated Video Player Frame -->
+                <div class="scanlines bg-neutral-900 aspect-video relative flex items-center justify-center border-b-4 border-black">
+                    <!-- Dynamic Video Graphic overlay -->
+                    <div class="absolute inset-0 brutalist-pattern opacity-10"></div>
+                    <div class="absolute inset-0 flex flex-col justify-between p-6 z-10 text-white pointer-events-none">
+                        <span class="text-xs font-mono font-black uppercase bg-[#FF0055] text-white px-2 py-1 self-start brutalist-border border-white shadow-[2px_2px_0px_0px_#000]">
+                            VIDEO MODULE <span id="video-overlay-num">01</span>
+                        </span>
+                        <div class="bg-black/95 p-4 brutalist-border border-white self-start max-w-md">
+                            <h3 id="video-overlay-title" class="text-xl md:text-2xl font-black text-[#E2FF00] leading-none mb-1">COOKIE INJECTION LOGIC</h3>
+                            <p id="video-overlay-desc" class="text-xs font-bold text-gray-300">Learn how to build direct referral query strings and cookie drops valid for 365 days.</p>
+                        </div>
+                    </div>
+
+                    <!-- Play button simulator -->
+                    <button onclick="triggerVideoPlay()" id="play-btn" class="z-20 bg-black text-[#E2FF00] brutalist-border w-24 h-24 rounded-none hover:scale-105 active:scale-95 transition-transform flex items-center justify-center hover:bg-[#FF0055] hover:text-white group">
+                        <span id="play-btn-icon" class="text-4xl translate-x-1 group-hover:text-white">▶</span>
+                    </button>
+                </div>
+
+                <!-- Video Modules Selector Grid -->
+                <div class="p-4 bg-gray-100 border-b-4 border-black">
+                    <span class="text-xs font-black uppercase text-gray-500 block mb-3">// SELECT LESSON MODULE:</span>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        
+                        <!-- Module Button 1 -->
+                        <button onclick="selectVideo(1, 'COOKIE INJECTION LOGIC', 'Learn how to build direct referral query strings and cookie drops valid for 365 days.', '14:22')" id="mod-btn-1" class="video-mod-btn text-left p-3 brutalist-border bg-[#E2FF00] text-black transition-all flex flex-col justify-between h-24">
+                            <span class="text-xs font-mono font-black">// MOD_01 [ACTIVE]</span>
+                            <span class="font-black text-sm uppercase leading-tight mt-1">COOKIE ARRAYS & TRAFFIC INGESTION</span>
+                            <span class="text-[10px] font-bold mt-auto bg-black text-white px-1.5 self-start">DURATION: 14:22</span>
+                        </button>
+
+                        <!-- Module Button 2 -->
+                        <button onclick="selectVideo(2, 'CONVERSION CLOSING HACKS', 'Target corporate developers and structural real estate asset buyers for optimal payouts.', '18:45')" id="mod-btn-2" class="video-mod-btn text-left p-3 brutalist-border bg-white text-black hover:bg-gray-200 transition-all flex flex-col justify-between h-24">
+                            <span class="text-xs font-mono font-black text-gray-400">// MOD_02</span>
+                            <span class="font-black text-sm uppercase leading-tight mt-1">CONVERTING HIGH LIQUIDITY LEADS</span>
+                            <span class="text-[10px] font-bold mt-auto bg-black text-white px-1.5 self-start">DURATION: 18:45</span>
+                        </button>
+
+                        <!-- Module Button 3 -->
+                        <button onclick="selectVideo(3, 'COMMISSION LEDGER DECODER', 'Master the live visual analytics panel, transaction tracking ledger, and crypto routing rules.', '11:05')" id="mod-btn-3" class="video-mod-btn text-left p-3 brutalist-border bg-white text-black hover:bg-gray-200 transition-all flex flex-col justify-between h-24">
+                            <span class="text-xs font-mono font-black text-gray-400">// MOD_03</span>
+                            <span class="font-black text-sm uppercase leading-tight mt-1">LEDGERS & LIQUIDITY DISPATCH</span>
+                            <span class="text-[10px] font-bold mt-auto bg-black text-white px-1.5 self-start">DURATION: 11:05</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Solid Black Buttons for Resource Downloads / Handbooks -->
+            <div class="bg-white p-6 brutalist-border brutalist-shadow-accent">
+                <div class="border-b-4 border-black pb-3 mb-6">
+                    <span class="text-xs font-black bg-black text-white px-2 py-0.5 uppercase tracking-wider">SECURE RESOURCES</span>
+                    <h2 class="text-3xl font-black mt-1">COMPLIANCE & BRANDING TOOLKIT</h2>
+                </div>
+
+                <p class="text-sm font-bold text-gray-700 mb-6 leading-relaxed">
+                    Ensure all your marketing distribution complies strictly with SEC Reg D exemptions and global compliance procedures. Download the official, pre-vetted material below:
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Resource Card 1 -->
+                    <div class="p-4 brutalist-border bg-gray-50 flex flex-col justify-between">
+                        <div>
+                            <span class="text-[10px] font-mono text-gray-400 font-bold block uppercase">// SECURITY MANUAL</span>
+                            <h4 class="text-lg font-black uppercase mt-1 leading-tight">2024 COMPLIANCE GUIDELINES Handbook</h4>
+                            <p class="text-xs text-gray-600 mt-2 font-semibold">Strict operational restrictions for referral promotion and marketing protocols.</p>
+                        </div>
+                        <button onclick="downloadResource('Moonshine_2024_Compliance_v4.pdf')" class="w-full mt-4 brutalist-btn brutalist-btn-black py-3 text-xs font-black tracking-widest flex items-center justify-center gap-2">
+                            📁 DOWNLOAD COMPLIANCE (PDF, 4MB)
+                        </button>
+                    </div>
+
+                    <!-- Resource Card 2 -->
+                    <div class="p-4 brutalist-border bg-gray-50 flex flex-col justify-between">
+                        <div>
+                            <span class="text-[10px] font-mono text-gray-400 font-bold block uppercase">// DESIGN ASSETS</span>
+                            <h4 class="text-lg font-black uppercase mt-1 leading-tight">CO-BRANDING MEDIA KIT v12</h4>
+                            <p class="text-xs text-gray-600 mt-2 font-semibold">Lossless SVG vector logos, raw brutalist badges, high contrast banner components.</p>
+                        </div>
+                        <button onclick="downloadResource('Moonshine_Brand_Kit_Vector_Raw.zip')" class="w-full mt-4 brutalist-btn brutalist-btn-black py-3 text-xs font-black tracking-widest flex items-center justify-center gap-2">
+                            📁 DOWNLOAD BRANDING (ZIP, 142MB)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Giant Blocky Dropdown Accordions for FAQs -->
+            <div class="bg-white p-6 brutalist-border brutalist-shadow-pink">
+                <div class="border-b-4 border-black pb-3 mb-6">
+                    <span class="text-xs font-black bg-[#FF0055] text-white px-2 py-0.5 uppercase tracking-wider">FAQ ENGINE</span>
+                    <h2 class="text-3xl font-black mt-1">PROGRAM PROTOCOL FAQ</h2>
+                </div>
+
+                <div class="flex flex-col gap-4">
+                    
+                    <!-- Accordion Item 1 -->
+                    <div class="faq-item brutalist-border active" id="faq-1">
+                        <button onclick="toggleFAQ(1)" class="faq-header w-full text-left p-4 bg-white font-black uppercase text-sm md:text-md tracking-tight flex justify-between items-center transition-all">
+                            <span>01 // WHEN ARE MONTHLY RECURRING REVENUES (MRR) DEPLOYED?</span>
+                            <span class="faq-icon text-xl font-black">−</span>
+                        </button>
+                        <div class="faq-content bg-white border-t-4 border-black p-4 text-xs md:text-sm text-gray-700 font-bold leading-relaxed">
+                            All referral metrics are reconciled instantly at the midnight close of the month. Wire releases or direct USDC smart contracts trigger liquidity actions by the 5th of the succeeding month. Maximum latency across banking networks typically ranges between 2 to 4 business days.
+                        </div>
+                    </div>
+
+                    <!-- Accordion Item 2 -->
+                    <div class="faq-item brutalist-border" id="faq-2">
+                        <button onclick="toggleFAQ(2)" class="faq-header w-full text-left p-4 bg-white font-black uppercase text-sm md:text-md tracking-tight flex justify-between items-center transition-all">
+                            <span>02 // WHAT ARE THE FORBIDDEN PROTOCOLS IN TRAFFIC INJECTION?</span>
+                            <span class="faq-icon text-xl font-black">+</span>
+                        </button>
+                        <div class="faq-content bg-white border-t-4 border-black p-4 text-xs md:text-sm text-gray-700 font-bold leading-relaxed">
+                            Any form of spam, self-referrals to execute mock arbitrage, or purchasing search engine real estate directly targeting terms owned by Moonshine Capital will immediately terminate your partner ID. Zero tolerance. Associated earnings will be quarantined permanently.
+                        </div>
+                    </div>
+
+                    <!-- Accordion Item 3 -->
+                    <div class="faq-item brutalist-border" id="faq-3">
+                        <button onclick="toggleFAQ(3)" class="faq-header w-full text-left p-4 bg-white font-black uppercase text-sm md:text-md tracking-tight flex justify-between items-center transition-all">
+                            <span>03 // CAN WE CO-BRAND WEBPAGES FOR INSTITUTIONAL PROSPECTS?</span>
+                            <span class="faq-icon text-xl font-black">+</span>
+                        </button>
+                        <div class="faq-content bg-white border-t-4 border-black p-4 text-xs md:text-sm text-gray-700 font-bold leading-relaxed">
+                            Yes. Direct integrations can request dynamically rendered custom landers through our technical terminal. Contact your program manager inside the Live Desk sidebar on the right with your custom subdomain specification.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Right Column: Aggressive Support Terminal Chat (4 cols) -->
+        <aside class="lg:col-span-4 w-full flex flex-col gap-6">
+            
+            <div class="bg-white brutalist-border brutalist-shadow-pink overflow-hidden flex flex-col min-h-[550px]">
+                
+                <!-- Chat Header -->
+                <div class="bg-black text-[#FF0055] p-4 border-b-4 border-black flex justify-between items-center">
+                    <div>
+                        <h4 class="text-md font-black tracking-tight leading-none text-white">LIVE SUPPORT CONSOLE</h4>
+                        <span class="text-[10px] font-bold text-[#E2FF00] block mt-1 tracking-wider uppercase">// HOST: DIRECT OPERATIONS DESK</span>
+                    </div>
+                    <span class="bg-[#FF0055] text-white text-xs font-black px-2 py-0.5 uppercase brutalist-border border-black live-blink">LIVE</span>
+                </div>
+
+                <!-- Chat System status indicator -->
+                <div class="bg-yellow-50 p-3 text-xs font-mono font-bold border-b-4 border-black text-black leading-tight flex gap-2">
+                    <span class="text-red-500 font-black">⚠️</span>
+                    <span>ATTENTION: DEMAND VOLUMES ARE EXTREMELY HIGH. AGENT "ENFORCER-1" IS ASSIGNED.</span>
+                </div>
+
+                <!-- Chat History Window (Brutalist style) -->
+                <div id="chat-window" class="flex-grow p-4 bg-[#fcfcfc] flex flex-col gap-4 overflow-y-auto max-h-[350px] min-h-[300px]">
+                    
+                    <!-- System message -->
+                    <div class="bg-black text-[#E2FF00] p-3 text-[10px] font-mono brutalist-border self-start w-full">
+                        <p class="font-black">&gt;&gt;&gt; SECURE CONNECTION INITIALIZED // SEC-PROTOCOL-125</p>
+                        <p class="text-gray-400">&gt;&gt;&gt; CONTEXT: PROGRAM MANAGER ESCALATION</p>
+                    </div>
+
+                    <!-- Bot Message -->
+                    <div class="self-start max-w-[85%]">
+                        <div class="bg-black text-white p-3 brutalist-border">
+                            <span class="block text-[10px] font-bold text-[#FF0055] uppercase tracking-widest font-mono mb-1">// ENFORCER-1</span>
+                            <p class="text-xs font-black uppercase leading-tight">
+                                WELCOME PARTNER. IDENTIFY YOUR DEVIATION STATUS OR REQUEST ACCESS PROTOCOL FOR IMMEDIATE ROUTING clearance.
+                            </p>
+                        </div>
+                        <span class="text-[10px] text-gray-400 font-bold uppercase mt-1 block">10:41 AM</span>
+                    </div>
+
+                    <!-- Dynamic Chat injection point -->
+                    <div id="dynamic-messages" class="flex flex-col gap-4"></div>
+
+                </div>
+
+                <!-- Suggested Quick Actions (Brutalist Mini-Buttons) -->
+                <div class="p-3 bg-gray-100 border-t-4 border-black border-b-4 flex flex-wrap gap-2">
+                    <span class="text-[9px] font-black text-gray-500 w-full block uppercase">// QUICK TRANSMISSION:</span>
+                    <button onclick="injectQuickMessage('REQUEST CO-BRANDED LANDER')" class="bg-white hover:bg-black hover:text-[#E2FF00] transition-colors border border-black font-black text-[9px] px-2 py-1 uppercase">REQUEST LANDER</button>
+                    <button onclick="injectQuickMessage('COMMISSION METRIC MISMATCH')" class="bg-white hover:bg-black hover:text-[#E2FF00] transition-colors border border-black font-black text-[9px] px-2 py-1 uppercase">REPORT MISMATCH</button>
+                    <button onclick="injectQuickMessage('EXPRESS WIRE REQUEST')" class="bg-white hover:bg-black hover:text-[#E2FF00] transition-colors border border-black font-black text-[9px] px-2 py-1 uppercase">WIRE EXPORT</button>
+                </div>
+
+                <!-- Chat Input System -->
+                <div class="p-4 bg-white flex gap-2">
+                    <input type="text" id="chat-input" onkeydown="handleChatKeyPress(event)" placeholder="TRANSMIT REQUEST DATA..." class="w-full brutalist-input px-3 py-3 text-xs uppercase bg-white">
+                    <button onclick="sendChatMessage()" class="brutalist-btn brutalist-btn-pink px-6 text-xs font-black tracking-widest">SEND</button>
+                </div>
+
+            </div>
+
+            <!-- Terminal System Information Panel -->
+            <div class="bg-black text-white p-6 brutalist-border brutalist-shadow-black font-mono text-xs">
+                <span class="text-[#E2FF00] font-black uppercase block mb-3">// LIVE SYSTEM STATUS DIAGNOSTICS</span>
+                <div class="flex flex-col gap-1.5">
+                    <div class="flex justify-between">
+                        <span>LATENCY:</span>
+                        <span class="text-green-400 font-bold">14MS</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>ESTIMATED WIRE CLEARANCE:</span>
+                        <span class="text-[#E2FF00] font-bold">AUTOMATIC</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>SEC PROTOCOL VERSION:</span>
+                        <span class="text-[#FF0055] font-bold">SEC-REG-D-34.1</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>CO-BRANDED DOMAIN ACTIVE:</span>
+                        <span class="text-[#E2FF00] font-bold">YES</span>
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+
+    </main>
+
+    <!-- Footer System Status Ledger -->
+    <footer class="w-full bg-black text-white p-4 brutalist-border flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-mono">
+        <div>
+            <span>SYSTEM CONTEXT: MOONSHINE CAPITAL CAPITAL ROUTING SYSTEMS v3.44</span>
+        </div>
+        <div class="flex gap-4">
+            <a href="#" class="hover:text-[#E2FF00] underline font-bold">LEDGER STATUS</a>
+            <span>|</span>
+            <a href="#" class="hover:text-[#E2FF00] underline font-bold">API INTEGRATION MANUAL</a>
+            <span>|</span>
+            <a href="#" class="hover:text-[#E2FF00] underline font-bold">SECURITY GATE</a>
+        </div>
+    </footer>
+
+    <!-- INTERACTION LOGIC LAYER (VANILLA JAVASCRIPT) -->
+    <script>
+        // FAQ Accordion Toggle Mechanism
+        function toggleFAQ(id) {
+            const faqItem = document.getElementById(`faq-${id}`);
+            const isActive = faqItem.classList.contains('active');
+
+            // Close all items
+            const allItems = document.querySelectorAll('.faq-item');
+            allItems.forEach(item => {
+                item.classList.remove('active');
+                item.querySelector('.faq-icon').innerText = '+';
+            });
+
+            // If item wasn't active, activate it
+            if (!isActive) {
+                faqItem.classList.add('active');
+                faqItem.querySelector('.faq-icon').innerText = '−';
+            }
+        }
+
+        // Switch Active Videos
+        function selectVideo(num, title, desc, duration) {
+            // Update Active Video Player Frame
+            document.getElementById('current-mod-num').innerText = num;
+            document.getElementById('video-overlay-num').innerText = `0${num}`;
+            document.getElementById('video-overlay-title').innerText = title;
+            document.getElementById('video-overlay-desc').innerText = desc;
+
+            // Update Class styles for buttons
+            const buttons = document.querySelectorAll('.video-mod-btn');
+            buttons.forEach(btn => {
+                btn.className = "video-mod-btn text-left p-3 brutalist-border bg-white text-black hover:bg-gray-200 transition-all flex flex-col justify-between h-24";
+                const numSpan = btn.querySelector('span:first-child');
+                if (numSpan) {
+                    numSpan.classList.add('text-gray-400');
+                }
+            });
+
+            const activeBtn = document.getElementById(`mod-btn-${num}`);
+            if (activeBtn) {
+                activeBtn.className = "video-mod-btn text-left p-3 brutalist-border bg-[#E2FF00] text-black transition-all flex flex-col justify-between h-24";
+                const numSpan = activeBtn.querySelector('span:first-child');
+                if (numSpan) {
+                    numSpan.classList.remove('text-gray-400');
+                }
+            }
+
+            // Reset Play Button visual states
+            const playBtnIcon = document.getElementById('play-btn-icon');
+            playBtnIcon.innerText = "▶";
+        }
+
+        // Trigger Play Simulation alert
+        function triggerVideoPlay() {
+            const playBtnIcon = document.getElementById('play-btn-icon');
+            const modNum = document.getElementById('current-mod-num').innerText;
+            const modTitle = document.getElementById('video-overlay-title').innerText;
+
+            if (playBtnIcon.innerText === "▶") {
+                playBtnIcon.innerText = "❚❚";
+                alert(`[STREAM INITIALIZED]\nCONNECTING TO CDN NODE...\nLESSON 0${modNum}: ${modTitle}\nPIPELINE FEED INTEGRATED.`);
+            } else {
+                playBtnIcon.innerText = "▶";
+            }
+        }
+
+        // Alert download resource in brutalist style
+        function downloadResource(filename) {
+            alert(`[SECURE TRANSACTION COMMENCED]\nFILE IDENTIFIER: ${filename}\nRETRIEVING FROM LIQUIDITY STORAGE VAULT...\nREADY AND EXTRACTED.`);
+        }
+
+        // Chat triggers and inputs
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+
+        function injectQuickMessage(msgText) {
+            const input = document.getElementById('chat-input');
+            input.value = msgText;
+            sendChatMessage();
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const messageText = input.value.trim().toUpperCase();
+
+            if (messageText === "") {
+                return;
+            }
+
+            const dynamicMessages = document.getElementById('dynamic-messages');
+
+            // Inject User Message HTML block
+            const userMsgHTML = `
+                <div class="self-end max-w-[85%] text-right self-end ml-auto">
+                    <div class="bg-[#E2FF00] text-black p-3 brutalist-border">
+                        <span class="block text-[10px] font-bold text-gray-600 uppercase tracking-widest font-mono mb-1">// PARTNER (YOU)</span>
+                        <p class="text-xs font-black uppercase leading-tight">${escapeHTML(messageText)}</p>
+                    </div>
+                    <span class="text-[10px] text-gray-400 font-bold uppercase mt-1 block">JUST NOW</span>
+                </div>
+            `;
+            dynamicMessages.insertAdjacentHTML('beforeend', userMsgHTML);
+            input.value = "";
+
+            // Auto-scroll chat to the bottom
+            const chatWindow = document.getElementById('chat-window');
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+
+            // Simulated response logic
+            setTimeout(() => {
+                // Generate automated aggressive/brutalist programmatic response
+                let botResponse = "REQUEST DETECTED. ENFORCER DESK IS VERIFYING CONTEXT ENGINE PARAMS.";
+                if (messageText.includes("LANDER")) {
+                    botResponse = "CO-BRANDED SUBDOMAIN REQUEST ROUTED. EXPECT AUTOMATED LANDER LINK DEPLOYMENT TO YOUR NOTIFICATION SCREEN INSIDE 45 MINUTES.";
+                } else if (messageText.includes("MISMATCH")) {
+                    botResponse = "INITIATING PARITY RECONCILIATION PROTOCOLS across internal blockchains. Upload your CSV log or dynamic click identifier strings for fast validation.";
+                } else if (messageText.includes("WIRE") || messageText.includes("EXPORT")) {
+                    botResponse = "WIRE DEPLOYMENT STATUS: QUEUED. PLEASE ENSURE SEC REQUISITE FORMS ARE PROPERLY EXECUTED & SEALED TO PREVENT CORRESPONDENT CORRUPTION LOCKS.";
+                } else {
+                    botResponse = `COMMAND "${escapeHTML(messageText)}" COMPILING. ENFORCER PROTOCOLS REPORT TRANSACTION INTEGRATED WITH AFFILIATE LINK RECORD. OPERATIONS REMAIN ACTIVE.`;
+                }
+
+                const botMsgHTML = `
+                    <div class="self-start max-w-[85%] mt-2">
+                        <div class="bg-black text-white p-3 brutalist-border">
+                            <span class="block text-[10px] font-bold text-[#FF0055] uppercase tracking-widest font-mono mb-1">// ENFORCER-1</span>
+                            <p class="text-xs font-black uppercase leading-tight">${botResponse}</p>
+                        </div>
+                        <span class="text-[10px] text-gray-400 font-bold uppercase mt-1 block">JUST NOW</span>
+                    </div>
+                `;
+                dynamicMessages.insertAdjacentHTML('beforeend', botMsgHTML);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            }, 800);
+        }
+
+        // Helper to clean inputs from scripting attacks
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag] || tag)
+            );
+        }
+    </script>
+</body>
+</html>
+```

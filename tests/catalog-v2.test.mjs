@@ -25,6 +25,15 @@ test('metadata search, intersected filters, missing dates and stable tie sorting
  assert.equal(sortCatalog([row,dated],'created')[0].id,'dated');
  assert.equal(sortCatalog([row,{...row,id:'aaa'}],'updated')[0].id,'aaa');
 });
+test('framework implementation metadata is searchable and filterable through architecture',()=>{
+ const source=fixture();
+ source.showcase.projects.group.catalog.architecture=['Next.js'];
+ source.showcase.projects.group.catalog.frameworkImplementations=[{id:'impl-next',name:'nextjs.zip',frameworks:['Next.js'],packageMetadata:[{name:'next',version:'15'}]}];
+ const [row]=normalizeCatalog(source);
+ assert.ok(matchesCatalog(row,{architecture:'Next.js'}));
+ assert.ok(matchesCatalog(row,{q:'nextjs.zip'}));
+ assert.equal(row.catalog.frameworkImplementations[0].packageMetadata[0].version,'15');
+});
 test('real catalog preserves all previously visible destinations and canonical group identities',()=>{
  const routes=applyCuratedCollections(read('asset-route-resolution'),read('curated-collections'));
  const rows=normalizeCatalog({routes,showcase:read('asset-showcase'),previews:read('asset-previews'),themes:read('transferable-design-themes'),registry:read('site-registry'),groups:read('asset-groups'),contracts:read('variant-route-contracts')});

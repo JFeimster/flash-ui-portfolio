@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash UI Export</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="prism-container">
+        <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+
+        <!-- View 1: Landing -->
+        <div class="view active" id="view-landing">
+            <div class="landing-content">
+                <div style="margin-bottom: 10px;"><span class="question-number">Strategic Analysis Tool</span></div>
+                <h1>Should Your Business <br><span class="split-text">Bootstrap or Seek Funding?</span></h1>
+                <p class="subtitle">A logic-driven framework to determine the optimal capital structure for your specific market window, risk tolerance, and growth goals.</p>
+                <button class="btn-primary" onclick="startQuiz()">
+                    Start Decision Engine
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- View 2: Quiz -->
+        <div class="view" id="view-quiz">
+            <div class="quiz-header">
+                <div class="question-number" id="qNumber">Question 1 of 10</div>
+                <div class="question-text" id="qText">What is your primary objective for the next 24 months?</div>
+            </div>
+            <div class="options-grid" id="optionsGrid">
+                <!-- Options injected via JS -->
+            </div>
+        </div>
+
+        <!-- View 3: Results -->
+        <div class="view" id="view-results">
+            <div class="results-header">
+                <span class="question-number">Recommendation Analysis</span>
+                <h2 id="recommendationTitle" style="font-size: 2rem; margin: 10px 0;">Calculated Path: The Bootstrap Route</h2>
+                <p id="recommendationText" style="color: #64748b; line-height: 1.6;">Based on your inputs regarding control and profitability, steady growth ensures long-term equity preservation.</p>
+            </div>
+
+            <div class="results-grid">
+                <div class="path-score-card bootstrap-card">
+                    <div class="winner-badge bootstrap-badge" id="badge-bootstrap" style="display:none">Optimal</div>
+                    <div class="score-label" style="color: var(--bootstrap-green)">Bootstrap Index</div>
+                    <div class="score-val" id="score-bootstrap">72%</div>
+                    <p style="font-size: 0.85rem; color: #166534;">Prioritizes sustainability, optionality, and 100% ownership.</p>
+                </div>
+                <div class="path-score-card funding-card">
+                    <div class="winner-badge funding-badge" id="badge-funding" style="display:none">Optimal</div>
+                    <div class="score-label" style="color: var(--funding-blue)">Funding Index</div>
+                    <div class="score-val" id="score-funding">28%</div>
+                    <p style="font-size: 0.85rem; color: #1e40af;">Prioritizes market capture, speed, and aggressive scaling.</p>
+                </div>
+            </div>
+
+            <div class="modeler-box">
+                <div class="modeler-header">
+                    <h4 style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">5-Year Market Capture Projection</h4>
+                </div>
+                <div class="projection-bar-container">
+                    <div class="proj-bootstrap" id="bar-bootstrap" style="width: 40%"></div>
+                    <div class="proj-funding" id="bar-funding" style="width: 60%"></div>
+                </div>
+                <div class="proj-labels">
+                    <span>Bootstrap Path (Organic)</span>
+                    <span>Funded Path (Aggressive)</span>
+                </div>
+            </div>
+
+            <div class="cta-container" id="ctaContainer">
+                <!-- CTAs injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "What is your primary objective for the next 24 months?", a: [
+                { t: "Sustainable profitability and control", v: "b" },
+                { t: "Aggressive market share acquisition", v: "f" }
+            ]},
+            { q: "How crowded is your current market landscape?", a: [
+                { t: "Niche or emerging with low competition", v: "b" },
+                { t: "Winner-take-all with heavy incumbents", v: "f" }
+            ]},
+            { q: "What is your comfort level with external governance?", a: [
+                { t: "High - I want experienced board guidance", v: "f" },
+                { t: "Low - I want absolute final say on product", v: "b" }
+            ]},
+            { q: "Your product's capital intensity is...", a: [
+                { t: "Low - We can build with sweat equity", v: "b" },
+                { t: "High - Requires R&D, hardware, or large sales teams", v: "f" }
+            ]},
+            { q: "What is your ideal exit timeline?", a: [
+                { t: "10+ years or a legacy business", v: "b" },
+                { t: "3-7 years via acquisition or IPO", v: "f" }
+            ]},
+            { q: "How fast does your industry move?", a: [
+                { t: "Incremental - Relationships matter most", v: "b" },
+                { t: "Exponential - Speed is a moat", v: "f" }
+            ]},
+            { q: "What is your current monthly burn?", a: [
+                { t: "Profitable or break-even", v: "b" },
+                { t: "Heavily cash-flow negative", v: "f" }
+            ]},
+            { q: "How much of your equity are you willing to trade?", a: [
+                { t: "0-10% maximum", v: "b" },
+                { t: "20-50% for high growth resources", v: "f" }
+            ]},
+            { q: "Your hiring needs are...", a: [
+                { t: "Lean - Small team of generalists", v: "b" },
+                { t: "Rapid - Need 20+ specialized hires now", v: "f" }
+            ]},
+            { q: "The 'Opportunity Cost' of moving slowly is...", a: [
+                { t: "Manageable - The market will wait", v: "b" },
+                { t: "Fatal - Competitors will lock the market", v: "f" }
+            ]}
+        ];
+
+        let currentStep = 0;
+        let scores = { b: 0, f: 0 };
+
+        function startQuiz() {
+            document.getElementById('view-landing').classList.remove('active');
+            document.getElementById('view-quiz').classList.add('active');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = questions[currentStep];
+            document.getElementById('qNumber').innerText = `Question ${currentStep + 1} of 10`;
+            document.getElementById('qText').innerText = q.q;
+            document.getElementById('progressBar').style.width = `${((currentStep + 1) / 10) * 100}%`;
+            
+            const grid = document.getElementById('optionsGrid');
+            grid.innerHTML = '';
+            
+            q.a.forEach(opt => {
+                const div = document.createElement('div');
+                div.className = 'option-card';
+                div.innerHTML = `<div class="dot"></div><span>${opt.t}</span>`;
+                div.onclick = () => selectOption(opt.v);
+                grid.appendChild(div);
+            });
+        }
+
+        function selectOption(val) {
+            scores[val]++;
+            if (currentStep < questions.length - 1) {
+                currentStep++;
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('view-quiz').classList.remove('active');
+            document.getElementById('view-results').classList.add('active');
+            document.getElementById('progressBar').style.width = `100%`;
+
+            const bPerc = (scores.b / 10) * 100;
+            const fPerc = (scores.f / 10) * 100;
+
+            document.getElementById('score-bootstrap').innerText = `${bPerc}%`;
+            document.getElementById('score-funding').innerText = `${fPerc}%`;
+            
+            // Scenario Modeler Logic (Math-based logic reveal)
+            // Bootstrap results in higher ownership but slower market cap
+            // Funding results in lower ownership but potentially larger absolute market cap
+            document.getElementById('bar-bootstrap').style.width = `${Math.max(20, bPerc - 10)}%`;
+            document.getElementById('bar-funding').style.width = `${Math.max(20, fPerc + 10)}%`;
+
+            const container = document.getElementById('ctaContainer');
+            
+            if (scores.f > scores.b) {
+                document.getElementById('recommendationTitle').innerText = "Calculated Path: Strategic Funding";
+                document.getElementById('recommendationText').innerText = "Your model suggests high capital intensity and a narrow market window. Venture capital or private equity will provide the necessary 'fuel' to capture the territory before incumbents react.";
+                document.getElementById('badge-funding').style.display = 'block';
+                container.innerHTML = `
+                    <button class="btn-primary" style="background:var(--funding-blue)">Apply for Funding Analysis</button>
+                    <button class="btn-outline" onclick="location.reload()">Recalculate</button>
+                `;
+            } else {
+                document.getElementById('recommendationTitle').innerText = "Calculated Path: The Bootstrap Route";
+                document.getElementById('recommendationText').innerText = "Profitability and control are your moats. By growing organically, you maintain 100% optionality. We've prepared a nurture sequence to help you optimize cash flow while keeping funding as a future lever.";
+                document.getElementById('badge-bootstrap').style.display = 'block';
+                container.innerHTML = `
+                    <button class="btn-primary" style="background:var(--bootstrap-green)">Access Bootstrap Blueprint</button>
+                    <button class="btn-outline" onclick="location.reload()">Recalculate</button>
+                `;
+            }
+        }
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

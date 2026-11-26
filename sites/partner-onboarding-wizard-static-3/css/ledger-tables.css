@@ -1,0 +1,451 @@
+:root {
+    --ledger-bg: #ffffff;
+    --ledger-black: #000000;
+    --ledger-accent: #E2FF00;
+    --ledger-pink: #FF0055;
+    --ledger-border-width: 4px;
+    --ledger-shadow-offset: 8px;
+    --ledger-font: 'Space Grotesk', 'Courier New', monospace;
+}
+
+/* ==========================================================================
+   1. STARK ACCOUNTING LEDGERCONTAINER
+   ========================================================================== */
+.ledger-wrapper {
+    background-color: var(--ledger-bg);
+    border: var(--ledger-border-width) solid var(--ledger-black);
+    box-shadow: var(--ledger-shadow-offset) var(--ledger-shadow-offset) 0px 0px var(--ledger-black);
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.ledger-header {
+    background-color: var(--ledger-black);
+    color: #ffffff;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: var(--ledger-border-width) solid var(--ledger-black);
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.ledger-header-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+}
+
+.ledger-header-meta {
+    font-family: var(--ledger-font);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--ledger-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* Scrollable viewport built for brute responsiveness */
+.ledger-table-viewport {
+    overflow-x: auto;
+    width: 100%;
+    background-image: 
+        linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+/* ==========================================================================
+   2. AGGRESSIVE LEDGER TABLE
+   ========================================================================== */
+.ledger-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--ledger-font);
+    text-align: left;
+    min-width: 750px; /* Forces horizontal scrolling on narrow screens instead of squishing */
+}
+
+.ledger-table th {
+    background-color: #ffffff;
+    color: var(--ledger-black);
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    padding: 1rem 1.5rem;
+    border-bottom: var(--ledger-border-width) solid var(--ledger-black);
+    border-right: 2px solid var(--ledger-black);
+}
+
+.ledger-table th:last-child {
+    border-right: none;
+}
+
+.ledger-table tr {
+    border-bottom: 2px solid var(--ledger-black);
+    transition: background-color 0.15s ease;
+}
+
+.ledger-table tr:last-child {
+    border-bottom: none;
+}
+
+.ledger-table tr:hover {
+    background-color: #fafdf0 !important; /* Toxic highlight on hover */
+}
+
+/* Stripe rows with an ultra-flat brutalist gray */
+.ledger-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.ledger-table td {
+    padding: 1rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--ledger-black);
+    border-right: 2px solid var(--ledger-black);
+}
+
+.ledger-table td:last-child {
+    border-right: none;
+}
+
+/* Highlight Numeric Columns */
+.ledger-col-numeric {
+    font-family: monospace;
+    font-size: 1rem !important;
+    font-weight: 900 !important;
+    text-align: right;
+    letter-spacing: -0.02em;
+}
+
+.ledger-col-id {
+    font-family: monospace;
+    font-size: 0.75rem !important;
+    color: #666666 !important;
+    text-transform: uppercase;
+}
+
+/* Double underline accounting row (total summaries) */
+.ledger-row-summary {
+    background-color: var(--ledger-black) !important;
+    color: #ffffff !important;
+    border-top: var(--ledger-border-width) solid var(--ledger-black);
+}
+
+.ledger-row-summary td {
+    color: #ffffff !important;
+    border-right-color: #333333;
+    font-weight: 900;
+}
+
+.ledger-row-summary .ledger-col-numeric {
+    border-bottom: 6px double var(--ledger-accent);
+}
+
+/* ==========================================================================
+   3. MASSIVE, LOUD STATUS BADGES
+   ========================================================================== */
+.ledger-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.75rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    border: 2px solid var(--ledger-black);
+    background-color: #ffffff;
+    box-shadow: 2px 2px 0px 0px var(--ledger-black);
+}
+
+.status-cleared {
+    background-color: var(--ledger-accent);
+    color: var(--ledger-black);
+}
+
+.status-pending {
+    background-color: var(--ledger-pink);
+    color: #ffffff;
+}
+
+.status-audit {
+    background-color: var(--ledger-black);
+    color: #ffffff;
+    border: 2px solid #ffffff;
+}
+
+.status-failed {
+    background-color: #ffffff;
+    color: var(--ledger-black);
+    border-style: dashed;
+}
+
+/* ==========================================================================
+   4. CASHOUT STATION & LEDGER METRICS GRID
+   ========================================================================== */
+.cashout-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.cashout-card {
+    background-color: #ffffff;
+    border: var(--ledger-border-width) solid var(--ledger-black);
+    box-shadow: var(--ledger-shadow-offset) var(--ledger-shadow-offset) 0px 0px var(--ledger-black);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.cashout-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 10px 10px 0px 0px var(--ledger-black);
+}
+
+.cashout-card.accent-pink {
+    box-shadow: var(--ledger-shadow-offset) var(--ledger-shadow-offset) 0px 0px var(--ledger-pink);
+}
+.cashout-card.accent-pink:hover {
+    box-shadow: 10px 10px 0px 0px var(--ledger-pink);
+}
+
+.cashout-card.accent-volt {
+    box-shadow: var(--ledger-shadow-offset) var(--ledger-shadow-offset) 0px 0px var(--ledger-accent);
+}
+.cashout-card.accent-volt:hover {
+    box-shadow: 10px 10px 0px 0px var(--ledger-accent);
+}
+
+.cashout-label {
+    font-size: 0.7rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #666666;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.cashout-value {
+    font-family: var(--ledger-font);
+    font-size: 2.25rem;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin-bottom: 1rem;
+}
+
+.cashout-btn {
+    border: var(--ledger-border-width) solid var(--ledger-black);
+    padding: 1rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    text-align: center;
+    background-color: var(--ledger-black);
+    color: #ffffff;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.1s ease;
+}
+
+.cashout-btn:hover {
+    background-color: var(--ledger-accent);
+    color: var(--ledger-black);
+    box-shadow: 4px 4px 0px 0px var(--ledger-black);
+}
+
+.cashout-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0px 0px var(--ledger-black);
+}
+
+/* ==========================================================================
+   5. STARK MODAL FOR CASHOUT ACTIONS
+   ========================================================================== */
+.ledger-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    backdrop-filter: blur(4px);
+}
+
+.ledger-modal {
+    background-color: #ffffff;
+    border: var(--ledger-border-width) solid var(--ledger-black);
+    box-shadow: 12px 12px 0px 0px var(--ledger-pink);
+    width: 100%;
+    max-width: 550px;
+    position: relative;
+    overflow: hidden;
+    animation: modalSlide 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalSlide {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.ledger-modal-header {
+    background-color: var(--ledger-black);
+    color: #ffffff;
+    padding: 1.25rem;
+    border-bottom: var(--ledger-border-width) solid var(--ledger-black);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ledger-modal-close {
+    background: none;
+    border: 2px solid #ffffff;
+    color: #ffffff;
+    font-family: var(--ledger-font);
+    font-weight: 900;
+    cursor: pointer;
+    font-size: 1rem;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.1s ease;
+}
+
+.ledger-modal-close:hover {
+    background-color: var(--ledger-pink);
+    border-color: var(--ledger-pink);
+}
+
+.ledger-modal-body {
+    padding: 2rem;
+}
+
+/* Radio Switchers for Payout Options */
+.payment-selector-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.payment-radio-label {
+    border: var(--ledger-border-width) solid var(--ledger-black);
+    padding: 1rem;
+    text-align: center;
+    cursor: pointer;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    transition: all 0.1s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.payment-radio-input {
+    display: none;
+}
+
+.payment-radio-input:checked + .payment-radio-label {
+    background-color: var(--ledger-accent);
+    box-shadow: 4px 4px 0px 0px var(--ledger-black);
+    transform: translate(-2px, -2px);
+}
+
+/* Stark Form Elements */
+.ledger-field-group {
+    margin-bottom: 1.25rem;
+}
+
+.ledger-field-group label {
+    display: block;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.4rem;
+    color: var(--ledger-black);
+}
+
+.ledger-form-input {
+    width: 100%;
+    border: var(--ledger-border-width) solid var(--ledger-black);
+    padding: 0.8rem 1rem;
+    font-family: var(--ledger-font);
+    font-weight: 700;
+    font-size: 0.9rem;
+    outline: none;
+    background-color: #ffffff;
+    transition: all 0.1s ease;
+}
+
+.ledger-form-input:focus {
+    background-color: #fafdf0;
+    box-shadow: 4px 4px 0px 0px var(--ledger-black);
+    transform: translate(-2px, -2px);
+}
+
+/* Modal Info Panel */
+.ledger-modal-disclaimer {
+    background-color: #f5f5f5;
+    border: 2px dashed var(--ledger-black);
+    padding: 1rem;
+    font-size: 0.75rem;
+    color: #444444;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-top: 1.5rem;
+    text-transform: uppercase;
+}
+
+/* ==========================================================================
+   6. DEVIATION METERS (Flat Progress Bars)
+   ========================================================================== */
+.ledger-progress-container {
+    width: 100%;
+    height: 1.5rem;
+    background-color: #ffffff;
+    border: var(--ledger-border-width) solid var(--ledger-black);
+    margin: 0.5rem 0 1rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.ledger-progress-bar {
+    height: 100%;
+    background-color: var(--ledger-pink);
+    border-right: 2px solid var(--ledger-black);
+    transition: width 0.4s cubic-bezier(0.1, 0.8, 0.25, 1);
+}
+
+.ledger-progress-bar.bar-volt {
+    background-color: var(--ledger-accent);
+}
