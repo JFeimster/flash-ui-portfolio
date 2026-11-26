@@ -624,6 +624,13 @@
         try {
           const payload = JSON.parse(sessionStorage.getItem("flash-ui-copilot-generator-handoff:v1") || "null");
           if (payload?.source === "copilot" && typeof payload.prompt === "string" && (!payload.ideaId || payload.ideaId === requestedSource?.id)) {
+            const copilot = payload.brief || {};
+            const fieldMap = {projectName:"projectName",audience:"audience",problem:"problem",hook:"hook",cta:"cta",features:"features",idea:"subject",designDirection:"customDirection"};
+            for (const [from,to] of Object.entries(fieldMap)) if (typeof copilot[from] === "string") state.values[to] = copilot[from];
+            if (transferableThemes.some(theme => theme.id === copilot.themeId)) state.options.designStyle = `theme:${copilot.themeId}`;
+            renderAllControls();
+            syncFieldsFromState();
+            updateOutput(true);
             $("#promptOutput").value = payload.prompt;
             promptDirty = true;
             updateOutput();
