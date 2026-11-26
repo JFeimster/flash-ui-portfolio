@@ -34,6 +34,7 @@ const reportPath=option('report');
 const previewBase=option('preview-base');
 if(!['auto','static','grouped','existing','external','tool'].includes(modeOption))throw Error('Invalid --mode');
 if(!sourceOption&&!manifestPath&&!bulkOption)throw Error('Usage: node scripts/import-asset.mjs --source "C:\\path\\project" [--manifest "C:\\path\\project.json"] [--slug id] [--mode static|grouped|existing|external|tool] [--apply] [--report "C:\\path\\report.json"] [--bulk "C:\\path\\incoming"] [--repo-root "C:\\path\\isolated-repo"] [--preview-base http://localhost:4173]');
+if(reportPath&&!within(path.resolve(reportPath),root))throw Error('Report must be inside repository');
 
 const approvedFile='data/batch-19c-approved-imports.json';
 const showcaseFile='data/asset-showcase.json';
@@ -50,7 +51,9 @@ const fingerprint=files=>crypto.createHash('sha256').update(JSON.stringify(files
 function filesUnder(dir) {
  const files=[];
  function visit(folder){for(const item of fs.readdirSync(folder,{withFileTypes:true})){const file=path.join(folder,item.name);if(item.isSymbolicLink())throw Error('Symlink source requires review: '+file);if(item.isDirectory())visit(file);else if(item.isFile())files.push({path:path.relative(dir,file).replaceAll('\\','/'),sha256:sha(file),size:fs.statSync(file).size});else throw Error('Unsupported source entry: '+file);}}
- visit(dir);return files.sort((a,b)=>a.path.localeCompare(b.path));
+ visit(dir);
+ if(files.length>3000||files.reduce((total,file)=>total+file.size,0)>200_000_000)throw Error('Source exceeds file count or size limit');
+ return files.sort((a,b)=>a.path.localeCompare(b.path));
 }
 function stage(source) {
  if(!source)return {folder:null,cleanup:()=>{},archiveSha256:null};
