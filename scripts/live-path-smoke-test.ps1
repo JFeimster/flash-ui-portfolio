@@ -109,7 +109,21 @@ $standaloneApps = @($routeResolution.entries | Where-Object { $_.resolutionStatu
 # but never counted as production failures unless the canonical resolver still
 # selects that exact route.
 $legacyPaths = @()
+$batch5Path = Join-Path $dataRoot 'site-registry-batch-5-additions.json'
+if (Test-Path $batch5Path) {
+  $batch5 = Get-Content $batch5Path -Raw | ConvertFrom-Json
+  foreach ($file in @($batch5.rootHtml)) {
+    $legacyPaths += [pscustomobject]@{ sourceFile = 'data/site-registry-batch-5-additions.json'; title = [string]$file; path = (ConvertTo-CanonicalRoutePath "sites/$file") }
+  }
+  foreach ($tuple in @($batch5.static)) {
+    $name = [string]$tuple[0]
+    $subdir = if ($tuple.Count -gt 1) { [string]$tuple[1] } else { '' }
+    $path = if ($subdir) { "sites/$name/$subdir" } else { "sites/$name" }
+    $legacyPaths += [pscustomobject]@{ sourceFile = 'data/site-registry-batch-5-additions.json'; title = $name; path = (ConvertTo-CanonicalRoutePath $path) }
+  }
+}
 foreach ($source in @('site-registry-batch-5-additions.json', 'site-registry-static-extractions.json')) {
+  if ($source -eq 'site-registry-batch-5-additions.json') { continue }
   $path = Join-Path $dataRoot $source
   if (-not (Test-Path $path)) { continue }
   $legacy = Get-Content $path -Raw | ConvertFrom-Json
@@ -121,6 +135,8 @@ foreach ($source in @('site-registry-batch-5-additions.json', 'site-registry-sta
 $canonicalPathSet = @{}
 foreach ($candidate in $candidates) { $canonicalPathSet[$candidate.path] = $true }
 $supersededLegacy = @($legacyPaths | Where-Object { -not $canonicalPathSet.ContainsKey($_.path) } | Sort-Object path -Unique)
+$supersededLegacyBySource = [ordered]@{}
+foreach ($group in @($supersededLegacy | Group-Object sourceFile)) { $supersededLegacyBySource[$group.Name] = $group.Count }
 
 $rows = @($resultsByUrl.Values)
 $passed = @($rows | Where-Object { $_.result -in @('pass', 'redirected-pass') })
@@ -134,7 +150,7 @@ $report = [pscustomobject]@{
   coverageSources = @('data/asset-route-resolution.json', 'data/asset-previews.json', 'data/asset-showcase.json')
   batch42ExpectedImports = 75; batch42ImportsDiscovered = $batch42Folders.Count; batch42ImportsWithCanonicalRoutes = @($batch42Coverage | Where-Object { $_.canonicalPath }).Count
   batch42Coverage = @($batch42Coverage | Sort-Object folder, canonicalPath)
-  supersededLegacyPathCount = $supersededLegacy.Count; supersededLegacyPaths = @($supersededLegacy)
+  supersededLegacyPathCount = $supersededLegacy.Count; supersededLegacyBySource = $supersededLegacyBySource; supersededLegacyPaths = @($supersededLegacy)
   unresolvedEntries = $unresolved; archives = $archives; standaloneApplications = $standaloneApps
   results = @($rows | Sort-Object result, title)
 }
@@ -154,6 +170,7 @@ $md.Add(''); $md.Add('## Unresolved Route Entries'); $md.Add('')
 if (-not $unresolved.Count) { $md.Add('No unresolved route-resolution entries.') } else { foreach ($item in $unresolved) { $md.Add("- $($item.resolutionStatus): $($item.title) — $($item.originalPath) ($($item.reason))") } }
 $md.Add(''); $md.Add('## Archives and Standalone Applications'); $md.Add(''); $md.Add("- Archives: $($archives.Count)"); $md.Add("- Standalone applications: $($standaloneApps.Count)")
 $md.Add(''); $md.Add('## Superseded Legacy Paths'); $md.Add(''); $md.Add("$($supersededLegacy.Count) legacy paths no longer selected by canonical route resolution. They are reported separately and are not production failures.")
+foreach ($sourceName in $supersededLegacyBySource.Keys) { $md.Add("- ${sourceName}: $($supersededLegacyBySource[$sourceName])") }
 foreach ($item in $supersededLegacy) { $md.Add("- $($item.path) — $($item.title) [$($item.sourceFile)]") }
 $md.Add(''); $md.Add('## Batch 42 Import Coverage'); $md.Add(''); $md.Add('| Imported folder | Canonical path | Result | URL |'); $md.Add('| --- | --- | --- | --- |')
 foreach ($item in $report.batch42Coverage) { $md.Add("| $($item.folder) | $($item.canonicalPath) | $($item.result) | $($item.url) |") }
