@@ -9,6 +9,7 @@
   };
   const params = new URLSearchParams(location.search);
   const id = params.get('idea');
+  if (id) $('#copilotLink').href = '/copilot/?idea=' + encodeURIComponent(id);
   const status = message => { $('#workbenchStatus').textContent = message; };
   const count = value => ({ words: value.trim().split(/\s+/).filter(Boolean).length, characters: value.length });
   const fields = [

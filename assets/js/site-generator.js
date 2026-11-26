@@ -620,6 +620,18 @@
           }
         } catch { setStatus("Workbench handoff could not be loaded."); }
       }
+      if (params.get("handoff") === "copilot") {
+        try {
+          const payload = JSON.parse(sessionStorage.getItem("flash-ui-copilot-generator-handoff:v1") || "null");
+          if (payload?.source === "copilot" && typeof payload.prompt === "string" && (!payload.ideaId || payload.ideaId === requestedSource?.id)) {
+            $("#promptOutput").value = payload.prompt;
+            promptDirty = true;
+            updateOutput();
+            sessionStorage.removeItem("flash-ui-copilot-generator-handoff:v1");
+            setStatus("Copilot prompt loaded locally. Review the draft before export or build handoff.");
+          }
+        } catch { setStatus("Copilot handoff could not be loaded. Export the brief from Copilot and retry."); }
+      }
       $("#sourceResultCount").textContent = `${library.filter((entry) => entry.factory.kind === "site-idea").length} site ideas ready`;
     } catch (error) {
       $("#sourceResultCount").textContent = "Prompt library could not be loaded";
