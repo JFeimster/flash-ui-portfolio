@@ -79,7 +79,7 @@ function localRefs(file) {
  if(/\.css$/i.test(file)){for(const m of body.matchAll(/(?:url\(\s*|@import\s+)(?:["']?)([^"'\)\s]+)["']?\s*\)?/gi))refs.push(m[1]);}
  else if(/\.html?$/i.test(file)){for(const m of body.matchAll(/\b(?:src|href|poster|data-src)\s*=\s*["']([^"']+)["']/gi))refs.push(m[1]);for(const m of body.matchAll(/\bsrcset\s*=\s*["']([^"']+)["']/gi))refs.push(...m[1].split(',').map(x=>x.trim().split(/\s+/)[0]));}
  else if(/\.[cm]?js$/i.test(file)){for(const m of body.matchAll(/\b(?:import|export)\s*(?:[^"']*?from\s*)?["'](\.[^"']+)["']/g))refs.push(m[1]);}
- return refs.filter(x=>x&&!/^(?:[a-z]+:|\/|#|data:|\/\/)/i.test(x));
+ return refs.filter(x=>x&&!x.includes("${")&&!/^(?:[a-z]+:|\/|#|data:|\/\/)/i.test(x));
 }
 function validateEntries(base, entries) {
  const missing=[], visited=new Set(), checked=[];
