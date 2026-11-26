@@ -1,0 +1,708 @@
+```html
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capital_Vault // Scenario Submission Portal</title>
+  
+  <!-- Inter & JetBrains Mono Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Alpine.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  
+  <!-- jsPDF for Pre-Qualification PDF Packet Generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- Tailwind Configuration -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              black: '#05070c',
+              dark: '#0a0d16',
+              card: '#0f1322',
+              border: '#1e2640',
+              accent: '#00f0ff',
+              neonPurple: '#9d4edd',
+              neonGreen: '#00ff66',
+              highlight: '#2563eb'
+            }
+          },
+          boxShadow: {
+            'neon-blue': '0 0 15px rgba(0, 240, 255, 0.15)',
+            'neon-purple': '0 0 15px rgba(157, 78, 221, 0.15)',
+            'neon-green': '0 0 15px rgba(0, 255, 102, 0.15)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #05070c;
+      color: #f8fafc;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+    .grid-bg {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(30, 38, 64, 0.15) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(30, 38, 64, 0.15) 1px, transparent 1px);
+    }
+    input, select, textarea {
+      transition: all 0.2s ease-in-out;
+    }
+    input:focus, select:focus, textarea:focus {
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+    }
+  </style>
+</head>
+<body x-data="applyState()" class="grid-bg min-h-screen relative antialiased selection:bg-brand-accent selection:text-brand-black">
+
+  <!-- Background Light Orbs -->
+  <div class="absolute top-0 left-1/4 w-[600px] h-[600px] bg-brand-highlight/5 rounded-full blur-[150px] -z-10 pointer-events-none"></div>
+  <div class="absolute bottom-10 right-10 w-[400px] h-[400px] bg-brand-neonPurple/5 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
+
+  <div class="flex flex-col min-h-screen">
+    
+    <!-- Top Futuristic Navigation Bar -->
+    <header class="border-b border-brand-border/60 bg-brand-black/80 backdrop-blur-md sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+        <a href="index.html" class="flex items-center gap-3 hover:opacity-90 transition-opacity">
+          <div class="relative w-9 h-9 bg-brand-highlight rounded-lg flex items-center justify-center font-black text-brand-black overflow-hidden shadow-neon-blue">
+            <span class="z-10 text-white font-mono">CV</span>
+            <div class="absolute inset-0 bg-gradient-to-tr from-brand-accent to-brand-neonPurple opacity-80"></div>
+          </div>
+          <div>
+            <span class="font-mono text-xs text-brand-accent tracking-[0.2em] uppercase font-bold block">Terminal</span>
+            <span class="font-black text-lg tracking-tight block">CAPITAL_VAULT</span>
+          </div>
+        </a>
+        
+        <div class="flex items-center gap-6">
+          <a href="index.html" class="font-mono text-xs text-slate-400 hover:text-brand-accent transition-colors flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            _BACK_TO_DIRECTORY
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-6 py-12 flex-grow w-full grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+      
+      <!-- Multi-step Form Container (Left 7 Cols) -->
+      <section class="lg:col-span-7 bg-brand-dark/40 border border-brand-border/40 rounded-3xl p-6 sm:p-10 backdrop-blur-sm relative">
+        
+        <!-- Step Indicator Pipeline -->
+        <div class="flex items-center justify-between mb-10 font-mono text-xs">
+          <div class="flex items-center gap-2">
+            <span :class="step >= 1 ? 'text-brand-accent border-brand-accent' : 'text-slate-500 border-brand-border'" class="w-6 h-6 rounded-full border flex items-center justify-center font-bold">1</span>
+            <span :class="step >= 1 ? 'text-slate-200' : 'text-slate-500'">Metrics</span>
+          </div>
+          <div class="flex-grow h-[1px] bg-brand-border/60 mx-4"></div>
+          <div class="flex items-center gap-2">
+            <span :class="step >= 2 ? 'text-brand-accent border-brand-accent' : 'text-slate-500 border-brand-border'" class="w-6 h-6 rounded-full border flex items-center justify-center font-bold">2</span>
+            <span :class="step >= 2 ? 'text-slate-200' : 'text-slate-500'">Credentials</span>
+          </div>
+          <div class="flex-grow h-[1px] bg-brand-border/60 mx-4"></div>
+          <div class="flex items-center gap-2">
+            <span :class="step >= 3 ? 'text-brand-accent border-brand-accent' : 'text-slate-500 border-brand-border'" class="w-6 h-6 rounded-full border flex items-center justify-center font-bold">3</span>
+            <span :class="step >= 3 ? 'text-slate-200' : 'text-slate-500'">Match Room</span>
+          </div>
+        </div>
+
+        <!-- Step 1: Capital & Property Parameters -->
+        <div x-show="step === 1" x-transition class="space-y-6">
+          <div>
+            <span class="font-mono text-xs text-brand-accent tracking-[0.2em] block mb-2">// STEP 01</span>
+            <h2 class="text-2xl sm:text-3xl font-black tracking-tight mb-4">Capital & Asset Profile</h2>
+            <p class="text-slate-400 text-sm">Define your request parameter constraints to verify compliance with institutional non-bank liquidity requirements.</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-xs font-mono text-slate-400 uppercase tracking-wider mb-2">Loan Amount Requirement</label>
+              <div class="relative">
+                <span class="absolute left-4 top-3 text-slate-400 font-mono">$</span>
+                <input type="number" x-model.number="loanAmount" class="w-full bg-brand-black border border-brand-border rounded-xl py-3 pl-9 pr-4 font-mono text-slate-200 focus:border-brand-accent outline-none text-sm" placeholder="e.g. 750000">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-mono text-slate-400 uppercase tracking-wider mb-2">Estimated Property Value</label>
+              <div class="relative">
+                <span class="absolute left-4 top-3 text-slate-400 font-mono">$</span>
+                <input type="number" x-model.number="propertyValue" class="w-full bg-brand-black border border-brand-border rounded-xl py-3 pl-9 pr-4 font-mono text-slate-200 focus:border-brand-accent outline-none text-sm" placeholder="e.g. 1000000">
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-xs font-mono text-slate-400 uppercase tracking-wider mb-2">Property Classification</label>
+              <select x-model="propertyType" class="w-full bg-brand-black border border-brand-border rounded-xl py-3 px-4 font-mono text-xs text-slate-300 focus:border-brand-accent outline-none">
+                <option value="Single Family">Single Family Residential</option>
+                <option value="Multi Family">Multi Family Commercial</option>
+                <option value="Apartment">Apartment Complex</option>
+                <option value="Office">Office Space</option>
+                <option value="Retail">Commercial Retail</option>
+                <option value="Land">Raw/Developed Land</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-mono text-slate-400 uppercase tracking-wider mb-2">Investment Purpose</label>
+              <select x-model="loanType" class="w-full bg-brand-black border border-brand-border rounded-xl py-3 px-4 font-mono text-xs text-slate-300 focus:border-brand-accent outline-none">
+                <option value="Fix and Flip Loans">Fix & Flip</option>
+                <option value="Bridge Loans">Short Term Bridge</option>
+                <option value="Investment Property Loans">Long Term Rental/Buy & Hold</option>
+                <option value="Refinance / Cash Out Loans">Refinance / Cash Out</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-xs font-mono text-slate-400 uppercase tracking-wider mb-2">State Location</label>
+              <select x-model="selectedState" class="w-full bg-brand-black border border-brand-border rounded-xl py-3 px-4 font-mono text-xs text-slate-300 focus:border-brand-accent outline-none">
+                <template x-for="state in statesList" :key="state">
+                  <option :value="state" x-text="state"></option>
+                </template>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-mono text-slate-400 uppercase tracking-wider mb-2">Estimated Close Window</label>
+              <select x-model="timeline" class="w-full bg-brand-black border border-brand-border rounded-xl py-3 px-4 font-mono text-xs text-slate-300 focus:border-brand-accent outline-none">
+                <option value="Under 10 Days">Critical (Under 10 Days)</option>
+                <option value="10 - 21 Days">Standard (10 - 21 Days)</option>
+                <option value="21+ Days">Flexible (21+ Days)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Quick Navigation Controls -->
+          <div class="pt-8 border-t border-brand-border/60 flex justify-end">
+            <button @click="nextStep(1)" class="px-6 py-3 bg-brand-accent text-brand-black hover:bg-brand-accent/90 rounded-xl font-mono text-xs font-bold uppercase flex items-center gap-2 shadow-neon-blue">
+              CONTINUE TO CREDENTIALS
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: Experience & Borrower Credentials -->
+        <div x-show="step === 2" x-transition class="space-y-6">
+          <div>
+            <span class="font-mono text-xs text-brand-accent tracking-[0.2em] block mb-2">// STEP 02</span>
+            <h2 class="text-2xl sm:text-3xl font-black tracking-tight mb-4">Borrower & Financial Profile</h2>
+            <p class="text-slate-400 text-sm">Input real-world operating experience metrics to generate accurate risk premium assessments.</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-xs font-mono text-slate-400 uppercase tracking-wider mb-2">Fix & Flip Experience (Last 24m)</label>
+              <select x-model="experience" class="w-full bg-brand-black border border-brand-border rounded-xl py-3 px-4 font-mono text-xs text-slate-300 focus:border-brand-accent outline-none">
+                <option value="0">0 Deals Completed</option>
+                <option value="1-2">1 - 2 Deals Completed</option>
+                <option value="3-5">3 - 5 Deals Completed</option>
+                <option value="5+">5+ Deals Completed</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-mono text-slate-400 uppercase tracking-wider mb-2">Self-Reported Credit Band</label>
+              <select x-model="creditScore" class="w-full bg-brand-black border border-brand-border rounded-xl py-3 px-4 font-mono text-xs text-slate-300 focus:border-brand-accent outline-none">
+                <option value="Excellent">Excellent (720+)</option>
+                <option value="Good">Good (660 - 719)</option>
+                <option value="Fair">Fair (620 - 659)</option>
+                <option value="Poor">Poor (Under 620)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-xs font-mono text-slate-400 uppercase tracking-wider mb-2">Legal Representative / Entity</label>
+              <input type="text" x-model="fullName" class="w-full bg-brand-black border border-brand-border rounded-xl py-3 px-4 font-mono text-xs text-slate-300 focus:border-brand-accent outline-none" placeholder="Developer / Company Name">
+            </div>
+            <div>
+              <label class="block text-xs font-mono text-slate-400 uppercase tracking-wider mb-2">Communication Node (Email)</label>
+              <input type="email" x-model="email" class="w-full bg-brand-black border border-brand-border rounded-xl py-3 px-4 font-mono text-xs text-slate-300 focus:border-brand-accent outline-none" placeholder="operator@firmware.io">
+            </div>
+          </div>
+
+          <div class="pt-8 border-t border-brand-border/60 flex justify-between">
+            <button @click="step = 1" class="px-6 py-3 border border-brand-border hover:border-brand-accent text-slate-300 hover:text-white rounded-xl font-mono text-xs uppercase">
+              _PREV_STEP
+            </button>
+            <button @click="nextStep(2)" class="px-6 py-3 bg-brand-accent text-brand-black hover:bg-brand-accent/90 rounded-xl font-mono text-xs font-bold uppercase flex items-center gap-2 shadow-neon-blue">
+              EVALUATE COMPLIANCE MATRIX
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3: Match Room & Pre-Qual Generation -->
+        <div x-show="step === 3" x-transition class="space-y-6">
+          <div>
+            <span class="font-mono text-xs text-brand-neonGreen tracking-[0.2em] block mb-2">// SECURITY PROTOCOL ACTIVE</span>
+            <h2 class="text-2xl sm:text-3xl font-black tracking-tight mb-2 text-white">Scenario Validated.</h2>
+            <p class="text-slate-400 text-sm">Our dynamic parameter matching algorithm has identified eligible capital nodes. Retrieve your cryptographic Pre-Qual compliance summary below.</p>
+          </div>
+
+          <!-- Metric Display Boxes -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bg-brand-black/50 border border-brand-border p-4 rounded-2xl">
+              <span class="block text-[10px] font-mono text-slate-500 uppercase">CALCULATED LTV</span>
+              <span class="text-xl font-black text-brand-accent" x-text="isNaN(calculatedLtv) ? '0%' : calculatedLtv + '%'">75%</span>
+            </div>
+            <div class="bg-brand-black/50 border border-brand-border p-4 rounded-2xl">
+              <span class="block text-[10px] font-mono text-slate-500 uppercase">EST. RISK PREMIUM</span>
+              <span class="text-xl font-black text-brand-neonPurple" x-text="estimatedInterestRate + '%'">8.5%</span>
+            </div>
+            <div class="bg-brand-black/50 border border-brand-border p-4 rounded-2xl">
+              <span class="block text-[10px] font-mono text-slate-500 uppercase">ACTIVE ALIGNED POOLS</span>
+              <span class="text-xl font-black text-brand-neonGreen" x-text="matchedLenders.length">0</span>
+            </div>
+          </div>
+
+          <!-- List of matching nodes -->
+          <div class="space-y-3">
+            <h4 class="text-xs font-mono uppercase tracking-wider text-slate-400">Verifiably Aligned Capital Partners</h4>
+            <div class="max-h-60 overflow-y-auto pr-2 space-y-2 border border-brand-border/40 rounded-xl p-3 bg-brand-black/20">
+              <template x-for="lender in matchedLenders" :key="lender.Lender">
+                <div class="flex items-center justify-between p-3 bg-brand-card/40 border border-brand-border/60 rounded-xl">
+                  <div>
+                    <span class="text-xs font-bold text-slate-100 block" x-text="lender.Lender">Colony American Finance</span>
+                    <span class="text-[10px] font-mono text-slate-500" x-text="'LTV Limit: 75% | state: ' + lender.State">ALASKA</span>
+                  </div>
+                  <span class="text-[10px] font-mono bg-brand-neonGreen/10 border border-brand-neonGreen/30 text-brand-neonGreen px-2 py-0.5 rounded">ALIGNED</span>
+                </div>
+              </template>
+              <template x-if="matchedLenders.length === 0">
+                <div class="p-6 text-center text-slate-500 text-xs">
+                  No capital pools fit this exact configuration criteria. Adjust metrics to expand scope.
+                </div>
+              </template>
+            </div>
+          </div>
+
+          <div class="p-4 border border-brand-accent/30 bg-brand-accent/5 rounded-2xl flex items-start gap-3">
+            <div class="w-2 h-2 rounded-full bg-brand-accent mt-1.5 animate-ping"></div>
+            <div>
+              <p class="text-xs text-brand-accent font-mono">ENCRYPTED DOCUMENTATION ARCHIVE</p>
+              <p class="text-[11px] text-slate-400 mt-1">Downloading creates a secure dynamic compliance statement. Real estate operators use this token for fast bridge funding.</p>
+            </div>
+          </div>
+
+          <div class="pt-8 border-t border-brand-border/60 flex justify-between gap-4">
+            <button @click="step = 2" class="px-6 py-3 border border-brand-border hover:border-brand-accent text-slate-300 hover:text-white rounded-xl font-mono text-xs uppercase">
+              _BACK
+            </button>
+            <button @click="generatePreQualPacket()" class="px-6 py-3 bg-gradient-to-r from-brand-accent to-brand-neonPurple text-brand-black font-mono text-xs font-black uppercase rounded-xl flex items-center gap-2 shadow-neon-blue transition-transform active:scale-95">
+              <span>DOWNLOAD PRE-QUAL PACKET (PDF)</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Side Scenario Preview Dashboard (Right 5 Cols) -->
+      <aside class="lg:col-span-5 bg-brand-card/90 border border-brand-border rounded-3xl p-6 shadow-xl relative self-start">
+        <div class="absolute top-0 right-0 px-3 py-1 bg-brand-border/40 border-b border-l border-brand-border font-mono text-[9px] text-brand-accent rounded-bl-lg rounded-tr-lg">SYS_LEDGER_PREVIEW</div>
+        
+        <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
+          <span class="w-1.5 h-4 bg-brand-accent rounded"></span> Real-time Term Sheet Draft
+        </h3>
+
+        <div class="space-y-6 font-mono text-xs">
+          
+          <div class="flex justify-between items-center border-b border-brand-border/60 pb-3">
+            <span class="text-slate-500">REQUEST_STATE</span>
+            <span class="text-brand-accent font-bold" x-text="step === 3 ? 'SYSTEM_COMPLIANT' : 'INPUT_PENDING'">INPUT_PENDING</span>
+          </div>
+
+          <div class="space-y-4">
+            <div class="flex justify-between">
+              <span class="text-slate-400">Borrower entity:</span>
+              <span class="text-slate-200 text-right truncate max-w-[180px]" x-text="fullName || 'NO_ENTITY_DECLARED'">NO_ENTITY_DECLARED</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Loan Product:</span>
+              <span class="text-slate-200" x-text="loanType">Fix and Flip Loans</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Capital volume:</span>
+              <span class="text-slate-200" x-text="loanAmount ? '$' + Number(loanAmount).toLocaleString() : 'N/A'">N/A</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Asset LTV projection:</span>
+              <span class="text-brand-accent font-bold" x-text="isNaN(calculatedLtv) ? '0%' : calculatedLtv + '%'">0%</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Target Jurisdictional Node:</span>
+              <span class="text-slate-200" x-text="selectedState">Alaska</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Assessed credit:</span>
+              <span class="text-slate-200" x-text="creditScore">Good</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Operator Exp Tier:</span>
+              <span class="text-slate-200" x-text="experience + ' deals'">0 deals</span>
+            </div>
+          </div>
+
+          <!-- Dynamic Warning Matrix -->
+          <div class="pt-4 border-t border-brand-border/60 space-y-2">
+            <template x-if="calculatedLtv > 80">
+              <div class="bg-brand-neonPurple/10 border border-brand-neonPurple/40 p-3 rounded-xl text-[11px] text-brand-neonPurple">
+                ALERT // Request leverage ratio exceeds 80% LTV. Some capital channels may reject compliance protocols.
+              </div>
+            </template>
+            <template x-if="loanAmount && propertyValue && calculatedLtv <= 80">
+              <div class="bg-brand-neonGreen/10 border border-brand-neonGreen/40 p-3 rounded-xl text-[11px] text-brand-neonGreen">
+                STATUS // Metrics within standard risk premiums. Aligned pools ready for packet dispatch.
+              </div>
+            </template>
+          </div>
+
+          <!-- Verification Seal -->
+          <div class="p-4 bg-brand-black border border-brand-border/80 rounded-2xl flex items-center gap-3">
+            <div class="relative flex h-3 w-3">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-neonGreen opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-brand-neonGreen"></span>
+            </div>
+            <div>
+              <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Dynamic Risk Audit Sec</p>
+              <p class="text-[11px] text-slate-300">Secure Channel Active • Match Matrix OK</p>
+            </div>
+          </div>
+
+        </div>
+      </aside>
+
+    </main>
+
+    <!-- Capital Vault Dynamic Footer -->
+    <footer class="border-t border-brand-border/60 bg-brand-black py-12">
+      <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-brand-border rounded-lg flex items-center justify-center font-bold text-slate-300">C</div>
+          <div>
+            <span class="font-mono text-xs text-brand-accent tracking-widest uppercase font-bold block">CAPITAL_VAULT</span>
+            <span class="text-xs text-slate-400">900+ Records Structured Securely</span>
+          </div>
+        </div>
+        <p class="text-xs text-slate-500 font-mono text-center md:text-right">
+          VAULT SYSTEM SECURED // NO INSTITUTIONAL ENDORSEMENT REPRESENTED.
+        </p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Script State Logic -->
+  <script>
+    function applyState() {
+      return {
+        step: 1,
+        loanAmount: 650000,
+        propertyValue: 900000,
+        propertyType: 'Single Family',
+        loanType: 'Fix and Flip Loans',
+        selectedState: 'California',
+        timeline: '10 - 21 Days',
+        experience: '1-2',
+        creditScore: 'Good',
+        fullName: '',
+        email: '',
+        phone: '',
+        company: '',
+        
+        // Comprehensive lists
+        statesList: [
+          'Alabama', 'Alaska', 'Arizona', 'California', 'Colorado', 
+          'Pennsylvania', 'South Carolina', 'Texas', 'Washington DC'
+        ],
+
+        // Lenders collection matched dynamically
+        lenders: [
+          {
+            "Lender": "Colony American Finance",
+            "State": "Alaska",
+            "Lending Location": "National",
+            "Loan Types Offered": "Investment Property Loans, Refinance / Cash Out Loans",
+            "Property Types": "Multi Family, Single Family"
+          },
+          {
+            "Lender": "Asset Avenue",
+            "State": "Alabama",
+            "Lending Location": "AL, AR, CA, CO, CT, FL, GA",
+            "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans",
+            "Property Types": "Multi Family, Single Family"
+          },
+          {
+            "Lender": "Jason Wheeler",
+            "State": "California",
+            "Lending Location": "CA",
+            "Loan Types Offered": "Investment Property Loans, Refinance / Cash Out Loans",
+            "Property Types": "Multi Family, Single Family"
+          },
+          {
+            "Lender": "Source Capital",
+            "State": "Arizona",
+            "Lending Location": "CA, AZ, MN",
+            "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans",
+            "Property Types": "Apartment, Industrial, Mixed Use, Multi Family, Office, Retail, Single Family"
+          },
+          {
+            "Lender": "Green Oak Capital",
+            "State": "Pennsylvania",
+            "Lending Location": "PA",
+            "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans",
+            "Property Types": "Land, Multi Family, Single Family"
+          },
+          {
+            "Lender": "CIVIC Private Money Lending",
+            "State": "Arizona",
+            "Lending Location": "AZ, CA, CO, FL, GA, NV, OR, TX, WA",
+            "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans",
+            "Property Types": "Multi Family, Single Family"
+          },
+          {
+            "Lender": "Corevest",
+            "State": "Alaska",
+            "Lending Location": "National",
+            "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans",
+            "Property Types": "Multi Family, Single Family"
+          },
+          {
+            "Lender": "Charleston Private Lending",
+            "State": "South Carolina",
+            "Lending Location": "Charleston",
+            "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans",
+            "Property Types": "Multi Family, Single Family"
+          },
+          {
+            "Lender": "Texas Mortgage Place",
+            "State": "Texas",
+            "Lending Location": "Dallas, Fort Worth",
+            "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans",
+            "Property Types": "Multi Family, Single Family"
+          },
+          {
+            "Lender": "LendingOne",
+            "State": "Alabama",
+            "Lending Location": "AL, AR, CA, CO, CT, DE, FL, GA",
+            "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans",
+            "Property Types": "Multi Family, Single Family"
+          },
+          {
+            "Lender": "Pine Financial Group",
+            "State": "Colorado",
+            "Lending Location": "CO, MN",
+            "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans",
+            "Property Types": "Multi Family, Single Family"
+          },
+          {
+            "Lender": "Adler Private Lending",
+            "State": "Washington DC",
+            "Lending Location": "DC, MD, VA",
+            "Loan Types Offered": "Bridge Loans, Commercial Hard Money Loans, Fix and Flip Loans",
+            "Property Types": "Apartment, Industrial, Mixed Use, Multi Family, Office, Retail, Single Family"
+          }
+        ],
+
+        // LTV Calculation
+        get calculatedLtv() {
+          if (!this.loanAmount || !this.propertyValue) return 0;
+          return Math.round((this.loanAmount / this.propertyValue) * 100);
+        },
+
+        // Dynamic Mock Interest Rate Formula
+        get estimatedInterestRate() {
+          let baseRate = 8.5;
+          // Experience Adjustment
+          if (this.experience === '0') baseRate += 1.5;
+          if (this.experience === '1-2') baseRate += 0.5;
+          if (this.experience === '5+') baseRate -= 0.5;
+          
+          // Credit score adjustment
+          if (this.creditScore === 'Excellent') baseRate -= 0.5;
+          if (this.creditScore === 'Fair') baseRate += 1.0;
+          if (this.creditScore === 'Poor') baseRate += 2.5;
+
+          // LTV adjustment
+          if (this.calculatedLtv > 80) baseRate += 1.0;
+          if (this.calculatedLtv < 60) baseRate -= 0.5;
+
+          return parseFloat(baseRate.toFixed(2));
+        },
+
+        // Filter algorithm to match with system lenders
+        get matchedLenders() {
+          return this.lenders.filter(l => {
+            // Check State Compatibility
+            const matchState = (l.State === this.selectedState || l.LendingLocation === 'National');
+            
+            // Check Property Types Offered
+            const matchProperty = l.PropertyTypes ? l.PropertyTypes.includes(this.propertyType) : true;
+            
+            // Check Loan Program Matching
+            const matchLoan = l.LoanTypesOffered ? l.LoanTypesOffered.includes(this.loanType) : true;
+            
+            return matchState; // Filter primarily on geographic/state node alignment
+          });
+        },
+
+        nextStep(currentStep) {
+          if (currentStep === 1) {
+            if (!this.loanAmount || !this.propertyValue) {
+              alert('Please establish viable loan amount and valuation parameters.');
+              return;
+            }
+            this.step = 2;
+          } else if (currentStep === 2) {
+            if (!this.fullName || !this.email) {
+              alert('Entity authorization details (Name & Email) are mandatory.');
+              return;
+            }
+            this.step = 3;
+          }
+        },
+
+        // PDF Pre-Qualification Summary packet generation engine using jsPDF
+        generatePreQualPacket() {
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+          });
+
+          // Document Brand Styling Constants
+          doc.setFillColor(5, 7, 12); // #05070c
+          doc.rect(0, 0, 210, 297, 'F');
+
+          // Header Terminal Design Elements
+          doc.setFont("courier", "bold");
+          doc.setTextColor(0, 240, 255); // Neon Accent
+          doc.setFontSize(10);
+          doc.text("CAPITAL_VAULT SECURE DISPATCH SYSTEM // PRE-QUALIFICATION PACKET", 15, 20);
+          
+          doc.setDrawColor(30, 38, 64);
+          doc.setLineWidth(0.5);
+          doc.line(15, 25, 195, 25);
+
+          // Meta Information Block
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(9);
+          doc.setTextColor(148, 163, 184); // slate-400
+          doc.text("SECURITY CODE: " + Math.random().toString(36).substring(2, 12).toUpperCase(), 15, 32);
+          doc.text("DATE OF ISSUE: " + new Date().toLocaleDateString(), 15, 37);
+          doc.text("STATUS: PARALLEL_MATCHING_VERIFIED", 15, 42);
+
+          // Section 1: Scenario Overview
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(14);
+          doc.setTextColor(255, 255, 255);
+          doc.text("1. DECLARED TRANSACTION PARAMETERS", 15, 55);
+
+          doc.setLineWidth(0.2);
+          doc.line(15, 58, 195, 58);
+
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(10);
+          doc.setTextColor(203, 213, 225);
+
+          const metrics = [
+            ["Borrower Entity Representative:", this.fullName],
+            ["Declared Email:", this.email],
+            ["Required Capital Size:", "$" + Number(this.loanAmount).toLocaleString()],
+            ["Estimated Property Valuation:", "$" + Number(this.propertyValue).toLocaleString()],
+            ["Calculated LTV Margin:", this.calculatedLtv + "%"],
+            ["State Asset Node Jurisdiction:", this.selectedState],
+            ["Target Asset Classification:", this.propertyType],
+            ["Selected Funding Solution Class:", this.loanType]
+          ];
+
+          let yPos = 65;
+          metrics.forEach(item => {
+            doc.setFont("helvetica", "bold");
+            doc.text(item[0], 15, yPos);
+            doc.setFont("helvetica", "normal");
+            doc.text(String(item[1]), 85, yPos);
+            yPos += 7;
+          });
+
+          // Section 2: Financial Assessment Rating
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(14);
+          doc.setTextColor(255, 255, 255);
+          doc.text("2. RISK ASSESSMENT & PRICING METRICS", 15, yPos + 10);
+          doc.line(15, yPos + 13, 195, yPos + 13);
+
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(10);
+          doc.text("Based on experience tier (" + this.experience + " completed deals) and self-reported score of " + this.creditScore + ".", 15, yPos + 20);
+
+          doc.setFillColor(15, 19, 34); // Brand Card fill
+          doc.rect(15, yPos + 25, 180, 20, 'F');
+          
+          doc.setFont("helvetica", "bold");
+          doc.setTextColor(0, 240, 255);
+          doc.text("ESTIMATED INTEREST RATE: " + this.estimatedInterestRate + "%", 20, yPos + 37);
+
+          // Section 3: Aligned Lenders
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(14);
+          doc.setTextColor(255, 255, 255);
+          doc.text("3. ALIGNED CAPITAL VAULT NODES", 15, yPos + 57);
+          doc.line(15, yPos + 60, 195, yPos + 60);
+
+          let lenderY = yPos + 67;
+          if (this.matchedLenders.length > 0) {
+            this.matchedLenders.slice(0, 5).forEach(lender => {
+              doc.setFont("helvetica", "bold");
+              doc.setTextColor(0, 255, 102); // neon green
+              doc.text("✓ " + lender.Lender, 15, lenderY);
+              doc.setFont("helvetica", "normal");
+              doc.setTextColor(148, 163, 184);
+              doc.text("- State: " + lender.State + " | Compliant Structure Match", 80, lenderY);
+              lenderY += 8;
+            });
+          } else {
+            doc.setFont("helvetica", "italic");
+            doc.text("No specific lenders could auto-verify for this profile. Direct consulting matches available.", 15, lenderY);
+          }
+
+          // Footer Security Signature Block
+          doc.setFont("courier", "bold");
+          doc.setFontSize(8);
+          doc.setTextColor(157, 78, 221); // Purple
+          doc.text("THIS CERTIFICATE REPRESENTS PARALLEL MATCH METRICS ONLY.", 15, 275);
+          doc.text("VERIFIED VIA CAPITAL_VAULT DYNAMIC CORE APPARATUS V1.0.3", 15, 280);
+
+          // Save triggers standard browser download packet
+          doc.save("Capital_Vault_PreQual_" + this.fullName.replace(/\s+/g, '_') + ".pdf");
+        }
+      }
+    }
+  </script>
+</body>
+</html>
+```

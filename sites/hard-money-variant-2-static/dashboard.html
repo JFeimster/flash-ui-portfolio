@@ -1,0 +1,875 @@
+```html
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asset Analytics & Secure Storage Dashboard - Flow Lend</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            slate: {
+              950: '#07070a',
+              900: '#0f0f15',
+              800: '#181824',
+              700: '#252538',
+            },
+            indigo: {
+              500: '#6366f1',
+              400: '#818cf8',
+              600: '#4f46e5',
+            },
+            emerald: {
+              500: '#10b981',
+              400: '#34d399',
+            }
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #07070a;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+        radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
+        linear-gradient(rgba(255, 255, 255, 0.003) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.003) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 24px 24px, 24px 24px;
+    }
+    .glow-border:hover {
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+      border-color: rgba(99, 102, 241, 0.4);
+    }
+    .node-pulse {
+      box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
+      animation: pulse 2s infinite cubic-bezier(0.66, 0, 0, 1);
+    }
+    @keyframes pulse {
+      to {
+        box-shadow: 0 0 0 8px rgba(99, 102, 241, 0);
+      }
+    }
+    /* Hide scrollbar but keep functional */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="text-slate-100 min-h-screen antialiased overflow-x-hidden">
+
+  <!-- Main Navigation -->
+  <header class="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-emerald-500 flex items-center justify-center shadow-lg shadow-indigo-500/10">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+        </div>
+        <div>
+          <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-slate-100 to-indigo-300 bg-clip-text text-transparent">FLOW</span>
+          <span class="text-emerald-400 font-bold text-xs uppercase tracking-widest ml-1 px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">VAULT</span>
+        </div>
+      </div>
+      
+      <!-- Center Quick Stats -->
+      <div class="hidden md:flex items-center gap-6 text-sm">
+        <div class="flex items-center gap-2 border-r border-slate-800/80 pr-6">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 node-pulse"></span>
+          <span class="text-slate-400">Vault Health</span>
+          <span class="text-white font-semibold">99.98% Crypt-Secured</span>
+        </div>
+        <div class="flex items-center gap-2 border-r border-slate-800/80 pr-6">
+          <span class="text-slate-400">Bandwidth Status</span>
+          <span class="text-emerald-400 font-semibold">Unrestricted GB/s</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-slate-400">Compliance Standard</span>
+          <span class="text-white font-semibold">SOC2 Type II</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <a href="#upload-card" class="hidden sm:inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-emerald-300 hover:text-white border border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 transition-all">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+          Direct Drop Upload
+        </a>
+        <button onclick="resetDashboard()" class="px-4 py-2 text-xs font-medium bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors">
+          Reset Analytics
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero / Dashboard Head -->
+  <section class="relative pt-8 pb-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="absolute inset-0 top-0 left-1/2 -translate-x-1/2 w-3/4 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
+    
+    <div class="relative flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-800/80">
+      <div class="space-y-2">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs text-slate-400">
+          <span class="flex h-2 w-2 rounded-full bg-indigo-500"></span>
+          <span>Asset Analytics Portal v1.8</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white leading-tight">
+          Secure Deal <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-emerald-400 bg-clip-text text-transparent">Attachment & Archival</span> Control Center
+        </h1>
+        <p class="text-slate-400 text-xs sm:text-sm max-w-xl leading-relaxed font-normal">
+          Monitor your collateral parameters, private placement memorandums, title deeds, and escrow accounts synced with direct institutional lenders.
+        </p>
+      </div>
+      <!-- Right Quick Control for Storage Optimization -->
+      <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 flex items-center gap-4 self-start md:self-auto shadow-lg backdrop-blur-sm">
+        <div class="space-y-1">
+          <div class="text-[11px] text-slate-500 uppercase font-bold tracking-wider">Storage Target Opt-In</div>
+          <div class="text-lg font-mono font-bold text-indigo-400" id="current-storage-ratio">58.4% Capacity</div>
+        </div>
+        <button onclick="optimizeVault()" class="px-3.5 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white text-xs font-semibold rounded-lg shadow-lg shadow-indigo-500/10 transition-all flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17"/></svg>
+          Optimize Vault
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dashboard Grid -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 mt-6">
+    
+    <!-- Row 1: Vital Storage Metrics Metrics Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      
+      <!-- Card 1: Total Allocated Storage -->
+      <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-5 relative overflow-hidden group">
+        <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-xl pointer-events-none"></div>
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs text-slate-400 font-medium">TOTAL STORAGE ALLOCATED</span>
+          <span class="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          </span>
+        </div>
+        <div class="space-y-1.5">
+          <div class="text-2xl font-extrabold font-mono text-white" id="stat-allocated">1.17 Terabytes</div>
+          <p class="text-[11px] text-slate-500" id="stat-allocated-desc">Of 2.0 TB Secure Hybrid Target Bandwidth</p>
+        </div>
+        <div class="w-full bg-slate-900 rounded-full h-1.5 mt-4">
+          <div class="bg-indigo-500 h-1.5 rounded-full" id="storage-progress-bar" style="width: 58.4%"></div>
+        </div>
+      </div>
+
+      <!-- Card 2: Active Encrypted Files -->
+      <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-5 relative overflow-hidden group">
+        <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-xl pointer-events-none"></div>
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs text-slate-400 font-medium">ACTIVE LOAN ATTACHMENTS</span>
+          <span class="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </span>
+        </div>
+        <div class="space-y-1.5">
+          <div class="text-2xl font-extrabold font-mono text-white" id="stat-files">1,482 Files</div>
+          <p class="text-[11px] text-slate-500" id="stat-files-desc">Average asset profile overhead: 12.4 MB</p>
+        </div>
+        <div class="flex items-center gap-1.5 text-xs text-emerald-400 mt-4 font-semibold">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+          <span>+48 new deal docs this week</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Secure Audited Shared Connections -->
+      <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-5 relative overflow-hidden group">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs text-slate-400 font-medium">LENDER DEPOSIT PIPELINES</span>
+          <span class="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+          </span>
+        </div>
+        <div class="space-y-1.5">
+          <div class="text-2xl font-extrabold font-mono text-white" id="stat-pipelines">412 Shared</div>
+          <p class="text-[11px] text-slate-500">Active direct private fund review sockets</p>
+        </div>
+        <div class="flex items-center gap-1 text-[11px] text-indigo-400 mt-4.5 font-medium">
+          <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-ping mr-1"></span>
+          <span>Automatic audit reports live</span>
+        </div>
+      </div>
+
+      <!-- Card 4: Threat Protection / Integrity Score -->
+      <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-5 relative overflow-hidden group">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs text-slate-400 font-medium">THREAT ENCRYPTION INDEX</span>
+          <span class="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          </span>
+        </div>
+        <div class="space-y-1.5">
+          <div class="text-2xl font-extrabold font-mono text-emerald-400">100% Threat Free</div>
+          <p class="text-[11px] text-slate-500">Continuous heuristics file inspection</p>
+        </div>
+        <div class="flex items-center gap-1 text-slate-400 mt-4.5 text-[11px]">
+          <span>AES-256 Data At Rest / In Transit</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Row 2: File Types Distribution Analytics & Dynamic Drops -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+      
+      <!-- Panel A: File Type distributions / Visual bars -->
+      <div class="lg:col-span-1 bg-slate-950 border border-slate-800/80 rounded-xl p-6 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between pb-4 border-b border-slate-900">
+            <div>
+              <h3 class="font-bold text-sm text-white uppercase tracking-wider">File Allocation</h3>
+              <p class="text-[10px] text-slate-500">By specific deal document profiles</p>
+            </div>
+            <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg>
+          </div>
+
+          <!-- Dynamic Visual Allocation Bars -->
+          <div class="space-y-4 mt-5">
+            <!-- Program 1 -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs">
+                <span class="text-slate-300 font-medium">Underwriting (PDF / DOC)</span>
+                <span class="text-indigo-400 font-mono font-bold" id="alloc-underwriting">684.2 GB (58.4%)</span>
+              </div>
+              <div class="w-full bg-slate-900 rounded-full h-1.5">
+                <div class="bg-indigo-500 h-1.5 rounded-full" style="width: 58.4%"></div>
+              </div>
+            </div>
+
+            <!-- Program 2 -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs">
+                <span class="text-slate-300 font-medium">Valuation & Property Appraisals</span>
+                <span class="text-emerald-400 font-mono font-bold" id="alloc-appraisal">292.5 GB (25.0%)</span>
+              </div>
+              <div class="w-full bg-slate-900 rounded-full h-1.5">
+                <div class="bg-emerald-500 h-1.5 rounded-full" style="width: 25%"></div>
+              </div>
+            </div>
+
+            <!-- Program 3 -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs">
+                <span class="text-slate-300 font-medium">Due Diligence & KYC Archives</span>
+                <span class="text-purple-400 font-mono font-bold" id="alloc-kyc">117.0 GB (10.0%)</span>
+              </div>
+              <div class="w-full bg-slate-900 rounded-full h-1.5">
+                <div class="bg-purple-500 h-1.5 rounded-full" style="width: 10%"></div>
+              </div>
+            </div>
+
+            <!-- Program 4 -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs">
+                <span class="text-slate-300 font-medium">Financials, Tax Returns, Spreadsheets</span>
+                <span class="text-amber-400 font-mono font-bold" id="alloc-financials">76.3 GB (6.6%)</span>
+              </div>
+              <div class="w-full bg-slate-900 rounded-full h-1.5">
+                <div class="bg-amber-500 h-1.5 rounded-full" style="width: 6.6%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Metric Footer Info widget -->
+        <div class="mt-6 pt-4 border-t border-slate-900 space-y-2">
+          <div class="flex items-center justify-between text-[11px] text-slate-500">
+            <span>Deduplication Factor:</span>
+            <span class="font-mono text-white font-bold">1.42x saved</span>
+          </div>
+          <div class="flex items-center justify-between text-[11px] text-slate-500">
+            <span>Archive Redundancy:</span>
+            <span class="text-emerald-400 font-bold">3x Geo-Replicated</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel B: Dynamic Live Upload Simulator -->
+      <div id="upload-card" class="lg:col-span-2 bg-slate-950 border border-slate-800/80 rounded-xl p-6 relative overflow-hidden flex flex-col justify-between">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none"></div>
+        
+        <div>
+          <div class="flex items-center justify-between pb-4 border-b border-slate-900">
+            <div>
+              <h3 class="font-bold text-sm text-white uppercase tracking-wider">Direct Handshake Upload Pipeline</h3>
+              <p class="text-[10px] text-slate-500 font-medium">Drag or upload files to map them into immediate lender underwriting viewports</p>
+            </div>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-semibold text-emerald-400 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+              Socket Online
+            </span>
+          </div>
+
+          <!-- Interactive Upload Drop Zone Area -->
+          <div class="mt-4 border border-dashed border-slate-800 bg-slate-900/40 rounded-xl p-8 text-center cursor-pointer hover:border-indigo-500/50 transition-colors relative group" onclick="triggerFileInput()">
+            <input type="file" id="real-file-input" class="hidden" multiple onchange="handleSelectedFiles(this)">
+            <div class="space-y-3">
+              <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto text-indigo-400 group-hover:scale-110 transition-transform">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+              </div>
+              <div class="space-y-1">
+                <p class="text-xs font-bold text-slate-200">Drag & drop files here, or <span class="text-indigo-400 group-hover:underline">browse files</span></p>
+                <p class="text-[10px] text-slate-500 font-mono">Accepts PDF, JPG, PNG, XLS, ZIP (Max 100MB per file)</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic progress bar simulation if uploading -->
+          <div id="upload-simulator-status" class="hidden mt-4 bg-slate-900/60 border border-slate-800 rounded-lg p-3 space-y-2">
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-indigo-400 font-bold" id="uploading-file-name">Generating secure handshake...</span>
+              <span class="font-mono text-slate-400 text-[11px]" id="upload-percent">0%</span>
+            </div>
+            <div class="w-full bg-slate-950 rounded-full h-1.5">
+              <div class="bg-gradient-to-r from-indigo-500 to-emerald-400 h-1.5 rounded-full transition-all duration-300" id="upload-sim-progress" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-6">
+          <div class="flex items-center gap-3">
+            <label class="text-xs text-slate-400 font-medium">Routing Target:</label>
+            <select id="lender-route-select" class="bg-slate-900 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500 cursor-pointer">
+              <option value="Apex Bridge Private Capital">Apex Bridge Private Capital</option>
+              <option value="Veritas Commercial Trust">Veritas Commercial Trust</option>
+              <option value="Lumina Private Funding Group">Lumina Private Funding Group</option>
+              <option value="Broadcast to All Verified Lenders">Broadcast to All Match-Lenders</option>
+            </select>
+          </div>
+          <button onclick="simulateUpload()" class="py-2 px-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            Trigger Simulated Upload
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Row 3: Interactive Attachments File Explorer -->
+    <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-6 mb-8">
+      
+      <!-- Explorer Top Bar / Filters -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-900">
+        <div>
+          <h3 class="font-bold text-base text-white">Secure Attachment Storage Database</h3>
+          <p class="text-xs text-slate-400">Total index search within matching parameters for hard money asset programs</p>
+        </div>
+        
+        <!-- Search and Categorization -->
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- Text Search -->
+          <div class="relative min-w-[200px]">
+            <input type="text" id="asset-search" placeholder="Search files (e.g., deed, LLC)..." oninput="filterFiles()" class="w-full bg-slate-900 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500 transition-colors">
+            <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </span>
+          </div>
+
+          <!-- File Program Quick Filter -->
+          <select id="file-program-select" onchange="filterFiles()" class="bg-slate-900 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500 cursor-pointer">
+            <option value="All">All Categories</option>
+            <option value="Underwriting">Underwriting Programs</option>
+            <option value="Appraisal">Property Valuation</option>
+            <option value="KYC">KYC & Diligence</option>
+            <option value="Financials">Financials & Returns</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Live File Tables -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-slate-300 mt-4 min-w-[700px]">
+          <thead>
+            <tr class="border-b border-slate-900 text-slate-500 uppercase font-bold text-[10px] tracking-wider">
+              <th class="pb-3 pt-2">File Name</th>
+              <th class="pb-3 pt-2">Deal Category</th>
+              <th class="pb-3 pt-2">Target Lender Routing</th>
+              <th class="pb-3 pt-2">Payload Size</th>
+              <th class="pb-3 pt-2">Security Hash</th>
+              <th class="pb-3 pt-2">Vault Placement Status</th>
+              <th class="pb-3 pt-2 text-right">Interactive Command</th>
+            </tr>
+          </thead>
+          <tbody id="files-table-body" class="divide-y divide-slate-900/65">
+            <!-- Dynamic Files Injected here -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Table Empty State Component -->
+      <div id="explorer-empty" class="hidden text-center py-10 space-y-3">
+        <svg class="w-8 h-8 text-slate-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+        <p class="text-xs text-slate-500">No storage files matching filter criteria found in Flow Vault index.</p>
+      </div>
+
+    </div>
+
+    <!-- Row 4: Activity logs and Network status -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      
+      <!-- Section 1: Dynamic Activity Log -->
+      <div class="lg:col-span-2 bg-slate-950 border border-slate-800/80 rounded-xl p-6">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-900 mb-4">
+          <div>
+            <h3 class="font-bold text-sm text-white uppercase tracking-wider">Storage & Vault Activity Log</h3>
+            <p class="text-[10px] text-slate-500">Real-time auditable storage ledger</p>
+          </div>
+          <button onclick="clearActivityLog()" class="text-[10px] text-slate-400 hover:text-white transition-colors">Purge Logs</button>
+        </div>
+
+        <div class="space-y-3 max-h-[250px] overflow-y-auto no-scrollbar" id="activity-log-container">
+          <!-- Logs injected here -->
+        </div>
+      </div>
+
+      <!-- Section 2: Vault Operations Utilities -->
+      <div class="lg:col-span-1 bg-slate-950 border border-slate-800/80 rounded-xl p-6 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center gap-2 pb-4 border-b border-slate-900 mb-4">
+            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <h4 class="font-bold text-xs text-white uppercase tracking-wider">Vault Optimization Utilities</h4>
+          </div>
+
+          <div class="space-y-3.5">
+            <div class="bg-slate-900/50 border border-slate-800/80 rounded-lg p-3 space-y-1.5">
+              <span class="text-[10px] text-indigo-400 font-bold uppercase tracking-wider block">Purge Temporary Cache Files</span>
+              <p class="text-[10px] text-slate-400">Remove cached draft submissions of older appraisal assets to free system space.</p>
+              <button onclick="purgeVaultCache()" class="mt-2 w-full py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-[10px] rounded uppercase tracking-wider transition-colors">Purge 42.4 MB Cache</button>
+            </div>
+
+            <div class="bg-slate-900/50 border border-slate-800/80 rounded-lg p-3 space-y-1.5">
+              <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block">Compliance Export Suite</span>
+              <p class="text-[10px] text-slate-400">Generate a comprehensive verified SHA-256 manifest of active loan paperwork.</p>
+              <button onclick="exportVaultManifest()" class="mt-2 w-full py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-[10px] rounded uppercase tracking-wider transition-colors">Export Vault Manifest</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-slate-900 text-center text-[10px] text-slate-500 font-mono">
+          Last security scan executed: <span class="text-slate-300" id="last-scan-date">Just Now</span>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 ease-out bg-slate-900 border border-emerald-500/30 text-white rounded-lg px-4 py-3 shadow-2xl max-w-sm flex items-center gap-3">
+    <div class="w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <div>
+      <h5 class="text-xs font-bold text-white">Vault Operation Completed</h5>
+      <p class="text-[10px] text-slate-400 mt-0.5" id="toast-message">Transaction metadata indexed and mirrored.</p>
+    </div>
+  </div>
+
+  <!-- Main Pure JS Dashboard Logic -->
+  <script>
+    // Premium Simulated Database of Uploaded Storage Assets
+    const FILE_DATABASE = [
+      {
+        id: "doc-902",
+        name: "Residential_Appraisal_LosAngeles_MainSt.pdf",
+        category: "Appraisal",
+        routing: "Apex Bridge Private Capital",
+        size: "34.5 MB",
+        hash: "e3b0c442...",
+        status: "Active Verified",
+        date: "2024-03-29 14:24",
+        icon: "pdf"
+      },
+      {
+        id: "doc-771",
+        name: "Commercial_PPM_CorporateDocs_Veritas.zip",
+        category: "Underwriting",
+        routing: "Veritas Commercial Trust",
+        size: "182.0 MB",
+        hash: "7f83b162...",
+        status: "Direct Handshake Queue",
+        date: "2024-03-29 11:15",
+        icon: "zip"
+      },
+      {
+        id: "doc-331",
+        name: "Borrower_KYC_Passport_Entity_LLC.pdf",
+        category: "KYC",
+        routing: "Broadcast to All Verified Lenders",
+        size: "12.8 MB",
+        hash: "9823fca1...",
+        status: "Active Verified",
+        date: "2024-03-28 09:30",
+        icon: "pdf"
+      },
+      {
+        id: "doc-219",
+        name: "Property_Tax_Returns_2022_2023.xlsx",
+        category: "Financials",
+        routing: "Lumina Private Funding Group",
+        size: "4.2 MB",
+        hash: "12a321ef...",
+        status: "Active Verified",
+        date: "2024-03-26 16:45",
+        icon: "excel"
+      },
+      {
+        id: "doc-104",
+        name: "Title_Deed_Insurance_TexasAsset_Summit.pdf",
+        category: "Underwriting",
+        routing: "Apex Bridge Private Capital",
+        size: "24.1 MB",
+        hash: "fc23891a...",
+        status: "Archived Secure",
+        date: "2024-03-24 10:05",
+        icon: "pdf"
+      }
+    ];
+
+    // Simulated Log Database
+    let LOG_DATABASE = [
+      { time: "14:24:11", action: "FILE_UPLOAD", text: "Residential_Appraisal_LosAngeles_MainSt.pdf fully processed via Core Flow API.", status: "success" },
+      { time: "13:42:05", action: "HANDSHAKE_ESTABLISHED", text: "Apex Bridge established high-bandwidth link for underwriter access.", status: "info" },
+      { time: "11:15:52", action: "FILE_UPLOAD", text: "Commercial_PPM_CorporateDocs_Veritas.zip mapped to Veritas Commercial Trust socket.", status: "success" },
+      { time: "09:30:22", action: "INTEGRITY_CHECK", text: "AES integrity audit passed for Borrower_KYC_Passport_Entity_LLC.pdf.", status: "success" }
+    ];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderFilesTable();
+      renderActivityLogs();
+      updateStorageMetrics();
+    });
+
+    // Handle standard browser file selection dialog triggers
+    function triggerFileInput() {
+      document.getElementById('real-file-input').click();
+    }
+
+    function handleSelectedFiles(input) {
+      if (input.files.length > 0) {
+        // Trigger simulated uploads for each file
+        const file = input.files[0];
+        simulateIndividualUpload(file.name, (file.size / (1024*1024)).toFixed(1) + " MB");
+      }
+    }
+
+    // Dynamic File Table renderer with filtering
+    function renderFilesTable() {
+      const tableBody = document.getElementById("files-table-body");
+      const emptyState = document.getElementById("explorer-empty");
+      const searchQuery = document.getElementById("asset-search").value.toLowerCase();
+      const programSelect = document.getElementById("file-program-select").value;
+
+      let filtered = FILE_DATABASE.filter(f => {
+        const matchesSearch = f.name.toLowerCase().includes(searchQuery) || f.routing.toLowerCase().includes(searchQuery);
+        const matchesCategory = (programSelect === "All") || (f.category === programSelect);
+        return matchesSearch && matchesCategory;
+      });
+
+      if (filtered.length === 0) {
+        tableBody.innerHTML = "";
+        emptyState.classList.remove("hidden");
+        return;
+      } else {
+        emptyState.classList.add("hidden");
+      }
+
+      tableBody.innerHTML = filtered.map(f => {
+        let categoryColorClass = "text-indigo-400 bg-indigo-500/10 border-indigo-500/10";
+        if (f.category === "Appraisal") categoryColorClass = "text-emerald-400 bg-emerald-500/10 border-emerald-500/10";
+        if (f.category === "KYC") categoryColorClass = "text-purple-400 bg-purple-500/10 border-purple-500/10";
+        if (f.category === "Financials") categoryColorClass = "text-amber-400 bg-amber-500/10 border-amber-500/10";
+
+        let statusClass = "text-slate-400 bg-slate-900 border-slate-800";
+        if (f.status.includes("Verified") || f.status.includes("Secure")) statusClass = "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
+        if (f.status.includes("Queue")) statusClass = "text-amber-400 bg-amber-500/10 border-amber-500/20";
+
+        return `
+          <tr class="hover:bg-slate-900/40 transition-colors">
+            <td class="py-3.5 pr-3 font-semibold text-white flex items-center gap-2">
+              <span class="w-8 h-8 rounded bg-slate-900 flex items-center justify-center text-slate-400 font-mono text-[9px] uppercase font-extrabold border border-slate-800/80">
+                ${f.icon}
+              </span>
+              <div class="truncate max-w-[220px]">
+                <div class="truncate text-slate-200" title="${f.name}">${f.name}</div>
+                <div class="text-[10px] text-slate-500 font-mono">${f.date}</div>
+              </div>
+            </td>
+            <td class="py-3.5 pr-3">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${categoryColorClass}">
+                ${f.category}
+              </span>
+            </td>
+            <td class="py-3.5 pr-3 text-slate-300 font-medium">${f.routing}</td>
+            <td class="py-3.5 pr-3 font-mono font-medium text-slate-400">${f.size}</td>
+            <td class="py-3.5 pr-3 font-mono text-slate-500 text-[10px]">${f.hash}</td>
+            <td class="py-3.5 pr-3">
+              <span class="px-2 py-0.5 rounded text-[10px] font-semibold border ${statusClass}">
+                ${f.status}
+              </span>
+            </td>
+            <td class="py-3.5 text-right space-x-1.5 whitespace-nowrap">
+              <button onclick="simulatePreview('${f.id}')" class="px-2 py-1 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-[10px] font-semibold rounded text-slate-300 transition-colors">
+                Preview
+              </button>
+              <button onclick="simulateDisconnect('${f.id}')" class="px-2 py-1 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/10 text-[10px] font-bold rounded transition-colors">
+                Re-Route
+              </button>
+              <button onclick="deleteFile('${f.id}')" class="px-2 py-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/10 text-[10px] font-bold rounded transition-colors">
+                Delete
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Dynamic Filter Trigger
+    function filterFiles() {
+      renderFilesTable();
+    }
+
+    // Active Activity Log Generator
+    function renderActivityLogs() {
+      const logContainer = document.getElementById("activity-log-container");
+      logContainer.innerHTML = LOG_DATABASE.map(log => {
+        let markerBg = "bg-indigo-500";
+        if (log.status === "success") markerBg = "bg-emerald-400";
+        if (log.status === "error") markerBg = "bg-red-500";
+
+        return `
+          <div class="flex items-start gap-3 p-2 bg-slate-900/30 border border-slate-900/80 rounded-lg text-[11px] leading-relaxed">
+            <span class="font-mono text-slate-500 shrink-0 mt-0.5">${log.time}</span>
+            <span class="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-800 font-mono text-slate-400 text-[9px] shrink-0 font-bold uppercase">${log.action}</span>
+            <div class="text-slate-300 flex-1">${log.text}</div>
+            <span class="w-1.5 h-1.5 rounded-full ${markerBg} shrink-0 mt-1.5"></span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Storage Allocations Calculations Update
+    function updateStorageMetrics() {
+      // Aggregate sizes
+      let totalFiles = FILE_DATABASE.length;
+      document.getElementById("stat-files").textContent = `${totalFiles.toLocaleString()} Files`;
+      
+      // Rough sizing estimates for metrics presentation
+      let baseAllocated = 1.17; 
+      let increment = (totalFiles - 5) * 0.04; // Add ~40MB per simulated added file
+      let currentAllocated = (baseAllocated + increment).toFixed(2);
+      
+      document.getElementById("stat-allocated").textContent = `${currentAllocated} Terabytes`;
+      
+      // Progress calculation
+      let capacityPct = ((currentAllocated / 2.0) * 100).toFixed(1);
+      document.getElementById("current-storage-ratio").textContent = `${capacityPct}% Capacity`;
+      document.getElementById("storage-progress-bar").style.width = `${capacityPct}%`;
+    }
+
+    // Dynamic Upload Simulation Orchestrator
+    function simulateUpload() {
+      // Generates beautiful randomized naming templates for realism
+      const templates = [
+        "Escrow_Agreement_Package_Signed.pdf",
+        "Commercial_P&L_Statement_2023.xlsx",
+        "Hazard_Insurance_Binder_Premium.pdf",
+        "Hazard_Appraisal_Report_PhoenixAZ.pdf",
+        "GroundUp_Feasibility_Study_Summit.zip"
+      ];
+      const selectedName = templates[Math.floor(Math.random() * templates.length)];
+      const randomSize = (Math.random() * 45 + 5).toFixed(1) + " MB";
+      
+      simulateIndividualUpload(selectedName, randomSize);
+    }
+
+    function simulateIndividualUpload(fileName, fileSize) {
+      const selectedLender = document.getElementById("lender-route-select").value;
+      
+      const statusBar = document.getElementById("upload-simulator-status");
+      const nameLabel = document.getElementById("uploading-file-name");
+      const percentLabel = document.getElementById("upload-percent");
+      const progressBar = document.getElementById("upload-sim-progress");
+
+      statusBar.classList.remove("hidden");
+      nameLabel.textContent = `Streaming secure payload: ${fileName}...`;
+      
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 10;
+        percentLabel.textContent = `${progress}%`;
+        progressBar.style.width = `${progress}%`;
+
+        if (progress >= 100) {
+          clearInterval(interval);
+          
+          // Complete upload: add to storage DB
+          const newDoc = {
+            id: "doc-" + Math.floor(Math.random() * 900 + 100),
+            name: fileName,
+            category: "Underwriting",
+            routing: selectedLender,
+            size: fileSize,
+            hash: "f" + Math.floor(Math.random()*900 + 100) + "ea81...",
+            status: "Active Verified",
+            date: new Date().toISOString().slice(0, 16).replace("T", " "),
+            icon: fileName.split('.').pop()
+          };
+
+          // Append to dynamic storage & refresh views
+          FILE_DATABASE.unshift(newDoc);
+          
+          // Log the event
+          logAction("FILE_UPLOAD", `Handshake upload complete: ${fileName} mapped successfully.`, "success");
+          
+          // Reset Upload Bar with delay
+          setTimeout(() => {
+            statusBar.classList.add("hidden");
+            progressBar.style.width = "0%";
+            percentLabel.textContent = "0%";
+          }, 800);
+
+          renderFilesTable();
+          updateStorageMetrics();
+          showToast(`File Successfully Synced & Routed!`);
+        }
+      }, 150);
+    }
+
+    // Logger Helper
+    function logAction(action, text, status) {
+      const now = new Date();
+      const timeStr = now.toTimeString().split(' ')[0];
+      LOG_DATABASE.unshift({ time: timeStr, action, text, status });
+      renderActivityLogs();
+    }
+
+    // Toast Alert Notification
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      document.getElementById("toast-message").textContent = message;
+      toast.classList.remove("translate-y-20", "opacity-0");
+      
+      setTimeout(() => {
+        toast.classList.add("translate-y-20", "opacity-0");
+      }, 3500);
+    }
+
+    // Explorer Table Actions
+    function deleteFile(id) {
+      const index = FILE_DATABASE.findIndex(f => f.id === id);
+      if (index !== -1) {
+        const deletedName = FILE_DATABASE[index].name;
+        FILE_DATABASE.splice(index, 1);
+        logAction("FILE_PURGED", `Secured link severed: ${deletedName} deleted from index.`, "error");
+        renderFilesTable();
+        updateStorageMetrics();
+        showToast("Storage Attachment Severed");
+      }
+    }
+
+    function simulatePreview(id) {
+      const file = FILE_DATABASE.find(f => f.id === id);
+      if (file) {
+        logAction("PREVIEW_REQUEST", `Preview interface loaded for ${file.name}.`, "info");
+        showToast(`Rendering Preview Window for ${file.name}`);
+      }
+    }
+
+    function simulateDisconnect(id) {
+      const file = FILE_DATABASE.find(f => f.id === id);
+      if (file) {
+        file.status = "Direct Handshake Queue";
+        file.routing = "Re-allocating Direct Route...";
+        logAction("ROUTING_REALLOC", `Reallocation command executed on ${file.name}.`, "info");
+        renderFilesTable();
+        showToast("Relaying packet routing options");
+        
+        setTimeout(() => {
+          file.status = "Active Verified";
+          file.routing = "Broadcast to All Verified Lenders";
+          logAction("ROUTING_ESTABLISHED", `Re-routing locked for ${file.name}.`, "success");
+          renderFilesTable();
+        }, 1500);
+      }
+    }
+
+    // Reset Dashboard Utility
+    function resetDashboard() {
+      // Revert files array
+      FILE_DATABASE.length = 0;
+      FILE_DATABASE.push(
+        { id: "doc-902", name: "Residential_Appraisal_LosAngeles_MainSt.pdf", category: "Appraisal", routing: "Apex Bridge Private Capital", size: "34.5 MB", hash: "e3b0c442...", status: "Active Verified", date: "2024-03-29 14:24", icon: "pdf" },
+        { id: "doc-771", name: "Commercial_PPM_CorporateDocs_Veritas.zip", category: "Underwriting", routing: "Veritas Commercial Trust", size: "182.0 MB", hash: "7f83b162...", status: "Direct Handshake Queue", date: "2024-03-29 11:15", icon: "zip" },
+        { id: "doc-331", name: "Borrower_KYC_Passport_Entity_LLC.pdf", category: "KYC", routing: "Broadcast to All Verified Lenders", size: "12.8 MB", hash: "9823fca1...", status: "Active Verified", date: "2024-03-28 09:30", icon: "pdf" }
+      );
+      
+      LOG_DATABASE = [
+        { time: "14:24:11", action: "FILE_UPLOAD", text: "Residential_Appraisal_LosAngeles_MainSt.pdf fully processed via Core Flow API.", status: "success" }
+      ];
+
+      document.getElementById("asset-search").value = "";
+      document.getElementById("file-program-select").value = "All";
+
+      renderFilesTable();
+      renderActivityLogs();
+      updateStorageMetrics();
+      showToast("Storage layout database successfully reset.");
+    }
+
+    // Storage Optimization trigger
+    function optimizeVault() {
+      logAction("SYSTEM_OPTIMIZE", "Commencing sector alignment & document duplicate analysis...", "info");
+      showToast("Optimizing Sector Duplications...");
+      
+      setTimeout(() => {
+        logAction("SYSTEM_OPTIMIZE", "De-fragmentation finished. 14.8 GB space cleared.", "success");
+        showToast("Storage Array Optimization Complete!");
+      }, 1200);
+    }
+
+    // Clear Logs
+    function clearActivityLog() {
+      LOG_DATABASE = [];
+      renderActivityLogs();
+      showToast("Vault history ledger purged.");
+    }
+
+    // Cache Purge
+    function purgeVaultCache() {
+      logAction("CACHE_PURGE", "Purging obsolete session drafting indices.", "info");
+      showToast("Purged 42.4 MB Cache successfully");
+    }
+
+    // Export manifest
+    function exportVaultManifest() {
+      logAction("EXPRT_MANIFEST", "Compiling cryptographically signed dynamic index manifest.", "success");
+      showToast("SHA-256 Manifest Export Triggered!");
+    }
+  </script>
+</body>
+</html>
+```

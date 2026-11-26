@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Funding Intelligence Engine MVP | Moonshine Capital</title>
+  <meta name="description" content="A static MVP for borrower intake, funding readiness scoring, archetype classification, routing, white-labeled recommendations, and analyst debug review." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="Funding Intelligence Engine home">
+        <span class="brand-mark">FIE</span>
+        <span><strong>Funding Intelligence Engine</strong><small>Moonshine Capital MVP</small></span>
+      </a>
+      <nav class="nav">
+        <a href="#intake">Intake</a>
+        <a href="#recommendations">Recommendations</a>
+        <a href="#analyst">Analyst Panel</a>
+      </nav>
+      <button id="toggleAnalyst" class="ghost-btn" type="button">Show Analyst Debug</button>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Static MVP · JSON-driven · Vercel-ready</p>
+          <h1>Find the likely funding lane before a borrower face-plants into the wrong application.</h1>
+          <p class="hero-sub">Borrower intake, readiness scoring, archetype classification, funding-family routing, white-labeled recommendations, and internal analyst visibility — all in one deployable static frontend.</p>
+          <div class="hero-actions">
+            <a class="primary-btn" href="#intake">Run borrower intake</a>
+            <a class="secondary-btn" href="#analyst">Inspect routing logic</a>
+          </div>
+        </div>
+        <div class="hero-card" aria-label="MVP capabilities">
+          <div class="mini-stat"><span id="productCount">--</span><small>Products loaded</small></div>
+          <div class="mini-stat"><span id="providerCount">--</span><small>Providers loaded</small></div>
+          <div class="mini-stat"><span>Static</span><small>No build step</small></div>
+          <div class="mini-stat"><span>Safe</span><small>No approval language</small></div>
+        </div>
+      </section>
+
+      <section class="system-strip" aria-label="Architecture status">
+        <div><strong>Data</strong><span>providers.json + products.json</span></div>
+        <div><strong>Logic</strong><span>routing + weights + risk flags</span></div>
+        <div><strong>Output</strong><span>public paths + internal matches</span></div>
+        <div><strong>Next</strong><span>HubSpot / n8n submit hook</span></div>
+      </section>
+
+      <section id="intake" class="workspace">
+        <form id="borrowerForm" class="panel intake-panel">
+          <div class="panel-header">
+            <p class="eyebrow">Borrower intake</p>
+            <h2>Funding Readiness Scorecard</h2>
+            <p>Use realistic inputs. The engine recalculates locally and consumes the JSON data files in <code>/data</code>.</p>
+          </div>
+
+          <div class="form-grid">
+            <label>Business type
+              <select name="businessType">
+                <option value="existing_business">Existing small business</option>
+                <option value="gig_worker">Gig worker / independent contractor</option>
+                <option value="ecommerce_seller">E-commerce / marketplace seller</option>
+                <option value="startup_founder">Startup founder</option>
+                <option value="real_estate_investor">Real estate investor</option>
+                <option value="equipment_heavy">Contractor / trucking / equipment-heavy</option>
+              </select>
+            </label>
+
+            <label>Average monthly revenue
+              <select name="monthlyRevenue">
+                <option value="0">$0–$2,999</option>
+                <option value="3000">$3,000–$8,499</option>
+                <option value="8500">$8,500–$14,999</option>
+                <option value="15000" selected>$15,000–$19,999</option>
+                <option value="20000">$20,000–$49,999</option>
+                <option value="50000">$50,000–$99,999</option>
+                <option value="100000">$100,000+</option>
+              </select>
+            </label>
+
+            <label>Time in business
+              <select name="timeInBusinessMonths">
+                <option value="0">Not launched / 0 months</option>
+                <option value="3">0–3 months</option>
+                <option value="5">4–5 months</option>
+                <option value="9">6–11 months</option>
+                <option value="18" selected>12–23 months</option>
+                <option value="30">24+ months</option>
+              </select>
+            </label>
+
+            <label>Estimated personal credit
+              <select name="creditScore">
+                <option value="480">Below 500</option>
+                <option value="540">500–579</option>
+                <option value="590">580–599</option>
+                <option value="630" selected>600–659</option>
+                <option value="670">660–679</option>
+                <option value="690">680–699</option>
+                <option value="720">700+</option>
+              </select>
+            </label>
+
+            <label>Bank activity
+              <select name="bankActivity">
+                <option value="none">No business bank account</option>
+                <option value="inconsistent">Low or inconsistent deposits</option>
+                <option value="consistent" selected>Consistent monthly deposits</option>
+                <option value="strong_clean">Strong deposits + clean activity</option>
+                <option value="recent_nsfs">Recent NSFs / overdrafts</option>
+              </select>
+            </label>
+
+            <label>Business structure
+              <select name="businessStructure">
+                <option value="none">No formal business yet</option>
+                <option value="sole_prop">Sole proprietor / contractor</option>
+                <option value="entity_no_bank">LLC/corp, no business bank account</option>
+                <option value="entity_bank" selected>LLC/corp with business bank account</option>
+                <option value="entity_bank_clean">LLC/corp, EIN, clean records</option>
+              </select>
+            </label>
+
+            <label>Funding purpose
+              <select name="fundingPurpose">
+                <option value="working_capital" selected>Payroll / working capital</option>
+                <option value="inventory">Inventory / materials</option>
+                <option value="growth">Marketing / growth</option>
+                <option value="equipment">Equipment / truck / vehicle</option>
+                <option value="real_estate">Real estate purchase/project</option>
+                <option value="ecommerce">E-commerce / marketplace growth</option>
+                <option value="startup">Startup launch capital</option>
+                <option value="refinance">Debt consolidation / refinance</option>
+                <option value="business_credit">Business credit building</option>
+              </select>
+            </label>
+
+            <label>Desired funding amount
+              <select name="desiredFundingAmount">
+                <option value="5000">Under $5,000</option>
+                <option value="25000">$5,000–$25,000</option>
+                <option value="75000" selected>$25,000–$75,000</option>
+                <option value="150000">$75,000–$150,000</option>
+                <option value="500000">$150,000–$500,000</option>
+                <option value="1000000">$500,000+</option>
+              </select>
+            </label>
+          </div>
+
+          <fieldset class="checkbox-fieldset">
+            <legend>Red flags / manual review triggers</legend>
+            <label><input type="checkbox" name="riskFlags" value="risk_open_bankruptcy"> Open bankruptcy</label>
+            <label><input type="checkbox" name="riskFlags" value="risk_tax_lien"> Recent tax lien</label>
+            <label><input type="checkbox" name="riskFlags" value="risk_recent_late_payments"> Recent missed payments</label>
+            <label><input type="checkbox" name="riskFlags" value="risk_recent_nsfs"> Recent NSFs / overdrafts</label>
+            <label><input type="checkbox" name="riskFlags" value="risk_existing_mca_stack"> Existing MCA / daily payment advance</label>
+            <label><input type="checkbox" name="riskFlags" value="risk_marketplace_suspension"> Suspended marketplace account</label>
+          </fieldset>
+
+          <fieldset class="checkbox-fieldset">
+            <legend>Documents currently available</legend>
+            <label><input type="checkbox" name="docs" value="bank_statements" checked> Bank statements</label>
+            <label><input type="checkbox" name="docs" value="tax_returns"> Tax returns</label>
+            <label><input type="checkbox" name="docs" value="credit_report"> Credit report</label>
+            <label><input type="checkbox" name="docs" value="platform_connection"> Marketplace/platform connection</label>
+            <label><input type="checkbox" name="docs" value="equipment_invoice"> Equipment invoice/spec sheet</label>
+            <label><input type="checkbox" name="docs" value="real_estate_docs"> Real estate docs</label>
+          </fieldset>
+
+          <div id="lead-capture" class="lead-capture">
+            <h3>Lead capture payload preview</h3>
+            <div class="form-grid compact">
+              <label>Name <input name="contactName" placeholder="Jane Operator" /></label>
+              <label>Email <input name="email" placeholder="jane@example.com" /></label>
+              <label>Business name <input name="businessName" placeholder="Example Ventures LLC" /></label>
+              <label>State <input name="state" placeholder="VA" maxlength="2" /></label>
+            </div>
+            <label class="consent"><input name="consent" type="checkbox" checked /> I agree to be contacted about funding options and understand this score is not an approval, offer, or guarantee of funding.</label>
+          </div>
+
+          <div class="form-actions">
+            <button class="primary-btn" type="submit">Calculate funding route</button>
+            <button class="secondary-btn" type="button" id="loadExample">Load e-commerce example</button>
+          </div>
+        </form>
+
+        <aside id="recommendations" class="panel result-panel" aria-live="polite">
+          <div class="panel-header">
+            <p class="eyebrow">Public borrower output</p>
+            <h2>White-labeled recommendation</h2>
+            <p>No lender/provider names are exposed here. The business sees funding paths, not the sausage factory.</p>
+          </div>
+
+          <div class="score-card">
+            <svg class="meter" viewBox="0 0 120 120" aria-hidden="true">
+              <circle class="meter-bg" cx="60" cy="60" r="52"></circle>
+              <circle id="scoreRing" class="meter-fg" cx="60" cy="60" r="52"></circle>
+            </svg>
+            <div class="score-copy"><span id="scoreValue">--</span><small id="scoreTier">Run the intake</small></div>
+          </div>
+
+          <div class="result-block">
+            <h3 id="primaryFamily">Awaiting borrower profile</h3>
+            <p id="publicSummary">Complete the form to generate a funding readiness score, archetype, and likely funding path.</p>
+          </div>
+
+          <div class="result-grid">
+            <div class="result-block"><h4>Borrower archetype</h4><p id="archetypeOut">--</p></div>
+            <div class="result-block"><h4>Data confidence</h4><p id="confidenceOut">--</p></div>
+          </div>
+
+          <div class="result-block">
+            <h4>Potential funding paths</h4>
+            <div id="publicPaths" class="pill-list"></div>
+          </div>
+
+          <div class="result-block">
+            <h4>Possible blockers</h4>
+            <ul id="blockersList"></ul>
+          </div>
+
+          <div class="result-block">
+            <h4>Recommended next steps</h4>
+            <ul id="nextStepsList"></ul>
+          </div>
+
+          <div class="cta-box">
+            <strong>Recommended next step</strong>
+            <p id="ctaText">Run the assessment first.</p>
+            <a class="primary-btn" href="#lead-capture">Request funding review</a>
+          </div>
+        </aside>
+      </section>
+
+      <section id="analyst" class="panel analyst-panel is-hidden">
+        <div class="panel-header row-header">
+          <div>
+            <p class="eyebrow">Internal-only analyst panel</p>
+            <h2>Routing/debug payload</h2>
+            <p>Shows actual ranked product/provider matches, score components, risk penalties, and JSON output for CRM or n8n handoff.</p>
+          </div>
+          <button id="copyPayload" class="ghost-btn" type="button">Copy payload</button>
+        </div>
+
+        <div class="analyst-grid">
+          <div class="debug-card">
+            <h3>Score dimensions</h3>
+            <div id="dimensionBars"></div>
+          </div>
+          <div class="debug-card">
+            <h3>Top internal product matches</h3>
+            <div id="internalMatches"></div>
+          </div>
+          <div class="debug-card wide">
+            <h3>CRM / automation payload</h3>
+            <pre id="jsonPayload">{}</pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="disclaimer panel">
+        <strong>Compliance note:</strong>
+        <span id="disclaimerText">This scorecard is for educational and pre-qualification guidance only. It is not an approval, commitment to lend, offer of credit, or guarantee of funding.</span>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

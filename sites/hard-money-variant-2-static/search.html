@@ -1,0 +1,864 @@
+```html
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Attachment Search & Filter Engine</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            slate: {
+              950: '#07070a',
+              900: '#0f0f15',
+              800: '#181824',
+              700: '#252538',
+            },
+            indigo: {
+              500: '#6366f1',
+              400: '#818cf8',
+              600: '#4f46e5',
+            },
+            emerald: {
+              500: '#10b981',
+              400: '#34d399',
+            }
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #07070a;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+        radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
+        linear-gradient(rgba(255, 255, 255, 0.003) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.003) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 24px 24px, 24px 24px;
+    }
+    .glow-border:hover {
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+      border-color: rgba(99, 102, 241, 0.4);
+    }
+    .drawer-transition {
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+  </style>
+</head>
+<body class="text-slate-100 min-h-screen antialiased overflow-x-hidden">
+
+  <!-- Main Navigation -->
+  <header class="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-0 z-40 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-emerald-500 flex items-center justify-center shadow-lg shadow-indigo-500/10">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <div>
+          <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-slate-100 to-indigo-300 bg-clip-text text-transparent">FLOW</span>
+          <span class="text-emerald-400 font-bold text-xs uppercase tracking-widest ml-1 px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">ARCHIVE</span>
+        </div>
+      </div>
+      
+      <!-- Center Quick Stats -->
+      <div class="hidden md:flex items-center gap-6 text-sm">
+        <div class="flex items-center gap-2 border-r border-slate-800/80 pr-6">
+          <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+          <span class="text-slate-400">Vault Health</span>
+          <span class="text-white font-semibold">1,482 Files</span>
+        </div>
+        <div class="flex items-center gap-2 border-r border-slate-800/80 pr-6">
+          <span class="text-slate-400">OCR Engine</span>
+          <span class="text-emerald-400 font-semibold">Active (99.8%)</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-slate-400">Total Indexed Size</span>
+          <span class="text-white font-semibold">14.8 GB</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button onclick="resetSearchEngine()" class="px-4 py-2 text-xs font-medium bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors">
+          Reset Search
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative pt-8 pb-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="absolute inset-0 top-0 left-1/2 -translate-x-1/2 w-3/4 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
+    
+    <div class="relative text-center max-w-3xl mx-auto space-y-4 mb-8">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs text-slate-400">
+        <span class="flex h-2 w-2 rounded-full bg-emerald-500"></span>
+        <span>Secure OCR & Smart Attachment Routing Panel</span>
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white leading-tight">
+        Advanced Document & <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-emerald-400 bg-clip-text text-transparent">Attachment Intelligence</span>
+      </h1>
+      <p class="text-slate-400 text-xs sm:text-sm max-w-xl mx-auto leading-relaxed">
+        Execute full-text indexing, file-metadata isolation, size thresholds, and deep OCR keyword matching across your corporate document vaults instantly.
+      </p>
+    </div>
+  </section>
+
+  <!-- Core Layout Interface -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 relative">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      
+      <!-- Left Sidebar: Multi-Criteria Filters -->
+      <aside class="space-y-6 lg:col-span-1">
+        <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-5 space-y-6">
+          <div class="flex items-center justify-between">
+            <h4 class="font-bold text-xs text-white uppercase tracking-wider">Advanced Filters</h4>
+            <button onclick="clearAllFilters()" class="text-[10px] text-slate-400 hover:text-white transition-colors">Clear Filters</button>
+          </div>
+
+          <!-- File Extension Filter -->
+          <div class="space-y-2">
+            <label class="text-xs text-slate-400 font-medium block">File Extensions</label>
+            <div class="grid grid-cols-2 gap-2" id="extension-filters">
+              <label class="flex items-center gap-2 text-xs text-slate-300 bg-slate-900/50 hover:bg-slate-900 border border-slate-800 rounded p-2 cursor-pointer transition-colors">
+                <input type="checkbox" value="PDF" class="ext-cb rounded border-slate-700 bg-slate-950 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-slate-950">
+                <span>PDF Document</span>
+              </label>
+              <label class="flex items-center gap-2 text-xs text-slate-300 bg-slate-900/50 hover:bg-slate-900 border border-slate-800 rounded p-2 cursor-pointer transition-colors">
+                <input type="checkbox" value="XLSX" class="ext-cb rounded border-slate-700 bg-slate-950 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-slate-950">
+                <span>Excel Sheet</span>
+              </label>
+              <label class="flex items-center gap-2 text-xs text-slate-300 bg-slate-900/50 hover:bg-slate-900 border border-slate-800 rounded p-2 cursor-pointer transition-colors">
+                <input type="checkbox" value="PPTX" class="ext-cb rounded border-slate-700 bg-slate-950 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-slate-950">
+                <span>Powerpoint</span>
+              </label>
+              <label class="flex items-center gap-2 text-xs text-slate-300 bg-slate-900/50 hover:bg-slate-900 border border-slate-800 rounded p-2 cursor-pointer transition-colors">
+                <input type="checkbox" value="ZIP" class="ext-cb rounded border-slate-700 bg-slate-950 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-slate-950">
+                <span>Archive ZIP</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- File Size Threshold Selector -->
+          <div class="space-y-3">
+            <div class="flex justify-between items-center text-xs">
+              <label class="text-slate-400 font-medium">Maximum File Size</label>
+              <span id="size-label" class="text-indigo-400 font-mono font-medium">100+ MB</span>
+            </div>
+            <div class="bg-slate-900 p-3 rounded-xl border border-slate-800/80">
+              <input type="range" id="size-slider" min="1" max="150" value="150" class="w-full accent-indigo-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg appearance-none">
+              <div class="flex justify-between text-[10px] text-slate-500 font-mono mt-1">
+                <span>1 MB</span>
+                <span>75 MB</span>
+                <span>150 MB</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Authors / Uploaders List -->
+          <div class="space-y-2">
+            <label class="text-xs text-slate-400 font-medium block">Author / Origin Department</label>
+            <select id="author-select" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer">
+              <option value="All">All Authors</option>
+              <option value="Legal Team">Legal Team</option>
+              <option value="Financial Dept">Financial Dept</option>
+              <option value="Inspections Dept">Inspections Dept</option>
+              <option value="Engineering">Engineering Team</option>
+              <option value="Marketing">Marketing / Capital Placement</option>
+              <option value="Accounting">Accounting / Audit</option>
+              <option value="Settlement Agent">Settlement Agent</option>
+            </select>
+          </div>
+
+          <!-- Date Quick Selectors -->
+          <div class="space-y-2">
+            <label class="text-xs text-slate-400 font-medium block">Uploaded Frame</label>
+            <div class="grid grid-cols-2 gap-1.5 bg-slate-900 p-1 rounded-lg border border-slate-800/80">
+              <button onclick="setDateRange('all')" id="date-all" class="date-btn py-1.5 text-[11px] rounded font-medium text-white bg-indigo-600 transition-all">All Time</button>
+              <button onclick="setDateRange('30')" id="date-30" class="date-btn py-1.5 text-[11px] rounded font-medium text-slate-400 hover:text-white transition-all">Last 30 Days</button>
+              <button onclick="setDateRange('90')" id="date-90" class="date-btn py-1.5 text-[11px] rounded font-medium text-slate-400 hover:text-white transition-all">Last 90 Days</button>
+              <button onclick="setDateRange('180')" id="date-180" class="date-btn py-1.5 text-[11px] rounded font-medium text-slate-400 hover:text-white transition-all">Last 6 Months</button>
+            </div>
+          </div>
+
+          <!-- Smart Scanning / OCR Toggle -->
+          <div class="space-y-2 border-t border-slate-800/60 pt-4">
+            <label class="text-xs text-slate-400 font-medium">Smart Extraction Requirements</label>
+            <div class="space-y-2 mt-1">
+              <label class="flex items-center gap-2.5 text-xs text-slate-300 cursor-pointer">
+                <input type="checkbox" id="chk-ocr" class="w-3.5 h-3.5 rounded bg-slate-900 border-slate-800 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-slate-950">
+                <span>Requires OCR Transcript</span>
+              </label>
+              <label class="flex items-center gap-2.5 text-xs text-slate-300 cursor-pointer">
+                <input type="checkbox" id="chk-confident" class="w-3.5 h-3.5 rounded bg-slate-900 border-slate-800 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-slate-950">
+                <span>Verified OCR Accuracy High (&gt;95%)</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Stats Bar -->
+        <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-5 space-y-3">
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></div>
+            <h4 class="font-bold text-xs text-white uppercase tracking-wider">Engine Processing pipeline</h4>
+          </div>
+          <div class="space-y-2 text-xs">
+            <div class="flex justify-between text-slate-400">
+              <span>OCR Backlog:</span>
+              <span class="text-white font-mono">0 Items (Idle)</span>
+            </div>
+            <div class="flex justify-between text-slate-400">
+              <span>Index Version:</span>
+              <span class="text-white font-mono">v4.89</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Right Panel: Advanced Search Bar + Results Container -->
+      <section class="lg:col-span-3 space-y-6">
+        
+        <!-- Live Global Smart Text Search Bar -->
+        <div class="bg-slate-950 border border-indigo-500/10 p-4 rounded-xl space-y-3 shadow-xl relative overflow-hidden">
+          <div class="absolute -top-10 -right-10 w-24 h-24 bg-indigo-500/5 rounded-full blur-xl pointer-events-none"></div>
+          <label class="text-xs font-bold text-indigo-300 uppercase tracking-wider block">Full-Text Deep Document OCR Scan</label>
+          <div class="relative">
+            <input type="text" id="engine-search" placeholder="Type document names, keywords inside images, values, specific items (e.g. 'LTV', 'easement', 'revenue')..." class="w-full bg-slate-900 border border-slate-800 rounded-lg pl-10 pr-4 py-3 text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors">
+            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+            </span>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 text-[11px] text-slate-400">
+            <span>Quick Suggestions:</span>
+            <button onclick="applyQuickQuery('LTV')" class="bg-slate-900 hover:bg-slate-800 px-2 py-0.5 rounded border border-slate-800 transition-colors text-slate-300">"LTV"</button>
+            <button onclick="applyQuickQuery('revenue')" class="bg-slate-900 hover:bg-slate-800 px-2 py-0.5 rounded border border-slate-800 transition-colors text-slate-300">"revenue"</button>
+            <button onclick="applyQuickQuery('easement')" class="bg-slate-900 hover:bg-slate-800 px-2 py-0.5 rounded border border-slate-800 transition-colors text-slate-300">"easement"</button>
+            <button onclick="applyQuickQuery('partnership')" class="bg-slate-900 hover:bg-slate-800 px-2 py-0.5 rounded border border-slate-800 transition-colors text-slate-300">"partnership"</button>
+          </div>
+        </div>
+
+        <!-- Sorting & Search Stats Ribbon -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-slate-950 border border-slate-800/80 rounded-xl p-4">
+          <div>
+            <span class="text-slate-400 text-xs">Matching Vault Artifacts</span>
+            <div class="flex items-center gap-2 mt-1">
+              <span id="active-results-count" class="text-lg font-extrabold text-white">0</span>
+              <span class="text-slate-500 text-xs">items match exact filters</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-xs text-slate-400">Sort Matrix:</span>
+            <select id="sort-select" onchange="sortArtifacts()" class="bg-slate-900 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500 cursor-pointer">
+              <option value="newest">Upload Date (Newest)</option>
+              <option value="oldest">Upload Date (Oldest)</option>
+              <option value="size-large">File Size (Largest)</option>
+              <option value="size-small">File Size (Smallest)</option>
+              <option value="name">File Name (A-Z)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Files Directory Grid -->
+        <div id="artifacts-grid" class="space-y-3">
+          <!-- Dynamic high fidelity list rendering here -->
+        </div>
+
+        <!-- Empty State Component -->
+        <div id="empty-state" class="hidden text-center py-20 bg-slate-950 border border-dashed border-slate-800 rounded-xl space-y-4">
+          <div class="w-12 h-12 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto text-slate-500">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <div>
+            <h4 class="font-bold text-white text-sm">No Attachment Matches Formulated</h4>
+            <p class="text-xs text-slate-400 max-w-sm mx-auto mt-1">Adjust your extension checkmarks, push your file size slider right, or revise your OCR search term criteria.</p>
+          </div>
+          <button onclick="clearAllFilters()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg transition-colors">
+            Reset All Criteria
+          </button>
+        </div>
+
+      </section>
+    </div>
+
+    <!-- Smart Interactive Document Preview Drawer (Slides from Right) -->
+    <div id="preview-drawer" class="fixed top-0 right-0 h-full w-full sm:w-[500px] bg-slate-950 border-l border-slate-800/80 shadow-2xl z-50 transform translate-x-full drawer-transition flex flex-col justify-between overflow-hidden">
+      
+      <!-- Drawer Header -->
+      <div class="p-6 border-b border-slate-800/80 bg-slate-950/80 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div id="d-icon-container" class="w-10 h-10 rounded-lg flex items-center justify-center text-white">
+            <!-- Icon Dynamic -->
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-white truncate max-w-[280px]" id="d-filename">File_Name.pdf</h3>
+            <span class="text-[10px] text-emerald-400 uppercase font-bold tracking-widest" id="d-meta">PDF DOCUMENT &bull; 12.4 MB</span>
+          </div>
+        </div>
+        <button onclick="closeDrawer()" class="text-slate-400 hover:text-white bg-slate-900 border border-slate-800 hover:border-slate-700 p-1.5 rounded-lg transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Drawer Scrollable Content -->
+      <div class="p-6 flex-1 overflow-y-auto space-y-6 no-scrollbar">
+        
+        <!-- File Profile Attributes Grid -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800/60">
+            <span class="text-[9px] text-slate-500 uppercase block">Uploaded By</span>
+            <span class="text-xs font-semibold text-slate-300 mt-1 block" id="d-author">Legal Team</span>
+          </div>
+          <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800/60">
+            <span class="text-[9px] text-slate-500 uppercase block">Indexing Date</span>
+            <span class="text-xs font-semibold text-slate-300 mt-1 block" id="d-date">Oct 24, 2023</span>
+          </div>
+        </div>
+
+        <!-- Smart Document Mock Preview Graphic -->
+        <div class="space-y-2">
+          <label class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Simulated Attachment Preview</label>
+          <div class="aspect-video w-full rounded-xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center text-slate-500 p-4 relative overflow-hidden group">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent pointer-events-none"></div>
+            <svg class="w-12 h-12 text-slate-600 mb-2 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <span class="text-[10px] text-slate-400 font-medium z-10">Document Sandbox Render Active</span>
+            <span class="text-[9px] text-slate-500 uppercase z-10 mt-1">Click below to export raw file</span>
+          </div>
+        </div>
+
+        <!-- Dynamic Extracted OCR Content / Transcription Panel -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="text-[10px] text-indigo-400 uppercase font-bold tracking-wider">Identified OCR Transcript Keywords</label>
+            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[9px] font-bold">100% Text Scan Match</span>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
+            <p class="text-xs text-slate-300 leading-relaxed font-mono" id="d-ocr-text">
+              "This serves as evidence that all initial LTV rates are locked inside private legal trusts. The borrower has fulfilled the title assurance covenant for primary parcels..."
+            </p>
+          </div>
+        </div>
+
+        <!-- Quick Routing Handshake Options -->
+        <div class="space-y-2">
+          <label class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Attachment Tags</label>
+          <div class="flex flex-wrap gap-1.5" id="d-tags">
+            <!-- tags go here -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Drawer Footer Actions -->
+      <div class="p-6 border-t border-slate-800/80 bg-slate-900/40 space-y-3">
+        <button onclick="simulateExport()" class="w-full py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-lg shadow-indigo-500/15 transition-all flex items-center justify-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+          </svg>
+          Export & Route Document
+        </button>
+        <button onclick="closeDrawer()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-semibold uppercase tracking-wider rounded-lg transition-colors">
+          Close Preview
+        </button>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Interactive Toast Notification Component -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 ease-out bg-slate-900 border border-indigo-500/30 text-white rounded-lg px-4 py-3 shadow-2xl max-w-sm flex items-center gap-3">
+    <div class="w-6 h-6 rounded-full bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <div>
+      <h5 class="text-xs font-bold text-white">Attachment Handshake Logged</h5>
+      <p class="text-[10px] text-slate-400 mt-0.5" id="toast-message">Export protocol initiated successfully.</p>
+    </div>
+  </div>
+
+  <script>
+    // Attachment Vault Database Struct
+    const VAULT_DATABASE = [
+      {
+        id: "doc-01",
+        name: "Q4_Financial_Report.xlsx",
+        extension: "XLSX",
+        size: 12.4, // MB
+        author: "Financial Dept",
+        uploadedDate: "2023-11-12",
+        hasOcr: true,
+        ocrScore: 98.7,
+        ocrSnippet: "Revenue targets exceeded standard predictions. Total portfolio growth parameters at 114% with strong EBITDA projections.",
+        tags: ["Finances", "Spreadsheet", "Calculations"],
+        downloadCount: 182
+      },
+      {
+        id: "doc-02",
+        name: "Commercial_Loan_Agreement_Signed.pdf",
+        extension: "PDF",
+        size: 45.1,
+        author: "Legal Team",
+        uploadedDate: "2023-10-24",
+        hasOcr: true,
+        ocrScore: 99.4,
+        ocrSnippet: "Lender parameters and default maturity LTV structures explicitly structured in Section 14. Signed off on all deeds.",
+        tags: ["Legal", "Direct Underwriting", "LTV"],
+        downloadCount: 42
+      },
+      {
+        id: "doc-03",
+        name: "Property_Deed_Scan_OCR.pdf",
+        extension: "PDF",
+        size: 8.2,
+        author: "Inspections Dept",
+        uploadedDate: "2023-12-01",
+        hasOcr: true,
+        ocrScore: 96.1,
+        ocrSnippet: "Property transfer easement authorization registered on official registrar indexes under parcel 401.",
+        tags: ["Escrow", "Deed", "Inspections"],
+        downloadCount: 15
+      },
+      {
+        id: "doc-04",
+        name: "Site_Photos_External_Facade.zip",
+        extension: "ZIP",
+        size: 120.5,
+        author: "Inspections Dept",
+        uploadedDate: "2024-01-10",
+        hasOcr: false,
+        ocrScore: 0,
+        ocrSnippet: "Non-transcribed artifact. Archive contains 48 structural survey imagery documents.",
+        tags: ["Images", "Zip Archive", "Survey"],
+        downloadCount: 9
+      },
+      {
+        id: "doc-05",
+        name: "As-Built_Blueprints_Level3.pdf",
+        extension: "PDF",
+        size: 85.0,
+        author: "Engineering",
+        uploadedDate: "2024-01-15",
+        hasOcr: true,
+        ocrScore: 95.8,
+        ocrSnippet: "Structural load bearing pillars registered under section code Column-4B. High density steel structures matched to standard HVAC ductwork protocols.",
+        tags: ["Engineering", "Schematics", "Drawings"],
+        downloadCount: 31
+      },
+      {
+        id: "doc-06",
+        name: "Executive_Capital_Pitch_v2.pptx",
+        extension: "PPTX",
+        size: 18.5,
+        author: "Marketing",
+        uploadedDate: "2023-12-15",
+        hasOcr: true,
+        ocrScore: 97.2,
+        ocrSnippet: "Target mezzanine debt and preferred equity metrics structure highlights an IRR of 18.9% with secure direct routing algorithms.",
+        tags: ["Pitch", "Equity", "Investors"],
+        downloadCount: 64
+      },
+      {
+        id: "doc-07",
+        name: "Tax_Return_Form_1065.pdf",
+        extension: "PDF",
+        size: 4.1,
+        author: "Accounting",
+        uploadedDate: "2023-09-30",
+        hasOcr: true,
+        ocrScore: 99.8,
+        ocrSnippet: "Partnership gross receipts structured inside standard schedule K-1 reports. Absolute valuation and deduction structures match escrow accounts.",
+        tags: ["Taxation", "Audit", "Compliance"],
+        downloadCount: 110
+      },
+      {
+        id: "doc-08",
+        name: "Closing_Statement_HUD1.pdf",
+        extension: "PDF",
+        size: 2.7,
+        author: "Settlement Agent",
+        uploadedDate: "2024-02-02",
+        hasOcr: true,
+        ocrScore: 94.5,
+        ocrSnippet: "Settlement charges, title registration insurance and escrow deposit reserves are verified cleared on both sides of structural financing protocols.",
+        tags: ["Closing", "HUD-1", "Settlement"],
+        downloadCount: 12
+      }
+    ];
+
+    // Current State Management
+    let searchFilters = {
+      query: "",
+      extensions: [],
+      maxSize: 150,
+      author: "All",
+      timeframe: "all",
+      requiresOcr: false,
+      highAccuracyOnly: false,
+      sortBy: "newest"
+    };
+
+    // Initialize Page Controls
+    document.addEventListener("DOMContentLoaded", () => {
+      initExtensionFilters();
+      initSizeSlider();
+      initSearchInput();
+      initCheckboxes();
+      
+      // Perform initial filter match rendering
+      renderArtifacts();
+    });
+
+    // Toggle Extension Checkboxes
+    function initExtensionFilters() {
+      const checkboxes = document.querySelectorAll(".ext-cb");
+      checkboxes.forEach(cb => {
+        cb.addEventListener("change", () => {
+          const selected = [];
+          checkboxes.forEach(c => {
+            if (c.checked) selected.push(c.value);
+          });
+          searchFilters.extensions = selected;
+          renderArtifacts();
+        });
+      });
+    }
+
+    // Size Slider Management
+    function initSizeSlider() {
+      const slider = document.getElementById("size-slider");
+      const label = document.getElementById("size-label");
+      
+      slider.addEventListener("input", (e) => {
+        const val = parseInt(e.target.value);
+        searchFilters.maxSize = val;
+        label.textContent = val >= 150 ? "150+ MB" : `${val} MB`;
+        renderArtifacts();
+      });
+    }
+
+    // Search Keydown Processing
+    function initSearchInput() {
+      const input = document.getElementById("engine-search");
+      input.addEventListener("input", (e) => {
+        searchFilters.query = e.target.value.toLowerCase();
+        renderArtifacts();
+      });
+
+      const authorSelect = document.getElementById("author-select");
+      authorSelect.addEventListener("change", (e) => {
+        searchFilters.author = e.target.value;
+        renderArtifacts();
+      });
+    }
+
+    function initCheckboxes() {
+      document.getElementById("chk-ocr").addEventListener("change", (e) => {
+        searchFilters.requiresOcr = e.target.checked;
+        renderArtifacts();
+      });
+      document.getElementById("chk-confident").addEventListener("change", (e) => {
+        searchFilters.highAccuracyOnly = e.target.checked;
+        renderArtifacts();
+      });
+    }
+
+    // Quick Keywords suggestions injection
+    function applyQuickQuery(word) {
+      const input = document.getElementById("engine-search");
+      input.value = word;
+      searchFilters.query = word.toLowerCase();
+      renderArtifacts();
+      showToast(`Filter configured to search "${word}"`);
+    }
+
+    // Time frame configurations
+    function setDateRange(days) {
+      searchFilters.timeframe = days;
+      
+      const buttons = document.querySelectorAll(".date-btn");
+      buttons.forEach(btn => btn.classList.remove("bg-indigo-600", "text-white"));
+      
+      document.getElementById(`date-${days}`).classList.add("bg-indigo-600", "text-white");
+      renderArtifacts();
+    }
+
+    // Sort Trigger
+    function sortArtifacts() {
+      searchFilters.sortBy = document.getElementById("sort-select").value;
+      renderArtifacts();
+    }
+
+    // Reset Engine State
+    function resetSearchEngine() {
+      clearAllFilters();
+      showToast("Engine indices re-scanned and synchronized");
+    }
+
+    // Clear filters helpers
+    function clearAllFilters() {
+      searchFilters = {
+        query: "",
+        extensions: [],
+        maxSize: 150,
+        author: "All",
+        timeframe: "all",
+        requiresOcr: false,
+        highAccuracyOnly: false,
+        sortBy: "newest"
+      };
+
+      // Reset Inputs
+      document.getElementById("engine-search").value = "";
+      document.getElementById("size-slider").value = 150;
+      document.getElementById("size-label").textContent = "150+ MB";
+      document.getElementById("author-select").value = "All";
+      document.getElementById("chk-ocr").checked = false;
+      document.getElementById("chk-confident").checked = false;
+
+      // Checkboxes UI reset
+      document.querySelectorAll(".ext-cb").forEach(cb => cb.checked = false);
+
+      // Date UI reset
+      setDateRange("all");
+    }
+
+    // Dynamic Filter Operations
+    function renderArtifacts() {
+      const grid = document.getElementById("artifacts-grid");
+      const emptyState = document.getElementById("empty-state");
+      const counterLabel = document.getElementById("active-results-count");
+
+      let matches = VAULT_DATABASE.filter(file => {
+        // Search Term Match (Name, Author, Tags, Snippet text)
+        if (searchFilters.query) {
+          const inName = file.name.toLowerCase().includes(searchFilters.query);
+          const inSnippet = file.ocrSnippet.toLowerCase().includes(searchFilters.query);
+          const inAuthor = file.author.toLowerCase().includes(searchFilters.query);
+          const inTags = file.tags.some(tag => tag.toLowerCase().includes(searchFilters.query));
+          if (!inName && !inSnippet && !inAuthor && !inTags) return false;
+        }
+
+        // Extension Match
+        if (searchFilters.extensions.length > 0) {
+          if (!searchFilters.extensions.includes(file.extension)) return false;
+        }
+
+        // Size limit Match
+        if (file.size > searchFilters.maxSize) return false;
+
+        // Author limit Match
+        if (searchFilters.author !== "All") {
+          if (file.author !== searchFilters.author) return false;
+        }
+
+        // OCR criteria checks
+        if (searchFilters.requiresOcr && !file.hasOcr) return false;
+        if (searchFilters.highAccuracyOnly && file.ocrScore < 95.0) return false;
+
+        // Upload Time limit checks
+        if (searchFilters.timeframe !== "all") {
+          const fileDate = new Date(file.uploadedDate);
+          const referenceDate = new Date();
+          const parsedDays = parseInt(searchFilters.timeframe);
+          referenceDate.setDate(referenceDate.getDate() - parsedDays);
+          if (fileDate < referenceDate) return false;
+        }
+
+        return true;
+      });
+
+      // Sort Algorithms
+      if (searchFilters.sortBy === "newest") {
+        matches.sort((a, b) => new Date(b.uploadedDate) - new Date(a.uploadedDate));
+      } else if (searchFilters.sortBy === "oldest") {
+        matches.sort((a, b) => new Date(a.uploadedDate) - new Date(b.uploadedDate));
+      } else if (searchFilters.sortBy === "size-large") {
+        matches.sort((a, b) => b.size - a.size);
+      } else if (searchFilters.sortBy === "size-small") {
+        matches.sort((a, b) => a.size - b.size);
+      } else if (searchFilters.sortBy === "name") {
+        matches.sort((a, b) => a.name.localeCompare(b.name));
+      }
+
+      // Render items logic
+      counterLabel.textContent = matches.length;
+
+      if (matches.length === 0) {
+        grid.innerHTML = "";
+        emptyState.classList.remove("hidden");
+        return;
+      } else {
+        emptyState.classList.add("hidden");
+      }
+
+      grid.innerHTML = matches.map(file => {
+        let iconBg = "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20";
+        if (file.extension === "XLSX") iconBg = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+        if (file.extension === "ZIP") iconBg = "bg-orange-500/10 text-orange-400 border border-orange-500/20";
+        if (file.extension === "PPTX") iconBg = "bg-red-500/10 text-red-400 border border-red-500/20";
+
+        // Highlight matching OCR snippet text
+        let snippetMarkup = file.ocrSnippet;
+        if (searchFilters.query) {
+          const regex = new RegExp(`(${searchFilters.query})`, "gi");
+          snippetMarkup = file.ocrSnippet.replace(regex, `<span class="bg-indigo-500/30 text-white font-bold px-1 rounded">$1</span>`);
+        }
+
+        return `
+          <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-4 sm:p-5 hover:bg-slate-900/40 transition-all duration-300 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 glow-border group">
+            
+            <!-- Icon and File Meta Block -->
+            <div class="flex items-start gap-4 flex-1">
+              <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${iconBg}">
+                ${getFileIconSvg(file.extension)}
+              </div>
+              <div class="space-y-1 max-w-xl">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="font-bold text-white text-sm sm:text-base group-hover:text-indigo-400 transition-colors">${file.name}</h3>
+                  <span class="text-[9px] bg-slate-900 text-slate-400 px-2 py-0.5 rounded border border-slate-800 font-mono">${file.size} MB</span>
+                  ${file.hasOcr ? `<span class="text-[9px] bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 px-1.5 py-0.5 rounded flex items-center gap-1 font-semibold">OCR ${file.ocrScore}%</span>` : ''}
+                </div>
+                
+                <!-- OCR Text Highlight Snippet -->
+                <p class="text-xs text-slate-400 leading-relaxed truncate-2-lines font-medium">
+                  ${snippetMarkup}
+                </p>
+
+                <!-- Footer File Attributes -->
+                <div class="flex flex-wrap items-center gap-3 text-[10px] text-slate-500 pt-1">
+                  <span>Author: <span class="text-slate-300 font-semibold">${file.author}</span></span>
+                  <span>&bull;</span>
+                  <span>Indexed: <span class="text-slate-300">${file.uploadedDate}</span></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Handshake Actions -->
+            <div class="flex items-center gap-2 w-full md:w-auto shrink-0 border-t border-slate-900 pt-3 md:pt-0 md:border-t-0">
+              <button onclick="openDrawer('${file.id}')" class="flex-1 md:flex-initial px-3 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all text-center">
+                Review Vault
+              </button>
+              <button onclick="triggerDownloadMock('${file.name}')" class="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 rounded-lg text-slate-300 hover:text-white transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              </button>
+            </div>
+
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Helper: File Type SVG Selectors
+    function getFileIconSvg(ext) {
+      if (ext === "XLSX") {
+        return `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`;
+      }
+      if (ext === "ZIP") {
+        return `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>`;
+      }
+      if (ext === "PPTX") {
+        return `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>`;
+      }
+      return `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>`;
+    }
+
+    // Interactive Drawer Handlers
+    let activeDrawerFileId = null;
+
+    function openDrawer(fileId) {
+      const file = VAULT_DATABASE.find(f => f.id === fileId);
+      if (!file) return;
+
+      activeDrawerFileId = fileId;
+
+      // DOM bindings
+      const filenameLabel = document.getElementById("d-filename");
+      const metaLabel = document.getElementById("d-meta");
+      const authorLabel = document.getElementById("d-author");
+      const dateLabel = document.getElementById("d-date");
+      const ocrLabel = document.getElementById("d-ocr-text");
+      const tagsContainer = document.getElementById("d-tags");
+      const iconContainer = document.getElementById("d-icon-container");
+
+      filenameLabel.textContent = file.name;
+      metaLabel.innerHTML = `${file.extension} ARCHIVE &bull; ${file.size} MB`;
+      authorLabel.textContent = file.author;
+      dateLabel.textContent = file.uploadedDate;
+      ocrLabel.textContent = file.ocrSnippet;
+
+      // Dynamic Tags
+      tagsContainer.innerHTML = file.tags.map(tag => `
+        <span class="px-2.5 py-1 bg-slate-900 border border-slate-800 rounded text-[11px] text-indigo-300">#${tag}</span>
+      `).join('');
+
+      // Dynamic icon coloring matching
+      let iconColorClass = "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20";
+      if (file.extension === "XLSX") iconColorClass = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+      if (file.extension === "ZIP") iconColorClass = "bg-orange-500/10 text-orange-400 border border-orange-500/20";
+      if (file.extension === "PPTX") iconColorClass = "bg-red-500/10 text-red-400 border border-red-500/20";
+
+      iconContainer.className = `w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${iconColorClass}`;
+      iconContainer.innerHTML = getFileIconSvg(file.extension);
+
+      // Slide drawer visually
+      const drawer = document.getElementById("preview-drawer");
+      drawer.classList.remove("translate-x-full");
+    }
+
+    function closeDrawer() {
+      const drawer = document.getElementById("preview-drawer");
+      drawer.classList.add("translate-x-full");
+    }
+
+    // Simulation Handshakes
+    function simulateExport() {
+      if (!activeDrawerFileId) return;
+      const file = VAULT_DATABASE.find(f => f.id === activeDrawerFileId);
+      closeDrawer();
+      showToast(`Exported ${file.name} to connected pipeline`);
+    }
+
+    function triggerDownloadMock(filename) {
+      showToast(`Simulating encrypted direct download of ${filename}`);
+    }
+
+    // Dynamic Toast Controller
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      const text = document.getElementById("toast-message");
+      
+      text.textContent = message;
+      toast.classList.remove("translate-y-20", "opacity-0");
+      
+      setTimeout(() => {
+        toast.classList.add("translate-y-20", "opacity-0");
+      }, 3500);
+    }
+  </script>
+</body>
+</html>
+```

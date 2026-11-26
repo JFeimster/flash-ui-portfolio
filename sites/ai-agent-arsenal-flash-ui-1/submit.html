@@ -1,0 +1,1106 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Operator Sandbox & Submissions // AI Agent Arsenal</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Space+Grotesk:wght@400;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* Neo-Brutalist & Cyberpunk Global Variables */
+    :root {
+      --deep-black: #050505;
+      --carbon-black: #0A0B0F;
+      --graphite: #171821;
+      --off-white: #F4F1E8;
+      
+      /* Primary Accents */
+      --cyan: #00E5FF;
+      --acid-green: #B6FF00;
+      --magenta: #FF2BD6;
+      --orange: #FF7A00;
+      --yellow: #FFE600;
+      --red: #FF1744;
+      --blue: #245BFF;
+
+      /* Shadows */
+      --neo-shadow-cyan: 5px 5px 0px var(--cyan);
+      --neo-shadow-green: 5px 5px 0px var(--acid-green);
+      --neo-shadow-magenta: 5px 5px 0px var(--magenta);
+      --neo-shadow-orange: 5px 5px 0px var(--orange);
+      --neo-shadow-yellow: 7px 7px 0px var(--yellow);
+      --neo-shadow-white: 5px 5px 0px var(--off-white);
+      --neo-shadow-black: 6px 6px 0px rgba(0,0,0,1);
+    }
+
+    /* Reset & Base */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    ::selection {
+      background-color: var(--acid-green);
+      color: var(--deep-black);
+    }
+
+    ::-webkit-scrollbar {
+      width: 12px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--carbon-black);
+      border-left: 3px solid var(--graphite);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--graphite);
+      border: 3px solid var(--carbon-black);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--cyan);
+    }
+
+    body {
+      background-color: var(--deep-black);
+      color: var(--off-white);
+      font-family: 'Space Grotesk', -apple-system, sans-serif;
+      overflow-x: hidden;
+      background-image: 
+        linear-gradient(rgba(23, 24, 33, 0.4) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(23, 24, 33, 0.4) 1px, transparent 1px);
+      background-size: 30px 30px;
+      background-position: center;
+    }
+
+    /* Utilities */
+    .mono {
+      font-family: 'Share Tech Mono', monospace;
+      text-transform: uppercase;
+    }
+
+    .glow-cyan { text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
+    .glow-green { text-shadow: 0 0 10px rgba(182, 255, 0, 0.5); }
+    .glow-magenta { text-shadow: 0 0 10px rgba(255, 43, 214, 0.5); }
+    .glow-yellow { text-shadow: 0 0 10px rgba(255, 230, 0, 0.5); }
+
+    /* Top Sticky Navigation Bar */
+    .terminal-nav {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: var(--carbon-black);
+      border-bottom: 4px solid var(--off-white);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .brand-logo {
+      background: var(--magenta);
+      color: var(--off-white);
+      font-weight: 800;
+      padding: 0.5rem 1rem;
+      border: 2px solid var(--off-white);
+      box-shadow: 3px 3px 0px var(--cyan);
+      font-size: 1.2rem;
+      text-transform: uppercase;
+      letter-spacing: -1px;
+    }
+
+    .brand-meta {
+      font-size: 0.8rem;
+      color: #888;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .nav-link {
+      color: var(--off-white);
+      text-decoration: none;
+      font-weight: 700;
+      padding: 0.5rem 0.8rem;
+      border: 2px solid transparent;
+      transition: all 0.15s ease;
+    }
+
+    .nav-link:hover {
+      border: 2px solid var(--magenta);
+      background: var(--graphite);
+      color: var(--magenta);
+    }
+
+    .nav-cta {
+      background: var(--cyan);
+      color: var(--deep-black);
+      font-weight: 800;
+      padding: 0.6rem 1.2rem;
+      border: 2px solid var(--off-white);
+      box-shadow: 4px 4px 0px var(--magenta);
+      text-decoration: none;
+      transition: all 0.1s ease;
+    }
+
+    .nav-cta:hover {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0px var(--magenta);
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Section Headers */
+    .section-header {
+      border-left: 8px solid var(--accent, var(--magenta));
+      padding-left: 1.5rem;
+      margin-top: 2rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .section-eyebrow {
+      color: var(--accent, var(--magenta));
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      line-height: 0.95;
+      letter-spacing: -1.5px;
+    }
+
+    .section-subtitle {
+      font-size: 1.2rem;
+      color: #bbb;
+      max-width: 800px;
+      margin-top: 0.75rem;
+    }
+
+    /* Submissions Layout Grid */
+    .sandbox-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 2.5rem;
+      margin-bottom: 4rem;
+    }
+
+    @media (max-width: 1100px) {
+      .sandbox-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Configurator Panel Left Side */
+    .configurator-card {
+      background: var(--carbon-black);
+      border: 4px solid var(--off-white);
+      padding: 2.5rem;
+      box-shadow: var(--neo-shadow-magenta);
+      position: relative;
+    }
+
+    .corner-tag {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: var(--magenta);
+      color: var(--deep-black);
+      font-weight: bold;
+      padding: 0.25rem 1rem;
+      font-size: 0.75rem;
+      border-bottom: 3px solid var(--off-white);
+      border-left: 3px solid var(--off-white);
+    }
+
+    /* Form Styles */
+    .form-group-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 600px) {
+      .form-group-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--cyan);
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .form-input, .form-select, .form-textarea {
+      background: var(--deep-black);
+      border: 2px solid var(--off-white);
+      color: var(--off-white);
+      padding: 0.8rem;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.15s ease;
+      width: 100%;
+    }
+
+    .form-textarea {
+      font-family: inherit;
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--magenta);
+    }
+
+    /* Accent color swatch selector */
+    .color-picker-grid {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-top: 0.3rem;
+    }
+
+    .color-swatch {
+      width: 32px;
+      height: 32px;
+      border: 2px solid var(--off-white);
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.1s ease;
+    }
+
+    .color-swatch:hover {
+      transform: scale(1.1);
+    }
+
+    .color-swatch.active::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--deep-black);
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+
+    /* Left Side Playground Area */
+    .playground-box {
+      border-top: 3px dashed var(--graphite);
+      margin-top: 2rem;
+      padding-top: 2rem;
+    }
+
+    .playground-title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      color: var(--yellow);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .playground-title::before {
+      content: '';
+      width: 10px;
+      height: 10px;
+      background: var(--yellow);
+      display: inline-block;
+    }
+
+    /* Right Side Output Terminal */
+    .preview-pane-container {
+      background: var(--graphite);
+      border: 4px solid var(--off-white);
+      box-shadow: var(--neo-shadow-cyan);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 600px;
+    }
+
+    .pane-header {
+      background: var(--carbon-black);
+      border-bottom: 4px solid var(--off-white);
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .pane-dots {
+      display: flex;
+      gap: 8px;
+    }
+
+    .pane-dot {
+      width: 12px;
+      height: 12px;
+      border: 2px solid var(--off-white);
+    }
+    .pane-dot.red { background: var(--red); }
+    .pane-dot.yellow { background: var(--yellow); }
+    .pane-dot.green { background: var(--acid-green); }
+
+    .pane-tab-bar {
+      display: flex;
+      border-bottom: 2px solid var(--off-white);
+      background: var(--deep-black);
+    }
+
+    .pane-tab {
+      background: transparent;
+      border: none;
+      border-right: 2px solid var(--off-white);
+      color: #888;
+      font-family: 'Share Tech Mono', monospace;
+      font-weight: bold;
+      padding: 0.8rem 1.5rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      transition: all 0.15s ease;
+    }
+
+    .pane-tab:hover {
+      color: var(--off-white);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .pane-tab.active {
+      color: var(--deep-black);
+      background: var(--cyan);
+    }
+
+    .output-content-area {
+      padding: 1.5rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: var(--carbon-black);
+    }
+
+    .live-code-block {
+      background: var(--deep-black);
+      border: 2px solid var(--off-white);
+      padding: 1.2rem;
+      font-family: 'Share Tech Mono', monospace;
+      color: var(--acid-green);
+      font-size: 0.85rem;
+      overflow-y: auto;
+      height: 400px;
+      white-space: pre-wrap;
+      margin-bottom: 1.5rem;
+      box-shadow: inset 0 0 10px rgba(182, 255, 0, 0.1);
+    }
+
+    .live-code-block.markdown-mode {
+      color: var(--cyan);
+      box-shadow: inset 0 0 10px rgba(0, 229, 255, 0.1);
+    }
+
+    .action-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 480px) {
+      .action-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Cyber Buttons */
+    .btn-brutal {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: 3px solid var(--off-white);
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+
+    .btn-cyan {
+      background: var(--cyan);
+      color: var(--deep-black);
+      box-shadow: 4px 4px 0px var(--off-white);
+    }
+    .btn-cyan:hover {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0px var(--off-white);
+    }
+
+    .btn-magenta {
+      background: var(--magenta);
+      color: var(--off-white);
+      box-shadow: 4px 4px 0px var(--deep-black);
+    }
+    .btn-magenta:hover {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0px var(--deep-black);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--off-white);
+      box-shadow: 4px 4px 0px var(--cyan);
+    }
+    .btn-outline:hover {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0px var(--cyan);
+      background: rgba(0, 229, 255, 0.05);
+    }
+
+    /* Sandbox Interactive Dry-Run Panel */
+    .dryrun-panel {
+      background: var(--carbon-black);
+      border: 4px solid var(--off-white);
+      box-shadow: var(--neo-shadow-yellow);
+      padding: 2.5rem;
+      margin-bottom: 5rem;
+    }
+
+    .dryrun-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid var(--off-white);
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .dryrun-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 900px) {
+      .dryrun-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .terminal-output-window {
+      background: var(--deep-black);
+      border: 2px solid var(--off-white);
+      padding: 1.2rem;
+      font-family: 'Share Tech Mono', monospace;
+      color: var(--yellow);
+      height: 280px;
+      overflow-y: auto;
+      font-size: 0.85rem;
+      box-shadow: inset 0 0 10px rgba(255, 230, 0, 0.15);
+    }
+
+    .terminal-line {
+      margin-bottom: 0.5rem;
+      line-height: 1.4;
+    }
+
+    .terminal-prefix {
+      color: var(--magenta);
+    }
+
+    /* Form Checkboxes matrix */
+    .dependency-matrix {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 480px) {
+      .dependency-matrix {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .dep-checkbox-card {
+      background: var(--graphite);
+      border: 2px solid var(--off-white);
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.1s ease;
+    }
+
+    .dep-checkbox-card:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .dep-checkbox-card.checked {
+      border-color: var(--acid-green);
+      background: rgba(182, 255, 0, 0.05);
+    }
+
+    .custom-checkbox {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--off-white);
+      background: var(--deep-black);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .dep-checkbox-card.checked .custom-checkbox {
+      background: var(--acid-green);
+      border-color: var(--acid-green);
+    }
+
+    .dep-checkbox-card.checked .custom-checkbox::after {
+      content: '✓';
+      color: var(--deep-black);
+      font-weight: 900;
+      font-size: 0.75rem;
+    }
+
+    .validation-badge {
+      background: var(--red);
+      color: var(--off-white);
+      padding: 0.2rem 0.6rem;
+      font-size: 0.7rem;
+      font-weight: bold;
+      border: 1px solid var(--off-white);
+    }
+
+    .validation-badge.ok {
+      background: var(--acid-green);
+      color: var(--deep-black);
+    }
+
+    /* Rules of submission banner */
+    .guideline-strip {
+      background: var(--orange);
+      color: var(--deep-black);
+      font-weight: 800;
+      padding: 0.8rem 1.5rem;
+      font-size: 0.9rem;
+      border-top: 4px solid var(--off-white);
+      border-bottom: 4px solid var(--off-white);
+      margin-bottom: 4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- STICKY TOP NAVIGATION BAR -->
+  <nav class="terminal-nav">
+    <div class="brand-group">
+      <div class="brand-logo">SANDBOX_HUB</div>
+      <div class="brand-meta mono">[ SUBMISSION v1.1 ]</div>
+    </div>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link mono">← BACK_TO_ARMORY</a>
+      <a href="#configurator" class="nav-link mono">MANIFEST_BUILDER</a>
+      <a href="#playground" class="nav-link mono">DRY_RUN_AUDITOR</a>
+    </div>
+    <a href="https://github.com/jasonfeimster/ai-agent-arsenal" target="_blank" class="nav-cta mono">GITHUB_RELEASES</a>
+  </nav>
+
+  <!-- MAIN CONTAINER -->
+  <div class="container">
+
+    <!-- HERO SECTION -->
+    <header class="section-header">
+      <div class="section-eyebrow mono">OPERATOR SANDBOX & MANIFEST COMPILER</div>
+      <h1 class="section-title">Weapon Configurator</h1>
+      <p class="section-subtitle">
+        Package raw custom agent workflows, Gemini Gems, bespoke prompts, or static tools into pristine open-source manifest structures. Live validation checks compatibility schemas instantly before you push your upstream pipeline.
+      </p>
+    </header>
+
+    <!-- OPERATING INSTRUCTIONS STRIP -->
+    <div class="guideline-strip">
+      <span class="mono">▲ IMPORTANT: WEAPON MANIFEST REQUIRES UNIQUE ID AND VALID ACCENT TARGET SPECIFICATION</span>
+      <span class="mono" style="border: 2px solid var(--deep-black); padding: 0.1rem 0.5rem;">RULE_04 ACTIVE</span>
+    </div>
+
+    <!-- MAIN CONFIGURATOR DASHBOARD GRID -->
+    <div id="configurator" class="sandbox-grid">
+      
+      <!-- LEFT SIDE: CONFIGURATION CONTROL DECK -->
+      <section class="configurator-card">
+        <div class="corner-tag mono">SANDBOX MODE // ONLINE</div>
+        
+        <form id="manifestForm" onsubmit="handleFormSubmit(event)">
+          
+          <!-- Tool Basic Details -->
+          <div class="form-group-row">
+            <div class="form-group">
+              <label class="form-label">Weapon unique ID *</label>
+              <input type="text" id="toolId" class="form-input" placeholder="e.g. real-estate-mca-agent" required oninput="updateOutputs()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Weapon Name *</label>
+              <input type="text" id="toolName" class="form-input" placeholder="e.g. Direct Lender Pathfinder" required oninput="updateOutputs()">
+            </div>
+          </div>
+
+          <!-- Platform & Category -->
+          <div class="form-group-row">
+            <div class="form-group">
+              <label class="form-label">Target Platform Architecture</label>
+              <select id="toolPlatform" class="form-select" onchange="updateOutputs()">
+                <option value="CustomGPT">CustomGPT</option>
+                <option value="Gemini Gem">Gemini Gem</option>
+                <option value="AI Studio App">AI Studio App</option>
+                <option value="Static App">Static App</option>
+                <option value="Vercel App">Vercel App</option>
+                <option value="Prompt System">Prompt System</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Primary Operational Category</label>
+              <select id="toolCategory" class="form-select" onchange="updateOutputs()">
+                <option value="Funding & Capital">Funding & Capital</option>
+                <option value="Cash Flow">Cash Flow</option>
+                <option value="Business Credit">Business Credit</option>
+                <option value="Founder Ops">Founder Ops</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Dynamic Metadata Tag & Live Status -->
+          <div class="form-group-row">
+            <div class="form-group">
+              <label class="form-label">Custom Meta Tag (Subcategory)</label>
+              <input type="text" id="toolTag" class="form-input" placeholder="e.g. Underwriting Analytics" oninput="updateOutputs()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Deployment Readiness State</label>
+              <select id="toolStatus" class="form-select" onchange="updateOutputs()">
+                <option value="Live">Live (Production Ready)</option>
+                <option value="Prototype">Prototype (Active R&D)</option>
+                <option value="Needs Update">Needs Update (Stale Dep)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="form-group">
+            <label class="form-label">Weapon Capability Summary * (Max 240 chars)</label>
+            <textarea id="toolDescription" class="form-textarea" placeholder="Describe the tactical objective this tool solves..." required oninput="updateOutputs()"></textarea>
+          </div>
+
+          <!-- Dynamic Integration Links -->
+          <div class="form-group-row">
+            <div class="form-group">
+              <label class="form-label">GitHub Source Repo URL</label>
+              <input type="url" id="toolRepoUrl" class="form-input" value="https://github.com/jasonfeimster/ai-agent-arsenal" oninput="updateOutputs()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Dynamic Launch Path / Target URL</label>
+              <input type="text" id="toolLaunchUrl" class="form-input" placeholder="e.g. #lead-maximizer or https://..." oninput="updateOutputs()">
+            </div>
+          </div>
+
+          <!-- Accent Selector Swatches -->
+          <div class="form-group">
+            <label class="form-label">Core Aesthetic Color Accent</label>
+            <div class="color-picker-grid">
+              <div class="color-swatch active" style="background: var(--cyan);" data-color="var(--cyan)" onclick="selectSwatch(this)"></div>
+              <div class="color-swatch" style="background: var(--acid-green);" data-color="var(--acid-green)" onclick="selectSwatch(this)"></div>
+              <div class="color-swatch" style="background: var(--magenta);" data-color="var(--magenta)" onclick="selectSwatch(this)"></div>
+              <div class="color-swatch" style="background: var(--orange);" data-color="var(--orange)" onclick="selectSwatch(this)"></div>
+              <div class="color-swatch" style="background: var(--yellow);" data-color="var(--yellow)" onclick="selectSwatch(this)"></div>
+              <div class="color-swatch" style="background: var(--blue);" data-color="var(--blue)" onclick="selectSwatch(this)"></div>
+            </div>
+          </div>
+
+          <!-- Integration Matrix Toggles inside configuration panel -->
+          <div class="form-group" style="margin-top: 2rem;">
+            <label class="form-label">Compatible Dependency Integration Nodes</label>
+            <div class="dependency-matrix">
+              <div class="dep-checkbox-card checked" onclick="toggleCheckbox(this, 'chatgpt')">
+                <div class="custom-checkbox"></div>
+                <span class="mono" style="font-size:0.8rem;">ChatGPT API</span>
+              </div>
+              <div class="dep-checkbox-card checked" onclick="toggleCheckbox(this, 'notion')">
+                <div class="custom-checkbox"></div>
+                <span class="mono" style="font-size:0.8rem;">Notion Sync</span>
+              </div>
+              <div class="dep-checkbox-card" onclick="toggleCheckbox(this, 'supabase')">
+                <div class="custom-checkbox"></div>
+                <span class="mono" style="font-size:0.8rem;">Supabase Guard</span>
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </section>
+
+      <!-- RIGHT SIDE: REAL-TIME OUTPUT TERMINAL -->
+      <section class="preview-pane-container">
+        
+        <div class="pane-header">
+          <div class="pane-dots">
+            <div class="pane-dot red"></div>
+            <div class="pane-dot yellow"></div>
+            <div class="pane-dot green"></div>
+          </div>
+          <div id="validationBadge" class="validation-badge ok mono">MANIFEST VALID: TRUE</div>
+        </div>
+
+        <div class="pane-tab-bar">
+          <button class="pane-tab active" onclick="switchOutputTab('yaml')">YAML MANIFEST</button>
+          <button class="pane-tab" onclick="switchOutputTab('markdown')">PULL REQUEST TEMPLATE</button>
+        </div>
+
+        <div class="output-content-area">
+          <!-- Raw Code Render Blocks -->
+          <div id="liveOutputBlock" class="live-code-block">Loading output schema configuration...</div>
+
+          <!-- Terminal Control Buttons -->
+          <div class="action-row">
+            <button class="btn-brutal btn-cyan mono" onclick="copyOutputBuffer()">COPY BUFFER</button>
+            <button class="btn-brutal btn-magenta mono" onclick="triggerMockSubmission()">SUBMIT TOOL DIRECTLY</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- PLAYGROUND AND AUDITING SIMULATION DECK -->
+    <section id="playground" class="dryrun-panel">
+      <div class="dryrun-header">
+        <div>
+          <span class="mono" style="color: var(--yellow); font-weight: 800; font-size: 0.9rem;">AUTOMATED VALIDATION SUITE</span>
+          <h2 class="mono" style="font-size: 2rem; margin-top: 0.2rem;">Dry-Run Execution Sandbox</h2>
+        </div>
+        <div class="mono" id="validationResultBox" style="font-size: 0.85rem; background: var(--deep-black); color: var(--acid-green); padding: 0.5rem 1rem; border: 2px solid var(--off-white);">
+          READY FOR AUDIT
+        </div>
+      </div>
+
+      <div class="dryrun-grid">
+        <!-- Interactive Testing inputs -->
+        <div>
+          <p style="font-size: 0.95rem; line-height: 1.4; color: #ccc; margin-bottom: 1.5rem;">
+            Test how your newly mapped AI Tool behaves under live terminal simulation conditions. Submit a test instruction, select the model temperature pipeline, and execute a dry-run log to audit operational latencies before packaging.
+          </p>
+
+          <div class="form-group">
+            <label class="form-label">Simulation Prompt Input</label>
+            <input type="text" id="sandboxPrompt" class="form-input" value="Audit MCA portfolio statement for structural defaults" style="font-family: 'Share Tech Mono', monospace; font-size: 0.9rem;">
+          </div>
+
+          <div class="form-group-row">
+            <div class="form-group">
+              <label class="form-label">Simulated Temperature</label>
+              <select id="sandboxTemp" class="form-select">
+                <option value="0.2">0.2 (Deterministic Audit)</option>
+                <option value="0.7" selected>0.7 (Standard Creative Ops)</option>
+                <option value="1.0">1.0 (Extreme Divergence)</option>
+              </select>
+            </div>
+            <div class="form-group" style="justify-content: flex-end;">
+              <button class="btn-brutal btn-cyan mono" style="width: 100%;" onclick="runDryRunSimulation()">EXECUTE DRY-RUN AUDIT</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Terminal Output Window -->
+        <div>
+          <div class="payload-title-bar" style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span class="mono" style="font-size: 0.8rem; color: var(--yellow);">MOCK PIPELINE LOGS</span>
+            <span class="mono" style="font-size: 0.7rem; color: #888;">READY STACK</span>
+          </div>
+          <div class="terminal-output-window" id="dryrunConsole">
+            <div class="terminal-line"><span class="terminal-prefix">></span> PIPELINE: Awaiting dry-run trigger...</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div> <!-- /CONTAINER -->
+
+  <!-- FOOTER -->
+  <footer>
+    <div style="max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; font-family: 'Share Tech Mono', monospace;">
+      <span style="color: var(--magenta); font-weight: bold; font-size: 1.1rem;">// SUBMISSIONS_PORTAL //</span>
+      <span style="color: #666; font-size: 0.85rem;">MIT LICENSE. SUBMISSIONS SYNCED WITH MASTER COGNITIVE REPOSITORY.</span>
+      <span style="color: var(--cyan); font-size: 0.85rem;">[ SECURITY: AUTHENTICATED ]</span>
+    </div>
+  </footer>
+
+  <!-- CORE SCRIPT ENGINE FOR SANDBOX -->
+  <script>
+    // Selected options variables
+    let selectedColor = "var(--cyan)";
+    let currentTab = 'yaml';
+    const activeDependencies = {
+      chatgpt: true,
+      notion: true,
+      supabase: false
+    };
+
+    // Swatch Selector helper
+    function selectSwatch(element) {
+      document.querySelectorAll('.color-swatch').forEach(swatch => swatch.classList.remove('active'));
+      element.classList.add('active');
+      selectedColor = element.getAttribute('data-color');
+      updateOutputs();
+    }
+
+    // Toggle custom checkboxes inside UI dependency map
+    function toggleCheckbox(element, service) {
+      activeDependencies[service] = !activeDependencies[service];
+      
+      if (activeDependencies[service]) {
+        element.classList.add('checked');
+      } else {
+        element.classList.remove('checked');
+      }
+      
+      updateOutputs();
+    }
+
+    // Handle Active Output Tab switcher
+    function switchOutputTab(tabType) {
+      currentTab = tabType;
+      document.querySelectorAll('.pane-tab').forEach(btn => {
+        if (btn.textContent.toLowerCase().includes(tabType)) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      const block = document.getElementById('liveOutputBlock');
+      if (tabType === 'markdown') {
+        block.classList.add('markdown-mode');
+      } else {
+        block.classList.remove('markdown-mode');
+      }
+
+      updateOutputs();
+    }
+
+    // Generate Dynamic YAML Structure based on inputs
+    function buildYAMLManifest() {
+      const id = document.getElementById('toolId').value.trim() || 'pending-id';
+      const name = document.getElementById('toolName').value.trim() || 'Pending Name';
+      const platform = document.getElementById('toolPlatform').value;
+      const category = document.getElementById('toolCategory').value;
+      const tag = document.getElementById('toolTag').value.trim() || category;
+      const status = document.getElementById('toolStatus').value;
+      const desc = document.getElementById('toolDescription').value.trim() || 'A short description of this weapon features...';
+      const repoUrl = document.getElementById('toolRepoUrl').value.trim();
+      const launchUrl = document.getElementById('toolLaunchUrl').value.trim() || '#';
+
+      const gptState = activeDependencies.chatgpt ? 'READY' : 'N/A';
+      const notionState = activeDependencies.notion ? 'SYNC_OK' : 'N/A';
+      const supabaseState = activeDependencies.supabase ? 'SECURED' : 'N/A';
+
+      return `- id: "${id}"
+  name: "${name}"
+  platform: "${platform}"
+  category: "${category}"
+  tag: "${tag}"
+  status: "${status}"
+  description: "${desc}"
+  color: "${selectedColor}"
+  launchUrl: "${launchUrl}"
+  repoUrl: "${repoUrl}"
+  chatgpt: "${gptState}"
+  notion: "${notionState}"
+  supabase: "${supabaseState}"`;
+    }
+
+    // Generate Dynamic Markdown GitHub Pull Request Template
+    function buildMarkdownPR() {
+      const id = document.getElementById('toolId').value.trim() || 'pending-id';
+      const name = document.getElementById('toolName').value.trim() || 'Pending Name';
+      const platform = document.getElementById('toolPlatform').value;
+      const category = document.getElementById('toolCategory').value;
+      const tag = document.getElementById('toolTag').value.trim() || category;
+      const desc = document.getElementById('toolDescription').value.trim() || 'No description supplied.';
+      const launch = document.getElementById('toolLaunchUrl').value.trim() || 'Local Anchor Only';
+
+      return `### 🚀 NEW WEAPON ENTRY SUBMISSION
+
+**Weapon Identifier:** \`${id}\`
+**Weapon Display Name:** ${name}
+**Target Platform Integration:** \`${platform}\`
+**Operational Classification:** \`${category}\` / \`${tag}\`
+
+---
+
+#### 📌 Core Capability Summary
+> ${desc}
+
+#### 🔗 Interface Anchors
+- **Live Destination Routing:** \`${launch}\`
+- **Dependency Map configuration:**
+  - ChatGPT Engine Node: \`${activeDependencies.chatgpt ? 'ACTIVE' : 'OFFLINE'}\`
+  - Notion CRM Connection: \`${activeDependencies.notion ? 'ACTIVE' : 'OFFLINE'}\`
+  - Supabase Edge Guard Protection: \`${activeDependencies.supabase ? 'ACTIVE' : 'OFFLINE'}\`
+
+---
+
+#### 🛠 Checklist for Merger Review
+- [x] Code verified inside live Tactical Sandbox Dry-run auditor.
+- [x] No bloated boilerplate or external SaaS marketing elements included.
+- [x] Manifest aligns dynamically with CSS variables inside master styles.`;
+    }
+
+    // Update Output buffers live
+    function updateOutputs() {
+      const outputBlock = document.getElementById('liveOutputBlock');
+      const validationBadge = document.getElementById('validationBadge');
+      
+      const idValid = document.getElementById('toolId').value.trim().length > 0;
+      const nameValid = document.getElementById('toolName').value.trim().length > 0;
+      const descValid = document.getElementById('toolDescription').value.trim().length > 0;
+
+      if (idValid && nameValid && descValid) {
+        validationBadge.textContent = 'MANIFEST VALID: TRUE';
+        validationBadge.className = 'validation-badge ok mono';
+      } else {
+        validationBadge.textContent = 'MANIFEST ERROR: MISSING REQUIRED FIELDS';
+        validationBadge.className = 'validation-badge mono';
+      }
+
+      if (currentTab === 'yaml') {
+        outputBlock.textContent = buildYAMLManifest();
+      } else {
+        outputBlock.textContent = buildMarkdownPR();
+      }
+    }
+
+    // Copy Content Buffer logic
+    function copyOutputBuffer() {
+      const textToCopy = document.getElementById('liveOutputBlock').textContent;
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        alert("Success: Configuration buffer copied to clipboard.");
+      }).catch(err => {
+        alert("Clipboard error. Permit browser permissions.");
+      });
+    }
+
+    // Mock direct PR trigger
+    function triggerMockSubmission() {
+      const id = document.getElementById('toolId').value.trim();
+      if (!id) {
+        alert("ERROR: Specify a weapon identifier ID to compile this manifest.");
+        return;
+      }
+
+      alert(`INITIALIZING INGESTION LOOP... \n\nTarget Weapon: [${id}] compiled successfully. \nRedirecting payload directly to GitHub submission interface templates...`);
+      
+      // Open GitHub issues with compiled parameters pre-filled
+      const title = encodeURIComponent(`Feat: Submit Operator Weapon - ${id}`);
+      const body = encodeURIComponent(buildMarkdownPR() + "\n\n```yaml\n" + buildYAMLManifest() + "\n```");
+      const githubUrl = `https://github.com/jasonfeimster/ai-agent-arsenal/issues/new?title=${title}&body=${body}`;
+      
+      window.open(githubUrl, '_blank');
+    }
+
+    // Simulate dry run terminal audit action
+    function runDryRunSimulation() {
+      const consoleNode = document.getElementById('dryrunConsole');
+      const statusBox = document.getElementById('validationResultBox');
+      const promptText = document.getElementById('sandboxPrompt').value;
+      const id = document.getElementById('toolId').value.trim() || 'anonymous_module';
+      const platform = document.getElementById('toolPlatform').value;
+      const tempValue = document.getElementById('sandboxTemp').value;
+
+      statusBox.textContent = "RUNNING AUDIT...";
+      statusBox.style.color = "var(--yellow)";
+      
+      consoleNode.innerHTML = `<div class="terminal-line"><span class="terminal-prefix">></span> INITIALIZING PIPELINE RUNTIME DRY-RUN FOR: [${id}]...</div>`;
+
+      setTimeout(() => {
+        consoleNode.innerHTML += `<div class="terminal-line"><span class="terminal-prefix">></span> RESOLVED PLATFORM ARCHITECTURE: [${platform.toUpperCase()}]</div>`;
+        
+        setTimeout(() => {
+          consoleNode.innerHTML += `<div class="terminal-line"><span class="terminal-prefix">></span> MAPPING LIVE INTEGRATION CONNECTIONS...</div>`;
+          consoleNode.innerHTML += `<div class="terminal-line"><span class="terminal-prefix">></span> GPT: ${activeDependencies.chatgpt ? 'CONNECTED (200 OK)' : 'BYPASSING' } | Notion DB: ${activeDependencies.notion ? 'CONNECTED' : 'DISCONNECTED'} | Supabase Edge: ${activeDependencies.supabase ? 'SECURING GUARD' : 'BYPASSING'}</div>`;
+
+          setTimeout(() => {
+            consoleNode.innerHTML += `<div class="terminal-line" style="color:var(--acid-green);"><span class="terminal-prefix">></span> EXECUTING SIMULATION PROMPT LOGIC ON ENGINE [Temp: ${tempValue}]...</div>`;
+            consoleNode.innerHTML += `<div class="terminal-line" style="color:#888;">Input Prompt: "${promptText}"</div>`;
+
+            setTimeout(() => {
+              // Simulating output token response metrics
+              const tokensUsed = Math.floor(Math.random() * 400) + 200;
+              const latency = Math.floor(Math.random() * 200) + 80;
+              const price = (tokensUsed * 0.000015).toFixed(5);
+
+              consoleNode.innerHTML += `<div class="terminal-line" style="color:var(--cyan);"><span class="terminal-prefix">></span> OUTPUT: Simulated cognitive query parsed successfully.</div>`;
+              consoleNode.innerHTML += `<div class="terminal-line"><span class="terminal-prefix">></span> METRICS: [Tokens used: ${tokensUsed} | Latency: ${latency}ms | Est Cost: $${price}]</div>`;
+              consoleNode.innerHTML += `<div class="terminal-line" style="color:var(--acid-green);"><span class="terminal-prefix">></span> DRY-RUN AUDIT: STABLE FOR PRODUCTION MERGER.</div>`;
+              
+              consoleNode.scrollTop = consoleNode.scrollHeight;
+              
+              statusBox.textContent = "AUDIT COMPLETE: STABLE";
+              statusBox.style.color = "var(--acid-green)";
+
+            }, 1000);
+          }, 800);
+        }, 800);
+      }, 600);
+    }
+
+    // Default Init
+    window.addEventListener('DOMContentLoaded', () => {
+      updateOutputs();
+    });
+  </script>
+</body>
+</html>
+```

@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Estimate acquisition DSCR, supportable senior debt, buyer cash, seller financing, and a 0-100 fundability score for small-business acquisitions.">
+  <meta name="application-name" content="Acquisition Deal Fundability Calculator">
+  <meta name="version" content="1.3.1">
+  <title>Acquisition Deal Fundability Calculator</title>
+  <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/calculator.css?v=1.3.1">
+</head>
+<body>
+  <main class="shell">
+    <section class="calculator" aria-labelledby="calculatorTitle">
+      <header class="hero">
+        <img class="brand-mark" src="/assets/logo.svg" alt="" width="54" height="54">
+        <div class="hero-copy">
+          <p class="eyebrow">Acquisition underwriting quick screen</p>
+          <h1 id="calculatorTitle">Acquisition Deal Fundability Calculator</h1>
+          <p>Stress-test cash flow, senior debt capacity, seller financing, and buyer cash before a small-business acquisition earns more of your time.</p>
+        </div>
+        <span class="version" id="versionLabel">v1.3.1</span>
+      </header>
+
+      <nav class="top-nav" aria-label="Calculator navigation">
+        <a class="nav-link active" data-preserve-embed href="/" aria-current="page">Calculator</a>
+        <a class="nav-link" data-preserve-embed href="/import">Import Listing</a>
+        <a class="nav-link" data-preserve-embed href="/methodology">Terms &amp; Methodology</a>
+      </nav>
+
+      <div class="content">
+        <section class="import-notice hidden" id="importNotice" aria-live="polite">
+          <div class="import-notice-copy">
+            <strong id="importNoticeTitle">Imported deal loaded</strong>
+            <span id="importNoticeText">Review imported assumptions and unresolved diligence items before relying on the score.</span>
+          </div>
+          <div class="import-notice-actions">
+            <a class="mini-action" id="importNoticeSource" href="https://empireflippers.com/marketplace/?referrer=6I8WK4WSMYC9KGJD" target="_blank" rel="noopener noreferrer">Source listing ↗</a>
+            <a class="mini-action" data-preserve-embed href="/import">Review import</a>
+            <button class="mini-action mini-action-button" id="clearImportedDeal" type="button">Clear import</button>
+          </div>
+        </section>
+
+        <div class="input-grid">
+          <section class="card" aria-labelledby="dealCashFlowHeading">
+            <h2 id="dealCashFlowHeading">Deal &amp; Cash Flow</h2>
+            <div class="field-grid">
+              <div class="field-wide price-field">
+                <label for="price">Purchase price ($)</label>
+                <input id="price" type="number" value="300000" min="0" step="1000" inputmode="decimal">
+                <p class="helper">The asking or negotiated acquisition price.</p>
+              </div>
+
+              <div class="field">
+                <label for="cashFlowBasis">Cash flow basis</label>
+                <select id="cashFlowBasis">
+                  <option value="sde" selected>SDE</option>
+                  <option value="ebitda">EBITDA</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="cashFlow">Annual stated cash flow ($)</label>
+                <input id="cashFlow" type="number" value="140000" min="0" step="1000" inputmode="decimal">
+              </div>
+
+              <div class="field-wide">
+                <label id="managementLabel" for="managementCost">Replacement management / owner compensation ($/yr)</label>
+                <input id="managementCost" type="number" value="80000" min="0" step="1000" inputmode="decimal">
+                <p class="helper" id="managementHelper">SDE commonly includes owner economics, so replacement management is deducted for a transferable cash-flow view.</p>
+                <label class="checkbox-row hidden" id="ebitdaOptions" for="managementIncluded">
+                  <input id="managementIncluded" type="checkbox" checked>
+                  <span>The entered EBITDA already reflects replacement management expense.</span>
+                </label>
+              </div>
+
+              <div class="field">
+                <label for="capex">Capex reserve ($/yr)</label>
+                <input id="capex" type="number" value="12000" min="0" step="500" inputmode="decimal">
+                <p class="helper">Annual fixed-asset / system replacement reserve. Inventory is not capex.</p>
+              </div>
+              <div class="field">
+                <label for="otherDebt">Other annual debt service ($/yr)</label>
+                <input id="otherDebt" type="number" value="0" min="0" step="500" inputmode="decimal">
+                <p class="helper">Include retained debt and any current-pay seller-note debt service not modeled separately.</p>
+              </div>
+
+              <div class="field">
+                <label for="topCust">Top customer concentration (%)</label>
+                <input id="topCust" type="number" value="15" min="0" max="100" step="1" inputmode="decimal">
+              </div>
+              <div class="field">
+                <label for="recurring">Recurring revenue (%)</label>
+                <input id="recurring" type="number" value="30" min="0" max="100" step="1" inputmode="decimal">
+              </div>
+
+              <div class="field">
+                <label for="ownerDep">Owner dependence</label>
+                <select id="ownerDep">
+                  <option value="unknown">Unknown — confirm</option>
+                  <option value="low" selected>Low — systemized / transferable</option>
+                  <option value="med">Medium — some key relationships</option>
+                  <option value="high">High — owner is the business</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="books">Books verifiability</label>
+                <select id="books">
+                  <option value="unknown">Unknown — confirm</option>
+                  <option value="clean" selected>Clean — deposits match, consistent add-backs</option>
+                  <option value="some">Some cleanup needed</option>
+                  <option value="messy">Messy / unclear</option>
+                </select>
+              </div>
+            </div>
+          </section>
+
+          <section class="card structure-card" aria-labelledby="financingRiskHeading">
+            <h2 id="financingRiskHeading">Financing &amp; Structure</h2>
+            <div class="field-grid">
+              <div class="field">
+                <label for="loanAmt">Acquisition loan ($)</label>
+                <input id="loanAmt" type="number" value="240000" min="0" step="1000" inputmode="decimal">
+              </div>
+              <div class="field">
+                <label for="targetDscr">Target DSCR</label>
+                <input id="targetDscr" type="number" value="1.35" min="1" max="3" step="0.05" inputmode="decimal">
+                <p class="helper">1.35x is the balanced screening default.</p>
+              </div>
+
+              <div class="field">
+                <label for="rate">Interest rate (APR %)</label>
+                <input id="rate" type="number" value="11.5" min="0" max="50" step="0.1" inputmode="decimal">
+              </div>
+              <div class="field">
+                <label for="term">Loan term (years)</label>
+                <input id="term" type="number" value="10" min="1" max="30" step="1" inputmode="numeric">
+              </div>
+
+              <div class="field-wide supportable-action">
+                <div>
+                  <span class="label">Cash-flow-supported senior debt</span>
+                  <strong id="maxLoanInline">—</strong>
+                  <p class="helper">Based on normalized cash flow, target DSCR, APR, and term. This is debt capacity, not lender approval.</p>
+                </div>
+                <button class="btn btn-secondary" id="applyMaxLoanBtn" type="button">Use Supportable Loan</button>
+              </div>
+
+              <div class="field">
+                <label for="sellerNote">Seller note ($)</label>
+                <input id="sellerNote" type="number" value="0" min="0" step="1000" inputmode="decimal">
+                <p class="helper">Funding source only. If it requires current payments, include that annual payment in Other annual debt service.</p>
+              </div>
+              <div class="field">
+                <label for="buyerCash">Buyer cash available ($)</label>
+                <input id="buyerCash" type="number" value="0" min="0" step="1000" inputmode="decimal">
+              </div>
+
+              <div class="field">
+                <label for="wcAtClose">Working / operating capital at close ($)</label>
+                <input id="wcAtClose" type="number" value="8000" min="0" step="500" inputmode="decimal">
+                <p class="helper">A use of funds at closing; it no longer reduces annual DSCR cash flow.</p>
+              </div>
+              <div class="field">
+                <label for="transactionCosts">Transaction / closing costs ($)</label>
+                <input id="transactionCosts" type="number" value="9000" min="0" step="500" inputmode="decimal">
+                <p class="helper">Default is a 3% screening placeholder on the sample deal. Replace with known costs.</p>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <p class="terms-callout">Have a marketplace deal? <a data-preserve-embed href="/import">Import an Empire Flippers listing</a>. Need the math? <a data-preserve-embed href="/methodology">Open Terms &amp; Methodology</a>.</p>
+
+        <div class="toolbar" aria-label="Calculator actions">
+          <button class="btn btn-primary" id="calcBtn" type="button">Calculate</button>
+          <button class="btn btn-secondary" id="resetBtn" type="button">Reset</button>
+          <span class="status-tag" id="statusTag" aria-live="polite">Ready</span>
+        </div>
+
+        <section class="results-grid expanded-results" aria-label="Calculated results">
+          <article class="result-card"><div class="result-label">Fundability Score</div><div class="result-value" id="outScore">—</div><div class="result-meta" id="outBucket">—</div></article>
+          <article class="result-card"><div class="result-label">Estimated DSCR</div><div class="result-value" id="outDscr">—</div><div class="result-meta" id="outCash">—</div></article>
+          <article class="result-card highlight-result"><div class="result-label">Max Supportable Loan</div><div class="result-value" id="outMaxLoan">—</div><div class="result-meta" id="outMaxLoanMeta">—</div></article>
+          <article class="result-card highlight-result"><div class="result-label">Required Buyer Cash</div><div class="result-value" id="outBuyerCashRequired">—</div><div class="result-meta" id="outBuyerCashMeta">—</div></article>
+          <article class="result-card"><div class="result-label">Annual Senior Debt Service</div><div class="result-value" id="outDebt">—</div><div class="result-meta" id="outMonthlyDebt">—</div></article>
+          <article class="result-card"><div class="result-label">Total Project Cost</div><div class="result-value" id="outProjectCost">—</div><div class="result-meta" id="outProjectCostMeta">—</div></article>
+          <article class="result-card"><div class="result-label">Purchase-Price Equity</div><div class="result-value" id="outEquity">—</div><div class="result-meta" id="outEquityMeta">—</div></article>
+          <article class="result-card"><div class="result-label">Financing Gap / Surplus</div><div class="result-value" id="outGap">—</div><div class="result-meta" id="outGapMeta">—</div></article>
+        </section>
+
+        <section class="scenario-section" aria-labelledby="scenarioHeading">
+          <div class="scenario-heading">
+            <div><p class="eyebrow">Debt-capacity scenarios</p><h2 id="scenarioHeading">What changes when you demand more cushion?</h2></div>
+            <p>Each scenario caps senior acquisition debt at the purchase price and holds your entered seller note, APR, term, working capital, and closing costs constant.</p>
+          </div>
+          <div class="scenario-grid">
+            <article class="scenario-card"><span>Conservative</span><strong>1.50x DSCR</strong><div id="scenarioConservativeLoan">—</div><small id="scenarioConservativeCash">—</small></article>
+            <article class="scenario-card balanced"><span>Balanced</span><strong>1.35x DSCR</strong><div id="scenarioBalancedLoan">—</div><small id="scenarioBalancedCash">—</small></article>
+            <article class="scenario-card"><span>Aggressive</span><strong>1.20x DSCR</strong><div id="scenarioAggressiveLoan">—</div><small id="scenarioAggressiveCash">—</small></article>
+          </div>
+        </section>
+
+        <div class="analysis-grid">
+          <section class="card"><h3>Risk Flags</h3><ul id="outFlags" aria-live="polite"><li>—</li></ul></section>
+          <section class="card"><h3>Next Actions</h3><ol id="outActions" aria-live="polite"><li>—</li></ol></section>
+        </div>
+
+        <section class="cta" aria-labelledby="ctaHeading">
+          <div class="cta-copy"><h2 id="ctaHeading">Deal looks worth pursuing?</h2><p>Turn the screen into a financing conversation—or compare notes with buyers, sellers, and operators working through real acquisition math.</p></div>
+          <div class="cta-actions">
+            <a class="cta-button cta-primary" href="https://www.distilledfunding.com/apply" target="_blank" rel="noopener noreferrer">Explore Acquisition Financing</a>
+            <a class="cta-button cta-secondary" href="https://www.distilledfunding.com/group/business-acquisition-exit-network" target="_blank" rel="noopener noreferrer">Join the Acquisition Network</a>
+          </div>
+        </section>
+
+        <details class="methodology">
+          <summary>Quick scoring & financing methodology</summary>
+          <div class="methodology-content">
+            <p><strong>Score:</strong> 100 points total: DSCR 35, books 20, owner dependence 15, customer concentration 10, capex 10, recurring revenue 10.</p>
+            <p><strong>Debt capacity:</strong> normalized cash flow ÷ target DSCR determines maximum annual senior debt service, then the amortization formula is reversed to estimate supportable principal.</p>
+            <p><strong>Working capital:</strong> working / operating capital at close is a source-and-use item, not an annual DSCR deduction.</p>
+            <p><strong>Seller note:</strong> the amount reduces buyer cash required, but current-pay seller-note debt service must be entered under Other annual debt service.</p>
+          </div>
+          <a class="methodology-more" data-preserve-embed href="/methodology">See every term, assumption, formula, and import recommendation rule →</a>
+        </details>
+
+        <footer class="footer">
+          <span><strong>Educational estimator only.</strong> Debt capacity and financing scenarios are screening estimates, not lender approvals or commitments.</span>
+          <span>Acquisition Deal Fundability Calculator <strong>v1.3.1</strong></span>
+        </footer>
+      </div>
+    </section>
+  </main>
+
+  <script src="/js/app-shell.js?v=1.3.1" defer></script>
+  <script src="/js/calculator.js?v=1.3.1" defer></script>
+</body>
+</html>

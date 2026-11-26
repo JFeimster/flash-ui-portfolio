@@ -1,0 +1,428 @@
+{
+  "_meta": {
+    "engine_version": "0.2.3-operational-routing-draft",
+    "source_version": "0.2.2 provider/product verification draft",
+    "source_files": [
+      "providers.json",
+      "products.json",
+      "verification_report.md",
+      "unresolved_conflicts_report.csv",
+      "high_priority_missing_data_report.csv"
+    ],
+    "generated_date": "2026-05-20",
+    "file_name": "borrower_archetypes.json",
+    "purpose": "Semantic borrower classification layer for routing, recommendation explanations, nurture branching, and monetization logic.",
+    "logic_precedence": [
+      "product_rules",
+      "provider_defaults",
+      "funding_family_defaults",
+      "global_fallback_logic"
+    ],
+    "status": "draft_for_operational_testing_not_final_underwriting_policy"
+  },
+  "schema": [
+    "archetype_id",
+    "archetype_name",
+    "description",
+    "trigger_conditions",
+    "strengths",
+    "risks",
+    "best_fit_funding_families",
+    "poor_fit_funding_families",
+    "recommended_cta",
+    "nurture_path",
+    "ideal_lender_appetite_profile"
+  ],
+  "records": [
+    {
+      "archetype_id": "revenue_stable_operator",
+      "archetype_name": "Revenue-Stable Operator",
+      "description": "Established business with meaningful monthly revenue, consistent deposits, and enough operating history for mainstream alternative funding.",
+      "trigger_conditions": {
+        "monthly_revenue_min": 20000,
+        "time_in_business_months_min": 12,
+        "bank_status": [
+          "consistent",
+          "strong_clean"
+        ]
+      },
+      "strengths": [
+        "deposit history",
+        "operating history",
+        "multiple product lanes"
+      ],
+      "risks": [
+        "documentation gaps",
+        "existing debt stack"
+      ],
+      "best_fit_funding_families": [
+        "structured_growth_capital",
+        "lines_of_credit_revolving_access",
+        "working_capital_emergency_capital"
+      ],
+      "poor_fit_funding_families": [
+        "startup_credit_leverage"
+      ],
+      "recommended_cta": "Get My Funding Options Reviewed",
+      "nurture_path": "funding_application_or_strategy_review",
+      "ideal_lender_appetite_profile": [
+        "moderate_risk",
+        "revenue_sensitive",
+        "documentation_medium"
+      ]
+    },
+    {
+      "archetype_id": "credit_strong_startup_founder",
+      "archetype_name": "Credit-Strong Startup Founder",
+      "description": "New or pre-revenue founder with strong personal credit but limited business history.",
+      "trigger_conditions": {
+        "time_in_business_months_max": 6,
+        "credit_score_min": 680,
+        "monthly_revenue_max": 10000
+      },
+      "strengths": [
+        "personal credit leverage",
+        "startup-friendly paths possible"
+      ],
+      "risks": [
+        "limited revenue",
+        "business docs may be thin"
+      ],
+      "best_fit_funding_families": [
+        "startup_credit_leverage",
+        "manual_review"
+      ],
+      "poor_fit_funding_families": [
+        "working_capital_emergency_capital",
+        "structured_growth_capital"
+      ],
+      "recommended_cta": "Explore Startup Funding Paths",
+      "nurture_path": "credit_leverage_plus_business_credit_builder",
+      "ideal_lender_appetite_profile": [
+        "credit_first",
+        "startup_friendly"
+      ]
+    },
+    {
+      "archetype_id": "distressed_cash_flow_borrower",
+      "archetype_name": "Distressed Cash Flow Borrower",
+      "description": "Operator seeking urgent cash with red flags such as NSFs, tax issues, MCA stack, or weak bank activity.",
+      "trigger_conditions": {
+        "funding_purpose": [
+          "payroll",
+          "emergency_cash_flow",
+          "working_capital"
+        ],
+        "risk_flags_any": [
+          "risk_recent_nsfs",
+          "risk_existing_mca_stack",
+          "risk_recent_tax_lien"
+        ]
+      },
+      "strengths": [
+        "possible revenue-driven options if deposits support"
+      ],
+      "risks": [
+        "stacking risk",
+        "cash-flow compression",
+        "manual review likely"
+      ],
+      "best_fit_funding_families": [
+        "working_capital_emergency_capital",
+        "manual_review"
+      ],
+      "poor_fit_funding_families": [
+        "structured_growth_capital",
+        "startup_credit_leverage"
+      ],
+      "recommended_cta": "Get a Funding Strategy Review",
+      "nurture_path": "bank_statement_review_cash_flow_cleanup",
+      "ideal_lender_appetite_profile": [
+        "aggressive",
+        "revenue_first",
+        "manual_review"
+      ]
+    },
+    {
+      "archetype_id": "growth_stage_ecommerce_seller",
+      "archetype_name": "Growth-Stage Ecommerce Seller",
+      "description": "Marketplace or ecommerce seller with platform sales history and inventory/ad-spend needs.",
+      "trigger_conditions": {
+        "business_persona": [
+          "ecommerce_seller"
+        ],
+        "monthly_revenue_min": 3000,
+        "funding_purpose_any": [
+          "ecommerce_growth",
+          "inventory",
+          "ad_spend"
+        ]
+      },
+      "strengths": [
+        "platform/API underwriting",
+        "sales history",
+        "inventory-growth use case"
+      ],
+      "risks": [
+        "platform suspension",
+        "seasonality",
+        "supply chain volatility"
+      ],
+      "best_fit_funding_families": [
+        "platform_marketplace_seller_capital",
+        "working_capital_emergency_capital"
+      ],
+      "poor_fit_funding_families": [
+        "real_estate_asset_secured"
+      ],
+      "recommended_cta": "Review Ecommerce Capital Options",
+      "nurture_path": "platform_connection_then_ecommerce_capital_review",
+      "ideal_lender_appetite_profile": [
+        "platform_based",
+        "revenue_first",
+        "speed_high"
+      ]
+    },
+    {
+      "archetype_id": "asset_heavy_contractor",
+      "archetype_name": "Asset-Heavy Contractor",
+      "description": "Contractor, trucking, fleet, construction, or capex-heavy business where equipment and assets matter.",
+      "trigger_conditions": {
+        "business_persona_any": [
+          "contractor",
+          "trucking",
+          "equipment_heavy"
+        ],
+        "funding_purpose_any": [
+          "equipment",
+          "vehicle",
+          "truck",
+          "fleet",
+          "materials"
+        ]
+      },
+      "strengths": [
+        "collateral path",
+        "equipment-specific use case"
+      ],
+      "risks": [
+        "asset documentation",
+        "equipment age/title issues",
+        "seasonal cash flow"
+      ],
+      "best_fit_funding_families": [
+        "equipment_truck_asset_backed",
+        "structured_growth_capital",
+        "working_capital_emergency_capital"
+      ],
+      "poor_fit_funding_families": [
+        "startup_credit_leverage"
+      ],
+      "recommended_cta": "Review Equipment or Working Capital Fit",
+      "nurture_path": "asset_docs_collection_plus_funding_review",
+      "ideal_lender_appetite_profile": [
+        "collateral_first",
+        "moderate_risk"
+      ]
+    },
+    {
+      "archetype_id": "real_estate_capital_operator",
+      "archetype_name": "Real Estate Capital Operator",
+      "description": "Investor, flipper, rental buyer, or commercial owner-operator with property-specific capital needs.",
+      "trigger_conditions": {
+        "business_persona": [
+          "real_estate_investor"
+        ],
+        "funding_purpose_any": [
+          "real_estate_purchase",
+          "fix_and_flip",
+          "rental_dscr",
+          "commercial_property"
+        ]
+      },
+      "strengths": [
+        "asset-secured underwriting",
+        "project-specific capital stack"
+      ],
+      "risks": [
+        "LTV/equity",
+        "property docs",
+        "exit strategy"
+      ],
+      "best_fit_funding_families": [
+        "real_estate_asset_secured",
+        "manual_review"
+      ],
+      "poor_fit_funding_families": [
+        "platform_marketplace_seller_capital"
+      ],
+      "recommended_cta": "Request Real Estate Capital Review",
+      "nurture_path": "property_detail_intake_then_manual_review",
+      "ideal_lender_appetite_profile": [
+        "asset_first",
+        "documentation_high"
+      ]
+    },
+    {
+      "archetype_id": "thin_file_entrepreneur",
+      "archetype_name": "Thin-File Entrepreneur",
+      "description": "Business owner or founder with incomplete business structure, limited docs, weak credit history, or missing financial signals.",
+      "trigger_conditions": {
+        "data_confidence_score_max": 65,
+        "documentation_readiness_score_max": 5
+      },
+      "strengths": [
+        "fixable if willing to prep"
+      ],
+      "risks": [
+        "low confidence",
+        "missing docs",
+        "hard to route automatically"
+      ],
+      "best_fit_funding_families": [
+        "manual_review",
+        "startup_credit_leverage"
+      ],
+      "poor_fit_funding_families": [
+        "structured_growth_capital"
+      ],
+      "recommended_cta": "Get the Funding Prep Checklist",
+      "nurture_path": "funding_prep_business_credit_builder",
+      "ideal_lender_appetite_profile": [
+        "manual_review",
+        "prep_required"
+      ]
+    },
+    {
+      "archetype_id": "prime_expansion_candidate",
+      "archetype_name": "Prime Expansion Candidate",
+      "description": "Strong credit, strong revenue, clean bank activity, and established operations suitable for better-priced or structured products.",
+      "trigger_conditions": {
+        "monthly_revenue_min": 50000,
+        "time_in_business_months_min": 24,
+        "credit_score_min": 680,
+        "risk_flags_none": [
+          "critical",
+          "high"
+        ]
+      },
+      "strengths": [
+        "prime credit",
+        "stable revenue",
+        "cleaner underwriting file"
+      ],
+      "risks": [
+        "docs still required",
+        "SBA timeline mismatch if urgent"
+      ],
+      "best_fit_funding_families": [
+        "structured_growth_capital",
+        "lines_of_credit_revolving_access",
+        "equipment_truck_asset_backed"
+      ],
+      "poor_fit_funding_families": [
+        "working_capital_emergency_capital"
+      ],
+      "recommended_cta": "Compare Structured Funding Paths",
+      "nurture_path": "funding_application_high_priority",
+      "ideal_lender_appetite_profile": [
+        "conservative_to_moderate",
+        "credit_first",
+        "documentation_medium_high"
+      ]
+    },
+    {
+      "archetype_id": "mca_stack_risk_borrower",
+      "archetype_name": "MCA Stack Risk Borrower",
+      "description": "Borrower with existing daily/weekly advance obligations or stack risk.",
+      "trigger_conditions": {
+        "risk_flags_any": [
+          "risk_existing_mca_stack"
+        ]
+      },
+      "strengths": [
+        "may have revenue/deposit history"
+      ],
+      "risks": [
+        "overleveraging",
+        "cash-flow compression",
+        "lender stacking restrictions"
+      ],
+      "best_fit_funding_families": [
+        "manual_review",
+        "working_capital_emergency_capital"
+      ],
+      "poor_fit_funding_families": [
+        "lines_of_credit_revolving_access",
+        "structured_growth_capital"
+      ],
+      "recommended_cta": "Request MCA Stack Review",
+      "nurture_path": "debt_schedule_review_cash_flow_cleanup",
+      "ideal_lender_appetite_profile": [
+        "aggressive",
+        "manual_review"
+      ]
+    },
+    {
+      "archetype_id": "funding_prep_candidate",
+      "archetype_name": "Funding Prep Candidate",
+      "description": "Not ready for reliable funding yet, but likely monetizable through prep, credit-building, banking, docs, or strategy services.",
+      "trigger_conditions": {
+        "fundability_score_max": 45
+      },
+      "strengths": [
+        "clear improvement path possible"
+      ],
+      "risks": [
+        "not application-ready"
+      ],
+      "best_fit_funding_families": [
+        "manual_review",
+        "startup_credit_leverage"
+      ],
+      "poor_fit_funding_families": [
+        "structured_growth_capital",
+        "lines_of_credit_revolving_access"
+      ],
+      "recommended_cta": "Start Funding Prep",
+      "nurture_path": "business_credit_builder_docs_bank_setup",
+      "ideal_lender_appetite_profile": [
+        "not_ready_route_to_prep"
+      ]
+    },
+    {
+      "archetype_id": "sole_prop_gig_operator",
+      "archetype_name": "Sole-Prop / Gig Operator",
+      "description": "Independent contractor, gig worker, creator, or very small operator with modest but active deposits.",
+      "trigger_conditions": {
+        "business_structure": [
+          "sole_prop"
+        ],
+        "monthly_revenue_min": 3000,
+        "time_in_business_months_min": 4
+      },
+      "strengths": [
+        "may fit gig/revenue-first or micro-capital paths"
+      ],
+      "risks": [
+        "entity readiness",
+        "thin docs",
+        "small funding amounts"
+      ],
+      "best_fit_funding_families": [
+        "working_capital_emergency_capital",
+        "manual_review",
+        "startup_credit_leverage"
+      ],
+      "poor_fit_funding_families": [
+        "structured_growth_capital"
+      ],
+      "recommended_cta": "Check Small Business Funding Paths",
+      "nurture_path": "entity_setup_business_bank_account_then_review",
+      "ideal_lender_appetite_profile": [
+        "revenue_first",
+        "sole_prop_friendly"
+      ]
+    }
+  ]
+}

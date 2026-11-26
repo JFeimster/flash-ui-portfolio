@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Estimate what an online business may be worth using Empire Flippers' Referral Partner Valuation Tool API, then review the valuation range and exit options.">
+  <meta name="application-name" content="Acquisition Deal Fundability Calculator">
+  <meta name="version" content="1.4.0">
+  <title>Seller Valuation | Acquisition Deal Fundability Calculator</title>
+  <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/calculator.css?v=1.4.0">
+  <link rel="stylesheet" href="/css/v1.3.1.css?v=1.4.0">
+  <link rel="stylesheet" href="/css/v1.4.css?v=1.4.0">
+</head>
+<body>
+  <main class="shell">
+    <section class="calculator" aria-labelledby="valuationTitle">
+      <header class="hero">
+        <img class="brand-mark" src="/assets/logo.svg" alt="" width="54" height="54">
+        <div class="hero-copy">
+          <p class="eyebrow">Seller-side exit intelligence</p>
+          <h1 id="valuationTitle">What Could Your Business Be Worth?</h1>
+          <p>Use Empire Flippers' live valuation engine as a market-backed starting point, then decide whether the next move is to sell, prepare, or keep building.</p>
+        </div>
+        <span class="version">v1.4</span>
+      </header>
+
+      <nav class="top-nav" aria-label="Calculator navigation">
+        <a class="nav-link" data-preserve-embed href="/">Buyer Calculator</a>
+        <a class="nav-link" data-preserve-embed href="/import">Import Listing</a>
+        <a class="nav-link active" data-preserve-embed href="/seller-valuation" aria-current="page">Seller Valuation</a>
+        <a class="nav-link" data-preserve-embed href="/methodology">Terms &amp; Methodology</a>
+      </nav>
+
+      <div class="valuation-layout">
+        <section class="valuation-form-card">
+          <div class="provider-line">
+            <span class="provider-badge">Empire Flippers</span>
+            <span class="provider-note">Referral Partner Valuation Tool API</span>
+          </div>
+          <h2>Start with the numbers that move the multiple</h2>
+          <p class="helper">Monthly net profit is required. Monetization and business age materially improve the estimate. SaaS owners can add recurring-revenue details for a more specific result.</p>
+
+          <form id="valuationForm" class="valuation-form" novalidate>
+            <div class="review-grid">
+              <div class="review-field">
+                <label for="monthlyProfit">Average monthly net profit ($)</label>
+                <input id="monthlyProfit" name="average_monthly_net_profit" type="number" min="0" step="100" inputmode="decimal" required placeholder="5000">
+                <p class="helper">Prefer the average from the last 12 months.</p>
+              </div>
+
+              <div class="review-field">
+                <label for="monetization">Primary monetization</label>
+                <select id="monetization" name="monetization">
+                  <option value="">Choose if known</option>
+                  <option>Affiliate</option><option>Agency</option><option>Amazon Associates</option><option>Amazon FBA</option><option>Amazon FBM</option><option>Amazon KDP</option><option>Amazon Merch</option><option>Application</option><option>Digital Product</option><option>Display Advertising</option><option>DropShipping</option><option>eCommerce</option><option>Info Product</option><option>Lead Gen</option><option>Newsletter</option><option>SaaS</option><option>Service</option><option>Subscription</option><option>Subscription-Box</option><option>Youtube</option>
+                </select>
+              </div>
+
+              <div class="review-field">
+                <label for="businessCreatedAt">Business started</label>
+                <input id="businessCreatedAt" name="business_created_at" type="date">
+              </div>
+
+              <div class="review-field">
+                <label for="ownerHours">Owner hours / week</label>
+                <input id="ownerHours" name="hours_worked_per_week" type="number" min="0" max="168" step="1" inputmode="numeric">
+              </div>
+
+              <div class="review-field">
+                <label for="monthlyRevenue">Average monthly gross revenue ($)</label>
+                <input id="monthlyRevenue" name="average_monthly_gross_revenue" type="number" min="0" step="100" inputmode="decimal">
+              </div>
+
+              <div class="review-field">
+                <label for="emailSubscribers">Email subscribers</label>
+                <input id="emailSubscribers" name="email_subscribers" type="number" min="0" step="1" inputmode="numeric">
+              </div>
+            </div>
+
+            <section class="saas-fields hidden" id="saasFields" aria-labelledby="saasHeading">
+              <h3 id="saasHeading">SaaS valuation refinements</h3>
+              <div class="review-grid">
+                <div class="review-field"><label for="saasModel">Recurring model</label><select id="saasModel" name="saas_model"><option value="">Choose</option><option>MRR only</option><option>ARR only</option><option>Both</option><option>None</option></select></div>
+                <div class="review-field"><label for="mrrNow">MRR now ($)</label><input id="mrrNow" name="mrr_now" type="number" min="0" step="100"></div>
+                <div class="review-field"><label for="mrr3">MRR 3 months ago ($)</label><input id="mrr3" name="mrr_3_months_ago" type="number" min="0" step="100"></div>
+                <div class="review-field"><label for="mrr12">MRR 12 months ago ($)</label><input id="mrr12" name="mrr_12_months_ago" type="number" min="0" step="100"></div>
+                <div class="review-field"><label for="churn">Average monthly churn (%)</label><input id="churn" name="average_monthly_churn_percent" type="number" min="0" max="100" step="0.1"></div>
+                <div class="review-field"><label for="firstSubscriberAt">First paying subscriber</label><input id="firstSubscriberAt" name="first_subscriber_at" type="date"></div>
+              </div>
+            </section>
+
+            <div class="valuation-actions">
+              <button class="cta-button cta-primary" id="valuationBtn" type="submit">Estimate My Valuation</button>
+              <button class="btn btn-secondary" id="resetValuationBtn" type="button">Reset</button>
+            </div>
+          </form>
+          <div class="import-status hidden" id="valuationStatus" role="status" aria-live="polite"></div>
+        </section>
+
+        <section class="valuation-results hidden" id="valuationResults" aria-labelledby="valuationResultsHeading">
+          <div class="valuation-results-head">
+            <div><p class="eyebrow">Live marketplace estimate</p><h2 id="valuationResultsHeading">Estimated Valuation</h2></div>
+            <span class="source-status">Empire Flippers</span>
+          </div>
+          <div class="valuation-hero-number" id="suggestedPrice">—</div>
+          <p class="valuation-multiple" id="suggestedMultiple">—</p>
+
+          <div class="valuation-range-grid">
+            <article><span>Typical Low</span><strong id="typicalLow">—</strong><small id="typicalLowMultiple">—</small></article>
+            <article class="primary-range"><span>Suggested Listing</span><strong id="suggestedPriceCard">—</strong><small id="suggestedMultipleCard">—</small></article>
+            <article><span>Typical High</span><strong id="typicalHigh">—</strong><small id="typicalHighMultiple">—</small></article>
+          </div>
+
+          <details class="absolute-range">
+            <summary>Show absolute valuation range</summary>
+            <div class="absolute-grid">
+              <div><span>Absolute Low</span><strong id="absoluteLow">—</strong><small id="absoluteLowMultiple">—</small></div>
+              <div><span>Absolute High</span><strong id="absoluteHigh">—</strong><small id="absoluteHighMultiple">—</small></div>
+            </div>
+          </details>
+
+          <div class="valuation-basis" id="valuationBasis">—</div>
+          <div class="valuation-cta-grid">
+            <a class="cta-button cta-primary" href="https://empireflippers.com/sell-your-site/?referrer=6I8WK4WSMYC9KGJD" target="_blank" rel="noopener noreferrer">Sell Your Site on Empire Flippers ↗</a>
+            <a class="cta-button cta-secondary" href="https://empireflippers.com/vt/?referrer=6I8WK4WSMYC9KGJD" target="_blank" rel="noopener noreferrer">Open Empire Flippers Valuation Tool ↗</a>
+            <a class="cta-button cta-secondary" href="https://www.distilledfunding.com/group/business-acquisition-exit-network" target="_blank" rel="noopener noreferrer">Business Acquisition &amp; Exit Network ↗</a>
+          </div>
+          <p class="valuation-disclaimer">This automated estimate is a screening tool, not a formal appraisal, broker opinion, lender approval, or guarantee of sale price. Actual value depends on diligence, transferability, growth, risk, buyer demand, and current market conditions.</p>
+        </section>
+      </div>
+
+      <footer class="footer">
+        <span><strong>Seller-side estimate only.</strong> Buyer underwriting remains separate from this workflow.</span>
+        <span>Acquisition Deal Fundability Calculator <strong>v1.4</strong></span>
+      </footer>
+    </section>
+  </main>
+  <script src="/js/app-shell.js?v=1.4.0" defer></script>
+  <script src="/js/seller-valuation.js?v=1.4.0" defer></script>
+</body>
+</html>

@@ -1,0 +1,1077 @@
+```html
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PRISM LOGIC // Transfer Security & Compliance Audit Logs</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            prism: {
+              black: '#030712',
+              charcoal: '#0b0f19',
+              slate: '#1e293b',
+              red: '#ff2e93',
+              blue: '#00f0ff',
+              green: '#00ff87',
+              yellow: '#ffde43',
+              purple: '#8b5cf6'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #030712;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1f2937;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #374151;
+    }
+
+    /* Prism Grid Background */
+    .prism-grid {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
+
+    /* Chromatic Aberration & Glow Effects */
+    .prism-glow-blue {
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.15);
+      border: 1px solid rgba(0, 240, 255, 0.25);
+    }
+    
+    .prism-glow-red {
+      box-shadow: 0 0 30px rgba(255, 46, 147, 0.15);
+      border: 1px solid rgba(255, 46, 147, 0.25);
+    }
+
+    .prism-glow-green {
+      box-shadow: 0 0 30px rgba(0, 255, 135, 0.15);
+      border: 1px solid rgba(0, 255, 135, 0.25);
+    }
+
+    .prism-glass {
+      background: rgba(11, 15, 25, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .prism-glass-hover:hover {
+      background: rgba(11, 15, 25, 0.85);
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: translateY(-2px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Refraction animation */
+    @keyframes refract {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .rainbow-border {
+      position: relative;
+    }
+    .rainbow-border::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(90deg, #ff2e93, #00f0ff, #00ff87, #ffde43, #ff2e93);
+      background-size: 300% 300%;
+      animation: refract 8s ease infinite;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    /* Status Dot Pulse */
+    .status-pulse {
+      box-shadow: 0 0 0 0 rgba(0, 255, 135, 0.7);
+      animation: pulse 1.8s infinite cubic-bezier(0.66, 0, 0, 1);
+    }
+
+    .status-pulse-red {
+      box-shadow: 0 0 0 0 rgba(255, 46, 147, 0.7);
+      animation: pulse-red 1.8s infinite cubic-bezier(0.66, 0, 0, 1);
+    }
+
+    @keyframes pulse {
+      to {
+        box-shadow: 0 0 0 8px rgba(0, 255, 135, 0);
+      }
+    }
+
+    @keyframes pulse-red {
+      to {
+        box-shadow: 0 0 0 8px rgba(255, 46, 147, 0);
+      }
+    }
+
+    /* Simple toggle switch Custom styling */
+    .toggle-switch:checked ~ .toggle-bg {
+      background-color: #00ff87;
+    }
+    .toggle-switch:checked ~ .toggle-dot {
+      transform: translateX(100%);
+    }
+  </style>
+</head>
+
+<body class="bg-prism-black text-slate-100 font-sans min-h-screen relative overflow-x-hidden prism-grid">
+
+  <!-- Glow Elements in Background -->
+  <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-prism-red/10 rounded-full blur-[120px] pointer-events-none"></div>
+  <div class="absolute bottom-[20%] right-[-10%] w-[45%] h-[45%] bg-prism-blue/10 rounded-full blur-[140px] pointer-events-none"></div>
+  <div class="absolute top-[40%] left-[30%] w-[35%] h-[35%] bg-prism-purple/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+  <!-- Main Grid Wrapper -->
+  <div class="min-h-screen flex flex-col justify-between z-10 relative">
+    
+    <!-- Top Navigation Header -->
+    <header class="border-b border-white/5 prism-glass sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        
+        <!-- Logo / Branding -->
+        <div class="flex items-center space-x-3">
+          <div class="relative w-8 h-8 flex items-center justify-center rainbow-border rounded-lg">
+            <svg class="w-4 h-4 text-white animate-spin-slow" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+              <path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </div>
+          <div>
+            <span class="font-mono text-xs text-prism-red tracking-[0.3em] font-semibold block">PRISM LOGIC</span>
+            <h1 class="text-sm font-bold tracking-tight text-white flex items-center gap-1.5 uppercase">
+              Transfer Audit Matrix <span class="text-[9px] bg-prism-red/10 text-prism-red px-1.5 py-0.5 rounded font-mono border border-prism-red/20">SEC-v4.1</span>
+            </h1>
+          </div>
+        </div>
+
+        <!-- Quick Compliance Metrics -->
+        <div class="hidden md:flex items-center space-x-6 text-xs font-mono border-l border-white/10 pl-6">
+          <div>
+            <span class="text-white/40 block">MONITORED TRANSFERS</span>
+            <span class="text-prism-blue font-bold text-sm">4,812 TOTAL</span>
+          </div>
+          <div>
+            <span class="text-white/40 block">AUTHORIZED TUNNELS</span>
+            <span id="activeTunnelCount" class="text-prism-green font-bold text-sm">34 ACTIVE</span>
+          </div>
+          <div>
+            <span class="text-white/40 block">ANOMALIES DETECTED</span>
+            <span class="text-prism-yellow font-bold text-sm">0 CRITICAL</span>
+          </div>
+          <div>
+            <span class="text-white/40 block">REVOCATION RATE</span>
+            <span class="text-prism-red font-bold text-sm">2.41%</span>
+          </div>
+        </div>
+
+        <!-- Action Controls -->
+        <div class="flex items-center space-x-3">
+          <button onclick="triggerGlobalLockdown()" class="relative flex items-center space-x-2 bg-gradient-to-r from-prism-red/20 to-prism-purple/15 hover:from-prism-red/30 hover:to-prism-purple/25 text-white text-xs font-semibold py-2 px-4 rounded-lg border border-prism-red/30 transition duration-300">
+            <span class="w-2 h-2 rounded-full bg-prism-red status-pulse-red"></span>
+            <span>Emergency Lockdown</span>
+          </button>
+          
+          <button onclick="toggleComplianceGuide()" class="p-2 rounded-lg bg-white/5 border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition">
+            <i data-lucide="shield-alert" class="w-4.5 h-4.5"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- interactive Security Map & Real-time Flow simulation -->
+    <section class="border-b border-white/5 relative overflow-hidden bg-prism-charcoal/50 py-10">
+      <div class="absolute top-4 right-4 z-20 flex items-center space-x-2 bg-black/60 px-3 py-1.5 rounded-full border border-white/10">
+        <span class="w-1.5 h-1.5 rounded-full bg-prism-green animate-ping"></span>
+        <span class="text-[10px] font-mono text-white/60 uppercase tracking-widest">Global Handshake Terminal Live</span>
+      </div>
+      
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          
+          <!-- Copy / Info Column -->
+          <div class="lg:col-span-5 space-y-6">
+            <div class="inline-flex items-center space-x-2 bg-white/5 border border-white/10 px-3 py-1 rounded-full">
+              <span class="w-2 h-2 rounded-full bg-prism-red"></span>
+              <span class="text-[10px] font-mono tracking-widest text-white/80 uppercase">Decentralized Trust Ledger</span>
+            </div>
+            
+            <h2 class="text-3xl md:text-5xl font-black text-white leading-tight tracking-tight uppercase">
+              Transfer <span class="text-transparent bg-clip-text bg-gradient-to-r from-prism-red via-prism-purple to-prism-blue">Security</span> & Handshake Audit
+            </h2>
+            
+            <p class="text-white/60 text-sm md:text-base leading-relaxed">
+              Track sensitive real estate packages, LOIs, and institutional underwriting disclosures. Monitor geolocation headers, trigger dynamic link expirations, or instantly sever secure tunnels mid-stream.
+            </p>
+
+            <div class="flex flex-wrap gap-3">
+              <div class="bg-white/5 border border-white/5 p-3 rounded-xl flex-1 min-w-[120px]">
+                <span class="text-[10px] font-mono text-white/40 block">COMPLIANCE PROTOCOL</span>
+                <span class="text-xs font-semibold text-white">SOC-2 Type II Certified</span>
+              </div>
+              <div class="bg-white/5 border border-white/5 p-3 rounded-xl flex-1 min-w-[120px]">
+                <span class="text-[10px] font-mono text-white/40 block">CIPHER MECHANISM</span>
+                <span class="text-xs font-semibold text-prism-blue">AES-GCM 256bit</span>
+              </div>
+              <div class="bg-white/5 border border-white/5 p-3 rounded-xl flex-1 min-w-[120px]">
+                <span class="text-[10px] font-mono text-white/40 block">LINK ENFORCEMENT</span>
+                <span class="text-xs font-semibold text-prism-green">Real-time Revoke</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Network Tunnel Simulation -->
+          <div class="lg:col-span-7 h-[260px] md:h-[300px] prism-glass rounded-2xl relative overflow-hidden flex items-center justify-center border border-white/10">
+            <canvas id="securityCanvas" class="absolute inset-0 w-full h-full pointer-events-auto"></canvas>
+            
+            <!-- Floating Overlay Inside Simulation -->
+            <div class="absolute bottom-4 left-4 z-20 pointer-events-none bg-black/60 p-3 rounded-lg border border-white/5 font-mono text-[10px] text-white/60 space-y-1">
+              <div>// CYPHER TUNNEL SIMULATOR</div>
+              <div>ENCRYPTED PIPELINE: <span class="text-prism-green">OPERATIONAL</span></div>
+              <div>GEO-CORRELATION MATRIX: <span class="text-prism-blue">1:1 MATCH</span></div>
+              <div class="text-[9px] text-white/30 italic">Move cursor across grid to verify network handshakes</div>
+            </div>
+
+            <!-- Terminal output ticker inside simulation -->
+            <div class="absolute top-4 left-4 z-20 pointer-events-none hidden sm:block bg-black/45 px-2 py-1.5 rounded border border-white/5 font-mono text-[8px] text-prism-green/80">
+              [SYSTEM LOG]: <span id="tickerLog">Listening on port 443...</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content Area: Directory & Logs -->
+    <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
+      
+      <!-- Filter Ribbon -->
+      <div class="prism-glass p-5 rounded-2xl border border-white/10 mb-8 space-y-4">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          
+          <!-- Search box -->
+          <div class="relative flex-1">
+            <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 w-5 h-5"></i>
+            <input 
+              type="text" 
+              id="auditSearchInput" 
+              oninput="filterLogs()"
+              placeholder="Search by attachment name, IP address, country code, or audit ID..." 
+              class="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-sm text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-prism-red focus:border-prism-red transition"
+            >
+          </div>
+
+          <!-- Filters -->
+          <div class="flex flex-wrap items-center gap-3">
+            <!-- Access Status Filter -->
+            <div class="relative">
+              <select 
+                id="statusFilter" 
+                onchange="filterLogs()"
+                class="appearance-none bg-black/40 border border-white/10 rounded-xl px-4 py-3 pr-10 text-xs font-medium text-white/80 focus:outline-none focus:ring-1 focus:ring-prism-red cursor-pointer"
+              >
+                <option value="ALL">All Access States</option>
+                <option value="Active">Active (Permitted)</option>
+                <option value="Revoked">Revoked (Blocked)</option>
+                <option value="Flagged">Flagged Anomalies</option>
+              </select>
+              <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none"></i>
+            </div>
+
+            <!-- Action Type Filter -->
+            <div class="relative">
+              <select 
+                id="actionFilter" 
+                onchange="filterLogs()"
+                class="appearance-none bg-black/40 border border-white/10 rounded-xl px-4 py-3 pr-10 text-xs font-medium text-white/80 focus:outline-none focus:ring-1 focus:ring-prism-red cursor-pointer"
+              >
+                <option value="ALL">All Action Types</option>
+                <option value="Download">Downloads</option>
+                <option value="View Only">View Events</option>
+                <option value="Metadata Check">Decryption Inquiries</option>
+              </select>
+              <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none"></i>
+            </div>
+
+            <!-- Risk Rating Sort -->
+            <div class="relative">
+              <select 
+                id="sortFilter" 
+                onchange="filterLogs()"
+                class="appearance-none bg-black/40 border border-white/10 rounded-xl px-4 py-3 pr-10 text-xs font-medium text-white/80 focus:outline-none focus:ring-1 focus:ring-prism-red cursor-pointer"
+              >
+                <option value="time-desc">Time Logged (Recent First)</option>
+                <option value="time-asc">Time Logged (Oldest First)</option>
+                <option value="payload-desc">Payload Size (Largest First)</option>
+                <option value="status-state">Status Isolation Matrix</option>
+              </select>
+              <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none"></i>
+            </div>
+
+            <!-- Clear filters -->
+            <button onclick="resetAuditFilters()" class="text-xs text-white/40 hover:text-white underline font-mono px-2 py-1">
+              Reset Security Parameters
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Secondary parameters: Payload Threshold slider and terminal details -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-3 border-t border-white/5 text-xs">
+          <!-- Min Payload Size Slider -->
+          <div class="space-y-2">
+            <div class="flex justify-between font-mono">
+              <span class="text-white/50 uppercase tracking-wider">Minimum Logged Payload</span>
+              <span id="payloadValue" class="text-prism-blue font-bold">0.1 MB</span>
+            </div>
+            <input 
+              type="range" 
+              id="payloadSlider" 
+              min="0.1" 
+              max="50.0" 
+              step="0.1"
+              value="0.1"
+              oninput="updatePayloadValue(this.value)"
+              class="w-full accent-prism-red bg-black/40 rounded-lg h-1.5"
+            >
+          </div>
+
+          <!-- Alert Level Check -->
+          <div class="flex items-center space-x-3">
+            <label class="flex items-center space-x-2 text-white/60 cursor-pointer font-mono text-[11px]">
+              <input type="checkbox" id="criticalOnlyCheckbox" onchange="filterLogs()" class="rounded bg-black border-white/20 text-prism-red accent-prism-red">
+              <span>Isolate Critical Anomaly Flags Only</span>
+            </label>
+          </div>
+
+          <!-- Audit statistics count -->
+          <div class="flex items-center justify-end font-mono text-[11px] text-white/40">
+            <span>INDEXED: <strong id="matchedLogCount" class="text-white">0</strong> / <strong id="totalLogCount" class="text-white">0</strong> INTERFACES</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Main Log Listing Table Component -->
+      <div class="prism-glass rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse font-sans">
+            <thead>
+              <tr class="bg-black/40 border-b border-white/10 text-white/40 font-mono text-[11px] uppercase tracking-wider">
+                <th class="p-4 pl-6">Handshake ID / Date</th>
+                <th class="p-4">Package Name / Payload</th>
+                <th class="p-4">Recipient Geo Location / IP</th>
+                <th class="p-4">Access Action</th>
+                <th class="p-4">Risk Rating</th>
+                <th class="p-4 text-center">Transmission Status</th>
+                <th class="p-4 pr-6 text-right">Revoke / Force Kill</th>
+              </tr>
+            </thead>
+            <tbody id="logsTableBody" class="divide-y divide-white/5 text-xs text-white/80">
+              <!-- Dynamically populated via script -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Empty State / Audit Safe Clearance -->
+      <div id="emptyState" class="hidden text-center py-20 bg-prism-charcoal/40 rounded-2xl border border-white/5 p-8 max-w-md mx-auto mt-8">
+        <div class="inline-flex p-3 rounded-full bg-white/5 mb-4 text-prism-green">
+          <i data-lucide="shield-check" class="w-8 h-8"></i>
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2">Audit Registry Cleared</h3>
+        <p class="text-sm text-white/50 mb-6">No security violations or file transfer logs intersect your filter parameters.</p>
+        <button onclick="resetAuditFilters()" class="bg-white/10 hover:bg-white/20 text-white font-semibold text-xs py-2.5 px-6 rounded-lg transition">
+          Restore Active Stream Monitor
+        </button>
+      </div>
+
+    </main>
+
+    <!-- Detailed Compliance Guidelines / Help Drawer -->
+    <section id="complianceGuideSection" class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-12 border-t border-white/5 bg-prism-charcoal/20 hidden">
+      <div class="max-w-3xl mx-auto space-y-6">
+        <div class="text-center space-y-2">
+          <span class="text-[10px] font-mono tracking-widest text-prism-red uppercase">Compliance Directives</span>
+          <h2 class="text-2xl font-black text-white uppercase tracking-tight">Security Handshake & Audit Protocols</h2>
+          <p class="text-sm text-white/40">Explanation of system indicators, revocation mechanisms, and compliance scores.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-5 prism-glass rounded-xl border border-white/5">
+            <h3 class="text-sm font-bold text-white mb-2 flex items-center gap-1.5 font-mono">// WHAT IS A DIRECT REVOCATION?</h3>
+            <p class="text-xs text-white/60 leading-relaxed">
+              Toggling the switch to "Revoked" instantly invalidates the temporary symlink tokens stored in the distributed secure ledger, severing active downstream decryption routines.
+            </p>
+          </div>
+          <div class="p-5 prism-glass rounded-xl border border-white/5">
+            <h3 class="text-sm font-bold text-white mb-2 flex items-center gap-1.5 font-mono">// ANOMALY CLASSIFICATION MODEL</h3>
+            <p class="text-xs text-white/60 leading-relaxed">
+              If an IP accesses from a jurisdiction deviating significantly from standard regional boundaries, the system raises a risk rating, enabling rapid isolation.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/5 py-8 bg-prism-black/95 text-xs font-mono relative z-20">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-white/40">
+        
+        <div class="flex items-center space-x-2">
+          <span class="text-white/80 font-bold tracking-widest">PRISM LOGIC SECURE</span>
+          <span>© <span id="currentYear"></span>. SOC2-TII Compliant. Handshake verified.</span>
+        </div>
+
+        <div class="flex items-center space-x-6 text-[11px]">
+          <a href="#" class="hover:text-prism-red transition">MUTUAL NDA PATTERN</a>
+          <a href="#" class="hover:text-prism-blue transition">SYSTEM KEYS (v4)</a>
+          <a href="#" class="hover:text-prism-green transition">RECORDS DISCLOSURE</a>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <span class="w-2 h-2 rounded-full bg-prism-green status-pulse"></span>
+          <span class="text-[10px] uppercase">Compliance Node: Active</span>
+        </div>
+
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- REVOKE DETAIL DIALOG MODAL -->
+  <div id="revoke-confirm-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
+    <div class="prism-glass max-w-md w-full rounded-2xl border border-prism-red/30 overflow-hidden relative shadow-2xl">
+      <div class="h-1 bg-gradient-to-r from-prism-red via-prism-purple to-prism-blue"></div>
+
+      <div class="p-6 space-y-6">
+        <div class="flex justify-between items-start">
+          <div class="flex items-center gap-3">
+            <div class="p-2 bg-prism-red/10 border border-prism-red/20 text-prism-red rounded-lg">
+              <i data-lucide="shield-alert" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <span class="text-[9px] font-mono tracking-widest text-prism-red uppercase">Security Ledger Overrides</span>
+              <h3 class="text-lg font-black text-white uppercase tracking-tight">Revoke Tunnel Pipeline?</h3>
+            </div>
+          </div>
+          <button onclick="closeModal('revoke-confirm-modal')" class="p-1 rounded-lg bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div class="space-y-3 font-mono text-xs">
+          <p class="text-white/60 font-sans leading-relaxed">
+            Executing a manual transmission override forces instant connection shutdown. Real-time token caching databases will expire for this package instance immediately.
+          </p>
+          <div class="bg-black/50 p-4 rounded-xl border border-white/5 space-y-2">
+            <div class="flex justify-between">
+              <span class="text-white/40">PACKAGE TARGET:</span>
+              <span id="modalPackageName" class="text-white font-bold">--</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-white/40">RECEIVER IP:</span>
+              <span id="modalPackageIp" class="text-prism-blue font-bold">--</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-white/40">LEAK RISK SCORE:</span>
+              <span id="modalPackageRisk" class="text-prism-yellow font-bold">--</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 pt-2">
+          <button onclick="closeModal('revoke-confirm-modal')" class="w-full bg-white/5 hover:bg-white/10 text-white font-bold py-2.5 rounded-lg border border-white/10 text-xs font-mono uppercase tracking-wider transition">
+            Abort Action
+          </button>
+          <button onclick="confirmOverrideRevocation()" class="w-full bg-gradient-to-r from-prism-red to-prism-purple text-white hover:brightness-110 font-bold py-2.5 rounded-lg border border-white/20 text-xs font-mono uppercase tracking-wider transition">
+            Terminate Session
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATA & AUDIT COMPLIANCE LOGIC -->
+  <script>
+    // Initial dynamic dataset depicting attachment download and viewed audit logs
+    const INITIAL_AUDIT_LOGS = [
+      {
+        id: "AUD-9481",
+        date: "2024-11-04 14:22:18",
+        packageName: "Apex_Prism_Underwriting_Matrix.pdf",
+        payloadSize: "18.4 MB",
+        rawPayload: 18.4,
+        recipientIp: "184.22.109.5",
+        geoCountry: "United States",
+        geoState: "CA",
+        actionType: "Download",
+        riskRating: "Low",
+        status: "Active", // "Active" or "Revoked"
+        criticalFlag: false
+      },
+      {
+        id: "AUD-9480",
+        date: "2024-11-04 13:05:51",
+        packageName: "Lumina_Bridge_Asset_Schedules.xlsx",
+        payloadSize: "4.2 MB",
+        rawPayload: 4.2,
+        recipientIp: "92.112.44.89",
+        geoCountry: "Germany",
+        geoState: "Berlin",
+        actionType: "Download",
+        riskRating: "Flagged",
+        status: "Active",
+        criticalFlag: true
+      },
+      {
+        id: "AUD-9479",
+        date: "2024-11-04 11:15:02",
+        packageName: "Obsidian_Corporate_BalanceSheet_2024.pdf",
+        payloadSize: "32.1 MB",
+        rawPayload: 32.1,
+        recipientIp: "74.125.19.147",
+        geoCountry: "United States",
+        geoState: "TX",
+        actionType: "View Only",
+        riskRating: "Low",
+        status: "Active",
+        criticalFlag: false
+      },
+      {
+        id: "AUD-9478",
+        date: "2024-11-04 09:44:33",
+        packageName: "GroundUp_Construction_Milestones_V2.dwg",
+        payloadSize: "48.9 MB",
+        rawPayload: 48.9,
+        recipientIp: "103.22.109.5",
+        geoCountry: "Singapore",
+        geoState: "Downtown Core",
+        actionType: "Download",
+        riskRating: "Low",
+        status: "Revoked",
+        criticalFlag: false
+      },
+      {
+        id: "AUD-9477",
+        date: "2024-11-03 22:11:59",
+        packageName: "Spectrum_Portfolio_DSCR_Model.xlsx",
+        payloadSize: "8.1 MB",
+        rawPayload: 8.1,
+        recipientIp: "198.51.100.42",
+        geoCountry: "United States",
+        geoState: "NY",
+        actionType: "Metadata Check",
+        riskRating: "Low",
+        status: "Active",
+        criticalFlag: false
+      },
+      {
+        id: "AUD-9476",
+        date: "2024-11-03 18:30:11",
+        packageName: "Horizon_Equity_Commitment_Letter_Signed.pdf",
+        payloadSize: "2.5 MB",
+        rawPayload: 2.5,
+        recipientIp: "142.250.74.46",
+        geoCountry: "Canada",
+        geoState: "ON",
+        actionType: "Download",
+        riskRating: "Flagged",
+        status: "Active",
+        criticalFlag: true
+      },
+      {
+        id: "AUD-9475",
+        date: "2024-11-03 16:12:00",
+        packageName: "Apex_Prism_Underwriting_Matrix.pdf",
+        payloadSize: "18.4 MB",
+        rawPayload: 18.4,
+        recipientIp: "185.190.140.2",
+        geoCountry: "Netherlands",
+        geoState: "Amsterdam",
+        actionType: "View Only",
+        riskRating: "Low",
+        status: "Revoked",
+        criticalFlag: false
+      },
+      {
+        id: "AUD-9474",
+        date: "2024-11-03 14:02:15",
+        packageName: "Lumina_NDA_Dynamic_V1.pdf",
+        payloadSize: "1.1 MB",
+        rawPayload: 1.1,
+        recipientIp: "172.56.21.99",
+        geoCountry: "United States",
+        geoState: "NV",
+        actionType: "Metadata Check",
+        riskRating: "Low",
+        status: "Active",
+        criticalFlag: false
+      }
+    ];
+
+    let auditLogs = [...INITIAL_AUDIT_LOGS];
+    let selectedOverrideIndex = null;
+
+    // Trigger compliance Guide drawer
+    function toggleComplianceGuide() {
+      const sect = document.getElementById('complianceGuideSection');
+      sect.classList.toggle('hidden');
+      if (!sect.classList.contains('hidden')) {
+        sect.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    // Modal Operations
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+      }, 50);
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      modal.classList.add('opacity-0');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 300);
+    }
+
+    // Updates live metrics header
+    function updateActiveTunnelsMetric() {
+      const count = auditLogs.filter(l => l.status === 'Active').length;
+      document.getElementById('activeTunnelCount').textContent = `${count} ACTIVE`;
+    }
+
+    // Direct interface payload filter trigger
+    function updatePayloadValue(val) {
+      document.getElementById('payloadValue').textContent = parseFloat(val).toFixed(1) + ' MB';
+      filterLogs();
+    }
+
+    // Reset filter controls
+    function resetAuditFilters() {
+      document.getElementById('auditSearchInput').value = '';
+      document.getElementById('statusFilter').value = 'ALL';
+      document.getElementById('actionFilter').value = 'ALL';
+      document.getElementById('sortFilter').value = 'time-desc';
+      document.getElementById('payloadSlider').value = '0.1';
+      document.getElementById('criticalOnlyCheckbox').checked = false;
+
+      document.getElementById('payloadValue').textContent = '0.1 MB';
+      filterLogs();
+    }
+
+    // Core sorting and filter execution logic
+    function filterLogs() {
+      const query = document.getElementById('auditSearchInput').value.toLowerCase().trim();
+      const statusValue = document.getElementById('statusFilter').value;
+      const actionValue = document.getElementById('actionFilter').value;
+      const sortValue = document.getElementById('sortFilter').value;
+      const payloadLimit = parseFloat(document.getElementById('payloadSlider').value);
+      const isCriticalOnly = document.getElementById('criticalOnlyCheckbox').checked;
+
+      let filtered = auditLogs.filter(log => {
+        // Query filter
+        const matchesQuery = !query || 
+          log.packageName.toLowerCase().includes(query) ||
+          log.recipientIp.toLowerCase().includes(query) ||
+          log.geoCountry.toLowerCase().includes(query) ||
+          log.geoState.toLowerCase().includes(query) ||
+          log.id.toLowerCase().includes(query);
+
+        // Status matching
+        const matchesStatus = statusValue === 'ALL' || log.status === statusValue || 
+          (statusValue === 'Flagged' && log.riskRating === 'Flagged');
+
+        // Action matching
+        const matchesAction = actionValue === 'ALL' || log.actionType === actionValue;
+
+        // Payload sizing check
+        const matchesPayload = log.rawPayload >= payloadLimit;
+
+        // Critical Flag isolate check
+        const matchesCritical = !isCriticalOnly || log.criticalFlag;
+
+        return matchesQuery && matchesStatus && matchesAction && matchesPayload && matchesCritical;
+      });
+
+      // Sorting protocols
+      if (sortValue === 'time-desc') {
+        filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+      } else if (sortValue === 'time-asc') {
+        filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
+      } else if (sortValue === 'payload-desc') {
+        filtered.sort((a, b) => b.rawPayload - a.rawPayload);
+      } else if (sortValue === 'status-state') {
+        filtered.sort((a, b) => a.status.localeCompare(b.status));
+      }
+
+      renderLogs(filtered);
+    }
+
+    // Toggling the checkbox toggle visually modifies state
+    function handleToggleState(logId, checked) {
+      const logItem = auditLogs.find(l => l.id === logId);
+      if (!logItem) return;
+
+      if (!checked) {
+        // Prepare revocation confirm dialog modal metadata
+        selectedOverrideIndex = logId;
+        document.getElementById('modalPackageName').textContent = logItem.packageName;
+        document.getElementById('modalPackageIp').textContent = logItem.recipientIp;
+        document.getElementById('modalPackageRisk').textContent = logItem.riskRating;
+        openModal('revoke-confirm-modal');
+      } else {
+        // Transition revoked to Active again directly
+        logItem.status = 'Active';
+        updateActiveTunnelsMetric();
+        filterLogs();
+        pushSystemTicker(`Access handshakes restabilized for ${logItem.id}`);
+      }
+    }
+
+    // Confirmation logic inside Revocation Override Modal
+    function confirmOverrideRevocation() {
+      if (selectedOverrideIndex) {
+        const logItem = auditLogs.find(l => l.id === selectedOverrideIndex);
+        if (logItem) {
+          logItem.status = 'Revoked';
+          updateActiveTunnelsMetric();
+          filterLogs();
+          pushSystemTicker(`Emergency terminal shutdown triggered for ${logItem.id}`);
+        }
+      }
+      closeModal('revoke-confirm-modal');
+    }
+
+    // Trigger full override system lockout
+    function triggerGlobalLockdown() {
+      if (confirm("CRITICAL WARNING: Terminate all active tunnels instantly and seal the ledger pipeline?")) {
+        auditLogs.forEach(l => l.status = 'Revoked');
+        updateActiveTunnelsMetric();
+        filterLogs();
+        pushSystemTicker("GLOBAL OVERRIDE LOCKDOWN COMPLETED.");
+      }
+    }
+
+    // Print text alerts onto the canvas visual simulator ticker
+    function pushSystemTicker(text) {
+      document.getElementById('tickerLog').textContent = `[EVENT LOG]: ${text}`;
+    }
+
+    // Dynamic rendering of rows inside matching data frames
+    function renderLogs(list) {
+      const tableBody = document.getElementById('logsTableBody');
+      const emptyState = document.getElementById('emptyState');
+
+      document.getElementById('matchedLogCount').textContent = list.length;
+      document.getElementById('totalLogCount').textContent = auditLogs.length;
+
+      if (list.length === 0) {
+        tableBody.parentElement.parentElement.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+        return;
+      }
+
+      tableBody.parentElement.parentElement.classList.remove('hidden');
+      emptyState.classList.add('hidden');
+
+      tableBody.innerHTML = list.map(l => {
+        const isActive = l.status === 'Active';
+        const isFlagged = l.riskRating === 'Flagged';
+
+        return `
+          <tr class="hover:bg-white/5 transition duration-150 border-b border-white/5">
+            
+            <!-- Handshake ID & Date -->
+            <td class="p-4 pl-6 font-mono">
+              <div class="text-white font-semibold">${l.id}</div>
+              <div class="text-[9px] text-white/40 mt-0.5">${l.date}</div>
+            </td>
+
+            <!-- Package Name / Payload Size -->
+            <td class="p-4">
+              <div class="flex items-center space-x-2">
+                <i data-lucide="file-text" class="w-4 h-4 text-white/40 flex-shrink-0"></i>
+                <div class="truncate max-w-[220px] font-medium text-white/90" title="${l.packageName}">${l.packageName}</div>
+              </div>
+              <div class="text-[10px] text-white/40 font-mono mt-0.5 pl-6">Size: ${l.payloadSize}</div>
+            </td>
+
+            <!-- Location info -->
+            <td class="p-4 font-mono text-[11px]">
+              <div class="text-white flex items-center gap-1.5">
+                <i data-lucide="globe" class="w-3.5 h-3.5 text-prism-blue"></i>
+                <span>${l.geoCountry} (${l.geoState})</span>
+              </div>
+              <div class="text-[10px] text-white/40 mt-0.5 pl-5">${l.recipientIp}</div>
+            </td>
+
+            <!-- Action Tag -->
+            <td class="p-4">
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono bg-white/5 border border-white/10 text-white/80">
+                ${l.actionType}
+              </span>
+            </td>
+
+            <!-- Anomaly Rating Indicator -->
+            <td class="p-4">
+              ${isFlagged ? `
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono bg-prism-yellow/10 border border-prism-yellow/30 text-prism-yellow font-bold uppercase tracking-wider">
+                  <span class="w-1.5 h-1.5 rounded-full bg-prism-yellow animate-pulse"></span>
+                  Flagged
+                </span>
+              ` : `
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono bg-prism-green/10 border border-prism-green/20 text-prism-green/80 uppercase">
+                  <span class="w-1 h-1 rounded-full bg-prism-green"></span>
+                  Clear
+                </span>
+              `}
+            </td>
+
+            <!-- Real-time Handshake Status -->
+            <td class="p-4 text-center">
+              ${isActive ? `
+                <div class="inline-flex items-center justify-center space-x-1">
+                  <span class="w-2 h-2 rounded-full bg-prism-green status-pulse"></span>
+                  <span class="text-[10px] font-mono uppercase text-prism-green font-bold">Secure Tunnel</span>
+                </div>
+              ` : `
+                <div class="inline-flex items-center justify-center space-x-1">
+                  <span class="w-2 h-2 rounded-full bg-prism-red"></span>
+                  <span class="text-[10px] font-mono uppercase text-prism-red font-medium">Severed</span>
+                </div>
+              `}
+            </td>
+
+            <!-- Switch control toggle -->
+            <td class="p-4 pr-6 text-right">
+              <label class="relative inline-flex items-center justify-end cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  ${isActive ? 'checked' : ''} 
+                  onchange="handleToggleState('${l.id}', this.checked)"
+                  class="sr-only peer toggle-switch"
+                >
+                <div class="w-10 h-5 bg-prism-charcoal rounded-full border border-white/10 peer peer-checked:bg-prism-green/20 transition-all duration-300 toggle-bg relative">
+                  <div class="absolute top-0.5 left-0.5 w-3.5 h-3.5 bg-white/80 rounded-full transition-transform duration-300 transform peer-checked:translate-x-5 toggle-dot"></div>
+                </div>
+              </label>
+            </td>
+
+          </tr>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    // Timestamp Setup
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+    // DOM Initial launch
+    window.addEventListener('DOMContentLoaded', () => {
+      resetAuditFilters();
+      updateActiveTunnelsMetric();
+    });
+  </script>
+
+  <!-- HANDSHAKE MATRIX ANIMATED CANVAS -->
+  <script>
+    const canvas = document.getElementById('securityCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    let mouse = { x: canvas.width * 0.5, y: canvas.height * 0.5 };
+    canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+    });
+
+    // Create randomized floating transmission network nodes
+    const nodes = [];
+    const nodeCount = 18;
+    for (let i = 0; i < nodeCount; i++) {
+      nodes.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.6,
+        vy: (Math.random() - 0.5) * 0.6,
+        radius: Math.random() * 2 + 1.5,
+        type: Math.random() > 0.8 ? 'red' : 'blue'
+      });
+    }
+
+    function drawNetwork() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Canvas background clean structure
+      ctx.fillStyle = "rgba(11, 15, 25, 0.3)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Draw standard connection mesh grid points
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.03)";
+      ctx.lineWidth = 0.5;
+      const step = 25;
+      for (let x = 0; x < canvas.width; x += step) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < canvas.height; y += step) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+
+      // Draw the firewall core element (The prism circle centerpiece)
+      const centerX = canvas.width * 0.5;
+      const centerY = canvas.height * 0.5;
+      const coreRadius = 40;
+
+      // Draw animated outer shield
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, coreRadius + Math.sin(Date.now() * 0.003) * 5, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(0, 240, 255, 0.15)";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Draw glass container core
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, coreRadius - 10, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(11, 15, 25, 0.8)";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+      ctx.stroke();
+
+      // Center laser anchor points
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
+      ctx.fillStyle = "#ff2e93";
+      ctx.fill();
+
+      // Update and connect nodes
+      nodes.forEach((node, idx) => {
+        // Move coordinates
+        node.x += node.vx;
+        node.y += node.vy;
+
+        // Bounce triggers
+        if (node.x < 0 || node.x > canvas.width) node.vx *= -1;
+        if (node.y < 0 || node.y > canvas.height) node.vy *= -1;
+
+        // Draw points
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+        ctx.fillStyle = node.type === 'red' ? '#ff2e93' : '#00f0ff';
+        ctx.fill();
+
+        // Connect nodes close to each other
+        for (let j = idx + 1; j < nodes.length; j++) {
+          const nextNode = nodes[j];
+          const dist = Math.hypot(node.x - nextNode.x, node.y - nextNode.y);
+          if (dist < 100) {
+            ctx.beginPath();
+            ctx.moveTo(node.x, node.y);
+            ctx.lineTo(nextNode.x, nextNode.y);
+            ctx.strokeStyle = node.type === 'red' 
+              ? 'rgba(255, 46, 147, 0.06)' 
+              : 'rgba(0, 240, 255, 0.06)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+
+        // Draw secure link from mouse to nearest nodes
+        const mouseDist = Math.hypot(node.x - mouse.x, node.y - mouse.y);
+        if (mouseDist < 120) {
+          ctx.beginPath();
+          ctx.moveTo(mouse.x, mouse.y);
+          ctx.lineTo(node.x, node.y);
+          ctx.strokeStyle = 'rgba(0, 255, 135, 0.2)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+
+        // Connect outer nodes toward central prism core
+        const coreDist = Math.hypot(node.x - centerX, node.y - centerY);
+        if (coreDist < 140) {
+          ctx.beginPath();
+          ctx.moveTo(centerX, centerY);
+          ctx.lineTo(node.x, node.y);
+          ctx.strokeStyle = 'rgba(139, 92, 246, 0.08)';
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      });
+
+      // Pointer interactive scan circle
+      ctx.beginPath();
+      ctx.arc(mouse.x, mouse.y, 45, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(0, 255, 135, 0.12)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      requestAnimationFrame(drawNetwork);
+    }
+
+    // Run animation matrix
+    drawNetwork();
+  </script>
+
+</body>
+</html>
+```

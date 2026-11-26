@@ -1,0 +1,496 @@
+/* 
+ * COMMAND CENTER TERMINAL (LIVE STATUS & API TELEMETRY)
+ * Custom styles for the high-impact cyberpunk fintech dashboard
+ */
+
+:root {
+    --provider-openai: var(--green);
+    --provider-gemini: var(--magenta);
+    --provider-anthropic: var(--orange);
+    --provider-cohere: var(--cyan);
+}
+
+/* Main Terminal Container */
+.cmd-terminal {
+    background-color: var(--carbon-black);
+    border: var(--border-width) solid var(--off-white);
+    box-shadow: 10px 10px 0 var(--base-black);
+    margin-top: 3rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.cmd-terminal::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(
+        to bottom,
+        rgba(182, 255, 0, 0.03) 0%,
+        rgba(5, 5, 5, 0) 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Terminal Header */
+.cmd-header {
+    background-color: var(--graphite);
+    border-bottom: var(--border-width) solid var(--off-white);
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.cmd-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cmd-status-indicator {
+    width: 12px;
+    height: 12px;
+    background-color: var(--green);
+    border: 2px solid var(--base-black);
+    box-shadow: 0 0 10px var(--green);
+    animation: terminal-pulse 1.2s infinite;
+}
+
+@keyframes terminal-pulse {
+    0% { transform: scale(1); opacity: 1; box-shadow: 0 0 4px var(--green); }
+    50% { transform: scale(1.2); opacity: 0.6; box-shadow: 0 0 12px var(--green); }
+    100% { transform: scale(1); opacity: 1; box-shadow: 0 0 4px var(--green); }
+}
+
+.cmd-title {
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    color: var(--off-white);
+}
+
+.cmd-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.cmd-btn-small {
+    background: transparent;
+    border: 2px solid var(--off-white);
+    color: var(--off-white);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: bold;
+    transition: all 0.15s;
+}
+
+.cmd-btn-small:hover {
+    background: var(--off-white);
+    color: var(--base-black);
+    transform: translate(-1px, -1px);
+    box-shadow: 2px 2px 0 var(--magenta);
+}
+
+/* Live Telemetry Layout */
+.cmd-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    border-bottom: var(--border-width) solid var(--off-white);
+}
+
+@media (max-width: 1024px) {
+    .cmd-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.cmd-main-panel {
+    padding: 1.5rem;
+    border-right: var(--border-width) solid var(--off-white);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+    .cmd-main-panel {
+        border-right: none;
+        border-bottom: var(--border-width) solid var(--off-white);
+    }
+}
+
+.cmd-side-panel {
+    padding: 1.5rem;
+    background-color: rgba(23, 24, 33, 0.4);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* API Telemetry (Latency Cards) */
+.telemetry-section-title {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--cyan);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.telemetry-section-title::before {
+    content: "■";
+    color: var(--cyan);
+}
+
+.api-latency-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.api-card {
+    background-color: var(--graphite);
+    border: 2px solid var(--graphite);
+    border-left: 6px solid var(--provider-color, var(--off-white));
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: transform 0.15s;
+}
+
+.api-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--off-white);
+}
+
+.api-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.api-name {
+    font-family: var(--font-sans);
+    font-weight: 900;
+    font-size: 1rem;
+    text-transform: uppercase;
+}
+
+.api-ping {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--green);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.api-ping.high-latency {
+    color: var(--orange);
+}
+
+.api-ping.error-state {
+    color: var(--red);
+}
+
+.api-ping-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: currentColor;
+}
+
+.api-latency-bar-container {
+    height: 6px;
+    background-color: var(--base-black);
+    border: 1px solid rgba(244, 241, 232, 0.1);
+    position: relative;
+    margin-top: 4px;
+}
+
+.api-latency-bar {
+    height: 100%;
+    background-color: var(--provider-color, var(--off-white));
+    width: 0%;
+    transition: width 0.6s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.api-metrics {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: rgba(244, 241, 232, 0.5);
+    margin-top: 2px;
+}
+
+/* Active Executions Queue */
+.queue-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.queue-item {
+    background-color: var(--base-black);
+    border: 2px solid var(--graphite);
+    padding: 0.8rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.queue-item.active {
+    border-color: var(--magenta);
+}
+
+.queue-item.active::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 4px;
+    background-color: var(--magenta);
+}
+
+.queue-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 2;
+}
+
+.queue-agent-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.queue-subtext {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: rgba(244, 241, 232, 0.5);
+}
+
+.queue-progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 140px;
+    z-index: 2;
+}
+
+@media (max-width: 480px) {
+    .queue-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .queue-progress-wrap {
+        width: 100%;
+    }
+}
+
+.queue-progress-bar {
+    flex-grow: 1;
+    height: 10px;
+    background-color: var(--graphite);
+    border: 1px solid var(--off-white);
+    position: relative;
+    overflow: hidden;
+}
+
+.queue-progress-fill {
+    height: 100%;
+    background-color: var(--green);
+    width: 0%;
+    transition: width 0.4s ease;
+    background-image: linear-gradient(
+        45deg,
+        rgba(5, 5, 5, 0.15) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(5, 5, 5, 0.15) 50%,
+        rgba(5, 5, 5, 0.15) 75%,
+        transparent 75%,
+        transparent
+    );
+    background-size: 15px 15px;
+    animation: queue-bar-stripes 1s linear infinite;
+}
+
+@keyframes queue-bar-stripes {
+    0% { background-position: 0 0; }
+    100% { background-position: 15px 0; }
+}
+
+.queue-percent {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: var(--green);
+    min-width: 35px;
+    text-align: right;
+}
+
+/* Live Currency & Funding Trend Ticker */
+.ticker-wrap {
+    background-color: var(--base-black);
+    border-top: var(--border-width) solid var(--off-white);
+    height: 40px;
+    overflow: hidden;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+}
+
+.ticker-title {
+    background-color: var(--magenta);
+    color: var(--base-black);
+    font-family: var(--font-mono);
+    font-weight: 900;
+    font-size: 0.75rem;
+    padding: 0 1.2rem;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    border-right: var(--border-width) solid var(--off-white);
+    z-index: 10;
+}
+
+.ticker-track {
+    display: inline-flex;
+    animation: ticker-slide 25s linear infinite;
+    padding-left: 100%;
+}
+
+.ticker-track:hover {
+    animation-play-state: paused;
+}
+
+@keyframes ticker-slide {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-100%, 0, 0); }
+}
+
+.ticker-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 2rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--off-white);
+}
+
+.ticker-item span.up {
+    color: var(--green);
+    font-weight: bold;
+}
+
+.ticker-item span.down {
+    color: var(--red);
+    font-weight: bold;
+}
+
+/* System Log Simulator Panel */
+.sys-log-box {
+    background-color: rgba(5, 5, 5, 0.9);
+    border: 2px solid var(--graphite);
+    padding: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--off-white);
+    height: 250px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    scroll-behavior: smooth;
+}
+
+.sys-log-line {
+    line-height: 1.4;
+    display: flex;
+    gap: 8px;
+    word-break: break-all;
+}
+
+.sys-log-time {
+    color: var(--cyan);
+    flex-shrink: 0;
+}
+
+.sys-log-tag {
+    font-weight: bold;
+    padding: 0 4px;
+    border-radius: 0;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+}
+
+.sys-log-tag.info { background-color: rgba(0, 229, 255, 0.1); color: var(--cyan); border: 1px solid var(--cyan); }
+.sys-log-tag.warn { background-color: rgba(255, 122, 0, 0.1); color: var(--orange); border: 1px solid var(--orange); }
+.sys-log-tag.success { background-color: rgba(182, 255, 0, 0.1); color: var(--green); border: 1px solid var(--green); }
+.sys-log-tag.error { background-color: rgba(255, 23, 68, 0.1); color: var(--red); border: 1px solid var(--red); }
+
+.sys-log-message {
+    color: rgba(244, 241, 232, 0.85);
+}
+
+/* Mini Visual Diagnostics Grid */
+.mini-diag-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.mini-diag-card {
+    background: var(--graphite);
+    border: 2px solid var(--graphite);
+    padding: 0.8rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 5px;
+}
+
+.mini-diag-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: rgba(244, 241, 232, 0.5);
+    text-transform: uppercase;
+}
+
+.mini-diag-value {
+    font-size: 1.3rem;
+    font-weight: 900;
+    font-family: var(--font-mono);
+    color: var(--yellow);
+}
+
+/* Glitch effects for visual elements (optional trigger classes) */
+.glitch-trigger:hover .cmd-title {
+    animation: text-glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+}
+
+@keyframes text-glitch {
+    0% { transform: translate(0); text-shadow: none; }
+    20% { transform: translate(-2px, 2px); text-shadow: -2px -2px 0 var(--magenta), 2px 2px 0 var(--cyan); }
+    40% { transform: translate(-2px, -2px); text-shadow: 2px -2px 0 var(--magenta), -2px 2px 0 var(--cyan); }
+    60% { transform: translate(2px, 2px); text-shadow: -2px 2px 0 var(--magenta), 2px -2px 0 var(--cyan); }
+    80% { transform: translate(2px, -2px); text-shadow: 2px 2px 0 var(--magenta), -2px -2px 0 var(--cyan); }
+    100% { transform: translate(0); text-shadow: none; }
+}

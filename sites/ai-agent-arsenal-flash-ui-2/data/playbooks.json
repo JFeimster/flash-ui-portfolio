@@ -1,0 +1,152 @@
+[
+  {
+    "id": "playbook-01",
+    "title": "Bridge CustomGPT to Make.com Webhook Routing",
+    "subtitle": "Convert AI conversations into structured database actions in real time.",
+    "category": "Make.com Automation",
+    "executionTime": "5 mins",
+    "difficulty": "Intermediate",
+    "summary": "Establish a reliable, authenticated bridge between a CustomGPT conversation and a Make.com (formerly Integromat) custom webhook scenario. Stops customer bleed and captures lead payloads instantly.",
+    "command": "deploy_webhook_bridge --endpoint make_live_081",
+    "steps": [
+      {
+        "stepNumber": 1,
+        "title": "Configure Make.com Webhook Trigger",
+        "instructions": "Create a new Scenario in Make.com. Add a 'Custom Webhook' module. Copy the unique URL generated (e.g., https://hook.us1.make.com/xxxxxx)."
+      },
+      {
+        "stepNumber": 2,
+        "title": "Establish the OpenAPI Action Schema",
+        "instructions": "In your CustomGPT editor, scroll to 'Actions' and select 'Create New Action'. Paste the custom JSON Schema, substituting your specific Make.com endpoint path."
+      },
+      {
+        "stepNumber": 3,
+        "title": "Inject Authentication Parameters",
+        "instructions": "Set the authentication type to 'API Key' in the CustomGPT Actions interface. Choose 'Header' as the positioning, using parameter name 'Authorization'. Make sure to validate this token inside Make.com's router block."
+      },
+      {
+        "stepNumber": 4,
+        "title": "Force-Test Payload Delivery",
+        "instructions": "Run a test query in the GPT preview pane, e.g., 'Submit lead: John Doe, 50k MRR, phone 555-0199'. Confirm Make.com successfully parses the incoming JSON packet with 200 OK status."
+      }
+    ],
+    "codeSnippet": "{\n  \"openapi\": \"3.1.0\",\n  \"info\": {\n    \"title\": \"Make Webhook Dispatcher\",\n    \"version\": \"1.0.0\"\n  },\n  \"paths\": {\n    \"/hooks/live-routing\": {\n      \"post\": {\n        \"summary\": \"Dispatch payload containing user telemetry metrics\",\n        \"operationId\": \"dispatchTelemetry\",\n        \"requestBody\": {\n          \"required\": true,\n          \"content\": {\n            \"application/json\": {\n              \"schema\": {\n                \"type\": \"object\",\n                \"properties\": {\n                  \"operatorName\": { \"type\": \"string\" },\n                  \"monthlyRevenue\": { \"type\": \"number\" },\n                  \"fundingNeed\": { \"type\": \"number\" },\n                  \"contactEmail\": { \"type\": \"string\", \"format\": \"email\" }\n                },\n                \"required\": [\"operatorName\", \"monthlyRevenue\", \"contactEmail\"]\n              }\n            }\n          }\n        },\n        \"responses\": {\n          \"200\": {\n            \"description\": \"Payload committed to operator CRM database.\"\n          }\n        }\n      }\n    }\n  }\n}",
+    "tags": ["custom-gpt", "make", "webhooks", "automation", "crm-routing"]
+  },
+  {
+    "id": "playbook-02",
+    "title": "White-Label Gemini API Apps for Local Businesses",
+    "subtitle": "Pack high-context Google LLM models into clean, lightweight local lead generation nodes.",
+    "category": "Gemini White-label",
+    "executionTime": "10 mins",
+    "difficulty": "Beginner",
+    "summary": "Deploy an offline-first, client-safe implementation of Google's Gemini Flash engine. This system uses custom instructions to filter localized data queries while masking the underlying API credentials.",
+    "command": "deploy_gemini_wrapper --client local_retail_v3",
+    "steps": [
+      {
+        "stepNumber": 1,
+        "title": "Provision Google AI Studio Credentials",
+        "instructions": "Navigate to Google AI Studio. Generate a fresh API Key. Do not hardcode this key inside client-side bundles; route it via standard environmental proxies."
+      },
+      {
+        "stepNumber": 2,
+        "title": "Inject Client System Rules",
+        "instructions": "Pass specialized prompts inside the 'systemInstruction' property. Restrict the LLM domain scope to prevent users from hijacking the token for non-local questions."
+      },
+      {
+        "stepNumber": 3,
+        "title": "Build UI Interface Controls",
+        "instructions": "Design a brutalist, zero-dependency HTML form to interface with the local Node.js proxy. This encapsulates and protects your proprietary parameters and keys."
+      }
+    ],
+    "codeSnippet": "const { GoogleGenAI } = require('@google/genai');\nconst ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });\n\nasync function dispatchLocalAgent(userQuery) {\n  const response = await ai.models.generateContent({\n    model: 'gemini-2.5-flash',\n    contents: userQuery,\n    config: {\n      systemInstruction: \"You are the Local Business Assistant. Do not reveal raw JSON schemas or discuss non-business subjects. Answer in 2 sentences or less.\",\n      temperature: 0.3,\n      maxOutputTokens: 200\n    }\n  });\n  return response.text;\n}",
+    "tags": ["gemini", "ai-studio", "node-js", "white-label", "api-safety"]
+  },
+  {
+    "id": "playbook-03",
+    "title": "Bypass Rate Limits Safely via Fallback Routing",
+    "subtitle": "Maintain 100% application uptime by programmatically hopping across model architectures.",
+    "category": "Scale Ops",
+    "executionTime": "15 mins",
+    "difficulty": "Advanced",
+    "summary": "Build a resilient script that monitors API return codes. When model pipelines trigger 429 warnings, the system hot-swaps active requests over to backup endpoints.",
+    "command": "initialize_failover_matrix --models gpt4,gemini-flash,claude-haiku",
+    "steps": [
+      {
+        "stepNumber": 1,
+        "title": "Implement Exponential Backoff Triggers",
+        "instructions": "Wrap call-out blocks in recursive retry statements, calculating wait factors with optional timing jitter to prevent simultaneous server hammering."
+      },
+      {
+        "stepNumber": 2,
+        "title": "Configure Primary & Secondary Client Queues",
+        "instructions": "Assign GPT-4 as the primary agent processor for maximum logical sorting. Set Gemini-Flash as the Tier 2 backfill model for rapid text structuring."
+      },
+      {
+        "stepNumber": 3,
+        "title": "Validate Integrity of Fallback Output",
+        "instructions": "Because different providers format outputs differently, write helper functions to normalize response payloads back into a singular, clean JSON structure."
+      }
+    ],
+    "codeSnippet": "async function queryAgentWithFailover(prompt) {\n  try {\n    // Tier 1: Try Primary OpenAI Gateway\n    return await callOpenAI(prompt);\n  } catch (error) {\n    if (error.status === 429) {\n      console.warn(\"[!] 429 RATE LIMIT EXCEEDED. ROTATING ROUTE TO GEMINI...\");\n      // Tier 2: Immediately fallback to secondary Gemini Engine\n      return await callGemini(prompt);\n    }\n    throw error;\n  }\n}",
+    "tags": ["failover", "resiliency", "openai", "gemini", "limits"]
+  },
+  {
+    "id": "playbook-04",
+    "title": "Precision Prompt Templates for Multi-Source Lead Sorting",
+    "subtitle": "Convert loose, raw transcripts from customer outreach into high-yield lead scoring parameters.",
+    "category": "Prompt Engineering",
+    "executionTime": "5 mins",
+    "difficulty": "Beginner",
+    "summary": "Eliminate expensive data parsing software. Use a strict structural markdown format to force any standard chat model to output predictable machine-readable tables.",
+    "command": "compile_meta_prompt --target scoring_engine",
+    "steps": [
+      {
+        "stepNumber": 1,
+        "title": "Isolate Raw Input Logs",
+        "instructions": "Place unstructured chat transcripts or scraped outreach replies in the specified tag container <RAW_TRANSCRIPT> to separate operational data from the core instructions."
+      },
+      {
+        "stepNumber": 2,
+        "title": "Deploy the Structured Parser Instruction",
+        "instructions": "Paste the structured prompt framework directly inside your CustomGPT or Gemini instruction matrix. This forces the model to ignore conversational fluff."
+      },
+      {
+        "stepNumber": 3,
+        "title": "Set Validation Rules",
+        "instructions": "Instruct the model to output a score of 0 for any missing variables, keeping your downstream databases clean and error-free."
+      }
+    ],
+    "codeSnippet": "system_rules: [\n  \"Analyze raw text records and produce structured JSON output.\",\n  \"Rules: Do not write explanations. Do not use formatting outside of raw JSON code block.\"\n]\nprompt_template: `\n  Analyze the transcript inside <RAW_TRANSCRIPT> tags.\n  Extract the following data into valid JSON:\n  {\n    \"leadScore\": (integer 1-100 scale, based on urgency and capital capacity),\n    \"hasFundingHistory\": (boolean),\n    \"primaryHurdle\": (string describing the main bottleneck),\n    \"recommendedFundingTrack\": (SBA | MCA | Asset | None)\n  }\n  <RAW_TRANSCRIPT>\n  {{user_raw_data}}\n  </RAW_TRANSCRIPT>\n`",
+    "tags": ["prompt-engineering", "lead-scoring", "extraction", "json-output"]
+  },
+  {
+    "id": "playbook-05",
+    "title": "Database Scraping Normalizer for BizCredit Building",
+    "subtitle": "Scrape public registration sites, analyze entity statuses, and isolate high-probability corporate prospects.",
+    "category": "Scale Ops",
+    "executionTime": "15 mins",
+    "difficulty": "Advanced",
+    "summary": "Write a lightweight, reliable parser that accepts messy, raw scraping logs from local business directories and spits out formatted Dun & Bradstreet application readiness data.",
+    "command": "normalize_directory --input scrape_v9.csv --output active_targets.json",
+    "steps": [
+      {
+        "stepNumber": 1,
+        "title": "Examine raw data inputs",
+        "instructions": "Export scraped lists from your custom tools or third-party scrapers, focusing on fields like legal name, filing dates, and current corporate standings."
+      },
+      {
+        "stepNumber": 2,
+        "title": "Format and filter",
+        "instructions": "Run the sorting logic script to remove inactive LLCs, foreign entities without local physical branches, and addresses matched to known virtual mailboxes."
+      },
+      {
+        "stepNumber": 3,
+        "title": "Flag credit readiness status",
+        "instructions": "Use standard validation regex to flag listings with invalid phone profiles, mismatched business names, or missing tax IDs."
+      }
+    ],
+    "codeSnippet": "function checkCorporateProfile(scrapedRow) {\n  const virtualBoxBlacklist = [/p\\.o\\.\\s+box/i, /ups\\s+store/i, /pmb/i];\n  const isVirtualAddress = virtualBoxBlacklist.some(rx => rx.test(scrapedRow.address));\n  const hasCleanPhone = /^\\+?[1-9]\\d{1,14}$/.test(scrapedRow.phone.replace(/\\D/g, \"\"));\n\n  return {\n    legalName: scrapedRow.name.toUpperCase().trim(),\n    creditRatingTrack: (hasCleanPhone && !isVirtualAddress) ? \"HIGH_PROBABILITY\" : \"REQUIRES_REMEDIATION\",\n    issuesDetected: {\n      virtualAddress: isVirtualAddress,\n      unverifiedPhone: !hasCleanPhone\n    }\n  };\n}",
+    "tags": ["business-credit", "scraping", "normalization", "lead-qualification"]
+  }
+]

@@ -1,0 +1,1027 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Prompt Armament // System Prompt & Blueprint Vault</title>
+    <!-- Google Fonts for High-Impact Brutalism -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Space+Grotesk:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --base-black: #050505;
+            --carbon-black: #0A0B0F;
+            --graphite: #171821;
+            --off-white: #F4F1E8;
+            
+            /* Accents */
+            --cyan: #00E5FF;
+            --green: #B6FF00;
+            --magenta: #FF2BD6;
+            --orange: #FF7A00;
+            --yellow: #FFE600;
+            --red: #FF1744;
+            --blue: #245BFF;
+            
+            --font-sans: 'Space Grotesk', -apple-system, sans-serif;
+            --font-mono: 'Share Tech Mono', monospace;
+            --border-width: 3px;
+        }
+
+        /* Reset & Base Styling */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        ::-moz-selection { background: var(--magenta); color: var(--base-black); }
+        ::selection { background: var(--magenta); color: var(--base-black); }
+
+        body {
+            background-color: var(--base-black);
+            color: var(--off-white);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+            line-height: 1.4;
+            background-image: 
+                linear-gradient(rgba(23, 24, 33, 0.4) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(23, 24, 33, 0.4) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-position: center top;
+        }
+
+        /* Cyber Overlay Scanlines */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            z-index: 99999;
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.03em;
+        }
+
+        .mono-text {
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Header Navigation */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background-color: var(--carbon-black);
+            border-bottom: var(--border-width) solid var(--off-white);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .logo-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--off-white);
+        }
+
+        .logo-box {
+            background-color: var(--magenta);
+            color: var(--base-black);
+            font-family: var(--font-mono);
+            font-weight: 900;
+            padding: 0.3rem 0.6rem;
+            border: var(--border-width) solid var(--base-black);
+            box-shadow: 3px 3px 0 var(--off-white);
+            transform: rotate(-2deg);
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: -0.05em;
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 2px solid var(--graphite);
+            padding: 4px 12px;
+            background: rgba(23, 24, 33, 0.8);
+            font-size: 0.8rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--magenta);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--magenta);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-brutal {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--off-white);
+            color: var(--base-black);
+            border: var(--border-width) solid var(--base-black);
+            padding: 0.6rem 1.2rem;
+            font-weight: 700;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            box-shadow: 4px 4px 0 var(--orange);
+            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            font-family: var(--font-sans);
+        }
+
+        .btn-brutal:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 var(--cyan);
+        }
+
+        .btn-brutal:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0 var(--magenta);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--off-white);
+            border-color: var(--off-white);
+            box-shadow: 4px 4px 0 var(--graphite);
+        }
+
+        /* Main Workspace Layout */
+        .workspace-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            border-bottom: var(--border-width) solid var(--off-white);
+        }
+
+        @media (max-width: 1024px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* System Architecture Section */
+        .architecture-banner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem 0 2rem;
+        }
+
+        .arch-title-wrap {
+            border-left: 5px solid var(--cyan);
+            padding-left: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Pure CSS Grid System Architecture Diagram */
+        .diagram-container {
+            border: var(--border-width) solid var(--off-white);
+            background: var(--carbon-black);
+            padding: 2rem;
+            box-shadow: 8px 8px 0 var(--cyan);
+            margin-bottom: 4rem;
+        }
+
+        .arch-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            position: relative;
+        }
+
+        @media (max-width: 768px) {
+            .arch-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .arch-node {
+            background: var(--graphite);
+            border: 2px solid var(--off-white);
+            padding: 1.5rem;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 180px;
+            box-shadow: 4px 4px 0 var(--graphite);
+            transition: all 0.2s;
+        }
+
+        .arch-node:hover {
+            border-color: var(--cyan);
+            box-shadow: 6px 6px 0 var(--cyan);
+            transform: translateY(-2px);
+        }
+
+        .node-num {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--yellow);
+            border-bottom: 1px dashed rgba(244, 241, 232, 0.2);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .node-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--off-white);
+            margin-bottom: 0.5rem;
+        }
+
+        .node-desc {
+            font-size: 0.8rem;
+            color: rgba(244, 241, 232, 0.7);
+        }
+
+        .node-connector {
+            position: absolute;
+            font-family: var(--font-mono);
+            color: var(--magenta);
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Interactive Parameter Panel */
+        .control-panel {
+            border: var(--border-width) solid var(--off-white);
+            background: var(--carbon-black);
+            padding: 2rem;
+            box-shadow: 10px 10px 0 var(--green);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .control-header {
+            border-bottom: 3px solid var(--off-white);
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .parameter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .param-label {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--green);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .param-input {
+            background-color: var(--graphite);
+            border: 2px solid var(--off-white);
+            color: var(--off-white);
+            padding: 0.8rem;
+            font-family: var(--font-sans);
+            font-weight: bold;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.15s;
+        }
+
+        .param-input:focus {
+            border-color: var(--magenta);
+            background-color: var(--base-black);
+            box-shadow: 3px 3px 0 var(--magenta);
+        }
+
+        /* Live Preview Output Panel */
+        .preview-panel {
+            border: var(--border-width) solid var(--off-white);
+            background: var(--base-black);
+            padding: 2rem;
+            box-shadow: 10px 10px 0 var(--magenta);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 500px;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px dashed var(--graphite);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .preview-container {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            color: var(--green);
+            line-height: 1.5;
+            white-space: pre-wrap;
+            background: var(--graphite);
+            border: 1px solid var(--magenta);
+            padding: 1.5rem;
+            overflow-y: auto;
+            max-height: 450px;
+            flex-grow: 1;
+            margin-bottom: 1.5rem;
+        }
+
+        .preview-container mark {
+            background: var(--magenta);
+            color: var(--base-black);
+            font-weight: bold;
+            padding: 0 4px;
+        }
+
+        .workspace-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Directory of Templates & Blueprints */
+        .blueprint-vault {
+            background: var(--carbon-black);
+            border-top: var(--border-width) solid var(--off-white);
+            padding: 6rem 2rem;
+        }
+
+        .vault-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .vault-header {
+            margin-bottom: 4rem;
+        }
+
+        .vault-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 2rem;
+        }
+
+        @media (max-width: 480px) {
+            .vault-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .blueprint-card {
+            background: var(--base-black);
+            border: var(--border-width) solid var(--off-white);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            transition: all 0.2s;
+            box-shadow: 6px 6px 0 var(--graphite);
+        }
+
+        .blueprint-card:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 10px 10px 0 var(--orange);
+        }
+
+        .blueprint-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .badge-list {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .p-badge {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border: 1px solid currentColor;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .p-xml { color: var(--cyan); }
+        .p-system { color: var(--yellow); }
+        .p-agent { color: var(--magenta); }
+
+        .blueprint-title {
+            font-size: 1.6rem;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+
+        .blueprint-desc {
+            color: rgba(244, 241, 232, 0.7);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+
+        .blueprint-footer {
+            border-top: 1px solid var(--graphite);
+            padding-top: 1.5rem;
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Success Alert Flash */
+        .toast-notification {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            background: var(--green);
+            color: var(--base-black);
+            font-family: var(--font-mono);
+            font-weight: bold;
+            padding: 1rem 2rem;
+            border: var(--border-width) solid var(--base-black);
+            box-shadow: 5px 5px 0 var(--off-white);
+            z-index: 10000;
+            display: none;
+            animation: slideIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Footer Elements */
+        footer {
+            background-color: var(--base-black);
+            padding: 4rem 2rem;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            border-top: var(--border-width) solid var(--off-white);
+        }
+
+        .footer-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .footer-copyright {
+            color: rgba(244, 241, 232, 0.4);
+        }
+
+        .footer-links-title {
+            color: var(--cyan);
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+        }
+
+        .footer-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .footer-list a {
+            color: rgba(244, 241, 232, 0.7);
+            text-decoration: none;
+            transition: color 0.15s;
+        }
+
+        .footer-list a:hover {
+            color: var(--magenta);
+            text-decoration: underline;
+        }
+
+        /* Back to top brutalist style button */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 99;
+            background: var(--yellow);
+            color: var(--base-black);
+            border: 2px solid var(--base-black);
+            font-weight: 900;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 3px 3px 0 var(--base-black);
+            text-decoration: none;
+        }
+
+        .back-to-top:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0 var(--magenta);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- STICKY NAVIGATION -->
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo-wrap">
+                <div class="logo-box">A.A.A.</div>
+                <div class="logo-text">PROMPT ARMAMENT</div>
+            </a>
+            
+            <div class="system-status">
+                <div class="status-pill">
+                    <div class="status-dot"></div>
+                    <span class="mono-text">COMPILER: ACTIVE</span>
+                </div>
+                <div class="status-pill" style="border-color: var(--cyan);">
+                    <span class="mono-text" style="color: var(--cyan);">v2.1.0-beta</span>
+                </div>
+            </div>
+
+            <div class="nav-links">
+                <a href="index.html" class="btn-brutal btn-secondary mono-text">The Directory</a>
+                <a href="https://github.com/jasonfeimster/ai-agent-arsenal" target="_blank" rel="noopener noreferrer" class="btn-brutal mono-text">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                    Source Repo
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- SYSTEM DIAGRAM BANNER -->
+    <section class="architecture-banner">
+        <div class="arch-title-wrap">
+            <div class="mono-text" style="color: var(--cyan); font-weight: bold; margin-bottom: 0.5rem;">// PIPELINE VISUALIZATION</div>
+            <h2 style="font-size: clamp(2rem, 4vw, 3rem); line-height: 1;">PROMPT SYSTEM ARCHITECTURE</h2>
+            <p style="color: rgba(244, 241, 232, 0.7); max-width: 800px; margin-top: 0.5rem;">
+                Our system blueprints wrap conversational engines inside XML diagnostic filters, enforcing rigorous constraints before invoking backend actions.
+            </p>
+        </div>
+
+        <!-- DIAGRAM GRID -->
+        <div class="diagram-container">
+            <div class="arch-grid">
+                <div class="arch-node">
+                    <div>
+                        <div class="node-num">[01] PARAMETER INTAKE</div>
+                        <h4 class="node-title">Dynamic Context Injection</h4>
+                        <p class="node-desc">Receives raw user parameters and binds them to the system scope using strong XML bounds.</p>
+                    </div>
+                </div>
+
+                <div class="arch-node">
+                    <div>
+                        <div class="node-num">[02] CONSTRAINT SANDBOX</div>
+                        <h4 class="node-title">XML Tags Boundary</h4>
+                        <p class="node-desc">Locks conversational context. Prevents prompt injection attacks, target deviation, and hallucination loops.</p>
+                    </div>
+                </div>
+
+                <div class="arch-node">
+                    <div>
+                        <div class="node-num">[03] CORE DIRECTIVE</div>
+                        <h4 class="node-title">System Role Execution</h4>
+                        <p class="node-desc">Applies optimized operational matrices, assigning target goals, tone parameters, and rules.</p>
+                    </div>
+                </div>
+
+                <div class="arch-node">
+                    <div>
+                        <div class="node-num">[04] RESPONSE SANITIZER</div>
+                        <h4 class="node-title">Evaluation Filter</h4>
+                        <p class="node-desc">Validates output structures against schema boundaries before routing down-channel.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- INTERACTIVE WORKSPACE SECTION -->
+    <section class="workspace-grid" id="compilation-chamber">
+        <!-- Control Panel (Variables) -->
+        <div class="control-panel">
+            <div class="control-header">
+                <span class="mono-text" style="color: var(--green); font-size: 1.1rem; font-weight: bold;">[COMPILATION INJECTOR]</span>
+                <p style="font-size: 0.85rem; color: rgba(244, 241, 232, 0.6); margin-top: 5px;">
+                    Inject custom operational metrics directly into system blueprints before launching.
+                </p>
+            </div>
+
+            <div class="parameter-group">
+                <label class="param-label"><span>TARGET_NICHE</span><span>Market segment</span></label>
+                <input type="text" id="input-niche" class="param-input" value="Alternative Merchant Funding">
+            </div>
+
+            <div class="parameter-group">
+                <label class="param-label"><span>COMPLIANCE_STANDARD</span><span>Legal regulatory bound</span></label>
+                <input type="text" id="input-compliance" class="param-input" value="SBA & D&B Underwriting Policies v4">
+            </div>
+
+            <div class="parameter-group">
+                <label class="param-label"><span>MAX_LIMIT</span><span>Cap threshold parameter</span></label>
+                <input type="text" id="input-limit" class="param-input" value="$2,000,000 USD">
+            </div>
+
+            <div class="parameter-group">
+                <label class="param-label"><span>OUTPUT_FORMAT</span><span>Structural format schema</span></label>
+                <input type="text" id="input-format" class="param-input" value="Strict XML schemas with mathematical confidence markers">
+            </div>
+
+            <div style="border-top: 2px dashed var(--graphite); padding-top: 1.5rem; margin-top: 1rem;">
+                <button class="btn-brutal" id="btn-recompile" style="background: var(--green); width: 100%; justify-content: center;">
+                    [COMPILE & FORCE UPDATE]
+                </button>
+            </div>
+        </div>
+
+        <!-- Live Preview Output -->
+        <div class="preview-panel">
+            <div class="preview-header">
+                <div>
+                    <span class="mono-text" style="color: var(--magenta); font-weight: bold;">[ACTIVE ARSENAL ENGINE]</span>
+                    <h3 style="font-size: 1.2rem; margin-top: 3px;" id="active-template-title">SBA Cap-Stack Matrix Parser</h3>
+                </div>
+                <span class="p-badge p-xml" id="active-template-type">XML WRAPPER</span>
+            </div>
+
+            <!-- Code output pane -->
+            <div class="preview-container" id="preview-box">
+                <!-- Javascript injects template preview here -->
+            </div>
+
+            <div class="workspace-actions">
+                <button class="btn-brutal" id="btn-copy" style="background: var(--off-white); flex-grow: 1;">
+                    Copy Structured Prompt
+                </button>
+                <button class="btn-brutal btn-secondary" id="btn-reset">
+                    Reset defaults
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- BLUEPRINT DIRECTORY -->
+    <section class="blueprint-vault">
+        <div class="vault-container">
+            <div class="vault-header">
+                <div class="mono-text" style="color: var(--orange); font-weight: bold; margin-bottom: 0.5rem;">// INTEL SYSTEM STORAGE</div>
+                <h2 style="font-size: clamp(2.5rem, 5vw, 4rem); line-height: 0.9;">THE PROMPT DIRECTORY</h2>
+                <p style="color: rgba(244, 241, 232, 0.7); max-width: 700px; margin-top: 1rem;">
+                    Deploy these battle-tested blueprint protocols. Select any weapon to load it directly into the Compiler Chamber above.
+                </p>
+            </div>
+
+            <div class="vault-grid" id="blueprint-grid">
+                <!-- Card 1 -->
+                <div class="blueprint-card" data-index="0">
+                    <div>
+                        <div class="blueprint-card-top">
+                            <div class="badge-list">
+                                <span class="p-badge p-xml">XML WRAPPER</span>
+                                <span class="p-badge p-system">CORE SYSTEM</span>
+                            </div>
+                            <span class="mono-text" style="color: var(--cyan);">[SYS-01]</span>
+                        </div>
+                        <h3 class="blueprint-title">SBA Cap-Stack Matrix Parser</h3>
+                        <p class="blueprint-desc">Engineered system instruction configuration designed to break down SBA, MCA, and venture lines into a unified diagnostic report output.</p>
+                    </div>
+                    <div class="blueprint-footer">
+                        <button class="btn-brutal btn-load-blueprint" data-index="0" style="background: var(--cyan); padding: 0.4rem 0.8rem; font-size: 0.8rem;">Load To Chamber</button>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="blueprint-card" data-index="1">
+                    <div>
+                        <div class="blueprint-card-top">
+                            <div class="badge-list">
+                                <span class="p-badge p-agent">AGENT DIRECTIVE</span>
+                                <span class="p-badge p-system">CONVERSION</span>
+                            </div>
+                            <span class="mono-text" style="color: var(--magenta);">[SYS-02]</span>
+                        </div>
+                        <h3 class="blueprint-title">Lead Gen Qualifier Blueprint</h3>
+                        <p class="blueprint-desc">Optimized validation pipeline prompt that extracts transaction metrics from raw client messages and maps funding chances.</p>
+                    </div>
+                    <div class="blueprint-footer">
+                        <button class="btn-brutal btn-load-blueprint" data-index="1" style="background: var(--magenta); padding: 0.4rem 0.8rem; font-size: 0.8rem;">Load To Chamber</button>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="blueprint-card" data-index="2">
+                    <div>
+                        <div class="blueprint-card-top">
+                            <div class="badge-list">
+                                <span class="p-badge p-xml">STRICT SCHEMA</span>
+                                <span class="p-badge p-system">DUNS-PROCEDURE</span>
+                            </div>
+                            <span class="mono-text" style="color: var(--yellow);">[SYS-03]</span>
+                        </div>
+                        <h3 class="blueprint-title">DUNS Profile Sequencer</h3>
+                        <p class="blueprint-desc">Enforces strict sequencing output structures to construct corporate credit files without breaking personal guarantees.</p>
+                    </div>
+                    <div class="blueprint-footer">
+                        <button class="btn-brutal btn-load-blueprint" data-index="2" style="background: var(--yellow); padding: 0.4rem 0.8rem; font-size: 0.8rem; color: var(--base-black);">Load To Chamber</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TOAST ALERT SYSTEM -->
+    <div class="toast-notification" id="toast">
+        [✓] BLUEPRINT COMPILED & CLIPPED TO SYSTEM MEMORY
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="logo-wrap">
+                    <div class="logo-box" style="background: var(--cyan)">A.A.A.</div>
+                    <div class="logo-text">AI AGENT ARSENAL</div>
+                </div>
+                <p style="color: rgba(244, 241, 232, 0.6); line-height: 1.6;">
+                    A decentralized public workspace and development hub containing Jason Feimster's battle-tested CustomGPTs, Gemini Gems, static tools, calculators, and system prompt matrices.
+                </p>
+                <p class="footer-copyright">
+                    &copy; <span id="current-year"></span> AI Agent Arsenal. Built for Operators. MIT License.
+                </p>
+            </div>
+
+            <div>
+                <h4 class="footer-links-title">RESOURCES</h4>
+                <ul class="footer-list">
+                    <li><a href="https://github.com/jasonfeimster/ai-agent-arsenal" target="_blank">GitHub Repo</a></li>
+                    <li><a href="index.html#directory">Interactive Search</a></li>
+                    <li><a href="https://github.com/jasonfeimster/ai-agent-arsenal#submitting" target="_blank">Submit An Agent</a></li>
+                    <li><a href="https://github.com/jasonfeimster/ai-agent-arsenal/blob/main/LICENSE" target="_blank">MIT License Details</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="footer-links-title">STACK MAP</h4>
+                <ul class="footer-list">
+                    <li><a href="index.html#directory">Custom GPT Stack</a></li>
+                    <li><a href="index.html#directory">Gemini Gems Hub</a></li>
+                    <li><a href="index.html#directory">Google AI Studio</a></li>
+                    <li><a href="index.html#directory">Prompt Engineering</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to top trigger -->
+    <a href="#" class="back-to-top" title="Back to top">↑</a>
+
+    <!-- ENGINE SCRIPTS -->
+    <script>
+        const promptBlueprints = [
+            {
+                title: "SBA Cap-Stack Matrix Parser",
+                type: "XML WRAPPER",
+                template: `<system_instructions>
+    <role_definition>
+        You are a tactical financial diagnostic assistant. Your specific operational niche is: [TARGET_NICHE].
+    </role_definition>
+    
+    <compliance_boundaries>
+        All evaluations must conform precisely to [COMPLIANCE_STANDARD].
+        Do not deviate into consumer debt restructuring advice.
+    </compliance_boundaries>
+    
+    <operational_constraints>
+        1. Limit assessment capacity strictly under [MAX_LIMIT].
+        2. Reject data files with zero historical revenue metrics.
+        3. Flag anomalous debt loads exceeding 3x monthly run-rates.
+    </operational_constraints>
+    
+    <response_schema>
+        Formulate your report structure according to: [OUTPUT_FORMAT].
+        Ensure outputs wrap critical nodes inside XML elements.
+    </response_schema>
+</system_instructions>`
+            },
+            {
+                title: "Lead Gen Qualifier Blueprint",
+                type: "AGENT DIRECTIVE",
+                template: `<agent_configuration>
+    <objective>
+        Convert conversational inbound prospects in the [TARGET_NICHE] market.
+    </objective>
+    
+    <audit_rules>
+        - Verify business parameters under current [COMPLIANCE_STANDARD] metrics.
+        - Prevent any projection calculations over the hard ceiling limit of [MAX_LIMIT].
+    </audit_rules>
+    
+    <interaction_pipeline>
+        Step 1: Parse inbound stream for metric points.
+        Step 2: Generate dynamic diagnostics based on: [OUTPUT_FORMAT].
+    </interaction_pipeline>
+</agent_configuration>`
+            },
+            {
+                title: "DUNS Profile Sequencer",
+                type: "STRICT SCHEMA",
+                template: `<duns_sequencing_protocol>
+    <context>
+        Target sequence optimization blueprint engineered specifically for: [TARGET_NICHE].
+    </context>
+    
+    <regulatory_alignment>
+        Align system execution matrices against: [COMPLIANCE_STANDARD].
+        Maximum line valuation assignment is hard capped at [MAX_LIMIT].
+    </regulatory_alignment>
+    
+    <execution_formatting>
+        Response format must strictly adhere to: [OUTPUT_FORMAT].
+    </execution_formatting>
+</duns_sequencing_protocol>`
+            }
+        ];
+
+        let activeIndex = 0;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("current-year").textContent = new Date().getFullYear();
+
+            const nicheInput = document.getElementById("input-niche");
+            const complianceInput = document.getElementById("input-compliance");
+            const limitInput = document.getElementById("input-limit");
+            const formatInput = document.getElementById("input-format");
+            
+            const previewBox = document.getElementById("preview-box");
+            const activeTitle = document.getElementById("active-template-title");
+            const activeType = document.getElementById("active-template-type");
+            
+            const btnRecompile = document.getElementById("btn-recompile");
+            const btnCopy = document.getElementById("btn-copy");
+            const btnReset = document.getElementById("btn-reset");
+            const toast = document.getElementById("toast");
+
+            function recompilePrompt() {
+                const selectedBlueprint = promptBlueprints[activeIndex];
+                
+                let rawTemplate = selectedBlueprint.template;
+                
+                // Replace variables safely
+                const parameters = {
+                    "TARGET_NICHE": nicheInput.value,
+                    "COMPLIANCE_STANDARD": complianceInput.value,
+                    "MAX_LIMIT": limitInput.value,
+                    "OUTPUT_FORMAT": formatInput.value
+                };
+
+                // Escape HTML for rendering safely in previews but preserving spacing
+                let compiledText = rawTemplate;
+                for (const [key, val] of Object.entries(parameters)) {
+                    const regex = new RegExp(`\\[${key}\\]`, 'g');
+                    compiledText = compiledText.replace(regex, val);
+                }
+
+                // Wrap injected elements in marks for visual flair inside code views
+                let visualText = rawTemplate;
+                for (const [key, val] of Object.entries(parameters)) {
+                    const regex = new RegExp(`\\[${key}\\]`, 'g');
+                    visualText = visualText.replace(regex, `<mark>${val}</mark>`);
+                }
+
+                // Inject markup safe formatting
+                previewBox.innerHTML = escapeHTML(visualText)
+                    .replace(/&lt;mark&gt;/g, "<mark>")
+                    .replace(/&lt;\/mark&gt;/g, "</mark>");
+
+                activeTitle.textContent = selectedBlueprint.title;
+                activeType.textContent = selectedBlueprint.type;
+            }
+
+            function escapeHTML(str) {
+                return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            }
+
+            function triggerToast() {
+                toast.style.display = "block";
+                setTimeout(() => {
+                    toast.style.display = "none";
+                }, 3000);
+            }
+
+            // Copy to Clipboard Action
+            btnCopy.addEventListener("click", () => {
+                // Get absolute plain text of preview box
+                const tempEl = document.createElement("textarea");
+                tempEl.value = previewBox.textContent;
+                document.body.appendChild(tempEl);
+                tempEl.select();
+                document.execCommand("copy");
+                document.body.removeChild(tempEl);
+                
+                triggerToast();
+            });
+
+            // Input interactions
+            btnRecompile.addEventListener("click", recompilePrompt);
+            
+            btnReset.addEventListener("click", () => {
+                nicheInput.value = "Alternative Merchant Funding";
+                complianceInput.value = "SBA & D&B Underwriting Policies v4";
+                limitInput.value = "$2,000,000 USD";
+                formatInput.value = "Strict XML schemas with mathematical confidence markers";
+                recompilePrompt();
+            });
+
+            // Loading Blueprint selectors
+            document.querySelectorAll(".btn-load-blueprint").forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                    activeIndex = parseInt(e.target.getAttribute("data-index"));
+                    recompilePrompt();
+                    
+                    // Smooth transition to compile station
+                    document.getElementById("compilation-chamber").scrollIntoView({
+                        behavior: "smooth"
+                    });
+                });
+            });
+
+            // Boot Setup
+            recompilePrompt();
+        });
+    </script>
+</body>
+</html>
+```

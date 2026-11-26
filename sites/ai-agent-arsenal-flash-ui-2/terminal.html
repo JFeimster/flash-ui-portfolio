@@ -1,0 +1,1110 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Command Center Terminal // Live Status & API Telemetry</title>
+    <!-- Google Fonts for High-Impact Brutalism -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Space+Grotesk:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --base-black: #050505;
+            --carbon-black: #0A0B0F;
+            --graphite: #171821;
+            --off-white: #F4F1E8;
+            
+            /* Accents */
+            --cyan: #00E5FF;
+            --green: #B6FF00;
+            --magenta: #FF2BD6;
+            --orange: #FF7A00;
+            --yellow: #FFE600;
+            --red: #FF1744;
+            --blue: #245BFF;
+            
+            --font-sans: 'Space Grotesk', -apple-system, sans-serif;
+            --font-mono: 'Share Tech Mono', monospace;
+            --border-width: 3px;
+        }
+
+        /* Reset & Base Styling */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            selection-background-color: var(--green);
+            selection-color: var(--base-black);
+        }
+        
+        ::-moz-selection { background: var(--green); color: var(--base-black); }
+        ::selection { background: var(--green); color: var(--base-black); }
+
+        body {
+            background-color: var(--base-black);
+            color: var(--off-white);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+            line-height: 1.4;
+            background-image: 
+                linear-gradient(rgba(23, 24, 33, 0.4) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(23, 24, 33, 0.4) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-position: center top;
+        }
+
+        /* Scanline Cyber Effect Overlay */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            z-index: 99999;
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+        }
+
+        /* Typography Utilities */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.03em;
+        }
+
+        .mono-text {
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Header Styling */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background-color: var(--carbon-black);
+            border-bottom: var(--border-width) solid var(--off-white);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .logo-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--off-white);
+        }
+
+        .logo-box {
+            background-color: var(--magenta);
+            color: var(--base-black);
+            font-family: var(--font-mono);
+            font-weight: 900;
+            padding: 0.3rem 0.6rem;
+            border: var(--border-width) solid var(--base-black);
+            box-shadow: 3px 3px 0 var(--off-white);
+            transform: rotate(-2deg);
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: -0.05em;
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 2px solid var(--graphite);
+            padding: 4px 12px;
+            background: rgba(23, 24, 33, 0.8);
+            font-size: 0.8rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--green);
+            animation: pulse 1.5s infinite;
+        }
+
+        .status-dot.pulsing-magenta {
+            background-color: var(--magenta);
+            box-shadow: 0 0 8px var(--magenta);
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
+
+        /* Brutalist Buttons */
+        .btn-brutal {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--off-white);
+            color: var(--base-black);
+            border: var(--border-width) solid var(--base-black);
+            padding: 0.6rem 1.2rem;
+            font-weight: 700;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            box-shadow: 4px 4px 0 var(--orange);
+            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            font-family: var(--font-sans);
+        }
+
+        .btn-brutal:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 var(--cyan);
+        }
+
+        .btn-brutal:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0 var(--magenta);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--off-white);
+            border-color: var(--off-white);
+            box-shadow: 4px 4px 0 var(--graphite);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(244, 241, 232, 0.05);
+            box-shadow: 6px 6px 0 var(--magenta);
+        }
+
+        /* Marquee Ticker */
+        .marquee-container {
+            background-color: var(--yellow);
+            color: var(--base-black);
+            border-bottom: var(--border-width) solid var(--off-white);
+            font-family: var(--font-mono);
+            font-weight: 900;
+            font-size: 0.9rem;
+            padding: 0.5rem 0;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 25s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% { transform: translate3d(100%, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+
+        /* Main Dashboard Grid */
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Panel Wrapper Styling */
+        .panel {
+            background-color: var(--carbon-black);
+            border: var(--border-width) solid var(--off-white);
+            padding: 1.5rem;
+            position: relative;
+            box-shadow: 8px 8px 0 var(--shadow-color, var(--cyan));
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px dashed var(--graphite);
+            padding-bottom: 0.75rem;
+        }
+
+        .panel-title {
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: var(--off-white);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Latency Grid elements */
+        .api-latency-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .api-latency-item {
+            background-color: var(--graphite);
+            border: 2px solid var(--graphite);
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: 100px 1fr auto;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .api-latency-item:hover {
+            border-color: var(--magenta);
+        }
+
+        .api-name {
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+
+        .bar-container {
+            background-color: var(--base-black);
+            height: 12px;
+            width: 100%;
+            position: relative;
+            border: 1px solid rgba(244, 241, 232, 0.15);
+        }
+
+        .bar-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.6s cubic-bezier(0.1, 0.8, 0.2, 1);
+            background-color: var(--bar-color, var(--green));
+        }
+
+        .latency-ms {
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+            min-width: 65px;
+            text-align: right;
+            font-weight: bold;
+        }
+
+        /* Execution Queue section */
+        .queue-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-height: 380px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        /* Custom scrollbar for cyber locker feeds */
+        .queue-container::-webkit-scrollbar, .terminal-feed::-webkit-scrollbar {
+            width: 6px;
+        }
+        .queue-container::-webkit-scrollbar-track, .terminal-feed::-webkit-scrollbar-track {
+            background: var(--base-black);
+        }
+        .queue-container::-webkit-scrollbar-thumb, .terminal-feed::-webkit-scrollbar-thumb {
+            background: var(--graphite);
+            border: 1px solid var(--off-white);
+        }
+
+        .queue-item {
+            background: var(--graphite);
+            border: 2px solid var(--graphite);
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            transition: border-color 0.15s;
+        }
+
+        .queue-item.active {
+            border-color: var(--yellow);
+            background-color: rgba(255, 230, 0, 0.03);
+        }
+
+        .queue-left {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .queue-id {
+            color: var(--magenta);
+            font-weight: bold;
+        }
+
+        .queue-name {
+            color: var(--off-white);
+            font-weight: 700;
+        }
+
+        .queue-payload {
+            color: rgba(244, 241, 232, 0.5);
+            font-size: 0.75rem;
+        }
+
+        .queue-status {
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            border: 1px solid currentColor;
+        }
+
+        .status-running { color: var(--yellow); }
+        .status-queued { color: var(--cyan); }
+        .status-complete { color: var(--green); }
+
+        /* Command override terminal console */
+        .console-box {
+            background-color: var(--base-black);
+            border: 2px solid var(--orange);
+            padding: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--orange);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 300px;
+        }
+
+        .terminal-feed {
+            overflow-y: auto;
+            max-height: 220px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 1rem;
+        }
+
+        .terminal-line {
+            line-height: 1.4;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .terminal-line.green-response {
+            color: var(--green);
+        }
+
+        .terminal-line.magenta-response {
+            color: var(--magenta);
+        }
+
+        .terminal-input-wrap {
+            border-top: 1px dashed rgba(255, 122, 0, 0.3);
+            padding-top: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .prompt-symbol {
+            font-weight: bold;
+            user-select: none;
+        }
+
+        .terminal-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--yellow);
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            width: 100%;
+        }
+
+        /* Oscilloscope Waveform visualizer */
+        .oscilloscope-container {
+            background-color: var(--base-black);
+            border: 2px solid var(--green);
+            position: relative;
+            height: 120px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .oscilloscope-label {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: rgba(182, 255, 0, 0.4);
+            z-index: 10;
+        }
+
+        /* Index metrics panels */
+        .market-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        @media (max-width: 600px) {
+            .market-metrics {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .metric-block {
+            background-color: var(--graphite);
+            border: 2px solid var(--graphite);
+            padding: 1rem;
+            text-align: center;
+            font-family: var(--font-mono);
+        }
+
+        .metric-block:hover {
+            border-color: var(--yellow);
+        }
+
+        .metric-val {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: var(--yellow);
+            margin: 5px 0;
+        }
+
+        .metric-lbl {
+            font-size: 0.7rem;
+            color: rgba(244, 241, 232, 0.5);
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .trend-up {
+            color: var(--green);
+        }
+
+        .trend-down {
+            color: var(--red);
+        }
+
+        /* Badges */
+        .p-badge {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border: 1px solid currentColor;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .p-openai { color: var(--green); }
+        .p-anthropic { color: var(--orange); }
+        .p-gemini { color: var(--magenta); }
+        .p-deepseek { color: var(--cyan); }
+
+        /* Trigger station layouts */
+        .trigger-bar {
+            display: flex;
+            gap: 1rem;
+            margin-top: auto;
+        }
+
+        /* Panic Mode Animation / Trigger */
+        .panic-mode {
+            animation: redAlert 0.5s infinite alternate;
+        }
+
+        @keyframes redAlert {
+            0% { border-color: var(--off-white); box-shadow: 8px 8px 0 var(--cyan); }
+            100% { border-color: var(--red); box-shadow: 8px 8px 0 var(--red); }
+        }
+
+        /* Custom empty state style */
+        .console-tip {
+            font-size: 0.75rem;
+            color: rgba(255, 122, 0, 0.6);
+            margin-top: 5px;
+        }
+
+        /* Back back brutal link */
+        .back-nav {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+            color: var(--off-white);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            border: 2px solid var(--off-white);
+            padding: 0.4rem 0.8rem;
+            transition: all 0.1s;
+        }
+
+        .back-nav:hover {
+            background-color: var(--off-white);
+            color: var(--base-black);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- STICKY NAVIGATION -->
+    <header>
+        <div class="nav-container">
+            <a href="#" class="logo-wrap">
+                <div class="logo-box">A.A.A.</div>
+                <div class="logo-text">AI AGENT ARSENAL</div>
+            </a>
+            
+            <div class="system-status">
+                <div class="status-pill">
+                    <div class="status-dot pulsing-magenta"></div>
+                    <span class="mono-text">TELEMETRY: ACTIVE</span>
+                </div>
+                <a href="index.html" class="back-nav">← EXIT TO THE ARMORY</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- LIVE MARQUEE TICKER -->
+    <div class="marquee-container">
+        <div class="marquee-content">
+            ✦ D&B PROFILE COMPILATION STACK: ONLINE [0.00% DELAYED] ✦ FEEDS // SBA 7(A) PRIMARY LENDING RATE: 11.5% [STABLE] ✦ OVERALL ARSENAL LOAD: 43.12 GigaFLOPS ✦ MCA RISK VALUATION MATRIX: RE-ROUTED VIA CHATGPT PROMPT-v4.1 ✦ ACTIVE THREADS: 18/18 DEPLOYED AGENTS RUNNING ✦
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD CONTENT -->
+    <main class="dashboard-container">
+
+        <!-- COLUMN 1: API LATENCY & TICKERS -->
+        <div style="display: flex; flex-direction: column; gap: 2rem;">
+            
+            <!-- PANEL 1: LLM LATENCY TESTING ENGINE -->
+            <div class="panel" style="--shadow-color: var(--cyan);">
+                <div class="panel-header">
+                    <h2 class="panel-title">
+                        <span class="mono-text">[L1]</span> API Latency Monitors
+                    </h2>
+                    <span class="mono-text" style="color: var(--cyan); font-size: 0.8rem;">REAL-TIME RTT (ms)</span>
+                </div>
+
+                <p style="font-size: 0.9rem; color: rgba(244, 241, 232, 0.75);">
+                    Monitoring operational round-trip times for key infrastructure endpoints. These times map response generation latency on complex system instructions.
+                </p>
+
+                <!-- Latency Grid -->
+                <div class="api-latency-list">
+                    <!-- OpenAI -->
+                    <div class="api-latency-item">
+                        <span class="p-badge p-openai">OpenAI</span>
+                        <div class="bar-container">
+                            <div class="bar-fill" id="bar-openai" style="--bar-color: var(--green);"></div>
+                        </div>
+                        <span class="latency-ms trend-up" id="ms-openai">0 ms</span>
+                    </div>
+
+                    <!-- Anthropic -->
+                    <div class="api-latency-item">
+                        <span class="p-badge p-anthropic">Anthropic</span>
+                        <div class="bar-container">
+                            <div class="bar-fill" id="bar-anthropic" style="--bar-color: var(--orange);"></div>
+                        </div>
+                        <span class="latency-ms trend-down" id="ms-anthropic">0 ms</span>
+                    </div>
+
+                    <!-- Gemini -->
+                    <div class="api-latency-item">
+                        <span class="p-badge p-gemini">Gemini G.</span>
+                        <div class="bar-container">
+                            <div class="bar-fill" id="bar-gemini" style="--bar-color: var(--magenta);"></div>
+                        </div>
+                        <span class="latency-ms trend-up" id="ms-gemini">0 ms</span>
+                    </div>
+
+                    <!-- DeepSeek -->
+                    <div class="api-latency-item">
+                        <span class="p-badge p-deepseek">DeepSeek</span>
+                        <div class="bar-container">
+                            <div class="bar-fill" id="bar-deepseek" style="--bar-color: var(--cyan);"></div>
+                        </div>
+                        <span class="latency-ms trend-up" id="ms-deepseek">0 ms</span>
+                    </div>
+                </div>
+
+                <div class="trigger-bar">
+                    <button class="btn-brutal mono-text" style="background-color: var(--cyan);" id="ping-trigger-btn">
+                        Force System Ping
+                    </button>
+                    <div style="font-size: 0.75rem; color: rgba(244, 241, 232, 0.4); display: flex; align-items: center;">
+                        Auto-testing triggers every 8 seconds
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANEL 2: PORTFOLIO FINANCIAL MATRIX -->
+            <div class="panel" style="--shadow-color: var(--yellow);">
+                <div class="panel-header">
+                    <h2 class="panel-title">
+                        <span class="mono-text">[F3]</span> Fintech Trend Monitors
+                    </h2>
+                    <span class="mono-text" style="color: var(--yellow); font-size: 0.8rem;">MARKET INDEX INDEXING</span>
+                </div>
+
+                <!-- Index blocks -->
+                <div class="market-metrics">
+                    <div class="metric-block">
+                        <div class="metric-lbl">MCA Yield Index</div>
+                        <div class="metric-val" id="metric-mca">24.2%</div>
+                        <span class="mono-text trend-up" style="font-size:0.7rem;">+1.45% ▲</span>
+                    </div>
+                    <div class="metric-block">
+                        <div class="metric-lbl">Default Risk Cap</div>
+                        <div class="metric-val" id="metric-risk">3.12%</div>
+                        <span class="mono-text trend-down" style="font-size:0.7rem;">-0.22% ▼</span>
+                    </div>
+                    <div class="metric-block">
+                        <div class="metric-lbl">Avg Broker Fee</div>
+                        <div class="metric-val" id="metric-fee">12.5%</div>
+                        <span class="mono-text" style="font-size:0.7rem; color:var(--off-white);">0.00% ─</span>
+                    </div>
+                </div>
+
+                <!-- Oscilloscope Dynamic Visualizer Canvas -->
+                <div class="oscilloscope-container">
+                    <span class="oscilloscope-label">THROUGHPUT ENGINE WAVEFORM // CHANNEL A</span>
+                    <canvas id="oscilloscope-canvas" style="width: 100%; height: 100%; display: block;"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- COLUMN 2: ACTIVE QUEUE & OVERRIDE CONSOLE -->
+        <div style="display: flex; flex-direction: column; gap: 2rem;">
+
+            <!-- PANEL 3: AGENT EXECUTION QUEUE -->
+            <div class="panel" style="--shadow-color: var(--magenta);">
+                <div class="panel-header">
+                    <h2 class="panel-title">
+                        <span class="mono-text">[E2]</span> Deployed Agent Queue
+                    </h2>
+                    <span class="mono-text" style="color: var(--magenta); font-size: 0.8rem;">ACTIVE ENGINE THREADS</span>
+                </div>
+
+                <div class="queue-container" id="agent-queue-list">
+                    <!-- Queue list items will populate here dynamically -->
+                </div>
+
+                <div class="trigger-bar">
+                    <button class="btn-brutal btn-secondary mono-text" id="add-agent-btn">
+                        Inject Test Agent
+                    </button>
+                    <button class="btn-brutal mono-text" style="background-color: var(--magenta);" id="clear-complete-btn">
+                        Prune Completed
+                    </button>
+                </div>
+            </div>
+
+            <!-- PANEL 4: COMMAND OVERRIDE TERMINAL -->
+            <div class="panel" id="console-panel" style="--shadow-color: var(--orange);">
+                <div class="panel-header">
+                    <h2 class="panel-title">
+                        <span class="mono-text">[O9]</span> Command Console Override
+                    </h2>
+                    <span class="mono-text" style="color: var(--orange); font-size: 0.8rem;">PORT-8088 ROOT</span>
+                </div>
+
+                <div class="console-box">
+                    <div class="terminal-feed" id="console-terminal-feed">
+                        <div class="terminal-line">&gt; SYSTEM COMPILATION COMPLETE. OVERRIDE TERMINAL INITIALIZED.</div>
+                        <div class="terminal-line">&gt; Enter "help" to view authorized override directives.</div>
+                    </div>
+
+                    <div class="terminal-input-wrap">
+                        <span class="prompt-symbol">&gt; OPERATOR@ARSENAL:~$</span>
+                        <input type="text" class="terminal-input" id="console-input" autofocus autocomplete="off" placeholder="type command here...">
+                    </div>
+                </div>
+                <div class="console-tip">
+                    [TIPS] Try commands: <strong style="cursor:pointer;" onclick="runPreSet('ping')">ping</strong>, <strong style="cursor:pointer;" onclick="runPreSet('inject')">inject</strong>, <strong style="cursor:pointer;" onclick="runPreSet('panic')">panic</strong>, <strong style="cursor:pointer;" onclick="runPreSet('clear')">clear</strong>.
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer style="margin-top: 4rem; background-color: var(--base-black); padding: 4rem 2rem; font-family: var(--font-mono); font-size: 0.9rem; border-top: var(--border-width) solid var(--off-white);">
+        <div style="max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 2rem;">
+            <div>
+                <div class="logo-wrap" style="margin-bottom: 1rem;">
+                    <div class="logo-box">A.A.A.</div>
+                    <div class="logo-text">AI AGENT ARSENAL</div>
+                </div>
+                <p style="color: rgba(244, 241, 232, 0.4);">&copy; <span id="year"></span> AI Agent Arsenal Terminal Panel. Operates under MIT licensing.</p>
+            </div>
+            <div>
+                <span style="color: var(--magenta);">OPERATOR STATION v1.0.4 // LOCALHOST NODE ACTIVE</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- TELEMETRY ENGINE & DYNAMIC LOGIC -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("year").textContent = new Date().getFullYear();
+
+            // 1. LATENCY TESTING ENGINE
+            const providers = {
+                openai: { base: 140, variance: 75, bar: document.getElementById("bar-openai"), msText: document.getElementById("ms-openai") },
+                anthropic: { base: 260, variance: 120, bar: document.getElementById("bar-anthropic"), msText: document.getElementById("ms-anthropic") },
+                gemini: { base: 95, variance: 40, bar: document.getElementById("bar-gemini"), msText: document.getElementById("ms-gemini") },
+                deepseek: { base: 310, variance: 180, bar: document.getElementById("bar-deepseek"), msText: document.getElementById("ms-deepseek") }
+            };
+
+            function updateLatencyMetric(key) {
+                const target = providers[key];
+                const realMs = Math.round(target.base + (Math.random() * target.variance - (target.variance / 2)));
+                
+                // Calculate percentage scale against maximum 600ms latency baseline
+                const percent = Math.min((realMs / 600) * 100, 100);
+                target.bar.style.width = `${percent}%`;
+                target.msText.textContent = `${realMs} ms`;
+
+                // Quick visual feedback color shifts
+                if (realMs < 150) {
+                    target.msText.style.color = "var(--green)";
+                } else if (realMs < 300) {
+                    target.msText.style.color = "var(--yellow)";
+                } else {
+                    target.msText.style.color = "var(--magenta)";
+                }
+            }
+
+            function triggerPingRoutine() {
+                Object.keys(providers).forEach(key => {
+                    updateLatencyMetric(key);
+                });
+            }
+
+            // Run initial and set continuous intervals
+            triggerPingRoutine();
+            setInterval(triggerPingRoutine, 8000);
+
+            // Button trigger link
+            document.getElementById("ping-trigger-btn").addEventListener("click", () => {
+                triggerPingRoutine();
+                writeConsoleLine("System manual ping requested. Telemetry data recalculated.", "green-response");
+            });
+
+
+            // 2. OSCILLOSCOPE WAVEFORM ENGINE (CANVAS)
+            const canvas = document.getElementById("oscilloscope-canvas");
+            const ctx = canvas.getContext("2d");
+            
+            // Adjust canvas to match display size
+            function resizeCanvas() {
+                canvas.width = canvas.parentElement.clientWidth;
+                canvas.height = canvas.parentElement.clientHeight;
+            }
+            resizeCanvas();
+            window.addEventListener("resize", resizeCanvas);
+
+            let waveOffset = 0;
+            function drawWaveform() {
+                ctx.fillStyle = "#050505";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Draw retro oscilloscope background grid
+                ctx.strokeStyle = "rgba(182, 255, 0, 0.08)";
+                ctx.lineWidth = 1;
+                
+                // Vertical lines
+                for (let x = 0; x < canvas.width; x += 40) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, canvas.height);
+                    ctx.stroke();
+                }
+                // Horizontal lines
+                for (let y = 0; y < canvas.height; y += 30) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(canvas.width, y);
+                    ctx.stroke();
+                }
+
+                // Draw mathematical signal sine-wave representing active thread throughput
+                ctx.strokeStyle = "var(--green)";
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+
+                for (let x = 0; x < canvas.width; x++) {
+                    const normalizedX = x / canvas.width;
+                    // Combine complex frequencies for high technical detail look
+                    const wave1 = Math.sin((normalizedX * 6) + waveOffset);
+                    const wave2 = Math.cos((normalizedX * 12) - waveOffset * 1.5) * 0.4;
+                    const combinedAmp = (wave1 + wave2) / 1.4;
+
+                    const y = (canvas.height / 2) + (combinedAmp * (canvas.height * 0.35));
+                    
+                    if (x === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.stroke();
+
+                // Increment offsets for animation frame updates
+                waveOffset += 0.05;
+                requestAnimationFrame(drawWaveform);
+            }
+            drawWaveform();
+
+
+            // 3. AGENT ACTIVE EXECUTION QUEUE MODEL
+            const mockAgents = [
+                { id: "01", name: "Ecommerce Cash Flow Forecaster", platform: "AI Studio", payload: "Restocking Runway audit logs for Store ID: #e1098" },
+                { id: "03", name: "Funding Pathfinder GPT", platform: "CustomGPT", payload: "Parsing alternative MCA term parameters for Broker ID: #b332" },
+                { id: "05", name: "Funding Goal Tracker", platform: "Gemini Gem", payload: "Recalculating SBA eligibility thresholds against leverage variables" },
+                { id: "06", name: "MRR to Money GPT", platform: "CustomGPT", payload: "Constructing debt-service capacity analysis parameters for SaaS project" },
+                { id: "09", name: "GPT Stack Builder", platform: "Prompt System", payload: "Compiling system instruction set for cold outbound sequencing" },
+                { id: "11", name: "Chaos Mitigation Bot", platform: "AI Studio", payload: "Structuring Raw Voice Memo #104 into structured Jira backlog directives" }
+            ];
+
+            const activeQueue = [];
+            const queueListElement = document.getElementById("agent-queue-list");
+
+            // Seed initial 3 items
+            for (let i = 0; i < 3; i++) {
+                injectNewQueueItem();
+            }
+
+            function injectNewQueueItem() {
+                const randomBase = mockAgents[Math.floor(Math.random() * mockAgents.length)];
+                const randomThreadId = Math.floor(1000 + Math.random() * 9000);
+                
+                const item = {
+                    threadId: `T-${randomThreadId}`,
+                    name: randomBase.name,
+                    platform: randomBase.platform,
+                    payload: randomBase.payload,
+                    status: "queued"
+                };
+
+                activeQueue.push(item);
+                renderQueue();
+
+                // Spin up progression timeline loop for the injected queue item
+                setTimeout(() => {
+                    item.status = "running";
+                    renderQueue();
+                    
+                    setTimeout(() => {
+                        item.status = "complete";
+                        renderQueue();
+                        // Trigger dynamic terminal log sync
+                        writeConsoleLine(`Thread ${item.threadId} completed execution cycle on ${item.name}. Status: 200 OK.`, "green-response");
+                    }, 4000 + Math.random() * 6000);
+
+                }, 1500 + Math.random() * 2000);
+            }
+
+            function renderQueue() {
+                queueListElement.innerHTML = "";
+                
+                activeQueue.forEach(item => {
+                    const element = document.createElement("div");
+                    element.className = `queue-item ${item.status === 'running' ? 'active' : ''}`;
+                    
+                    let statusBadgeClass = "status-queued";
+                    if (item.status === "running") statusBadgeClass = "status-running";
+                    if (item.status === "complete") statusBadgeClass = "status-complete";
+
+                    element.innerHTML = `
+                        <div class="queue-left">
+                            <div>
+                                <span class="queue-id">[${item.threadId}]</span>
+                                <span class="queue-name">${item.name}</span>
+                                <span style="font-size:0.7rem; color:var(--magenta); border: 1px solid var(--magenta); padding:0 4px; margin-left: 5px;">${item.platform}</span>
+                            </div>
+                            <div class="queue-payload">${item.payload}</div>
+                        </div>
+                        <div>
+                            <span class="queue-status ${statusBadgeClass}">${item.status}</span>
+                        </div>
+                    `;
+                    queueListElement.appendChild(element);
+                });
+
+                // Auto-scroll queue listing container
+                queueListElement.scrollTop = queueListElement.scrollHeight;
+            }
+
+            // Actions mapping
+            document.getElementById("add-agent-btn").addEventListener("click", () => {
+                injectNewQueueItem();
+                writeConsoleLine("Direct telemetry manual override: Injected simulated agent worker into active pipeline.", "green-response");
+            });
+
+            document.getElementById("clear-complete-btn").addEventListener("click", () => {
+                const countBefore = activeQueue.length;
+                for (let i = activeQueue.length - 1; i >= 0; i--) {
+                    if (activeQueue[i].status === "complete") {
+                        activeQueue.splice(i, 1);
+                    }
+                }
+                renderQueue();
+                const pruned = countBefore - activeQueue.length;
+                writeConsoleLine(`Cleanup protocol completed. Pruned ${pruned} completed process threads from local viewport.`, "magenta-response");
+            });
+
+
+            // 4. COMMAND OVERRIDE CONSOLE INTERACTIVITY
+            const consoleInput = document.getElementById("console-input");
+            const consoleFeed = document.getElementById("console-terminal-feed");
+
+            function writeConsoleLine(text, customClass = "") {
+                const line = document.createElement("div");
+                line.className = `terminal-line ${customClass}`;
+                line.textContent = `> ${text}`;
+                consoleFeed.appendChild(line);
+                consoleFeed.scrollTop = consoleFeed.scrollHeight;
+            }
+
+            consoleInput.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    const rawVal = consoleInput.value.trim();
+                    if (!rawVal) return;
+
+                    // Write user echo back to feed
+                    writeConsoleLine(`OPERATOR@ARSENAL:~$ ${rawVal}`);
+                    consoleInput.value = "";
+
+                    // Trigger command parsing routing
+                    processTerminalCommand(rawVal.toLowerCase());
+                }
+            });
+
+            function processTerminalCommand(cmd) {
+                const parts = cmd.split(" ");
+                const baseCmd = parts[0];
+
+                switch (baseCmd) {
+                    case "help":
+                        writeConsoleLine("AUTHORIZED COMMAND SEQUENCES:");
+                        writeConsoleLine("  help               - Shows this diagnostic documentation listing.");
+                        writeConsoleLine("  ping               - Manually force telemetry RTT ping checks across API pipelines.");
+                        writeConsoleLine("  inject             - Spawn simulated worker thread into system processing stream.");
+                        writeConsoleLine("  panic              - Triggers manual Red Alert override protocols.");
+                        writeConsoleLine("  clear              - Wipe the local screen buffer variables.");
+                        writeConsoleLine("  rate [percent]     - Override mock global SBA Interest Rate model. Example: rate 10.5");
+                        break;
+                    case "ping":
+                        triggerPingRoutine();
+                        writeConsoleLine("Querying operational latency models on OpenAI, Anthropic, Gemini & DeepSeek endpoints...", "green-response");
+                        break;
+                    case "inject":
+                        injectNewQueueItem();
+                        writeConsoleLine("Worker thread spawned and initialized successfully.", "green-response");
+                        break;
+                    case "panic":
+                        document.getElementById("console-panel").classList.add("panic-mode");
+                        writeConsoleLine("CRITICAL ALERT: RED OVERRIDE STATE DEPLOYED! INJECTING NOISE INTO ENGINES...", "magenta-response");
+                        // Simulates fluctuation spikes on metrics
+                        document.getElementById("metric-risk").textContent = "18.45%";
+                        document.getElementById("metric-risk").className = "metric-val trend-down";
+                        setTimeout(() => {
+                            document.getElementById("console-panel").classList.remove("panic-mode");
+                            document.getElementById("metric-risk").textContent = "3.12%";
+                            document.getElementById("metric-risk").className = "metric-val";
+                            writeConsoleLine("Panic mitigation complete. Feedback loops normalized. Grid safe.", "green-response");
+                        }, 5000);
+                        break;
+                    case "clear":
+                        consoleFeed.innerHTML = "";
+                        writeConsoleLine("Terminal buffer clear completed successfully.");
+                        break;
+                    case "rate":
+                        if (parts[1]) {
+                            const newRate = parseFloat(parts[1]);
+                            if (!isNaN(newRate)) {
+                                writeConsoleLine(`Override confirmed. Global system rate recalculated to: ${newRate}%`, "green-response");
+                                document.getElementById("metric-mca").textContent = `${newRate}%`;
+                            } else {
+                                writeConsoleLine("ERROR: Provided rate parameter is NaN. Syntax: rate [number]");
+                            }
+                        } else {
+                            writeConsoleLine("ERROR: Parameter missing. Syntax: rate [percentage_number]");
+                        }
+                        break;
+                    default:
+                        writeConsoleLine(`COMMAND PARSE ERROR: Directive "${baseCmd}" not registered on port-8088 gateway configuration. Type "help" for guidelines.`, "magenta-response");
+                        break;
+                }
+            }
+
+            // Global trigger hook for pre-sets click actions
+            window.runPreSet = function(commandStr) {
+                consoleInput.value = commandStr;
+                consoleInput.focus();
+                // Simulate Enter key event manually on the target
+                const event = new KeyboardEvent('keydown', { 'key': 'Enter' });
+                consoleInput.dispatchEvent(event);
+            };
+
+            // Simulates periodic dynamic terminal logging feedback loops
+            const backgroundLogs = [
+                "CACHE SYNC: Dynamic assets mapping complete on index channel.",
+                "API MONITOR: DeepSeek endpoint reporting transient packet drop warnings.",
+                "FINTECH REPORT: Fed fund target parameters stable. Restructuring projections.",
+                "METADATA PIPELINE: CustomGPT metadata variables compiled cleanly."
+            ];
+
+            setInterval(() => {
+                const log = backgroundLogs[Math.floor(Math.random() * backgroundLogs.length)];
+                writeConsoleLine(log);
+            }, 12000);
+        });
+    </script>
+</body>
+</html>
+```

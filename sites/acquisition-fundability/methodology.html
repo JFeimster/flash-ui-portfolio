@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Definitions, assumptions, formulas, import recommendations, and financing-structure methodology for the Acquisition Deal Fundability Calculator.">
+  <meta name="application-name" content="Acquisition Deal Fundability Calculator">
+  <meta name="version" content="1.3.1">
+  <title>Terms & Methodology | Acquisition Deal Fundability Calculator</title>
+  <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/calculator.css?v=1.3.1">
+  <link rel="stylesheet" href="/css/v1.3.1.css?v=1.3.1">
+</head>
+<body>
+  <main class="shell">
+    <section class="calculator" aria-labelledby="methodologyTitle">
+      <header class="hero">
+        <img class="brand-mark" src="/assets/logo.svg" alt="" width="54" height="54">
+        <div class="hero-copy">
+          <p class="eyebrow">Terms, assumptions & formulas</p>
+          <h1 id="methodologyTitle">How the Calculator Thinks About a Deal</h1>
+          <p>Understand imported listing recommendations, SDE vs. EBITDA, debt capacity, project cost, seller financing, and buyer cash requirements.</p>
+        </div>
+        <span class="version">v1.3.1</span>
+      </header>
+
+      <nav class="top-nav" aria-label="Calculator navigation">
+        <a class="nav-link" data-preserve-embed href="/">Calculator</a>
+        <a class="nav-link" data-preserve-embed href="/import">Import Listing</a>
+        <a class="nav-link active" data-preserve-embed href="/methodology" aria-current="page">Terms &amp; Methodology</a>
+      </nav>
+
+      <div class="doc-content">
+        <section class="doc-intro">
+          <div class="doc-lead">
+            <h2>Screening logic, not lender approval</h2>
+            <p>The calculator converts listing-level and early diligence assumptions into a financing screen. Imported facts, inferred calculations, and recommended assumptions are deliberately separated. None of them replaces lender underwriting, valuation work, source financials, legal/tax diligence, or a complete sources-and-uses schedule.</p>
+          </div>
+          <aside class="quick-jump" aria-label="Quick navigation">
+            <strong>Jump to</strong>
+            <a href="#imports">Import intelligence</a>
+            <a href="#sde-ebitda">SDE vs. EBITDA</a>
+            <a href="#cashflow">Cash-flow normalization</a>
+            <a href="#financing">Financing structure</a>
+            <a href="#inputs">Input definitions</a>
+            <a href="#outputs">Output definitions</a>
+            <a href="#assumptions">Assumptions & limits</a>
+          </aside>
+        </section>
+
+        <section class="doc-section" id="imports">
+          <h2 class="section-title">Import intelligence: four different kinds of information</h2>
+          <div class="term-grid">
+            <article class="term-card"><h3>Imported</h3><p>A value reported directly by the marketplace API, such as Empire Flippers listing price, monthly net profit, monthly revenue, or hours worked.</p><p class="use-it">Imported means provider-reported, not audited or lender-verified.</p></article>
+            <article class="term-card"><h3>Inferred</h3><p>A calculation derived directly from provider facts. Examples: monthly net profit × 12 or MRR ÷ monthly revenue.</p><p class="use-it">The derivation should remain visible.</p></article>
+            <article class="term-card"><h3>Recommended</h3><p>A conservative screening assumption derived from business model or listing context, such as SDE as a starting basis, low owner dependence from very low reported owner hours, or a small capex reserve for an asset-light digital business.</p><p class="use-it">Recommendations are editable heuristics, not provider facts.</p></article>
+            <article class="term-card"><h3>Needs confirmation</h3><p>A field the public listing cannot support. Books verifiability, customer concentration, retained debt, and some recurring-revenue or management assumptions often belong here.</p><p class="use-it">Unknown fields receive no score credit when an imported deal is handed to the calculator.</p></article>
+          </div>
+          <div class="note-box"><strong>Empire Flippers rule:</strong> average monthly net profit is not silently relabeled EBITDA. v1.3.1 may recommend SDE as a moderate-confidence small-business screening starting point, but the user should verify the underlying earnings definition.</div>
+        </section>
+
+        <section class="doc-section" id="sde-ebitda">
+          <h2 class="section-title">SDE vs. EBITDA</h2>
+          <div class="compare-wrap">
+            <table class="compare-table">
+              <thead><tr><th>Question</th><th>SDE</th><th>EBITDA</th></tr></thead>
+              <tbody>
+                <tr><td>Typical use</td><td>Smaller owner-operated businesses; often adds back one owner's compensation and selected discretionary expenses.</td><td>Larger or manager-run businesses; operating earnings before interest, taxes, depreciation and amortization.</td></tr>
+                <tr><td>Replacement management</td><td>The calculator deducts entered replacement management because the seller's labor/economics may not transfer.</td><td>Deduct replacement management only when the entered EBITDA does not already contain that expense.</td></tr>
+                <tr><td>Importer recommendation</td><td>When Empire Flippers reports net profit but not EBITDA/SDE, SDE may be recommended as a moderate-confidence starting point.</td><td>Recommended automatically only when provider data explicitly reports EBITDA.</td></tr>
+                <tr><td>Main failure mode</td><td>Treating all SDE as transferable cash flow can overstate debt capacity.</td><td>Deducting management twice can understate cash flow; omitting missing management can overstate it.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="doc-section" id="cashflow">
+          <h2 class="section-title">Cash-flow normalization and DSCR</h2>
+          <div class="formula-grid">
+            <article class="formula-card"><h3>SDE mode</h3><p class="formula">Stated SDE
+− Replacement management
+− Annual capex reserve
+− Other annual debt service
+= Cash flow available for senior debt service</p></article>
+            <article class="formula-card"><h3>EBITDA — management included</h3><p class="formula">Stated EBITDA
+− Annual capex reserve
+− Other annual debt service
+= Cash flow available for senior debt service</p></article>
+            <article class="formula-card"><h3>EBITDA — management not included</h3><p class="formula">Stated EBITDA
+− Replacement management
+− Annual capex reserve
+− Other annual debt service
+= Cash flow available for senior debt service</p></article>
+          </div>
+          <div class="term-grid spaced-grid">
+            <article class="term-card"><h3>DSCR</h3><p><strong>Cash flow available for senior debt service ÷ annual senior acquisition debt service.</strong></p><p class="use-it">Working capital at close is no longer deducted from annual cash flow because it is a use of funds at closing.</p></article>
+            <article class="term-card"><h3>Target DSCR</h3><p>A screening cushion used to estimate supportable senior debt. v1.3.1 defaults to 1.35x.</p><p class="use-it">Higher targets reduce supportable debt and increase required buyer/seller financing.</p></article>
+          </div>
+        </section>
+
+        <section class="doc-section" id="financing">
+          <h2 class="section-title">Financing structure & sources / uses</h2>
+          <div class="term-grid">
+            <article class="term-card"><h3>Maximum supportable acquisition loan</h3><p>Normalized cash flow is divided by target DSCR to determine maximum annual senior debt service. The standard amortization formula is then reversed using the entered APR and term to estimate principal.</p><p class="use-it">The displayed acquisition-loan estimate is capped at purchase price and is not lender approval or an advance-rate promise.</p></article>
+            <article class="term-card"><h3>Total project cost</h3><p><strong>Purchase price + working/operating capital at close + transaction/closing costs.</strong></p><p class="use-it">This is a lightweight sources-and-uses screen, not a lender closing statement.</p></article>
+            <article class="term-card"><h3>Seller note</h3><p>A seller-financed source that reduces cash the buyer must provide at close.</p><p class="use-it">v1.3.1 does not amortize the seller note separately. If it requires current payments, add its annual debt service to Other annual debt service. Standby treatment must be verified.</p></article>
+            <article class="term-card"><h3>Required buyer cash</h3><p><strong>Total project cost − acquisition loan − seller note.</strong></p><p class="use-it">Buyer cash available is compared against this amount to show a financing gap or surplus.</p></article>
+            <article class="term-card"><h3>Scenario cards</h3><p>Conservative 1.50x, Balanced 1.35x, and Aggressive 1.20x scenarios hold APR, term, seller note, working capital, and transaction costs constant while changing the DSCR cushion.</p></article>
+            <article class="term-card"><h3>Working capital at close</h3><p>An operating reserve / use of funds needed at closing. For imported deals, v1.3.1 may recommend one or two months of reported average expenses based on business model.</p><p class="use-it">Inventory can require additional cash and should not be disguised as capex.</p></article>
+          </div>
+        </section>
+
+        <section class="doc-section" id="inputs">
+          <h2 class="section-title">Input definitions</h2>
+          <div class="term-grid">
+            <article class="term-card"><h3>Purchase price</h3><p>The asking or negotiated price paid for the business.</p></article>
+            <article class="term-card"><h3>Annual stated cash flow</h3><p>The annual SDE or EBITDA figure before calculator normalization adjustments.</p></article>
+            <article class="term-card"><h3>Replacement management</h3><p>Annual market cost to replace seller labor/management that does not transfer.</p></article>
+            <article class="term-card"><h3>Capex reserve</h3><p>Annual reserve for fixed assets, equipment, systems, or durable operating assets. Inventory is working capital, not capex.</p></article>
+            <article class="term-card"><h3>Other annual debt service</h3><p>Annual payments on debt obligations that reduce cash available for the modeled senior acquisition loan. Include current-pay seller-note debt service here until dedicated seller-note amortization is added.</p></article>
+            <article class="term-card"><h3>Top customer concentration</h3><p>Percentage of revenue attributable to the largest customer. Imported deals leave this unresolved unless provider data can support it.</p></article>
+            <article class="term-card"><h3>Owner dependence</h3><p>How much operations, relationships, know-how, or delivery depends on the seller. Import recommendations based on owner hours are only heuristics.</p></article>
+            <article class="term-card"><h3>Books verifiability</h3><p>Whether performance can be supported by tax returns, P&Ls, bank deposits, add-back documentation, AR/AP and source evidence. Public listings do not establish this.</p></article>
+            <article class="term-card"><h3>Recurring revenue</h3><p>Durable contractual/subscription-like revenue as a percentage of total revenue. When MRR and monthly revenue are both available, the importer can calculate the percentage directly.</p></article>
+            <article class="term-card"><h3>Acquisition loan / APR / term</h3><p>The senior acquisition debt amount and amortization assumptions used to calculate monthly and annual debt service.</p></article>
+            <article class="term-card"><h3>Buyer cash available</h3><p>Cash the buyer is willing/able to contribute to the modeled project. It does not determine credit approval.</p></article>
+            <article class="term-card"><h3>Transaction / closing costs</h3><p>Legal, lender, diligence, closing and related transaction costs. Import recommendations may use 3% of purchase price only as a placeholder.</p></article>
+          </div>
+        </section>
+
+        <section class="doc-section" id="outputs">
+          <h2 class="section-title">Output definitions</h2>
+          <div class="term-grid">
+            <article class="term-card"><h3>Fundability Score</h3><p>0–100 screening score: DSCR 35, books 20, owner dependence 15, customer concentration 10, capex 10, recurring revenue 10.</p></article>
+            <article class="term-card"><h3>Max Supportable Loan</h3><p>Senior acquisition debt that the modeled normalized cash flow can support at the chosen target DSCR, APR and term, capped at purchase price.</p></article>
+            <article class="term-card"><h3>Required Buyer Cash</h3><p>Modeled project uses remaining after entered senior acquisition debt and seller note.</p></article>
+            <article class="term-card"><h3>Financing Gap / Surplus</h3><p>Total project cost minus acquisition loan, seller note and buyer cash available. Positive is a gap; negative is excess modeled sources.</p></article>
+            <article class="term-card"><h3>Purchase-Price Equity</h3><p>Purchase price less senior loan and seller note, before working capital and transaction costs.</p></article>
+            <article class="term-card"><h3>Risk Flags / Next Actions</h3><p>Warnings and practical follow-ups tied to weak coverage, unknown diligence items, financing gaps, capex, debt structure, concentration, books, or transferability.</p></article>
+          </div>
+        </section>
+
+        <section class="doc-section assumptions-section" id="assumptions">
+          <h2 class="section-title">Assumptions & limitations</h2>
+          <ul class="assumption-list">
+            <li>All outputs are educational screening estimates and depend on the accuracy of user/provider inputs.</li>
+            <li>Marketplace imports are public provider data, not verified diligence.</li>
+            <li>Recommendations based on monetization or owner hours are heuristics and remain editable.</li>
+            <li>Senior debt service uses a standard fully amortizing loan with level monthly payments.</li>
+            <li>Seller-note principal is modeled as a funding source; seller-note APR, amortization, standby, balloon and subordination terms are not modeled directly in v1.3.1.</li>
+            <li>The calculator does not model SBA guarantee fees, lender-specific advance rates, earnouts, investor waterfalls, tax effects, or every closing-cost category.</li>
+            <li>Working capital at close is a use of funds, not an annual DSCR deduction. Inventory may require additional financing.</li>
+            <li>Fundability score weights and DSCR scenarios are screening heuristics, not lender credit policy.</li>
+          </ul>
+        </section>
+
+        <div class="doc-actions">
+          <a class="cta-button cta-primary" data-preserve-embed href="/">Return to Calculator</a>
+          <a class="cta-button cta-secondary" data-preserve-embed href="/import">Import a Listing</a>
+          <a class="cta-button cta-secondary" href="https://www.distilledfunding.com/apply" target="_blank" rel="noopener noreferrer">Explore Acquisition Financing</a>
+        </div>
+
+        <footer class="footer">
+          <span><strong>Educational estimator only.</strong> Verify underwriting assumptions, debt terms, source financials, transaction costs, and marketplace data with qualified professionals.</span>
+          <span>Acquisition Deal Fundability Calculator <strong>v1.3.1</strong></span>
+        </footer>
+      </div>
+    </section>
+  </main>
+
+  <script src="/js/app-shell.js?v=1.3.1" defer></script>
+</body>
+</html>

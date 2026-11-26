@@ -1,0 +1,1071 @@
+```html
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PRISM LOGIC // Collaborative Review Space</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            prism: {
+              black: '#030712',
+              charcoal: '#0b0f19',
+              slate: '#1e293b',
+              red: '#ff2e93',
+              blue: '#00f0ff',
+              green: '#00ff87',
+              yellow: '#ffde43',
+              purple: '#8b5cf6'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #030712;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1f2937;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #374151;
+    }
+
+    /* Prism Grid Background */
+    .prism-grid {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
+
+    /* Chromatic Aberration & Glow Effects */
+    .prism-glow-blue {
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.15);
+      border: 1px solid rgba(0, 240, 255, 0.25);
+    }
+    
+    .prism-glow-red {
+      box-shadow: 0 0 30px rgba(255, 46, 147, 0.15);
+      border: 1px solid rgba(255, 46, 147, 0.25);
+    }
+
+    .prism-glow-green {
+      box-shadow: 0 0 30px rgba(0, 255, 135, 0.15);
+      border: 1px solid rgba(0, 255, 135, 0.25);
+    }
+
+    .prism-glow-purple {
+      box-shadow: 0 0 30px rgba(139, 92, 246, 0.15);
+      border: 1px solid rgba(139, 92, 246, 0.25);
+    }
+
+    .prism-glass {
+      background: rgba(11, 15, 25, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .prism-glass-hover:hover {
+      background: rgba(11, 15, 25, 0.85);
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: translateY(-2px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Refraction animation */
+    @keyframes refract {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .rainbow-border {
+      position: relative;
+    }
+    .rainbow-border::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(90deg, #ff2e93, #00f0ff, #00ff87, #ffde43, #ff2e93);
+      background-size: 300% 300%;
+      animation: refract 8s ease infinite;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    /* Status Dot Pulse */
+    .status-pulse {
+      box-shadow: 0 0 0 0 rgba(0, 255, 135, 0.7);
+      animation: pulse 1.8s infinite cubic-bezier(0.66, 0, 0, 1);
+    }
+
+    .status-pulse-red {
+      box-shadow: 0 0 0 0 rgba(255, 46, 147, 0.7);
+      animation: pulse-red 1.8s infinite cubic-bezier(0.66, 0, 0, 1);
+    }
+
+    @keyframes pulse {
+      to { box-shadow: 0 0 0 8px rgba(0, 255, 135, 0); }
+    }
+
+    @keyframes pulse-red {
+      to { box-shadow: 0 0 0 8px rgba(255, 46, 147, 0); }
+    }
+
+    /* Wave effect under the mock PDF */
+    .document-shimmer {
+      background: linear-gradient(110deg, rgba(255,255,255,0.01) 30%, rgba(255,255,255,0.04) 50%, rgba(255,255,255,0.01) 70%);
+      background-size: 200% 100%;
+      animation: shimmer 4s infinite linear;
+    }
+    @keyframes shimmer {
+      to { background-position: -200% 0; }
+    }
+
+    /* Pin positioning dynamic class styles */
+    .annotation-pin {
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .annotation-pin:hover {
+      transform: scale(1.3) translateY(-4px);
+    }
+  </style>
+</head>
+
+<body class="bg-prism-black text-slate-100 font-sans min-h-screen relative overflow-x-hidden prism-grid">
+
+  <!-- Glow Elements in Background -->
+  <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-prism-blue/10 rounded-full blur-[120px] pointer-events-none"></div>
+  <div class="absolute bottom-[20%] right-[-10%] w-[45%] h-[45%] bg-prism-purple/10 rounded-full blur-[140px] pointer-events-none"></div>
+
+  <!-- Main Grid Wrapper -->
+  <div class="min-h-screen flex flex-col justify-between z-10 relative">
+    
+    <!-- Top Navigation Header -->
+    <header class="border-b border-white/5 prism-glass sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        
+        <!-- Logo / Branding -->
+        <div class="flex items-center space-x-3">
+          <a href="#" class="relative w-8 h-8 flex items-center justify-center rainbow-border rounded-lg">
+            <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 22H22L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+          </a>
+          <div>
+            <span class="font-mono text-xs text-prism-blue tracking-[0.3em] font-semibold block">PRISM LOGIC</span>
+            <h1 class="text-sm font-bold tracking-tight text-white flex items-center gap-1.5 uppercase">
+              Shared Workspace <span class="text-[9px] bg-prism-purple/20 text-prism-purple px-1.5 py-0.5 rounded font-mono border border-prism-purple/30">Review Engine v3.1</span>
+            </h1>
+          </div>
+        </div>
+
+        <!-- Document Metadata Telemetry Banner -->
+        <div class="hidden lg:flex items-center space-x-6 text-xs font-mono border-l border-white/10 pl-6">
+          <div>
+            <span class="text-white/40 block">TARGET PORTFOLIO</span>
+            <span class="text-white font-semibold">CA-FL_COMM_ACQUISITION_V3</span>
+          </div>
+          <div>
+            <span class="text-white/40 block">ACTIVE COLLABORATORS</span>
+            <div class="flex items-center space-x-1.5 mt-0.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-prism-green status-pulse"></span>
+              <span class="text-prism-green font-bold">5 ONLINE</span>
+            </div>
+          </div>
+          <div>
+            <span class="text-white/40 block">APPROVAL QUORUM</span>
+            <span id="quorum-ratio" class="text-prism-yellow font-bold">2 / 4 VERIFIED</span>
+          </div>
+          <div>
+            <span class="text-white/40 block">LAST MODIFIED</span>
+            <span class="text-prism-red font-bold">JUST NOW</span>
+          </div>
+        </div>
+
+        <!-- Action Controls -->
+        <div class="flex items-center space-x-2">
+          <!-- Live User Avatars -->
+          <div class="hidden sm:flex items-center -space-x-2 mr-3 border-r border-white/10 pr-4">
+            <div class="w-7 h-7 rounded-full bg-prism-blue/20 border border-prism-blue flex items-center justify-center text-[10px] font-bold text-prism-blue font-mono" title="Underwriter (You)">UW</div>
+            <div class="w-7 h-7 rounded-full bg-prism-purple/20 border border-prism-purple flex items-center justify-center text-[10px] font-bold text-prism-purple font-mono" title="Risk Officer (Sonia)">SO</div>
+            <div class="w-7 h-7 rounded-full bg-prism-red/20 border border-prism-red flex items-center justify-center text-[10px] font-bold text-prism-red font-mono" title="Legal Counsel (Marcus)">MA</div>
+            <div class="w-7 h-7 rounded-full bg-prism-yellow/20 border border-prism-yellow flex items-center justify-center text-[10px] font-bold text-prism-yellow font-mono relative" title="Capital Sponsor (Dave)">
+              DA
+              <span class="absolute bottom-0 right-0 w-1.5 h-1.5 bg-prism-green rounded-full"></span>
+            </div>
+          </div>
+
+          <button onclick="exportRevisionLog()" class="flex items-center space-x-1.5 bg-white/5 hover:bg-white/10 text-white text-xs font-semibold py-2 px-3.5 rounded-lg border border-white/10 transition">
+            <i data-lucide="download" class="w-3.5 h-3.5 text-prism-blue"></i>
+            <span class="font-mono">Export Audit Log</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace Area -->
+    <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- LEFT WORKSPACE: Documents & Direct Viewport (Col 8) -->
+      <section class="lg:col-span-8 flex flex-col space-y-4">
+        
+        <!-- Document Type Selector & Navigation Header -->
+        <div class="prism-glass p-3 rounded-xl flex flex-wrap items-center justify-between gap-3 border border-white/10">
+          
+          <!-- Document Tabs Selection -->
+          <div class="flex items-center space-x-1.5 overflow-x-auto pb-1 sm:pb-0" id="document-tabs">
+            <button onclick="switchDocument('term-sheet')" id="tab-term-sheet" class="flex items-center space-x-2 px-3.5 py-2 rounded-lg text-xs font-mono transition bg-prism-blue/15 border border-prism-blue/30 text-white">
+              <i data-lucide="file-text" class="w-4.5 h-4.5 text-prism-blue"></i>
+              <span>TERM_SHEET_DRAFT.PDF</span>
+            </button>
+            <button onclick="switchDocument('underwriting-sheet')" id="tab-underwriting-sheet" class="flex items-center space-x-2 px-3.5 py-2 rounded-lg text-xs font-mono transition bg-white/5 border border-transparent text-white/55 hover:text-white hover:bg-white/10">
+              <i data-lucide="table" class="w-4.5 h-4.5"></i>
+              <span>FINANCIAL_PROJECTION.CSV</span>
+            </button>
+            <button onclick="switchDocument('site-survey')" id="tab-site-survey" class="flex items-center space-x-2 px-3.5 py-2 rounded-lg text-xs font-mono transition bg-white/5 border border-transparent text-white/55 hover:text-white hover:bg-white/10">
+              <i data-lucide="map" class="w-4.5 h-4.5"></i>
+              <span>APPRAISAL_SURVEY.PNG</span>
+            </button>
+          </div>
+
+          <!-- Pin tool instruction -->
+          <div class="hidden sm:flex items-center space-x-2 text-[10px] font-mono bg-black/50 px-3 py-1.5 rounded-md border border-white/5">
+            <span class="w-1.5 h-1.5 bg-prism-blue rounded-full status-pulse"></span>
+            <span class="text-white/60 uppercase tracking-wider">Click Document to Drop Annotation Pin</span>
+          </div>
+
+        </div>
+
+        <!-- PRIMARY VIEWPORT CANVAS CONTAINER -->
+        <div class="relative flex-1 prism-glass rounded-2xl border border-white/10 min-h-[550px] overflow-hidden flex flex-col">
+          
+          <!-- Interactivity Overlay Instructions -->
+          <div class="absolute top-3 left-3 z-10 bg-prism-black/90 px-3 py-1.5 rounded-lg border border-white/10 font-mono text-[9px] text-white/60 uppercase tracking-widest flex items-center gap-2">
+            <i data-lucide="zoom-in" class="w-3.5 h-3.5 text-prism-blue"></i>
+            <span>Interactive Multi-File Preview Node</span>
+          </div>
+
+          <!-- Document Target View Container (Point and click listener is attached here) -->
+          <div id="document-viewport" onclick="onDocumentClick(event)" class="relative flex-1 p-6 md:p-10 select-none overflow-y-auto document-shimmer cursor-crosshair">
+            
+            <!-- Dynamic Document Loading Screens -->
+            
+            <!-- DOCUMENT 1: TERM SHEET PDF VIEW (DEFAULT ACTIVE) -->
+            <div id="doc-term-sheet" class="space-y-6 max-w-2xl mx-auto font-sans text-xs md:text-sm text-white/80 leading-relaxed pt-6">
+              <div class="text-center space-y-1 pb-4 border-b border-white/10">
+                <span class="text-xs font-mono text-prism-blue uppercase tracking-widest block">Exhibit A // Proposed Capital Restructuring</span>
+                <h2 class="text-lg font-bold uppercase tracking-tight text-white font-mono">Prism Bridge Loan Agreement Terms</h2>
+              </div>
+
+              <div class="space-y-3 relative p-4 rounded-lg hover:bg-white/5 transition" id="section-1">
+                <div class="absolute top-2 right-2 text-[9px] font-mono text-white/30">SEC 1.01</div>
+                <h3 class="font-bold text-white uppercase tracking-wider font-mono flex items-center gap-2 text-xs">
+                  <span class="text-prism-blue">01.</span> Capital Injection Provisions &amp; Leverage
+                </h3>
+                <p class="text-white/70">
+                  The primary underwriters designate an aggregate initial capital deployment of <span class="bg-prism-blue/20 text-prism-blue px-1.5 py-0.5 rounded font-mono font-bold">$12,500,000 USD</span>. The Max Loan-To-Value ratio of this specific transitional pool is capped explicitly at <span class="bg-prism-green/20 text-prism-green px-1.5 py-0.5 rounded font-mono font-bold">85% LTV</span>, contingent upon satisfactory ground-up progress evaluations.
+                </p>
+              </div>
+
+              <div class="space-y-3 relative p-4 rounded-lg hover:bg-white/5 transition" id="section-2">
+                <div class="absolute top-2 right-2 text-[9px] font-mono text-white/30">SEC 2.04</div>
+                <h3 class="font-bold text-white uppercase tracking-wider font-mono flex items-center gap-2 text-xs">
+                  <span class="text-prism-red">02.</span> Prepayment Penalties &amp; Extension Windows
+                </h3>
+                <p class="text-white/70">
+                  Should the borrowing entity initiate full restructuring or exit capital payoff prior to the standard <span class="text-prism-yellow underline font-bold font-mono">12-Month Lockout Period</span>, a penalty rate equivalent to <span class="text-prism-red font-mono font-bold">1.5%</span> of total outstanding debt principal will be triggered immediately inside secondary liquidity escrow nodes.
+                </p>
+              </div>
+
+              <div class="space-y-3 relative p-4 rounded-lg hover:bg-white/5 transition" id="section-3">
+                <div class="absolute top-2 right-2 text-[9px] font-mono text-white/30">SEC 3.12</div>
+                <h3 class="font-bold text-white uppercase tracking-wider font-mono flex items-center gap-2 text-xs">
+                  <span class="text-prism-purple">03.</span> Escrow Holdbacks &amp; Ground Development Milestones
+                </h3>
+                <p class="text-white/70">
+                  An initial draw holding reserve of <span class="text-white font-mono">$1,850,000</span> will remain locked inside an institutional capital node. Draw disbursements are released sequentially over 4 phases of construction. Release approval requires third-party inspection certifications filed within 72 hours of milestone completion.
+                </p>
+              </div>
+            </div>
+
+            <!-- DOCUMENT 2: UNDERWRITING SHEET VIEW (HIDDEN INITIALLY) -->
+            <div id="doc-underwriting-sheet" class="hidden space-y-6 max-w-3xl mx-auto pt-6">
+              <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <span class="text-xs font-mono text-prism-green uppercase tracking-widest font-semibold">// FINANCIAL LEDGER EXCEL EXPORT</span>
+                <span class="text-[10px] font-mono text-white/40">CALCULATION MODEL v1.04</span>
+              </div>
+              
+              <div class="overflow-x-auto">
+                <table class="w-full text-left font-mono text-[11px] text-white/80 border-collapse">
+                  <thead>
+                    <tr class="border-b border-white/20 bg-white/5">
+                      <th class="p-2.5 text-white/50">PROJECTION ID</th>
+                      <th class="p-2.5 text-white/50">FINANCIAL LINE ITEM</th>
+                      <th class="p-2.5 text-white/50">ESTIMATED ASSET</th>
+                      <th class="p-2.5 text-white/50">STRESS RATE (11.5%)</th>
+                      <th class="p-2.5 text-white/50">VERDICT</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-white/5">
+                    <tr class="hover:bg-white/5">
+                      <td class="p-2.5 text-prism-blue">#PRJ-01</td>
+                      <td class="p-2.5 font-bold">Total Acquisition Capital</td>
+                      <td class="p-2.5 text-right">$14,750,000</td>
+                      <td class="p-2.5 text-right text-prism-blue">$14,750,000</td>
+                      <td class="p-2.5"><span class="bg-prism-green/10 text-prism-green text-[9px] px-1.5 py-0.5 rounded border border-prism-green/20">PASSED</span></td>
+                    </tr>
+                    <tr class="hover:bg-white/5">
+                      <td class="p-2.5 text-prism-blue">#PRJ-02</td>
+                      <td class="p-2.5 font-bold">Debt Service Coverage (DSCR)</td>
+                      <td class="p-2.5 text-right">1.35x Ratio</td>
+                      <td class="p-2.5 text-right text-prism-red">1.08x Ratio</td>
+                      <td class="p-2.5"><span class="bg-prism-red/10 text-prism-red text-[9px] px-1.5 py-0.5 rounded border border-prism-red/20">WARNING</span></td>
+                    </tr>
+                    <tr class="hover:bg-white/5">
+                      <td class="p-2.5 text-prism-blue">#PRJ-03</td>
+                      <td class="p-2.5 font-bold">Sponsor Equity Contribution</td>
+                      <td class="p-2.5 text-right">$2,250,000</td>
+                      <td class="p-2.5 text-right text-prism-blue">$2,250,000</td>
+                      <td class="p-2.5"><span class="bg-prism-green/10 text-prism-green text-[9px] px-1.5 py-0.5 rounded border border-prism-green/20">PASSED</span></td>
+                    </tr>
+                    <tr class="hover:bg-white/5">
+                      <td class="p-2.5 text-prism-blue">#PRJ-04</td>
+                      <td class="p-2.5 font-bold">Capitalized Reserve Cushion</td>
+                      <td class="p-2.5 text-right">$450,000</td>
+                      <td class="p-2.5 text-right text-prism-yellow">$310,000</td>
+                      <td class="p-2.5"><span class="bg-prism-yellow/10 text-prism-yellow text-[9px] px-1.5 py-0.5 rounded border border-prism-yellow/20">ADJUST</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="text-[10px] text-white/40 italic font-mono">// Highlighted stress formulas assume secondary bank rates climbing past index projections by 150 basis points.</p>
+            </div>
+
+            <!-- DOCUMENT 3: SITE APPRAISAL SURVEY (HIDDEN INITIALLY) -->
+            <div id="doc-site-survey" class="hidden space-y-4 max-w-2xl mx-auto pt-4 text-center">
+              <span class="text-xs font-mono text-prism-purple uppercase tracking-widest block font-semibold">// APPRAISAL SITE PLAN &amp; GEOMETRIC BORDERS</span>
+              
+              <!-- Mock High Tech Blueprint Image Container -->
+              <div class="relative max-w-lg mx-auto h-[280px] rounded-xl border border-white/10 bg-prism-charcoal overflow-hidden flex flex-col justify-between p-4">
+                <!-- Grid pattern background simulation -->
+                <div class="absolute inset-0 bg-prism-blue/5 pointer-events-none prism-grid"></div>
+                
+                <div class="flex justify-between items-start z-10 font-mono text-[9px] text-white/40">
+                  <span>LOT ID: 489-A2</span>
+                  <span>COORDS: 34.0522° N, 118.2437° W</span>
+                </div>
+                
+                <!-- Vector Abstract shapes representing building outlines -->
+                <div class="relative w-full h-32 flex items-center justify-center z-10">
+                  <svg class="w-48 h-32 text-prism-purple/40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="10" y="20" width="35" height="40" stroke="currentColor" stroke-width="2" stroke-dasharray="2 2" fill="rgba(139, 92, 246, 0.05)" />
+                    <rect x="55" y="10" width="35" height="70" stroke="#00f0ff" stroke-width="2" fill="rgba(0, 240, 255, 0.05)" />
+                    <circle cx="50" cy="50" r="8" stroke="#ff2e93" stroke-width="1.5" />
+                  </svg>
+                  <span class="absolute bottom-2 text-[10px] text-white/60 font-mono tracking-widest">// TARGET PROPERTY PARCEL //</span>
+                </div>
+
+                <div class="flex justify-between items-end z-10 font-mono text-[9px]">
+                  <span class="text-prism-red">RED: HAZARD ZONE</span>
+                  <span class="text-prism-blue">CYAN: PROPOSED DEVELOPMENT</span>
+                </div>
+              </div>
+              <p class="text-[10px] text-white/40 font-mono max-w-md mx-auto">Property parcel assessment confirms zero structural overlay violations. Right parcel shows easement limits adjacent to the federal water preservation drainage basin.</p>
+            </div>
+
+            <!-- ANNOTATION PINS LAYER (RENDERED VIA JAVASCRIPT) -->
+            <div id="pins-layer" class="absolute inset-0 pointer-events-none"></div>
+
+          </div>
+
+          <!-- Active Document Status Summary Bottom Bar -->
+          <div class="border-t border-white/5 p-4 bg-black/40 flex flex-col sm:flex-row items-center justify-between text-xs font-mono gap-3">
+            <div class="flex items-center space-x-2">
+              <span class="text-white/40">Selected File:</span>
+              <span id="active-filename" class="text-prism-blue font-bold">TERM_SHEET_DRAFT.PDF</span>
+            </div>
+            <div class="flex items-center space-x-4 text-white/50">
+              <span>Annotation Hotspots: <strong id="annot-count" class="text-white">3</strong></span>
+              <span class="hidden sm:inline">|</span>
+              <span>Review Cycle Phase: <strong class="text-prism-purple">Legal & Underwriting Handshake</strong></span>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- RIGHT WORKSPACE: Annotation Form, Actionable Comments, Approvals & Log Export (Col 4) -->
+      <aside class="lg:col-span-4 flex flex-col space-y-6">
+        
+        <!-- SECTION 1: SYSTEM ANNOTATIONS PANEL -->
+        <div class="prism-glass p-5 rounded-2xl border border-white/10 flex flex-col space-y-4">
+          
+          <div class="flex items-center justify-between border-b border-white/5 pb-3">
+            <div class="flex items-center space-x-2">
+              <i data-lucide="message-square" class="w-4 h-4 text-prism-blue"></i>
+              <h2 class="text-sm font-bold text-white uppercase tracking-tight font-mono">Precision Log</h2>
+            </div>
+            <!-- Filter comments -->
+            <span class="text-[10px] font-mono text-white/40">Filtered by: <span class="text-prism-blue">Active Document</span></span>
+          </div>
+
+          <!-- Dynamic Comments List Container -->
+          <div class="space-y-3 max-h-[280px] overflow-y-auto pr-1" id="comments-container">
+            <!-- Simulated Annotation Item 1 -->
+            <div class="p-3 rounded-xl bg-white/5 border border-white/10 hover:border-prism-blue/30 transition text-xs space-y-2" id="comment-card-1">
+              <div class="flex items-center justify-between font-mono">
+                <span class="text-[10px] text-white/40 block">PIN #1 · SECTION 1.01</span>
+                <span class="text-[9px] bg-prism-blue/10 text-prism-blue px-1.5 py-0.5 rounded font-bold">UNDERWRITING</span>
+              </div>
+              <p class="text-white/80 leading-relaxed text-[11px]">
+                "Is the 85% LTV limit locked, or can the sponsor request an additional 5% stretch if collateral yields double?"
+              </p>
+              <div class="flex items-center justify-between font-mono text-[10px] text-white/40 pt-1 border-t border-white/5">
+                <span class="text-prism-blue font-semibold">U/W Lead (You)</span>
+                <div class="flex items-center space-x-2">
+                  <button onclick="resolveComment(1)" class="hover:text-prism-green flex items-center gap-1">
+                    <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Resolve
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Simulated Annotation Item 2 -->
+            <div class="p-3 rounded-xl bg-white/5 border border-white/10 hover:border-prism-red/30 transition text-xs space-y-2" id="comment-card-2">
+              <div class="flex items-center justify-between font-mono">
+                <span class="text-[10px] text-white/40 block">PIN #2 · SECTION 2.04</span>
+                <span class="text-[9px] bg-prism-red/10 text-prism-red px-1.5 py-0.5 rounded font-bold">RISK &amp; COMPLIANCE</span>
+              </div>
+              <p class="text-white/80 leading-relaxed text-[11px]">
+                "A 1.5% penalty rate on early payback might raise regulatory flags. I suggest lowering standard lockout to 1.2%."
+              </p>
+              <div class="flex items-center justify-between font-mono text-[10px] text-white/40 pt-1 border-t border-white/5">
+                <span class="text-prism-red font-semibold">Sonia (Underwriting Risk)</span>
+                <div class="flex items-center space-x-2">
+                  <button onclick="resolveComment(2)" class="hover:text-prism-green flex items-center gap-1">
+                    <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Resolve
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Simulated Annotation Item 3 -->
+            <div class="p-3 rounded-xl bg-white/5 border border-white/10 hover:border-prism-purple/30 transition text-xs space-y-2" id="comment-card-3">
+              <div class="flex items-center justify-between font-mono">
+                <span class="text-[10px] text-white/40 block">PIN #3 · SECTION 3.12</span>
+                <span class="text-[9px] bg-prism-purple/10 text-prism-purple px-1.5 py-0.5 rounded font-bold">LEGAL</span>
+              </div>
+              <p class="text-white/80 leading-relaxed text-[11px]">
+                "Make sure milestone draws require mechanical engineering sign-off, not just municipal inspectors."
+              </p>
+              <div class="flex items-center justify-between font-mono text-[10px] text-white/40 pt-1 border-t border-white/5">
+                <span class="text-prism-purple font-semibold">Marcus (Legal Council)</span>
+                <div class="flex items-center space-x-2">
+                  <button onclick="resolveComment(3)" class="hover:text-prism-green flex items-center gap-1">
+                    <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Resolve
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Empty Annotation State Prompt (Hidden) -->
+          <div id="no-comments-prompt" class="hidden text-center py-4 bg-white/5 border border-white/5 rounded-xl text-white/40 font-mono text-[11px]">
+            No annotations recorded for this document.
+          </div>
+
+          <!-- Quick Interactive Pin Placement Form -->
+          <form id="add-pin-form" onsubmit="handlePinSubmit(event)" class="bg-black/40 p-3.5 rounded-xl border border-white/5 space-y-3">
+            <div class="flex justify-between items-center text-[10px] font-mono text-white/55">
+              <span>DEPLOY NEW ANNOTATION PIN</span>
+              <span id="pin-placement-indicators" class="text-prism-blue">Click doc to locate coordinates</span>
+            </div>
+
+            <!-- Coordinate readouts hidden values -->
+            <input type="hidden" id="pin-x" value="50">
+            <input type="hidden" id="pin-y" value="50">
+
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="space-y-1">
+                <label class="block font-mono text-[9px] text-white/40 uppercase">Domain Department</label>
+                <select id="pin-domain" class="w-full bg-prism-black border border-white/10 rounded p-1.5 text-white focus:outline-none focus:border-prism-blue font-mono text-[10px]">
+                  <option value="UNDERWRITING">Underwriting</option>
+                  <option value="RISK">Risk Oversight</option>
+                  <option value="LEGAL">Legal / Escrow</option>
+                  <option value="SPONSOR">Capital Sponsor</option>
+                </select>
+              </div>
+              <div class="space-y-1">
+                <label class="block font-mono text-[9px] text-white/40 uppercase">Action Severity</label>
+                <select id="pin-severity" class="w-full bg-prism-black border border-white/10 rounded p-1.5 text-white focus:outline-none focus:border-prism-blue font-mono text-[10px]">
+                  <option value="blue">Info Request</option>
+                  <option value="yellow">Adjustment Required</option>
+                  <option value="red">Critical Blocker</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="space-y-1">
+              <label class="block font-mono text-[9px] text-white/40 uppercase">Annotation Note</label>
+              <textarea id="pin-text" required rows="2" placeholder="Type comments. Drop on document relative positions above..." class="w-full bg-prism-black border border-white/10 rounded p-2 text-[11px] text-white placeholder-white/20 focus:outline-none focus:border-prism-blue leading-normal"></textarea>
+            </div>
+
+            <button type="submit" class="w-full bg-gradient-to-r from-prism-blue to-prism-purple text-white hover:brightness-110 font-bold uppercase tracking-wider py-2 rounded text-[10px] border border-white/10 transition font-mono">
+              Apply Annotation Node
+            </button>
+          </form>
+
+        </div>
+
+        <!-- SECTION 2: APPROVAL QUORUM MATRIX -->
+        <div class="prism-glass p-5 rounded-2xl border border-white/10 space-y-4">
+          
+          <div class="flex items-center justify-between border-b border-white/5 pb-3">
+            <div class="flex items-center space-x-2">
+              <i data-lucide="check-square" class="w-4 h-4 text-prism-green"></i>
+              <h2 class="text-sm font-bold text-white uppercase tracking-tight font-mono">Consensus Framework</h2>
+            </div>
+            <span class="text-[10px] font-mono text-prism-green uppercase">Spectral Approval Gates</span>
+          </div>
+
+          <div class="space-y-3 text-xs">
+            
+            <!-- Underwriter Checkbox -->
+            <div class="flex items-center justify-between p-2.5 rounded-lg bg-white/5 border border-white/5">
+              <div class="flex items-center space-x-2.5">
+                <div class="w-2 h-2 rounded-full bg-prism-green"></div>
+                <div>
+                  <span class="block font-mono text-[11px] font-bold text-white uppercase">Sponsor Verification Gate</span>
+                  <span class="text-[9px] text-white/40 font-mono">// Dave (Primary Sponsor)</span>
+                </div>
+              </div>
+              <span class="text-[9px] font-mono text-prism-green bg-prism-green/10 px-2 py-0.5 rounded border border-prism-green/20">VERIFIED SIGN-OFF</span>
+            </div>
+
+            <!-- Risk Officer Toggle -->
+            <div class="flex items-center justify-between p-2.5 rounded-lg bg-white/5 border border-white/5">
+              <div class="flex items-center space-x-2.5">
+                <div class="w-2 h-2 rounded-full bg-prism-green"></div>
+                <div>
+                  <span class="block font-mono text-[11px] font-bold text-white uppercase font-sans">Risk Underwriting Framework</span>
+                  <span class="text-[9px] text-white/40 font-mono">// Sonia (Risk Officer)</span>
+                </div>
+              </div>
+              <span class="text-[9px] font-mono text-prism-green bg-prism-green/10 px-2 py-0.5 rounded border border-prism-green/20">VERIFIED SIGN-OFF</span>
+            </div>
+
+            <!-- Legal Oversight Trigger -->
+            <div id="legal-signoff-box" class="flex items-center justify-between p-2.5 rounded-lg bg-white/5 border border-white/5 transition-colors duration-300">
+              <div class="flex items-center space-x-2.5">
+                <div id="legal-dot" class="w-2 h-2 rounded-full bg-prism-yellow"></div>
+                <div>
+                  <span class="block font-mono text-[11px] font-bold text-white uppercase">Escrow Structure Oversight</span>
+                  <span class="text-[9px] text-white/40 font-mono">// Marcus (Legal Officer)</span>
+                </div>
+              </div>
+              <button onclick="toggleConsensus('legal')" id="legal-btn" class="text-[9px] font-mono text-prism-yellow hover:text-white bg-prism-yellow/10 hover:bg-prism-yellow/20 px-2 py-0.5 rounded border border-prism-yellow/30 transition">
+                TOGGLE CONSENT
+              </button>
+            </div>
+
+            <!-- Secondary Capital Handshake Check -->
+            <div id="handshake-signoff-box" class="flex items-center justify-between p-2.5 rounded-lg bg-white/5 border border-white/5 transition-colors duration-300">
+              <div class="flex items-center space-x-2.5">
+                <div id="handshake-dot" class="w-2 h-2 rounded-full bg-prism-red status-pulse-red"></div>
+                <div>
+                  <span class="block font-mono text-[11px] font-bold text-white uppercase">Liquidity Handshake Agreement</span>
+                  <span class="text-[9px] text-white/40 font-mono">// Team Direct Underwriter (You)</span>
+                </div>
+              </div>
+              <button onclick="toggleConsensus('handshake')" id="handshake-btn" class="text-[9px] font-mono text-prism-red hover:text-white bg-prism-red/10 hover:bg-prism-red/20 px-2 py-0.5 rounded border border-prism-red/30 transition">
+                SIGN HANDSHAKE
+              </button>
+            </div>
+
+          </div>
+
+          <div class="bg-black/50 p-3 rounded-lg border border-white/5 text-[10px] font-mono text-white/50 leading-relaxed">
+            <span class="text-white block font-bold mb-1">// COGNITIVE SECURITY ENGINE</span>
+            Once quorum consensus completes (4/4 sign-offs), document logs seal dynamically inside the decentralized audit register. No manual alteration allowed.
+          </div>
+
+        </div>
+
+      </aside>
+
+    </main>
+
+    <!-- Detailed Documentation & System Logs Guide -->
+    <section class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 border-t border-white/5 bg-prism-charcoal/20">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 font-sans">
+        
+        <div class="p-5 prism-glass rounded-xl border border-white/5">
+          <h3 class="text-xs font-bold text-white mb-2 font-mono flex items-center gap-1.5 uppercase">
+            <i data-lucide="shield-alert" class="w-4 h-4 text-prism-yellow"></i> Consensus Security
+          </h3>
+          <p class="text-[11px] text-white/60 leading-relaxed">
+            All reviews utilize multi-signature approvals to prevent document alterations during contract underwriting escrow checks. All modifications are timestamped and tied directly to verified public key certificates.
+          </p>
+        </div>
+
+        <div class="p-5 prism-glass rounded-xl border border-white/5">
+          <h3 class="text-xs font-bold text-white mb-2 font-mono flex items-center gap-1.5 uppercase">
+            <i data-lucide="git-branch" class="w-4 h-4 text-prism-blue"></i> Multi-File Branching
+          </h3>
+          <p class="text-[11px] text-white/60 leading-relaxed">
+            Instantly preview and comment across active underwriting templates, surveyor site blueprints, and formal loan payout structures with precise coordinates mapped relative to target files.
+          </p>
+        </div>
+
+        <div class="p-5 prism-glass rounded-xl border border-white/5">
+          <h3 class="text-xs font-bold text-white mb-2 font-mono flex items-center gap-1.5 uppercase">
+            <i data-lucide="cpu" class="w-4 h-4 text-prism-green"></i> Real-time Telemetry
+          </h3>
+          <p class="text-[11px] text-white/60 leading-relaxed">
+            An automated simulation layer verifies alignment and reports active comments dynamically across multiple peer connections to bypass slow legal review cycles.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/5 py-8 bg-prism-black/95 text-xs font-mono relative z-20">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-white/40">
+        
+        <div class="flex items-center space-x-2">
+          <span class="text-white/80 font-bold tracking-widest">PRISM REVIEW LAYER</span>
+          <span>© <span id="currentYear"></span>. Handshake protocol active.</span>
+        </div>
+
+        <div class="flex items-center space-x-6 text-[11px]">
+          <a href="#" class="hover:text-prism-blue transition">AUDIT EXPORTS</a>
+          <a href="#" class="hover:text-prism-red transition">SECURITY SCHEMA</a>
+          <a href="#" class="hover:text-prism-green transition">COLLABORATION TERMS</a>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <span class="w-2 h-2 rounded-full bg-prism-green status-pulse"></span>
+          <span class="text-[10px] uppercase">Node state: SECURED</span>
+        </div>
+
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- APPLICATION CODE -->
+  <script>
+    // Initial dataset of annotations
+    let annotations = [
+      {
+        id: 1,
+        doc: "term-sheet",
+        x: 45, // horizontal percentage inside preview panel
+        y: 24, // vertical percentage
+        domain: "UNDERWRITING",
+        author: "U/W Lead (You)",
+        text: "Is the 85% LTV limit locked, or can the sponsor request an additional 5% stretch if collateral yields double?",
+        severity: "blue"
+      },
+      {
+        id: 2,
+        doc: "term-sheet",
+        x: 65,
+        y: 50,
+        domain: "RISK",
+        author: "Sonia (Underwriting Risk)",
+        text: "A 1.5% penalty rate on early payback might raise regulatory flags. I suggest lowering standard lockout to 1.2%.",
+        severity: "red"
+      },
+      {
+        id: 3,
+        doc: "term-sheet",
+        x: 25,
+        y: 75,
+        domain: "LEGAL",
+        author: "Marcus (Legal Council)",
+        text: "Make sure milestone draws require mechanical engineering sign-off, not just municipal inspectors.",
+        severity: "purple"
+      },
+      {
+        id: 4,
+        doc: "underwriting-sheet",
+        x: 82,
+        y: 35,
+        domain: "RISK",
+        author: "Sonia (Underwriting Risk)",
+        text: "Verify the leverage values are calculation matches. The Excel model stress projections seem slightly skewed here.",
+        severity: "yellow"
+      },
+      {
+        id: 5,
+        doc: "site-survey",
+        x: 50,
+        y: 52,
+        domain: "LEGAL",
+        author: "Marcus (Legal Council)",
+        text: "Is there any secondary hazard report for the center of this proposed parcel?",
+        severity: "blue"
+      }
+    ];
+
+    let activeDoc = "term-sheet";
+    const filenames = {
+      "term-sheet": "TERM_SHEET_DRAFT.PDF",
+      "underwriting-sheet": "FINANCIAL_PROJECTION.CSV",
+      "site-survey": "APPRAISAL_SURVEY.PNG"
+    };
+
+    let consensus = {
+      sponsor: true,
+      risk: true,
+      legal: false,
+      handshake: false
+    };
+
+    // Revision Event logs for simulated exports
+    let auditLog = [
+      { timestamp: "14:24:01", author: "SYSTEM", action: "Review cycle initialized by underwriter lead." },
+      { timestamp: "14:25:12", author: "Dave (Sponsor)", action: "Consensus state toggled to VERIFIED." },
+      { timestamp: "14:28:34", author: "Sonia (Risk)", action: "Applied Pin Annotation #4 to FINANCIAL_PROJECTION.CSV" },
+      { timestamp: "14:31:02", author: "Sonia (Risk)", action: "Consensus state toggled to VERIFIED." }
+    ];
+
+    // Initialize document viewports and active tab styles
+    function switchDocument(docKey) {
+      activeDoc = docKey;
+      
+      // Update Tab Styles
+      const tabs = ["term-sheet", "underwriting-sheet", "site-survey"];
+      tabs.forEach(t => {
+        const tabEl = document.getElementById(`tab-${t}`);
+        if (t === docKey) {
+          tabEl.className = "flex items-center space-x-2 px-3.5 py-2 rounded-lg text-xs font-mono transition bg-prism-blue/15 border border-prism-blue/30 text-white";
+        } else {
+          tabEl.className = "flex items-center space-x-2 px-3.5 py-2 rounded-lg text-xs font-mono transition bg-white/5 border border-transparent text-white/55 hover:text-white hover:bg-white/10";
+        }
+      });
+
+      // Update Viewports Display
+      document.getElementById("doc-term-sheet").classList.add("hidden");
+      document.getElementById("doc-underwriting-sheet").classList.add("hidden");
+      document.getElementById("doc-site-survey").classList.add("hidden");
+
+      if (docKey === "term-sheet") {
+        document.getElementById("doc-term-sheet").classList.remove("hidden");
+      } else if (docKey === "underwriting-sheet") {
+        document.getElementById("doc-underwriting-sheet").classList.remove("hidden");
+      } else if (docKey === "site-survey") {
+        document.getElementById("doc-site-survey").classList.remove("hidden");
+      }
+
+      // Update metadata text
+      document.getElementById("active-filename").textContent = filenames[docKey];
+
+      // Refresh pins layers & comment side lists
+      renderActivePins();
+      renderComments();
+    }
+
+    // Capture coordinates inside the viewport for placement
+    function onDocumentClick(e) {
+      const viewport = document.getElementById("document-viewport");
+      const rect = viewport.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+      // Restrict coordinate limits
+      const boundedX = Math.max(2, Math.min(x, 95)).toFixed(0);
+      const boundedY = Math.max(2, Math.min(y, 95)).toFixed(0);
+
+      // Set input coords for submission
+      document.getElementById("pin-x").value = boundedX;
+      document.getElementById("pin-y").value = boundedY;
+
+      // Update visual labels in the form
+      document.getElementById("pin-placement-indicators").textContent = `X: ${boundedX}%, Y: ${boundedY}% Target Coordinates Locked`;
+      document.getElementById("pin-placement-indicators").className = "text-prism-green font-bold animate-pulse";
+    }
+
+    // Submission handler of dynamic pins
+    function handlePinSubmit(e) {
+      e.preventDefault();
+
+      const newId = annotations.length + 1;
+      const newPin = {
+        id: newId,
+        doc: activeDoc,
+        x: parseInt(document.getElementById("pin-x").value),
+        y: parseInt(document.getElementById("pin-y").value),
+        domain: document.getElementById("pin-domain").value,
+        author: "U/W Lead (You)",
+        text: document.getElementById("pin-text").value,
+        severity: document.getElementById("pin-severity").value
+      };
+
+      annotations.push(newPin);
+      
+      // Update revision audit log
+      logRevisionEvent("U/W Lead (You)", `Placed Annotation Pin #${newId} on ${filenames[activeDoc]}`);
+
+      // Reset form variables
+      document.getElementById("pin-text").value = "";
+      document.getElementById("pin-placement-indicators").textContent = "Click doc to locate coordinates";
+      document.getElementById("pin-placement-indicators").className = "text-prism-blue";
+
+      switchDocument(activeDoc); // Force redraw checks
+    }
+
+    // Map colored icons/circles based on pin priority
+    function getSeverityHex(colorName) {
+      if (colorName === 'red') return '#ff2e93';
+      if (colorName === 'yellow') return '#ffde43';
+      if (colorName === 'purple') return '#8b5cf6';
+      return '#00f0ff'; // default blue
+    }
+
+    // Render Pin Hotspots Layer onto the active viewport
+    function renderActivePins() {
+      const container = document.getElementById("pins-layer");
+      container.innerHTML = ""; // Clear existing layer
+      
+      const activeAnnotations = annotations.filter(ann => ann.doc === activeDoc);
+
+      activeAnnotations.forEach(ann => {
+        const pinEl = document.createElement("div");
+        const color = getSeverityHex(ann.severity);
+        
+        // CSS position calculation
+        pinEl.style.left = `${ann.x}%`;
+        pinEl.style.top = `${ann.y}%`;
+        pinEl.style.position = "absolute";
+        
+        pinEl.className = "annotation-pin pointer-events-auto transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center cursor-pointer z-30";
+        pinEl.title = `[PIN #${ann.id}] ${ann.author}: ${ann.text}`;
+        
+        // Inner design structure of our high-tech glowing crosshair dot
+        pinEl.innerHTML = `
+          <div class="relative w-8 h-8 flex items-center justify-center">
+            <span class="absolute w-6 h-6 rounded-full border border-white/20 animate-ping opacity-30"></span>
+            <span class="absolute w-4 h-4 rounded-full" style="background: ${color}; opacity: 0.2;"></span>
+            <span class="w-2.5 h-2.5 rounded-full border border-white flex items-center justify-center" style="background: ${color}; box-shadow: 0 0 10px ${color}">
+              <span class="text-[7px] font-mono text-black font-extrabold">${ann.id}</span>
+            </span>
+          </div>
+        `;
+
+        // Direct scroll linkage triggers comment card focus when clicked
+        pinEl.onclick = (e) => {
+          e.stopPropagation(); // Avoid triggering document background click
+          focusCommentCard(ann.id);
+        };
+
+        container.appendChild(pinEl);
+      });
+    }
+
+    // Focus comment side element and flash border styling
+    function focusCommentCard(pinId) {
+      const card = document.getElementById(`comment-card-${pinId}`);
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        card.classList.add("rainbow-border");
+        setTimeout(() => {
+          card.classList.remove("rainbow-border");
+        }, 2200);
+      }
+    }
+
+    // Render active annotations lists
+    function renderComments() {
+      const listContainer = document.getElementById("comments-container");
+      const emptyPrompt = document.getElementById("no-comments-prompt");
+      
+      // Filter list based on selected document key
+      const filtered = annotations.filter(ann => ann.doc === activeDoc);
+      document.getElementById("annot-count").textContent = filtered.length;
+
+      if (filtered.length === 0) {
+        listContainer.classList.add("hidden");
+        emptyPrompt.classList.remove("hidden");
+        return;
+      }
+
+      listContainer.classList.remove("hidden");
+      emptyPrompt.classList.add("hidden");
+
+      listContainer.innerHTML = filtered.map(ann => {
+        let labelClass = "bg-prism-blue/10 text-prism-blue";
+        if (ann.domain === "RISK") labelClass = "bg-prism-red/10 text-prism-red";
+        if (ann.domain === "LEGAL") labelClass = "bg-prism-purple/10 text-prism-purple";
+        if (ann.domain === "SPONSOR") labelClass = "bg-prism-yellow/10 text-prism-yellow";
+
+        return `
+          <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 hover:border-prism-blue/30 transition text-xs space-y-2" id="comment-card-${ann.id}">
+            <div class="flex items-center justify-between font-mono">
+              <span class="text-[10px] text-white/40 block">PIN #${ann.id} · COORDS (${ann.x}%, ${ann.y}%)</span>
+              <span class="text-[9px] ${labelClass} px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">${ann.domain}</span>
+            </div>
+            <p class="text-white/80 leading-relaxed text-[11px]">
+              "${ann.text}"
+            </p>
+            <div class="flex items-center justify-between font-mono text-[10px] text-white/40 pt-1 border-t border-white/5">
+              <span class="text-white/70 font-semibold flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
+                ${ann.author}
+              </span>
+              <button onclick="resolveComment(${ann.id})" class="text-white/40 hover:text-prism-green flex items-center gap-1 transition">
+                <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Resolve
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    // Remove or archive precise comments
+    function resolveComment(id) {
+      const commentIndex = annotations.findIndex(ann => ann.id === id);
+      if (commentIndex !== -1) {
+        const ann = annotations[commentIndex];
+        annotations.splice(commentIndex, 1);
+        logRevisionEvent("Underwriter Lead", `Resolved Annotation Pin #${ann.id} on ${filenames[ann.doc]}`);
+        switchDocument(activeDoc);
+      }
+    }
+
+    // Toggle multi-signature consensus states
+    function toggleConsensus(role) {
+      consensus[role] = !consensus[role];
+      
+      const dotEl = document.getElementById(`${role}-dot`);
+      const btnEl = document.getElementById(`${role}-btn`);
+      const boxEl = document.getElementById(`${role}-signoff-box`);
+
+      if (consensus[role]) {
+        dotEl.className = "w-2 h-2 rounded-full bg-prism-green";
+        boxEl.className = "flex items-center justify-between p-2.5 rounded-lg bg-prism-green/5 border border-prism-green/10";
+        btnEl.textContent = "REVOKE CONSENT";
+        btnEl.className = "text-[9px] font-mono text-prism-red hover:text-white bg-prism-red/10 hover:bg-prism-red/20 px-2 py-0.5 rounded border border-prism-red/30 transition";
+        logRevisionEvent("Underwriter Lead", `Assigned multi-signature approval to key sector [${role.toUpperCase()}]`);
+      } else {
+        const dotColor = (role === 'legal') ? 'bg-prism-yellow' : 'bg-prism-red status-pulse-red';
+        const textColor = (role === 'legal') ? 'text-prism-yellow hover:text-white bg-prism-yellow/10 border-prism-yellow/30' : 'text-prism-red hover:text-white bg-prism-red/10 border-prism-red/30';
+        
+        dotEl.className = `w-2 h-2 rounded-full ${dotColor}`;
+        boxEl.className = "flex items-center justify-between p-2.5 rounded-lg bg-white/5 border border-white/5";
+        btnEl.textContent = (role === 'legal') ? "TOGGLE CONSENT" : "SIGN HANDSHAKE";
+        btnEl.className = `text-[9px] font-mono ${textColor} px-2 py-0.5 rounded border transition`;
+        logRevisionEvent("Underwriter Lead", `Revoked multi-signature approval from key sector [${role.toUpperCase()}]`);
+      }
+
+      updateQuorumState();
+    }
+
+    // Refresh telemetry counters of sign-offs
+    function updateQuorumState() {
+      const keys = Object.keys(consensus);
+      const verifiedCount = keys.filter(k => consensus[k]).length;
+      const totalCount = keys.length;
+
+      const ratioEl = document.getElementById("quorum-ratio");
+      ratioEl.textContent = `${verifiedCount} / ${totalCount} VERIFIED`;
+
+      if (verifiedCount === totalCount) {
+        ratioEl.className = "text-prism-green font-bold animate-bounce";
+      } else if (verifiedCount > 2) {
+        ratioEl.className = "text-prism-blue font-bold";
+      } else {
+        ratioEl.className = "text-prism-yellow font-bold";
+      }
+    }
+
+    // Record dynamic log details
+    function logRevisionEvent(author, action) {
+      const timestamp = new Date().toTimeString().split(' ')[0];
+      auditLog.unshift({ timestamp, author, action });
+    }
+
+    // Generate revision text dump and trigger standard file stream save
+    function exportRevisionLog() {
+      let text = "==================================================\n";
+      text += "   PRISM LOGIC SYSTEM REVIEW AUDIT DEPLOYMENT   \n";
+      text += `   TIMESTAMP: ${new Date().toISOString()}      \n`;
+      text += "==================================================\n\n";
+
+      text += "1. REVISION STATUS OVERVIEWS:\n";
+      text += `   Quorum Completion: ${Object.values(consensus).filter(Boolean).length}/4 Verified Signatures\n`;
+      text += `   Active Open Annotations: ${annotations.length} items recorded\n\n`;
+
+      text += "2. HISTORICAL LOG REGISTER:\n";
+      auditLog.forEach(log => {
+        text += `   [${log.timestamp}] - ${log.author}: ${log.action}\n`;
+      });
+
+      text += "\n\n3. ACTIVE UNRESOLVED PIN DETAILS:\n";
+      annotations.forEach(ann => {
+        text += `   - Pin #${ann.id} inside file: ${filenames[ann.doc]} [${ann.domain}] at (${ann.x}%, ${ann.y}%)\n`;
+        text += `     Comment: "${ann.text}"\n`;
+      });
+
+      const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `prism-collaborator-revision-log.txt`;
+      link.click();
+    }
+
+    // Setup active year
+    document.getElementById("currentYear").textContent = new Date().getFullYear();
+
+    // Initial load setup
+    window.addEventListener("DOMContentLoaded", () => {
+      switchDocument("term-sheet");
+      updateQuorumState();
+    });
+  </script>
+
+</body>
+</html>
+```

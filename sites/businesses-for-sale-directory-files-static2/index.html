@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash UI Export</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- 1. GLOBAL TICKER HEADER -->
+    <header class="w-full bg-[#090909] border-b border-[#222222] h-11 flex items-center overflow-hidden sticky top-0 z-50">
+        <!-- Terminal Status Badge -->
+        <div class="bg-[#00FF66] text-black font-mono text-[10px] font-bold px-4 h-full flex items-center space-x-2 shrink-0 border-r border-[#222222] tracking-wider uppercase">
+            <span class="inline-block w-2 h-2 rounded-full bg-black animate-ping"></span>
+            <span>LIVE TERMINAL</span>
+        </div>
+        
+        <!-- Scrolling Marquee -->
+        <div class="relative w-full overflow-hidden h-full flex items-center font-mono text-[11px] text-[#888888] tracking-widest uppercase">
+            <div class="flex whitespace-nowrap animate-marquee">
+                <!-- Set 1 -->
+                <span class="mx-6 text-[#F9F9F9]"><span class="text-[#00FF66]">●</span> ACQUIRED: $1.2M EBITDA Manufacturing, Atlanta</span>
+                <span class="mx-6 text-[#F9F9F9]"><span class="text-[#0EA5E9]">▲</span> UNDER CONTRACT: $450K SaaS, Remote</span>
+                <span class="mx-6 text-[#F9F9F9]"><span class="text-[#FF3333]">■</span> RISK NOTICE: Heavy Customer Concentration on Project Apex</span>
+                <span class="mx-6 text-[#F9F9F9]"><span class="text-[#00FF66]">●</span> NEW LISTING: $800K HVAC, Franconia, VA</span>
+                <span class="mx-6 text-[#F9F9F9]"><span class="text-[#0EA5E9]">▲</span> ORIGINATION STAGE: $3.2M MSP, Chicagoland</span>
+                <!-- Set 2 (Duplicate for continuous loop) -->
+                <span class="mx-6 text-[#F9F9F9]"><span class="text-[#00FF66]">●</span> ACQUIRED: $1.2M EBITDA Manufacturing, Atlanta</span>
+                <span class="mx-6 text-[#F9F9F9]"><span class="text-[#0EA5E9]">▲</span> UNDER CONTRACT: $450K SaaS, Remote</span>
+                <span class="mx-6 text-[#F9F9F9]"><span class="text-[#FF3333]">■</span> RISK NOTICE: Heavy Customer Concentration on Project Apex</span>
+                <span class="mx-6 text-[#F9F9F9]"><span class="text-[#00FF66]">●</span> NEW LISTING: $800K HVAC, Franconia, VA</span>
+                <span class="mx-6 text-[#F9F9F9]"><span class="text-[#0EA5E9]">▲</span> ORIGINATION STAGE: $3.2M MSP, Chicagoland</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow flex flex-col lg:flex-row w-full max-w-[1600px] mx-auto border-x border-[#222222]">
+        
+        <!-- 2. SEARCH & DRILL-DOWN BENTO FILTERS (Left Rail / Collapsible Mobile Top) -->
+        <aside class="w-full lg:w-[360px] border-b lg:border-b-0 lg:border-r border-[#222222] bg-[#080808] p-6 shrink-0 flex flex-col justify-between">
+            <div class="space-y-6">
+                <!-- Branding Header -->
+                <div class="border-b border-[#222222] pb-6">
+                    <h1 class="font-mono text-xl font-bold tracking-tight text-[#F9F9F9] flex items-center">
+                        ACQUIRE<span class="text-[#00FF66]">META</span>
+                    </h1>
+                    <p class="font-mono text-[9px] text-[#666666] tracking-widest uppercase mt-1">UNDERGROUND DEAL FLOW INTERFACE v3.11</p>
+                </div>
+
+                <!-- Search Input -->
+                <div class="space-y-2">
+                    <label class="font-mono text-[10px] uppercase text-[#888888] tracking-widest">01 / SEARCH CRITERIA</label>
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="search-input"
+                            placeholder="Search asset codename or vertical..." 
+                            class="w-full h-11 bg-black border border-[#222] rounded-none px-4 text-xs font-mono text-[#F9F9F9] placeholder-[#555] focus:outline-none focus:border-[#00FF66] transition-colors"
+                        >
+                        <span class="absolute right-3 top-3.5 text-[#555] font-mono text-[10px]">CMD+K</span>
+                    </div>
+                </div>
+
+                <!-- Vertical Multi-Selector -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label class="font-mono text-[10px] uppercase text-[#888888] tracking-widest">02 / VERTICAL SEGMENT</label>
+                        <button onclick="clearSectorFilters()" class="font-mono text-[9px] uppercase text-[#FF3333] hover:underline">RESET</button>
+                    </div>
+                    <div class="grid grid-cols-1 gap-1" id="vertical-pills">
+                        <button onclick="toggleSector('SaaS')" data-sector="SaaS" class="sector-pill h-10 w-full bg-black border border-[#222222] rounded-none px-4 flex items-center justify-between text-xs font-mono text-[#888] hover:border-[#0EA5E9] hover:text-[#F9F9F9] transition-all text-left">
+                            <span>SaaS & Digital</span>
+                            <span class="text-[9px] text-[#444] indicator">●</span>
+                        </button>
+                        <button onclick="toggleSector('Home Services')" data-sector="Home Services" class="sector-pill h-10 w-full bg-black border border-[#222222] rounded-none px-4 flex items-center justify-between text-xs font-mono text-[#888] hover:border-[#0EA5E9] hover:text-[#F9F9F9] transition-all text-left">
+                            <span>Home Services / HVAC</span>
+                            <span class="text-[9px] text-[#444] indicator">●</span>
+                        </button>
+                        <button onclick="toggleSector('Logistics')" data-sector="Logistics" class="sector-pill h-10 w-full bg-black border border-[#222222] rounded-none px-4 flex items-center justify-between text-xs font-mono text-[#888] hover:border-[#0EA5E9] hover:text-[#F9F9F9] transition-all text-left">
+                            <span>Logistics & Transport</span>
+                            <span class="text-[9px] text-[#444] indicator">●</span>
+                        </button>
+                        <button onclick="toggleSector('Manufacturing')" data-sector="Manufacturing" class="sector-pill h-10 w-full bg-black border border-[#222222] rounded-none px-4 flex items-center justify-between text-xs font-mono text-[#888] hover:border-[#0EA5E9] hover:text-[#F9F9F9] transition-all text-left">
+                            <span>Precision Manufacturing</span>
+                            <span class="text-[9px] text-[#444] indicator">●</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- EBITDA Multiple Range Slider -->
+                <div class="space-y-3">
+                    <div class="flex justify-between font-mono text-[10px] uppercase text-[#888888] tracking-widest">
+                        <span>03 / MAX MULTIPLE</span>
+                        <span id="multiple-output" class="text-[#00FF66] font-bold">5.0x</span>
+                    </div>
+                    <div class="relative py-2">
+                        <input 
+                            type="range" 
+                            id="multiple-slider" 
+                            min="1.5" 
+                            max="5.0" 
+                            step="0.1" 
+                            value="5.0"
+                            class="w-full h-1 bg-neutral-800 accent-[#00FF66] cursor-pointer appearance-none rounded-none"
+                            oninput="updateMultipleFilter(this.value)"
+                        >
+                    </div>
+                    <div class="flex justify-between font-mono text-[9px] text-[#444]">
+                        <span>1.5x</span>
+                        <span>3.0x</span>
+                        <span>5.0x</span>
+                    </div>
+                </div>
+
+                <!-- Cash Flow Minimum Selector -->
+                <div class="space-y-2">
+                    <label class="font-mono text-[10px] uppercase text-[#888888] tracking-widest">04 / MIN ADJ. EBITDA</label>
+                    <select 
+                        id="ebitda-selector"
+                        class="w-full h-11 bg-black border border-[#222] rounded-none px-4 text-xs font-mono text-[#F9F9F9] focus:outline-none focus:border-[#0EA5E9] appearance-none"
+                        style="background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23888888%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpolyline points=%226 9 12 15 18 9%22%3E%3C/polyline%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 16px center;"
+                    >
+                        <option value="0">Show All Cash Flow Levels</option>
+                        <option value="400000">$400,000+ Min EBITDA</option>
+                        <option value="750000">$750,000+ Min EBITDA</option>
+                        <option value="1000000">$1,000,000+ Min EBITDA</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Meta System Statistics bento element -->
+            <div class="mt-8 border-t border-[#222222] pt-6 space-y-4">
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="bg-black p-3 border border-[#1a1a1a]">
+                        <p class="font-mono text-[8px] text-[#666]">VERIFIED POOL</p>
+                        <p class="font-mono text-base font-bold text-[#F9F9F9]">$24.8M</p>
+                    </div>
+                    <div class="bg-black p-3 border border-[#1a1a1a]">
+                        <p class="font-mono text-[8px] text-[#666]">ACTIVE BUYERS</p>
+                        <p class="font-mono text-base font-bold text-[#0EA5E9]">1,402</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2 text-[10px] font-mono text-[#555]">
+                    <span class="inline-block w-1.5 h-1.5 bg-[#00FF66]"></span>
+                    <span>SECURE SHELL PIPELINE ACTIVE</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 3. PREMIUM DEAL STREAM FLOW (Center Feed) -->
+        <section class="flex-grow p-4 lg:p-8 space-y-6 bg-[#050505]">
+            <!-- Header Stream & Actions -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#222222] pb-6">
+                <div>
+                    <h2 class="font-mono text-sm uppercase tracking-widest text-[#F9F9F9] flex items-center space-x-2">
+                        <span>PREMIUM DEAL STREAM</span>
+                        <span class="text-[10px] text-[#888]">/ (UNFILTERED SECURE LEADS)</span>
+                    </h2>
+                    <p class="text-xs text-[#666] mt-1 font-mono">Highly optimized and validated EBITDA platforms across core domestic niches.</p>
+                </div>
+                <!-- Controls info -->
+                <div class="flex items-center space-x-3 text-xs font-mono text-[#888]">
+                    <span>SORT:</span>
+                    <select id="sort-selector" class="bg-black border border-[#222222] px-3 py-1.5 text-xs text-[#F9F9F9] focus:outline-none rounded-none">
+                        <option value="asking-desc">Asking Price: High to Low</option>
+                        <option value="asking-asc">Asking Price: Low to High</option>
+                        <option value="ebitda-desc">EBITDA: High to Low</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Deal Cards Container -->
+            <div id="deal-container" class="space-y-6">
+                <!-- Javascript will inject real-time filtered cards here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- 4. TRANSACTION NEXT-STEPS MODAL (Drill-Down Trigger) -->
+    <div id="deal-modal" class="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4 md:p-8 hidden backdrop-blur-md">
+        <div class="w-full max-w-[850px] bg-[#090909] border border-[#222222] text-[#F9F9F9] flex flex-col relative glow-copper">
+            
+            <!-- Modal Header -->
+            <div class="flex justify-between items-center px-6 py-4 border-b border-[#222222] bg-[#0c0c0c]">
+                <div class="flex items-center space-x-2">
+                    <span class="inline-block w-2.5 h-2.5 bg-[#00FF66]"></span>
+                    <h3 id="modal-title" class="font-mono text-xs uppercase tracking-widest text-[#F9F9F9]">PROJECT ANALYSIS INTERFACE</h3>
+                </div>
+                <button onclick="closeModal()" class="text-xs font-mono text-[#666] hover:text-[#FF3333] transition-colors border border-[#222222] px-2.5 py-1 hover:border-[#FF3333]">
+                    [ ESC / CLOSE ]
+                </button>
+            </div>
+
+            <!-- Modal Content (SBA Modeling Layout) -->
+            <div class="p-6 md:p-8 space-y-8 overflow-y-auto max-h-[80vh]">
+                
+                <!-- Codename & Industry Summary -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 border-b border-[#1a1a1a] pb-6">
+                    <div class="md:col-span-2 space-y-1">
+                        <div class="text-[10px] font-mono text-[#0EA5E9] tracking-widest uppercase" id="modal-industry">CATEGORY</div>
+                        <h4 class="text-xl font-bold tracking-tight text-[#F9F9F9]" id="modal-codename">PROJECT DELTA</h4>
+                        <p class="text-xs text-[#888]" id="modal-desc">Detailed business characteristics modeling & SBA compliance structures.</p>
+                    </div>
+                    <div class="bg-black p-4 border border-[#222222] flex flex-col justify-center">
+                        <span class="font-mono text-[8px] text-[#666] uppercase block">ASKING VALUATION</span>
+                        <span class="text-lg font-bold text-[#00FF66]" id="modal-asking-price">$1,800,000</span>
+                        <span class="font-mono text-[10px] text-[#888]" id="modal-implied-multiple">2.9x Multiple</span>
+                    </div>
+                </div>
+
+                <!-- Structured Financial Breakdown -->
+                <div>
+                    <h5 class="font-mono text-[10px] text-[#888] uppercase tracking-wider mb-3">01 / TRANSACTION CORE FINANCIALS</h5>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <div class="bg-black border border-[#1a1a1a] p-4">
+                            <span class="font-mono text-[9px] text-[#555] block">ANNUAL REVENUE</span>
+                            <span class="text-base font-semibold text-[#F9F9F9]" id="modal-rev">$2,400,000</span>
+                        </div>
+                        <div class="bg-black border border-[#1a1a1a] p-4">
+                            <span class="font-mono text-[9px] text-[#555] block">ADJUSTED EBITDA</span>
+                            <span class="text-base font-semibold text-[#00FF66]" id="modal-ebitda">$620,000</span>
+                        </div>
+                        <div class="bg-black border border-[#1a1a1a] p-4">
+                            <span class="font-mono text-[9px] text-[#555] block">EBITDA MARGIN</span>
+                            <span class="text-base font-semibold text-[#0EA5E9]" id="modal-margin">25.8%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SBA 7(a) Acquisition Debt Modeling Engine -->
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <h5 class="font-mono text-[10px] text-[#888] uppercase tracking-wider">02 / CAPITAL STRUCTURE & SBA 7(a) LEVERAGE DEBT MODEL</h5>
+                        <span class="font-mono text-[8px] bg-[#0ea5e9]/10 text-[#0ea5e9] border border-[#0ea5e9]/20 px-2 py-0.5">SIMULATED DEBT PROFILE</span>
+                    </div>
+                    
+                    <div class="bg-black border border-[#222222] p-5 space-y-6">
+                        <!-- Sliders to Adjust Capital Stack -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Equity Injection -->
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs font-mono">
+                                    <span class="text-[#888]">Buyer Cash Equity Injection (10%)</span>
+                                    <span id="equity-val" class="text-[#F9F9F9] font-bold">$180,000</span>
+                                </div>
+                                <input type="range" id="slider-equity" min="10" max="30" step="1" value="10" class="w-full h-1 bg-neutral-800 accent-[#0EA5E9]" oninput="recalculateSBA()">
+                            </div>
+                            <!-- Seller Note Standby -->
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs font-mono">
+                                    <span class="text-[#888]">Seller Standby Note (15%)</span>
+                                    <span id="seller-val" class="text-[#F9F9F9] font-bold">$270,000</span>
+                                </div>
+                                <input type="range" id="slider-seller" min="0" max="25" step="1" value="15" class="w-full h-1 bg-neutral-800 accent-[#0EA5E9]" oninput="recalculateSBA()">
+                            </div>
+                        </div>
+
+                        <!-- Mathematical Output Stack -->
+                        <div class="border-t border-[#1a1a1a] pt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div>
+                                <span class="font-mono text-[8px] text-[#555] block">SBA DEBT REQ. (75%)</span>
+                                <span class="text-xs font-mono font-bold text-[#F9F9F9]" id="debt-amount">$1,350,000</span>
+                            </div>
+                            <div>
+                                <span class="font-mono text-[8px] text-[#555] block">ANNUAL DEBT SERVICE</span>
+                                <span class="text-xs font-mono font-bold text-[#FF3333]" id="debt-service">$197,351</span>
+                            </div>
+                            <div>
+                                <span class="font-mono text-[8px] text-[#555] block">NET POST-DEBT CASH FLOW</span>
+                                <span class="text-xs font-mono font-bold text-[#00FF66]" id="net-cashflow">$422,649</span>
+                            </div>
+                            <div>
+                                <span class="font-mono text-[8px] text-[#555] block">DEBT COVERAGE RATIO (DSCR)</span>
+                                <span class="text-xs font-mono font-bold text-[#00FF66]" id="dscr-val">3.14x</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Strategic Risk / Advisory Disclaimers -->
+                <div class="border-t border-[#1a1a1a] pt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="md:col-span-2 space-y-2">
+                        <span class="font-mono text-[10px] text-[#FF3333] tracking-widest uppercase flex items-center space-x-1">
+                            <span class="inline-block w-1.5 h-1.5 bg-[#FF3333]"></span>
+                            <span>CRITICAL RISK FACTORS</span>
+                        </span>
+                        <ul class="text-xs text-[#888] space-y-1.5 list-disc list-inside font-mono" id="modal-risks">
+                            <li>Seller training/transitional note requires structured standby periods.</li>
+                            <li>Customer concentration limit rules must trigger pre-closing pricing clawbacks.</li>
+                        </ul>
+                    </div>
+                    <!-- Advisory badging -->
+                    <div class="bg-[#FF3333]/5 border border-[#FF3333]/20 p-4 flex flex-col justify-center space-y-1">
+                        <span class="font-mono text-[8px] text-[#FF3333] tracking-widest block uppercase">ETA SAFEGUARD</span>
+                        <p class="text-[10px] text-[#888] font-mono leading-tight">Structured under 10-year maturity, standard 11.25% prevailing variable SBA benchmark rates.</p>
+                    </div>
+                </div>
+
+                <!-- Primary Action Button -->
+                <div class="pt-2 flex flex-col sm:flex-row gap-2">
+                    <button class="flex-grow h-12 bg-transparent border border-[#00FF66] text-[#00FF66] hover:bg-[#00FF66] hover:text-black font-mono text-xs font-bold tracking-widest uppercase transition-colors hover:shadow-[0_0_15px_rgba(0,255,102,0.3)]">
+                        Model Acquisition Structure & Debt Service Capacity
+                    </button>
+                    <button class="px-6 h-12 bg-neutral-900 border border-[#222222] font-mono text-xs text-[#888] hover:text-[#F9F9F9] hover:bg-neutral-800 transition-all uppercase">
+                        Request Blinded CIM
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. COMPLIANCE DISCLAIMERS & TRUST SIGNALS (Footer) -->
+    <footer class="mt-auto w-full bg-[#080808] border-t border-[#222222]">
+        <div class="max-w-[1600px] mx-auto px-6 py-8 space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <!-- Disclaimers / Text block -->
+                <div class="max-w-4xl space-y-2">
+                    <p class="font-mono text-[10px] text-[#666666] leading-relaxed">
+                        Disclaimer: AcquireMeta and Moonshine Capital are financial advisory and brokerage networks. All deal information is structurally simulated or blinded for educational and origination reference. Past operational performance is no guarantee of future returns. Financial solutions provided under compliance guidelines.
+                    </p>
+                    <p class="font-mono text-[9px] text-[#444444]">
+                        SBA 7(a) terms are structural simulations only and do not constitute absolute debt offers or guaranteed underwriting standards.
+                    </p>
+                </div>
+
+                <!-- Trust Badges Integration -->
+                <div class="flex flex-wrap gap-2 shrink-0">
+                    <span class="h-9 border border-[#222] bg-black px-3 py-1.5 flex items-center font-mono text-[10px] text-[#888] tracking-widest uppercase">
+                        PLAID DATA VERIFIED
+                    </span>
+                    <span class="h-9 border border-[#222] bg-black px-3 py-1.5 flex items-center font-mono text-[10px] text-[#888] tracking-widest uppercase">
+                        FINCEN COMPLIANT
+                    </span>
+                    <span class="h-9 border border-[#222] bg-black px-3 py-1.5 flex items-center font-mono text-[10px] text-[#888] tracking-widest uppercase">
+                        SBA PREFERRED ADVISORY
+                    </span>
+                </div>
+            </div>
+            
+            <div class="border-t border-[#111] pt-6 flex flex-col md:flex-row justify-between items-center text-[10px] font-mono text-[#444]">
+                <span>OPERATING CLASSIFIED CHANNEL SECURE SH-883</span>
+                <span>© 2026 ACQUIREMETA & MOONSHINE CAPITAL CAPITAL. ALL RIGHTS RESERVED.</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- INTERACTION LOGIC ENGINE -->
+    <script>
+        // MOCK DEAL STREAM ARRAY
+        const DEALS = [
+            {
+                id: "delta",
+                codename: "Project Delta — B2B Logistics Agency",
+                sector: "Logistics",
+                revenue: 2400000,
+                ebitda: 620000,
+                asking: 1800000,
+                multiple: 2.9,
+                sba_qualified: true,
+                exchange_ready: true,
+                high_risk: "High Customer Concentration",
+                risks: [
+                    "Sovereign manufacturer is responsible for 42% of gross logistics fees.",
+                    "Fleet utilization relies heavily on outsourced 1099 operators.",
+                    "Seller retirement requires transition contingency clause built into SBA standby."
+                ],
+                location: "Midwest Territory",
+                description: "Critical regional distribution platform specializing in customized third-party logistics integrations for auto manufacturing components."
+            },
+            {
+                id: "kestrel",
+                codename: "Project Kestrel — Cloud Asset Management SaaS",
+                sector: "SaaS",
+                revenue: 1200000,
+                ebitda: 450000,
+                asking: 1900000,
+                multiple: 4.2,
+                sba_qualified: true,
+                exchange_ready: false,
+                high_risk: "IP Architecture Audit Needed",
+                risks: [
+                    "System built on legacy infrastructure requiring immediate container modernization.",
+                    "Single-person engineering reliance poses massive key-man vulnerability.",
+                    "Variable retention ratios on second-tier client cohorts."
+                ],
+                location: "100% Remote",
+                description: "Integrated cloud optimization solution tracking high-value tangible assets for construction logistics corporations."
+            },
+            {
+                id: "hvac-nova",
+                codename: "Project Nova — Regional HVAC & Infrastructure Service",
+                sector: "Home Services",
+                revenue: 3100000,
+                ebitda: 810000,
+                asking: 2600000,
+                multiple: 3.2,
+                sba_qualified: true,
+                exchange_ready: true,
+                high_risk: "Tight Technician Labor Market",
+                risks: [
+                    "Experienced master techs are close to retirement age.",
+                    "Requires state license structural transition on local corporate bylaws.",
+                    "Seasonality spikes during high winter heating periods."
+                ],
+                location: "Franconia, VA",
+                description: "Highly stable residential and mid-market commercial HVAC maintenance firm featuring high recurring maintenance subscription channels."
+            },
+            {
+                id: "onyx",
+                codename: "Project Onyx — Precision Component CNC Manufacturing",
+                sector: "Manufacturing",
+                revenue: 5800000,
+                ebitda: 1200000,
+                asking: 3800000,
+                multiple: 3.1,
+                sba_qualified: true,
+                exchange_ready: true,
+                high_risk: "High Capital Expenditures Reinvestment",
+                risks: [
+                    "Requires multi-million dollar machinery modernization cycle within 3 years.",
+                    "Key site facility lease up for review in 24 months.",
+                    "Environmental certifications require ongoing EPA filings."
+                ],
+                location: "Atlanta Hub",
+                description: "State-of-the-art precision components manufacture serving aerospace subsystems with active long-term procurement frameworks."
+            },
+            {
+                id: "titan",
+                codename: "Project Titan — Last-Mile Commercial Fleet System",
+                sector: "Logistics",
+                revenue: 4200000,
+                ebitda: 950000,
+                asking: 2800000,
+                multiple: 2.9,
+                sba_qualified: false,
+                exchange_ready: true,
+                high_risk: "SBA Collateral Gap Detected",
+                risks: [
+                    "High depreciation on equipment requires structural personal guarantees.",
+                    "Fuel surcharge pass-through structures subject to rapid market fluctuations.",
+                    "Primary distribution hub operating under near-capacity logistics constraints."
+                ],
+                location: "Chicagoland Area",
+                description: "Last-mile final delivery network providing high density distribution contracts for Fortune 500 retail networks."
+            }
+        ];
+
+        // State variables
+        let selectedSectors = [];
+        let maxMultiple = 5.0;
+        let minEbitda = 0;
+        let searchQuery = "";
+        let selectedDeal = null;
+
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', () => {
+            renderDeals();
+            
+            // Event Listener for Search
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                searchQuery = e.target.value.toLowerCase();
+                renderDeals();
+            });
+
+            // Event Listener for EBITDA Selection
+            document.getElementById('ebitda-selector').addEventListener('change', (e) => {
+                minEbitda = parseInt(e.target.value);
+                renderDeals();
+            });
+
+            // Event Listener for Sort Selector
+            document.getElementById('sort-selector').addEventListener('change', () => {
+                renderDeals();
+            });
+        });
+
+        // Toggle sectors selection
+        function toggleSector(sector) {
+            const button = document.querySelector(`[data-sector="${sector}"]`);
+            if (selectedSectors.includes(sector)) {
+                selectedSectors = selectedSectors.filter(s => s !== sector);
+                button.classList.remove('border-[#0EA5E9]', 'text-[#F9F9F9]');
+                button.classList.add('border-[#222222]', 'text-[#888]');
+                button.querySelector('.indicator').classList.remove('text-[#0EA5E9]');
+                button.querySelector('.indicator').classList.add('text-[#444]');
+            } else {
+                selectedSectors.push(sector);
+                button.classList.add('border-[#0EA5E9]', 'text-[#F9F9F9]');
+                button.classList.remove('border-[#222222]', 'text-[#888]');
+                button.querySelector('.indicator').classList.add('text-[#0EA5E9]');
+                button.querySelector('.indicator').classList.remove('text-[#444]');
+            }
+            renderDeals();
+        }
+
+        function clearSectorFilters() {
+            selectedSectors = [];
+            document.querySelectorAll('.sector-pill').forEach(button => {
+                button.classList.remove('border-[#0EA5E9]', 'text-[#F9F9F9]');
+                button.classList.add('border-[#222222]', 'text-[#888]');
+                button.querySelector('.indicator').classList.remove('text-[#0EA5E9]');
+                button.querySelector('.indicator').classList.add('text-[#444]');
+            });
+            renderDeals();
+        }
+
+        // Update Max Multiple Filter
+        function updateMultipleFilter(val) {
+            maxMultiple = parseFloat(val);
+            document.getElementById('multiple-output').textContent = val + 'x';
+            renderDeals();
+        }
+
+        // Save State Toggle (Heart/Star action placeholder)
+        const savedDeals = new Set();
+        function toggleSave(dealId, event) {
+            event.stopPropagation();
+            const btn = document.getElementById(`save-btn-${dealId}`);
+            if (savedDeals.has(dealId)) {
+                savedDeals.delete(dealId);
+                btn.innerHTML = `
+                    <svg class="w-4 h-4 text-[#888] hover:text-[#0ea5e9] transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+                    </svg>
+                `;
+            } else {
+                savedDeals.add(dealId);
+                btn.innerHTML = `
+                    <svg class="w-4 h-4 text-[#00FF66] transition-all fill-[#00FF66]" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+                    </svg>
+                `;
+            }
+        }
+
+        // Format Big Currency Figures cleanly
+        function formatCurrency(num) {
+            return '$' + num.toLocaleString('en-US');
+        }
+
+        // RENDER PIPELINE
+        function renderDeals() {
+            const container = document.getElementById('deal-container');
+            
+            // Filter Data Set
+            let filtered = DEALS.filter(deal => {
+                const matchesSector = selectedSectors.length === 0 || selectedSectors.includes(deal.sector);
+                const matchesMultiple = deal.multiple <= maxMultiple;
+                const matchesEbitda = deal.ebitda >= minEbitda;
+                const matchesSearch = deal.codename.toLowerCase().includes(searchQuery) || deal.sector.toLowerCase().includes(searchQuery);
+                return matchesSector && matchesMultiple && matchesEbitda && matchesSearch;
+            });
+
+            // Sort Data Set
+            const sortBy = document.getElementById('sort-selector').value;
+            if (sortBy === 'asking-desc') {
+                filtered.sort((a, b) => b.asking - a.asking);
+            } else if (sortBy === 'asking-asc') {
+                filtered.sort((a, b) => a.asking - b.asking);
+            } else if (sortBy === 'ebitda-desc') {
+                filtered.sort((a, b) => b.ebitda - a.ebitda);
+            }
+
+            // Zero State
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="h-64 border border-dashed border-[#222] flex flex-col items-center justify-center p-8 space-y-4">
+                        <span class="font-mono text-xs text-[#555] tracking-widest uppercase">/ ALERT: ZERO ASSETS DETECTED FOR CURRENT PARAMETERS /</span>
+                        <button onclick="resetAllFilters()" class="font-mono text-xs text-black bg-[#00FF66] px-4 py-2 hover:bg-white transition-all font-semibold uppercase">RESET CURRENT CONSTRAINTS</button>
+                    </div>
+                `;
+                return;
+            }
+
+            // Build Cards Markup
+            container.innerHTML = filtered.map(deal => {
+                return `
+                    <article class="relative bg-gradient-to-r from-[#090909] to-black border border-[#222222] p-5 md:p-6 hover:border-[#0EA5E9] transition-all group duration-300">
+                        <!-- Top Header Row -->
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#181818] pb-4 mb-5">
+                            <div class="space-y-1">
+                                <span class="font-mono text-[9px] text-[#0EA5E9] tracking-widest uppercase">${deal.sector} // ${deal.location}</span>
+                                <h3 class="text-base font-bold text-[#F9F9F9] tracking-tight group-hover:text-white transition-colors">
+                                    ${deal.codename}
+                                </h3>
+                            </div>
+                            
+                            <!-- Action Hooks (Save and Detail triggers) -->
+                            <div class="flex items-center space-x-2 w-full sm:w-auto justify-between sm:justify-start">
+                                <span class="font-mono text-[10px] text-[#666]">MULTIPLE: <span class="text-[#00FF66] font-bold">${deal.multiple}x</span></span>
+                                <button id="save-btn-${deal.id}" onclick="toggleSave('${deal.id}', event)" class="p-2 border border-[#222222] bg-[#0c0c0c] hover:border-[#0EA5E9] transition-all" title="Save to Board">
+                                    <svg class="w-4 h-4 text-[#888] hover:text-[#0ea5e9] transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Bento Metrics Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 mb-5">
+                            <div class="bg-black p-3.5 border border-[#161616] flex flex-col justify-center">
+                                <span class="font-mono text-[9px] text-[#555] uppercase block">REVENUE</span>
+                                <span class="text-sm font-semibold text-[#F9F9F9] tracking-wider font-mono">${formatCurrency(deal.revenue)}</span>
+                            </div>
+                            <div class="bg-black p-3.5 border border-[#161616] flex flex-col justify-center">
+                                <span class="font-mono text-[9px] text-[#555] uppercase block">ADJUSTED EBITDA</span>
+                                <span class="text-sm font-semibold text-[#00FF66] tracking-wider font-mono">${formatCurrency(deal.ebitda)}</span>
+                            </div>
+                            <div class="bg-black p-3.5 border border-[#161616] flex flex-col justify-center">
+                                <span class="font-mono text-[9px] text-[#555] uppercase block">ASKING VALUATION</span>
+                                <span class="text-sm font-semibold text-[#0EA5E9] tracking-wider font-mono">${formatCurrency(deal.asking)}</span>
+                            </div>
+                        </div>
+
+                        <!-- Quality Tag Badges & Risk Warnings -->
+                        <div class="flex flex-wrap items-center justify-between gap-4">
+                            <div class="flex flex-wrap gap-1.5">
+                                ${deal.sba_qualified ? `<span class="bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/20 font-mono text-[9px] px-2.5 py-1">SBA PRE-QUALIFIED</span>` : ''}
+                                ${deal.exchange_ready ? `<span class="bg-[#0EA5E9]/10 text-[#0EA5E9] border border-[#0EA5E9]/20 font-mono text-[9px] px-2.5 py-1">1031 EXCHANGE READY</span>` : ''}
+                                <span class="bg-[#FF3333]/10 text-[#FF3333] border border-[#FF3333]/20 font-mono text-[9px] px-2.5 py-1 uppercase tracking-tight flex items-center space-x-1">
+                                    <span class="inline-block w-1 h-1 bg-[#FF3333] rounded-full animate-pulse"></span>
+                                    <span>RISK: ${deal.high_risk}</span>
+                                </span>
+                            </div>
+
+                            <!-- Primary Transaction Tool Trigger -->
+                            <button onclick="openModal('${deal.id}')" class="w-full sm:w-auto h-10 border border-[#00FF66] text-[#00FF66] font-mono text-[10px] font-semibold tracking-wider uppercase px-4 hover:bg-[#00FF66] hover:text-black hover:shadow-[0_0_10px_rgba(0,255,102,0.2)] transition-all flex items-center justify-center space-x-2">
+                                <span>ANALYZE DEAL MECHANICS</span>
+                                <span>→</span>
+                            </button>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        function resetAllFilters() {
+            document.getElementById('search-input').value = "";
+            document.getElementById('multiple-slider').value = 5.0;
+            document.getElementById('ebitda-selector').value = 0;
+            searchQuery = "";
+            maxMultiple = 5.0;
+            minEbitda = 0;
+            updateMultipleFilter(5.0);
+            clearSectorFilters();
+        }
+
+        // DEBT ENGINE AND SBA MODELING LOGIC
+        function openModal(dealId) {
+            selectedDeal = DEALS.find(d => d.id === dealId);
+            if (!selectedDeal) return;
+
+            document.getElementById('modal-title').textContent = `${selectedDeal.id.toUpperCase()} // PORTFOLIO ANALYSIS ENGINE`;
+            document.getElementById('modal-codename').textContent = selectedDeal.codename;
+            document.getElementById('modal-industry').textContent = `${selectedDeal.sector} Platform // Origin: ${selectedDeal.location}`;
+            document.getElementById('modal-desc').textContent = selectedDeal.description;
+            document.getElementById('modal-asking-price').textContent = formatCurrency(selectedDeal.asking);
+            document.getElementById('modal-implied-multiple').textContent = `${selectedDeal.multiple}x Implied Multiple`;
+            
+            document.getElementById('modal-rev').textContent = formatCurrency(selectedDeal.revenue);
+            document.getElementById('modal-ebitda').textContent = formatCurrency(selectedDeal.ebitda);
+            
+            // Calculate Margin percentage
+            const margin = ((selectedDeal.ebitda / selectedDeal.revenue) * 100).toFixed(1);
+            document.getElementById('modal-margin').textContent = margin + '%';
+
+            // Populate Risk Bullet Points
+            const risksContainer = document.getElementById('modal-risks');
+            risksContainer.innerHTML = selectedDeal.risks.map(r => `<li>${r}</li>`).join('');
+
+            // Reset Slider default positions dynamically to fit context
+            document.getElementById('slider-equity').value = 10;
+            document.getElementById('slider-seller').value = 15;
+
+            recalculateSBA();
+
+            document.getElementById('deal-modal').classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('deal-modal').classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        // Real-time financial math modeling engine built inside modal
+        function recalculateSBA() {
+            if (!selectedDeal) return;
+
+            const eqPct = parseFloat(document.getElementById('slider-equity').value);
+            const sellerPct = parseFloat(document.getElementById('slider-seller').value);
+            
+            // Constrain ranges so sum is max 95%
+            let sbaPct = 100 - eqPct - sellerPct;
+            if (sbaPct < 0) {
+                sbaPct = 0;
+            }
+
+            // Calculations based on pricing index rules
+            const asking = selectedDeal.asking;
+            const equityVal = asking * (eqPct / 100);
+            const sellerVal = asking * (sellerPct / 100);
+            const debtVal = asking * (sbaPct / 100);
+
+            // Compute standard amortized payment structure based on 10-year term (SBA standard)
+            // standard 11.25% interest rate. PMT = P * [r(1+r)^n] / [(1+r)^n - 1]
+            const rate = 0.1125 / 12;
+            const payments = 120; // 10 years
+            let monthlyPayment = 0;
+            if (debtVal > 0) {
+                monthlyPayment = debtVal * (rate * Math.pow(1 + rate, payments)) / (Math.pow(1 + rate, payments) - 1);
+            }
+            const annualDebtService = monthlyPayment * 12;
+
+            // Post-debt Free Cash Flow projection
+            const netCashflow = selectedDeal.ebitda - annualDebtService;
+
+            // Debt Service Coverage Ratio (DSCR)
+            let dscr = 0;
+            if (annualDebtService > 0) {
+                dscr = selectedDeal.ebitda / annualDebtService;
+            }
+
+            // Update UI elements dynamic feedback output fields
+            document.getElementById('equity-val').textContent = `${formatCurrency(Math.round(equityVal))} (${eqPct}%)`;
+            document.getElementById('seller-val').textContent = `${formatCurrency(Math.round(sellerVal))} (${sellerPct}%)`;
+            document.getElementById('debt-amount').textContent = `${formatCurrency(Math.round(debtVal))} (${Math.round(sbaPct)}%)`;
+            document.getElementById('debt-service').textContent = formatCurrency(Math.round(annualDebtService));
+            document.getElementById('net-cashflow').textContent = formatCurrency(Math.round(netCashflow));
+            
+            const dscrElement = document.getElementById('dscr-val');
+            dscrElement.textContent = dscr > 0 ? dscr.toFixed(2) + 'x' : 'N/A';
+            
+            // Visual indicators signaling safety rules
+            if (dscr < 1.25) {
+                dscrElement.className = "text-xs font-mono font-bold text-[#FF3333]";
+            } else if (dscr < 1.75) {
+                dscrElement.className = "text-xs font-mono font-bold text-[#0EA5E9]";
+            } else {
+                dscrElement.className = "text-xs font-mono font-bold text-[#00FF66]";
+            }
+        }
+
+        // Close modal on escape key
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

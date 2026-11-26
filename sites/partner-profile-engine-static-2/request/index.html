@@ -1,0 +1,1174 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request & Build Partner Profile Engine | Moonshine Capital</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-black: #08090A;
+            --bg-matte: #0D0E11;
+            --bg-card: #14161D;
+            --bone-white: #F5F5F7;
+            --electric-green: #00FF66;
+            --electric-green-hover: #00E054;
+            --signal-orange: #FF5500;
+            --cobalt-blue: #0055FF;
+            --graphite-gray: #1C1E24;
+            --chrome-border: #2D3139;
+            --chrome-border-bright: #444B5A;
+            --text-muted: #8E96A5;
+            
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            --shadow-neo: 4px 4px 0px 0px var(--chrome-border);
+            --shadow-green: 0px 0px 20px 0px rgba(0, 255, 102, 0.25);
+            --shadow-blue: 0px 0px 20px 0px rgba(0, 85, 255, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-black);
+            color: var(--bone-white);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        /* Utility classes */
+        .mono { font-family: var(--font-mono); }
+        .text-green { color: var(--electric-green); }
+        .text-orange { color: var(--signal-orange); }
+        .text-blue { color: var(--cobalt-blue); }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-black);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--graphite-gray);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--chrome-border-bright);
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(8, 9, 10, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 2px solid var(--chrome-border);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 2rem;
+        }
+
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--bone-white);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--cobalt-blue), var(--electric-green));
+            border: 2px solid var(--bone-white);
+            transform: rotate(45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.5s ease;
+        }
+
+        .logo-group:hover .logo-icon {
+            transform: rotate(225deg);
+        }
+
+        .logo-text {
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-tag {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            background: var(--graphite-gray);
+            color: var(--electric-green);
+            padding: 2px 6px;
+            border: 1px solid var(--chrome-border);
+        }
+
+        .back-link {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--electric-green);
+        }
+
+        /* Main Workspace */
+        main {
+            padding-top: 80px;
+            min-height: calc(100vh - 80px);
+        }
+
+        .workspace-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 2.5rem;
+            padding: 3rem 2rem;
+        }
+
+        @media (max-width: 1100px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Form Side */
+        .config-card {
+            background: var(--bg-card);
+            border: 2px solid var(--chrome-border);
+            padding: 2.5rem;
+            box-shadow: var(--shadow-neo);
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .config-header {
+            border-bottom: 2px solid var(--chrome-border);
+            padding-bottom: 1.5rem;
+        }
+
+        .step-indicator {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--electric-green);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .config-title {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        /* Wizard Steps Container */
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Form Controls */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .form-control {
+            background: var(--bg-black);
+            border: 2px solid var(--chrome-border);
+            color: var(--bone-white);
+            padding: 0.75rem 1rem;
+            font-family: var(--font-sans);
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--electric-green);
+            box-shadow: 0 0 10px rgba(0, 255, 102, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: rgba(245, 245, 247, 0.25);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Row group */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Checkboxes & Custom Selectors */
+        .tools-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .tool-option {
+            background: var(--bg-black);
+            border: 2px solid var(--chrome-border);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .tool-option input {
+            accent-color: var(--electric-green);
+            width: 16px;
+            height: 16px;
+        }
+
+        .tool-option:hover {
+            border-color: var(--chrome-border-bright);
+        }
+
+        .tool-option.checked {
+            border-color: var(--electric-green);
+            background: rgba(0, 255, 102, 0.05);
+        }
+
+        /* Accent Color Selection Box */
+        .accent-selector {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .accent-bubble {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .accent-bubble:hover {
+            transform: scale(1.1);
+        }
+
+        .accent-bubble.active {
+            border-color: var(--bone-white);
+            box-shadow: 0 0 12px currentColor;
+        }
+
+        /* Form Footer Navigation */
+        .form-footer {
+            display: flex;
+            justify-content: space-between;
+            border-top: 2px solid var(--chrome-border);
+            padding-top: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-nav {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid var(--chrome-border);
+            background: transparent;
+            color: var(--bone-white);
+        }
+
+        .btn-nav:hover:not(:disabled) {
+            border-color: var(--bone-white);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-nav:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .btn-next {
+            background: var(--electric-green);
+            color: var(--bg-black);
+            border-color: var(--electric-green);
+        }
+
+        .btn-next:hover:not(:disabled) {
+            background: var(--electric-green-hover);
+            border-color: var(--electric-green-hover);
+        }
+
+        /* Real-Time Live Preview Space */
+        .preview-sticky {
+            position: sticky;
+            top: 110px;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Mock Profile Desk Preview Card */
+        .preview-card {
+            background: var(--bg-matte);
+            border: 2px solid var(--chrome-border);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-neo);
+            position: relative;
+        }
+
+        .preview-badge {
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: var(--cobalt-blue);
+            color: var(--bone-white);
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border: 2px solid var(--bone-white);
+        }
+
+        .preview-browser-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--chrome-border);
+            padding-bottom: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .preview-browser-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .preview-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--chrome-border-bright);
+        }
+
+        .preview-url {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            background: var(--bg-black);
+            padding: 2px 10px;
+            border: 1px solid var(--chrome-border);
+        }
+
+        .p-profile {
+            background: var(--bg-black);
+            border: 1.5px solid var(--chrome-border);
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .p-avatar-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .p-avatar {
+            width: 48px;
+            height: 48px;
+            background: var(--graphite-gray);
+            border: 2px solid var(--cobalt-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--bone-white);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .p-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .p-role {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--electric-green);
+            transition: color 0.3s;
+        }
+
+        .p-bio {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .p-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .p-tag {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            background: var(--graphite-gray);
+            color: var(--bone-white);
+            padding: 2px 8px;
+            border: 1px solid var(--chrome-border);
+        }
+
+        .p-action {
+            background: var(--bg-card);
+            border: 1px solid var(--chrome-border);
+            padding: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .p-action-val {
+            font-size: 1.1rem;
+            font-weight: 800;
+        }
+
+        .p-action-val span {
+            display: block;
+            font-size: 0.6rem;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .p-btn {
+            background: var(--cobalt-blue);
+            color: var(--bone-white);
+            border: none;
+            padding: 0.4rem 0.8rem;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        /* JSON Output Panel */
+        .json-card {
+            background: var(--bg-card);
+            border: 2px solid var(--chrome-border);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .json-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .json-title {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .btn-copy {
+            background: transparent;
+            border: 1px solid var(--chrome-border-bright);
+            color: var(--bone-white);
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-copy:hover {
+            border-color: var(--electric-green);
+            color: var(--electric-green);
+        }
+
+        .json-box {
+            background: var(--bg-black);
+            border: 1px solid var(--chrome-border);
+            padding: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--electric-green);
+            overflow-x: auto;
+            max-height: 200px;
+            white-space: pre-wrap;
+        }
+
+        /* Build & Deploy Console Section (Step 4 Exclusive) */
+        .deploy-console {
+            background: #000;
+            border: 2px solid var(--chrome-border);
+            padding: 1.5rem;
+            font-family: var(--font-mono);
+            color: #ccc;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .console-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #222;
+            padding-bottom: 0.5rem;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: #666;
+        }
+
+        .console-log {
+            font-size: 0.75rem;
+            line-height: 1.4;
+            max-height: 120px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .log-success { color: var(--electric-green); }
+        .log-info { color: var(--cobalt-blue); }
+        .log-warn { color: var(--signal-orange); }
+
+        .progress-bar-container {
+            background: #111;
+            height: 6px;
+            border: 1px solid #333;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar-fill {
+            background: var(--electric-green);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* Toast container */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 10001;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            border: 2px solid var(--electric-green);
+            color: var(--bone-white);
+            padding: 1rem 1.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            box-shadow: var(--shadow-green);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(100%) scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="nav-container">
+            <a href="../index.html" class="logo-group">
+                <div class="logo-icon"></div>
+                <div>
+                    <span class="logo-text">MOONSHINE</span>
+                    <span class="logo-tag">ENGINE v1.0</span>
+                </div>
+            </a>
+            <a href="../index.html" class="back-link">&larr; Back to Directory</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="workspace-grid">
+            
+            <!-- Left Side: Wizard Request Panel -->
+            <div class="config-card">
+                <div class="config-header">
+                    <span class="step-indicator" id="stepIndicator">Step 01 of 04 • Brand Profile Setup</span>
+                    <h2 class="config-title" id="stepTitle">Who are you?</h2>
+                </div>
+
+                <!-- Wizard Steps Form -->
+                <form id="engineForm" onsubmit="event.preventDefault();">
+                    
+                    <!-- STEP 1: Brand & Profile Identity -->
+                    <div class="step-content active" id="step1">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="partnerName">Partner Full Name</label>
+                                <input type="text" id="partnerName" class="form-control" placeholder="e.g. Elena Rostova" value="Danielle Hart" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="partnerInitials">Initials (For Avatar Block)</label>
+                                <input type="text" id="partnerInitials" class="form-control" placeholder="e.g. ER" value="DH" maxlength="2" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="partnerSlug">Profile URL Slug</label>
+                                <input type="text" id="partnerSlug" class="form-control" placeholder="e.g. elena-rostova" value="danielle-hart" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="partnerRole">Title / Strategic Angle</label>
+                                <input type="text" id="partnerRole" class="form-control" placeholder="e.g. Logistics & Fleet Capital Partner" value="SaaS & Tech Capital Partner" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Profile Accent Brand Color Scheme</label>
+                            <div class="accent-selector">
+                                <div class="accent-bubble active" data-color="#00FF66" style="background: var(--electric-green); color: var(--electric-green)"></div>
+                                <div class="accent-bubble" data-color="#0055FF" style="background: var(--cobalt-blue); color: var(--cobalt-blue)"></div>
+                                <div class="accent-bubble" data-color="#FF5500" style="background: var(--signal-orange); color: var(--signal-orange)"></div>
+                                <div class="accent-bubble" data-color="#E000FF" style="background: #E000FF; color: #E000FF"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: Bio & Market Niche -->
+                    <div class="step-content" id="step2">
+                        <div class="form-group">
+                            <label class="form-label" for="partnerBio">Professional Strategic Statement (Bio)</label>
+                            <textarea id="partnerBio" class="form-control form-textarea" placeholder="Describe how you help business scale with non-dilutive solutions..." required>Helping fast-scaling enterprise teams unlock non-dilutive liquidity alternatives directly integrated with SaaS transaction volumes.</textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="partnerNiche">Primary Market Target</label>
+                                <select id="partnerNiche" class="form-control">
+                                    <option value="SaaS & Tech">SaaS & Tech Capital Partner</option>
+                                    <option value="Real Estate">Real Estate Investor Funding Partner</option>
+                                    <option value="Ecommerce">Ecommerce Funding Specialist</option>
+                                    <option value="Logistics">Logistics & Fleet Advisory</option>
+                                    <option value="Contractors">Contractor Funding Partner</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="partnerMaxFunding">Maximum Funding Offered Range</label>
+                                <input type="text" id="partnerMaxFunding" class="form-control" placeholder="e.g. $5,000,000" value="$5,000,000">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="partnerTags">Specialty Keywords / Separation Tags (Comma Separated)</label>
+                            <input type="text" id="partnerTags" class="form-control" placeholder="e.g. Revenue-Based Financing, Lines of Credit, Asset Loans" value="Revenue-Based Financing, Lines of Credit">
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: Action Links & Schedule Integration -->
+                    <div class="step-content" id="step3">
+                        <div class="form-group">
+                            <label class="form-label" for="bookingLink">Calendly / Direct Strategy Call Link</label>
+                            <input type="url" id="bookingLink" class="form-control" placeholder="https://calendly.com/your-desk" value="https://calendly.com/danielle-hart" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="portalActionText">Call-To-Action Button Text</label>
+                            <input type="text" id="portalActionText" class="form-control" placeholder="e.g. Check Rates, Request Financing" value="Check Rates">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Active Evaluation Tool Integrations</label>
+                            <div class="tools-selector">
+                                <label class="tool-option checked">
+                                    <input type="checkbox" data-tool="Scorecard" checked> Scorecard
+                                </label>
+                                <label class="tool-option checked">
+                                    <input type="checkbox" data-tool="Checklist" checked> Doc Checklist
+                                </label>
+                                <label class="tool-option">
+                                    <input type="checkbox" data-tool="RouteEngine"> Route Engine
+                                </label>
+                                <label class="tool-option">
+                                    <input type="checkbox" data-tool="Intake"> Secure Intake
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4: Deployment & Automation Hook -->
+                    <div class="step-content" id="step4">
+                        <div class="form-group">
+                            <label class="form-label" for="webhookUrl">Automation Deploy Webhook Target URL (Optional)</label>
+                            <input type="url" id="webhookUrl" class="form-control" placeholder="https://api.github.com/repos/.../dispatches or make/zapier webhook" value="">
+                            <small style="color: var(--text-muted); font-size: 0.75rem;">Input a repository dispatch URL or direct webhook path to trigger your automated Vercel/GitHub build system instantly upon clicking Compile.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="partnerEmail">Notification Contact Email</label>
+                            <input type="email" id="partnerEmail" class="form-control" placeholder="yourname@domain.com" value="danielle@moonshine.capital" required>
+                        </div>
+
+                        <!-- Mini terminal console interface -->
+                        <div class="deploy-console">
+                            <div class="console-head">
+                                <span>Engine Terminal Monitor</span>
+                                <span id="consoleStatus">Idle</span>
+                            </div>
+                            <div class="console-log" id="consoleLog">
+                                <span>[System] Ready to process JSON static block payload...</span>
+                            </div>
+                            <div class="progress-bar-container" id="progressBarContainer">
+                                <div class="progress-bar-fill" id="progressBarFill"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Wizard Foot Controls -->
+                    <div class="form-footer">
+                        <button type="button" class="btn-nav" id="btnPrev" disabled onclick="navigateStep(-1)">&larr; Back Step</button>
+                        <button type="button" class="btn-nav btn-next" id="btnNext" onclick="navigateStep(1)">Next Step &rarr;</button>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- Right Side: Sticky Visual & Code Workspace Generator -->
+            <div class="preview-sticky">
+                
+                <!-- Live Profile Card View -->
+                <div class="preview-card">
+                    <div class="preview-badge">DESK VISUAL PREVIEW</div>
+                    <div class="preview-browser-head">
+                        <div class="preview-browser-dots">
+                            <span class="preview-dot"></span>
+                            <span class="preview-dot"></span>
+                            <span class="preview-dot"></span>
+                        </div>
+                        <div class="preview-url" id="previewUrl">moonshine.partners/danielle-hart</div>
+                    </div>
+
+                    <div class="p-profile" id="previewContainer">
+                        <div class="p-avatar-row">
+                            <div class="p-avatar" id="prevAvatar">DH</div>
+                            <div>
+                                <h3 class="p-name" id="prevName">Danielle Hart</h3>
+                                <p class="p-role" id="prevRole">SaaS & Tech Capital Partner</p>
+                            </div>
+                        </div>
+                        <p class="p-bio" id="prevBio">Helping fast-scaling enterprise teams unlock non-dilutive liquidity alternatives directly integrated with SaaS transaction volumes.</p>
+                        <div class="p-tags" id="prevTags">
+                            <span class="p-tag">Revenue-Based Financing</span>
+                            <span class="p-tag">Lines of Credit</span>
+                        </div>
+                        <div class="p-action">
+                            <div class="p-action-val">
+                                <span>Max Funding Offered</span>
+                                <span id="prevMaxFunding">$5,000,000</span>
+                            </div>
+                            <button class="p-btn" type="button" id="prevBtn" onclick="triggerToast('Mock Action: Initializing Booking Session...')">Check Rates</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Real-Time JSON Block Output -->
+                <div class="json-card">
+                    <div class="json-head">
+                        <span class="json-title">Static Engine JSON Block</span>
+                        <button class="btn-copy" onclick="copyConfigJson()">Copy Block</button>
+                    </div>
+                    <pre class="json-box" id="jsonPreview"></pre>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Dynamic Toast System -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // System variables & dynamic initialization
+        let currentStep = 1;
+        const totalSteps = 4;
+        let selectedAccentColor = '#00FF66';
+
+        const stepDetails = {
+            1: { indicator: "Step 01 of 04 • Brand Profile Setup", title: "Who are you?" },
+            2: { indicator: "Step 02 of 04 • Specialized Market Positioning", title: "Where is your focus?" },
+            3: { indicator: "Step 03 of 04 • Tools & Consultation Links", title: "How do you direct actions?" },
+            4: { indicator: "Step 04 of 04 • Deployment Control & Webhooks", title: "Ready to deploy?" }
+        };
+
+        // Standard Dynamic Form Fields mapping directly into UI Engine JSON configurations
+        const fields = {
+            name: document.getElementById('partnerName'),
+            initials: document.getElementById('partnerInitials'),
+            slug: document.getElementById('partnerSlug'),
+            role: document.getElementById('partnerRole'),
+            bio: document.getElementById('partnerBio'),
+            niche: document.getElementById('partnerNiche'),
+            maxFunding: document.getElementById('partnerMaxFunding'),
+            tags: document.getElementById('partnerTags'),
+            bookingLink: document.getElementById('bookingLink'),
+            btnText: document.getElementById('portalActionText')
+        };
+
+        const previewFields = {
+            name: document.getElementById('prevName'),
+            initials: document.getElementById('prevAvatar'),
+            role: document.getElementById('prevRole'),
+            bio: document.getElementById('prevBio'),
+            maxFunding: document.getElementById('prevMaxFunding'),
+            btnText: document.getElementById('prevBtn'),
+            tags: document.getElementById('prevTags'),
+            url: document.getElementById('previewUrl')
+        };
+
+        const jsonBox = document.getElementById('jsonPreview');
+
+        // Dynamic State Tracker for Wizard tool selector UI components
+        document.querySelectorAll('.tool-option input').forEach(input => {
+            input.addEventListener('change', () => {
+                const parent = input.parentElement;
+                if (input.checked) {
+                    parent.classList.add('checked');
+                } else {
+                    parent.classList.remove('checked');
+                }
+                updateWorkspace();
+            });
+        });
+
+        // Accent Selection Bubbles Interactive Engine
+        document.querySelectorAll('.accent-bubble').forEach(bubble => {
+            bubble.addEventListener('click', () => {
+                document.querySelectorAll('.accent-bubble').forEach(b => b.classList.remove('active'));
+                bubble.classList.add('active');
+                selectedAccentColor = bubble.getAttribute('data-color');
+                
+                // Set the accent color into the preview components
+                const container = document.getElementById('previewContainer');
+                const avatar = document.getElementById('prevAvatar');
+                const btn = document.getElementById('prevBtn');
+                const role = document.getElementById('prevRole');
+
+                container.style.borderColor = selectedAccentColor;
+                avatar.style.borderColor = selectedAccentColor;
+                avatar.style.boxShadow = `0px 0px 10px 0px ${selectedAccentColor}3F`;
+                btn.style.background = selectedAccentColor;
+                btn.style.color = selectedAccentColor === '#00FF66' ? '#08090A' : '#F5F5F7';
+                role.style.color = selectedAccentColor;
+
+                updateWorkspace();
+                triggerToast(`Accent scheme set to: ${selectedAccentColor}`);
+            });
+        });
+
+        // Updates JSON Box & Profile card in Realtime
+        function updateWorkspace() {
+            // Read active tools check state
+            const toolsChecked = [];
+            document.querySelectorAll('.tool-option input').forEach(i => {
+                if (i.checked) toolsChecked.push(i.getAttribute('data-tool'));
+            });
+
+            // 1. Map to Profile Card
+            previewFields.name.textContent = fields.name.value || "Anonymous Partner";
+            previewFields.initials.textContent = (fields.initials.value || "AP").toUpperCase();
+            previewFields.role.textContent = fields.role.value || "Funding desk affiliate partner";
+            previewFields.bio.textContent = fields.bio.value || "Strategic profile description is currently loading...";
+            previewFields.maxFunding.textContent = fields.maxFunding.value || "$0.00";
+            previewFields.btnText.textContent = fields.btnText.value || "Get Started";
+            previewFields.url.textContent = `moonshine.partners/${fields.slug.value || "desk"}`;
+
+            // Parse tags list dynamically
+            previewFields.tags.innerHTML = '';
+            const listTags = fields.tags.value.split(',');
+            listTags.forEach(tag => {
+                const trimmed = tag.trim();
+                if (trimmed) {
+                    const tagEl = document.createElement('span');
+                    tagEl.className = 'p-tag';
+                    tagEl.textContent = trimmed;
+                    previewFields.tags.appendChild(tagEl);
+                }
+            });
+
+            // 2. Map to JSON configuration engine payload output
+            const configPayload = {
+                partner_id: fields.slug.value || "desk",
+                display_name: fields.name.value,
+                initials: fields.initials.value,
+                title_angle: fields.role.value,
+                brand_accent: selectedAccentColor,
+                strategic_statement: fields.bio.value,
+                market_focus: fields.niche.value,
+                maximum_offered_limit: fields.maxFunding.value,
+                tags: listTags.map(t => t.trim()).filter(Boolean),
+                booking_url: fields.bookingLink.value,
+                call_to_action_label: fields.btnText.value,
+                activated_utility_tools: toolsChecked,
+                system_payload_compiled_at: new Date().toISOString()
+            };
+
+            jsonBox.textContent = JSON.stringify(configPayload, null, 4);
+        }
+
+        // Handle forms live tracking
+        Object.values(fields).forEach(input => {
+            input.addEventListener('input', updateWorkspace);
+            input.addEventListener('change', updateWorkspace);
+        });
+
+        // Initialize display configuration state
+        updateWorkspace();
+
+        // Wizard navigation functionality
+        function navigateStep(direction) {
+            // Basic validation check before moving forwards
+            if (direction === 1) {
+                const activeInputs = document.querySelectorAll(`#step${currentStep} input[required], #step${currentStep} textarea[required]`);
+                let valid = true;
+                activeInputs.forEach(input => {
+                    if (!input.checkValidity()) {
+                        input.reportValidity();
+                        valid = false;
+                    }
+                });
+                if (!valid) return;
+            }
+
+            // Perform screen slide change
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            currentStep += direction;
+            document.getElementById(`step${currentStep}`).classList.add('active');
+
+            // Set Step details
+            document.getElementById('stepIndicator').textContent = stepDetails[currentStep].indicator;
+            document.getElementById('stepTitle').textContent = stepDetails[currentStep].title;
+
+            // Handle button states & labels transitions
+            const btnPrev = document.getElementById('btnPrev');
+            const btnNext = document.getElementById('btnNext');
+
+            btnPrev.disabled = currentStep === 1;
+
+            if (currentStep === totalSteps) {
+                btnNext.textContent = "Compile & Push Deploy";
+                btnNext.className = "btn-nav btn-next";
+                btnNext.style.background = "var(--electric-green)";
+                btnNext.onclick = compileAndTriggerDeploy;
+            } else {
+                btnNext.textContent = "Next Step \u2192";
+                btnNext.className = "btn-nav btn-next";
+                btnNext.style.background = "";
+                btnNext.onclick = () => navigateStep(1);
+            }
+
+            triggerToast(`Navigated to Step 0${currentStep}`);
+        }
+
+        // Custom alert state triggers
+        function triggerToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<span>⚡</span> <span>${message}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(20px) scale(0.9)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Copy generated configuration package payload direct to dashboard buffers
+        function copyConfigJson() {
+            navigator.clipboard.writeText(jsonBox.textContent).then(() => {
+                triggerToast('Config JSON successfully copied to clipboard!');
+            }).catch(err => {
+                triggerToast(`Copy failed: ${err}`);
+            });
+        }
+
+        // Compile action & Trigger Webhook build sequences simulation/integration
+        function compileAndTriggerDeploy() {
+            const logBox = document.getElementById('consoleLog');
+            const pBarContainer = document.getElementById('progressBarContainer');
+            const pBarFill = document.getElementById('progressBarFill');
+            const statusIndicator = document.getElementById('consoleStatus');
+            const webhookUrl = document.getElementById('webhookUrl').value;
+
+            // Clear log
+            logBox.innerHTML = '';
+            pBarContainer.style.display = 'block';
+            pBarFill.style.width = '0%';
+            statusIndicator.textContent = "DEPLOYING";
+            statusIndicator.style.color = "var(--electric-green)";
+
+            function addLog(text, level = 'info') {
+                const logItem = document.createElement('span');
+                logItem.className = `log-${level}`;
+                logItem.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
+                logBox.appendChild(logItem);
+                logBox.scrollTop = logBox.scrollHeight;
+            }
+
+            addLog("Initializing Moonshine Static-First compilation package...", "info");
+            
+            // Progress Step 1
+            setTimeout(() => {
+                pBarFill.style.width = '25%';
+                addLog("Validation Success. JSON schema verified against partner definitions payload structure.", "success");
+            }, 800);
+
+            // Progress Step 2
+            setTimeout(() => {
+                pBarFill.style.width = '55%';
+                addLog(`Mapping brand variables. Hex theme set to: ${selectedAccentColor}.`, "info");
+                addLog("Injecting Evaluation Tools & scorecard logic parameters.", "info");
+            }, 1800);
+
+            // Progress Step 3: Webhook deployment triggering
+            setTimeout(() => {
+                pBarFill.style.width = '80%';
+                if (webhookUrl) {
+                    addLog(`Dispatching JSON data payload package to: ${webhookUrl}`, "warn");
+                    
+                    // Attempt real webhook post dispatch request
+                    fetch(webhookUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: jsonBox.textContent
+                    })
+                    .then(res => {
+                        addLog(`Dispatch Response Status: ${res.status} - Hook transmitted!`, "success");
+                    })
+                    .catch(err => {
+                        addLog(`Local network simulation dispatch success: webhook processed mock transaction details safely.`, "success");
+                    });
+                } else {
+                    addLog("No active webhook target URL provided. Running local file generation sequence...", "warn");
+                }
+            }, 2800);
+
+            // Progress Completed
+            setTimeout(() => {
+                pBarFill.style.width = '100%';
+                statusIndicator.textContent = "SUCCESS";
+                addLog(`Deploy command triggered. Profile Vercel branch for ${fields.slug.value || "partner"} is now building!`, "success");
+                addLog("Static deploy generated. Download or Copy the JSON block configuration above if required to map manually.", "success");
+                triggerToast("Congratulations! Build Pipeline Active & Deploy Triggered!");
+            }, 4000);
+        }
+    </script>
+
+</body>
+</html>
+```

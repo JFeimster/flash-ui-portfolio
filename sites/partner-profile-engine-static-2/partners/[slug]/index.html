@@ -1,0 +1,1515 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partner Command Desk | Moonshine Capital</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-black: #08090A;
+            --bg-matte: #0D0E11;
+            --bg-card: #14161D;
+            --bone-white: #F5F5F7;
+            --electric-green: #00FF66;
+            --electric-green-hover: #00E054;
+            --signal-orange: #FF5500;
+            --cobalt-blue: #0055FF;
+            --graphite-gray: #1C1E24;
+            --chrome-border: #2D3139;
+            --chrome-border-bright: #444B5A;
+            --text-muted: #8E96A5;
+            
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            --partner-accent: var(--electric-green);
+            --partner-accent-glow: rgba(0, 255, 102, 0.15);
+            
+            --shadow-neo: 4px 4px 0px 0px var(--chrome-border);
+            --shadow-accent: 0px 0px 20px 0px var(--partner-accent-glow);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-black);
+            color: var(--bone-white);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        .mono { font-family: var(--font-mono); }
+        .text-accent { color: var(--partner-accent); }
+        .text-muted { color: var(--text-muted); }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-black);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--graphite-gray);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--chrome-border-bright);
+        }
+
+        /* Top Bar Indicator Status */
+        .status-header {
+            background: var(--bg-matte);
+            border-bottom: 2px solid var(--chrome-border);
+            padding: 0.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+        }
+
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--partner-accent);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px var(--partner-accent);
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
+
+        /* Nav Header */
+        header {
+            background: rgba(8, 9, 10, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 2px solid var(--chrome-border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--bone-white);
+        }
+
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--cobalt-blue), var(--electric-green));
+            border: 2px solid var(--bone-white);
+            transform: rotate(45deg);
+        }
+
+        .logo-text {
+            font-weight: 800;
+            font-size: 1.1rem;
+            letter-spacing: -0.5px;
+        }
+
+        .header-action-btn {
+            background: transparent;
+            border: 2px solid var(--partner-accent);
+            color: var(--partner-accent);
+            padding: 0.5rem 1rem;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .header-action-btn:hover {
+            background: var(--partner-accent);
+            color: var(--bg-black);
+            box-shadow: var(--shadow-accent);
+        }
+
+        /* Shell Grid Workspace */
+        .workspace {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2.5rem 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 3rem;
+            position: relative;
+        }
+
+        /* Profile Side Details block */
+        .profile-card {
+            background: var(--bg-card);
+            border: 2px solid var(--chrome-border);
+            padding: 2.5rem;
+            position: sticky;
+            top: 120px;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            box-shadow: var(--shadow-neo);
+        }
+
+        .profile-badge {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: var(--graphite-gray);
+            border: 3px solid var(--partner-accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 2rem;
+            color: var(--bone-white);
+            box-shadow: var(--shadow-accent);
+        }
+
+        .profile-info h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            margin-bottom: 0.25rem;
+        }
+
+        .profile-title {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--partner-accent);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .profile-bio {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text-muted);
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            background: var(--bg-black);
+            border: 1px solid var(--chrome-border);
+            padding: 1.5rem;
+        }
+
+        .stat-box {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .stat-box .label {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-box .val {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--bone-white);
+        }
+
+        .specializations {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .spec-title {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--bone-white);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--chrome-border);
+            padding-bottom: 0.5rem;
+        }
+
+        .spec-tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .spec-tag {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            background: var(--graphite-gray);
+            border: 1px solid var(--chrome-border-bright);
+            padding: 4px 10px;
+            color: var(--bone-white);
+        }
+
+        /* Interactive Right side Desk Controls */
+        .control-desk {
+            display: flex;
+            flex-direction: column;
+            gap: 3rem;
+        }
+
+        .desk-section {
+            background: var(--bg-matte);
+            border: 2px solid var(--chrome-border);
+            padding: 2.5rem;
+        }
+
+        .desk-section-header {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 2px solid var(--chrome-border);
+            padding-bottom: 1rem;
+        }
+
+        .desk-section-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .desk-section-pre {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--partner-accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Calculator Widget styling */
+        .calculator-block {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .input-label-row {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .range-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: var(--graphite-gray);
+            outline: none;
+            border: 1px solid var(--chrome-border);
+            transition: background 0.3s;
+        }
+
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--partner-accent);
+            cursor: pointer;
+            border: 2px solid var(--bone-white);
+        }
+
+        .range-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: var(--partner-accent);
+            cursor: pointer;
+            border: 2px solid var(--bone-white);
+        }
+
+        .custom-select {
+            background: var(--bg-black);
+            border: 1px solid var(--chrome-border);
+            color: var(--bone-white);
+            padding: 0.75rem;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .custom-select:focus {
+            border-color: var(--partner-accent);
+        }
+
+        .calc-result-box {
+            background: var(--bg-card);
+            border: 1px solid var(--chrome-border-bright);
+            padding: 1.5rem;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .calc-est-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--partner-accent);
+            line-height: 1;
+        }
+
+        .calc-est-label {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .calc-route-suggestion {
+            font-size: 0.8rem;
+            line-height: 1.4;
+            color: var(--text-muted);
+            border-left: 2px solid var(--partner-accent);
+            padding-left: 1rem;
+        }
+
+        /* Calendar Widget Styling */
+        .calendar-widget {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .calendar-week-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+        }
+
+        .calendar-day-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--chrome-border);
+            padding: 1rem 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .calendar-day-btn:hover {
+            border-color: var(--chrome-border-bright);
+            background: var(--graphite-gray);
+        }
+
+        .calendar-day-btn.active {
+            border-color: var(--partner-accent);
+            background: rgba(0, 255, 102, 0.05);
+        }
+
+        .calendar-day-btn .day-lbl {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .calendar-day-btn .day-num {
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        .time-slots-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .time-slots-title {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .slots-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+        }
+
+        .slot-btn {
+            background: var(--bg-black);
+            border: 1px solid var(--chrome-border);
+            color: var(--bone-white);
+            padding: 0.65rem;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .slot-btn:hover {
+            border-color: var(--partner-accent);
+            color: var(--partner-accent);
+        }
+
+        .slot-btn.active {
+            background: var(--partner-accent);
+            border-color: var(--partner-accent);
+            color: var(--bg-black);
+            font-weight: 700;
+        }
+
+        .booking-submit-btn {
+            background: var(--partner-accent);
+            color: var(--bg-black);
+            border: 2px solid var(--partner-accent);
+            padding: 1rem;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            box-shadow: 4px 4px 0px 0px rgba(0, 255, 102, 0.1);
+        }
+
+        .booking-submit-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px 0px var(--partner-accent-glow), var(--shadow-accent);
+        }
+
+        /* Document Portal Interactive Upload and checklist */
+        .doc-checklist {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .progress-bar-wrapper {
+            background: var(--bg-black);
+            border: 1px solid var(--chrome-border);
+            padding: 1rem;
+        }
+
+        .progress-text-row {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-track {
+            height: 4px;
+            background: var(--graphite-gray);
+            width: 100%;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--partner-accent);
+            width: 0%;
+            transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 0 8px var(--partner-accent);
+        }
+
+        .checklist-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .checklist-item {
+            background: var(--bg-card);
+            border: 1px solid var(--chrome-border);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .checklist-item:hover {
+            border-color: var(--chrome-border-bright);
+        }
+
+        .checklist-item.verified {
+            border-color: var(--partner-accent);
+            background: rgba(0, 255, 102, 0.02);
+        }
+
+        .checklist-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .checklist-status-marker {
+            width: 20px;
+            height: 20px;
+            border: 1px solid var(--chrome-border-bright);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: transparent;
+            font-weight: 700;
+        }
+
+        .checklist-item.verified .checklist-status-marker {
+            border-color: var(--partner-accent);
+            background: var(--partner-accent);
+            color: var(--bg-black);
+        }
+
+        .checklist-meta h4 {
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .checklist-meta p {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        .upload-trigger-btn {
+            background: var(--graphite-gray);
+            border: 1px solid var(--chrome-border-bright);
+            color: var(--bone-white);
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            padding: 0.35rem 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .upload-trigger-btn:hover {
+            background: var(--chrome-border-bright);
+            border-color: var(--bone-white);
+        }
+
+        .checklist-item.verified .upload-trigger-btn {
+            background: transparent;
+            border-color: var(--partner-accent);
+            color: var(--partner-accent);
+        }
+
+        /* Direct Contact Node */
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-input {
+            background: var(--bg-black);
+            border: 1px solid var(--chrome-border);
+            color: var(--bone-white);
+            padding: 0.85rem 1rem;
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: var(--partner-accent);
+        }
+
+        .form-textarea {
+            background: var(--bg-black);
+            border: 1px solid var(--chrome-border);
+            color: var(--bone-white);
+            padding: 1rem;
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            outline: none;
+            resize: vertical;
+            min-height: 120px;
+            transition: border-color 0.2s;
+        }
+
+        .form-textarea:focus {
+            border-color: var(--partner-accent);
+        }
+
+        .form-submit-btn {
+            background: transparent;
+            border: 2px solid var(--partner-accent);
+            color: var(--partner-accent);
+            padding: 1rem;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .form-submit-btn:hover {
+            background: var(--partner-accent);
+            color: var(--bg-black);
+            box-shadow: var(--shadow-accent);
+        }
+
+        /* Top Simulation Controls Switcher - Extremely handy demo helper */
+        .simulation-banner {
+            background: var(--bg-card);
+            border-bottom: 2px solid var(--chrome-border-bright);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .sim-title {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--signal-orange);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sim-selector-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .sim-selector-btn {
+            background: var(--bg-black);
+            border: 1px solid var(--chrome-border);
+            color: var(--text-muted);
+            padding: 0.35rem 0.75rem;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .sim-selector-btn:hover, .sim-selector-btn.active {
+            border-color: var(--partner-accent);
+            color: var(--bone-white);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 10001;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            border: 2px solid var(--partner-accent);
+            color: var(--bone-white);
+            padding: 1rem 1.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            box-shadow: var(--shadow-accent);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(100%) scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Footer */
+        footer {
+            background: var(--bg-matte);
+            border-top: 2px solid var(--chrome-border);
+            padding: 4rem 2rem 2rem 2rem;
+            margin-top: 5rem;
+        }
+
+        .footer-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            border-bottom: 1px solid var(--chrome-border);
+            padding-bottom: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .footer-brand {
+            font-weight: 800;
+            font-size: 1.1rem;
+            letter-spacing: -0.5px;
+        }
+
+        .footer-compliance {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        .footer-copyright {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 1100px) {
+            .workspace {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+            .profile-card {
+                position: relative;
+                top: 0;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .slots-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .calendar-week-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Dynamic Simulation Bar for Previewing Different Partners -->
+    <div class="simulation-banner">
+        <span class="sim-title"><span>⚙️</span> SIMULATION COMMANDER: SWITCH ACTIVE DECK PORTAL</span>
+        <div class="sim-selector-group" id="simSelector">
+            <button class="sim-selector-btn active" data-slug="danielle-hart">Danielle Hart</button>
+            <button class="sim-selector-btn" data-slug="darwin-hanneman">Darwin Hanneman</button>
+            <button class="sim-selector-btn" data-slug="marcus-vance">Marcus Vance</button>
+            <button class="sim-selector-btn" data-slug="elena-rostova">Elena Rostova</button>
+            <button class="sim-selector-btn" data-slug="jack-sterling">Jack Sterling</button>
+            <button class="sim-selector-btn" data-slug="sarah-jenkins">Sarah Jenkins</button>
+            <button class="sim-selector-btn" data-slug="devon-mills">Devon Mills</button>
+        </div>
+    </div>
+
+    <!-- Top Status Control Line -->
+    <div class="status-header">
+        <div class="status-left">
+            <span class="text-muted">PORTAL ID: <span id="slugDisplay" class="mono text-accent">danielle-hart</span></span>
+            <span class="text-muted">|</span>
+            <span class="text-muted">SYSTEM REVISION: <span class="mono text-accent">v1.2a</span></span>
+        </div>
+        <div class="status-indicator">
+            <span class="status-dot"></span>
+            <span>SECURE DOCK CONNECTION LINKED</span>
+        </div>
+    </div>
+
+    <!-- Sticky Portal Header -->
+    <header>
+        <div class="nav-container">
+            <a href="../../index.html" class="logo-group">
+                <div class="logo-icon"></div>
+                <div>
+                    <span class="logo-text">MOONSHINE PARTNERS</span>
+                </div>
+            </a>
+            <a href="../../index.html#profiles" class="header-action-btn">← Back to Registry</a>
+        </div>
+    </header>
+
+    <main class="workspace">
+        
+        <!-- Column 1: Static Profile Deck -->
+        <aside>
+            <div class="profile-card">
+                <div class="profile-badge">
+                    <div class="profile-avatar" id="partnerAvatar">DH</div>
+                    <div class="profile-info">
+                        <h1 id="partnerName">Danielle Hart</h1>
+                        <span class="profile-title" id="partnerRole">SaaS & Tech Capital Partner</span>
+                    </div>
+                </div>
+
+                <p class="profile-bio" id="partnerBio">
+                    Helping fast-scaling enterprise teams unlock non-dilutive liquidity alternatives directly integrated with SaaS transaction volumes. Releasing automated options customized for modern tech architecture.
+                </p>
+
+                <div class="profile-stats">
+                    <div class="stat-box">
+                        <span class="label">Max Funding</span>
+                        <span class="val text-accent" id="statMax">$5.0M</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="label">Speed Target</span>
+                        <span class="val" id="statSpeed">48 Hours</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="label">Specialty Route</span>
+                        <span class="val" id="statRoute">Revenue SaaS</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="label">Min Revenue</span>
+                        <span class="val" id="statMin">$25K / Mo</span>
+                    </div>
+                </div>
+
+                <div class="specializations">
+                    <span class="spec-title">Active Match Targets</span>
+                    <div class="spec-tags" id="partnerTags">
+                        <span class="spec-tag">Revenue-Based Financing</span>
+                        <span class="spec-tag">SaaS Growth</span>
+                        <span class="spec-tag">Tech Credit Lines</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Column 2: Interactive Operations Work Suite -->
+        <section class="control-desk">
+            
+            <!-- Widget 1: Immediate Capacity Optimizer Calculator -->
+            <div class="desk-section" id="deskCalc">
+                <div class="desk-section-header">
+                    <h2 class="desk-section-title">Estimated Match Tool</h2>
+                    <span class="desk-section-pre">Direct Pre-Screening</span>
+                </div>
+                <div class="calculator-block">
+                    <div class="input-group">
+                        <div class="input-label-row">
+                            <span>CURRENT MONTHLY REVENUE</span>
+                            <span id="revenueDisplay" class="text-accent font-mono">$150,000</span>
+                        </div>
+                        <input type="range" min="10000" max="1000000" step="5000" value="150000" class="range-slider" id="calcRevenue">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <div class="input-label-row">
+                                <span>BUSINESS LIFETIME</span>
+                            </div>
+                            <select class="custom-select" id="calcAge">
+                                <option value="0.8">Less than 1 Year</option>
+                                <option value="1.0" selected>1 - 3 Years</option>
+                                <option value="1.2">More than 3 Years</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <div class="input-label-row">
+                                <span>CREDIT PROFILE INDEX</span>
+                            </div>
+                            <select class="custom-select" id="calcCredit">
+                                <option value="0.9">Standard (580 - 650)</option>
+                                <option value="1.1" selected>Optimal (651 - 720)</option>
+                                <option value="1.3">Premier (720+)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="calc-result-box">
+                        <div>
+                            <span class="calc-est-label">Estimated Pre-Qualified Range</span>
+                            <span class="calc-est-value" id="calcEstOutput">$350,000</span>
+                        </div>
+                        <div class="calc-route-suggestion" id="calcRouteTip">
+                            Dynamic route optimal match calculated based on partner specialization profile. Submit requirements to confirm rate options.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Widget 2: Custom Document Progress Control Portal -->
+            <div class="desk-section" id="deskDocs">
+                <div class="desk-section-header">
+                    <h2 class="desk-section-title">Required Documents Tracker</h2>
+                    <span class="desk-section-pre">Secure Intake File Status</span>
+                </div>
+                <div class="doc-checklist">
+                    <p class="text-muted" style="font-size:0.85rem;">
+                        Upload standard verification files below to fast-track underwriting checks. Checked items represent successfully logged verification vectors.
+                    </p>
+                    <div class="progress-bar-wrapper">
+                        <div class="progress-text-row">
+                            <span>REGISTRATION COMPLETENESS INDEX</span>
+                            <span id="progressPercent" class="text-accent">0% Completed</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" id="progressBar"></div>
+                        </div>
+                    </div>
+
+                    <div class="checklist-items" id="checklistContainer">
+                        <!-- Doc 1 -->
+                        <div class="checklist-item" onclick="toggleDocCheck('bank')">
+                            <div class="checklist-left">
+                                <div class="checklist-status-marker" id="chk-bank">✓</div>
+                                <div class="checklist-meta">
+                                    <h4>Last 4 Months Bank Statements</h4>
+                                    <p class="mono">FORMAT: PDF ONLY • MAX SIZE 25MB</p>
+                                </div>
+                            </div>
+                            <button class="upload-trigger-btn" onclick="triggerFileUpload('bank', event)">Upload Document</button>
+                        </div>
+                        <!-- Doc 2 -->
+                        <div class="checklist-item" onclick="toggleDocCheck('tax')">
+                            <div class="checklist-left">
+                                <div class="checklist-status-marker" id="chk-tax">✓</div>
+                                <div class="checklist-meta">
+                                    <h4>Most Recent Federal Tax Returns</h4>
+                                    <p class="mono">FORMAT: PDF ONLY • COMPLETED AND SIGNED</p>
+                                </div>
+                            </div>
+                            <button class="upload-trigger-btn" onclick="triggerFileUpload('tax', event)">Upload Document</button>
+                        </div>
+                        <!-- Doc 3 -->
+                        <div class="checklist-item" onclick="toggleDocCheck('id')">
+                            <div class="checklist-left">
+                                <div class="checklist-status-marker" id="chk-id">✓</div>
+                                <div class="checklist-meta">
+                                    <h4>Authorized Signatory Identification</h4>
+                                    <p class="mono">FORMAT: JPG, PNG OR PDF • UNEXPIRED GOV ID</p>
+                                </div>
+                            </div>
+                            <button class="upload-trigger-btn" onclick="triggerFileUpload('id', event)">Upload Document</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Widget 3: Live Calendar Direct Booking Engine -->
+            <div class="desk-section" id="deskCalendar">
+                <div class="desk-section-header">
+                    <h2 class="desk-section-title">Schedule Strategic Consultation</h2>
+                    <span class="desk-section-pre">Direct Direct Booking Suite</span>
+                </div>
+                <div class="calendar-widget">
+                    <div class="calendar-week-grid" id="weekGrid">
+                        <!-- Days are generated dynamically below -->
+                    </div>
+
+                    <div class="time-slots-container">
+                        <span class="time-slots-title">Available Slot Options</span>
+                        <div class="slots-grid" id="slotsGrid">
+                            <!-- Slots are generated dynamically below -->
+                        </div>
+                    </div>
+
+                    <button class="booking-submit-btn" onclick="submitBooking()">Lock Consultation Call Slot</button>
+                </div>
+            </div>
+
+            <!-- Widget 4: Custom Contact Interface node -->
+            <div class="desk-section" id="deskContact">
+                <div class="desk-section-header">
+                    <h2 class="desk-section-title">Send Direct Secure Message</h2>
+                    <span class="desk-section-pre">Direct Encryption Pipeline</span>
+                </div>
+                <form class="contact-form" onsubmit="handleContactSubmit(event)">
+                    <div class="form-row">
+                        <input type="text" placeholder="Authorized Representative Name" class="form-input" required id="contactName">
+                        <input type="email" placeholder="Direct Security Notification Email" class="form-input" required id="contactEmail">
+                    </div>
+                    <div class="form-row">
+                        <input type="tel" placeholder="Contact Mobile Sequence" class="form-input" required id="contactPhone">
+                        <input type="text" placeholder="Official Registered Company Name" class="form-input" required id="contactCompany">
+                    </div>
+                    <textarea placeholder="Describe capital application intentions and current balance challenges..." class="form-textarea" required id="contactMsg"></textarea>
+                    <button type="submit" class="form-submit-btn">Transmit Direct Command Message</button>
+                </form>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer Segment matches brand style -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-info">
+                <span class="footer-brand">MOONSHINE PARTNER INTERFACE SYSTEM</span>
+                <p class="footer-copyright">
+                    © <span id="currentYear"></span> Moonshine Capital. Securely deploying custom partner workspaces. All rights reserved.
+                </p>
+            </div>
+            <div class="footer-compliance">
+                <strong>SECURE INFRASTRUCTURE ADVISORY:</strong> This portal constitutes a verified, static-first, highly secured partner channel running customized calculation utilities. All entered details remain strictly bounded within local encrypted caches until directly submitted via active secured pipelines. Consult local regulatory guides regarding precise rates and loan parameters.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Dynamic Alert Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // Set dynamic year
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Registry of Dynamic Partner Database Profiles
+        const partnersDb = {
+            'danielle-hart': {
+                name: 'Danielle Hart',
+                role: 'SaaS & Tech Capital Partner',
+                initials: 'DH',
+                bio: 'Helping fast-scaling enterprise teams unlock non-dilutive liquidity alternatives directly integrated with SaaS transaction volumes. Releasing automated options customized for modern tech architecture.',
+                max: '$5.0M',
+                speed: '48 Hours',
+                route: 'Revenue SaaS',
+                min: '$25K / Mo',
+                tags: ['Revenue-Based Financing', 'SaaS Growth Credit', 'Tech Credit Lines', 'Non-dilutive SaaS Desk'],
+                accent: '#00FF66',
+                accentGlow: 'rgba(0, 255, 102, 0.15)'
+            },
+            'darwin-hanneman': {
+                name: 'Darwin Hanneman',
+                role: 'Real Estate Investor Partner',
+                initials: 'DH',
+                bio: 'Unlocking dynamic short-term bridge products, portfolio lines, and transactional asset-based debt channels for fix & flip portfolios and multi-family developers.',
+                max: '$15.0M',
+                speed: '72 Hours',
+                route: 'Bridge Funding',
+                min: '$100K Asset',
+                tags: ['Fix & Flip Portfolios', 'Short-Term Bridge Notes', 'Asset-Based Debt', 'Development Lines'],
+                accent: '#0055FF',
+                accentGlow: 'rgba(0, 85, 255, 0.15)'
+            },
+            'marcus-vance': {
+                name: 'Marcus Vance',
+                role: 'Ecommerce Funding Specialist',
+                initials: 'MV',
+                bio: 'Releasing optimized revenue-based growth capital tailored for international direct-to-consumer pipelines, helping scale inventory before critical Q4 seasonal rushes.',
+                max: '$3.5M',
+                speed: '24 Hours',
+                route: 'Inventory Match',
+                min: '$15K / Mo',
+                tags: ['Inventory Accelerator', 'DTC Growth Lines', 'Merchant Credit Paths', 'Revolving Capital'],
+                accent: '#FF5500',
+                accentGlow: 'rgba(255, 85, 0, 0.15)'
+            },
+            'elena-rostova': {
+                name: 'Elena Rostova',
+                role: 'Logistics & Fleet Advisory',
+                initials: 'ER',
+                bio: 'Specialized logistics financing structuring asset equity, complex equipment acquisitions, and dispatch invoice streams for fast-expanding commercial transport fleets.',
+                max: '$8.0M',
+                speed: '3 Days',
+                route: 'Fleet Asset Map',
+                min: '$50K / Mo',
+                tags: ['Fleet Acquisition Debt', 'Equipment Term Structuring', 'Invoice Accounts Streams', 'Logistics Advisory'],
+                accent: '#00FF66',
+                accentGlow: 'rgba(0, 255, 102, 0.15)'
+            },
+            'jack-sterling': {
+                name: 'Jack Sterling',
+                role: 'Contractor Funding Partner',
+                initials: 'JS',
+                bio: 'Enabling high-capacity commercial contractors to fund immediate supply purchases and payroll runs securely through commercial contract milestones.',
+                max: '$2.0M',
+                speed: '36 Hours',
+                route: 'Contract Terms',
+                min: '$20K Invoice',
+                tags: ['HVAC Supply Financing', 'Electrical Project Bridge', 'Contract Milestones', 'Payroll Stream Access'],
+                accent: '#0055FF',
+                accentGlow: 'rgba(0, 85, 255, 0.15)'
+            },
+            'sarah-jenkins': {
+                name: 'Sarah Jenkins',
+                role: 'Multifamily Portfolio Capital',
+                initials: 'SJ',
+                bio: 'Focusing on private multi-family syndication funding models, flexible bridge notes, and joint venture capital options across primary coastal markets.',
+                max: '$25.0M',
+                speed: '5 Days',
+                route: 'Yield Structural',
+                min: '$250K Equity',
+                tags: ['10-50 Unit Assets', 'Joint Venture Structuring', 'Bridge Note Refinance', 'Syndication Funding'],
+                accent: '#FF5500',
+                accentGlow: 'rgba(255, 85, 0, 0.15)'
+            },
+            'devon-mills': {
+                name: 'Devon Mills',
+                role: 'Merchant Capital Specialist',
+                initials: 'DM',
+                bio: 'Fast-paced, optimization-driven capital models specifically calibrated for scaling cash inventories for high-growth local retailers and merchants.',
+                max: '$1.5M',
+                speed: '12 Hours',
+                route: 'Merchant Advance',
+                min: '$10K / Mo',
+                tags: ['Retail Cash Lines', 'Merchant Advance Matrix', 'Physical Store Bridging', 'Season Inventory Lift'],
+                accent: '#00FF66',
+                accentGlow: 'rgba(0, 255, 102, 0.15)'
+            }
+        };
+
+        let currentPartner = 'danielle-hart';
+
+        // Check query parameters or default slug
+        function initPartnerData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const pathSegments = window.location.pathname.split('/');
+            // Try to find if slug exists inside URL path, else check param, fallback to danielle-hart
+            let slug = pathSegments[pathSegments.length - 2];
+            
+            if (!partnersDb[slug]) {
+                slug = urlParams.get('p') || 'danielle-hart';
+            }
+            if (!partnersDb[slug]) {
+                slug = 'danielle-hart';
+            }
+            
+            loadPartner(slug);
+        }
+
+        // Apply partner details and update workspace color schemes
+        function loadPartner(slug) {
+            const p = partnersDb[slug];
+            if (!p) return;
+
+            currentPartner = slug;
+
+            // Update DOM fields
+            document.getElementById('slugDisplay').textContent = slug;
+            document.getElementById('partnerName').textContent = p.name;
+            document.getElementById('partnerRole').textContent = p.role;
+            document.getElementById('partnerAvatar').textContent = p.initials;
+            document.getElementById('partnerBio').textContent = p.bio;
+            document.getElementById('statMax').textContent = p.max;
+            document.getElementById('statSpeed').textContent = p.speed;
+            document.getElementById('statRoute').textContent = p.route;
+            document.getElementById('statMin').textContent = p.min;
+
+            // Generate Tags
+            const tagContainer = document.getElementById('partnerTags');
+            tagContainer.innerHTML = '';
+            p.tags.forEach(tag => {
+                const span = document.createElement('span');
+                span.className = 'spec-tag';
+                span.textContent = tag;
+                tagContainer.appendChild(span);
+            });
+
+            // Update colors dynamically on root variables
+            document.documentElement.style.setProperty('--partner-accent', p.accent);
+            document.documentElement.style.setProperty('--partner-accent-glow', p.accentGlow);
+
+            // Update Simulation switches active class
+            document.querySelectorAll('.sim-selector-btn').forEach(btn => {
+                if (btn.getAttribute('data-slug') === slug) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Re-trigger estimation calculator update
+            updateCalculation();
+            
+            // Build calendar
+            generateCalendarDays();
+            generateCalendarSlots();
+
+            // Refresh progress bar
+            updateProgress();
+
+            triggerToast(`Loaded secure workspace for ${p.name}`);
+        }
+
+        // Switch partner handler for simulation buttons
+        document.getElementById('simSelector').addEventListener('click', (e) => {
+            if (e.target.classList.contains('sim-selector-btn')) {
+                const slug = e.target.getAttribute('data-slug');
+                loadPartner(slug);
+            }
+        });
+
+        // Trigger dynamic system notifications
+        function triggerToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<span>⚡</span> <span>${message}</span>`;
+            container.appendChild(toast);
+
+            // Self cleanup
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(20px) scale(0.9)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        /* calculator logic */
+        const calcRevenueInput = document.getElementById('calcRevenue');
+        const calcAgeInput = document.getElementById('calcAge');
+        const calcCreditInput = document.getElementById('calcCredit');
+        const revenueDisplay = document.getElementById('revenueDisplay');
+        const calcEstOutput = document.getElementById('calcEstOutput');
+
+        function updateCalculation() {
+            const revVal = parseInt(calcRevenueInput.value);
+            const ageMultiplier = parseFloat(calcAgeInput.value);
+            const creditMultiplier = parseFloat(calcCreditInput.value);
+
+            revenueDisplay.textContent = `$${revVal.toLocaleString()}`;
+
+            // Calculate estimated capacity
+            let multiplier = 2.5; 
+            const activePartner = partnersDb[currentPartner];
+            if (activePartner.route.includes('Bridge') || activePartner.route.includes('Multifamily')) {
+                multiplier = 5.0; // Higher limits for Real estate assets
+            }
+
+            let result = revVal * multiplier * ageMultiplier * creditMultiplier;
+            
+            // Format result bound to partner maximums
+            const maxVal = parseFloat(activePartner.max.replace(/[^0-9.]/g, '')) * 1000000;
+            if (result > maxVal) result = maxVal;
+            if (result < 15000) result = 15000;
+
+            calcEstOutput.textContent = `$${Math.round(result).toLocaleString()}`;
+        }
+
+        calcRevenueInput.addEventListener('input', updateCalculation);
+        calcAgeInput.addEventListener('change', updateCalculation);
+        calcCreditInput.addEventListener('change', updateCalculation);
+
+
+        /* Calendar Direct Booking Engine logic */
+        let selectedDay = null;
+        let selectedSlot = null;
+
+        function generateCalendarDays() {
+            const grid = document.getElementById('weekGrid');
+            grid.innerHTML = '';
+            
+            // Generate next 5 business days
+            const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+            const today = new Date();
+            let addedCount = 0;
+            let checkDate = new Date(today);
+
+            while (addedCount < 5) {
+                checkDate.setDate(checkDate.getDate() + 1);
+                const dayIndex = checkDate.getDay();
+                
+                if (dayIndex !== 0 && dayIndex !== 6) { // Skip weekends
+                    const dayName = weekdays[dayIndex - 1];
+                    const dayNum = checkDate.getDate();
+                    
+                    const btn = document.createElement('button');
+                    btn.className = 'calendar-day-btn';
+                    if (addedCount === 0) {
+                        btn.classList.add('active');
+                        selectedDay = `${dayName} ${dayNum}`;
+                    }
+                    btn.innerHTML = `
+                        <span class="day-lbl">${dayName}</span>
+                        <span class="day-num">${dayNum}</span>
+                    `;
+                    
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.calendar-day-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        selectedDay = `${dayName} ${dayNum}`;
+                        triggerToast(`Target date set to ${selectedDay}`);
+                    });
+
+                    grid.appendChild(btn);
+                    addedCount++;
+                }
+            }
+        }
+
+        function generateCalendarSlots() {
+            const grid = document.getElementById('slotsGrid');
+            grid.innerHTML = '';
+
+            const times = ['09:00 AM', '10:30 AM', '01:00 PM', '03:30 PM'];
+            times.forEach((time, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'slot-btn';
+                if (index === 0) {
+                    btn.classList.add('active');
+                    selectedSlot = time;
+                }
+                btn.textContent = time;
+
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    selectedSlot = time;
+                    triggerToast(`Selected slot set to ${time}`);
+                });
+
+                grid.appendChild(btn);
+            });
+        }
+
+        function submitBooking() {
+            triggerToast(`CONFIRMED: Consulting hold verified for ${selectedDay} at ${selectedSlot}. Authorization details locked!`);
+        }
+
+
+        /* Document Upload Checklist checklist simulated states */
+        const docStates = {
+            bank: false,
+            tax: false,
+            id: false
+        };
+
+        function toggleDocCheck(docKey) {
+            docStates[docKey] = !docStates[docKey];
+            updateDocDisplay(docKey);
+        }
+
+        function updateDocDisplay(docKey) {
+            const itemElement = document.getElementById(`chk-${docKey}`).closest('.checklist-item');
+            if (docStates[docKey]) {
+                itemElement.classList.add('verified');
+            } else {
+                itemElement.classList.remove('verified');
+            }
+            updateProgress();
+        }
+
+        function triggerFileUpload(docKey, event) {
+            event.stopPropagation(); // prevent nested click triggering checkbox toggle twice
+            
+            triggerToast(`Connecting dynamic local storage upload sequence for ${docKey}...`);
+            setTimeout(() => {
+                docStates[docKey] = true;
+                updateDocDisplay(docKey);
+                triggerToast(`SUCCESS: Verified document data logged into system index!`);
+            }, 800);
+        }
+
+        function updateProgress() {
+            const keys = Object.keys(docStates);
+            const verifiedCount = keys.filter(k => docStates[k]).length;
+            const percentage = Math.round((verifiedCount / keys.length) * 100);
+
+            document.getElementById('progressBar').style.width = `${percentage}%`;
+            document.getElementById('progressPercent').textContent = `${percentage}% Completed (${verifiedCount} of ${keys.length})`;
+        }
+
+
+        /* Direct Form Transmission logic */
+        function handleContactSubmit(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('contactName').value;
+            const company = document.getElementById('contactCompany').value;
+
+            triggerToast(`Transmitting cryptographically packaged dossier for ${name} [${company}]...`);
+            
+            setTimeout(() => {
+                triggerToast(`TRANSMISSION LOCKED: ${partnersDb[currentPartner].name} has received your secure command desk packet!`);
+                // Clear input
+                document.getElementById('contactMsg').value = '';
+            }, 1200);
+        }
+
+        // Run Initializers
+        initPartnerData();
+
+    </script>
+</body>
+</html>
+```

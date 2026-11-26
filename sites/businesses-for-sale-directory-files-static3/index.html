@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash UI Export</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- 1. GLOBAL TICKER HEADER -->
+  <header class="w-full bg-black border-b border-[#222] z-50 sticky top-0">
+    <!-- Live Status bar -->
+    <div class="flex items-center justify-between px-4 py-2 border-b border-[#111] text-[10px] font-mono tracking-widest text-[#888]">
+      <div class="flex items-center space-x-3">
+        <span class="flex items-center text-[#00FF66] font-semibold">
+          <span class="inline-block w-2 h-2 mr-2 bg-[#00FF66] animate-pulse"></span>
+          ACQUIRE-NET LIVE CONNECTION STATUS: SECURE
+        </span>
+        <span class="hidden md:inline text-[#222]">|</span>
+        <span class="hidden md:inline">FEED DELAY: 0.00ms</span>
+        <span class="hidden md:inline text-[#222]">|</span>
+        <span class="hidden md:inline">SYSTEM PROTOCOL: SECTOR-1031 COMPLIANT</span>
+      </div>
+      <div class="flex items-center space-x-4">
+        <span>EST: <span x-text="currentTime">12:04:02</span></span>
+        <span class="text-[#0EA5E9]">SECURE OPERATOR ID: #ETA-7922</span>
+      </div>
+    </div>
+
+    <!-- Infinite Horizontal Marquee -->
+    <div class="w-full overflow-hidden whitespace-nowrap bg-[#0a0a0a] py-2 border-b border-[#222] flex items-center">
+      <div class="inline-flex animate-marquee text-xs font-mono tracking-wider text-[#F9F9F9]/90">
+        <!-- Loop 1 -->
+        <span class="mx-6 text-xs text-[#00FF66] font-bold">[CLOSED: $1.2M EBITDA Manufacturing, Atlanta] <span class="text-white/40">3.4x</span></span>
+        <span class="mx-6 text-[#0EA5E9]">[UNDER CONTRACT: $450K SaaS, Remote] <span class="text-white/40">4.1x</span></span>
+        <span class="mx-6 text-white">[NEW LISTING: $800K HVAC, Franconia, VA] <span class="text-white/40">2.8x</span></span>
+        <span class="mx-6 text-[#FF3333]">[BID DEADLINE: $2.1M Commercial Glass, TX]</span>
+        <span class="mx-6 text-[#00FF66] font-bold">[CLOSED: $950K Specialty Logistics, IL] <span class="text-white/40">3.1x</span></span>
+        <!-- Loop 2 Duplicated -->
+        <span class="mx-6 text-xs text-[#00FF66] font-bold">[CLOSED: $1.2M EBITDA Manufacturing, Atlanta] <span class="text-white/40">3.4x</span></span>
+        <span class="mx-6 text-[#0EA5E9]">[UNDER CONTRACT: $450K SaaS, Remote] <span class="text-white/40">4.1x</span></span>
+        <span class="mx-6 text-white">[NEW LISTING: $800K HVAC, Franconia, VA] <span class="text-white/40">2.8x</span></span>
+        <span class="mx-6 text-[#FF3333]">[BID DEADLINE: $2.1M Commercial Glass, TX]</span>
+        <span class="mx-6 text-[#00FF66] font-bold">[CLOSED: $950K Specialty Logistics, IL] <span class="text-white/40">3.1x</span></span>
+      </div>
+    </div>
+
+    <!-- Master Header Branding -->
+    <div class="px-6 py-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gradient-to-r from-[#050505] via-[#090909] to-[#050505]">
+      <div>
+        <div class="flex items-center space-x-2">
+          <span class="bg-[#00FF66] text-black text-[10px] font-mono font-black px-1.5 py-0.5 tracking-tighter">DEAL STREAM</span>
+          <span class="text-[10px] font-mono text-[#0EA5E9] tracking-widest font-bold">ALPHA V2.14</span>
+        </div>
+        <h1 class="text-2xl font-bold font-mono tracking-tight text-[#F9F9F9] mt-1">
+          UNDERGROUND <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#F9F9F9] via-[#0EA5E9] to-[#00FF66]">DEAL FLOW</span> TERMINAL
+        </h1>
+        <p class="text-xs text-[#888] font-mono mt-0.5">High-leverage origination engine for micro-PE and acquisition entrepreneurs.</p>
+      </div>
+
+      <!-- Quick Metrics Overview -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-px bg-[#222] w-full md:w-auto text-left font-mono">
+        <div class="bg-[#0c0c0c] p-2 px-3">
+          <div class="text-[9px] text-[#888]">ACTIVE PIPELINE</div>
+          <div class="text-sm font-bold text-[#F9F9F9]" x-text="`${filteredDealsCount()} / ${deals.length}`">6 / 6</div>
+        </div>
+        <div class="bg-[#0c0c0c] p-2 px-3">
+          <div class="text-[9px] text-[#888]">AGGREGATE EBITDA</div>
+          <div class="text-sm font-bold text-[#00FF66]">$4.52M</div>
+        </div>
+        <div class="bg-[#0c0c0c] p-2 px-3">
+          <div class="text-[9px] text-[#888]">MEDIAN MULTIPLE</div>
+          <div class="text-sm font-bold text-[#0EA5E9]">3.15x</div>
+        </div>
+        <div class="bg-[#0c0c0c] p-2 px-3">
+          <div class="text-[9px] text-[#888]">WATCHLIST COUNT</div>
+          <div class="text-sm font-bold text-[#FF3333]" x-text="watchlist.length">0</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN TERMINAL INTERFACE -->
+  <main class="flex-grow grid grid-cols-1 lg:grid-cols-12 gap-0 border-b border-[#222]">
+    
+    <!-- 2. SEARCH & DRILL-DOWN BENTO FILTERS (Left Rail) -->
+    <aside class="lg:col-span-3 bg-[#080808] border-r border-[#222] p-6 flex flex-col justify-between space-y-6">
+      
+      <div class="space-y-6">
+        <!-- Section Header -->
+        <div class="flex items-center justify-between border-b border-[#222] pb-3">
+          <h2 class="font-mono text-xs font-bold tracking-wider text-[#0EA5E9] flex items-center gap-2">
+            <span class="inline-block w-1.5 h-3 bg-[#0EA5E9]"></span>
+            FILTER MECHANICS
+          </h2>
+          <button @click="resetFilters()" class="font-mono text-[9px] text-[#FF3333] hover:underline uppercase tracking-widest">
+            RESET ALL
+          </button>
+        </div>
+
+        <!-- Sleek Search Input -->
+        <div class="space-y-2">
+          <label class="block font-mono text-[10px] text-[#888] tracking-widest uppercase">Global Search Query</label>
+          <div class="relative">
+            <input 
+              type="text" 
+              x-model="searchQuery" 
+              placeholder="Search cash flow or industry..."
+              class="w-full bg-[#050505] border border-[#222] focus:border-[#0EA5E9] focus:ring-0 text-xs font-mono text-white p-3 pr-8 placeholder:text-[#444] outline-none transition-all"
+            >
+            <div class="absolute right-3 top-1/2 -translate-y-1/2 text-[#444] pointer-events-none">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vertical Selector (Pills & Vertical Rows) -->
+        <div class="space-y-2">
+          <label class="block font-mono text-[10px] text-[#888] tracking-widest uppercase">Sectors & Verticals</label>
+          <div class="space-y-1">
+            <template x-for="vert in verticals" :key="vert">
+              <button 
+                @click="selectedVertical = (selectedVertical === vert ? 'ALL' : vert)" 
+                class="w-full flex items-center justify-between p-2.5 font-mono text-[11px] border tracking-wider transition-all text-left"
+                :class="selectedVertical === vert ? 'bg-[#0EA5E9]/10 border-[#0EA5E9] text-[#0EA5E9] font-bold' : 'bg-[#050505] border-[#222] text-[#888] hover:border-[#444] hover:text-[#F9F9F9]'"
+              >
+                <span x-text="vert"></span>
+                <span class="text-[9px]" x-text="selectedVertical === vert ? '[ACTIVE]' : '[+]'"></span>
+              </button>
+            </template>
+          </div>
+        </div>
+
+        <!-- EBITDA Multiple Range Slider -->
+        <div class="space-y-3 bg-[#0a0a0a] p-3 border border-[#222]">
+          <div class="flex justify-between items-center">
+            <label class="font-mono text-[10px] text-[#888] tracking-widest uppercase">Max EBITDA Multiple</label>
+            <span class="font-mono text-xs text-[#00FF66] font-bold" x-text="maxMultiple.toFixed(1) + 'x'">5.0x</span>
+          </div>
+          <input 
+            type="range" 
+            min="1.5" 
+            max="5.0" 
+            step="0.1" 
+            x-model.number="maxMultiple"
+            class="w-full accent-[#00FF66] bg-[#222] h-1 cursor-pointer"
+          >
+          <div class="flex justify-between text-[8px] font-mono text-neutral-600">
+            <span>1.5x</span>
+            <span>3.25x</span>
+            <span>5.0x</span>
+          </div>
+        </div>
+
+        <!-- Cash Flow Minimum Selector -->
+        <div class="space-y-2">
+          <label class="block font-mono text-[10px] text-[#888] tracking-widest uppercase">Min EBITDA / Cash Flow</label>
+          <select 
+            x-model.number="minCashFlow"
+            class="w-full bg-[#050505] border border-[#222] focus:border-[#0EA5E9] text-xs font-mono text-[#F9F9F9] p-3 focus:outline-none transition-all"
+          >
+            <option value="0">Any EBITDA Volume</option>
+            <option value="300000">$300K+ Min EBITDA</option>
+            <option value="500000">$500K+ Min EBITDA</option>
+            <option value="750000">$750K+ Min EBITDA</option>
+            <option value="1000000">$1.0M+ Min EBITDA</option>
+          </select>
+        </div>
+
+        <!-- SBA Filter Toggle -->
+        <div class="flex items-center justify-between p-3 bg-[#0a0a0a] border border-[#222]">
+          <span class="font-mono text-[10px] text-[#888] tracking-wider uppercase">SBA Pre-Qualified Only</span>
+          <button 
+            @click="sbaOnly = !sbaOnly"
+            class="w-12 h-6 border transition-colors flex items-center px-1"
+            :class="sbaOnly ? 'bg-[#00FF66]/20 border-[#00FF66] justify-end' : 'bg-black border-[#222] justify-start'"
+          >
+            <span class="w-4 h-4" :class="sbaOnly ? 'bg-[#00FF66]' : 'bg-[#444]'"></span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Quick Terminal Tips / Advisory -->
+      <div class="pt-6 border-t border-[#1a1a1a] hidden lg:block space-y-3">
+        <div class="p-3 bg-red-950/10 border border-[#FF3333]/30">
+          <div class="text-[9px] font-mono text-[#FF3333] font-bold tracking-wider">CRITICAL RISK ZONE WARNINGS</div>
+          <p class="text-[10px] text-[#888] font-mono leading-tight mt-1">
+            Always stress-test concentration limits and seller retention strategies prior to execution of binding LOI documents.
+          </p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 3. PREMIUM DEAL STREAM FLOW (Center Feed & Detail Desk) -->
+    <section class="lg:col-span-9 bg-[#050505] p-6 flex flex-col space-y-6">
+      
+      <!-- Top Bar / Meta Info -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-[#222] pb-4">
+        <div>
+          <h2 class="font-mono text-sm font-bold text-[#F9F9F9] tracking-tight">PREMIUM VERIFIED DEAL PIPELINE</h2>
+          <p class="text-xs text-[#888] font-mono">Real-time status tracking and asset evaluations</p>
+        </div>
+        
+        <!-- Active Filter Indicator Status -->
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-[9px] font-mono bg-[#111] px-2 py-1 border border-[#222] text-[#888]">
+            ACTIVE VERTICAL: <span class="text-[#0EA5E9]" x-text="selectedVertical">ALL</span>
+          </span>
+          <span class="text-[9px] font-mono bg-[#111] px-2 py-1 border border-[#222] text-[#888]">
+            MAX MULTIPLE: <span class="text-[#00FF66]" x-text="maxMultiple + 'x'">5.0x</span>
+          </span>
+          <button @click="resetFilters()" x-show="isFiltered()" class="text-[9px] font-mono bg-[#FF3333]/10 border border-[#FF3333]/30 px-2 py-1 text-[#FF3333] hover:bg-[#FF3333]/20 transition-all">
+            CLEAR [X]
+          </button>
+        </div>
+      </div>
+
+      <!-- Deal Cards Stream -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <template x-for="deal in filteredDeals()" :key="deal.codename">
+          
+          <!-- Deal Card Bento Box -->
+          <div 
+            class="group bg-[#080808] border transition-all duration-300 hover:-translate-y-1 relative flex flex-col justify-between"
+            :class="watchlist.includes(deal.codename) ? 'border-[#0EA5E9] glow-teal' : 'border-[#222] hover:border-[#444]'"
+          >
+            <!-- Glowing Accent Indicator -->
+            <div class="absolute top-0 left-0 w-full h-[1px]" :class="watchlist.includes(deal.codename) ? 'bg-[#0EA5E9]' : 'bg-transparent group-hover:bg-[#00FF66]'"></div>
+            
+            <div class="p-5 space-y-4">
+              
+              <!-- Card Top Meta -->
+              <div class="flex items-start justify-between">
+                <div>
+                  <span class="bg-[#111] border border-[#222] px-2 py-0.5 text-[9px] font-mono font-semibold tracking-widest text-[#0ea5e9] uppercase" x-text="deal.vertical">LOGISTICS</span>
+                  <div class="text-[10px] text-[#444] font-mono mt-1" x-text="'LOC: ' + deal.location">LOC: SOUTHEAST HUB</div>
+                </div>
+                
+                <!-- Watch Action Trigger -->
+                <button 
+                  @click.stop="toggleWatchlist(deal.codename)" 
+                  class="p-2 border transition-all"
+                  :class="watchlist.includes(deal.codename) ? 'border-[#0EA5E9] bg-[#0ea5e9]/10 text-[#0ea5e9]' : 'border-[#222] text-[#444] hover:text-[#00FF66] hover:border-[#00FF66]'"
+                  title="Add to Watchlist"
+                >
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"></path>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Deal Identifier & Blinded Title -->
+              <div>
+                <h3 class="font-mono text-base font-bold text-[#F9F9F9] group-hover:text-[#00FF66] transition-colors" x-text="deal.codename">PROJECT DELTA</h3>
+                <p class="text-xs text-[#888] font-mono mt-1 line-clamp-2" x-text="deal.description">B2B Logistics & Last-Mile Delivery Agency. Highly automated routes.</p>
+              </div>
+
+              <!-- Bento Metric Box (3 pillars) -->
+              <div class="grid grid-cols-3 gap-px bg-[#222] border border-[#222] font-mono text-center">
+                <div class="bg-black p-2">
+                  <div class="text-[8px] text-[#888]">REVENUE</div>
+                  <div class="text-xs font-semibold text-white" x-text="formatCurrency(deal.revenue)">$2.4M</div>
+                </div>
+                <div class="bg-black p-2">
+                  <div class="text-[8px] text-[#888]">ADJ. EBITDA</div>
+                  <div class="text-xs font-semibold text-[#00FF66]" x-text="formatCurrency(deal.ebitda)">$620K</div>
+                </div>
+                <div class="bg-black p-2">
+                  <div class="text-[8px] text-[#888]">ASKING</div>
+                  <div class="text-xs font-semibold text-[#0ea5e9]" x-text="formatCurrency(deal.asking)">$1.8M</div>
+                </div>
+              </div>
+
+              <!-- Structural Badges -->
+              <div class="flex flex-wrap gap-1.5 pt-1">
+                <!-- SBA Prequalified -->
+                <template x-if="deal.sba">
+                  <span class="text-[9px] font-mono font-semibold px-2 py-0.5 bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/20">
+                    SBA PRE-QUALIFIED
+                  </span>
+                </template>
+                <!-- 1031 Exchange -->
+                <template x-if="deal.exchange1031">
+                  <span class="text-[9px] font-mono font-semibold px-2 py-0.5 bg-[#0EA5E9]/10 text-[#0EA5E9] border border-[#0EA5E9]/20">
+                    1031 EXCHANGE READY
+                  </span>
+                </template>
+                <!-- Risk Alerts -->
+                <template x-if="deal.highConcentration">
+                  <span class="text-[9px] font-mono font-semibold px-2 py-0.5 bg-[#FF3333]/10 text-[#FF3333] border border-[#FF3333]/20">
+                    HIGH CUSTOMER CONCENTRATION
+                  </span>
+                </template>
+              </div>
+
+            </div>
+
+            <!-- Action Trigger Card Footer -->
+            <button 
+              @click="openDealModal(deal)"
+              class="w-full bg-[#111] hover:bg-[#00FF66] hover:text-black border-t border-[#222] group-hover:border-[#00FF66] py-3 text-center font-mono text-xs font-semibold text-[#00FF66] tracking-widest uppercase transition-all flex items-center justify-center space-x-2"
+            >
+              <span>ANALYZE DEAL MECHANICS</span>
+              <span>&rarr;</span>
+            </button>
+          </div>
+        </template>
+
+        <!-- No Results state -->
+        <div x-show="filteredDeals().length === 0" class="col-span-full border border-dashed border-[#222] p-12 text-center" x-transition>
+          <div class="text-[#FF3333] font-mono text-xs font-bold tracking-widest uppercase">ZERO MATCHING ASSETS FOUND</div>
+          <p class="text-xs text-[#888] font-mono mt-2">Adjust your financial parameters or select alternative industry verticals.</p>
+          <button @click="resetFilters()" class="mt-4 px-4 py-2 border border-[#0ea5e9] text-[#0ea5e9] font-mono text-xs hover:bg-[#0ea5e9]/10 transition-all">
+            RESET PARAMETERS
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 4. TRANSACTION NEXT-STEPS MODAL (Drill-Down Trigger) -->
+  <div 
+    x-show="modalOpen" 
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"
+    x-transition
+    @keydown.escape.window="modalOpen = false"
+    style="display: none;"
+  >
+    <!-- Modal Container -->
+    <div 
+      class="bg-[#050505] border-2 border-[#0ea5e9] w-full max-w-3xl flex flex-col overflow-hidden relative"
+      @click.away="modalOpen = false"
+    >
+      <!-- Modal Accent Top Bar -->
+      <div class="bg-[#0ea5e9] h-1.5 w-full"></div>
+
+      <!-- Modal Header -->
+      <div class="p-6 border-b border-[#222] flex items-start justify-between bg-[#0a0a0a]">
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="bg-[#0ea5e9] text-black text-[9px] font-mono font-bold px-1.5 py-0.5" x-text="activeDeal?.vertical.toUpperCase()">LOGISTICS</span>
+            <span class="text-[10px] font-mono text-white/50" x-text="activeDeal?.location">SOUTHEAST REGION</span>
+          </div>
+          <h3 class="text-xl font-bold font-mono tracking-tight text-white mt-1" x-text="activeDeal?.codename">PROJECT DELTA</h3>
+          <p class="text-xs text-[#888] font-mono" x-text="activeDeal?.headline">B2B Logistics Agency & Delivery Network</p>
+        </div>
+        <button @click="modalOpen = false" class="text-[#888] hover:text-white font-mono text-sm border border-[#222] px-2 py-1">
+          [ESC] CLOSE
+        </button>
+      </div>
+
+      <!-- Modal Content Area -->
+      <div class="p-6 space-y-6 overflow-y-auto max-h-[70vh]">
+        
+        <!-- Live Advisory Alert if risk concentration exists -->
+        <template x-if="activeDeal?.highConcentration">
+          <div class="bg-[#FF3333]/10 border border-[#FF3333] p-4 flex items-start space-x-3">
+            <div class="text-[#FF3333] font-bold text-xs font-mono">[RISK NOTICE]</div>
+            <p class="text-[11px] text-[#F9F9F9] font-mono leading-tight">
+              Operational audits imply customer base accounts for &gt;45% of gross revenues. Contract continuation clauses must be structured within deal Escrow provisions.
+            </p>
+          </div>
+        </template>
+
+        <!-- Financial Core Breakdown -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-px bg-[#222] border border-[#222] font-mono text-center">
+          <div class="bg-black p-4">
+            <div class="text-[9px] text-[#888]">ASKING PURCHASE PRICE</div>
+            <div class="text-lg font-bold text-[#0ea5e9]" x-text="formatCurrency(activeDeal?.asking)">$1,850,000</div>
+          </div>
+          <div class="bg-[#050505] p-4">
+            <div class="text-[9px] text-[#888]">EBITDA (ADJUSTED)</div>
+            <div class="text-lg font-bold text-[#00FF66]" x-text="formatCurrency(activeDeal?.ebitda)">$620,000</div>
+          </div>
+          <div class="bg-black p-4">
+            <div class="text-[9px] text-[#888]">IMPLIED MULTIPLE</div>
+            <div class="text-lg font-bold text-white" x-text="(activeDeal?.multiple || 0).toFixed(2) + 'x'">2.98x</div>
+          </div>
+        </div>
+
+        <!-- 10-Year SBA 7(a) Amortization Simulation Structure -->
+        <div class="space-y-3">
+          <h4 class="font-mono text-xs font-bold text-[#F9F9F9] tracking-wider uppercase border-b border-[#222] pb-1">Debt Amortization & Cash Flow Simulation (SBA 7a Standard Model)</h4>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Source of Funds -->
+            <div class="border border-[#222] p-4 space-y-2 bg-[#080808]">
+              <span class="text-[10px] font-mono text-[#0ea5e9] tracking-wider font-bold">SOURCE OF FUNDS</span>
+              <ul class="text-xs font-mono space-y-1 text-[#888]">
+                <li class="flex justify-between"><span>SBA Guaranteed Loan (75%):</span> <span class="text-white" x-text="formatCurrency(activeDeal?.asking * 0.75)">$1,387,500</span></li>
+                <li class="flex justify-between"><span>Seller Standby Note (15%):</span> <span class="text-white" x-text="formatCurrency(activeDeal?.asking * 0.15)">$277,500</span></li>
+                <li class="flex justify-between"><span>Equity Cash Required (10%):</span> <span class="text-[#00FF66]" x-text="formatCurrency(activeDeal?.cashNeeded)">$185,000</span></li>
+              </ul>
+            </div>
+
+            <!-- Debt Service Coverage Ratio -->
+            <div class="border border-[#222] p-4 space-y-2 bg-[#080808]">
+              <span class="text-[10px] font-mono text-[#00FF66] tracking-wider font-bold">PROJECTED DEBT METRICS</span>
+              <ul class="text-xs font-mono space-y-1 text-[#888]">
+                <li class="flex justify-between"><span>Est. Annual Debt Service:</span> <span class="text-[#FF3333]" x-text="formatCurrency(activeDeal?.debtService)">$198,000</span></li>
+                <li class="flex justify-between"><span>Net Flow Post-Debt Service:</span> <span class="text-[#00FF66]" x-text="formatCurrency((activeDeal?.ebitda || 0) - (activeDeal?.debtService || 0))">$422,000</span></li>
+                <li class="flex justify-between"><span>SBA Debt Coverage Ratio (DSCR):</span> <span class="text-white font-bold" x-text="((activeDeal?.ebitda || 0) / (activeDeal?.debtService || 1)).toFixed(2) + 'x'">2.12x</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detailed Structural Highlights -->
+        <div class="border border-[#222] p-4 space-y-2">
+          <div class="text-[10px] font-mono text-[#888] uppercase tracking-widest">TRANSACTION ADVANTAGES & LEVERAGE MATRIX</div>
+          <p class="text-xs font-mono text-[#F9F9F9] leading-relaxed" x-text="activeDeal?.description">
+            Seller is willing to stay on for up to 12 months for seamless training and client preservation. Back-office infrastructure requires minimal system upgrades post-close.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer Sticky CTA -->
+      <div class="p-6 border-t border-[#222] bg-[#0a0a0a] flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="text-[10px] font-mono text-[#888] text-center md:text-left">
+          <span>STRUCTURAL INQUIRY REFERENCE: <span class="text-[#0EA5E9]" x-text="activeDeal?.codename">PROJECT DELTA</span></span>
+        </div>
+        
+        <button 
+          @click="alert('Routing to Live LBO Structuring Analyzer...')"
+          class="w-full md:w-auto bg-[#00FF66] text-black font-mono text-xs font-bold px-6 py-4 tracking-widest hover:bg-[#F9F9F9] transition-all uppercase"
+        >
+          Model Acquisition Structure & Debt Service Capacity
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 5. COMPLIANCE DISCLAIMERS & TRUST SIGNALS -->
+  <footer class="bg-black border-t border-[#222] mt-auto">
+    
+    <!-- Integration/Verification Badges Bar -->
+    <div class="px-6 py-4 border-b border-[#222] grid grid-cols-2 md:grid-cols-4 gap-4 items-center justify-center text-center">
+      <div class="flex items-center justify-center space-x-2 text-xs font-mono text-white/50">
+        <span class="inline-block w-2.5 h-2.5 bg-[#00FF66] rounded-none"></span>
+        <span>PLAID DATA VERIFIED</span>
+      </div>
+      <div class="flex items-center justify-center space-x-2 text-xs font-mono text-white/50">
+        <span class="inline-block w-2.5 h-2.5 bg-[#0EA5E9] rounded-none"></span>
+        <span>FINCEN COMPLIANT REGISTRY</span>
+      </div>
+      <div class="flex items-center justify-center space-x-2 text-xs font-mono text-white/50">
+        <span class="inline-block w-2.5 h-2.5 bg-white rounded-none"></span>
+        <span>SBA PREFERRED ADVISORY</span>
+      </div>
+      <div class="flex items-center justify-center space-x-2 text-xs font-mono text-white/50">
+        <span class="inline-block w-2.5 h-2.5 bg-[#FF3333] rounded-none"></span>
+        <span>SECURE SHA-256 API LINKED</span>
+      </div>
+    </div>
+
+    <!-- Legal Disclaimers -->
+    <div class="max-w-7xl mx-auto px-6 py-8 text-[11px] font-mono text-[#888] leading-relaxed space-y-4">
+      <p>
+        <span class="text-[#F9F9F9] font-bold">Disclaimer:</span> AcquireMeta and Moonshine Capital are financial advisory and brokerage networks. All deal information is structurally simulated or blinded for educational and origination reference. Past operational performance is no guarantee of future returns. Financial solutions provided under strictly monitored Federal Small Business Administration compliance guidelines.
+      </p>
+      <div class="flex justify-between items-center text-[9px] text-neutral-600 border-t border-[#111] pt-4">
+        <span>&copy; <span x-text="new Date().getFullYear()"></span> ACQUIRE-NET TERMINAL, LLC. ALL CONSTITUTIONAL TRADEMARKS RECORDED.</span>
+        <span class="hidden md:inline hover:underline cursor-pointer hover:text-white">SYSTEM INTEGRITY PROTOCOLS v1.82</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function terminalData() {
+      return {
+        // App State
+        currentTime: '12:00:00',
+        searchQuery: '',
+        selectedVertical: 'ALL',
+        maxMultiple: 5.0,
+        minCashFlow: 0,
+        sbaOnly: false,
+        watchlist: [],
+        
+        // Modal State
+        modalOpen: false,
+        activeDeal: null,
+
+        // Static Vertical List
+        verticals: ['ALL', 'Logistics', 'SaaS', 'Manufacturing', 'HVAC', 'Home Services'],
+
+        // Mock Deal Database
+        deals: [
+          {
+            codename: "PROJECT DELTA",
+            vertical: "Logistics",
+            headline: "B2B Logistics & Last-Mile Delivery Agency",
+            revenue: 2450000,
+            ebitda: 620000,
+            asking: 1850000,
+            multiple: 2.98,
+            sba: true,
+            exchange1031: true,
+            highConcentration: false,
+            location: "Southeast Hub",
+            cashNeeded: 185000,
+            debtService: 198000,
+            sellerNote: 277500,
+            description: "Contracted shipping channels and regional distribution fleet operations. Transition management includes structured hands-on transfer program."
+          },
+          {
+            codename: "PROJECT HYDRO",
+            vertical: "HVAC",
+            headline: "Commercial HVAC & Specialty Mechanical Service Provider",
+            revenue: 3100000,
+            ebitda: 780000,
+            asking: 2200000,
+            multiple: 2.82,
+            sba: true,
+            exchange1031: false,
+            highConcentration: false,
+            location: "Franconia, VA",
+            cashNeeded: 220000,
+            debtService: 245000,
+            sellerNote: 330000,
+            description: "Consistently yielding high returns, specializing in industrial multi-zone cooling service agreements. Strong dispatch infrastructure with 15 master techs."
+          },
+          {
+            codename: "PROJECT APEX",
+            vertical: "SaaS",
+            headline: "Proprietary CRM for Specialty Chemical Logistics",
+            revenue: 1200000,
+            ebitda: 450000,
+            asking: 1980000,
+            multiple: 4.4,
+            sba: false,
+            exchange1031: false,
+            highConcentration: true,
+            location: "Remote",
+            cashNeeded: 500000,
+            debtService: 150000,
+            sellerNote: 198000,
+            description: "High gross margin subscription framework. Minor concentration with critical agrochemical client requires structural risk mitigate contingencies."
+          },
+          {
+            codename: "PROJECT TITAN",
+            vertical: "Manufacturing",
+            headline: "Precision Aerospace Component Tooling Center",
+            revenue: 5200000,
+            ebitda: 1150000,
+            asking: 3950000,
+            multiple: 3.43,
+            sba: true,
+            exchange1031: true,
+            highConcentration: false,
+            location: "Midwest Cluster",
+            cashNeeded: 395000,
+            debtService: 360000,
+            sellerNote: 592500,
+            description: "Tier-1 tooling developer with active Department of Defense aerospace subcontracts. Fully audited financials by SBA-approved premium brokers."
+          },
+          {
+            codename: "PROJECT KINETIC",
+            vertical: "Logistics",
+            headline: "Intermodal Container Freight Forwarder",
+            revenue: 4100000,
+            ebitda: 550000,
+            asking: 1650000,
+            multiple: 3.0,
+            sba: true,
+            exchange1031: true,
+            highConcentration: false,
+            location: "Port of Savannah",
+            cashNeeded: 165000,
+            debtService: 175000,
+            sellerNote: 247500,
+            description: "Strategically located at major logistics bottleneck. Asset-light model utilizing contracted owner-operators."
+          },
+          {
+            codename: "PROJECT VORTEX",
+            vertical: "Home Services",
+            headline: "Multi-State Residential & Commercial Plumbing Grid",
+            revenue: 2900000,
+            ebitda: 610000,
+            asking: 1700000,
+            multiple: 2.78,
+            sba: true,
+            exchange1031: false,
+            highConcentration: false,
+            location: "Central Texas",
+            cashNeeded: 170000,
+            debtService: 182000,
+            sellerNote: 255000,
+            description: "Recurrent maintenance service model servicing top suburban expansion metros. Robust crew structure in place."
+          }
+        ],
+
+        init() {
+          // Dynamic terminal clock update
+          setInterval(() => {
+            const now = new Date();
+            this.currentTime = now.toTimeString().split(' ')[0];
+          }, 1000);
+        },
+
+        // Filter Logic
+        filteredDeals() {
+          return this.deals.filter(deal => {
+            const matchesSearch = this.searchQuery === '' || 
+              deal.codename.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+              deal.headline.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+              deal.description.toLowerCase().includes(this.searchQuery.toLowerCase());
+
+            const matchesVertical = this.selectedVertical === 'ALL' || deal.vertical === this.selectedVertical;
+            const matchesMultiple = deal.multiple <= this.maxMultiple;
+            const matchesCashFlow = deal.ebitda >= this.minCashFlow;
+            const matchesSba = !this.sbaOnly || deal.sba;
+
+            return matchesSearch && matchesVertical && matchesMultiple && matchesCashFlow && matchesSba;
+          });
+        },
+
+        filteredDealsCount() {
+          return this.filteredDeals().length;
+        },
+
+        isFiltered() {
+          return this.selectedVertical !== 'ALL' || this.maxMultiple !== 5.0 || this.minCashFlow !== 0 || this.searchQuery !== '' || this.sbaOnly;
+        },
+
+        resetFilters() {
+          this.searchQuery = '';
+          this.selectedVertical = 'ALL';
+          this.maxMultiple = 5.0;
+          this.minCashFlow = 0;
+          this.sbaOnly = false;
+        },
+
+        // Watchlist Actions
+        toggleWatchlist(codename) {
+          if (this.watchlist.includes(codename)) {
+            this.watchlist = this.watchlist.filter(item => item !== codename);
+          } else {
+            this.watchlist.push(codename);
+          }
+        },
+
+        // Modal triggers
+        openDealModal(deal) {
+          this.activeDeal = deal;
+          this.modalOpen = true;
+        },
+
+        // Helper: Format Currency
+        formatCurrency(num) {
+          if (!num) return '$0';
+          if (num >= 1000000) {
+            return '$' + (num / 1000000).toFixed(2) + 'M';
+          } else if (num >= 1000) {
+            return '$' + (num / 1000).toFixed(0) + 'K';
+          }
+          return '$' + num;
+        }
+      }
+    }
+  </script>
+    <script src="script.js"></script>
+</body>
+</html>

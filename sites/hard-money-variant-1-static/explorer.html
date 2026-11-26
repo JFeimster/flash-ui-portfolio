@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Edge | Underwriting Asset & File Matrix</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            bg: '#07090e',
+                            card: '#0e131f',
+                            border: '#1e293b',
+                            accent: '#00f0ff',
+                            purple: '#bd00ff',
+                            emerald: '#05ffc4',
+                            amber: '#f59e0b',
+                            rose: '#f43f5e',
+                            glow: 'rgba(0, 240, 255, 0.15)'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Fira Code', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #07090e;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(189, 0, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 240, 255, 0.05) 0%, transparent 40%),
+                linear-gradient(rgba(255, 255, 255, 0.003) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.003) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+        }
+
+        /* Dynamic Edge Clip Paths */
+        .edge-clip {
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+        }
+        
+        .edge-clip-reverse {
+            clip-path: polygon(12px 0, 100% 0, 100% 100%, 0 100%, 0 12px);
+        }
+
+        .cyber-glow-hover:hover {
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.15);
+            border-color: #00f0ff;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #07090e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f0ff;
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen overflow-x-hidden antialiased selection:bg-cyber-accent selection:text-black">
+
+    <!-- TOP TELEMETRY STRIP -->
+    <div class="border-b border-cyber-border bg-black/60 backdrop-blur-md sticky top-0 z-50 transition-all duration-300">
+        <div class="max-w-[1400px] mx-auto px-4 py-2 flex items-center justify-between text-[11px] font-mono tracking-wider text-slate-400">
+            <div class="flex items-center gap-6">
+                <span class="flex items-center gap-1.5">
+                    <span class="h-2 w-2 rounded-full bg-cyber-accent animate-ping"></span>
+                    <span class="text-cyber-accent">ASSET REPOSITORY: ONLINE</span>
+                </span>
+                <span class="hidden md:inline">ENCRYPTION: <strong class="text-slate-200">256-BIT AES-GCM</strong></span>
+                <span class="hidden lg:inline">MATRIX CAPACITY: <strong id="headerCapacity" class="text-slate-200">42.8 GB / 100 GB</strong></span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span>INDEXED ITEMS: <strong id="headerIndexCount" class="text-cyber-emerald">8 ATTACHMENTS</strong></span>
+                <div class="h-4 w-px bg-cyber-border"></div>
+                <a href="#" class="flex items-center gap-1.5 hover:text-cyber-accent transition-colors duration-200">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
+                    <span>LENDER HANDSHAKE ACTIVE</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN HERO & HEADER -->
+    <header class="relative overflow-hidden pt-10 pb-6 border-b border-cyber-border/40">
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-cyber-bg pointer-events-none"></div>
+        <div class="max-w-[1400px] mx-auto px-4 relative z-10">
+            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+                <div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-cyber-purple/30 bg-cyber-purple/5 mb-4 text-xs font-mono text-cyber-purple uppercase tracking-widest">
+                        <span class="w-1.5 h-1.5 rounded-full bg-cyber-purple animate-pulse"></span>
+                        Underwriting Asset Portal v3.1
+                    </div>
+                    <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight leading-none mb-3">
+                        CAPITAL ASSET <br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyber-purple via-blue-500 to-cyber-accent">
+                            & FILE EXPLORER
+                        </span>
+                    </h1>
+                    <p class="text-slate-400 text-sm max-w-2xl font-light">
+                        Interact, index, and organize critical deal packets, appraisal parameters, and entity portfolios. Instant visual benchmarking matching underwriting criteria directly with active private equity guidelines.
+                    </p>
+                </div>
+                
+                <!-- Performance metrics module -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 w-full lg:max-w-md font-mono">
+                    <div class="bg-cyber-card border border-cyber-border p-3 rounded-lg edge-clip">
+                        <span class="block text-[10px] text-slate-500 uppercase">PROCESSING FLOW</span>
+                        <span class="text-lg font-bold text-cyber-emerald">Instant OCR</span>
+                    </div>
+                    <div class="bg-cyber-card border border-cyber-border p-3 rounded-lg edge-clip">
+                        <span class="block text-[10px] text-slate-500 uppercase">AVG VALIDATION</span>
+                        <span class="text-lg font-bold text-slate-200">12.4 SEC</span>
+                    </div>
+                    <div class="bg-cyber-card border border-cyber-border p-3 rounded-lg edge-clip col-span-2 sm:col-span-1">
+                        <span class="block text-[10px] text-slate-500 uppercase">RELIABILITY RANK</span>
+                        <span class="text-lg font-bold text-cyber-accent">99.98%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- CORE WORKSPACE CONTAINER -->
+    <main class="max-w-[1400px] mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            
+            <!-- LEFT COLUMN: CONTROL & SIMULATION ZONE -->
+            <div class="space-y-6">
+                <!-- Dropzone / Live Intake Module -->
+                <div class="bg-cyber-card border border-cyber-border p-5 rounded-xl relative overflow-hidden flex flex-col justify-between edge-clip-reverse">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-cyber-accent/5 rounded-full filter blur-xl pointer-events-none"></div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs font-mono text-cyber-accent uppercase tracking-wider">SECURE INGEST</span>
+                            <span class="h-2 w-2 rounded-full bg-cyber-accent animate-pulse"></span>
+                        </div>
+                        <h4 class="text-sm font-bold text-slate-200 mb-2">Deal Packet Drag & Drop</h4>
+                        <p class="text-slate-400 text-xs mb-4">Upload property appraisals, operating schedules, or track sheets for immediate analysis.</p>
+                        
+                        <!-- Interactive simulated zone -->
+                        <div id="dropZone" class="border-2 border-dashed border-cyber-border hover:border-cyber-accent hover:bg-black/20 rounded-lg p-6 text-center cursor-pointer transition-all duration-200" onclick="simulateFileUpload()">
+                            <svg class="w-8 h-8 text-slate-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                            <span class="block text-xs font-mono text-slate-400">SELECT TARGET FILES</span>
+                            <span class="text-[10px] text-slate-500 mt-1 block">Maximum upload limit: 50MB per file</span>
+                        </div>
+
+                        <!-- Progress indicator (hidden by default) -->
+                        <div id="uploadProgressContainer" class="mt-4 hidden space-y-2">
+                            <div class="flex justify-between text-xs font-mono text-slate-400">
+                                <span class="truncate" id="uploadFilename">Analyzing...</span>
+                                <span id="uploadPercent">0%</span>
+                            </div>
+                            <div class="w-full bg-black/55 h-1.5 rounded overflow-hidden">
+                                <div id="uploadProgressBar" class="bg-cyber-accent h-full w-0 transition-all duration-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Folders & Directories Filter System -->
+                <div class="bg-cyber-card border border-cyber-border p-5 rounded-xl">
+                    <div class="flex items-center justify-between mb-4 pb-2 border-b border-cyber-border/40">
+                        <span class="text-xs font-mono text-slate-400 uppercase tracking-wider">CAPITAL MATRIX DOMAINS</span>
+                    </div>
+                    <ul class="space-y-1 text-sm font-mono" id="folderFilterList">
+                        <li>
+                            <button onclick="filterByFolder('ALL')" class="w-full flex items-center justify-between px-3 py-2 rounded text-left transition-all duration-150 text-cyber-accent bg-cyber-accent/5 font-bold" id="btnFolder-ALL">
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                                    All Matrix Source Assets
+                                </span>
+                                <span class="text-xs text-slate-500" id="count-ALL">8</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button onclick="filterByFolder('Valuation')" class="w-full flex items-center justify-between px-3 py-2 rounded text-left transition-all duration-150 text-slate-400 hover:text-white hover:bg-slate-900/60" id="btnFolder-Valuation">
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                                    Valuations & Appraisals
+                                </span>
+                                <span class="text-xs text-slate-500" id="count-Valuation">2</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button onclick="filterByFolder('Underwriting')" class="w-full flex items-center justify-between px-3 py-2 rounded text-left transition-all duration-150 text-slate-400 hover:text-white hover:bg-slate-900/60" id="btnFolder-Underwriting">
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                    UW Schedules / Financials
+                                </span>
+                                <span class="text-xs text-slate-500" id="count-Underwriting">2</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button onclick="filterByFolder('Legal')" class="w-full flex items-center justify-between px-3 py-2 rounded text-left transition-all duration-150 text-slate-400 hover:text-white hover:bg-slate-900/60" id="btnFolder-Legal">
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"></path></svg>
+                                    Corporate & Title Docs
+                                </span>
+                                <span class="text-xs text-slate-500" id="count-Legal">2</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button onclick="filterByFolder('Capital')" class="w-full flex items-center justify-between px-3 py-2 rounded text-left transition-all duration-150 text-slate-400 hover:text-white hover:bg-slate-900/60" id="btnFolder-Capital">
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                                    Term Sheets & Commitments
+                                </span>
+                                <span class="text-xs text-slate-500" id="count-Capital">1</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button onclick="filterByFolder('Media')" class="w-full flex items-center justify-between px-3 py-2 rounded text-left transition-all duration-150 text-slate-400 hover:text-white hover:bg-slate-900/60" id="btnFolder-Media">
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    Property Facade Photos
+                                </span>
+                                <span class="text-xs text-slate-500" id="count-Media">1</span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Tag Management Engine -->
+                <div class="bg-cyber-card border border-cyber-border p-5 rounded-xl">
+                    <span class="text-xs font-mono text-slate-400 uppercase tracking-wider block mb-3">Classification Tags</span>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="toggleTagFilter('Verified')" class="tag-pill px-2.5 py-1 text-xs font-mono rounded border border-cyber-emerald/30 bg-cyber-emerald/5 text-cyber-emerald hover:bg-cyber-emerald/10 transition-colors" data-tag="Verified">
+                            #Verified
+                        </button>
+                        <button onclick="toggleTagFilter('Reviewed')" class="tag-pill px-2.5 py-1 text-xs font-mono rounded border border-cyber-accent/30 bg-cyber-accent/5 text-cyber-accent hover:bg-cyber-accent/10 transition-colors" data-tag="Reviewed">
+                            #Reviewed
+                        </button>
+                        <button onclick="toggleTagFilter('Action Required')" class="tag-pill px-2.5 py-1 text-xs font-mono rounded border border-cyber-rose/30 bg-cyber-rose/5 text-cyber-rose hover:bg-cyber-rose/10 transition-colors" data-tag="Action Required">
+                            #Action Required
+                        </button>
+                        <button onclick="toggleTagFilter('Under Review')" class="tag-pill px-2.5 py-1 text-xs font-mono rounded border border-cyber-amber/30 bg-cyber-amber/5 text-cyber-amber hover:bg-cyber-amber/10 transition-colors" data-tag="Under Review">
+                            #Under Review
+                        </button>
+                        <button onclick="toggleTagFilter('Pending Sign')" class="tag-pill px-2.5 py-1 text-xs font-mono rounded border border-cyber-purple/30 bg-cyber-purple/5 text-cyber-purple hover:bg-cyber-purple/10 transition-colors" data-tag="Pending Sign">
+                            #Pending Sign
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: INTERACTIVE FILE WORKSPACE -->
+            <div class="lg:col-span-3 space-y-6">
+                <!-- Search and Manipulation Toolbar -->
+                <div class="bg-cyber-card border border-cyber-border p-4 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                    
+                    <!-- Search input -->
+                    <div class="relative w-full sm:w-80">
+                        <input id="fileSearch" type="text" oninput="applyFilters()" placeholder="Query documents, metadata, formats..." 
+                            class="w-full bg-black/40 border border-cyber-border rounded-lg py-2 px-3 pl-9 text-sm text-slate-200 focus:outline-none focus:border-cyber-accent/80 transition-all duration-150">
+                        <svg class="absolute left-3 top-2.5 h-4 w-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+
+                    <!-- Toolbar Filters Group -->
+                    <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                        
+                        <!-- File format selector -->
+                        <select id="formatFilter" onchange="applyFilters()" class="bg-black/40 border border-cyber-border rounded-lg py-1.5 px-3 text-xs font-mono text-slate-200 focus:outline-none focus:border-cyber-accent">
+                            <option value="ALL">All Extension Profiles</option>
+                            <option value="PDF">PDF Documents</option>
+                            <option value="XLSX">Excel Spreadsheets</option>
+                            <option value="ZIP">ZIP Archives</option>
+                        </select>
+
+                        <!-- Sorting controls -->
+                        <select id="sortControl" onchange="sortFiles()" class="bg-black/40 border border-cyber-border rounded-lg py-1.5 px-3 text-xs font-mono text-slate-200 focus:outline-none focus:border-cyber-accent">
+                            <option value="name-asc">A to Z Index</option>
+                            <option value="name-desc">Z to A Index</option>
+                            <option value="size-desc">Largest Segment First</option>
+                            <option value="size-asc">Smallest Segment First</option>
+                            <option value="date-desc">Chronological: Latest</option>
+                            <option value="date-asc">Chronological: Earliest</option>
+                        </select>
+
+                        <!-- Layout togglers -->
+                        <div class="flex bg-black/40 border border-cyber-border rounded-lg p-0.5">
+                            <button id="gridToggleBtn" onclick="setLayout('grid')" class="p-1.5 rounded text-cyber-accent bg-cyber-accent/15" title="Grid View">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                            </button>
+                            <button id="listToggleBtn" onclick="setLayout('list')" class="p-1.5 rounded text-slate-500 hover:text-slate-300" title="List View">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Dynamic Workspace Output Grid/List -->
+                <div id="fileContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 transition-all duration-300">
+                    <!-- Javascript populates standard elements here -->
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FLOATING SYSTEM COMPARE / BULK ACTION BAR -->
+    <div id="bulkActionBar" class="fixed bottom-0 left-0 right-0 bg-black/95 border-t border-cyber-accent/40 translate-y-full transition-transform duration-300 z-40 backdrop-blur-md">
+        <div class="max-w-[1400px] mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <span class="h-2 w-2 rounded-full bg-cyber-accent animate-ping"></span>
+                <p class="text-sm font-mono text-slate-200">
+                    Bulk Operational Buffer: <span id="selectedCount" class="text-cyber-accent font-bold">0 Active Items</span>
+                </p>
+            </div>
+            <div class="flex flex-wrap gap-4 justify-end">
+                <button onclick="clearSelection()" class="text-xs font-mono text-slate-400 hover:text-white transition-colors">
+                    Reset Selection Buffer
+                </button>
+                <button onclick="triggerBulkDownload()" class="edge-clip bg-cyber-accent hover:bg-cyan-400 text-black px-4 py-2 text-xs font-bold uppercase transition-all">
+                    Initiate Direct Download Package (.ZIP)
+                </button>
+                <button onclick="triggerBulkAction('Verified')" class="border border-cyber-emerald/40 bg-cyber-emerald/5 hover:bg-cyber-emerald/10 text-cyber-emerald px-4 py-2 text-xs font-bold font-mono rounded transition-all">
+                    Flag As #Verified
+                </button>
+                <button onclick="triggerBulkDelete()" class="border border-cyber-rose/40 bg-cyber-rose/5 hover:bg-cyber-rose/10 text-cyber-rose px-4 py-2 text-xs font-bold font-mono rounded transition-all">
+                    Delete Targets
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PREVIEW MODAL -->
+    <div id="previewModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-cyber-card border border-cyber-accent w-full max-w-4xl p-6 rounded-xl edge-clip relative max-h-[90vh] overflow-y-auto">
+            
+            <div class="flex justify-between items-start mb-6 pb-4 border-b border-cyber-border">
+                <div class="flex items-center gap-3">
+                    <span class="p-2 bg-slate-900 rounded border border-cyber-border text-cyber-accent" id="previewIcon">
+                        <!-- Format Icon -->
+                    </span>
+                    <div>
+                        <h3 class="font-mono text-lg text-slate-200 font-bold" id="previewTitle">document_name.pdf</h3>
+                        <p class="text-xs font-mono text-slate-400" id="previewFolderMeta">Categorization Directory: Valuation & Appraisals</p>
+                    </div>
+                </div>
+                <button onclick="closePreviewModal()" class="text-slate-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Visual Simulated Canvas -->
+                <div class="lg:col-span-2 bg-black/60 rounded border border-cyber-border min-h-[350px] flex flex-col items-center justify-center relative p-6">
+                    <div class="absolute inset-0 bg-grid opacity-5"></div>
+                    
+                    <!-- Simulated interactive PDF / Image/ Spreadsheet previewer state -->
+                    <div id="canvasDocument" class="text-center w-full">
+                        <svg class="w-16 h-16 text-slate-700 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <p class="font-mono text-sm text-slate-400">SECURE PREVIEW ENGINE</p>
+                        <p class="text-xs text-slate-500 mt-2">End-to-end encrypted rendering active. No third-party servers contacted.</p>
+                        <div class="mt-6 flex justify-center gap-3">
+                            <button onclick="alert('Starting desktop projection...')" class="border border-cyber-border text-xs font-mono text-slate-400 hover:border-cyber-accent hover:text-cyber-accent px-4 py-2 rounded">
+                                Outer System Projection
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Simulated Image layout state -->
+                    <div id="canvasImage" class="hidden text-center">
+                        <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80" alt="Properties preview" class="max-h-[300px] max-w-full rounded border border-cyber-border mx-auto object-cover shadow-2xl">
+                        <span class="block text-[10px] text-slate-500 font-mono mt-2">EXIF DATA: GEOTAG VERIFIED [34.0522° N, 118.2437° W]</span>
+                    </div>
+
+                    <!-- Simulated Spreadsheet state -->
+                    <div id="canvasSpreadsheet" class="hidden w-full overflow-x-auto text-xs font-mono">
+                        <div class="min-w-full bg-black/80 rounded border border-cyber-border divide-y divide-cyber-border">
+                            <div class="grid grid-cols-4 bg-slate-900/60 p-2.5 font-bold text-cyber-accent">
+                                <span>Cell ID</span>
+                                <span>Parameter Designation</span>
+                                <span>Allocated Value</span>
+                                <span>Audit Path</span>
+                            </div>
+                            <div class="grid grid-cols-4 p-2.5 text-slate-300">
+                                <span>R1C1</span>
+                                <span>Estimated Asset Valuation</span>
+                                <span class="text-cyber-emerald">$1,250,000</span>
+                                <span>Matched</span>
+                            </div>
+                            <div class="grid grid-cols-4 p-2.5 text-slate-300">
+                                <span>R1C2</span>
+                                <span>Requested Senior Loan</span>
+                                <span class="text-cyber-accent">$1,062,500</span>
+                                <span>System Sync</span>
+                            </div>
+                            <div class="grid grid-cols-4 p-2.5 text-slate-300">
+                                <span>R1C3</span>
+                                <span>LTV Percentage</span>
+                                <span class="text-slate-200">85% Max LTV</span>
+                                <span>Locked</span>
+                            </div>
+                            <div class="grid grid-cols-4 p-2.5 text-slate-300">
+                                <span>R1C4</span>
+                                <span>Underwritten Capital Point</span>
+                                <span class="text-cyber-emerald">1.5% Base</span>
+                                <span>Audited</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Meta/Properties Panel -->
+                <div class="space-y-4">
+                    <span class="text-xs font-mono text-cyber-purple uppercase tracking-widest block border-b border-cyber-border pb-1">Asset Metadata</span>
+                    
+                    <div class="space-y-3 font-mono text-xs">
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">File Matrix Extension:</span>
+                            <span class="text-white font-bold" id="metaExtension">PDF</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Allocated Size:</span>
+                            <span class="text-white font-bold" id="metaSize">6.8 MB</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Last Synced Date:</span>
+                            <span class="text-white font-bold" id="metaDate">2023-11-04</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">OCR Confidence Rating:</span>
+                            <span class="text-cyber-emerald font-bold">98.4% Accuracy</span>
+                        </div>
+                        <div class="flex flex-col gap-1 pt-1">
+                            <span class="text-slate-400">Index ID Hash:</span>
+                            <span class="text-[10px] text-cyber-accent break-all font-mono" id="metaHash">0x93FA...E492</span>
+                        </div>
+                    </div>
+
+                    <!-- Tags customization within file -->
+                    <div class="pt-4 border-t border-cyber-border">
+                        <span class="text-xs font-mono text-slate-400 uppercase tracking-wider block mb-2">Assigned Classifiers</span>
+                        <div class="flex flex-wrap gap-1.5" id="previewTagsContainer">
+                            <!-- Dynamic Tag elements -->
+                        </div>
+                    </div>
+
+                    <div class="pt-6 space-y-2">
+                        <button onclick="downloadSpecificFile()" class="w-full py-2 bg-cyber-accent hover:bg-cyan-400 text-black text-xs font-mono font-bold uppercase rounded transition-colors flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            Download Direct Asset File
+                        </button>
+                        <button id="deleteBtnInPreview" class="w-full py-2 bg-cyber-rose/10 hover:bg-cyber-rose/25 text-cyber-rose text-xs font-mono font-bold uppercase rounded transition-colors flex items-center justify-center gap-2 border border-cyber-rose/30">
+                            Delete Document Entity
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-cyber-border flex justify-end">
+                <button onclick="closePreviewModal()" class="border border-cyber-border text-slate-300 hover:border-cyber-accent hover:text-cyber-accent px-6 py-2 text-sm font-mono rounded transition-colors">
+                    Close Document Review
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT LOGIC -->
+    <script>
+        // MOCK DATA: Underwriting files
+        let filesDatabase = [
+            {
+                id: 1,
+                name: "Phase_I_Environmental_Report.pdf",
+                folder: "Valuation",
+                size: "6.8 MB",
+                sizeBytes: 6800000,
+                extension: "PDF",
+                date: "2023-11-04",
+                tags: ["Verified", "Reviewed"],
+                hash: "0x8fa3f82de802cc7274baef5d836ea4f2",
+                previewType: "document"
+            },
+            {
+                id: 2,
+                name: "Sponsor_REO_Schedule_V3.xlsx",
+                folder: "Underwriting",
+                size: "2.4 MB",
+                sizeBytes: 2400000,
+                extension: "XLSX",
+                date: "2023-11-02",
+                tags: ["Reviewed"],
+                hash: "0xb4a9ccde82f1295db283624df02390a3",
+                previewType: "spreadsheet"
+            },
+            {
+                id: 3,
+                name: "Property_Photos_Main_Facade.zip",
+                folder: "Media",
+                size: "14.2 MB",
+                sizeBytes: 14200000,
+                extension: "ZIP",
+                date: "2023-10-30",
+                tags: ["Action Required"],
+                hash: "0xf0a4421aa48f93bcbc0034a7810eaee1",
+                previewType: "document"
+            },
+            {
+                id: 4,
+                name: "Corporate_Operating_Agreement.pdf",
+                folder: "Legal",
+                size: "3.1 MB",
+                sizeBytes: 3100000,
+                extension: "PDF",
+                date: "2023-11-01",
+                tags: ["Verified"],
+                hash: "0xd900e23aa3f92dcbbf239ac8e100e4ab",
+                previewType: "document"
+            },
+            {
+                id: 5,
+                name: "Proposed_Rehab_Budget_Breakdown.xlsx",
+                folder: "Underwriting",
+                size: "1.8 MB",
+                sizeBytes: 1800000,
+                extension: "XLSX",
+                date: "2023-11-05",
+                tags: ["Under Review"],
+                hash: "0xe29ccbb71aef2918bb1c0029ef3189ba",
+                previewType: "spreadsheet"
+            },
+            {
+                id: 6,
+                name: "Title_Commitment_Schedule_B.pdf",
+                folder: "Legal",
+                size: "4.5 MB",
+                sizeBytes: 4500000,
+                extension: "PDF",
+                date: "2023-10-28",
+                tags: ["Pending Sign"],
+                hash: "0xc10a8ef1aa34e2debb2cda8974aee231",
+                previewType: "document"
+            },
+            {
+                id: 7,
+                name: "Comparable_Market_Analysis_CMA.pdf",
+                folder: "Valuation",
+                size: "8.2 MB",
+                sizeBytes: 8200000,
+                extension: "PDF",
+                date: "2023-11-03",
+                tags: ["Reviewed"],
+                hash: "0xa1aefcc90e123afdbec2349eab23ea4e",
+                previewType: "document"
+            },
+            {
+                id: 8,
+                name: "Lender_Match_Term_Sheet_Apex.pdf",
+                folder: "Capital",
+                size: "1.1 MB",
+                sizeBytes: 1100000,
+                extension: "PDF",
+                date: "2023-11-05",
+                tags: ["Verified"],
+                hash: "0x34aef8cc71e29aa0ebcd23e9a28e3bfa",
+                previewType: "document"
+            }
+        ];
+
+        // System State parameters
+        let activeFilters = {
+            searchQuery: "",
+            folder: "ALL",
+            extension: "ALL",
+            selectedTags: []
+        };
+        let selectionBuffer = [];
+        let currentLayout = "grid"; // grid or list
+        let currentSorting = "name-asc";
+
+        // Application Initialization
+        document.addEventListener("DOMContentLoaded", () => {
+            renderFiles();
+            recalculateFileMetrics();
+        });
+
+        // Compute aggregate metrics
+        function recalculateFileMetrics() {
+            // Count items per category
+            const countMap = {
+                ALL: filesDatabase.length,
+                Valuation: filesDatabase.filter(f => f.folder === "Valuation").length,
+                Underwriting: filesDatabase.filter(f => f.folder === "Underwriting").length,
+                Legal: filesDatabase.filter(f => f.folder === "Legal").length,
+                Capital: filesDatabase.filter(f => f.folder === "Capital").length,
+                Media: filesDatabase.filter(f => f.folder === "Media").length
+            };
+
+            // Update DOM counters
+            for (const [folder, count] of Object.entries(countMap)) {
+                const el = document.getElementById(`count-${folder}`);
+                if (el) el.innerText = count;
+            }
+
+            // Header metric calculation
+            const totalBytes = filesDatabase.reduce((acc, f) => acc + f.sizeBytes, 0);
+            const totalMB = (totalBytes / 1000000).toFixed(1);
+            document.getElementById("headerCapacity").innerText = `${totalMB} MB / 100 GB`;
+            document.getElementById("headerIndexCount").innerText = `${filesDatabase.length} ATTACHMENT${filesDatabase.length !== 1 ? 'S' : ''}`;
+        }
+
+        // Apply filters & query metrics
+        function applyFilters() {
+            activeFilters.searchQuery = document.getElementById("fileSearch").value.toLowerCase();
+            activeFilters.extension = document.getElementById("formatFilter").value;
+            renderFiles();
+        }
+
+        // Filter folder activation state 
+        function filterByFolder(folder) {
+            activeFilters.folder = folder;
+            
+            // Adjust buttons active styling
+            const buttons = document.querySelectorAll("#folderFilterList button");
+            buttons.forEach(btn => {
+                btn.className = "w-full flex items-center justify-between px-3 py-2 rounded text-left transition-all duration-150 text-slate-400 hover:text-white hover:bg-slate-900/60";
+            });
+
+            const activeBtn = document.getElementById(`btnFolder-${folder}`);
+            if (activeBtn) {
+                activeBtn.className = "w-full flex items-center justify-between px-3 py-2 rounded text-left transition-all duration-150 text-cyber-accent bg-cyber-accent/5 font-bold";
+            }
+
+            renderFiles();
+        }
+
+        // Tag filtration switching
+        function toggleTagFilter(tag) {
+            const index = activeFilters.selectedTags.indexOf(tag);
+            if (index > -1) {
+                activeFilters.selectedTags.splice(index, 1);
+            } else {
+                activeFilters.selectedTags.push(tag);
+            }
+
+            // Toggle CSS selection styles
+            const tagButtons = document.querySelectorAll(".tag-pill");
+            tagButtons.forEach(btn => {
+                const btnTag = btn.getAttribute("data-tag");
+                if (activeFilters.selectedTags.includes(btnTag)) {
+                    btn.classList.add("bg-cyber-purple/20", "border-cyber-purple");
+                } else {
+                    btn.classList.remove("bg-cyber-purple/20", "border-cyber-purple");
+                }
+            });
+
+            renderFiles();
+        }
+
+        // Sort Files database based on UI trigger
+        function sortFiles() {
+            currentSorting = document.getElementById("sortControl").value;
+            renderFiles();
+        }
+
+        // Manage container grids vs list layout structure
+        function setLayout(layout) {
+            currentLayout = layout;
+            
+            const gridBtn = document.getElementById("gridToggleBtn");
+            const listBtn = document.getElementById("listToggleBtn");
+            const container = document.getElementById("fileContainer");
+
+            if (layout === "grid") {
+                gridBtn.className = "p-1.5 rounded text-cyber-accent bg-cyber-accent/15";
+                listBtn.className = "p-1.5 rounded text-slate-500 hover:text-slate-300";
+                container.className = "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 transition-all duration-300";
+            } else {
+                listBtn.className = "p-1.5 rounded text-cyber-accent bg-cyber-accent/15";
+                gridBtn.className = "p-1.5 rounded text-slate-500 hover:text-slate-300";
+                container.className = "flex flex-col gap-3 transition-all duration-300";
+            }
+            renderFiles();
+        }
+
+        // Build HTML template output matching either Grid or List modes
+        function renderFiles() {
+            const container = document.getElementById("fileContainer");
+            container.innerHTML = "";
+
+            // Filtering process
+            let filtered = filesDatabase.filter(file => {
+                const matchesSearch = file.name.toLowerCase().includes(activeFilters.searchQuery);
+                const matchesFolder = activeFilters.folder === "ALL" || file.folder === activeFilters.folder;
+                const matchesExtension = activeFilters.extension === "ALL" || file.extension === activeFilters.extension;
+                const matchesTags = activeFilters.selectedTags.length === 0 || activeFilters.selectedTags.every(t => file.tags.includes(t));
+
+                return matchesSearch && matchesFolder && matchesExtension && matchesTags;
+            });
+
+            // Sorting logic
+            filtered.sort((a, b) => {
+                if (currentSorting === "name-asc") return a.name.localeCompare(b.name);
+                if (currentSorting === "name-desc") return b.name.localeCompare(a.name);
+                if (currentSorting === "size-desc") return b.sizeBytes - a.sizeBytes;
+                if (currentSorting === "size-asc") return a.sizeBytes - b.sizeBytes;
+                if (currentSorting === "date-desc") return new Date(b.date) - new Date(a.date);
+                if (currentSorting === "date-asc") return new Date(a.date) - new Date(b.date);
+                return 0;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-16 text-center border border-dashed border-cyber-border rounded-xl">
+                        <svg class="w-12 h-12 text-slate-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <p class="font-mono text-sm text-slate-400">0 FILE ELEMENTS FOUND INSIDE PORTAL ENVIRONMENT</p>
+                        <p class="text-xs text-slate-500 mt-1">Refine active layout parameters or tag classifications.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(file => {
+                const element = document.createElement("div");
+                const isSelected = selectionBuffer.includes(file.id) ? 'checked' : '';
+
+                // Tag elements layout builder
+                const tagsHTML = file.tags.map(t => {
+                    let colorStyles = "border-cyber-border/80 text-slate-300 bg-black/40";
+                    if (t === "Verified") colorStyles = "border-cyber-emerald/30 text-cyber-emerald bg-cyber-emerald/5";
+                    if (t === "Reviewed") colorStyles = "border-cyber-accent/30 text-cyber-accent bg-cyber-accent/5";
+                    if (t === "Action Required") colorStyles = "border-cyber-rose/30 text-cyber-rose bg-cyber-rose/5";
+                    if (t === "Under Review") colorStyles = "border-cyber-amber/30 text-cyber-amber bg-cyber-amber/5";
+                    if (t === "Pending Sign") colorStyles = "border-cyber-purple/30 text-cyber-purple bg-cyber-purple/5";
+
+                    return `<span class="px-2 py-0.5 rounded border ${colorStyles} text-[10px] font-mono">${t}</span>`;
+                }).join("");
+
+                // Select Extension color theme icon
+                let extensionIconColor = "text-cyber-accent";
+                if (file.extension === "PDF") extensionIconColor = "text-cyber-rose";
+                if (file.extension === "XLSX") extensionIconColor = "text-cyber-emerald";
+                if (file.extension === "ZIP") extensionIconColor = "text-cyber-purple";
+
+                if (currentLayout === "grid") {
+                    element.className = "bg-cyber-card border border-cyber-border hover:border-cyber-accent/60 p-5 rounded-xl transition-all duration-300 relative group flex flex-col justify-between cyber-glow-hover edge-clip";
+                    element.innerHTML = `
+                        <div>
+                            <!-- Top Checkbox Line -->
+                            <div class="flex items-center justify-between mb-4 pb-3 border-b border-cyber-border/40">
+                                <span class="text-[10px] font-mono text-cyber-accent tracking-widest uppercase">${file.folder} DIRECTORY</span>
+                                <input type="checkbox" onchange="toggleFileSelection(${file.id}, this.checked)" ${isSelected} class="rounded border-cyber-border bg-black text-cyber-accent focus:ring-0 cursor-pointer">
+                            </div>
+
+                            <!-- Icon + Title layout block -->
+                            <div class="flex items-start gap-3">
+                                <span class="p-2.5 bg-black/60 rounded border border-cyber-border/80 ${extensionIconColor}">
+                                    ${getFileIconSvg(file.extension)}
+                                </span>
+                                <div class="overflow-hidden">
+                                    <h4 class="text-sm font-bold text-slate-100 group-hover:text-cyber-accent transition-colors duration-200 truncate cursor-pointer" onclick="openPreviewModal(${file.id})">${file.name}</h4>
+                                    <span class="text-[10px] text-slate-400 font-mono block mt-1">${file.size} | ${file.date}</span>
+                                </div>
+                            </div>
+
+                            <!-- Assigned custom labels matrix -->
+                            <div class="flex flex-wrap gap-1.5 mt-5">
+                                ${tagsHTML}
+                            </div>
+                        </div>
+
+                        <!-- CTA Row execution controls -->
+                        <div class="mt-5 pt-3 border-t border-cyber-border/30 flex items-center justify-between">
+                            <span class="text-[9px] font-mono text-slate-500 uppercase truncate max-w-[120px]" title="${file.hash}">Hash: ${file.hash.slice(0, 10)}...</span>
+                            <div class="flex gap-3">
+                                <button onclick="openPreviewModal(${file.id})" class="text-xs font-mono text-slate-400 hover:text-white transition-colors">
+                                    Review
+                                </button>
+                                <button onclick="individualFileDownload(${file.id})" class="text-xs font-mono text-cyber-accent hover:underline transition-colors">
+                                    Pull
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // List structural Layout Row
+                    element.className = "bg-cyber-card border border-cyber-border hover:border-cyber-accent/60 p-4 rounded-lg transition-all duration-300 flex items-center justify-between group gap-4";
+                    element.innerHTML = `
+                        <div class="flex items-center gap-4 flex-1 min-w-0">
+                            <!-- Selector state -->
+                            <input type="checkbox" onchange="toggleFileSelection(${file.id}, this.checked)" ${isSelected} class="rounded border-cyber-border bg-black text-cyber-accent focus:ring-0 cursor-pointer">
+                            
+                            <!-- Small identity tag -->
+                            <span class="p-2 bg-black/40 rounded border border-cyber-border/60 ${extensionIconColor} hidden sm:block">
+                                ${getFileIconSvg(file.extension)}
+                            </span>
+
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-sm font-bold text-slate-100 group-hover:text-cyber-accent transition-colors duration-200 truncate cursor-pointer" onclick="openPreviewModal(${file.id})">${file.name}</h4>
+                                <div class="flex items-center gap-3 text-[10px] text-slate-400 font-mono mt-0.5">
+                                    <span class="text-cyber-accent">${file.folder.toUpperCase()}</span>
+                                    <span>•</span>
+                                    <span>${file.size}</span>
+                                    <span>•</span>
+                                    <span>${file.date}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Inline Metadata tags -->
+                        <div class="hidden lg:flex items-center gap-1.5 flex-wrap max-w-xs">
+                            ${tagsHTML}
+                        </div>
+
+                        <!-- Direct interactive triggers -->
+                        <div class="flex items-center gap-4 ml-auto">
+                            <button onclick="openPreviewModal(${file.id})" class="text-xs font-mono text-slate-400 hover:text-white">Review</button>
+                            <button onclick="individualFileDownload(${file.id})" class="text-xs font-mono text-cyber-accent hover:underline">Download</button>
+                        </div>
+                    `;
+                }
+                container.appendChild(element);
+            });
+        }
+
+        // Return inline SVG indicators based on file formats
+        function getFileIconSvg(ext) {
+            if (ext === "PDF") {
+                return `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>`;
+            } else if (ext === "XLSX") {
+                return `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 0v4m0-4h4m-4 0H8m11 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+            } else if (ext === "ZIP") {
+                return `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>`;
+            }
+            return `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>`;
+        }
+
+        // Buffer selection controls
+        function toggleFileSelection(fileId, isChecked) {
+            if (isChecked) {
+                if (!selectionBuffer.includes(fileId)) selectionBuffer.push(fileId);
+            } else {
+                selectionBuffer = selectionBuffer.filter(id => id !== fileId);
+            }
+            updateBulkActionBar();
+        }
+
+        function updateBulkActionBar() {
+            const bar = document.getElementById("bulkActionBar");
+            const count = document.getElementById("selectedCount");
+
+            if (selectionBuffer.length > 0) {
+                bar.classList.remove("translate-y-full");
+                count.innerText = `${selectionBuffer.length} Element${selectionBuffer.length !== 1 ? 's' : ''} Synced`;
+            } else {
+                bar.classList.add("translate-y-full");
+            }
+        }
+
+        function clearSelection() {
+            selectionBuffer = [];
+            updateBulkActionBar();
+            renderFiles(); // Updates DOM views to uncheck standard structures
+        }
+
+        // Simulate new file intake via file zone
+        function simulateFileUpload() {
+            const inputNames = [
+                "Underwriting_Deal_Overview_Package.pdf",
+                "Appraisal_Audit_Value_Index_V2.xlsx",
+                "Sponsor_Proof_of_Funds_Escrow.pdf",
+                "Title_Insurance_Closing_Statement.pdf"
+            ];
+            const targetFilename = inputNames[Math.floor(Math.random() * inputNames.length)];
+            
+            // Check if file name already ingested to prevent duplicates
+            if (filesDatabase.some(f => f.name === targetFilename)) {
+                alert("FILE INDEX ALERT: Document already synced in local memory repository.");
+                return;
+            }
+
+            const container = document.getElementById("uploadProgressContainer");
+            const filenameLabel = document.getElementById("uploadFilename");
+            const progressBar = document.getElementById("uploadProgressBar");
+            const percentLabel = document.getElementById("uploadPercent");
+
+            container.classList.remove("hidden");
+            filenameLabel.innerText = targetFilename;
+            progressBar.style.width = "0%";
+            percentLabel.innerText = "0%";
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 20) + 10;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    // Trigger successful data append 
+                    setTimeout(() => {
+                        const folders = ["Valuation", "Underwriting", "Legal", "Capital"];
+                        const targetFolder = folders[Math.floor(Math.random() * folders.length)];
+                        const sizes = ["4.1 MB", "5.6 MB", "12.0 MB", "2.1 MB"];
+                        const bytes = [4100000, 5600000, 12000000, 21000000];
+                        const index = Math.floor(Math.random() * sizes.length);
+                        const isPdf = targetFilename.endsWith(".pdf");
+
+                        const mockNewFile = {
+                            id: filesDatabase.length + 1,
+                            name: targetFilename,
+                            folder: targetFolder,
+                            size: sizes[index],
+                            sizeBytes: bytes[index],
+                            extension: isPdf ? "PDF" : "XLSX",
+                            date: new Date().toISOString().slice(0, 10),
+                            tags: ["Under Review"],
+                            hash: "0x" + Math.random().toString(16).substr(2, 32),
+                            previewType: isPdf ? "document" : "spreadsheet"
+                        };
+
+                        filesDatabase.unshift(mockNewFile);
+                        recalculateFileMetrics();
+                        renderFiles();
+
+                        container.classList.add("hidden");
+                        alert(`SUCCESS: Secure OCR process compiled. File indexed in [${targetFolder}] directory.`);
+                    }, 400);
+                }
+                progressBar.style.width = `${progress}%`;
+                percentLabel.innerText = `${progress}%`;
+            }, 180);
+        }
+
+        // Preview operations modal state triggers
+        let activePreviewId = null;
+        function openPreviewModal(fileId) {
+            const file = filesDatabase.find(f => f.id === fileId);
+            if (!file) return;
+
+            activePreviewId = fileId;
+
+            document.getElementById("previewTitle").innerText = file.name;
+            document.getElementById("previewFolderMeta").innerText = `Categorization Directory: ${file.folder} Matrix`;
+            document.getElementById("metaExtension").innerText = file.extension;
+            document.getElementById("metaSize").innerText = file.size;
+            document.getElementById("metaDate").innerText = file.date;
+            document.getElementById("metaHash").innerText = file.hash;
+
+            // Preview icon select layout
+            let extensionIconColor = "text-cyber-accent";
+            if (file.extension === "PDF") extensionIconColor = "text-cyber-rose";
+            if (file.extension === "XLSX") extensionIconColor = "text-cyber-emerald";
+            if (file.extension === "ZIP") extensionIconColor = "text-cyber-purple";
+            
+            const previewIconBox = document.getElementById("previewIcon");
+            previewIconBox.className = `p-2 bg-slate-900 rounded border border-cyber-border ${extensionIconColor}`;
+            previewIconBox.innerHTML = getFileIconSvg(file.extension);
+
+            // Toggle Visual Previews based on format type
+            document.getElementById("canvasDocument").classList.add("hidden");
+            document.getElementById("canvasImage").classList.add("hidden");
+            document.getElementById("canvasSpreadsheet").classList.add("hidden");
+
+            if (file.previewType === "spreadsheet") {
+                document.getElementById("canvasSpreadsheet").classList.remove("hidden");
+            } else if (file.previewType === "image") {
+                document.getElementById("canvasImage").classList.remove("hidden");
+            } else {
+                document.getElementById("canvasDocument").classList.remove("hidden");
+            }
+
+            // Populate tags within modal meta panel
+            const tagContainer = document.getElementById("previewTagsContainer");
+            tagContainer.innerHTML = "";
+            file.tags.forEach(t => {
+                const tagEl = document.createElement("span");
+                tagEl.className = "px-2 py-0.5 rounded border border-cyber-accent/30 text-cyber-accent bg-cyber-accent/5 text-[10px] font-mono";
+                tagEl.innerText = `#${t}`;
+                tagContainer.appendChild(tagEl);
+            });
+
+            // Set up inner delete trigger
+            const deleteBtn = document.getElementById("deleteBtnInPreview");
+            deleteBtn.onclick = () => {
+                deleteSpecificFile(file.id);
+                closePreviewModal();
+            };
+
+            document.getElementById("previewModal").classList.remove("hidden");
+        }
+
+        function closePreviewModal() {
+            document.getElementById("previewModal").classList.add("hidden");
+            activePreviewId = null;
+        }
+
+        // Custom individual triggers
+        function deleteSpecificFile(fileId) {
+            if (confirm("CONFIRMATION REQUIRED: Permanently purge document entity from local repository?")) {
+                filesDatabase = filesDatabase.filter(f => f.id !== fileId);
+                selectionBuffer = selectionBuffer.filter(id => id !== fileId);
+                
+                updateBulkActionBar();
+                recalculateFileMetrics();
+                renderFiles();
+            }
+        }
+
+        function individualFileDownload(fileId) {
+            const file = filesDatabase.find(f => f.id === fileId);
+            if (file) {
+                alert(`STAGING EXPORT: Commencing client side packaging for target: ${file.name}`);
+            }
+        }
+
+        function downloadSpecificFile() {
+            if (activePreviewId) {
+                individualFileDownload(activePreviewId);
+            }
+        }
+
+        // Bulk operations executes
+        function triggerBulkDownload() {
+            alert(`DEAL PACKAGER ROUTING: Assembling ZIP package containing (${selectionBuffer.length}) underwriting elements...`);
+            clearSelection();
+        }
+
+        function triggerBulkDelete() {
+            if (confirm(`ALERT: Purge all (${selectionBuffer.length}) selected elements permanently from indices?`)) {
+                filesDatabase = filesDatabase.filter(f => !selectionBuffer.includes(f.id));
+                clearSelection();
+                recalculateFileMetrics();
+                renderFiles();
+            }
+        }
+
+        function triggerBulkAction(tagLabel) {
+            filesDatabase.forEach(f => {
+                if (selectionBuffer.includes(f.id) && !f.tags.includes(tagLabel)) {
+                    f.tags.push(tagLabel);
+                }
+            });
+            clearSelection();
+            renderFiles();
+            alert(`METADATA MATRIX UPDATED: Classification tags adjusted on target files.`);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,876 @@
+```html
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funding Route Matcher | Moonshine Partner Profile Engine</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Space Grotesk (Headers), JetBrains Mono (Tactical Elements) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            black: '#0A0A0C',
+                            darkGray: '#121214',
+                            graphite: '#1E1E22',
+                            borderGray: '#2A2A30',
+                            bone: '#F3F3F3',
+                            green: '#00FF66',
+                            orange: '#FF5500',
+                            blue: '#004BFF',
+                            chrome: '#E5E5E5'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style type="text/css">
+        /* Custom tactical grid background styling */
+        body {
+            background-color: #0A0A0C;
+            background-image: 
+                linear-gradient(rgba(18, 18, 20, 0.7) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(18, 18, 20, 0.7) 1px, transparent 1px);
+            background-size: 30px 30px;
+            color: #F3F3F3;
+        }
+
+        /* Neobrutalist components */
+        .neo-border {
+            border: 2px solid #2A2A30;
+        }
+        
+        .neo-card {
+            background: #121214;
+            border: 2px solid #2A2A30;
+            box-shadow: 4px 4px 0px #1E1E22;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .neo-card:hover {
+            border-color: #00FF66;
+            box-shadow: 6px 6px 0px rgba(0, 255, 102, 0.2);
+            transform: translate(-2px, -2px);
+        }
+
+        .neo-btn-green {
+            background: #00FF66;
+            color: #0A0A0C;
+            border: 2px solid #0A0A0C;
+            box-shadow: 4px 4px 0px #1E1E22;
+            font-weight: 700;
+            transition: all 0.15s ease-in-out;
+        }
+
+        .neo-btn-green:hover {
+            box-shadow: 1px 1px 0px #0A0A0C;
+            transform: translate(3px, 3px);
+            background: #00e55c;
+        }
+
+        .neo-btn-dark {
+            background: #121214;
+            color: #F3F3F3;
+            border: 2px solid #2A2A30;
+            box-shadow: 4px 4px 0px #0A0A0C;
+            transition: all 0.15s ease-in-out;
+        }
+
+        .neo-btn-dark:hover {
+            border-color: #F3F3F3;
+            box-shadow: 2px 2px 0px #0A0A0C;
+            transform: translate(2px, 2px);
+        }
+
+        .radial-green-glow {
+            background: radial-gradient(circle at 50% 50%, rgba(0, 255, 102, 0.05) 0%, transparent 70%);
+        }
+        
+        .radial-blue-glow {
+            background: radial-gradient(circle at 50% 50%, rgba(0, 75, 255, 0.08) 0%, transparent 70%);
+        }
+
+        /* Range sliders custom look */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: #1E1E22;
+            border: 1px solid #2A2A30;
+            height: 8px;
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #00FF66;
+            border: 2px solid #0A0A0C;
+            cursor: pointer;
+            box-shadow: 2px 2px 0px #004BFF;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased text-brand-bone relative overflow-x-hidden selection:bg-brand-green selection:text-brand-black min-h-screen flex flex-col justify-between">
+
+    <!-- TOP TELEMETRY STATUS BAR -->
+    <div class="w-full bg-brand-black border-b border-brand-borderGray py-1.5 px-4 md:px-8 text-[10px] font-mono flex justify-between items-center text-zinc-500">
+        <div class="flex items-center space-x-4">
+            <span class="flex items-center space-x-1.5">
+                <span class="w-2 h-2 rounded-full bg-brand-green animate-pulse"></span>
+                <span class="text-brand-bone">DECISION ENGINE ONLINE</span>
+            </span>
+            <span class="hidden md:inline">|</span>
+            <span class="hidden md:inline">ATTR MODEL: DYNAMIC JSON PAIRING</span>
+            <span class="hidden md:inline">|</span>
+            <span class="text-brand-orange uppercase" id="partner-sync-indicator">RESOLVING DESTRUCTURING PARTNER ID...</span>
+        </div>
+        <div>
+            <span>LATENCY: 14ms</span>
+        </div>
+    </div>
+
+    <!-- MAIN NAV HEADER -->
+    <header class="bg-brand-black/90 backdrop-blur-md border-b-2 border-brand-borderGray px-4 md:px-8 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <!-- Brand Logo -->
+            <a href="../../index.html" class="flex items-center space-x-3 group">
+                <div class="relative bg-brand-green p-2 border border-brand-black text-brand-black font-mono font-bold text-xs tracking-tighter shadow-[2px_2px_0px_#004BFF]">
+                    MS//PE
+                </div>
+                <div>
+                    <span class="font-bold text-lg tracking-tight uppercase block group-hover:text-brand-green transition-colors">Moonshine</span>
+                    <span class="text-[9px] font-mono text-zinc-500 block -mt-1 tracking-widest uppercase">Partner Profile Engine</span>
+                </div>
+            </a>
+
+            <!-- Active Desk Indicator -->
+            <div id="partner-desk-badge" class="hidden md:flex items-center space-x-3 bg-brand-darkGray border border-brand-borderGray px-4 py-1.5 font-mono text-xs">
+                <span class="w-2 h-2 rounded-full bg-brand-blue"></span>
+                <span class="text-zinc-500">ACTIVE REFERRAL DESK:</span>
+                <span id="partner-badge-name" class="text-brand-bone font-bold">SYSTEM DEFAULT</span>
+            </div>
+
+            <!-- Back to hub -->
+            <div>
+                <a href="../../index.html#tools" class="neo-btn-dark px-4 py-2 text-xs font-mono uppercase tracking-wider flex items-center space-x-2">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    <span>System Hub</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENT BODY CONTAINER -->
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 md:px-8 py-10 relative">
+        <div class="absolute inset-y-0 right-0 w-1/2 radial-blue-glow pointer-events-none"></div>
+        <div class="absolute inset-y-0 left-0 w-1/2 radial-green-glow pointer-events-none"></div>
+
+        <!-- INTRO HERO BLOCK -->
+        <div class="mb-10 text-center md:text-left">
+            <div class="inline-flex items-center space-x-2 bg-brand-darkGray border border-brand-borderGray py-1 px-3 mb-4">
+                <span class="w-1.5 h-1.5 bg-brand-green animate-ping"></span>
+                <span class="text-[9px] font-mono tracking-widest uppercase text-brand-green">Direct Underwriting Assessment Gateway v1.4</span>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-bold uppercase tracking-tight text-brand-bone">
+                Funding Route Matcher
+            </h1>
+            <p class="text-zinc-400 mt-2 max-w-2xl text-sm md:text-base">
+                Self-evaluate dynamic eligibility variables instantly. Adjust parameters below to find matching capital models backed by Moonshine Partner Operations.
+            </p>
+        </div>
+
+        <!-- GRID INTERFACE -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative z-10">
+            
+            <!-- LEFT INPUT PANEL: THE SIMULATION TERMINAL -->
+            <div class="lg:col-span-7 bg-brand-darkGray border-2 border-brand-borderGray p-6 shadow-[6px_6px_0px_#1E1E22] space-y-6">
+                
+                <!-- TERMINAL TITLE BAR -->
+                <div class="flex justify-between items-center border-b border-brand-borderGray pb-3 text-xs font-mono">
+                    <span class="text-brand-green">// INPUT PARAMETERS CONFIG</span>
+                    <span class="text-zinc-500">LIVE COUPLING MATRIX</span>
+                </div>
+
+                <!-- ATTRIBUTION PROFILE ACCENT ON MOBILE -->
+                <div id="partner-desk-badge-mobile" class="md:hidden flex items-center justify-between bg-brand-black border border-brand-borderGray p-3 font-mono text-xs">
+                    <span class="text-zinc-500">ACTIVE PARTNER DESK:</span>
+                    <span id="partner-badge-name-mobile" class="text-brand-green font-bold">SYSTEM DEFAULT</span>
+                </div>
+
+                <!-- PARAMETER 1: TIME IN BUSINESS -->
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center font-mono">
+                        <label class="text-xs text-zinc-400 uppercase tracking-wider">01 // Time in Business (TIB)</label>
+                        <span id="tib-val-display" class="text-xs font-bold text-brand-green bg-brand-green/10 border border-brand-green/30 px-2 py-0.5">2 Years</span>
+                    </div>
+                    <div class="grid grid-cols-4 gap-2">
+                        <button onclick="setTIB(3, '3 Months')" class="tib-btn px-3 py-2 bg-brand-black border border-brand-borderGray hover:border-brand-green text-xs font-mono transition-all text-zinc-400" id="tib-3m">
+                            &lt; 6 Mos
+                        </button>
+                        <button onclick="setTIB(6, '6 Months')" class="tib-btn px-3 py-2 bg-brand-black border border-brand-borderGray hover:border-brand-green text-xs font-mono transition-all text-zinc-400" id="tib-6m">
+                            6-12 Mos
+                        </button>
+                        <button onclick="setTIB(12, '1 Year')" class="tib-btn px-3 py-2 bg-brand-black border border-brand-borderGray hover:border-brand-green text-xs font-mono transition-all text-zinc-400" id="tib-1y">
+                            1-2 Years
+                        </button>
+                        <button onclick="setTIB(24, '2+ Years')" class="tib-btn px-3 py-2 bg-brand-black border-2 border-brand-green bg-brand-green/5 text-brand-green font-bold text-xs font-mono transition-all" id="tib-2y">
+                            2+ Years
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PARAMETER 2: MONTHLY REVENUE -->
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center font-mono">
+                        <label class="text-xs text-zinc-400 uppercase tracking-wider">02 // Monthly Gross Revenue</label>
+                        <span id="rev-val-display" class="text-xs font-bold text-brand-blue bg-brand-blue/10 border border-brand-blue/30 px-2 py-0.5">$45,000 / mo</span>
+                    </div>
+                    <input 
+                        type="range" 
+                        id="rev-slider" 
+                        min="5000" 
+                        max="250000" 
+                        step="5000" 
+                        value="45000" 
+                        oninput="updateRevenue(this.value)"
+                        class="w-full"
+                    >
+                    <div class="flex justify-between text-[10px] font-mono text-zinc-500">
+                        <span>$5K/MO</span>
+                        <span>$50K/MO</span>
+                        <span>$100K/MO</span>
+                        <span>$175K/MO</span>
+                        <span>$250K/MO+</span>
+                    </div>
+                </div>
+
+                <!-- PARAMETER 3: FICO CREDIT SCORE -->
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center font-mono">
+                        <label class="text-xs text-zinc-400 uppercase tracking-wider">03 // Minimum Guarantor FICO</label>
+                        <span id="fico-val-display" class="text-xs font-bold text-brand-orange bg-brand-orange/10 border border-brand-orange/30 px-2 py-0.5">680+ Excellent</span>
+                    </div>
+                    <div class="grid grid-cols-4 gap-2">
+                        <button onclick="setFico(500, '500-579 Bad')" class="fico-btn px-3 py-2 bg-brand-black border border-brand-borderGray hover:border-brand-orange text-xs font-mono transition-all text-zinc-400" id="fico-500">
+                            &lt; 580
+                        </button>
+                        <button onclick="setFico(580, '580-639 Fair')" class="fico-btn px-3 py-2 bg-brand-black border border-brand-borderGray hover:border-brand-orange text-xs font-mono transition-all text-zinc-400" id="fico-580">
+                            580 - 640
+                        </button>
+                        <button onclick="setFico(640, '640-679 Good')" class="fico-btn px-3 py-2 bg-brand-black border border-brand-borderGray hover:border-brand-orange text-xs font-mono transition-all text-zinc-400" id="fico-640">
+                            640 - 680
+                        </button>
+                        <button onclick="setFico(680, '680+ Excellent')" class="fico-btn px-3 py-2 bg-brand-black border-2 border-brand-orange bg-brand-orange/5 text-brand-orange font-bold text-xs font-mono transition-all" id="fico-680">
+                            680+
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PARAMETER 4: INDUSTRY FOCUS -->
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center font-mono">
+                        <label class="text-xs text-zinc-400 uppercase tracking-wider">04 // Core Business Niche Focus</label>
+                        <span id="industry-val-display" class="text-xs font-bold text-brand-bone bg-zinc-800 border border-zinc-700 px-2 py-0.5">Retail / Merchant</span>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <button onclick="setIndustry('local-business', 'Retail / Merchant')" class="ind-btn px-3 py-2 bg-brand-black border-2 border-zinc-400 bg-zinc-800 text-brand-bone font-bold text-xs font-mono transition-all text-left" id="ind-local">
+                            Main St Retail
+                        </button>
+                        <button onclick="setIndustry('e-commerce', 'E-commerce Brands')" class="ind-btn px-3 py-2 bg-brand-black border border-brand-borderGray hover:border-brand-blue text-xs font-mono transition-all text-left text-zinc-400" id="ind-ecom">
+                            E-Commerce
+                        </button>
+                        <button onclick="setIndustry('contractors', 'Builders & Trades')" class="ind-btn px-3 py-2 bg-brand-black border border-brand-borderGray hover:border-brand-green text-xs font-mono transition-all text-left text-zinc-400" id="ind-trades">
+                            Construction
+                        </button>
+                        <button onclick="setIndustry('b2b', 'B2B / Professional')" class="ind-btn px-3 py-2 bg-brand-black border border-brand-borderGray hover:border-brand-blue text-xs font-mono transition-all text-left text-zinc-400" id="ind-b2b">
+                            B2B / SaaS
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PRE-FLIGHT UNDERWRITING METRICS CHECKS -->
+                <div class="border-t border-brand-borderGray pt-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-[9px] font-mono text-zinc-400">INSTANT TELEMETRY PRE-FLIGHT DIAGNOSIS</span>
+                        <span class="text-[9px] font-mono text-brand-green bg-brand-green/10 px-1 border border-brand-green/30">REALTIME CHECKLIST</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-[11px] font-mono">
+                        <div id="check-bank" class="bg-brand-black border border-brand-borderGray p-2.5 flex items-center space-x-2">
+                            <span class="text-brand-green" id="check-bank-icon">✓</span>
+                            <span class="text-zinc-400" id="check-bank-text">6 Months Bank Records</span>
+                        </div>
+                        <div id="check-tax" class="bg-brand-black border border-brand-borderGray p-2.5 flex items-center space-x-2">
+                            <span class="text-brand-green" id="check-tax-icon">✓</span>
+                            <span class="text-zinc-400" id="check-tax-text">Business Tax Filings</span>
+                        </div>
+                        <div id="check-aging" class="bg-brand-black border border-brand-borderGray p-2.5 flex items-center space-x-2">
+                            <span class="text-brand-orange" id="check-aging-icon">?</span>
+                            <span class="text-zinc-400" id="check-aging-text">A/R Aging Ledger</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT OUTPUT PANEL: LIVE RESULTS & MATCH RANGES -->
+            <div class="lg:col-span-5 flex flex-col space-y-6">
+                
+                <!-- ATTRIBUTED PARTNER PREVIEW BOX -->
+                <div id="partner-panel" class="bg-brand-darkGray border-2 border-brand-borderGray p-4 relative overflow-hidden shadow-[4px_4px_0px_#121214]">
+                    <div class="absolute top-0 right-0 bg-brand-green text-brand-black text-[8px] font-mono font-bold px-2 py-0.5 border-b border-l border-brand-borderGray">
+                        REVENUE ROUTING VERIFIED
+                    </div>
+                    
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-brand-graphite border border-brand-borderGray flex items-center justify-center font-mono text-xs font-bold text-brand-green relative">
+                            <span id="partner-avatar-initials">MS</span>
+                        </div>
+                        <div>
+                            <span class="text-[9px] font-mono text-brand-green uppercase tracking-widest block">Primary Advisory Desk</span>
+                            <h4 id="partner-desk-title" class="text-sm font-bold text-brand-bone">Moonshine Corporate Desk</h4>
+                            <p class="text-[10px] text-zinc-500 font-mono" id="partner-desk-focus">Serving CPAs, Agencies & Retail Operators</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CORE ALGORITHM MATCH READOUT -->
+                <div class="bg-brand-black border-2 border-brand-borderGray p-5 space-y-4">
+                    <div class="flex justify-between items-center border-b border-brand-borderGray pb-3">
+                        <span class="font-mono text-xs text-brand-blue">[ CALCULATED ROUTING METRIC ]</span>
+                        <span id="match-percentage-badge" class="font-mono text-xs text-brand-green">100% MAXIMUM ELIGIBLE</span>
+                    </div>
+
+                    <!-- LOAN PROGRAM PRODUCTS -->
+                    <div class="space-y-3" id="program-list">
+                        
+                        <!-- Program 1: SBA 7(a) & Express -->
+                        <div id="prog-sba" class="p-3.5 bg-brand-darkGray border border-brand-borderGray transition-all">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-xs font-bold text-brand-bone">SBA 7(a) & Core Loans</span>
+                                <span class="status-pill text-[9px] font-mono bg-brand-green/10 text-brand-green border border-brand-green/30 px-1.5 py-0.2">HIGHLY ELIGIBLE</span>
+                            </div>
+                            <p class="text-[10px] text-zinc-400 leading-relaxed font-sans">
+                                Prime-backed institutional capital. Best rate option, requires multi-year operations and top-tier credit profiles.
+                            </p>
+                            <div class="flex justify-between items-center mt-2.5 text-[9px] font-mono text-zinc-500">
+                                <span>TERM: 10 - 25 YEARS</span>
+                                <span class="text-brand-green font-bold text-[10px]">MIN FICO: 680</span>
+                            </div>
+                        </div>
+
+                        <!-- Program 2: Revenue-Based Funding -->
+                        <div id="prog-rev" class="p-3.5 bg-brand-darkGray border border-brand-borderGray transition-all">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-xs font-bold text-brand-bone">Revenue-Based Capital</span>
+                                <span class="status-pill text-[9px] font-mono bg-brand-green/10 text-brand-green border border-brand-green/30 px-1.5 py-0.2">HIGHLY ELIGIBLE</span>
+                            </div>
+                            <p class="text-[10px] text-zinc-400 leading-relaxed font-sans">
+                                Flexible repayment structured against incoming monthly revenue. Quick automated underwrite paths based on account histories.
+                            </p>
+                            <div class="flex justify-between items-center mt-2.5 text-[9px] font-mono text-zinc-500">
+                                <span>TERM: FLEX MULTI-MONTH</span>
+                                <span class="text-brand-green font-bold text-[10px]">MIN FICO: 550</span>
+                            </div>
+                        </div>
+
+                        <!-- Program 3: Lines of Credit (LOC) -->
+                        <div id="prog-loc" class="p-3.5 bg-brand-darkGray border border-brand-borderGray transition-all">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-xs font-bold text-brand-bone">Unsecured Lines of Credit</span>
+                                <span class="status-pill text-[9px] font-mono bg-brand-green/10 text-brand-green border border-brand-green/30 px-1.5 py-0.2">HIGHLY ELIGIBLE</span>
+                            </div>
+                            <p class="text-[10px] text-zinc-400 leading-relaxed font-sans">
+                                Revolving pool of capital available instantly. Draw down for working expenditures and only pay interest on active balances.
+                            </p>
+                            <div class="flex justify-between items-center mt-2.5 text-[9px] font-mono text-zinc-500">
+                                <span>TERM: REVOLVING RESTARTS</span>
+                                <span class="text-brand-green font-bold text-[10px]">MIN FICO: 620</span>
+                            </div>
+                        </div>
+
+                        <!-- Program 4: Invoice & Factoring options -->
+                        <div id="prog-factor" class="p-3.5 bg-brand-darkGray border border-brand-borderGray transition-all opacity-40">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-xs font-bold text-brand-bone">Invoice Factoring Models</span>
+                                <span class="status-pill text-[9px] font-mono bg-brand-orange/10 text-brand-orange border border-brand-orange/30 px-1.5 py-0.2">NICHE ONLY</span>
+                            </div>
+                            <p class="text-[10px] text-zinc-400 leading-relaxed font-sans">
+                                Fast advances backed by your unpaid outstanding commercial customer invoices. Ideal for B2B/Trades.
+                            </p>
+                            <div class="flex justify-between items-center mt-2.5 text-[9px] font-mono text-zinc-500">
+                                <span>TERM: VARIABLE UP TO 90 DAYS</span>
+                                <span class="text-brand-orange font-bold text-[10px]">MIN FICO: 500+</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- SECURE CONVERT CTAS -->
+                    <div class="pt-2">
+                        <button onclick="triggerSecureIntake()" class="neo-btn-green w-full py-3.5 text-center font-mono text-xs uppercase tracking-wider flex items-center justify-center space-x-2">
+                            <span>Submit Underwrite Request to Desk</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </button>
+                        <p class="text-center text-[9px] font-mono text-zinc-500 mt-2">
+                            SUBMITTING SECURELY WITH DIRECT PORTAL ENCRYPTIONS VIA SHIELD_ROUTE_SSL
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- INTAKE CONVERSION OVERLAY MODAL -->
+    <div id="intake-modal" class="fixed inset-0 z-50 bg-brand-black/90 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="bg-brand-darkGray border-2 border-brand-borderGray p-6 max-w-lg w-full relative shadow-[8px_8px_0px_#0A0A0C]">
+            <button onclick="closeIntakeModal()" class="absolute top-4 right-4 text-zinc-500 hover:text-brand-orange font-mono text-xs">
+                [CLOSE_X]
+            </button>
+
+            <div class="flex items-center space-x-2 mb-6">
+                <span class="w-2.5 h-2.5 rounded-full bg-brand-green animate-pulse"></span>
+                <span class="font-mono text-xs text-brand-green uppercase font-bold tracking-widest">// SECURE PARTNER DESK EXPORT</span>
+            </div>
+
+            <h3 class="text-xl font-bold uppercase tracking-tight text-brand-bone mb-2">
+                Exporting Underwriting Report
+            </h3>
+            <p class="text-xs text-zinc-400 font-sans mb-6">
+                Your pre-flight diagnostics will be locked into the database under your attending specialist’s referral portal. Complete details to request formal program terms.
+            </p>
+
+            <form onsubmit="handlePreFlightSubmit(event)" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-mono text-zinc-400 uppercase tracking-wider mb-1.5">Company Legal Name</label>
+                        <input required type="text" id="modal-co" placeholder="Empire Distribution LLC" class="w-full bg-brand-black border border-brand-borderGray p-2.5 text-xs text-brand-bone font-mono focus:outline-none focus:border-brand-green">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-mono text-zinc-400 uppercase tracking-wider mb-1.5">Signatory Authorized Agent</label>
+                        <input required type="text" id="modal-name" placeholder="Johnathan Doe" class="w-full bg-brand-black border border-brand-borderGray p-2.5 text-xs text-brand-bone font-mono focus:outline-none focus:border-brand-green">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-mono text-zinc-400 uppercase tracking-wider mb-1.5">Direct Cell Contact</label>
+                        <input required type="tel" id="modal-tel" placeholder="555-019-2831" class="w-full bg-brand-black border border-brand-borderGray p-2.5 text-xs text-brand-bone font-mono focus:outline-none focus:border-brand-green">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-mono text-zinc-400 uppercase tracking-wider mb-1.5">Direct Professional Email</label>
+                        <input required type="email" id="modal-email" placeholder="john@empiredist.com" class="w-full bg-brand-black border border-brand-borderGray p-2.5 text-xs text-brand-bone font-mono focus:outline-none focus:border-brand-green">
+                    </div>
+                </div>
+
+                <div class="bg-brand-black border border-brand-borderGray p-3 text-[10px] font-mono text-zinc-500 space-y-1">
+                    <div class="flex justify-between"><span>REFERRAL PARTNER ID:</span><span id="modal-referral-id" class="text-brand-green font-bold">SYSTEM DEFAULT</span></div>
+                    <div class="flex justify-between"><span>EVALUATED TIME IN BUSINESS:</span><span id="modal-tib-val" class="text-brand-bone">24 Mos</span></div>
+                    <div class="flex justify-between"><span>EVALUATED MONTHLY REVENUE:</span><span id="modal-rev-val" class="text-brand-bone">$45,000</span></div>
+                    <div class="flex justify-between"><span>EVALUATED FICO METRIC:</span><span id="modal-fico-val" class="text-brand-bone">680+</span></div>
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" class="neo-btn-green w-full py-3 text-center text-xs font-mono uppercase tracking-widest">
+                        Submit Diagnostic Dossier
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TACTICAL TOAST SYSTEM -->
+    <div id="toast" class="fixed bottom-8 right-8 bg-brand-black border-2 border-brand-green p-4 max-w-sm z-50 shadow-[4px_4px_0px_#00FF66] transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="flex items-start space-x-3">
+            <div class="w-4 h-4 bg-brand-green text-brand-black text-xs font-mono font-bold flex items-center justify-center">i</div>
+            <div>
+                <span id="toast-title" class="block font-mono text-[10px] text-brand-green uppercase tracking-wider">ACTION</span>
+                <span id="toast-body" class="block text-xs text-brand-bone font-sans">Operation complete</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-brand-black pt-10 pb-12 px-4 md:px-8 border-t border-brand-borderGray">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-[10px] font-mono text-zinc-500 space-y-4 md:space-y-0">
+            <span>© <span id="current-year">2026</span> Moonshine Capital. Route evaluation pipeline.</span>
+            <div class="flex space-x-6">
+                <span>PIPELINE VER: V1.08_MATCH</span>
+                <span>DATA RESIDENCE: SECURE STATIC EXPORT</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- INTERACTIVE SCRIPT LOGIC -->
+    <script type="text/javascript">
+        // Set dynamic current year
+        document.getElementById('current-year').innerText = new Date().getFullYear();
+
+        // Target Parameter Defaults
+        let state = {
+            tib: 24,
+            tibLabel: "2+ Years",
+            revenue: 45000,
+            fico: 680,
+            ficoLabel: "680+ Excellent",
+            industry: "local-business",
+            industryLabel: "Retail / Merchant",
+            partner: "system-default"
+        };
+
+        // Static Partner DB configuration mapping
+        const partnerDirectory = {
+            "darwin-hanneman": {
+                name: "Darwin Hanneman",
+                title: "Darwin Hanneman (Local Biz Funding Desk)",
+                focus: "Main Street, Retail & SBA Working Capital Pipelines",
+                initials: "DH"
+            },
+            "amanda-sterling": {
+                name: "Amanda Sterling",
+                title: "Amanda Sterling (Ecommerce Specialty Desk)",
+                focus: "Digital Brands, Shopify Inventory Advances & Revenue Financing",
+                initials: "AS"
+            },
+            "jackson-vance": {
+                name: "Jackson Vance",
+                title: "Jackson Vance (Contractor Working Desk)",
+                focus: "Commercial Builders, Invoice Factoring & Material Supply Financing",
+                initials: "JV"
+            },
+            "helena-rostova": {
+                name: "Helena Rostova",
+                title: "Helena Rostova (RE Bridge Capital Desk)",
+                focus: "Real Estate Development, Flips, Commercial Mortgages & Bridge Debt",
+                initials: "HR"
+            },
+            "tyler-oconnell": {
+                name: "Tyler O'Connell",
+                title: "Tyler O'Connell (Unsecured Lines Desk)",
+                focus: "Business Credit Builders, Consultative Credit Line Preps",
+                initials: "TO"
+            },
+            "jordan-blake": {
+                name: "Jordan Blake",
+                title: "Jordan Blake (Online Wholesale Desk)",
+                focus: "Shopify Plus & Wholesale Importers Non-Dilutive Setup",
+                initials: "JB"
+            }
+        };
+
+        // Read URL Search Parameters for attribution
+        function resolveDynamicPartnerAttribution() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const partnerParam = urlParams.get('partner') || urlParams.get('ref') || 'system-default';
+            
+            const syncIndicator = document.getElementById('partner-sync-indicator');
+            const badgeName = document.getElementById('partner-badge-name');
+            const badgeNameMobile = document.getElementById('partner-badge-name-mobile');
+            const deskTitle = document.getElementById('partner-desk-title');
+            const deskFocus = document.getElementById('partner-desk-focus');
+            const avatarInitials = document.getElementById('partner-avatar-initials');
+
+            if (partnerDirectory[partnerParam]) {
+                const partnerObj = partnerDirectory[partnerParam];
+                state.partner = partnerParam;
+
+                // Update text configurations
+                syncIndicator.innerText = `ATTR ACTIVE: //PARTNERS/${partnerParam.toUpperCase()}`;
+                syncIndicator.className = "text-brand-green uppercase";
+                
+                badgeName.innerText = partnerObj.name.toUpperCase();
+                badgeNameMobile.innerText = partnerObj.name.toUpperCase();
+                
+                deskTitle.innerText = partnerObj.title;
+                deskFocus.innerText = partnerObj.focus;
+                avatarInitials.innerText = partnerObj.initials;
+
+                triggerToast('PARTNER DESK LOADED', `Underwriting matrix synced with advisory specialist: ${partnerObj.name}.`);
+            } else {
+                state.partner = 'system-default';
+                syncIndicator.innerText = "ATTRIBUTING DEALS DIRECT: MOONSHINE CAPITAL DIRECT PORTAL";
+                syncIndicator.className = "text-brand-blue uppercase";
+                badgeName.innerText = "MOONSHINE CORE";
+                badgeNameMobile.innerText = "MOONSHINE CORE";
+            }
+        }
+
+        // Handle Toast notifications
+        function triggerToast(title, message, colorClass = 'border-brand-green') {
+            const toast = document.getElementById('toast');
+            const toastTitle = document.getElementById('toast-title');
+            const toastBody = document.getElementById('toast-body');
+
+            toast.className = `fixed bottom-8 right-8 bg-brand-black border-2 p-4 max-w-sm z-50 transform transition-all duration-300 pointer-events-auto ${colorClass}`;
+            if (colorClass.includes('green')) {
+                toast.style.boxShadow = '4px 4px 0px #00FF66';
+                toastTitle.className = 'block font-mono text-[10px] text-brand-green uppercase tracking-wider';
+            } else if (colorClass.includes('orange')) {
+                toast.style.boxShadow = '4px 4px 0px #FF5500';
+                toastTitle.className = 'block font-mono text-[10px] text-brand-orange uppercase tracking-wider';
+            } else if (colorClass.includes('blue')) {
+                toast.style.boxShadow = '4px 4px 0px #004BFF';
+                toastTitle.className = 'block font-mono text-[10px] text-brand-blue uppercase tracking-wider';
+            }
+
+            toastTitle.innerText = title;
+            toastBody.innerText = message;
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3500);
+        }
+
+        // TIB Switchers
+        function setTIB(months, label) {
+            state.tib = months;
+            state.tibLabel = label;
+
+            document.getElementById('tib-val-display').innerText = label;
+            
+            // Toggle active classes on selectors
+            document.querySelectorAll('.tib-btn').forEach(btn => {
+                btn.className = "tib-btn px-3 py-2 bg-brand-black border border-brand-borderGray hover:border-brand-green text-xs font-mono transition-all text-zinc-400";
+            });
+            
+            const activeId = months === 3 ? 'tib-3m' : months === 6 ? 'tib-6m' : months === 12 ? 'tib-1y' : 'tib-2y';
+            document.getElementById(activeId).className = "tib-btn px-3 py-2 bg-brand-black border-2 border-brand-green bg-brand-green/5 text-brand-green font-bold text-xs font-mono transition-all";
+            
+            runCalculationEngine();
+        }
+
+        // Revenue Switchers
+        function updateRevenue(val) {
+            state.revenue = parseInt(val);
+            const formatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+            document.getElementById('rev-val-display').innerText = `${formatter.format(val)} / mo`;
+            
+            runCalculationEngine();
+        }
+
+        // Fico Switchers
+        function setFico(ficoVal, label) {
+            state.fico = ficoVal;
+            state.ficoLabel = label;
+
+            document.getElementById('fico-val-display').innerText = label;
+
+            document.querySelectorAll('.fico-btn').forEach(btn => {
+                btn.className = "fico-btn px-3 py-2 bg-brand-black border border-brand-borderGray hover:border-brand-orange text-xs font-mono transition-all text-zinc-400";
+            });
+
+            const activeId = ficoVal === 500 ? 'fico-500' : ficoVal === 580 ? 'fico-580' : ficoVal === 640 ? 'fico-640' : 'fico-680';
+            document.getElementById(activeId).className = "fico-btn px-3 py-2 bg-brand-black border-2 border-brand-orange bg-brand-orange/5 text-brand-orange font-bold text-xs font-mono transition-all";
+
+            runCalculationEngine();
+        }
+
+        // Industry Switchers
+        function setIndustry(indCode, label) {
+            state.industry = indCode;
+            state.industryLabel = label;
+
+            document.getElementById('industry-val-display').innerText = label;
+
+            document.querySelectorAll('.ind-btn').forEach(btn => {
+                btn.className = "ind-btn px-3 py-2 bg-brand-black border border-brand-borderGray hover:border-brand-bone text-xs font-mono transition-all text-left text-zinc-400";
+            });
+
+            const activeId = indCode === 'local-business' ? 'ind-local' : indCode === 'e-commerce' ? 'ind-ecom' : indCode === 'contractors' ? 'ind-trades' : 'ind-b2b';
+            document.getElementById(activeId).className = "ind-btn px-3 py-2 bg-brand-black border-2 border-zinc-400 bg-zinc-800 text-brand-bone font-bold text-xs font-mono transition-all text-left";
+
+            runCalculationEngine();
+        }
+
+        // LIVE COMPUTATIONAL RULESET CALCULATION ENGINE
+        function runCalculationEngine() {
+            // Evaluated values
+            const { tib, revenue, fico, industry } = state;
+
+            // Flags for Program calculations
+            let sbaEligible = false;
+            let revEligible = false;
+            let locEligible = false;
+            let factoringEligible = false;
+
+            // 1. SBA Core logic checking
+            if (tib >= 24 && revenue >= 30000 && fico >= 680) {
+                sbaEligible = true;
+            }
+
+            // 2. Revenue-Based logic checking
+            if (tib >= 6 && revenue >= 15000 && fico >= 550) {
+                revEligible = true;
+            }
+
+            // 3. Line of Credit logic checking
+            if (tib >= 12 && revenue >= 12000 && fico >= 620) {
+                locEligible = true;
+            }
+
+            // 4. Invoice factoring logic checking
+            if (fico >= 500 && revenue >= 10000 && (industry === 'contractors' || industry === 'b2b')) {
+                factoringEligible = true;
+            }
+
+            // Update UI items visually based on calculation values
+            updateProgramCard('prog-sba', sbaEligible, 'SBA Core Options');
+            updateProgramCard('prog-rev', revEligible, 'Revenue-Based');
+            updateProgramCard('prog-loc', locEligible, 'Lines of Credit');
+            updateProgramCard('prog-factor', factoringEligible, 'Invoice Factoring');
+
+            // Set telemetry checks
+            const checkBank = document.getElementById('check-bank');
+            const checkBankIcon = document.getElementById('check-bank-icon');
+            const checkBankText = document.getElementById('check-bank-text');
+
+            const checkTax = document.getElementById('check-tax');
+            const checkTaxIcon = document.getElementById('check-tax-icon');
+            const checkTaxText = document.getElementById('check-tax-text');
+
+            const checkAging = document.getElementById('check-aging');
+            const checkAgingIcon = document.getElementById('check-aging-icon');
+            const checkAgingText = document.getElementById('check-aging-text');
+
+            // Bank records requirement
+            if (revenue >= 10000) {
+                checkBankIcon.innerText = "✓";
+                checkBankIcon.className = "text-brand-green font-bold";
+                checkBankText.innerText = "6 Months Bank Records";
+                checkBank.classList.remove('opacity-40');
+            } else {
+                checkBankIcon.innerText = "?";
+                checkBankIcon.className = "text-brand-orange font-bold";
+                checkBankText.innerText = "Low Volume (Requires Prep)";
+                checkBank.classList.add('opacity-40');
+            }
+
+            // Tax Return status logic
+            if (tib >= 12) {
+                checkTaxIcon.innerText = "✓";
+                checkTaxIcon.className = "text-brand-green font-bold";
+                checkTaxText.innerText = "Business Tax Filings Ready";
+                checkTax.classList.remove('opacity-40');
+            } else {
+                checkTaxIcon.innerText = "!";
+                checkTaxIcon.className = "text-brand-orange font-bold";
+                checkTaxText.innerText = "New Business (Alternative Path)";
+                checkTax.classList.remove('opacity-40');
+            }
+
+            // Aging ledger checks
+            if (industry === 'contractors' || industry === 'b2b') {
+                checkAgingIcon.innerText = "✓";
+                checkAgingIcon.className = "text-brand-green font-bold";
+                checkAgingText.innerText = "Aging Ledger Critical";
+                checkAging.classList.remove('opacity-40');
+            } else {
+                checkAgingIcon.innerText = "✕";
+                checkAgingIcon.className = "text-zinc-600";
+                checkAgingText.innerText = "Aging Ledger Bypassed";
+                checkAging.classList.add('opacity-40');
+            }
+
+            // Calculate aggregate matching rating badge values
+            let matchesCount = (sbaEligible ? 1 : 0) + (revEligible ? 1 : 0) + (locEligible ? 1 : 0) + (factoringEligible ? 1 : 0);
+            let totalProgs = 4;
+            let ratio = Math.round((matchesCount / totalProgs) * 100);
+
+            const ratingBadge = document.getElementById('match-percentage-badge');
+            ratingBadge.innerText = `${ratio}% MINIMUM PROGRAM MATCH`;
+            if (ratio >= 75) {
+                ratingBadge.className = 'font-mono text-xs text-brand-green';
+            } else if (ratio >= 50) {
+                ratingBadge.className = 'font-mono text-xs text-brand-blue';
+            } else {
+                ratingBadge.className = 'font-mono text-xs text-brand-orange';
+            }
+        }
+
+        // Helper function to color program status pills based on logic values
+        function updateProgramCard(id, eligible, programName) {
+            const cardElement = document.getElementById(id);
+            const statusPill = cardElement.querySelector('.status-pill');
+
+            if (eligible) {
+                cardElement.classList.remove('opacity-40');
+                cardElement.style.borderColor = "#2A2A30";
+                statusPill.innerText = "ELIGENCE: COMPLIANT";
+                statusPill.className = "status-pill text-[9px] font-mono bg-brand-green/10 text-brand-green border border-brand-green/30 px-1.5 py-0.2";
+            } else {
+                cardElement.classList.add('opacity-40');
+                cardElement.style.borderColor = "#121214";
+                statusPill.innerText = "ELIGIBILITY GAP";
+                statusPill.className = "status-pill text-[9px] font-mono bg-brand-orange/10 text-brand-orange border border-brand-orange/30 px-1.5 py-0.2";
+            }
+        }
+
+        // Trigger secure overlay conversion popup modal
+        function triggerSecureIntake() {
+            // Lock active details parameters straight inside Modal labels dynamically
+            document.getElementById('modal-referral-id').innerText = state.partner.toUpperCase();
+            document.getElementById('modal-tib-val').innerText = state.tibLabel;
+            
+            const formatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+            document.getElementById('modal-rev-val').innerText = `${formatter.format(state.revenue)} / mo`;
+            document.getElementById('modal-fico-val').innerText = state.ficoLabel;
+
+            // Show secure popup modal
+            document.getElementById('intake-modal').classList.remove('hidden');
+        }
+
+        function closeIntakeModal() {
+            document.getElementById('intake-modal').classList.add('hidden');
+        }
+
+        // Action submit execution simulation
+        function handlePreFlightSubmit(event) {
+            event.preventDefault();
+
+            const companyName = document.getElementById('modal-co').value;
+            const clientName = document.getElementById('modal-name').value;
+            
+            closeIntakeModal();
+
+            triggerToast(
+                'COMPILING MATRIX DEALS',
+                `Successfully routing diagnostic calculations for ${companyName} to attending desk. Processing terms...`,
+                'border-brand-green'
+            );
+
+            // Clean values
+            document.getElementById('modal-co').value = '';
+            document.getElementById('modal-name').value = '';
+            document.getElementById('modal-tel').value = '';
+            document.getElementById('modal-email').value = '';
+        }
+
+        // Core initialization bindings on page ready state
+        window.addEventListener('DOMContentLoaded', () => {
+            resolveDynamicPartnerAttribution();
+            runCalculationEngine();
+        });
+    </script>
+</body>
+</html>
+```

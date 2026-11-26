@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PRISM LOGIC // Workspace & Transfer Dashboard</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            prism: {
+              black: '#030712',
+              charcoal: '#0b0f19',
+              slate: '#1e293b',
+              red: '#ff2e93',
+              blue: '#00f0ff',
+              green: '#00ff87',
+              yellow: '#ffde43',
+              purple: '#8b5cf6'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #030712;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1f2937;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #374151;
+    }
+
+    /* Prism Grid Background */
+    .prism-grid {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
+
+    /* Glow Effects */
+    .prism-glow-blue {
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.15);
+      border: 1px solid rgba(0, 240, 255, 0.25);
+    }
+    
+    .prism-glow-red {
+      box-shadow: 0 0 30px rgba(255, 46, 147, 0.15);
+      border: 1px solid rgba(255, 46, 147, 0.25);
+    }
+
+    .prism-glow-green {
+      box-shadow: 0 0 30px rgba(0, 255, 135, 0.15);
+      border: 1px solid rgba(0, 255, 135, 0.25);
+    }
+
+    .prism-glass {
+      background: rgba(11, 15, 25, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .prism-glass-hover:hover {
+      background: rgba(11, 15, 25, 0.85);
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: translateY(-2px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Refraction animation */
+    @keyframes refract {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .rainbow-border {
+      position: relative;
+    }
+    .rainbow-border::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(90deg, #ff2e93, #00f0ff, #00ff87, #ffde43, #ff2e93);
+      background-size: 300% 300%;
+      animation: refract 8s ease infinite;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    /* Status Dot Pulse */
+    .status-pulse {
+      box-shadow: 0 0 0 0 rgba(0, 255, 135, 0.7);
+      animation: pulse 1.8s infinite cubic-bezier(0.66, 0, 0, 1);
+    }
+
+    @keyframes pulse {
+      to {
+        box-shadow: 0 0 0 8px rgba(0, 255, 135, 0);
+      }
+    }
+
+    /* File upload active scanning glow animation */
+    @keyframes scanning {
+      0% { top: 0%; opacity: 0.1; }
+      50% { opacity: 0.8; }
+      100% { top: 100%; opacity: 0.1; }
+    }
+    .scanner-line {
+      animation: scanning 2.5s linear infinite;
+    }
+  </style>
+</head>
+
+<body class="bg-prism-black text-slate-100 font-sans min-h-screen relative overflow-x-hidden prism-grid">
+
+  <!-- Glow Elements in Background -->
+  <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-prism-blue/10 rounded-full blur-[120px] pointer-events-none"></div>
+  <div class="absolute bottom-[20%] right-[-10%] w-[45%] h-[45%] bg-prism-red/10 rounded-full blur-[140px] pointer-events-none"></div>
+  <div class="absolute top-[40%] left-[30%] w-[35%] h-[35%] bg-prism-purple/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+  <!-- Main Grid Wrapper -->
+  <div class="min-h-screen flex flex-col justify-between z-10 relative">
+    
+    <!-- Navigation Header -->
+    <header class="border-b border-white/5 prism-glass sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        
+        <!-- Logo / Branding -->
+        <div class="flex items-center space-x-3">
+          <div class="relative w-8 h-8 flex items-center justify-center rainbow-border rounded-lg">
+            <svg class="w-4 h-4 text-white animate-spin-slow" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 22H22L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div>
+            <span class="font-mono text-xs text-prism-blue tracking-[0.3em] font-semibold block">PRISM LOGIC</span>
+            <h1 class="text-sm font-bold tracking-tight text-white flex items-center gap-1.5 uppercase">
+              WORKSPACE & TRANSFERS <span class="text-[9px] bg-prism-red/10 text-prism-red px-1.5 py-0.5 rounded font-mono border border-prism-red/20">LIVE CONTROL</span>
+            </h1>
+          </div>
+        </div>
+
+        <!-- Quick Telemetry Stats -->
+        <div class="hidden md:flex items-center space-x-6 text-xs font-mono border-l border-white/10 pl-6">
+          <div>
+            <span class="text-white/40 block">ACTIVE STREAMS</span>
+            <span id="header-active-count" class="text-prism-blue font-bold text-sm">3 RUNNING</span>
+          </div>
+          <div>
+            <span class="text-white/40 block">STORAGE HEALTH</span>
+            <span class="text-prism-green font-bold text-sm">GOOD (28%)</span>
+          </div>
+          <div>
+            <span class="text-white/40 block">TOTAL TRANSFERS YTD</span>
+            <span class="text-prism-yellow font-bold text-sm">1,482 COMPLETED</span>
+          </div>
+          <div>
+            <span class="text-white/40 block">GLOBAL SPEED</span>
+            <span id="header-global-speed" class="text-prism-red font-bold text-sm">18.4 MB/s</span>
+          </div>
+        </div>
+
+        <!-- Action Controls -->
+        <div class="flex items-center space-x-3">
+          <button onclick="openModal('add-transfer-modal')" class="relative flex items-center space-x-2 bg-gradient-to-r from-prism-blue/15 to-prism-purple/15 hover:from-prism-blue/25 hover:to-prism-purple/25 text-white text-xs font-semibold py-2 px-4 rounded-lg border border-prism-blue/30 transition duration-300">
+            <span class="w-2 h-2 rounded-full bg-prism-green status-pulse"></span>
+            <span>Deploy Transfer</span>
+          </button>
+          
+          <button onclick="simulateActivitySync()" class="p-2 rounded-lg bg-white/5 border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition" title="Force Sync Matrix">
+            <i data-lucide="refresh-cw" class="w-4 h-4" id="sync-icon"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace Dashboard Grid -->
+    <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 space-y-8">
+      
+      <!-- Top Overview Metrics Panel -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Storage Allocation Visualizer (4 cols) -->
+        <div class="lg:col-span-4 prism-glass p-6 rounded-2xl border border-white/10 flex flex-col justify-between relative overflow-hidden">
+          <div class="absolute top-0 right-0 p-3 font-mono text-[9px] text-white/20">
+            METRIC NODE: ST-09
+          </div>
+          <div class="space-y-4">
+            <span class="text-[10px] font-mono tracking-widest text-prism-blue uppercase block">// Workspace Allocation</span>
+            <div>
+              <h2 class="text-2xl font-black text-white leading-none uppercase">Storage Capacity</h2>
+              <p class="text-white/50 text-xs mt-1">Unified balance of direct transaction documents and attachments.</p>
+            </div>
+            
+            <!-- Progress Arc / Circular Telemetry mockup styled with Tailwind -->
+            <div class="flex items-center space-x-6 py-2">
+              <div class="relative w-24 h-24 flex items-center justify-center">
+                <!-- Outer glow circle -->
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="40" stroke="rgba(255,255,255,0.05)" stroke-width="8" fill="transparent" />
+                  <circle id="storage-circle-bar" cx="50" cy="50" r="40" stroke="url(#prismGrad)" stroke-width="8" fill="transparent" 
+                          stroke-dasharray="251.2" stroke-dashoffset="180.8" class="transition-all duration-1000" />
+                  <defs>
+                    <linearGradient id="prismGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#00f0ff" />
+                      <stop offset="100%" stop-color="#8b5cf6" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div class="absolute flex flex-col items-center justify-center font-mono">
+                  <span id="storage-percentage-text" class="text-lg font-bold text-white">28%</span>
+                  <span class="text-[8px] text-white/40 uppercase">USED</span>
+                </div>
+              </div>
+
+              <div class="space-y-1 text-xs">
+                <div class="flex items-center space-x-2">
+                  <span class="w-2.5 h-2.5 rounded bg-prism-blue"></span>
+                  <span class="text-white/60">Allocated Space:</span>
+                </div>
+                <div class="font-mono font-bold text-white text-sm pl-4">
+                  <span id="storage-used-val">4.20</span> GB <span class="text-white/40 font-normal">/ 15.00 GB</span>
+                </div>
+                <div class="flex items-center space-x-2 pt-1">
+                  <span class="w-2.5 h-2.5 rounded bg-white/10"></span>
+                  <span class="text-white/40">Remaining:</span>
+                </div>
+                <div class="font-mono text-white/60 text-xs pl-4">
+                  <span id="storage-remaining-val">10.80</span> GB Available
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="border-t border-white/5 pt-4 mt-4 flex items-center justify-between text-xs">
+            <button onclick="simulatedStorageCleanup()" class="text-prism-red hover:text-white transition font-mono uppercase text-[10px] tracking-wider flex items-center gap-1.5">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Clean Cache Logs
+            </button>
+            <span class="text-white/30 font-mono text-[9px] uppercase">Refreshed real-time</span>
+          </div>
+        </div>
+
+        <!-- System Flow Rate / Interactive Telemetry Canvas (5 cols) -->
+        <div class="lg:col-span-5 h-[260px] lg:h-auto prism-glass p-6 rounded-2xl border border-white/10 relative overflow-hidden flex flex-col justify-between">
+          <div class="absolute top-0 right-0 p-3 font-mono text-[9px] text-white/20">
+            TELEMETRY NODE: OPTIC-04
+          </div>
+          
+          <div class="z-10">
+            <span class="text-[10px] font-mono tracking-widest text-prism-yellow uppercase block">// Stream Visualization</span>
+            <div class="flex justify-between items-start">
+              <div>
+                <h2 class="text-lg font-bold text-white uppercase tracking-tight">Active Transfer Ray Pipeline</h2>
+                <p class="text-[11px] text-white/50">Simulates packet transmission waves via internal light refraction.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Canvas element -->
+          <div class="relative w-full h-[120px] my-2 bg-black/40 rounded-xl overflow-hidden border border-white/5">
+            <canvas id="pipelineCanvas" class="absolute inset-0 w-full h-full"></canvas>
+            <div class="absolute bottom-2 left-2 z-20 pointer-events-none font-mono text-[8px] text-white/40 bg-black/80 px-2 py-0.5 rounded border border-white/5">
+              LATENCY: <span id="pipeline-latency" class="text-prism-green font-bold">14ms</span> | STABILITY: <span class="text-prism-blue font-bold">99.8%</span>
+            </div>
+          </div>
+
+          <!-- Mini visualizer toggles -->
+          <div class="flex justify-between items-center z-10 text-[10px] font-mono border-t border-white/5 pt-3">
+            <span class="text-white/40">STREAM SIGNAL MODULATION:</span>
+            <div class="flex items-center space-x-2">
+              <button onclick="setSignalRate('slow')" class="px-2 py-0.5 bg-white/5 hover:bg-white/10 rounded border border-white/10 text-white/60 hover:text-white">SLOW</button>
+              <button onclick="setSignalRate('normal')" class="px-2 py-0.5 bg-prism-blue/10 rounded border border-prism-blue/20 text-prism-blue">NORMAL</button>
+              <button onclick="setSignalRate('hyper')" class="px-2 py-0.5 bg-prism-red/10 rounded border border-prism-red/20 text-prism-red">HYPER</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Deploy Controller Box (3 cols) -->
+        <div class="lg:col-span-3 prism-glass p-6 rounded-2xl border border-white/10 flex flex-col justify-between relative overflow-hidden">
+          <div class="absolute top-0 right-0 p-3 font-mono text-[9px] text-white/20">
+            DEP-NODE: X-11
+          </div>
+          
+          <div class="space-y-3">
+            <span class="text-[10px] font-mono tracking-widest text-prism-purple uppercase block">// Instant Handshake</span>
+            <h2 class="text-lg font-black text-white uppercase tracking-tight">Direct Injector</h2>
+            <p class="text-white/50 text-[11px] leading-relaxed">Instantly bundle any document package to generate a secure temporal sharing link.</p>
+          </div>
+
+          <!-- Dropzone area mockup -->
+          <div onclick="openModal('add-transfer-modal')" class="group mt-3 border-2 border-dashed border-white/10 hover:border-prism-blue/50 rounded-xl p-4 text-center cursor-pointer transition bg-black/20 hover:bg-black/40 relative">
+            <div class="absolute inset-x-0 h-0.5 bg-prism-blue/10 scanner-line"></div>
+            <i data-lucide="cloud-lightning" class="w-6 h-6 mx-auto mb-2 text-white/30 group-hover:text-prism-blue transition animate-pulse"></i>
+            <span class="text-xs font-semibold text-white block">Drop files or click to build</span>
+            <span class="text-[9px] font-mono text-white/30 block mt-1">Max package limit: 2.5 GB</span>
+          </div>
+
+          <div class="text-[10px] font-mono text-white/40 text-center mt-3">
+            Fully compatible with client browser keys.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Main Contents Grid: Active Transfers & Activity Feed -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Left Side: Active Transfer Pipelines & Recent Attachment Bundles (8 cols) -->
+        <div class="lg:col-span-8 space-y-8">
+          
+          <!-- Section Header -->
+          <div class="flex items-center justify-between">
+            <div class="space-y-1">
+              <span class="text-xs font-mono text-prism-blue uppercase">// Active Streams & Handshakes</span>
+              <h2 class="text-2xl font-black text-white uppercase tracking-tight">Active File Transfer Pipelines</h2>
+            </div>
+            <div class="flex items-center space-x-2 bg-white/5 px-3 py-1.5 rounded-lg border border-white/10 text-xs font-mono">
+              <span class="w-2 h-2 rounded-full bg-prism-blue status-pulse"></span>
+              <span class="text-white/70" id="pipeline-active-badge">3 STREAMS DEPLOYED</span>
+            </div>
+          </div>
+
+          <!-- Pipelines Grid -->
+          <div id="transferPipelinesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Rendered Dynamically via JS -->
+          </div>
+
+          <!-- Section Header: Recent Attachment Bundles -->
+          <div class="flex items-center justify-between pt-4 border-t border-white/5">
+            <div class="space-y-1">
+              <span class="text-xs font-mono text-prism-purple uppercase">// Compiled Repositories</span>
+              <h2 class="text-xl font-black text-white uppercase tracking-tight">Recent Attachment Bundles</h2>
+            </div>
+            
+            <div class="relative">
+              <select id="bundleFilterType" onchange="filterBundles()" class="appearance-none bg-black/40 border border-white/10 rounded-lg px-3 py-1.5 pr-8 text-[11px] font-mono text-white/80 focus:outline-none focus:ring-1 focus:ring-prism-purple cursor-pointer">
+                <option value="ALL">ALL ASSETS</option>
+                <option value="PDF">PDF ONLY</option>
+                <option value="ZIP">ARCHIVES</option>
+                <option value="DOC">CONTRACTS</option>
+              </select>
+              <i data-lucide="chevron-down" class="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40 pointer-events-none"></i>
+            </div>
+          </div>
+
+          <!-- Attachment Bundles Deck -->
+          <div id="attachmentBundlesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Rendered Dynamically via JS -->
+          </div>
+
+        </div>
+
+        <!-- Right Side: Live Activity Monitor Terminal (4 cols) -->
+        <div class="lg:col-span-4 space-y-6">
+          
+          <!-- Terminal Panel -->
+          <div class="prism-glass rounded-2xl border border-white/10 overflow-hidden flex flex-col justify-between h-[620px] relative">
+            
+            <!-- Terminal Header -->
+            <div class="bg-black/60 border-b border-white/5 p-4 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <div class="flex space-x-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-prism-red"></span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-prism-yellow"></span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-prism-green"></span>
+                </div>
+                <span class="font-mono text-[10px] text-white/50 uppercase tracking-widest pl-2">recipient_telemetry_feed.log</span>
+              </div>
+              <div class="flex items-center space-x-1.5">
+                <span class="w-2 h-2 rounded-full bg-prism-green status-pulse"></span>
+                <span class="text-[9px] font-mono text-prism-green font-semibold uppercase">LIVE</span>
+              </div>
+            </div>
+
+            <!-- Terminal Stream Logs -->
+            <div id="terminalLogs" class="p-4 flex-1 font-mono text-[10.5px] leading-relaxed overflow-y-auto space-y-3 bg-prism-black/40">
+              <!-- Rendered Dynamically via live generator -->
+              <div class="text-white/30">// Initiating connection matrix to Prism Logic handshakes...</div>
+              <div class="text-white/30">// Nodes authenticated successfully.</div>
+            </div>
+
+            <!-- Terminal Status Bar -->
+            <div class="bg-black/80 border-t border-white/5 p-3 flex justify-between items-center text-[10px] font-mono text-white/50">
+              <div>
+                EVENTS LOGGED: <span id="log-count-text" class="text-prism-yellow font-bold">142</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <button onclick="clearTerminalLogs()" class="hover:text-prism-red text-[9px] uppercase hover:underline transition">Clear Buffer</button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Help panel / Quick rules -->
+          <div class="prism-glass p-5 rounded-2xl border border-white/10 text-xs space-y-3">
+            <h3 class="font-bold text-white flex items-center gap-2">
+              <i data-lucide="shield-alert" class="w-4 h-4 text-prism-yellow"></i>
+              WORKSPACE SECURITY GUIDELINES
+            </h3>
+            <p class="text-white/50 leading-relaxed text-[11px]">
+              All file transfers are client-side encrypted before deployment. Secondary nodes cannot inspect file payloads unless granted cryptographic private key signatures.
+            </p>
+            <div class="pt-2 border-t border-white/5 flex justify-between text-[10px] font-mono text-white/30">
+              <span>ALGORITHM: AES-256-GCM</span>
+              <span>INDEXER: PRISM-X9</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/5 py-8 bg-prism-black/95 text-xs font-mono relative z-20">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-white/40">
+        
+        <div class="flex items-center space-x-2">
+          <span class="text-white/80 font-bold tracking-widest">PRISM LOGIC</span>
+          <span>© <span id="currentYear"></span> Workspace Engine. All streams secured.</span>
+        </div>
+
+        <div class="flex items-center space-x-6 text-[11px]">
+          <a href="#" class="hover:text-prism-blue transition">WORKSPACE LICENSE</a>
+          <a href="#" class="hover:text-prism-red transition">UNDERWRITING PIPELINES</a>
+          <a href="#" class="hover:text-prism-green transition">CRYPTOGRAPHIC TERMS</a>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <span class="w-2 h-2 rounded-full bg-prism-green status-pulse"></span>
+          <span class="text-[10px] uppercase">Telemetry Node: ACTIVE</span>
+        </div>
+
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ADD TRANSFER MODAL -->
+  <div id="add-transfer-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
+    <div class="prism-glass max-w-lg w-full rounded-2xl border border-prism-blue/30 overflow-hidden relative shadow-2xl">
+      
+      <!-- Top decorative laser alignment line -->
+      <div class="h-1 bg-gradient-to-r from-prism-red via-prism-blue to-prism-green animate-pulse"></div>
+
+      <div class="p-6 space-y-6">
+        <div class="flex justify-between items-start">
+          <div>
+            <span class="text-[9px] font-mono tracking-widest text-prism-blue uppercase">Workspace Asset Deployment</span>
+            <h3 class="text-xl font-black text-white uppercase tracking-tight">Compile New Transfer Bundle</h3>
+          </div>
+          <button onclick="closeModal('add-transfer-modal')" class="p-1 rounded-lg bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <form id="addTransferForm" onsubmit="handleFormSubmit(event)" class="space-y-4 text-xs">
+          
+          <div class="space-y-1.5">
+            <label class="block text-white/50 uppercase font-mono tracking-wider">Bundle Title / Loan Reference</label>
+            <input type="text" required id="form-title" placeholder="e.g. Apex Multi-Family Underwriting Pack" class="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:outline-none focus:border-prism-blue">
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-1.5">
+              <label class="block text-white/50 uppercase font-mono tracking-wider">Asset Category Badge</label>
+              <select id="form-category" class="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:outline-none focus:border-prism-blue">
+                <option value="Fix & Flip">Fix & Flip</option>
+                <option value="Commercial">Commercial</option>
+                <option value="Bridge">Bridge</option>
+                <option value="Construction">Construction</option>
+                <option value="Rental">Rental / DSCR</option>
+              </select>
+            </div>
+            <div class="space-y-1.5">
+              <label class="block text-white/50 uppercase font-mono tracking-wider">Primary File Format</label>
+              <select id="form-format" class="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:outline-none focus:border-prism-blue">
+                <option value="PDF">PDF Portfolio Document</option>
+                <option value="ZIP">ZIP Archive Container</option>
+                <option value="DOC">DOC Draft Agreement</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-1.5">
+              <label class="block text-white/50 uppercase font-mono tracking-wider">Allocated File Size (MB)</label>
+              <input type="number" step="0.1" min="1" max="2500" required id="form-size" placeholder="e.g. 142.5" class="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:outline-none focus:border-prism-blue">
+            </div>
+            <div class="space-y-1.5">
+              <label class="block text-white/50 uppercase font-mono tracking-wider">Initial Pipeline Speed (MB/s)</label>
+              <input type="number" step="0.1" min="1" max="50" required id="form-speed" placeholder="e.g. 12.4" class="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:outline-none focus:border-prism-blue">
+            </div>
+          </div>
+
+          <div class="space-y-1.5">
+            <label class="block text-white/50 uppercase font-mono tracking-wider">Target Recipient Email / Institution</label>
+            <input type="text" required id="form-recipient" placeholder="e.g. obsidian-handshake@prism-capital.com" class="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:outline-none focus:border-prism-blue">
+          </div>
+
+          <div class="flex items-center space-x-2 pt-2">
+            <input type="checkbox" required id="form-encrypt" class="rounded accent-prism-blue bg-black/40 border-white/10">
+            <label for="form-encrypt" class="text-[10px] text-white/40 font-mono">Sign bundle cryptographically with my active workspace keys.</label>
+          </div>
+
+          <button type="submit" class="w-full bg-gradient-to-r from-prism-blue to-prism-purple text-white hover:brightness-110 font-bold uppercase tracking-widest py-3 rounded-lg border border-white/20 transition-all font-mono">
+            Inject Bundle into active Pipeline
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- CORE DASHBOARD LOGIC SCRIPT -->
+  <script>
+    // Initial Transfer Pipeline Data
+    const INITIAL_ACTIVE_PIPELINES = [
+      {
+        id: "PIPE-38",
+        title: "Apex Multi-Family Projections & Title",
+        category: "Fix & Flip",
+        fileFormat: "PDF",
+        sizeMB: 384.2,
+        speedMbs: 14.8,
+        progress: 68,
+        recipient: "Apex Prism Capital Node",
+        gradient: "prism-glow-blue",
+        paused: false
+      },
+      {
+        id: "PIPE-91",
+        title: "Obsidian Core-Plus Portfolio Underwriting",
+        category: "Commercial",
+        fileFormat: "ZIP",
+        sizeMB: 1240.5,
+        speedMbs: 22.4,
+        progress: 31,
+        recipient: "Obsidian Trust (Central Matrix)",
+        gradient: "prism-glow-red",
+        paused: false
+      },
+      {
+        id: "PIPE-12",
+        title: "Lumina Trust Direct handshakes",
+        category: "Bridge",
+        fileFormat: "DOC",
+        sizeMB: 84.1,
+        speedMbs: 8.2,
+        progress: 89,
+        recipient: "Lumina Compliance Vault",
+        gradient: "prism-glow-green",
+        paused: false
+      }
+    ];
+
+    // Compiled Attachment Bundles (Stored historically)
+    const INITIAL_BUNDLES = [
+      {
+        id: "BNDL-201",
+        title: "Spectrum Portfolio DSCR Spreadsheets",
+        category: "Rental",
+        fileFormat: "ZIP",
+        sizeMB: 48.4,
+        downloads: 14,
+        uploadedAt: "2 hours ago",
+        status: "Active Link"
+      },
+      {
+        id: "BNDL-202",
+        title: "Horizon Heavy Rehab Specifications v4",
+        category: "Construction",
+        fileFormat: "PDF",
+        sizeMB: 284.1,
+        downloads: 8,
+        uploadedAt: "Yesterday",
+        status: "Active Link"
+      },
+      {
+        id: "BNDL-203",
+        title: "Vertex Heavy Rehab Closing Instructions",
+        category: "Fix & Flip",
+        fileFormat: "PDF",
+        sizeMB: 12.8,
+        downloads: 41,
+        uploadedAt: "3 days ago",
+        status: "Expired"
+      },
+      {
+        id: "BNDL-204",
+        title: "Neon Horizon Interim Land Handshake Agreements",
+        category: "Bridge",
+        fileFormat: "DOC",
+        sizeMB: 4.1,
+        downloads: 3,
+        uploadedAt: "1 week ago",
+        status: "Active Link"
+      }
+    ];
+
+    let activePipelines = [...INITIAL_ACTIVE_PIPELINES];
+    let attachmentBundles = [...INITIAL_BUNDLES];
+
+    // Workspace Storage State
+    let workspaceStorage = {
+      used: 4.20,
+      total: 15.00
+    };
+
+    // Recipient Terminal log template options
+    const IP_POOL = ["104.22.9.1", "172.56.21.94", "209.85.238.11", "8.8.8.8", "192.168.1.42", "74.125.19.147"];
+    const ACTION_POOL = ["DOWNLOADED", "PREVIEWED", "VALIDATED SIGNATURE FOR", "REQUESTED HANDSHAKE KEY FOR", "ACCESSED DIRECT LINK FOR"];
+
+    // Dynamic state trackers
+    let signalSpeedMultiplier = 1; 
+
+    // Render pipeline items
+    function renderPipelines() {
+      const grid = document.getElementById('transferPipelinesGrid');
+      
+      // Update header badge
+      document.getElementById('header-active-count').textContent = `${activePipelines.filter(p => !p.paused).length} RUNNING`;
+      document.getElementById('pipeline-active-badge').textContent = `${activePipelines.length} STREAMS DEPLOYED`;
+
+      grid.innerHTML = activePipelines.map(p => {
+        const isCompleted = p.progress >= 100;
+        return `
+          <div class="prism-glass p-5 rounded-2xl relative overflow-hidden flex flex-col justify-between transition-all duration-300 prism-glass-hover ${p.gradient}">
+            <div class="absolute top-0 right-0 p-3 font-mono text-[9px] text-white/20">
+              ID: ${p.id}
+            </div>
+
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] bg-white/5 border border-white/10 text-white/80 px-2 py-0.5 rounded font-mono uppercase">
+                  ${p.category}
+                </span>
+                
+                <div class="flex items-center space-x-1">
+                  <span class="w-1.5 h-1.5 rounded-full ${p.paused ? 'bg-prism-yellow' : isCompleted ? 'bg-prism-green' : 'bg-prism-blue status-pulse'}"></span>
+                  <span class="text-[9px] font-mono uppercase ${p.paused ? 'text-prism-yellow' : isCompleted ? 'text-prism-green' : 'text-prism-blue'}">
+                    ${p.paused ? 'PAUSED' : isCompleted ? 'COMPLETED' : 'TRANSMITTING'}
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <h3 class="text-sm font-bold text-white tracking-tight uppercase truncate mr-8">${p.title}</h3>
+                <p class="text-[11px] text-white/40 font-mono mt-0.5">Target: ${p.recipient}</p>
+              </div>
+
+              <!-- Progress bar & metrics -->
+              <div class="space-y-2">
+                <div class="flex justify-between font-mono text-[10px] text-white/60">
+                  <span>Progress: <strong class="text-white">${Math.floor(p.progress)}%</strong></span>
+                  <span>Speed: <strong class="${p.paused ? 'text-white/40' : 'text-prism-yellow'}">${p.paused ? '0.0' : p.speedMbs} MB/s</strong></span>
+                </div>
+
+                <div class="w-full bg-black/40 rounded-full h-2 overflow-hidden border border-white/5 relative">
+                  <!-- Segmented progress bar bar -->
+                  <div class="h-full bg-gradient-to-r from-prism-blue to-prism-purple transition-all duration-300" style="width: ${p.progress}%"></div>
+                </div>
+
+                <div class="flex justify-between font-mono text-[9px] text-white/40">
+                  <span>TRANSFERRED: ${((p.sizeMB * p.progress) / 100).toFixed(1)} MB</span>
+                  <span>TOTAL: ${p.sizeMB} MB</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Pipeline action triggers -->
+            <div class="flex items-center space-x-2 pt-4 mt-4 border-t border-white/5">
+              <button onclick="togglePipelinePause('${p.id}')" class="flex-1 bg-white/5 hover:bg-white/10 text-white transition rounded-lg py-1.5 text-[10px] font-mono border border-white/5 uppercase">
+                ${p.paused ? 'Resume stream' : 'Pause stream'}
+              </button>
+              <button onclick="copyHandshakeLink('${p.id}')" class="px-3 bg-white/5 hover:bg-white/10 text-prism-blue hover:text-white transition rounded-lg py-1.5 text-[10px] font-mono border border-white/5">
+                <i data-lucide="link" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    // Render historical / compilations
+    function renderBundles() {
+      const grid = document.getElementById('attachmentBundlesGrid');
+      const selectedFilter = document.getElementById('bundleFilterType').value;
+
+      let list = attachmentBundles;
+      if (selectedFilter !== 'ALL') {
+        list = list.filter(b => b.fileFormat === selectedFilter);
+      }
+
+      grid.innerHTML = list.map(b => {
+        const isExpired = b.status === 'Expired';
+        return `
+          <div class="prism-glass p-5 rounded-2xl flex items-center justify-between transition-all duration-300 border border-white/5 hover:border-white/25">
+            <div class="flex items-center space-x-4">
+              <!-- Format Icon Badge -->
+              <div class="relative w-10 h-10 flex items-center justify-center rounded-xl bg-black/40 border ${b.fileFormat === 'PDF' ? 'border-prism-red text-prism-red' : b.fileFormat === 'ZIP' ? 'border-prism-blue text-prism-blue' : 'border-prism-yellow text-prism-yellow'} font-mono text-xs font-bold">
+                ${b.fileFormat}
+              </div>
+
+              <div>
+                <span class="text-[9px] font-mono tracking-wide px-1.5 py-0.5 rounded bg-white/5 text-white/60 uppercase">
+                  ${b.category}
+                </span>
+                <h4 class="text-xs font-bold text-white uppercase mt-1 truncate max-w-[200px]" title="${b.title}">${b.title}</h4>
+                <div class="flex space-x-3 font-mono text-[9px] text-white/40 mt-0.5">
+                  <span>${b.sizeMB} MB</span>
+                  <span>•</span>
+                  <span>${b.uploadedAt}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats & Download Action -->
+            <div class="text-right space-y-1">
+              <span class="text-[9px] font-mono block text-white/40">DOWNLOADS: <strong class="text-prism-green">${b.downloads}</strong></span>
+              ${isExpired ? `
+                <span class="inline-block px-1.5 py-0.5 rounded text-[8px] font-mono bg-prism-red/10 border border-prism-red/20 text-prism-red uppercase">LINK EXPIRED</span>
+              ` : `
+                <button onclick="downloadBundleMock('${b.id}')" class="px-2.5 py-1 bg-white/5 hover:bg-white/10 text-white transition rounded border border-white/10 font-mono text-[9px] uppercase flex items-center gap-1">
+                  <i data-lucide="download" class="w-3 h-3"></i> Get File
+                </button>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    // Modal triggers
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+      }, 50);
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      modal.classList.add('opacity-0');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 300);
+    }
+
+    // Pipeline controller functions
+    function togglePipelinePause(id) {
+      const pipe = activePipelines.find(p => p.id === id);
+      if (pipe) {
+        pipe.paused = !pipe.paused;
+        pushTerminalLog(`Pipeline execution node ${id} state mutated to: [${pipe.paused ? 'PAUSED' : 'TRANSMITTING'}].`);
+        renderPipelines();
+      }
+    }
+
+    function copyHandshakeLink(id) {
+      const pipe = activePipelines.find(p => p.id === id);
+      if (pipe) {
+        pushTerminalLog(`Generated cryptographic secure link handshake index for '${pipe.title}'.`);
+        alert(`Cryptographic pipeline link for '${pipe.title}' copied to internal clipboard!`);
+      }
+    }
+
+    // Submit bundle creator form
+    function handleFormSubmit(e) {
+      e.preventDefault();
+
+      const title = document.getElementById('form-title').value;
+      const category = document.getElementById('form-category').value;
+      const fileFormat = document.getElementById('form-format').value;
+      const sizeMB = parseFloat(document.getElementById('form-size').value);
+      const speedMbs = parseFloat(document.getElementById('form-speed').value);
+      const recipient = document.getElementById('form-recipient').value;
+
+      const newId = `PIPE-${Math.floor(10 + Math.random() * 90)}`;
+      const newPipeline = {
+        id: newId,
+        title,
+        category,
+        fileFormat,
+        sizeMB,
+        speedMbs,
+        progress: 0,
+        recipient,
+        gradient: "prism-glow-blue",
+        paused: false
+      };
+
+      // Add to pipeline deck
+      activePipelines.unshift(newPipeline);
+      
+      // Update Storage
+      const newUsed = workspaceStorage.used + (sizeMB / 1024);
+      if (newUsed <= workspaceStorage.total) {
+        workspaceStorage.used = parseFloat(newUsed.toFixed(2));
+      } else {
+        workspaceStorage.used = workspaceStorage.total; // clamp
+      }
+      updateStorageVisualizer();
+
+      renderPipelines();
+      
+      // Trigger dynamic compilation and upload logs in terminal
+      pushTerminalLog(`DEPL_CORE: Initialized high-speed optical handshake stream ${newId} with payload of ${sizeMB} MB.`);
+      pushTerminalLog(`DEPL_CORE: Cryptographic signature signed by current Workspace Owner Node.`);
+
+      closeModal('add-transfer-modal');
+      document.getElementById('addTransferForm').reset();
+    }
+
+    // Filter compilations
+    function filterBundles() {
+      renderBundles();
+    }
+
+    // Simulate direct bundle download
+    function downloadBundleMock(id) {
+      const bundle = attachmentBundles.find(b => b.id === id);
+      if (bundle) {
+        bundle.downloads += 1;
+        pushTerminalLog(`Local Client handshook package repository for: '${bundle.title}'. Download pipeline opened.`);
+        renderBundles();
+        alert(`Retrieving package payload for '${bundle.title}' directly from decentralized index.`);
+      }
+    }
+
+    // Simulated terminal log push
+    function pushTerminalLog(message) {
+      const term = document.getElementById('terminalLogs');
+      const timeStr = new Date().toLocaleTimeString('en-US', { hour12: false });
+      
+      const newLog = document.createElement('div');
+      newLog.className = "text-white/80 border-l border-prism-blue pl-2 py-0.5";
+      newLog.innerHTML = `<span class="text-white/40 font-mono">[${timeStr}]</span> ${message}`;
+      
+      term.appendChild(newLog);
+      term.scrollTop = term.scrollHeight;
+
+      // Update log telemetry counts
+      const countText = document.getElementById('log-count-text');
+      countText.textContent = parseInt(countText.textContent) + 1;
+    }
+
+    function clearTerminalLogs() {
+      const term = document.getElementById('terminalLogs');
+      term.innerHTML = '<div class="text-white/30">// Activity logger buffer cleared. Re-listening for streams...</div>';
+      document.getElementById('log-count-text').textContent = "1";
+    }
+
+    // Live Activity Simulator loops
+    function initActivitySimulation() {
+      setInterval(() => {
+        // Step active pipelines forward
+        activePipelines.forEach(p => {
+          if (!p.paused && p.progress < 100) {
+            // progress speeds up according to configured speed and visual multiplier
+            p.progress += (p.speedMbs / p.sizeMB) * 10 * signalSpeedMultiplier;
+            if (p.progress >= 100) {
+              p.progress = 100;
+              pushTerminalLog(`Stream integration fully COMPLETED for payload ${p.id} (${p.title}).`);
+              
+              // Automatically move completed pipelines into Attachment Bundles logs!
+              if (!attachmentBundles.some(b => b.title === p.title)) {
+                attachmentBundles.unshift({
+                  id: `BNDL-${200 + attachmentBundles.length + 1}`,
+                  title: p.title,
+                  category: p.category,
+                  fileFormat: p.fileFormat,
+                  sizeMB: p.sizeMB,
+                  downloads: 0,
+                  uploadedAt: "Just now",
+                  status: "Active Link"
+                });
+                renderBundles();
+              }
+            }
+          }
+        });
+        renderPipelines();
+      }, 1000);
+
+      // Random recipient downloads trigger log
+      setInterval(() => {
+        const randomIP = IP_POOL[Math.floor(Math.random() * IP_POOL.length)];
+        const randomAction = ACTION_POOL[Math.floor(Math.random() * ACTION_POOL.length)];
+        
+        let targetDocName = "Prism-Underwriting-Core-Guide.pdf";
+        if (attachmentBundles.length > 0) {
+          targetDocName = attachmentBundles[Math.floor(Math.random() * attachmentBundles.length)].title;
+        }
+
+        pushTerminalLog(`IP ${randomIP} successfully ${randomAction} '${targetDocName}'.`);
+      }, 7000);
+    }
+
+    // Refresh controls manual sync
+    function simulateActivitySync() {
+      const icon = document.getElementById('sync-icon');
+      icon.classList.add('animate-spin');
+      
+      setTimeout(() => {
+        icon.classList.remove('animate-spin');
+        // generate quick log
+        pushTerminalLog("Manual workspace sync request completed. Telemetry pipeline refreshed.");
+      }, 1000);
+    }
+
+    // Interactive storage slider visualizer update
+    function updateStorageVisualizer() {
+      const bar = document.getElementById('storage-circle-bar');
+      const text = document.getElementById('storage-percentage-text');
+      const usedText = document.getElementById('storage-used-val');
+      const remText = document.getElementById('storage-remaining-val');
+
+      const used = workspaceStorage.used;
+      const total = workspaceStorage.total;
+      const percentage = Math.round((used / total) * 100);
+
+      // Dash offset formula for 40 radius circle (circumference = 2 * PI * 40 ≈ 251.2)
+      const offset = 251.2 - (251.2 * percentage) / 100;
+      bar.setAttribute('stroke-dashoffset', offset);
+      text.textContent = `${percentage}%`;
+
+      usedText.textContent = used.toFixed(2);
+      remText.textContent = (total - used).toFixed(2);
+    }
+
+    function simulatedStorageCleanup() {
+      workspaceStorage.used = 4.20; // reset
+      updateStorageVisualizer();
+      pushTerminalLog("Direct trash/cleanup logs successfully completed. 0.82 GB cached files purged.");
+      alert("Local metadata caches successfully cleared. Space recovered!");
+    }
+
+    // Dynamic stream Canvas speed toggles
+    function setSignalRate(rate) {
+      const latencyNode = document.getElementById('pipeline-latency');
+      if (rate === 'slow') {
+        signalSpeedMultiplier = 0.3;
+        latencyNode.textContent = "38ms";
+        latencyNode.className = "text-prism-yellow font-bold";
+        pushTerminalLog("Optic transmission system rate limited to ECO-SLOW modulations.");
+      } else if (rate === 'normal') {
+        signalSpeedMultiplier = 1.0;
+        latencyNode.textContent = "14ms";
+        latencyNode.className = "text-prism-green font-bold";
+        pushTerminalLog("Optic transmission system configured back to baseline STANDARD speed.");
+      } else if (rate === 'hyper') {
+        signalSpeedMultiplier = 3.5;
+        latencyNode.textContent = "4ms";
+        latencyNode.className = "text-prism-red font-bold animate-pulse";
+        pushTerminalLog("HIGH-OUTPUT optical pipeline deployed! Rapid progress acceleration activated.");
+      }
+    }
+
+    // Initial setups
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderPipelines();
+      renderBundles();
+      updateStorageVisualizer();
+      initActivitySimulation();
+    });
+  </script>
+
+  <!-- INTERACTIVE PIPELINE STREAM CANVAS VISUALIZER -->
+  <script>
+    const pipeCanvas = document.getElementById('pipelineCanvas');
+    const pipeCtx = pipeCanvas.getContext('2d');
+
+    function resizePipelineCanvas() {
+      pipeCanvas.width = pipeCanvas.parentElement.clientWidth;
+      pipeCanvas.height = pipeCanvas.parentElement.clientHeight || 120;
+    }
+    window.addEventListener('resize', resizePipelineCanvas);
+    resizePipelineCanvas();
+
+    // Simulated wave configurations
+    let waveOffset = 0;
+    let particles = [];
+
+    // Create persistent packet particles flowing left-to-right
+    for (let i = 0; i < 20; i++) {
+      particles.push({
+        x: Math.random() * pipeCanvas.width,
+        y: Math.random() * pipeCanvas.height,
+        size: 1.5 + Math.random() * 2,
+        speed: 1 + Math.random() * 2,
+        color: i % 2 === 0 ? '#00f0ff' : '#8b5cf6'
+      });
+    }
+
+    function drawPipelineStream() {
+      pipeCtx.clearRect(0, 0, pipeCanvas.width, pipeCanvas.height);
+
+      // Background grids and alignment markers inside canvas
+      pipeCtx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+      pipeCtx.lineWidth = 1;
+      for (let i = 0; i < pipeCanvas.width; i += 40) {
+        pipeCtx.beginPath();
+        pipeCtx.moveTo(i, 0);
+        pipeCtx.lineTo(i, pipeCanvas.height);
+        pipeCtx.stroke();
+      }
+
+      // Draw horizontal reference logic centerlines
+      pipeCtx.strokeStyle = 'rgba(0, 240, 255, 0.08)';
+      pipeCtx.beginPath();
+      pipeCtx.moveTo(0, pipeCanvas.height / 2);
+      pipeCtx.lineTo(pipeCanvas.width, pipeCanvas.height / 2);
+      pipeCtx.stroke();
+
+      // Refraction wave lines representing live transfer speeds
+      waveOffset += 0.05 * signalSpeedMultiplier;
+      pipeCtx.strokeStyle = 'rgba(255, 46, 147, 0.25)';
+      pipeCtx.lineWidth = 2;
+      pipeCtx.beginPath();
+      for (let x = 0; x < pipeCanvas.width; x += 5) {
+        const y = pipeCanvas.height / 2 + Math.sin(x * 0.015 + waveOffset) * 20;
+        if (x === 0) {
+          pipeCtx.moveTo(x, y);
+        } else {
+          pipeCtx.lineTo(x, y);
+        }
+      }
+      pipeCtx.stroke();
+
+      // Secondary purple wave (inverse modulation)
+      pipeCtx.strokeStyle = 'rgba(0, 255, 135, 0.2)';
+      pipeCtx.beginPath();
+      for (let x = 0; x < pipeCanvas.width; x += 5) {
+        const y = pipeCanvas.height / 2 + Math.cos(x * 0.02 - waveOffset) * 15;
+        if (x === 0) {
+          pipeCtx.moveTo(x, y);
+        } else {
+          pipeCtx.lineTo(x, y);
+        }
+      }
+      pipeCtx.stroke();
+
+      // Flowing digital particles representing packet streams
+      particles.forEach(p => {
+        // particles speed influenced by signalSpeedMultiplier
+        p.x += p.speed * signalSpeedMultiplier;
+        if (p.x > pipeCanvas.width) {
+          p.x = 0;
+          p.y = 20 + Math.random() * (pipeCanvas.height - 40);
+        }
+
+        pipeCtx.fillStyle = p.color;
+        pipeCtx.beginPath();
+        pipeCtx.arc(p.x, p.y + Math.sin(p.x * 0.01) * 5, p.size, 0, Math.PI * 2);
+        pipeCtx.fill();
+
+        // draw small horizontal trail
+        pipeCtx.fillStyle = 'rgba(255,255,255,0.05)';
+        pipeCtx.fillRect(p.x - 10, p.y + Math.sin(p.x * 0.01) * 5, 8, p.size);
+      });
+
+      // Highlight target visual node on the right side
+      const pulseNodeRadius = 6 + Math.sin(Date.now() * 0.005) * 2;
+      pipeCtx.fillStyle = 'rgba(0, 240, 255, 0.2)';
+      pipeCtx.beginPath();
+      pipeCtx.arc(pipeCanvas.width - 30, pipeCanvas.height / 2, pulseNodeRadius + 4, 0, Math.PI * 2);
+      pipeCtx.fill();
+
+      pipeCtx.fillStyle = '#00f0ff';
+      pipeCtx.beginPath();
+      pipeCtx.arc(pipeCanvas.width - 30, pipeCanvas.height / 2, 4, 0, Math.PI * 2);
+      pipeCtx.fill();
+
+      requestAnimationFrame(drawPipelineStream);
+    }
+
+    drawPipelineStream();
+  </script>
+</body>
+</html>

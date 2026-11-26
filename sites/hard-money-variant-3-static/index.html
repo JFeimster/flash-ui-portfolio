@@ -1,0 +1,1829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash UI Export</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- Glow Elements in Background -->
+  <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-prism-blue/10 rounded-full blur-[120px] pointer-events-none"></div>
+  <div class="absolute bottom-[20%] right-[-10%] w-[45%] h-[45%] bg-prism-red/10 rounded-full blur-[140px] pointer-events-none"></div>
+  <div class="absolute top-[40%] left-[30%] w-[35%] h-[35%] bg-prism-purple/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+  <!-- Primary Wrapper Layout with Left Sidebar -->
+  <div class="min-h-screen flex flex-col md:flex-row relative z-10">
+
+    <!-- Responsive Navigation Sidebar -->
+    <aside id="sidebar" class="w-full md:w-64 bg-prism-charcoal/90 border-r border-white/5 flex flex-col justify-between transition-all duration-300 z-40 relative md:sticky md:top-0 md:h-screen">
+      <div>
+        <!-- Sidebar Brand Header -->
+        <div class="p-6 border-b border-white/5 flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="relative w-8 h-8 flex items-center justify-center rainbow-border rounded-lg">
+              <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 22H22L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div>
+              <span class="font-mono text-[9px] text-prism-blue tracking-[0.3em] font-semibold block">PRISM LOGIC</span>
+              <span class="text-xs font-bold text-white uppercase tracking-wider">UNDERWRITER</span>
+            </div>
+          </div>
+          <!-- Mobile Menu Close Toggle -->
+          <button onclick="toggleSidebarMobile()" class="md:hidden p-1 text-white/50 hover:text-white">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- Connection State and Node System Monitor -->
+        <div class="p-4 mx-4 my-3 bg-black/40 border border-white/5 rounded-xl space-y-2">
+          <div class="flex items-center justify-between text-[10px] font-mono">
+            <span class="text-white/40">NODE STATUS</span>
+            <span class="flex items-center gap-1 text-prism-green font-bold">
+              <span class="w-1.5 h-1.5 rounded-full bg-prism-green status-pulse"></span>
+              SYNCED
+            </span>
+          </div>
+          <div class="flex items-center justify-between text-[10px] font-mono">
+            <span class="text-white/40">ENVIRONMENT</span>
+            <select id="envSelector" onchange="changeEnvironment(this.value)" class="bg-transparent text-prism-blue font-bold outline-none cursor-pointer border-none p-0 text-[10px]">
+              <option value="production" class="bg-prism-black text-white">PRODUCTION</option>
+              <option value="sandbox" class="bg-prism-black text-white">SANDBOX-TEST</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Navigation Menu Items -->
+        <nav class="p-4 space-y-1.5">
+          <button onclick="switchView('dashboard')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition text-left text-xs font-semibold sidebar-nav-btn bg-white/5 text-white border border-white/5" id="nav-dashboard">
+            <i data-lucide="layout-dashboard" class="w-4 h-4 text-prism-blue"></i>
+            <span>Bento Dashboard</span>
+          </button>
+
+          <button onclick="switchView('grid')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition text-left text-xs font-semibold sidebar-nav-btn text-white/60 hover:text-white hover:bg-white/5 border border-transparent" id="nav-grid">
+            <i data-lucide="grid" class="w-4 h-4 text-prism-purple"></i>
+            <span>Multi-Column Grid</span>
+          </button>
+
+          <button onclick="switchView('table')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition text-left text-xs font-semibold sidebar-nav-btn text-white/60 hover:text-white hover:bg-white/5 border border-transparent" id="nav-table">
+            <i data-lucide="table-properties" class="w-4 h-4 text-prism-green"></i>
+            <span>Interactive Table</span>
+          </button>
+
+          <button onclick="switchView('uploader')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition text-left text-xs font-semibold sidebar-nav-btn text-white/60 hover:text-white hover:bg-white/5 border border-transparent" id="nav-uploader">
+            <i data-lucide="file-up" class="w-4 h-4 text-prism-yellow"></i>
+            <span>CSV / JSON Uploader</span>
+          </button>
+
+          <button onclick="openModal('settings-modal')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition text-left text-xs font-semibold text-white/60 hover:text-white hover:bg-white/5 border border-transparent">
+            <i data-lucide="sliders-horizontal" class="w-4 h-4 text-prism-red"></i>
+            <span>Console Settings</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Action logs quick terminal & footer profile -->
+      <div class="p-4 border-t border-white/5">
+        <!-- Quick Log Console -->
+        <div class="mb-4 bg-black/60 rounded-lg p-2.5 border border-white/5 font-mono text-[9px] space-y-1">
+          <div class="flex items-center justify-between text-white/30 text-[8px] pb-1 border-b border-white/5">
+            <span>LIVE HANDSHAKE LOGS</span>
+            <span class="animate-pulse text-prism-green">●</span>
+          </div>
+          <div id="quickLogsContainer" class="space-y-1 max-h-[70px] overflow-y-auto">
+            <div class="text-white/40">&gt; Underwriter cluster operational</div>
+            <div class="text-white/40">&gt; Syncing direct liquidity lines...</div>
+          </div>
+        </div>
+
+        <!-- User profile trigger -->
+        <div onclick="openModal('settings-modal')" class="flex items-center space-x-3 p-2 bg-white/5 rounded-xl border border-white/5 cursor-pointer hover:bg-white/10 transition">
+          <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-prism-blue to-prism-purple flex items-center justify-center font-bold text-xs text-white uppercase shadow-md">
+            PL
+          </div>
+          <div class="flex-1 min-w-0">
+            <h4 class="text-xs font-bold text-white truncate">Prism Operator</h4>
+            <span class="text-[9px] font-mono text-white/40 block truncate">keys: valid_prod_549</span>
+          </div>
+          <i data-lucide="settings" class="w-4 h-4 text-white/40"></i>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area Scroll Container -->
+    <main class="flex-1 min-w-0 flex flex-col justify-between min-h-screen">
+
+      <!-- Responsive Top Sticky Header -->
+      <header class="border-b border-white/5 bg-prism-charcoal/70 backdrop-blur-md sticky top-0 z-30">
+        <div class="px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+          
+          <!-- Mobile Menu Sidebar Toggle Button -->
+          <button onclick="toggleSidebarMobile()" class="md:hidden p-2 rounded-lg bg-white/5 border border-white/10 text-white hover:bg-white/10 transition">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+          </button>
+
+          <!-- Dynamic Mode Title -->
+          <div class="hidden sm:block">
+            <div class="flex items-center space-x-2">
+              <span class="h-2 w-2 rounded-full bg-prism-blue"></span>
+              <h2 id="currentViewTitle" class="text-xs font-mono font-bold tracking-widest text-white uppercase">BENTO DASHBOARD MATRIX</h2>
+            </div>
+          </div>
+
+          <!-- Central Search & Command Input -->
+          <div class="relative flex-1 max-w-md">
+            <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 w-4 h-4"></i>
+            <input 
+              type="text" 
+              id="globalSearchInput" 
+              oninput="handleGlobalSearch(this.value)"
+              placeholder="Search index (e.g. CA, Fix & Flip, Lumina)..." 
+              class="w-full bg-black/40 border border-white/10 rounded-xl py-2 pl-9 pr-4 text-xs text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-prism-blue focus:border-prism-blue transition"
+            >
+          </div>
+
+          <!-- Configuration toggles and Action buttons -->
+          <div class="flex items-center space-x-2">
+            <button onclick="openModal('add-lender-modal')" class="bg-gradient-to-r from-prism-blue/20 to-prism-purple/20 hover:from-prism-blue/30 hover:to-prism-purple/30 text-white text-[11px] font-semibold py-2 px-3 sm:px-4 rounded-lg border border-prism-blue/30 transition flex items-center space-x-2">
+              <i data-lucide="plus-circle" class="w-3.5 h-3.5 text-prism-blue"></i>
+              <span class="hidden sm:inline">Add Liquidity Source</span>
+            </button>
+            
+            <button onclick="openModal('settings-modal')" class="p-2 rounded-lg bg-white/5 border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition" title="Global configurations">
+              <i data-lucide="sliders" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+        </div>
+      </header>
+
+      <!-- View Wrapper: View 1: Bento Dashboard Panel -->
+      <section id="view-dashboard" class="p-4 sm:p-6 lg:p-8 space-y-6 flex-1 dynamic-view">
+        
+        <!-- Bento Grid Block 1: Real-time Stats Row (4 components) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <!-- Bento Stat Card 1 -->
+          <div class="prism-glass p-5 rounded-2xl relative overflow-hidden flex flex-col justify-between min-h-[140px] prism-glow-blue transition-all">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-mono tracking-wider text-white/50 uppercase">Active Index Pool</span>
+              <div class="p-1.5 bg-prism-blue/10 rounded-lg text-prism-blue border border-prism-blue/25">
+                <i data-lucide="database" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div>
+              <h3 id="statTotalLenders" class="text-2xl font-black text-white leading-none">8 Active</h3>
+              <p class="text-[10px] text-white/40 mt-1 font-mono uppercase tracking-wide">// Global Direct Underwriters</p>
+            </div>
+            <!-- Custom neon trend bar indicator -->
+            <div class="h-1 bg-gradient-to-r from-prism-blue/80 to-transparent w-full rounded-full mt-2"></div>
+          </div>
+
+          <!-- Bento Stat Card 2 -->
+          <div class="prism-glass p-5 rounded-2xl relative overflow-hidden flex flex-col justify-between min-h-[140px] prism-glow-purple transition-all">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-mono tracking-wider text-white/50 uppercase">Average LTV ceiling</span>
+              <div class="p-1.5 bg-prism-purple/10 rounded-lg text-prism-purple border border-prism-purple/25">
+                <i data-lucide="percent" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div>
+              <h3 id="statAvgLTV" class="text-2xl font-black text-white leading-none">79.7%</h3>
+              <p class="text-[10px] text-white/40 mt-1 font-mono uppercase tracking-wide">// Dynamic Leverage ratio</p>
+            </div>
+            <div class="h-1 bg-gradient-to-r from-prism-purple/80 to-transparent w-full rounded-full mt-2"></div>
+          </div>
+
+          <!-- Bento Stat Card 3 -->
+          <div class="prism-glass p-5 rounded-2xl relative overflow-hidden flex flex-col justify-between min-h-[140px] prism-glow-green transition-all">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-mono tracking-wider text-white/50 uppercase">Low Interest Floor</span>
+              <div class="p-1.5 bg-prism-green/10 rounded-lg text-prism-green border border-prism-green/25">
+                <i data-lucide="trending-down" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div>
+              <h3 id="statMinRate" class="text-2xl font-black text-white leading-none">7.99%</h3>
+              <p class="text-[10px] text-white/40 mt-1 font-mono uppercase tracking-wide">// Starting Yield base rate</p>
+            </div>
+            <div class="h-1 bg-gradient-to-r from-prism-green/80 to-transparent w-full rounded-full mt-2"></div>
+          </div>
+
+          <!-- Bento Stat Card 4 -->
+          <div class="prism-glass p-5 rounded-2xl relative overflow-hidden flex flex-col justify-between min-h-[140px] prism-glow-red transition-all">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-mono tracking-wider text-white/50 uppercase">Accumulated Max Loan</span>
+              <div class="p-1.5 bg-prism-red/10 rounded-lg text-prism-red border border-prism-red/25">
+                <i data-lucide="dollar-sign" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div>
+              <h3 id="statMaxLoan" class="text-2xl font-black text-white leading-none">$148.5M</h3>
+              <p class="text-[10px] text-white/40 mt-1 font-mono uppercase tracking-wide">// Total Indexed Deployment Capacity</p>
+            </div>
+            <div class="h-1 bg-gradient-to-r from-prism-red/80 to-transparent w-full rounded-full mt-2"></div>
+          </div>
+
+        </div>
+
+        <!-- Bento Grid Block 2: Interactive Prism Light Wave Simulator & Live Handshake Terminal -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <!-- Column 1: Simulator View -->
+          <div class="lg:col-span-7 h-[320px] prism-glass rounded-2xl relative overflow-hidden flex flex-col justify-between border border-white/10 p-5">
+            <!-- Canvas for light refraction interactive rays -->
+            <canvas id="prismCanvas" class="absolute inset-0 w-full h-full pointer-events-auto"></canvas>
+            
+            <div class="relative z-20 flex justify-between items-start pointer-events-none">
+              <div class="bg-black/60 px-3 py-1.5 rounded-xl border border-white/10">
+                <span class="text-[10px] font-mono text-white/60 uppercase tracking-widest flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-prism-red animate-ping"></span>
+                  Spectral Simulator Engine
+                </span>
+              </div>
+              <div class="text-[9px] text-white/40 font-mono">Move cursor to steer refraction vectors</div>
+            </div>
+
+            <!-- Floating Tech Overlay inside Prism -->
+            <div class="relative z-20 pointer-events-none bg-black/60 p-3 rounded-lg border border-white/5 font-mono text-[10px] text-white/60 max-w-[280px]">
+              <div>// EMITTANCE SPECS:</div>
+              <div>SPECTRAL DEFLECTION: <span id="canvasRefractionSpan" class="text-prism-green">1.54 LTV Ratio</span></div>
+              <div class="text-[9px] text-white/30 italic">Refraction angle mirrors active average LTV matrix values in real-time.</div>
+            </div>
+          </div>
+
+          <!-- Column 2: Live System Handshake Logs Terminal -->
+          <div class="lg:col-span-5 h-[320px] prism-glass rounded-2xl flex flex-col justify-between border border-white/10 p-5">
+            <div class="flex items-center justify-between border-b border-white/5 pb-3">
+              <span class="text-xs font-mono font-bold tracking-wider text-white uppercase">// Underwriter API Handshake Console</span>
+              <button onclick="clearConsoleLogs()" class="text-[10px] font-mono text-prism-blue hover:underline">Clear logs</button>
+            </div>
+
+            <div id="handshakeConsole" class="flex-1 overflow-y-auto my-3 font-mono text-[11px] text-slate-300 space-y-2 p-3 bg-black/50 rounded-xl border border-white/5">
+              <!-- Dynamically populated console logs -->
+            </div>
+
+            <!-- Interactive triggers to test actions -->
+            <div class="space-y-2 pt-2 border-t border-white/5">
+              <div class="flex items-center justify-between text-[10px] font-mono text-white/40">
+                <span>SIMULATE TEST WEBHOOK</span>
+                <span>Endpoint: post /v2/underwrite</span>
+              </div>
+              <div class="grid grid-cols-3 gap-2">
+                <button onclick="triggerSimulatedAPI('CA', 'Fix & Flip')" class="bg-white/5 hover:bg-white/10 text-white font-semibold py-2 px-1 rounded border border-white/10 text-[9px] font-mono">
+                  CA FIX&FLIP
+                </button>
+                <button onclick="triggerSimulatedAPI('TX', 'Commercial')" class="bg-white/5 hover:bg-white/10 text-white font-semibold py-2 px-1 rounded border border-white/10 text-[9px] font-mono">
+                  TX COMMERCIAL
+                </button>
+                <button onclick="triggerSimulatedAPI('NY', 'Bridge')" class="bg-white/5 hover:bg-white/10 text-white font-semibold py-2 px-1 rounded border border-white/10 text-[9px] font-mono">
+                  NY BRIDGE
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Bento Grid Block 3: Quick Overview & Custom Formula Card -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <div class="prism-glass p-6 rounded-2xl border border-white/10 space-y-4">
+            <div class="flex items-center space-x-3">
+              <div class="p-2 bg-prism-yellow/10 rounded-xl text-prism-yellow border border-prism-yellow/20">
+                <i data-lucide="activity" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-white uppercase tracking-wider">Underwriting Logic Framework</h3>
+                <p class="text-[11px] text-white/40 font-mono">LTV Threshold Verification & Yield Limits</p>
+              </div>
+            </div>
+            <p class="text-xs text-white/60 leading-relaxed">
+              Prism Logic evaluates capital parameters directly from decentralized balances. The dynamic simulation represents physical refraction coefficients. When institutional capital registers with 80%+ LTV boundaries, spectral light yields shift automatically towards high-leverage spectrum peaks.
+            </p>
+            <div class="grid grid-cols-3 gap-3 text-center font-mono">
+              <div class="bg-black/30 border border-white/5 p-2 rounded-xl">
+                <span class="text-[9px] text-white/40 block">DSCR MIN</span>
+                <span class="text-xs font-bold text-white">1.25x</span>
+              </div>
+              <div class="bg-black/30 border border-white/5 p-2 rounded-xl">
+                <span class="text-[9px] text-white/40 block">LTV CAP</span>
+                <span class="text-xs font-bold text-prism-blue">90.0%</span>
+              </div>
+              <div class="bg-black/30 border border-white/5 p-2 rounded-xl">
+                <span class="text-[9px] text-white/40 block">AVG SPEED</span>
+                <span class="text-xs font-bold text-prism-green">4.2 Days</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="prism-glass p-6 rounded-2xl border border-white/10 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between pb-3 border-b border-white/5">
+                <span class="text-xs font-mono text-white/50">// SIMULATED PIPELINE VOLUME</span>
+                <span class="text-[9px] bg-prism-blue/10 text-prism-blue px-2 py-0.5 rounded border border-prism-blue/20">LIVE METRICS</span>
+              </div>
+              <p class="text-xs text-white/60 mt-4 leading-relaxed">
+                Connect your database nodes, upload JSON profiles, or parse direct spreadsheet matrices using the CSV/JSON importer to map variables into real-time metrics.
+              </p>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-white/5">
+              <button onclick="switchView('uploader')" class="bg-prism-blue text-black font-bold uppercase tracking-wider py-2 px-4 rounded-xl text-[10px] font-mono hover:brightness-110 transition flex items-center justify-center gap-2">
+                <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
+                Launch CSV/JSON Uploader
+              </button>
+              <button onclick="switchView('grid')" class="bg-white/5 hover:bg-white/10 text-white font-bold uppercase tracking-wider py-2 px-4 rounded-xl text-[10px] font-mono border border-white/10 transition flex items-center justify-center gap-2">
+                <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+                Browse Directory Grid
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- View Wrapper: View 2: Multi-Column Grid View -->
+      <section id="view-grid" class="p-4 sm:p-6 lg:p-8 space-y-6 flex-1 dynamic-view hidden">
+        
+        <!-- Interactive Filter Ribbon -->
+        <div class="prism-glass p-5 rounded-2xl border border-white/10 space-y-4">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            
+            <!-- Dynamic filters -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 flex-1">
+              <!-- States Filter -->
+              <div class="relative">
+                <label class="block text-[10px] font-mono text-white/40 uppercase mb-1">State Covered</label>
+                <div class="relative">
+                  <select id="gridStateFilter" onchange="filterLenders()" class="appearance-none w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 pr-10 text-xs font-medium text-white/80 focus:outline-none focus:ring-1 focus:ring-prism-blue cursor-pointer">
+                    <option value="ALL">All States (Nationwide)</option>
+                    <option value="CA">California (CA)</option>
+                    <option value="NY">New York (NY)</option>
+                    <option value="FL">Florida (FL)</option>
+                    <option value="TX">Texas (TX)</option>
+                    <option value="CO">Colorado (CO)</option>
+                    <option value="NV">Nevada (NV)</option>
+                    <option value="GA">Georgia (GA)</option>
+                  </select>
+                  <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none"></i>
+                </div>
+              </div>
+
+              <!-- Loan Type Filter -->
+              <div class="relative">
+                <label class="block text-[10px] font-mono text-white/40 uppercase mb-1">Asset Specialty</label>
+                <div class="relative">
+                  <select id="gridTypeFilter" onchange="filterLenders()" class="appearance-none w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 pr-10 text-xs font-medium text-white/80 focus:outline-none focus:ring-1 focus:ring-prism-blue cursor-pointer">
+                    <option value="ALL">All Asset Types</option>
+                    <option value="Fix & Flip">Fix & Flip</option>
+                    <option value="Commercial">Commercial</option>
+                    <option value="Bridge">Bridge</option>
+                    <option value="Construction">Construction</option>
+                    <option value="Rental">Rental / DSCR</option>
+                  </select>
+                  <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none"></i>
+                </div>
+              </div>
+
+              <!-- Sorting Option -->
+              <div class="relative">
+                <label class="block text-[10px] font-mono text-white/40 uppercase mb-1">Sort Metric</label>
+                <div class="relative">
+                  <select id="gridSortFilter" onchange="filterLenders()" class="appearance-none w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 pr-10 text-xs font-medium text-white/80 focus:outline-none focus:ring-1 focus:ring-prism-blue cursor-pointer">
+                    <option value="desc">LTV (Highest First)</option>
+                    <option value="rate-asc">Interest Rate (Lowest First)</option>
+                    <option value="loan-desc">Max Loan (Highest First)</option>
+                    <option value="name">Alphabetical (A-Z)</option>
+                  </select>
+                  <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none"></i>
+                </div>
+              </div>
+
+              <!-- Search input within panel -->
+              <div class="relative">
+                <label class="block text-[10px] font-mono text-white/40 uppercase mb-1">Keyword Match</label>
+                <div class="relative">
+                  <input type="text" id="gridKeywordSearch" oninput="filterLenders()" placeholder="Lender name..." class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-prism-blue">
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Slider Filters (LTV & Loan Minimums) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4 border-t border-white/5 text-xs">
+            <!-- LTV Slider -->
+            <div class="space-y-2">
+              <div class="flex justify-between font-mono">
+                <span class="text-white/50 uppercase tracking-wider">Minimum Required LTV</span>
+                <span id="gridLtvValue" class="text-prism-blue font-bold">65%</span>
+              </div>
+              <input 
+                type="range" 
+                id="gridLtvSlider" 
+                min="65" 
+                max="90" 
+                value="65"
+                oninput="updateLtvValue(this.value)"
+                class="w-full accent-prism-blue bg-black/40 rounded-lg h-1.5"
+              >
+            </div>
+
+            <!-- Max Rate Limit -->
+            <div class="space-y-2">
+              <div class="flex justify-between font-mono">
+                <span class="text-white/50 uppercase tracking-wider">Max Acceptable Rate</span>
+                <span id="gridRateValue" class="text-prism-yellow font-bold">13.0%</span>
+              </div>
+              <input 
+                type="range" 
+                id="gridRateSlider" 
+                min="7.5" 
+                max="13.0" 
+                step="0.1" 
+                value="13.0"
+                oninput="updateRateValue(this.value)"
+                class="w-full accent-prism-yellow bg-black/40 rounded-lg h-1.5"
+              >
+            </div>
+
+            <!-- Clear button -->
+            <div class="flex items-center justify-end">
+              <button onclick="clearFilters()" class="bg-white/5 hover:bg-white/10 text-white font-semibold text-xs py-2 px-4 rounded-xl border border-white/10 transition">
+                Reset All Filter Attributes
+              </button>
+            </div>
+          </div>
+
+          <!-- Live Count indicator row -->
+          <div class="flex items-center justify-between text-[11px] font-mono text-white/40 pt-2 border-t border-white/5">
+            <span class="uppercase">Active parameters filtering</span>
+            <span>SHOWING <strong id="gridResultCount" class="text-white">0</strong> OF <strong id="gridTotalCount" class="text-white">0</strong> DIRECT SOURCES</span>
+          </div>
+
+        </div>
+
+        <!-- Main Directory Listings Grid -->
+        <div id="lendersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Rendered Dynamically via JS -->
+        </div>
+
+        <!-- Empty State / No Results -->
+        <div id="emptyState" class="hidden text-center py-20 bg-prism-charcoal/40 rounded-2xl border border-white/5 p-8 max-w-md mx-auto">
+          <div class="inline-flex p-3 rounded-full bg-white/5 mb-4 text-prism-red">
+            <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">No Lenders Intersect Filter Criteria</h3>
+          <p class="text-sm text-white/50 mb-6">Try adjusting your spectral threshold ranges, selecting nationwide states, or clearing search query keywords.</p>
+          <button onclick="clearFilters()" class="bg-white/10 hover:bg-white/20 text-white font-semibold text-xs py-2.5 px-6 rounded-lg transition">
+            Clear All Filters
+          </button>
+        </div>
+
+      </section>
+
+      <!-- View Wrapper: View 3: Interactive Data Table -->
+      <section id="view-table" class="p-4 sm:p-6 lg:p-8 space-y-6 flex-1 dynamic-view hidden">
+        
+        <!-- Table Filter and Bulk Action bar -->
+        <div class="prism-glass p-5 rounded-2xl border border-white/10 space-y-4">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h3 class="text-sm font-bold text-white uppercase tracking-wider">Index Table Matrix</h3>
+              <p class="text-[11px] text-white/40 font-mono">Interactive multi-column datagrid with sorting controls</p>
+            </div>
+            
+            <div class="flex flex-wrap gap-2 items-center">
+              <button onclick="exportTableToCSV()" class="bg-white/5 hover:bg-white/10 text-white text-xs font-semibold py-2 px-3 rounded-lg border border-white/10 transition flex items-center space-x-1.5">
+                <i data-lucide="download" class="w-3.5 h-3.5 text-white"></i>
+                <span>Export CSV</span>
+              </button>
+              
+              <button onclick="triggerDynamicHandshakeAlert()" class="bg-prism-purple/20 hover:bg-prism-purple/30 text-white text-xs font-semibold py-2 px-3 rounded-lg border border-prism-purple/30 transition flex items-center space-x-1.5">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-prism-purple"></i>
+                <span>Verify Pool Connectivity</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Search controls inside datatable view -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="relative">
+              <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30"></i>
+              <input type="text" id="tableSearchInput" oninput="filterTableLenders()" placeholder="Quick filter by institution..." class="w-full bg-black/40 border border-white/10 rounded-xl py-2 pl-9 pr-4 text-xs text-white focus:outline-none">
+            </div>
+
+            <div class="relative">
+              <select id="tableAssetFilter" onchange="filterTableLenders()" class="appearance-none w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-xs text-white focus:outline-none cursor-pointer">
+                <option value="ALL">All Asset Specialties</option>
+                <option value="Fix & Flip">Fix & Flip</option>
+                <option value="Commercial">Commercial</option>
+                <option value="Bridge">Bridge</option>
+                <option value="Construction">Construction</option>
+                <option value="Rental">Rental / DSCR</option>
+              </select>
+              <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none"></i>
+            </div>
+
+            <div class="relative">
+              <select id="tableStateFilter" onchange="filterTableLenders()" class="appearance-none w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-xs text-white focus:outline-none cursor-pointer">
+                <option value="ALL">All Covered States</option>
+                <option value="CA">California (CA)</option>
+                <option value="NY">New York (NY)</option>
+                <option value="FL">Florida (FL)</option>
+                <option value="TX">Texas (TX)</option>
+                <option value="CO">Colorado (CO)</option>
+                <option value="NV">Nevada (NV)</option>
+                <option value="GA">Georgia (GA)</option>
+              </select>
+              <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Premium Interactive Datagrid Table Container -->
+        <div class="prism-glass rounded-2xl border border-white/10 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="border-b border-white/10 bg-black/40 text-white/60 font-mono uppercase text-[10px] tracking-wider">
+                  <th class="p-4 font-semibold">Institutional Name</th>
+                  <th class="p-4 font-semibold">Asset Focus</th>
+                  <th class="p-4 font-semibold text-center">Max LTV</th>
+                  <th class="p-4 font-semibold text-center">Floor Rate</th>
+                  <th class="p-4 font-semibold">Min-Max Loan Boundaries</th>
+                  <th class="p-4 font-semibold">Covered Territory</th>
+                  <th class="p-4 font-semibold text-center">Origin Speed</th>
+                  <th class="p-4 font-semibold text-right">Verification</th>
+                </tr>
+              </thead>
+              <tbody id="tableLendersBody" class="divide-y divide-white/5">
+                <!-- Dynamically populated via JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Table footer statistics pagination -->
+          <div class="p-4 bg-black/40 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] font-mono text-white/40">
+            <div>
+              <span>CONNECTED CHANNELS ACTIVE: <strong class="text-prism-green font-bold">100%</strong></span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span id="tableResultsCount">Showing 8 entries</span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- View Wrapper: View 4: CSV / JSON Data Uploader -->
+      <section id="view-uploader" class="p-4 sm:p-6 lg:p-8 space-y-6 flex-1 dynamic-view hidden">
+        
+        <!-- Header description block -->
+        <div class="prism-glass p-6 rounded-2xl border border-white/10 space-y-2">
+          <h3 class="text-sm font-bold text-white uppercase tracking-wider">// Institutional Profile CSV/JSON Uploader</h3>
+          <p class="text-xs text-white/60 leading-relaxed">
+            Quickly ingest custom direct-capital registries into your local index environment memory. Upload or paste valid CSV arrays or JSON files mapping parameters to immediate spectral stats.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          
+          <!-- Column 1: Interactive Drag and Drop area & text pasting box -->
+          <div class="prism-glass p-6 rounded-2xl border border-white/10 space-y-4">
+            
+            <!-- File Drop Area -->
+            <div id="dropZone" ondragover="event.preventDefault(); this.classList.add('border-prism-blue');" ondragleave="this.classList.remove('border-prism-blue');" ondrop="handleDropFile(event)" class="border-2 border-dashed border-white/10 hover:border-prism-blue/60 transition rounded-xl p-8 text-center cursor-pointer relative">
+              <input type="file" id="fileSelector" onchange="handleSelectedFile(event)" accept=".csv,.json" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+              <div class="flex flex-col items-center space-y-3">
+                <div class="p-3 bg-prism-blue/10 rounded-full text-prism-blue border border-prism-blue/20">
+                  <i data-lucide="upload-cloud" class="w-8 h-8"></i>
+                </div>
+                <div>
+                  <h4 class="text-xs font-bold text-white uppercase">Drag & Drop CSV/JSON here</h4>
+                  <p class="text-[10px] text-white/40 mt-1 font-mono">Format matching system headers or JSON direct arrays</p>
+                </div>
+                <button class="bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-lg text-[10px] font-mono px-3 py-1.5 transition">
+                  Browse Files
+                </button>
+              </div>
+            </div>
+
+            <!-- Alternative Raw Text Input Area -->
+            <div class="space-y-1.5">
+              <label class="block text-[11px] font-mono text-white/50 uppercase tracking-wide">Or Paste Raw Data Array (JSON/CSV)</label>
+              <textarea id="rawUploaderText" rows="6" placeholder='[{"name": "Nova Yield", "assetFocus": "Bridge", "maxLTV": 80, "minRate": 8.5, "minLoan": 200000, "maxLoan": 12000000, "states": ["FL", "TX"], "verified": true}]' class="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-xs text-white focus:outline-none focus:border-prism-blue font-mono"></textarea>
+            </div>
+
+            <!-- Interactive Import / Parse Buttons -->
+            <div class="flex gap-2">
+              <button onclick="parseRawTextData()" class="bg-prism-blue text-black font-bold uppercase py-2.5 px-4 rounded-xl text-xs font-mono tracking-wider hover:brightness-110 transition flex-1">
+                Parse & Ingest Payload
+              </button>
+              <button onclick="loadSampleUploaderJSON()" class="bg-white/5 hover:bg-white/10 text-white font-semibold py-2.5 px-4 rounded-xl text-xs font-mono border border-white/10 transition">
+                Load Sample JSON
+              </button>
+            </div>
+
+          </div>
+
+          <!-- Column 2: Ingested Real-time Preview Table -->
+          <div class="prism-glass p-6 rounded-2xl border border-white/10 space-y-4 flex flex-col justify-between">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between border-b border-white/5 pb-2">
+                <span class="text-xs font-mono font-bold tracking-wider text-white uppercase">// Data Preview Container</span>
+                <span id="previewRecordCount" class="text-[9px] bg-prism-yellow/10 text-prism-yellow border border-prism-yellow/20 px-2 py-0.5 rounded font-mono">0 RECORDS PARSED</span>
+              </div>
+              <p class="text-[11px] text-white/40">Verify mapped attributes correctly matching the directory model fields prior to permanent environment integration.</p>
+            </div>
+
+            <!-- Live Table preview -->
+            <div class="flex-1 overflow-auto max-h-[220px] bg-black/40 rounded-xl border border-white/5 my-2">
+              <table class="w-full text-left border-collapse text-[11px]">
+                <thead>
+                  <tr class="border-b border-white/5 bg-white/5 text-white/60 font-mono uppercase text-[9px]">
+                    <th class="p-2">Name</th>
+                    <th class="p-2">Specialty</th>
+                    <th class="p-2 text-center">LTV</th>
+                    <th class="p-2 text-center">Rate</th>
+                    <th class="p-2">State</th>
+                    <th class="p-2 text-right">Integration</th>
+                  </tr>
+                </thead>
+                <tbody id="previewTableBody">
+                  <tr>
+                    <td colspan="6" class="p-6 text-center text-white/30 font-mono">No parsed file/text loaded inside buffer.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Commit buffer to live directory registry memory -->
+            <div>
+              <button id="commitBufferBtn" onclick="commitBufferToDirectory()" disabled class="w-full bg-gradient-to-r from-prism-green/20 to-prism-blue/20 hover:from-prism-green/30 hover:to-prism-blue/30 text-white/30 disabled:cursor-not-allowed font-bold uppercase tracking-wider py-3 rounded-xl text-xs font-mono border border-white/5 transition">
+                Commit Loaded Buffer to Active Pool
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- Detailed FAQ/Guide Accordion Drawer -->
+      <section id="faqSection" class="px-4 sm:px-6 lg:px-8 py-8 border-t border-white/5 bg-prism-charcoal/20">
+        <div class="max-w-3xl mx-auto space-y-6">
+          <div class="text-center space-y-2">
+            <span class="text-[10px] font-mono tracking-widest text-prism-blue uppercase">Help Matrix</span>
+            <h2 class="text-lg font-black text-white uppercase tracking-tight">Direct Funding Operations FAQ</h2>
+          </div>
+
+          <div class="space-y-3 font-sans">
+            <div class="p-4 prism-glass rounded-xl border border-white/5">
+              <h3 class="text-xs font-bold text-white mb-1">// What are direct underwriting capital metrics?</h3>
+              <p class="text-[11px] text-white/60 leading-relaxed">
+                Direct metrics connect liquid assets without middleman transaction points. Using our spectral model, underwriters instantly verify that incoming parameter boundaries match regional requirements.
+              </p>
+            </div>
+            <div class="p-4 prism-glass rounded-xl border border-white/5">
+              <h3 class="text-xs font-bold text-white mb-1">// How do custom JSON structures map attributes?</h3>
+              <p class="text-[11px] text-white/60 leading-relaxed">
+                Provide array structures holding name, assetFocus, maxLTV, minRate, and coverage territory fields. Custom nodes immediately ingest attributes and recalibrate bento-overview ceilings.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="border-t border-white/5 py-6 bg-prism-black/95 text-[10px] font-mono relative z-20">
+        <div class="px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-white/40">
+          
+          <div class="flex items-center space-x-2">
+            <span class="text-white/80 font-bold tracking-widest">PRISM LOGIC UNDERWRITING ENGINE</span>
+            <span>© <span id="currentYear"></span>. All operations synced.</span>
+          </div>
+
+          <div class="flex items-center space-x-4 text-[10px]">
+            <a href="#" class="hover:text-prism-blue transition">DATA EXPORT LICENSE</a>
+            <a href="#" class="hover:text-prism-red transition">DIRECT HANDSHAKE API</a>
+            <a href="#" class="hover:text-prism-green transition">CREDIT CORE</a>
+          </div>
+
+          <div class="flex items-center space-x-2">
+            <span class="w-2 h-2 rounded-full bg-prism-green status-pulse"></span>
+            <span class="text-[9px] uppercase font-bold text-prism-green">PROD STABLE NODE</span>
+          </div>
+
+        </div>
+      </footer>
+
+    </main>
+
+  </div>
+
+  <!-- MODAL 1: ADD LENDER SUBMISSION FORM -->
+  <div id="add-lender-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
+    <div class="prism-glass max-w-lg w-full rounded-2xl border border-prism-blue/30 overflow-hidden relative shadow-2xl">
+      <!-- Top visual status bar -->
+      <div class="h-1 bg-gradient-to-r from-prism-red via-prism-blue to-prism-green"></div>
+
+      <div class="p-6 space-y-5">
+        <div class="flex justify-between items-start">
+          <div>
+            <span class="text-[9px] font-mono tracking-widest text-prism-blue uppercase">Dynamic Ingestion</span>
+            <h3 class="text-lg font-black text-white uppercase tracking-tight">Register Direct Liquidity Node</h3>
+          </div>
+          <button onclick="closeModal('add-lender-modal')" class="p-1 rounded-lg bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10">
+            <i data-lucide="x" class="w-4.5 h-4.5"></i>
+          </button>
+        </div>
+
+        <form id="addLenderForm" onsubmit="handleFormSubmit(event)" class="space-y-4 text-xs">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-1.5">
+              <label class="block text-white/50 uppercase font-mono tracking-wider text-[9px]">Lender Name</label>
+              <input type="text" required id="form-name" placeholder="e.g. Lumina Private Credit" class="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:outline-none focus:border-prism-blue">
+            </div>
+            <div class="space-y-1.5">
+              <label class="block text-white/50 uppercase font-mono tracking-wider text-[9px]">Specialty Asset Focus</label>
+              <select id="form-type" class="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:outline-none focus:border-prism-blue">
+                <option value="Fix & Flip">Fix & Flip</option>
+                <option value="Commercial">Commercial</option>
+                <option value="Bridge">Bridge</option>
+                <option value="Construction">Construction</option>
+                <option value="Rental">Rental / DSCR</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-4">
+            <div class="space-y-1.5">
+              <label class="block text-white/50 uppercase font-mono tracking-wider text-[9px]">Max LTV %</label>
+              <input type="number" min="50" max="95" required id="form-ltv" placeholder="e.g. 80" class="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:outline-none focus:border-prism-blue">
+            </div>
+            <div class="space-y-1.5">
+              <label class="block text-white/50 uppercase font-mono tracking-wider text-[9px]">Min Starting Rate %</label>
+              <input type="number" step="0.01" min="4" max="25" required id="form-rate" placeholder="e.g. 8.49" class="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:outline-none focus:border-prism-blue">
+            </div>
+            <div class="space-y-1.5">
+              <label class="block text-white/50 uppercase font-mono tracking-wider text-[9px]">Covered State Code</label>
+              <input type="text" maxlength="2" required id="form-state" placeholder="e.g. CA" class="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:outline-none focus:border-prism-blue uppercase">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-1.5">
+              <label class="block text-white/50 uppercase font-mono tracking-wider text-[9px]">Min Loan Amount ($)</label>
+              <input type="number" required id="form-min-loan" placeholder="e.g. 100000" class="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:outline-none focus:border-prism-blue">
+            </div>
+            <div class="space-y-1.5">
+              <label class="block text-white/50 uppercase font-mono tracking-wider text-[9px]">Max Loan Amount ($)</label>
+              <input type="number" required id="form-max-loan" placeholder="e.g. 15000000" class="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:outline-none focus:border-prism-blue">
+            </div>
+          </div>
+
+          <div class="space-y-1.5">
+            <label class="block text-white/50 uppercase font-mono tracking-wider text-[9px]">Institutional Overview Detail</label>
+            <textarea id="form-desc" rows="2" placeholder="Specify speed, funding capacity constraints, and required covenants..." class="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:outline-none focus:border-prism-blue"></textarea>
+          </div>
+
+          <div class="flex items-center space-x-2 pt-1">
+            <input type="checkbox" required id="form-agree" class="rounded accent-prism-blue bg-black/40 border-white/10">
+            <label for="form-agree" class="text-[9px] text-white/40 font-mono">I verify this profile reflects a direct non-brokered balance sheet capital allocation.</label>
+          </div>
+
+          <button type="submit" class="w-full bg-gradient-to-r from-prism-blue to-prism-purple text-white hover:brightness-110 font-bold uppercase tracking-wider py-3 rounded-lg border border-white/20 transition-all font-mono">
+            Register Capital Source Node
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: USER SETTINGS & DEVELOPER CONFIGS -->
+  <div id="settings-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
+    <div class="prism-glass max-w-2xl w-full rounded-2xl border border-prism-purple/30 overflow-hidden relative shadow-2xl">
+      <!-- Top purple status bar -->
+      <div class="h-1 bg-gradient-to-r from-prism-purple via-prism-blue to-prism-green"></div>
+
+      <div class="p-6 space-y-6">
+        <div class="flex justify-between items-start border-b border-white/5 pb-3">
+          <div>
+            <span class="text-[9px] font-mono tracking-widest text-prism-purple uppercase">Global Configuration Terminal</span>
+            <h3 class="text-lg font-black text-white uppercase tracking-tight">Operator Profile & Underwriting Rules</h3>
+          </div>
+          <button onclick="closeModal('settings-modal')" class="p-1 rounded-lg bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10">
+            <i data-lucide="x" class="w-4.5 h-4.5"></i>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 text-xs">
+          
+          <!-- Modal Tab Left Selector menu -->
+          <div class="md:col-span-4 space-y-2">
+            <button onclick="switchSettingsTab('profile')" class="w-full text-left p-2 rounded-lg bg-white/5 border border-white/10 text-white font-mono text-[11px] block transition flex items-center gap-1.5" id="tab-btn-profile">
+              <i data-lucide="user" class="w-3.5 h-3.5"></i> Profile Details
+            </button>
+            <button onclick="switchSettingsTab('rules')" class="w-full text-left p-2 rounded-lg text-white/60 font-mono text-[11px] block transition flex items-center gap-1.5" id="tab-btn-rules">
+              <i data-lucide="shield" class="w-3.5 h-3.5"></i> Custom Handshake
+            </button>
+            <button onclick="switchSettingsTab('api')" class="w-full text-left p-2 rounded-lg text-white/60 font-mono text-[11px] block transition flex items-center gap-1.5" id="tab-btn-api">
+              <i data-lucide="key" class="w-3.5 h-3.5"></i> Developer API Keys
+            </button>
+          </div>
+
+          <!-- Modal Right Dynamic Forms Container -->
+          <div class="md:col-span-8">
+            
+            <!-- Tab view 1: Profile forms -->
+            <form id="settings-tab-profile" class="space-y-4 settings-tab-panel" onsubmit="saveProfileSettings(event)">
+              <div class="space-y-1.5">
+                <label class="block text-white/50 uppercase font-mono tracking-wider text-[9px]">Operator Pseudonym</label>
+                <input type="text" id="settings-username" value="Prism Underwriting Operator" class="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-prism-purple font-sans">
+              </div>
+              
+              <div class="space-y-1.5">
+                <label class="block text-white/50 uppercase font-mono tracking-wider text-[9px]">Notification Node Webhook Destination</label>
+                <input type="url" id="settings-webhook" value="https://api.prismlogic.io/v2/handshake/node_1189" class="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-prism-purple font-mono text-[10px]">
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                  <label class="block text-white/50 uppercase font-mono tracking-wider text-[9px]">System Dialect</label>
+                  <select id="settings-dialect" class="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-white focus:outline-none">
+                    <option value="standard">Standard Underwriter</option>
+                    <option value="developer">Developer verbose debug</option>
+                  </select>
+                </div>
+                <div class="space-y-1.5">
+                  <label class="block text-white/50 uppercase font-mono tracking-wider text-[9px]">Default Sorting Metrics</label>
+                  <select id="settings-default-sort" class="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-white focus:outline-none">
+                    <option value="desc">LTV (Highest First)</option>
+                    <option value="rate-asc">Interest Floor Limit</option>
+                  </select>
+                </div>
+              </div>
+
+              <button type="submit" class="bg-prism-purple text-white font-bold font-mono text-[10px] uppercase tracking-wider px-4 py-2 rounded-lg border border-white/10 transition hover:brightness-110">
+                Commit settings save
+              </button>
+            </form>
+
+            <!-- Tab view 2: System Rules -->
+            <div id="settings-tab-rules" class="space-y-4 settings-tab-panel hidden">
+              <div class="p-3 bg-black/40 rounded-xl border border-white/5 space-y-3">
+                <h4 class="font-mono text-white/80 font-bold uppercase text-[10px]">// Verification Constraints</h4>
+                <div class="flex items-center justify-between">
+                  <span class="text-[11px] text-white/60">Strictly require "Direct Source" flag</span>
+                  <input type="checkbox" id="rules-strict-verify" checked class="accent-prism-purple">
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-[11px] text-white/60">Auto-reject programs under 65% LTV</span>
+                  <input type="checkbox" id="rules-auto-reject" class="accent-prism-purple">
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-[11px] text-white/60">Verbose handshake simulations on click</span>
+                  <input type="checkbox" id="rules-verbose-handshake" checked class="accent-prism-purple">
+                </div>
+              </div>
+              <p class="text-[10px] text-white/30 italic font-mono">These restrictions automatically shape live preview rendering on CSV JSON array upload triggers.</p>
+            </div>
+
+            <!-- Tab view 3: API Integration -->
+            <div id="settings-tab-api" class="space-y-4 settings-tab-panel hidden">
+              <div class="space-y-2">
+                <label class="block text-white/50 uppercase font-mono tracking-wider text-[9px]">PRISM ACCESS TOKEN</label>
+                <div class="relative">
+                  <input type="password" readonly id="settings-api-key-input" value="pm_live_refraction_matrix_7x89aa2" class="w-full bg-black/40 border border-white/10 rounded-lg p-2 pr-10 text-xs text-white font-mono focus:outline-none">
+                  <button onclick="toggleApiKeyVisibility()" class="absolute right-2 top-1/2 -translate-y-1/2 text-white/40 hover:text-white p-1">
+                    <i data-lucide="eye" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <label class="block text-white/50 uppercase font-mono tracking-wider text-[9px]">API INTEGRATION SNIPPET (CURL)</label>
+                <pre class="bg-black/60 rounded-lg p-2.5 border border-white/5 font-mono text-[9px] text-prism-blue overflow-x-auto">curl -X POST https://api.prismlogic.io/v2/underwrite \
+-H "Authorization: Bearer pm_live_refraction..." \
+-d '{"state": "CA", "assetType": "Fix & Flip"}'</pre>
+              </div>
+
+              <button onclick="generateNewApiKey()" class="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold font-mono text-[10px] uppercase py-2 rounded-lg transition">
+                Revoke & Regrow API Access Secret Token
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPLICATION DATA AND CORE SCRIPT LOGIC -->
+  <script>
+    // Initial datasets mimicking live underwriting capital pipelines
+    const BASE_LENDERS = [
+      {
+        id: "L-101",
+        name: "Apex Prism Capital",
+        states: ["CA", "NV", "NY"],
+        assetFocus: "Fix & Flip",
+        maxLTV: 85,
+        minRate: 8.49,
+        minLoan: 150000,
+        maxLoan: 12500000,
+        originationSpeed: "5-7 Days",
+        description: "Premier leverage matrices for premium multi-family conversions. No translation layers, swift internal evaluation pipelines.",
+        verified: true,
+        gradient: "prism-glow-blue"
+      },
+      {
+        id: "L-102",
+        name: "Obsidian Funding Group",
+        states: ["TX", "FL", "GA"],
+        assetFocus: "Commercial",
+        maxLTV: 75,
+        minRate: 7.99,
+        minLoan: 500000,
+        maxLoan: 35000000,
+        originationSpeed: "10-14 Days",
+        description: "High-volume direct balance sheet capital for core-plus, industrial, and high-density retail redevelopment projects.",
+        verified: true,
+        gradient: "prism-glow-red"
+      },
+      {
+        id: "L-103",
+        name: "Lumina Trust Direct",
+        states: ["NY", "CO", "FL"],
+        assetFocus: "Bridge",
+        maxLTV: 80,
+        minRate: 8.99,
+        minLoan: 250000,
+        maxLoan: 15000000,
+        originationSpeed: "3-5 Days",
+        description: "Ultra-fast bridge structures with zero prepay penalties. Exceptional underwriting speed suited for distressed acquisitions.",
+        verified: true,
+        gradient: "prism-glow-green"
+      },
+      {
+        id: "L-104",
+        name: "Spectrum Capital Partners",
+        states: ["CA", "TX", "NV"],
+        assetFocus: "Rental",
+        maxLTV: 90,
+        minRate: 9.25,
+        minLoan: 100000,
+        maxLoan: 5000000,
+        originationSpeed: "7-10 Days",
+        description: "Optimized DSCR programs targeting portfolio aggregators. Transparent guidelines designed to bypass traditional banking delays.",
+        verified: true,
+        gradient: "prism-glow-blue"
+      },
+      {
+        id: "L-105",
+        name: "Horizon Construction Finance",
+        states: ["GA", "FL", "NY"],
+        assetFocus: "Construction",
+        maxLTV: 70,
+        minRate: 11.0,
+        minLoan: 1000000,
+        maxLoan: 50000000,
+        originationSpeed: "14-21 Days",
+        description: "Ground-up specialized real estate construct loans. Progressive drawer disbursements tied to real-time project milestone checks.",
+        verified: false,
+        gradient: "prism-glow-red"
+      },
+      {
+        id: "L-106",
+        name: "Vertex Credit Trust",
+        states: ["CO", "TX", "CA"],
+        assetFocus: "Fix & Flip",
+        maxLTV: 80,
+        minRate: 8.75,
+        minLoan: 75000,
+        maxLoan: 3000000,
+        originationSpeed: "2 Days",
+        description: "Specialized private lending node targeting heavy rehab fix & flip operators. Capital lines dynamically backed by institutional funds.",
+        verified: true,
+        gradient: "prism-glow-green"
+      },
+      {
+        id: "L-107",
+        name: "Neon Horizon Capital",
+        states: ["NV", "CA", "FL"],
+        assetFocus: "Bridge",
+        maxLTV: 78,
+        minRate: 9.50,
+        minLoan: 300000,
+        maxLoan: 20000000,
+        originationSpeed: "4 Days",
+        description: "Bespoke interim financing for commercial and residential asset positioning. Rapid underwriting turnaround for complex scenarios.",
+        verified: true,
+        gradient: "prism-glow-blue"
+      },
+      {
+        id: "L-108",
+        name: "Delta Real Estate Yield",
+        states: ["TX", "GA", "CO"],
+        assetFocus: "Rental",
+        maxLTV: 80,
+        minRate: 8.25,
+        minLoan: 200000,
+        maxLoan: 8500000,
+        originationSpeed: "6-8 Days",
+        description: "A secure framework built around single asset long term rental portfolios. Streamlined processing with flexible reserves requirements.",
+        verified: false,
+        gradient: "prism-glow-green"
+      }
+    ];
+
+    let lenders = [...BASE_LENDERS];
+    let parsedBuffer = [];
+
+    // Helper functions
+    function formatMoney(amount) {
+      if (amount >= 1000000) {
+        return `$${(amount / 1000000).toFixed(1)}M`;
+      }
+      return `$${(amount / 1000).toFixed(0)}k`;
+    }
+
+    // Toggle navigation views inside SPA
+    function switchView(viewId) {
+      document.querySelectorAll('.dynamic-view').forEach(view => {
+        view.classList.add('hidden');
+      });
+      document.getElementById('view-' + viewId).classList.remove('hidden');
+
+      // Update sidebar nav active buttons
+      document.querySelectorAll('.sidebar-nav-btn').forEach(btn => {
+        btn.classList.remove('bg-white/5', 'text-white', 'border-white/5');
+        btn.classList.add('text-white/60', 'hover:text-white', 'hover:bg-white/5', 'border-transparent');
+      });
+      
+      const activeBtn = document.getElementById('nav-' + viewId);
+      if (activeBtn) {
+        activeBtn.classList.remove('text-white/60', 'hover:text-white', 'hover:bg-white/5', 'border-transparent');
+        activeBtn.classList.add('bg-white/5', 'text-white', 'border-white/5');
+      }
+
+      // Update Top Header Title
+      const titlesMap = {
+        'dashboard': 'BENTO DASHBOARD MATRIX',
+        'grid': 'MULTI-COLUMN DIRECTORY GRID',
+        'table': 'INTERACTIVE SYSTEM TABLE DATAGRID',
+        'uploader': 'CSV / JSON DATA UPLOADER INTERFACES'
+      };
+      document.getElementById('currentViewTitle').textContent = titlesMap[viewId] || 'UNDERWRITING CORE CONSOLE';
+
+      // Re-trigger visual updates
+      if (viewId === 'grid' || viewId === 'table') {
+        filterLenders();
+      }
+
+      addConsoleLog(`Switched view space to: ${viewId.toUpperCase()}`);
+    }
+
+    // Sidebar Mobile controller
+    function toggleSidebarMobile() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('hidden');
+    }
+
+    // Toggle settings modal tab panel
+    function switchSettingsTab(tabName) {
+      document.querySelectorAll('.settings-tab-panel').forEach(panel => {
+        panel.classList.add('hidden');
+      });
+      document.getElementById('settings-tab-' + tabName).classList.remove('hidden');
+
+      // Update Tab button visual states
+      document.getElementById('tab-btn-profile').className = "w-full text-left p-2 rounded-lg text-white/60 font-mono text-[11px] block transition flex items-center gap-1.5";
+      document.getElementById('tab-btn-rules').className = "w-full text-left p-2 rounded-lg text-white/60 font-mono text-[11px] block transition flex items-center gap-1.5";
+      document.getElementById('tab-btn-api').className = "w-full text-left p-2 rounded-lg text-white/60 font-mono text-[11px] block transition flex items-center gap-1.5";
+
+      document.getElementById('tab-btn-' + tabName).className = "w-full text-left p-2 rounded-lg bg-white/5 border border-white/10 text-white font-mono text-[11px] block transition flex items-center gap-1.5";
+    }
+
+    // API Handshake logs controller
+    function addConsoleLog(message, level = 'INFO') {
+      const consoleNode = document.getElementById('handshakeConsole');
+      const quickLogsNode = document.getElementById('quickLogsContainer');
+      const timestamp = new Date().toTimeString().split(' ')[0];
+      const logLine = `[${timestamp}] <span class="text-prism-blue">${level}</span>: ${message}`;
+      
+      // Append to Main console
+      if (consoleNode) {
+        consoleNode.innerHTML += `<div class="pb-1 text-[10px]">&gt; ${logLine}</div>`;
+        consoleNode.scrollTop = consoleNode.scrollHeight;
+      }
+
+      // Append to quick sidebar logger
+      if (quickLogsNode) {
+        quickLogsNode.innerHTML = `<div>&gt; ${message}</div>` + quickLogsNode.innerHTML;
+        // prune old logs
+        if (quickLogsNode.children.length > 5) {
+          quickLogsNode.removeChild(quickLogsNode.lastChild);
+        }
+      }
+    }
+
+    function clearConsoleLogs() {
+      const consoleNode = document.getElementById('handshakeConsole');
+      if (consoleNode) {
+        consoleNode.innerHTML = `<div class="text-white/30 italic">&gt; Console cleared. Waiting for actions...</div>`;
+      }
+    }
+
+    // Modal controller actions
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+      }, 50);
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      modal.classList.add('opacity-0');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 300);
+    }
+
+    // Dynamic environmental selector shifts
+    function changeEnvironment(val) {
+      addConsoleLog(`System cluster environment altered to: ${val.toUpperCase()}`, 'WARN');
+    }
+
+    // Filter Logic Core linking Grid & table listings
+    function filterLenders() {
+      const query = document.getElementById('gridKeywordSearch').value.toLowerCase().trim();
+      const selectedState = document.getElementById('gridStateFilter').value;
+      const selectedType = document.getElementById('gridTypeFilter').value;
+      const sortValue = document.getElementById('gridSortFilter').value;
+      const ltvThreshold = parseInt(document.getElementById('gridLtvSlider').value);
+      const rateThreshold = parseFloat(document.getElementById('gridRateSlider').value);
+
+      let filtered = lenders.filter(l => {
+        const matchesQuery = !query || 
+          l.name.toLowerCase().includes(query) || 
+          l.assetFocus.toLowerCase().includes(query) ||
+          l.states.some(s => s.toLowerCase().includes(query));
+        
+        const matchesState = selectedState === 'ALL' || l.states.includes(selectedState);
+        const matchesType = selectedType === 'ALL' || l.assetFocus === selectedType;
+        const matchesLtv = l.maxLTV >= ltvThreshold;
+        const matchesRate = l.minRate <= rateThreshold;
+
+        return matchesQuery && matchesState && matchesType && matchesLtv && matchesRate;
+      });
+
+      // Sorting
+      if (sortValue === 'desc') {
+        filtered.sort((a, b) => b.maxLTV - a.maxLTV);
+      } else if (sortValue === 'rate-asc') {
+        filtered.sort((a, b) => a.minRate - b.minRate);
+      } else if (sortValue === 'loan-desc') {
+        filtered.sort((a, b) => b.maxLoan - a.maxLoan);
+      } else if (sortValue === 'name') {
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
+      }
+
+      renderLendersGrid(filtered);
+      renderLendersTable(filtered);
+      updateBentoMetrics();
+    }
+
+    // Handle global search in top sticky bar
+    function handleGlobalSearch(val) {
+      // populate query variables in grid & table search selectors
+      document.getElementById('gridKeywordSearch').value = val;
+      document.getElementById('tableSearchInput').value = val;
+      filterLenders();
+    }
+
+    function updateLtvValue(val) {
+      document.getElementById('gridLtvValue').textContent = val + '%';
+      filterLenders();
+    }
+
+    function updateRateValue(val) {
+      document.getElementById('gridRateValue').textContent = parseFloat(val).toFixed(1) + '%';
+      filterLenders();
+    }
+
+    // Grid Renderer
+    function renderLendersGrid(list) {
+      const grid = document.getElementById('lendersGrid');
+      const emptyState = document.getElementById('emptyState');
+      
+      document.getElementById('gridResultCount').textContent = list.length;
+      document.getElementById('gridTotalCount').textContent = lenders.length;
+
+      if (list.length === 0) {
+        grid.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+        return;
+      }
+
+      grid.classList.remove('hidden');
+      emptyState.classList.add('hidden');
+
+      grid.innerHTML = list.map(l => `
+        <div class="prism-glass p-5 rounded-2xl relative overflow-hidden flex flex-col justify-between transition-all duration-300 prism-glass-hover ${l.gradient}">
+          
+          <div class="absolute top-0 right-0 p-3 font-mono text-[9px] text-white/20">
+            ID: ${l.id}
+          </div>
+
+          <div class="space-y-4">
+            
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] bg-white/5 border border-white/10 text-white/80 px-2 py-0.5 rounded font-mono uppercase tracking-wider">
+                ${l.assetFocus}
+              </span>
+              
+              <div class="flex items-center space-x-1.5">
+                ${l.verified ? `
+                  <span class="w-1.5 h-1.5 rounded-full bg-prism-green"></span>
+                  <span class="text-[9px] font-mono uppercase text-prism-green font-semibold">Direct Source</span>
+                ` : `
+                  <span class="w-1.5 h-1.5 rounded-full bg-prism-yellow"></span>
+                  <span class="text-[9px] font-mono uppercase text-prism-yellow">Unverified</span>
+                `}
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-sm font-bold text-white tracking-tight uppercase">${l.name}</h3>
+              <p class="text-white/50 text-[11px] line-clamp-2 mt-1 leading-relaxed">${l.description}</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 py-3 border-y border-white/5 font-mono">
+              <div>
+                <span class="text-[9px] text-white/40 block">MAX LTV</span>
+                <span class="text-xs font-bold text-white">${l.maxLTV}%</span>
+              </div>
+              <div>
+                <span class="text-[9px] text-white/40 block">STARTING RATE</span>
+                <span class="text-xs font-bold text-prism-yellow">${l.minRate}%</span>
+              </div>
+              <div>
+                <span class="text-[9px] text-white/40 block">LOAN RANGE</span>
+                <span class="text-[10px] font-bold text-white">${formatMoney(l.minLoan)}-${formatMoney(l.maxLoan)}</span>
+              </div>
+              <div>
+                <span class="text-[9px] text-white/40 block">ORIGIN SPEED</span>
+                <span class="text-[10px] font-bold text-prism-blue">${l.originationSpeed}</span>
+              </div>
+            </div>
+
+            <div class="space-y-1">
+              <span class="text-[9px] font-mono text-white/40 uppercase block">Territory scope</span>
+              <div class="flex flex-wrap gap-1">
+                ${l.states.map(st => `
+                  <span class="px-1.5 py-0.5 text-[9px] font-mono bg-black/40 border border-white/10 text-white rounded">
+                    ${st}
+                  </span>
+                `).join('')}
+              </div>
+            </div>
+
+          </div>
+
+          <div class="pt-4 mt-auto">
+            <button onclick="triggerSimulatedAPI('${l.states[0]}', '${l.assetFocus}', '${l.name}')" class="w-full flex items-center justify-between bg-white/5 hover:bg-white/10 text-white transition-all rounded-xl py-2 px-3 text-[11px] font-mono group border border-white/5">
+              <span>TEST HANDSHAKE URL</span>
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-white/40 group-hover:translate-x-1 group-hover:text-white transition"></i>
+            </button>
+          </div>
+
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    // Datatable View Renderer
+    function renderLendersTable(list) {
+      const tbody = document.getElementById('tableLendersBody');
+      const countLabel = document.getElementById('tableResultsCount');
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-white/30 font-mono">No matching direct sources meet the criteria logic matrix.</td></tr>`;
+        countLabel.textContent = `Showing 0 entries`;
+        return;
+      }
+
+      countLabel.textContent = `Showing ${list.length} direct pool entries`;
+
+      tbody.innerHTML = list.map(l => `
+        <tr class="hover:bg-white/5 transition font-sans">
+          <td class="p-4 font-bold text-white uppercase">${l.name}</td>
+          <td class="p-4 font-mono"><span class="bg-white/5 px-2 py-0.5 rounded text-[10px] border border-white/5">${l.assetFocus}</span></td>
+          <td class="p-4 text-center font-bold text-prism-blue font-mono">${l.maxLTV}%</td>
+          <td class="p-4 text-center font-bold text-prism-yellow font-mono">${l.minRate}%</td>
+          <td class="p-4 font-mono">${formatMoney(l.minLoan)} – ${formatMoney(l.maxLoan)}</td>
+          <td class="p-4">
+            <div class="flex gap-1">
+              ${l.states.map(st => `<span class="bg-black/40 border border-white/5 px-1.5 py-0.5 rounded text-[9px] font-mono text-white">${st}</span>`).join('')}
+            </div>
+          </td>
+          <td class="p-4 text-center font-mono text-white/60">${l.originationSpeed}</td>
+          <td class="p-4 text-right">
+            <span class="inline-flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full ${l.verified ? 'bg-prism-green status-pulse' : 'bg-prism-yellow'}"></span>
+              <span class="text-[9px] font-mono uppercase ${l.verified ? 'text-prism-green' : 'text-prism-yellow'}">${l.verified ? 'Verified Node' : 'Secondary'}</span>
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Custom secondary quick filter for datatable
+    function filterTableLenders() {
+      const q = document.getElementById('tableSearchInput').value.toLowerCase().trim();
+      const st = document.getElementById('tableStateFilter').value;
+      const type = document.getElementById('tableAssetFilter').value;
+
+      let filtered = lenders.filter(l => {
+        const matchesQuery = !q || l.name.toLowerCase().includes(q) || l.assetFocus.toLowerCase().includes(q);
+        const matchesState = st === 'ALL' || l.states.includes(st);
+        const matchesType = type === 'ALL' || l.assetFocus === type;
+        return matchesQuery && matchesState && matchesType;
+      });
+
+      renderLendersTable(filtered);
+    }
+
+    // Bento stat box recalibration logic
+    function updateBentoMetrics() {
+      document.getElementById('statTotalLenders').textContent = `${lenders.length} Active`;
+      
+      const totalLtv = lenders.reduce((acc, l) => acc + l.maxLTV, 0);
+      const avgLtv = lenders.length ? (totalLtv / lenders.length).toFixed(1) : 0;
+      document.getElementById('statAvgLTV').textContent = `${avgLtv}%`;
+
+      const minRate = lenders.reduce((acc, l) => Math.min(acc, l.minRate), 99);
+      document.getElementById('statMinRate').textContent = `${minRate.toFixed(2)}%`;
+
+      const accumulatedMax = lenders.reduce((acc, l) => acc + l.maxLoan, 0);
+      document.getElementById('statMaxLoan').textContent = formatMoney(accumulatedMax);
+
+      // Map active average LTV to the prism reflection coefficient factor displayed on Dashboard
+      document.getElementById('canvasRefractionSpan').textContent = `${(avgLtv / 50).toFixed(2)} LTV Ratio`;
+    }
+
+    // Reset filters
+    function clearFilters() {
+      document.getElementById('gridKeywordSearch').value = '';
+      document.getElementById('tableSearchInput').value = '';
+      document.getElementById('globalSearchInput').value = '';
+      
+      document.getElementById('gridStateFilter').value = 'ALL';
+      document.getElementById('gridTypeFilter').value = 'ALL';
+      document.getElementById('gridSortFilter').value = 'desc';
+      document.getElementById('gridLtvSlider').value = 65;
+      document.getElementById('gridRateSlider').value = 13.0;
+
+      document.getElementById('tableAssetFilter').value = 'ALL';
+      document.getElementById('tableStateFilter').value = 'ALL';
+
+      document.getElementById('gridLtvValue').textContent = '65%';
+      document.getElementById('gridRateValue').textContent = '13.0%';
+
+      filterLenders();
+      addConsoleLog("Reset and synchronized all system filtration nodes.");
+    }
+
+    // Simulated REST webhook trigger outputs feedback directly on screen
+    function triggerSimulatedAPI(state, assetType, institutionName = null) {
+      const sourceLabel = institutionName ? `with node target: ${institutionName}` : `against active liquidity directory`;
+      addConsoleLog(`Incoming POST /v2/underwrite handshake init ${sourceLabel}`, 'INFO');
+      
+      setTimeout(() => {
+        // Find matching candidates inside system pool
+        const matching = lenders.filter(l => l.states.includes(state) && l.assetFocus === assetType);
+        addConsoleLog(`Executing state mapping algorithms for Territory: ${state} // Asset: ${assetType}`, 'DEBUG');
+        
+        setTimeout(() => {
+          if (matching.length > 0) {
+            addConsoleLog(`Handshake handshake pipeline resolved successfully: ${matching.length} programs mapping verified.`, 'SUCCESS');
+          } else {
+            addConsoleLog(`Empty intersection discovered for scope parameters: State: ${state}, Class: ${assetType}`, 'WARN');
+          }
+        }, 500);
+
+      }, 400);
+    }
+
+    function triggerDynamicHandshakeAlert() {
+      addConsoleLog("Initiating multi-node pool structural sweep. Querying active REST endpoints...", "WARN");
+      setTimeout(() => {
+        addConsoleLog("Network sync sweep complete: 8 of 8 endpoints handshake returned 200 OK status.", "SUCCESS");
+        alert("Verification check complete: Direct balance sheet lines validated for all active pool participants.");
+      }, 1200);
+    }
+
+    // Modal Ingestion Submission form processor
+    function handleFormSubmit(e) {
+      e.preventDefault();
+
+      const newLender = {
+        id: `L-${100 + lenders.length + 1}`,
+        name: document.getElementById('form-name').value,
+        states: [document.getElementById('form-state').value.toUpperCase()],
+        assetFocus: document.getElementById('form-type').value,
+        maxLTV: parseInt(document.getElementById('form-ltv').value),
+        minRate: parseFloat(document.getElementById('form-rate').value),
+        minLoan: parseInt(document.getElementById('form-min-loan').value),
+        maxLoan: parseInt(document.getElementById('form-max-loan').value),
+        originationSpeed: "3-5 Days",
+        description: document.getElementById('form-desc').value || "Verified institution directly deploying flexible loan-to-value products.",
+        verified: true,
+        gradient: "prism-glow-blue"
+      };
+
+      lenders.unshift(newLender);
+      filterLenders();
+      closeModal('add-lender-modal');
+      
+      // Clean up form
+      document.getElementById('addLenderForm').reset();
+      addConsoleLog(`Direct provider program indexed: ${newLender.name} successfully deployed.`, 'SUCCESS');
+      alert(`Capital source for ${newLender.name} successfully deployed to local environment registry memory!`);
+    }
+
+    // Data settings save handler
+    function saveProfileSettings(e) {
+      e.preventDefault();
+      const newName = document.getElementById('settings-username').value;
+      const newWebhook = document.getElementById('settings-webhook').value;
+      addConsoleLog(`Updated local operator configuration parameters: Alias: ${newName}`, 'SUCCESS');
+      closeModal('settings-modal');
+    }
+
+    function toggleApiKeyVisibility() {
+      const apiKeyInput = document.getElementById('settings-api-key-input');
+      if (apiKeyInput.type === "password") {
+        apiKeyInput.type = "text";
+      } else {
+        apiKeyInput.type = "password";
+      }
+    }
+
+    function generateNewApiKey() {
+      const generated = "pm_live_" + Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
+      document.getElementById('settings-api-key-input').value = generated;
+      addConsoleLog("Regenerated secure operator access token token.", "WARN");
+    }
+
+    // CSV/JSON Drag and Drop simulation functions
+    function handleDropFile(e) {
+      e.preventDefault();
+      document.getElementById('dropZone').classList.remove('border-prism-blue');
+      const file = e.dataTransfer.files[0];
+      processImportedFile(file);
+    }
+
+    function handleSelectedFile(e) {
+      const file = e.target.files[0];
+      processImportedFile(file);
+    }
+
+    function processImportedFile(file) {
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const text = evt.target.result;
+        document.getElementById('rawUploaderText').value = text;
+        addConsoleLog(`Read uploaded file: ${file.name} successfully. Size: ${file.size} bytes`, 'INFO');
+        parseRawTextData();
+      };
+      reader.readAsText(file);
+    }
+
+    // Sample JSON auto populator
+    function loadSampleUploaderJSON() {
+      const sample = [
+        {
+          "name": "Nova Capital Trust",
+          "assetFocus": "Fix & Flip",
+          "maxLTV": 85,
+          "minRate": 8.15,
+          "minLoan": 150000,
+          "maxLoan": 8000000,
+          "states": ["FL", "GA"],
+          "description": "Bespoke short term asset strategies optimized for rapid turnaround developers."
+        },
+        {
+          "name": "Ember Yield Direct",
+          "assetFocus": "Rental",
+          "maxLTV": 80,
+          "minRate": 7.89,
+          "minLoan": 100000,
+          "maxLoan": 15000000,
+          "states": ["TX", "CO"],
+          "description": "Direct DSCR balance sheet liquidity optimized for large scale single asset long term portfolio hold operators."
+        }
+      ];
+
+      document.getElementById('rawUploaderText').value = JSON.stringify(sample, null, 2);
+      addConsoleLog("Injected sample multi-record array into text buffer area.", "DEBUG");
+    }
+
+    // Raw parser engine (handles CSV mapping or JSON lists)
+    function parseRawTextData() {
+      const rawText = document.getElementById('rawUploaderText').value.trim();
+      parsedBuffer = [];
+
+      if (!rawText) {
+        alert("Payload text buffer contains no data. Paste array attributes to evaluate.");
+        return;
+      }
+
+      try {
+        // Attempt parsing as JSON
+        if (rawText.startsWith('[')) {
+          const parsed = JSON.parse(rawText);
+          parsed.forEach(item => {
+            parsedBuffer.push({
+              id: `BUF-${Math.floor(Math.random() * 900) + 100}`,
+              name: item.name || "Unnamed Import Node",
+              assetFocus: item.assetFocus || "Bridge",
+              maxLTV: parseInt(item.maxLTV) || 75,
+              minRate: parseFloat(item.minRate) || 9.5,
+              minLoan: parseInt(item.minLoan) || 200000,
+              maxLoan: parseInt(item.maxLoan) || 10000000,
+              states: Array.isArray(item.states) ? item.states : ["CA"],
+              description: item.description || "Direct capital source parsed via client data injection pipeline.",
+              verified: item.verified !== undefined ? item.verified : true,
+              gradient: "prism-glow-purple"
+            });
+          });
+        } else {
+          // Fallback parsing as simplified CSV format (Comma delimited)
+          // Header: name,assetFocus,maxLTV,minRate,minLoan,maxLoan,states
+          const lines = rawText.split('\n');
+          if (lines.length > 1) {
+            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+            for (let i = 1; i < lines.length; i++) {
+              if (!lines[i].trim()) continue;
+              const cols = lines[i].split(',').map(c => c.trim());
+              
+              parsedBuffer.push({
+                id: `BUF-${Math.floor(Math.random() * 900) + 100}`,
+                name: cols[0] || "CSV Direct Source Node",
+                assetFocus: cols[1] || "Fix & Flip",
+                maxLTV: parseInt(cols[2]) || 80,
+                minRate: parseFloat(cols[3]) || 8.99,
+                minLoan: parseInt(cols[4]) || 150000,
+                maxLoan: parseInt(cols[5]) || 5000000,
+                states: cols[6] ? [cols[6].toUpperCase()] : ["TX"],
+                description: "Direct capital source ingested dynamically from CSV row matrices.",
+                verified: true,
+                gradient: "prism-glow-purple"
+              });
+            }
+          }
+        }
+
+        renderUploaderPreview();
+
+      } catch (err) {
+        addConsoleLog(`Parser failure evaluating uploaded structure string. Trace: ${err.message}`, 'ERROR');
+        alert("Parser trace error. Verify payload represents correct JSON array formats or formatted CSV lines.");
+      }
+    }
+
+    // Render preview elements
+    function renderUploaderPreview() {
+      const tbody = document.getElementById('previewTableBody');
+      const counter = document.getElementById('previewRecordCount');
+      const commitBtn = document.getElementById('commitBufferBtn');
+
+      if (parsedBuffer.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-white/30 font-mono">No parsed file/text loaded inside buffer.</td></tr>`;
+        counter.textContent = "0 RECORDS PARSED";
+        commitBtn.disabled = true;
+        commitBtn.className = "w-full bg-gradient-to-r from-prism-green/20 to-prism-blue/20 text-white/30 cursor-not-allowed font-bold uppercase tracking-wider py-3 rounded-xl text-xs font-mono border border-white/5 transition";
+        return;
+      }
+
+      counter.textContent = `${parsedBuffer.length} RECORDS VALIDATED`;
+      commitBtn.disabled = false;
+      commitBtn.className = "w-full bg-gradient-to-r from-prism-green to-prism-blue text-black font-bold uppercase tracking-wider py-3 rounded-xl text-xs font-mono border border-white/5 transition hover:brightness-110 cursor-pointer shadow-lg";
+
+      tbody.innerHTML = parsedBuffer.map(item => `
+        <tr class="border-b border-white/5 hover:bg-white/5">
+          <td class="p-2 font-bold text-white truncate max-w-[120px]">${item.name}</td>
+          <td class="p-2 font-mono text-[9px]"><span class="bg-white/5 px-1 rounded">${item.assetFocus}</span></td>
+          <td class="p-2 text-center font-bold text-prism-blue">${item.maxLTV}%</td>
+          <td class="p-2 text-center font-bold text-prism-yellow">${item.minRate}%</td>
+          <td class="p-2 font-mono">${item.states.join(',')}</td>
+          <td class="p-2 text-right text-prism-green">Valid Buffer</td>
+        </tr>
+      `).join('');
+    }
+
+    // Commit buffer to live directory memory
+    function commitBufferToDirectory() {
+      if (parsedBuffer.length === 0) return;
+
+      lenders = [...parsedBuffer, ...lenders];
+      const count = parsedBuffer.length;
+      
+      // Clear buffer & inputs
+      parsedBuffer = [];
+      document.getElementById('rawUploaderText').value = '';
+      renderUploaderPreview();
+      filterLenders();
+
+      addConsoleLog(`Permanently merged ${count} imported capital programs into active index directory memory pools.`, 'SUCCESS');
+      alert(`Success: ${count} external lender matrices integrated into active directory pools.`);
+      
+      // Switch back to view directory view to observe outcomes
+      switchView('grid');
+    }
+
+    // Simulated Export dynamic Table grid to raw local CSV format 
+    function exportTableToCSV() {
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Institution Name,Asset Specialty,Max LTV,Min Starting Rate,Min Loan Limit,Max Loan Limit,Territories\r\n";
+      
+      lenders.forEach(l => {
+        const row = [
+          `"${l.name}"`,
+          `"${l.assetFocus}"`,
+          l.maxLTV,
+          l.minRate,
+          l.minLoan,
+          l.maxLoan,
+          `"${l.states.join(', ')}"`
+        ].join(",");
+        csvContent += row + "\r\n";
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `PRISM_LOGIC_capital_pool_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      addConsoleLog("Generated local system download stream payload for active indexed lenders.", "SUCCESS");
+    }
+
+    // Initialize Year in Footer
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+    // Initial setup loads base datasets
+    window.addEventListener('DOMContentLoaded', () => {
+      clearConsoleLogs();
+      clearFilters();
+    });
+  </script>
+
+  <!-- PRISM LIGHT SIMULATOR CANVAS COMPONENT -->
+  <script>
+    const canvas = document.getElementById('prismCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Resize tracking
+    function resizeCanvas() {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Mouse coordinates inside canvas (Initial start coordinate)
+    let mouse = { x: canvas.width * 0.25, y: canvas.height * 0.4 };
+
+    canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+    });
+
+    // Simple Vector 2D helper
+    function drawBeam(x1, y1, x2, y2, color, width = 1.5, blurColor = null) {
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      if (blurColor) {
+        ctx.shadowColor = blurColor;
+        ctx.shadowBlur = 10;
+      } else {
+        ctx.shadowBlur = 0;
+      }
+      ctx.stroke();
+    }
+
+    function drawPrism() {
+      // Create triangular prism coords center-right
+      const cx = canvas.width * 0.6;
+      const cy = canvas.height * 0.5;
+      const size = 55;
+
+      const p1 = { x: cx, y: cy - size };
+      const p2 = { x: cx - size * 0.9, y: cy + size * 0.7 };
+      const p3 = { x: cx + size * 0.9, y: cy + size * 0.7 };
+
+      // Clear Canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Background grids / logic graphics
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = "rgba(255,255,255,0.015)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Emitter point (Left side, gentle sway)
+      const emitter = { x: 50, y: canvas.height * 0.5 + Math.sin(Date.now() * 0.001) * 30 };
+      
+      // Control point (mouse)
+      const targetPoint = { x: mouse.x, y: mouse.y };
+
+      // Calculate intersection on side p1 -> p2 (approximately)
+      const hitPoint = { x: cx - 20, y: cy };
+
+      // 1. Draw original white ray from pointer target
+      drawBeam(targetPoint.x, targetPoint.y, hitPoint.x, hitPoint.y, 'rgba(255, 255, 255, 0.75)', 2, 'rgba(255,255,255,0.3)');
+
+      // Draw secondary source beam from simulated left emitter
+      drawBeam(emitter.x, emitter.y, hitPoint.x, hitPoint.y, 'rgba(0, 240, 255, 0.4)', 1);
+
+      // 2. Refract light spectrum out of right side (p1 -> p3) using system metrics
+      // Dynamic offset mirrors the state calculations
+      const refractions = [
+        { color: 'rgba(255, 46, 147, 0.8)', angle: 0.1, yOffset: -12 },   // Pink
+        { color: 'rgba(139, 92, 246, 0.8)', angle: 0.05, yOffset: -5 },  // Purple
+        { color: 'rgba(0, 240, 255, 0.8)', angle: 0.0, yOffset: 2 },     // Cyan
+        { color: 'rgba(0, 255, 135, 0.8)', angle: -0.05, yOffset: 9 },   // Green
+        { color: 'rgba(255, 222, 67, 0.8)', angle: -0.1, yOffset: 16 }    // Yellow
+      ];
+
+      const outSideStart = { x: cx + 15, y: cy };
+
+      refractions.forEach((ref) => {
+        // Calculate dynamic wave offsets to mimic organic shifting rates
+        const wave = Math.sin(Date.now() * 0.002 + ref.yOffset) * 0.02;
+        const outX = canvas.width;
+        const outY = outSideStart.y + ref.yOffset + (canvas.width - outSideStart.x) * (ref.angle + wave);
+        
+        // Internal refract beam (inside the glass prism itself)
+        drawBeam(hitPoint.x, hitPoint.y, outSideStart.x, outSideStart.y + ref.yOffset / 3, 'rgba(255,255,255,0.25)', 1.2);
+        
+        // Outward spectrum beam
+        drawBeam(outSideStart.x, outSideStart.y + ref.yOffset / 3, outX, outY, ref.color, 1.8, ref.color);
+      });
+
+      // 3. Draw physical Glass Prism outline
+      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.lineTo(p3.x, p3.y);
+      ctx.closePath();
+      
+      // Prism Fill
+      const prismGrad = ctx.createLinearGradient(cx, cy - size, cx, cy + size);
+      prismGrad.addColorStop(0, 'rgba(255, 255, 255, 0.15)');
+      prismGrad.addColorStop(1, 'rgba(255, 255, 255, 0.01)');
+      ctx.fillStyle = prismGrad;
+      ctx.fill();
+
+      // Prism Stroke
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Highlight nodes at triangle vertices
+      ctx.fillStyle = '#00f0ff';
+      ctx.beginPath();
+      ctx.arc(p1.x, p1.y, 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Animation loop
+      requestAnimationFrame(drawPrism);
+    }
+
+    // Launch Prism Canvas animation
+    drawPrism();
+  </script>
+    <script src="script.js"></script>
+</body>
+</html>
