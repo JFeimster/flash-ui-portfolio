@@ -1,0 +1,1236 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Partner Portal // AI Agent Arsenal</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Space+Grotesk:wght@400;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* Neo-Brutalist & Cyberpunk Global Variables */
+    :root {
+      --deep-black: #050505;
+      --carbon-black: #0A0B0F;
+      --graphite: #171821;
+      --off-white: #F4F1E8;
+      
+      /* Primary Accents */
+      --cyan: #00E5FF;
+      --acid-green: #B6FF00;
+      --magenta: #FF2BD6;
+      --orange: #FF7A00;
+      --yellow: #FFE600;
+      --red: #FF1744;
+      --blue: #245BFF;
+
+      /* Shadows */
+      --neo-shadow-cyan: 5px 5px 0px var(--cyan);
+      --neo-shadow-green: 5px 5px 0px var(--acid-green);
+      --neo-shadow-magenta: 5px 5px 0px var(--magenta);
+      --neo-shadow-orange: 5px 5px 0px var(--orange);
+      --neo-shadow-yellow: 7px 7px 0px var(--yellow);
+      --neo-shadow-white: 5px 5px 0px var(--off-white);
+      --neo-shadow-black: 6px 6px 0px rgba(0,0,0,1);
+    }
+
+    /* Reset & Base */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    ::selection {
+      background-color: var(--magenta);
+      color: var(--deep-black);
+    }
+
+    ::-webkit-scrollbar {
+      width: 12px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--carbon-black);
+      border-left: 3px solid var(--graphite);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--graphite);
+      border: 3px solid var(--carbon-black);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--magenta);
+    }
+
+    body {
+      background-color: var(--deep-black);
+      color: var(--off-white);
+      font-family: 'Space Grotesk', -apple-system, sans-serif;
+      overflow-x: hidden;
+      background-image: 
+        linear-gradient(rgba(23, 24, 33, 0.4) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(23, 24, 33, 0.4) 1px, transparent 1px);
+      background-size: 30px 30px;
+      background-position: center;
+    }
+
+    /* Utilities */
+    .mono {
+      font-family: 'Share Tech Mono', monospace;
+      text-transform: uppercase;
+    }
+
+    .glow-cyan { text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
+    .glow-green { text-shadow: 0 0 10px rgba(182, 255, 0, 0.5); }
+    .glow-magenta { text-shadow: 0 0 10px rgba(255, 43, 214, 0.5); }
+    .glow-yellow { text-shadow: 0 0 10px rgba(255, 230, 0, 0.5); }
+
+    /* Top Sticky Navigation Bar */
+    .terminal-nav {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: var(--carbon-black);
+      border-bottom: 4px solid var(--off-white);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .brand-logo {
+      background: var(--magenta);
+      color: var(--deep-black);
+      font-weight: 800;
+      padding: 0.5rem 1rem;
+      border: 2px solid var(--deep-black);
+      box-shadow: 3px 3px 0px var(--off-white);
+      font-size: 1.2rem;
+      text-transform: uppercase;
+      letter-spacing: -1px;
+    }
+
+    .brand-meta {
+      font-size: 0.8rem;
+      color: #888;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .nav-link {
+      color: var(--off-white);
+      text-decoration: none;
+      font-weight: 700;
+      padding: 0.5rem 0.8rem;
+      border: 2px solid transparent;
+      transition: all 0.15s ease;
+    }
+
+    .nav-link:hover {
+      border: 2px solid var(--magenta);
+      background: var(--graphite);
+      color: var(--magenta);
+    }
+
+    .nav-cta {
+      background: var(--acid-green);
+      color: var(--deep-black);
+      font-weight: 800;
+      padding: 0.6rem 1.2rem;
+      border: 2px solid var(--off-white);
+      box-shadow: 4px 4px 0px var(--magenta);
+      text-decoration: none;
+      transition: all 0.1s ease;
+    }
+
+    .nav-cta:hover {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0px var(--magenta);
+    }
+
+    /* Main Container Grid */
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Hero Section Component */
+    .hero-content {
+      background: var(--carbon-black);
+      border: 4px solid var(--off-white);
+      padding: 3rem;
+      box-shadow: var(--neo-shadow-magenta);
+      position: relative;
+      margin-top: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .corner-tag {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: var(--cyan);
+      color: var(--deep-black);
+      font-weight: bold;
+      padding: 0.25rem 1rem;
+      font-size: 0.75rem;
+      border-bottom: 3px solid var(--off-white);
+      border-left: 3px solid var(--off-white);
+    }
+
+    .hero-eyebrow {
+      color: var(--acid-green);
+      font-size: 1rem;
+      letter-spacing: 3px;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      background: var(--magenta);
+      animation: blink 1s infinite steps(2);
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .hero-title {
+      font-size: 3.8rem;
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -2px;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+    }
+
+    .hero-title span.accent-1 {
+      color: var(--deep-black);
+      background-color: var(--cyan);
+      padding: 0 0.5rem;
+    }
+
+    .hero-title span.accent-2 {
+      color: var(--magenta);
+      display: block;
+    }
+
+    .hero-desc {
+      font-size: 1.2rem;
+      line-height: 1.4;
+      margin-bottom: 1.5rem;
+      color: var(--off-white);
+      font-weight: 700;
+      border-left: 6px solid var(--magenta);
+      padding-left: 1.2rem;
+    }
+
+    /* CONFIGURATOR & PREVIEW SPLIT ENGINE */
+    .config-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 2.5rem;
+      margin-bottom: 4rem;
+    }
+
+    @media (max-width: 1100px) {
+      .config-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Form Panel Card */
+    .config-card {
+      background: var(--carbon-black);
+      border: 4px solid var(--off-white);
+      padding: 2.5rem;
+      box-shadow: var(--neo-shadow-black);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .panel-header-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid var(--off-white);
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .panel-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .form-label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      color: var(--cyan);
+    }
+
+    .form-input {
+      width: 100%;
+      background: var(--deep-black);
+      border: 2px solid var(--off-white);
+      padding: 0.8rem;
+      color: var(--off-white);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.1s;
+    }
+
+    .form-input:focus {
+      border-color: var(--magenta);
+      box-shadow: 2px 2px 0 var(--magenta);
+    }
+
+    .color-select-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .color-btn {
+      height: 40px;
+      border: 2px solid var(--off-white);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+    }
+
+    .color-btn.active {
+      box-shadow: inset 0 0 0 3px var(--deep-black);
+      border: 3px solid var(--off-white);
+    }
+
+    .tool-selector-group {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.8rem;
+    }
+
+    .tool-option {
+      background: var(--graphite);
+      border: 2px solid var(--off-white);
+      color: var(--off-white);
+      padding: 0.8rem;
+      font-weight: bold;
+      text-align: center;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.1s;
+    }
+
+    .tool-option.active {
+      background: var(--magenta);
+      color: var(--off-white);
+      box-shadow: 3px 3px 0 var(--cyan);
+    }
+
+    /* Live Preview & Widget Generator Pane */
+    .preview-pane {
+      background: var(--graphite);
+      border: 4px solid var(--off-white);
+      box-shadow: var(--neo-shadow-cyan);
+      padding: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .preview-header {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--magenta);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--off-white);
+      padding-bottom: 0.8rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Inside-Preview Mock Container simulating White-Label Widget */
+    .mock-widget-container {
+      background: var(--carbon-black);
+      border: 3px solid var(--off-white);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .mock-widget-brand {
+      font-family: 'Share Tech Mono', monospace;
+      font-weight: bold;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      color: var(--cyan);
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed #333;
+      padding-bottom: 0.5rem;
+    }
+
+    .mock-calc-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .mock-input-label {
+      font-size: 0.75rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: var(--off-white);
+    }
+
+    .mock-slider {
+      width: 100%;
+      accent-color: var(--magenta);
+      height: 6px;
+    }
+
+    .mock-output-banner {
+      background: var(--deep-black);
+      border: 2px dashed var(--accent-color, var(--magenta));
+      padding: 1rem;
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    .mock-cta-button {
+      background: var(--accent-color, var(--magenta));
+      color: var(--deep-black);
+      border: 2px solid var(--off-white);
+      padding: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+
+    /* Dynamic Embed Code Output Display */
+    .embed-generator-area {
+      background: var(--deep-black);
+      border: 2px solid var(--off-white);
+      padding: 1rem;
+      position: relative;
+    }
+
+    .embed-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .embed-code-box {
+      font-family: 'Share Tech Mono', monospace;
+      color: var(--acid-green);
+      font-size: 0.8rem;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      background: #000;
+      padding: 0.8rem;
+      border: 1px solid #333;
+      max-height: 120px;
+    }
+
+    .copy-btn {
+      background: var(--cyan);
+      color: var(--deep-black);
+      border: 2px solid var(--off-white);
+      padding: 0.4rem 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 0.75rem;
+      transition: all 0.1s;
+    }
+
+    .copy-btn:hover {
+      background: var(--off-white);
+    }
+
+    /* Section Headers */
+    .section-header {
+      border-left: 8px solid var(--accent, var(--magenta));
+      padding-left: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .section-eyebrow {
+      color: var(--accent, var(--magenta));
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      line-height: 0.95;
+      letter-spacing: -1.5px;
+    }
+
+    .section-subtitle {
+      font-size: 1.2rem;
+      color: #bbb;
+      max-width: 750px;
+      margin-top: 0.75rem;
+    }
+
+    /* Operational Statistics Grid */
+    .stats-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 4rem;
+    }
+
+    @media (max-width: 768px) {
+      .stats-strip {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .stat-card {
+      background: var(--carbon-black);
+      border: 3px solid var(--off-white);
+      padding: 1.5rem;
+      box-shadow: var(--neo-shadow-black);
+      position: relative;
+    }
+
+    .stat-num {
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-num.c1 { color: var(--acid-green); }
+    .stat-num.c2 { color: var(--cyan); }
+    .stat-num.c3 { color: var(--magenta); }
+    .stat-num.c4 { color: var(--yellow); }
+
+    .stat-label {
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: var(--off-white);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Integration Roadmap Pipeline Cards */
+    .roadmap-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      margin-bottom: 5rem;
+    }
+
+    @media (max-width: 900px) {
+      .roadmap-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .roadmap-card {
+      background: var(--carbon-black);
+      border: 3px solid var(--off-white);
+      padding: 2rem;
+      box-shadow: var(--neo-shadow-black);
+      position: relative;
+    }
+
+    .roadmap-step {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--magenta);
+      border-bottom: 2px dashed #444;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .roadmap-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+    }
+
+    .roadmap-desc {
+      color: #b3b2ae;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    /* Live Affiliate Simulator Terminal Console */
+    .terminal-container {
+      background: var(--graphite);
+      border: 4px solid var(--off-white);
+      box-shadow: var(--neo-shadow-magenta);
+      margin-bottom: 5rem;
+    }
+
+    .locker-header {
+      background: var(--carbon-black);
+      border-bottom: 4px solid var(--off-white);
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .locker-dots {
+      display: flex;
+      gap: 8px;
+    }
+
+    .locker-dot {
+      width: 12px;
+      height: 12px;
+      border: 2px solid var(--off-white);
+    }
+    .locker-dot.red { background: var(--red); }
+    .locker-dot.yellow { background: var(--yellow); }
+    .locker-dot.green { background: var(--acid-green); }
+
+    .terminal-output-pane {
+      background: var(--deep-black);
+      padding: 1.5rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--acid-green);
+      height: 300px;
+      overflow-y: auto;
+      border-bottom: 3px solid var(--off-white);
+    }
+
+    .terminal-input-bar {
+      background: var(--carbon-black);
+      padding: 1rem;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .terminal-btn {
+      background: var(--magenta);
+      color: var(--off-white);
+      border: 2px solid var(--off-white);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.9rem;
+      font-weight: bold;
+      padding: 0.6rem 1.2rem;
+      cursor: pointer;
+      transition: all 0.1s;
+    }
+
+    .terminal-btn:hover {
+      background: var(--off-white);
+      color: var(--deep-black);
+    }
+
+    /* Bottom Mega Call-To-Action */
+    .mega-cta {
+      background: var(--blue);
+      border: 4px solid var(--off-white);
+      box-shadow: 10px 10px 0px var(--cyan);
+      padding: 4rem 3rem;
+      text-align: center;
+      position: relative;
+      margin-bottom: 6rem;
+    }
+
+    .mega-cta-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      line-height: 1;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+
+    .mega-cta-sub {
+      font-size: 1.4rem;
+      max-width: 800px;
+      margin: 0 auto 3rem auto;
+      font-weight: bold;
+      color: var(--off-white);
+    }
+
+    .btn-brutal {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: 3px solid var(--off-white);
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+
+    .btn-cyan {
+      background: var(--cyan);
+      color: var(--deep-black);
+      box-shadow: 6px 6px 0px var(--off-white);
+    }
+
+    .btn-cyan:hover {
+      transform: translate(2px, 2px);
+      box-shadow: 4px 4px 0px var(--off-white);
+    }
+
+    /* Footer Styling */
+    footer {
+      background: var(--carbon-black);
+      border-top: 4px solid var(--off-white);
+      padding: 3rem 2rem;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    .footer-grid {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 4rem;
+    }
+
+    @media (max-width: 768px) {
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+    }
+
+    .footer-brand {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--acid-green);
+      text-transform: uppercase;
+    }
+
+    .footer-col-title {
+      color: var(--cyan);
+      font-weight: bold;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .footer-links {
+      list-style-type: none;
+    }
+
+    .footer-links li {
+      margin-bottom: 0.8rem;
+    }
+
+    .footer-links a {
+      color: #8c8b88;
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--off-white);
+    }
+
+    .footer-bottom {
+      border-top: 2px solid var(--graphite);
+      max-width: 1400px;
+      margin: 3rem auto 0 auto;
+      padding-top: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- STICKY TOP NAVIGATION BAR -->
+  <nav class="terminal-nav">
+    <div class="brand-group">
+      <div class="brand-logo">PARTNER_PORTAL</div>
+      <div class="brand-meta mono">[ REPO: ai-agent-arsenal ]</div>
+    </div>
+    <div class="nav-links">
+      <a href="#configurator" class="nav-link mono">WIDGET_CONFIG</a>
+      <a href="#roadmap" class="nav-link mono">INTEGRATION_MAP</a>
+      <a href="#simulator" class="nav-link mono">LEAD_MONITOR</a>
+      <a href="index.html" class="nav-cta mono">← RETURN TO ARMORY</a>
+    </div>
+  </nav>
+
+  <!-- MAIN WRAPPER -->
+  <div class="container">
+
+    <!-- HERO SECTION -->
+    <header class="hero-content">
+      <div class="corner-tag mono">WHITELABEL ENABLED // V2.5</div>
+      <div class="hero-eyebrow mono">COGNITIVE LEAD MAGNET CONSOLIDATOR</div>
+      <h1 class="hero-title">
+        <span class="accent-1">Deploy Custom</span>
+        <span class="accent-2">Fintech Widgets</span>
+      </h1>
+      <p class="hero-desc">
+        Affiliate loan brokers, funding consultants, and operators: inject your custom tracking links, skin our calculations into your personal brand, and generate high-intent inbound credit leads instantly.
+      </p>
+    </header>
+
+    <!-- LIVE CONFIGURATOR GRID -->
+    <section id="configurator" class="config-grid">
+      
+      <!-- LEFT PANEL: CUSTOMIZATION PANEL -->
+      <div class="config-card">
+        <div>
+          <div class="panel-header-line">
+            <span class="panel-title mono">1. Configure Metadata</span>
+            <span class="mono" style="color: var(--magenta); font-size: 0.8rem;">PARAMS_MAP</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Affiliate Tracking ID / CRM Webhook</label>
+            <input type="text" id="affiliateId" class="form-input" value="PARTNER_MCA_99" oninput="updateLiveWidgetAndCode()">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Custom Brokerage Name</label>
+            <input type="text" id="brandName" class="form-input" value="Apex Capital Group" oninput="updateLiveWidgetAndCode()">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Target Core Tool Selection</label>
+            <div class="tool-selector-group">
+              <button class="tool-option active" id="toolRunway" onclick="selectTool('runway')">SBA Runway Calc</button>
+              <button class="tool-option" id="toolCashflow" onclick="selectTool('cashflow')">Ecom Cash Flow</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Brand Theme Accent Color</label>
+            <div class="color-select-grid">
+              <button class="color-btn active" style="background: var(--magenta); color: var(--deep-black);" onclick="selectColorTheme('magenta', '#FF2BD6', this)">Pink</button>
+              <button class="color-btn" style="background: var(--cyan); color: var(--deep-black);" onclick="selectColorTheme('cyan', '#00E5FF', this)">Cyan</button>
+              <button class="color-btn" style="background: var(--acid-green); color: var(--deep-black);" onclick="selectColorTheme('green', '#B6FF00', this)">Green</button>
+              <button class="color-btn" style="background: var(--yellow); color: var(--deep-black);" onclick="selectColorTheme('yellow', '#FFE600', this)">Yellow</button>
+              <button class="color-btn" style="background: var(--orange); color: var(--deep-black);" onclick="selectColorTheme('orange', '#FF7A00', this)">Orange</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Post-Lead Submission Redirect URL</label>
+            <input type="text" id="redirectUrl" class="form-input" value="https://apex-capital.com/thank-you" oninput="updateLiveWidgetAndCode()">
+          </div>
+        </div>
+
+        <button class="terminal-btn mono" style="width:100%; margin-top:1.5rem;" onclick="simulateConfigurationSave()">LOCK & COMPILE SCHEMAS</button>
+      </div>
+
+      <!-- RIGHT PANEL: INTERACTIVE PREVIEW & CODE GENERATION -->
+      <div class="preview-pane">
+        <div>
+          <div class="preview-header">
+            <span class="mono">LIVE WHITE-LABEL PREVIEW MODULE</span>
+            <span id="activeToolBadge" class="mono" style="background:var(--magenta); color:var(--deep-black); padding: 0.1rem 0.5rem; font-size:0.75rem;">SBA RUNWAY ENGINE</span>
+          </div>
+
+          <!-- Mock embedded widget output -->
+          <div class="mock-widget-container" id="mockWidgetBox">
+            <div class="mock-widget-brand">
+              <span id="mockBrandText">APEX CAPITAL GROUP</span>
+              <span class="mono" style="color: var(--accent-color, var(--magenta));" id="mockTrackingText">TRACKING: PARTNER_MCA_99</span>
+            </div>
+            
+            <div class="mock-calc-form" id="mockWidgetContent">
+              <!-- Dynamically populated via javascript depending on tool selection -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic code generator frame -->
+        <div class="embed-generator-area">
+          <div class="embed-title-row">
+            <span class="mono" style="color: var(--cyan); font-weight: bold; font-size: 0.8rem;">READY HTML COGNITIVE WIDGET IFRAME</span>
+            <button class="copy-btn mono" onclick="copyEmbedCode()">COPY SNIPPET</button>
+          </div>
+          <div class="embed-code-box" id="embedSnippetArea">
+            &lt;iframe src="https://ai-agent-arsenal.com/widget/runway-engine?aff=PARTNER_MCA_99&amp;brand=Apex%20Capital%20Group&amp;color=FF2BD6&amp;redirect=https://apex-capital.com/thank-you" style="width:100%; height:550px; border:4px solid #F4F1E8; box-shadow:5px 5px 0px #FF2BD6;"&gt;&lt;/iframe&gt;
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- STATISTICS STRIP -->
+    <div class="stats-strip">
+      <div class="stat-card">
+        <div class="stat-num c1" id="statPartnersCount">2,140</div>
+        <div class="stat-label">Deployments Active</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num c2">4.8k</div>
+        <div class="stat-label">Leads Routed / Month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num c3" id="statBrokerPayouts">$92,400</div>
+        <div class="stat-label">Commissions Generated</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num c4">99.8%</div>
+        <div class="stat-label">Webhook Uptime</div>
+      </div>
+    </div>
+
+    <!-- ROADMAP SYSTEM ARCHITECTURE -->
+    <section id="roadmap">
+      <div class="section-header" style="--accent: var(--magenta);">
+        <div class="section-eyebrow mono">INTEGRATION WORKFLOWS</div>
+        <h2 class="section-title">Deployment Pipelines</h2>
+        <p class="section-subtitle">Embed custom pre-qualification agents directly onto lead acquisition landing pages under 5 minutes flat.</p>
+      </div>
+
+      <div class="roadmap-grid">
+        <div class="roadmap-card">
+          <div class="roadmap-step">01</div>
+          <h3 class="roadmap-title">Embed & Customize</h3>
+          <p class="roadmap-desc">Copy your specialized compiled HTML widget script. Standard style overrides match branding accents automatically directly on WordPress, Wix, or Webflow structures.</p>
+        </div>
+
+        <div class="roadmap-card">
+          <div class="roadmap-step">02</div>
+          <h3 class="roadmap-title">Wix / Webhook Ingestion</h3>
+          <p class="roadmap-desc">Submitted operational leads automatically transmit a secured structural JSON payload carrying tracking parameters instantly to your custom target endpoints.</p>
+        </div>
+
+        <div class="roadmap-card">
+          <div class="roadmap-step">03</div>
+          <h3 class="roadmap-title">Auto CRM Synced</h3>
+          <p class="roadmap-desc">Our core backend tracks specific lead scoring criteria, and outputs an immediately executable deal ticket formatted for direct alternative underwriting brokers.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIVE LEAD SIMULATOR & MONITORING CONSOLE -->
+    <section id="simulator" class="terminal-container">
+      <div class="locker-header">
+        <div class="locker-dots">
+          <div class="locker-dot red"></div>
+          <div class="locker-dot yellow"></div>
+          <div class="locker-dot green"></div>
+        </div>
+        <span class="mono" style="font-size: 0.8rem; color: var(--magenta);">LIVE PARTNER API PIPELINE ROUTING MONITOR v2.0</span>
+      </div>
+
+      <div class="terminal-output-pane" id="terminalOutput">
+        <div class="console-line">> ACTIVE PARTNER SESSION MONITORED // READY FOR TEST EMISSIONS...</div>
+        <div class="console-line">> WEBHOOK LISTENER ATTACHED AT: https://ai-agent-arsenal.com/api/v1/tally-lead-sync</div>
+        <div class="console-line">> READY FOR DYNAMIC SIMULATIONS.</div>
+      </div>
+
+      <div class="terminal-input-bar">
+        <span class="mono" style="color:#888;">TEST CONSOLE CONTROLS:</span>
+        <button class="terminal-btn" onclick="fireSimulatorTestLead()">EMIT MOCK CONVERSION EVENT</button>
+        <button class="terminal-btn" style="background:transparent; color:var(--off-white);" onclick="clearTerminalConsole()">CLEAR LISTENER</button>
+      </div>
+    </section>
+
+    <!-- HEAVY CALL-TO-ACTION PANEL -->
+    <section class="mega-cta">
+      <h2 class="mega-cta-title">Need a Custom Agent integration built for your team?</h2>
+      <p class="mega-cta-sub">
+        Partner with our direct solutions pipeline to design complex corporate financial classifiers, private database connections, or specialized webhook workflows.
+      </p>
+      <a href="https://github.com/jasonfeimster/ai-agent-arsenal" target="_blank" class="btn-brutal btn-cyan">Contact Technical Solutions</a>
+    </section>
+
+  </div> <!-- /CONTAINER -->
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">// AI_AGENT_ARSENAL</div>
+        <p style="color: #8c8b88; margin-top: 1rem; line-height: 1.5; font-size: 0.95rem;">
+          Created by Jason Feimster. A production-ready, tactical open-source armory designed for modern operators. Build lean, deploy fast, and run automated systems.
+        </p>
+      </div>
+      <div>
+        <div class="footer-col-title">Navigation</div>
+        <ul class="footer-links">
+          <li><a href="index.html#tactical-terminal">Tactical Terminal</a></li>
+          <li><a href="index.html#lead-maximizer">Fintech Maximizer Gate</a></li>
+          <li><a href="index.html#directory">Weapons Matrix</a></li>
+          <li><a href="index.html#api-documentation">API Stencils</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Affiliate Frameworks</div>
+        <ul class="footer-links">
+          <li><a href="#configurator">Iframe Generator</a></li>
+          <li><a href="#roadmap">Deploy Guide</a></li>
+          <li><a href="#simulator">Dynamic Endpoint Test</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>AI AGENT ARSENAL IS OPEN-SOURCE UNDER MIT LICENSE. COPYRIGHT JASON FEIMSTER 2025.</span>
+      <span>STATUS: PARTNER_OPERATIONAL [127.0.0.1]</span>
+    </div>
+  </footer>
+
+  <!-- DYNAMIC LOGIC SYSTEM -->
+  <script>
+    // Configuration memory structures
+    let activeTool = 'runway';
+    let activeColor = 'magenta';
+    let activeHex = '#FF2BD6';
+
+    const toolSchemas = {
+      runway: {
+        title: "SBA RUNWAY ENGINE",
+        inputs: [
+          { label: "Target Cash Injection Required ($)", min: 10000, max: 250000, step: 5000, val: 75000 },
+          { label: "Operating History (Months)", min: 1, max: 60, step: 1, val: 24 }
+        ],
+        buttonText: "CALCULATE INDICATIVE RUNWAY BASE"
+      },
+      cashflow: {
+        title: "ECOM CASH FLOW ANALYZER",
+        inputs: [
+          { label: "Monthly Gross Store Volume ($)", min: 5000, max: 500000, step: 5000, val: 50000 },
+          { label: "Inventory Order Holdbacks (%)", min: 0, max: 50, step: 2, val: 15 }
+        ],
+        buttonText: "EVALUATE 90-DAY VIABILITY STATUS"
+      }
+    };
+
+    function selectTool(toolKey) {
+      activeTool = toolKey;
+      document.getElementById('toolRunway').classList.toggle('active', toolKey === 'runway');
+      document.getElementById('toolCashflow').classList.toggle('active', toolKey === 'cashflow');
+
+      const badge = document.getElementById('activeToolBadge');
+      badge.textContent = toolSchemas[toolKey].title;
+      badge.style.background = `var(--${activeColor})`;
+
+      updateLiveWidgetAndCode();
+      addConsoleLog(`SYSTEM SWITCHED PREVIEW SCHEMATIC TO: [${toolSchemas[toolKey].title}]`, "SCHEM");
+    }
+
+    function selectColorTheme(colorName, hexValue, element) {
+      activeColor = colorName;
+      activeHex = hexValue;
+
+      // Reset state class on layout buttons
+      const buttons = document.querySelectorAll('.color-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+      element.classList.add('active');
+
+      // Sync color values inside the preview box parameters
+      const badge = document.getElementById('activeToolBadge');
+      badge.style.background = `var(--${colorName})`;
+
+      updateLiveWidgetAndCode();
+      addConsoleLog(`APPLIED HEX THEME HIGHLIGHT COLOR: [${hexValue}]`, "THEME");
+    }
+
+    // Interactive updates to Code Display and Mock Iframe previews
+    function updateLiveWidgetAndCode() {
+      const affId = document.getElementById('affiliateId').value || "PARTNER_ID";
+      const brand = document.getElementById('brandName').value || "Apex Capital Group";
+      const redirect = document.getElementById('redirectUrl').value || "https://your-redirect.com";
+      const activeHexStripped = activeHex.replace('#', '');
+
+      // Upkeep brand labels
+      document.getElementById('mockBrandText').textContent = brand.toUpperCase();
+      document.getElementById('mockTrackingText').textContent = `TRACKING: ${affId}`;
+
+      // Populate Mock Tool Content Inputs dynamically
+      const contentPane = document.getElementById('mockWidgetContent');
+      contentPane.innerHTML = '';
+
+      const schema = toolSchemas[activeTool];
+
+      schema.inputs.forEach((input, index) => {
+        const id = `mockInput_${index}`;
+        contentPane.innerHTML += `
+          <div>
+            <div style="display:flex; justify-content:space-between; margin-bottom: 0.3rem;">
+              <label class="mock-input-label">${input.label}</label>
+              <span id="${id}_val" class="mono" style="color: ${activeHex}; font-size: 0.8rem; font-weight:bold;">${input.val}</span>
+            </div>
+            <input type="range" class="mock-slider" id="${id}" min="${input.min}" max="${input.max}" step="${input.step}" value="${input.val}" oninput="updateMockLabel('${id}', this)" style="accent-color: ${activeHex};">
+          </div>
+        `;
+      });
+
+      // Append Banner indicator and Action Trigger
+      contentPane.innerHTML += `
+        <div class="mock-output-banner" style="border-color: ${activeHex};" id="mockOutputBlock">
+          <span class="mono" style="font-size: 0.7rem; color: #888;">[ LIVE CALCULATION DATA STREAMING SECURELY ]</span>
+          <p style="font-size: 0.9rem; font-weight: bold; margin-top:0.3rem;">Est. Qualifications: <span style="color:${activeHex};" id="mockValResult">$125,000 BASE</span></p>
+        </div>
+        <button class="mock-cta-button" style="background: ${activeHex};" onclick="simulateLeadCaptureFromWidget()">${schema.buttonText}</button>
+      `;
+
+      // Update Live Code snippet display
+      const snippet = `<iframe src="https://ai-agent-arsenal.com/widget/${activeTool}-engine?aff=${encodeURIComponent(affId)}&brand=${encodeURIComponent(brand)}&color=${activeHexStripped}&redirect=${encodeURIComponent(redirect)}" style="width:100%; height:550px; border:4px solid #F4F1E8; box-shadow:5px 5px 0px #${activeHexStripped};"></iframe>`;
+      document.getElementById('embedSnippetArea').textContent = snippet;
+
+      // Run dynamic calculations to sync preview output numbers
+      updateMockMath();
+    }
+
+    function updateMockLabel(id, el) {
+      document.getElementById(`${id}_val`).textContent = parseFloat(el.value).toLocaleString();
+      updateMockMath();
+    }
+
+    function updateMockMath() {
+      // Handle simple reactive formulas within widget mocks
+      if (activeTool === 'runway') {
+        const fundingVal = parseFloat(document.getElementById('mockInput_0').value) || 0;
+        const monthsVal = parseFloat(document.getElementById('mockInput_1').value) || 0;
+        const out = Math.round(fundingVal * (monthsVal / 12));
+        document.getElementById('mockValResult').textContent = `$${out.toLocaleString()} INDICATIVE RUNWAY`;
+      } else {
+        const volume = parseFloat(document.getElementById('mockInput_0').value) || 0;
+        const cost = parseFloat(document.getElementById('mockInput_1').value) || 0;
+        const out = Math.round(volume * ((100 - cost) / 100));
+        document.getElementById('mockValResult').textContent = `$${out.toLocaleString()} CASH BUFFER`;
+      }
+    }
+
+    // Copy to clipboard utility logic
+    function copyEmbedCode() {
+      const text = document.getElementById('embedSnippetArea').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        addConsoleLog("EMBED_SNIPPET COPIED DIRECTLY TO INTERACTIVE CLIPBOARD BUFFER.", "SYSTEM");
+      }).catch(err => {
+        addConsoleLog("CLIPBOARD CONSOLE FAILURE: Enable clipboard browser configurations.", "ERR");
+      });
+    }
+
+    // Mock logs emitter
+    function addConsoleLog(text, category = ">") {
+      const output = document.getElementById('terminalOutput');
+      const line = document.createElement('div');
+      line.style.marginBottom = '0.4rem';
+      line.innerHTML = `<span style="color: var(--magenta)">${category}</span> ${text}`;
+      output.appendChild(line);
+      output.scrollTop = output.scrollHeight;
+    }
+
+    function clearTerminalConsole() {
+      document.getElementById('terminalOutput').innerHTML = '<div class="console-line">> CONSOLE STATE: MUTED. INITIALIZE EVENT TRIGGERS...</div>';
+    }
+
+    function simulateConfigurationSave() {
+      addConsoleLog("UPDATING PRODUCTION DOCKER SCHEMATIC MAP...", "COMPILED");
+      setTimeout(() => {
+        addConsoleLog("SUCCESS: CDN configurations published successfully to edge routing systems.", "COMPILED");
+      }, 1000);
+    }
+
+    // Dynamic conversions simulator triggered directly inside inside the white-labeled mockup widget
+    function simulateLeadCaptureFromWidget() {
+      const affId = document.getElementById('affiliateId').value || "PARTNER_ID";
+      const brand = document.getElementById('brandName').value || "Apex Capital Group";
+      const redirect = document.getElementById('redirectUrl').value || "https://your-redirect.com";
+      const resultVal = document.getElementById('mockValResult').textContent;
+
+      addConsoleLog(`CONVERSION_EVENT: Capturing user lead through widget under target broker "${brand}"`, "CAPTURE");
+      
+      setTimeout(() => {
+        addConsoleLog(`DISPATCHING WEBHOUK SCHEMA: TALLY_POST_WIX_ROUTER to CRM`, "CAPTURE");
+        addConsoleLog(`DATA_PAYLOAD: { "affiliate": "${affId}", "score_output": "${resultVal}", "route_redirect": "${redirect}" }`, "CAPTURE");
+        addConsoleLog(`SYSTEM RESPONSE: 200 OK // Lead tracked successfully on master log systems.`, "CAPTURE");
+      }, 1000);
+    }
+
+    // Emit fully processed mock events matching real affiliate conversions logs
+    function fireSimulatorTestLead() {
+      const mockNames = ["Alpha Brokers Corp", "Venture Edge Finance", "Horizon Lending Inc", "Capital Matrix Capital"];
+      const mockIds = ["ALPHA_BROKER_9", "EDGE_V_CAP", "HORIZON_LOAN_X", "CAPITAL_M_CAP"];
+      const index = Math.floor(Math.random() * mockNames.length);
+
+      const targetName = mockNames[index];
+      const targetId = mockIds[index];
+      const randValue = Math.floor(Math.random() * 200000) + 15000;
+
+      addConsoleLog(`EMITTING TEST METRICS TO WEBHOUK FOR: [${targetName}]`, "TEST_EMITTER");
+      
+      setTimeout(() => {
+        addConsoleLog(`TRANSMITTING LEDGER DATA // CRM ENTRY ROUTED`, "NOTION_SYNC");
+        addConsoleLog(`POST /api/v1/tally-lead-sync [AFFILIATE: ${targetId}][INDICATIVE_VALUE: $${randValue.toLocaleString()}]`, "STATUS_OK");
+        
+        // Dynamic increments of live dashboard widgets
+        const activePayoutText = document.getElementById('statBrokerPayouts');
+        let currentPayout = parseInt(activePayoutText.textContent.replace(/[^0-9]/g, ''));
+        currentPayout += Math.round(randValue * 0.05); // Simulated 5% commission credit
+        activePayoutText.textContent = `$${currentPayout.toLocaleString()}`;
+
+        addConsoleLog(`COMMISSION GENERATED: Sync completed successfully. Log entries posted straight to Master Notion CRM.`, "PAYOUT_SYNC");
+      }, 1200);
+    }
+
+    // Start-up Initializers
+    window.addEventListener('DOMContentLoaded', () => {
+      selectTool('runway');
+    });
+  </script>
+</body>
+</html>
+```

@@ -1,0 +1,375 @@
+{
+  "_meta": {
+    "engine_version": "0.2.3-operational-routing-draft",
+    "source_version": "0.2.2 provider/product verification draft",
+    "source_files": [
+      "providers.json",
+      "products.json",
+      "verification_report.md",
+      "unresolved_conflicts_report.csv",
+      "high_priority_missing_data_report.csv"
+    ],
+    "generated_date": "2026-05-20",
+    "file_name": "routing_logic.json",
+    "purpose": "Operational routing engine for funding-family selection, product matching, fallback logic, and monetization branching.",
+    "logic_precedence": [
+      "product_rules",
+      "provider_defaults",
+      "funding_family_defaults",
+      "global_fallback_logic"
+    ],
+    "status": "draft_for_operational_testing_not_final_underwriting_policy"
+  },
+  "schema": [
+    "route_id",
+    "route_type",
+    "funding_family_id",
+    "label",
+    "description",
+    "trigger_conditions",
+    "ranking_instructions",
+    "exclusion_rules",
+    "fallback_route",
+    "monetization_branches",
+    "available_product_count_in_v0_2_2"
+  ],
+  "records": [
+    {
+      "route_id": "route_equipment_truck_asset_backed",
+      "route_type": "funding_family",
+      "funding_family_id": "equipment_truck_asset_backed",
+      "label": "Equipment / Truck / Asset-Backed Funding",
+      "description": "Equipment, truck, fleet, and asset-backed products where collateral and invoices drive fit.",
+      "trigger_conditions": {
+        "primary_use_cases": [
+          "equipment",
+          "vehicle",
+          "truck",
+          "fleet",
+          "capex"
+        ],
+        "typical_min_credit_score": 580,
+        "typical_min_monthly_revenue": 0,
+        "typical_min_time_in_business_months": 12
+      },
+      "ranking_instructions": "After family route is selected, score all active products in this family with partner_fit_scoring.json. Include adjacent families when confidence is low or multiple use cases exist.",
+      "exclusion_rules": [
+        "obsolete_equipment",
+        "salvage_title",
+        "no_equipment_invoice",
+        "low_asset_quality"
+      ],
+      "fallback_route": "route_manual_review",
+      "monetization_branches": [
+        "equipment_finance_review",
+        "funding_application",
+        "asset_document_collection"
+      ],
+      "available_product_count_in_v0_2_2": 5
+    },
+    {
+      "route_id": "route_lines_of_credit_revolving_access",
+      "route_type": "funding_family",
+      "funding_family_id": "lines_of_credit_revolving_access",
+      "label": "Lines of Credit / Revolving Access",
+      "description": "Draw-based business or personal credit lines for recurring working-capital and cash-flow smoothing.",
+      "trigger_conditions": {
+        "primary_use_cases": [
+          "cash_flow_smoothing",
+          "inventory",
+          "working_capital",
+          "recurring_access"
+        ],
+        "typical_min_credit_score": 600,
+        "typical_min_monthly_revenue": 15000,
+        "typical_min_time_in_business_months": 12
+      },
+      "ranking_instructions": "After family route is selected, score all active products in this family with partner_fit_scoring.json. Include adjacent families when confidence is low or multiple use cases exist.",
+      "exclusion_rules": [
+        "unstable_deposits",
+        "weak_credit_without_compensating_revenue",
+        "recent_nsfs_heavy"
+      ],
+      "fallback_route": "route_manual_review",
+      "monetization_branches": [
+        "funding_application",
+        "bank_statement_review",
+        "business_credit_builder"
+      ],
+      "available_product_count_in_v0_2_2": 5
+    },
+    {
+      "route_id": "route_manual_review",
+      "route_type": "funding_family",
+      "funding_family_id": "manual_review",
+      "label": "Manual Funding Strategy Review",
+      "description": "Fallback path for ambiguous, incomplete, specialty, service-only, or conflicting records.",
+      "trigger_conditions": {
+        "primary_use_cases": [
+          "not_sure",
+          "complex_file",
+          "specialty_finance",
+          "funding_prep"
+        ],
+        "typical_min_credit_score": null,
+        "typical_min_monthly_revenue": null,
+        "typical_min_time_in_business_months": null
+      },
+      "ranking_instructions": "After family route is selected, score all active products in this family with partner_fit_scoring.json. Include adjacent families when confidence is low or multiple use cases exist.",
+      "exclusion_rules": [],
+      "fallback_route": "route_funding_prep",
+      "monetization_branches": [
+        "funding_strategy_review",
+        "funding_prep",
+        "manual_review"
+      ],
+      "available_product_count_in_v0_2_2": 3
+    },
+    {
+      "route_id": "route_platform_marketplace_seller_capital",
+      "route_type": "funding_family",
+      "funding_family_id": "platform_marketplace_seller_capital",
+      "label": "E-commerce / Marketplace Seller Capital",
+      "description": "Platform-linked capital for Amazon, Walmart, Shopify, and marketplace sellers using sales history/API connections.",
+      "trigger_conditions": {
+        "primary_use_cases": [
+          "ecommerce_growth",
+          "inventory",
+          "ad_spend",
+          "supply_chain",
+          "platform_seller_cash_flow"
+        ],
+        "typical_min_credit_score": 0,
+        "typical_min_monthly_revenue": 3000,
+        "typical_min_time_in_business_months": 3
+      },
+      "ranking_instructions": "After family route is selected, score all active products in this family with partner_fit_scoring.json. Include adjacent families when confidence is low or multiple use cases exist.",
+      "exclusion_rules": [
+        "platform_account_suspended",
+        "no_platform_connection",
+        "insufficient_marketplace_sales"
+      ],
+      "fallback_route": "route_manual_review",
+      "monetization_branches": [
+        "ecommerce_capital_review",
+        "platform_connection",
+        "funding_application"
+      ],
+      "available_product_count_in_v0_2_2": 5
+    },
+    {
+      "route_id": "route_real_estate_asset_secured",
+      "route_type": "funding_family",
+      "funding_family_id": "real_estate_asset_secured",
+      "label": "Real Estate / Asset-Secured Capital",
+      "description": "Hard money, DSCR, rental, bridge, commercial mortgage, and real-estate project financing.",
+      "trigger_conditions": {
+        "primary_use_cases": [
+          "real_estate_purchase",
+          "fix_and_flip",
+          "rental_dscr",
+          "commercial_property",
+          "bridge_loan"
+        ],
+        "typical_min_credit_score": 650,
+        "typical_min_monthly_revenue": 0,
+        "typical_min_time_in_business_months": 0
+      },
+      "ranking_instructions": "After family route is selected, score all active products in this family with partner_fit_scoring.json. Include adjacent families when confidence is low or multiple use cases exist.",
+      "exclusion_rules": [
+        "low_ltv_support",
+        "insufficient_down_payment",
+        "missing_property_details",
+        "weak_exit_strategy"
+      ],
+      "fallback_route": "route_manual_review",
+      "monetization_branches": [
+        "real_estate_capital_review",
+        "asset_document_collection",
+        "funding_application"
+      ],
+      "available_product_count_in_v0_2_2": 10
+    },
+    {
+      "route_id": "route_startup_credit_leverage",
+      "route_type": "funding_family",
+      "funding_family_id": "startup_credit_leverage",
+      "label": "Startup / Credit-Leverage Funding",
+      "description": "Credit-card stacking, unsecured business finance, personal/startup loans, ROBS, and business credit build paths.",
+      "trigger_conditions": {
+        "primary_use_cases": [
+          "startup_launch",
+          "business_credit_building",
+          "early_stage_operating_liquidity"
+        ],
+        "typical_min_credit_score": 680,
+        "typical_min_monthly_revenue": 0,
+        "typical_min_time_in_business_months": 0
+      },
+      "ranking_instructions": "After family route is selected, score all active products in this family with partner_fit_scoring.json. Include adjacent families when confidence is low or multiple use cases exist.",
+      "exclusion_rules": [
+        "low_personal_credit",
+        "recent_derogatory_credit",
+        "high_utilization",
+        "thin_or_dirty_credit_file"
+      ],
+      "fallback_route": "route_manual_review",
+      "monetization_branches": [
+        "startup_strategy_review",
+        "business_credit_builder",
+        "credit_prep",
+        "funding_application"
+      ],
+      "available_product_count_in_v0_2_2": 7
+    },
+    {
+      "route_id": "route_structured_growth_capital",
+      "route_type": "funding_family",
+      "funding_family_id": "structured_growth_capital",
+      "label": "Structured Growth Capital",
+      "description": "Term loans, SBA, expansion loans, and more traditional business funding for stable operators.",
+      "trigger_conditions": {
+        "primary_use_cases": [
+          "expansion",
+          "refinance",
+          "inventory",
+          "working_capital",
+          "growth_capital"
+        ],
+        "typical_min_credit_score": 600,
+        "typical_min_monthly_revenue": 20000,
+        "typical_min_time_in_business_months": 12
+      },
+      "ranking_instructions": "After family route is selected, score all active products in this family with partner_fit_scoring.json. Include adjacent families when confidence is low or multiple use cases exist.",
+      "exclusion_rules": [
+        "very_short_time_in_business",
+        "weak_credit_without_revenue_strength",
+        "missing_financials",
+        "recent_bankruptcy"
+      ],
+      "fallback_route": "route_manual_review",
+      "monetization_branches": [
+        "funding_application",
+        "financial_document_prep",
+        "bookkeeping_cleanup",
+        "funding_strategy_review"
+      ],
+      "available_product_count_in_v0_2_2": 14
+    },
+    {
+      "route_id": "route_working_capital_emergency_capital",
+      "route_type": "funding_family",
+      "funding_family_id": "working_capital_emergency_capital",
+      "label": "Working Capital / Emergency Capital",
+      "description": "Fast-turn capital for urgent cash-flow gaps, payroll, materials, inventory, ad spend recovery, and revenue-backed needs.",
+      "trigger_conditions": {
+        "primary_use_cases": [
+          "working_capital",
+          "payroll",
+          "inventory",
+          "emergency_cash_flow",
+          "marketing_growth"
+        ],
+        "typical_min_credit_score": 500,
+        "typical_min_monthly_revenue": 10000,
+        "typical_min_time_in_business_months": 6
+      },
+      "ranking_instructions": "After family route is selected, score all active products in this family with partner_fit_scoring.json. Include adjacent families when confidence is low or multiple use cases exist.",
+      "exclusion_rules": [
+        "no_current_revenue",
+        "open_bankruptcy",
+        "excessive_mca_stacking",
+        "recent_nsfs_heavy"
+      ],
+      "fallback_route": "route_manual_review",
+      "monetization_branches": [
+        "funding_application",
+        "funding_strategy_review",
+        "bank_statement_review",
+        "cash_flow_cleanup"
+      ],
+      "available_product_count_in_v0_2_2": 10
+    },
+    {
+      "route_id": "pipeline_product_matching_v1",
+      "route_type": "pipeline",
+      "funding_family_id": null,
+      "label": "Product Matching Pipeline",
+      "description": "Operational order for intake-to-recommendation routing.",
+      "trigger_conditions": {
+        "steps": [
+          "normalize_borrower_inputs",
+          "calculate_readiness_dimensions",
+          "classify_archetypes",
+          "select_candidate_families",
+          "apply_hard_exclusion_gate",
+          "score_products",
+          "apply_confidence_adjustment",
+          "rank_recommendations",
+          "branch_to_monetization_or_manual_review"
+        ]
+      },
+      "ranking_instructions": "Candidate products are scored only after hard exclusions. Product rules override provider defaults; provider defaults override family defaults; family defaults override fallback logic.",
+      "exclusion_rules": [
+        "inactive_product",
+        "explicitly_excluded_product",
+        "geography_not_served",
+        "restricted_industry_conflict",
+        "critical_product_disqualifier"
+      ],
+      "fallback_route": "route_manual_review",
+      "monetization_branches": [
+        "funding_application",
+        "funding_strategy_review",
+        "funding_prep"
+      ]
+    },
+    {
+      "route_id": "route_funding_prep",
+      "route_type": "fallback",
+      "funding_family_id": "manual_review",
+      "label": "Funding Prep / Not Ready Yet",
+      "description": "Used when borrower has low fundability/readiness or no product clears hard gates.",
+      "trigger_conditions": {
+        "fundability_score_max": 44,
+        "no_product_match": true
+      },
+      "ranking_instructions": "Do not show lender/provider recommendations. Show prep CTA, business credit builder, docs checklist, bank setup, or strategy review.",
+      "exclusion_rules": [],
+      "fallback_route": "route_manual_review",
+      "monetization_branches": [
+        "business_credit_builder",
+        "bookkeeping_cleanup",
+        "business_bank_account",
+        "entity_setup",
+        "funding_prep_checklist"
+      ]
+    },
+    {
+      "route_id": "route_manual_review",
+      "route_type": "fallback",
+      "funding_family_id": "manual_review",
+      "label": "Manual Funding Strategy Review",
+      "description": "Used when data is incomplete, confidence is low, criteria conflict, risk flags are high, or product recommendations are too close to call.",
+      "trigger_conditions": {
+        "confidence_score_below": 60,
+        "risk_flags_any_severity": [
+          "critical",
+          "high"
+        ],
+        "top_3_scores_within_points": 5,
+        "conflicting_product_data": true
+      },
+      "ranking_instructions": "Show no more than 1-3 tentative paths; mark all as subject to review. Create CRM task for human review.",
+      "exclusion_rules": [
+        "do_not_auto_recommend_excluded_products"
+      ],
+      "fallback_route": "route_funding_prep",
+      "monetization_branches": [
+        "funding_strategy_review",
+        "document_review",
+        "bank_statement_review"
+      ]
+    }
+  ]
+}

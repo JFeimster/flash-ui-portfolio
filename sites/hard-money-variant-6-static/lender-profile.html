@@ -1,0 +1,775 @@
+```html
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capital_Vault // Interactive Lender Profile & Comparison Tool</title>
+  
+  <!-- Inter & JetBrains Mono Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Alpine.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  
+  <!-- Tailwind Configuration for Custom Colors & Fonts -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              black: '#05070c',
+              dark: '#0a0d16',
+              card: '#0f1322',
+              border: '#1e2640',
+              accent: '#00f0ff',
+              neonPurple: '#9d4edd',
+              neonGreen: '#00ff66',
+              highlight: '#2563eb'
+            }
+          },
+          boxShadow: {
+            'neon-blue': '0 0 15px rgba(0, 240, 255, 0.15)',
+            'neon-purple': '0 0 15px rgba(157, 78, 221, 0.15)',
+            'neon-green': '0 0 15px rgba(0, 255, 102, 0.15)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #05070c;
+      color: #f8fafc;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #05070c;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e2640;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00f0ff;
+    }
+
+    /* Grid Overlay Animation */
+    .grid-bg {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(30, 38, 64, 0.15) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(30, 38, 64, 0.15) 1px, transparent 1px);
+    }
+
+    /* Neo Brutalist Glow */
+    .glowing-border {
+      position: relative;
+    }
+    .glowing-border::after {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      background: linear-gradient(90deg, #00f0ff, #9d4edd);
+      border-radius: inherit;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .glowing-border:hover::after {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body x-data="profileState()" class="grid-bg min-h-screen relative antialiased selection:bg-brand-accent selection:text-brand-black pb-28">
+
+  <!-- Background Decorative Light Orbs -->
+  <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-highlight/10 rounded-full blur-[150px] -z-10 pointer-events-none"></div>
+  <div class="absolute bottom-1/4 left-10 w-[400px] h-[400px] bg-brand-neonPurple/5 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
+
+  <!-- Main Layout -->
+  <div class="flex flex-col min-h-screen">
+    
+    <!-- Top Futuristic Navigation Bar -->
+    <header class="border-b border-brand-border/60 bg-brand-black/80 backdrop-blur-md sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+        <a href="index.html" class="flex items-center gap-3 group">
+          <div class="relative w-9 h-9 bg-brand-highlight rounded-lg flex items-center justify-center font-black text-brand-black overflow-hidden shadow-neon-blue">
+            <span class="z-10 text-white font-mono">CV</span>
+            <div class="absolute inset-0 bg-gradient-to-tr from-brand-accent to-brand-neonPurple opacity-80"></div>
+          </div>
+          <div>
+            <span class="font-mono text-xs text-brand-accent tracking-[0.2em] uppercase font-bold block group-hover:text-white transition-colors">← Back to Terminal</span>
+            <span class="font-black text-lg tracking-tight block">CAPITAL_VAULT</span>
+          </div>
+        </a>
+        
+        <!-- Comparison Counter Badge -->
+        <div class="flex items-center gap-4 font-mono text-xs">
+          <div class="hidden md:flex items-center gap-2 border-r border-brand-border/60 pr-6 text-slate-400">
+            <span class="w-2 h-2 rounded-full bg-brand-neonPurple animate-pulse"></span>
+            <span>DIAGNOSTIC COMPARISON ENGINE ACTIVE</span>
+          </div>
+          <button @click="showComparisonModal = true" class="flex items-center gap-2 bg-brand-neonPurple/10 border border-brand-neonPurple/40 px-3 py-1.5 rounded-xl hover:bg-brand-neonPurple/20 transition-all text-slate-200">
+            <span>Pool Counter:</span>
+            <span class="text-brand-neonPurple font-bold bg-brand-neonPurple/20 px-2 py-0.5 rounded" x-text="compareList.length">0</span>
+            <span>/ 3</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Lender Header & Profile Switcher Bar -->
+    <section class="max-w-7xl mx-auto px-6 pt-8 pb-4 w-full">
+      <div class="bg-brand-dark/40 border border-brand-border/40 rounded-3xl p-6 md:p-8 backdrop-blur-sm relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-brand-accent/30 bg-brand-accent/5 text-brand-accent text-xs font-mono mb-4">
+            <span class="w-1.5 h-1.5 rounded-full bg-brand-accent"></span>
+            <span>System Matrix Profile</span>
+          </div>
+          <h1 class="text-3xl md:text-5xl font-black tracking-tight" x-text="activeLender.Lender">Colony American Finance</h1>
+          <p class="text-slate-400 text-sm mt-2 max-w-xl font-mono">
+            SEC_REGISTRATION // <span class="text-slate-300" x-text="activeLender['Lender City & State']">Los Angeles, CA</span>
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- Add to comparison pool toggle -->
+          <button 
+            @click="toggleCompare(activeLender)"
+            :class="isInCompare(activeLender) ? 'bg-brand-neonPurple border-brand-neonPurple text-brand-black' : 'border-brand-border text-slate-300 hover:border-brand-accent'"
+            class="flex items-center gap-2 px-5 py-3 rounded-xl border font-mono text-xs font-bold transition-all uppercase shadow-md">
+            <span x-text="isInCompare(activeLender) ? '✕ DISENGAGE COMPARISON' : '✚ ADD TO COMPARE POOL'"></span>
+          </button>
+          
+          <!-- Next Profile Switcher -->
+          <div class="relative" x-data="{ open: false }" @click.away="open = false">
+            <button @click="open = !open" class="bg-brand-card border border-brand-border px-4 py-3 rounded-xl font-mono text-xs hover:border-brand-accent transition-all flex items-center gap-2">
+              <span>SWITCH SYSTEM PROFILE</span>
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+            <div x-show="open" class="absolute right-0 mt-2 w-64 bg-brand-card border border-brand-border rounded-xl shadow-2xl overflow-hidden z-20" style="display: none;">
+              <div class="p-2 border-b border-brand-border/60 bg-brand-black/40 text-[10px] font-mono text-slate-500 uppercase">Select Capital Node</div>
+              <div class="max-h-60 overflow-y-auto">
+                <template x-for="(lender, index) in lenders" :key="lender.Lender">
+                  <button 
+                    @click="setActiveLender(index); open = false;" 
+                    :class="index === activeLenderIndex ? 'text-brand-accent bg-brand-accent/5' : 'text-slate-300 hover:bg-brand-border/40'"
+                    class="w-full text-left px-4 py-2.5 text-xs font-mono transition-all truncate block border-b border-brand-border/20 last:border-none">
+                    <span x-text="lender.Lender"></span>
+                  </button>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Workspace Area -->
+    <div class="max-w-7xl mx-auto px-6 py-6 w-full flex-grow grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- Left Column: Core Metrics & Tabbed Parameter Breakdown (8 Columns) -->
+      <main class="lg:col-span-8 space-y-8">
+        
+        <!-- Parameter Microcards Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div class="bg-brand-card/40 border border-brand-border/60 rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden">
+            <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest block mb-2">Max LTV Ratio</span>
+            <span class="text-2xl font-black text-brand-accent font-mono" x-text="activeLender.LTV || '75%'">75%</span>
+            <div class="absolute -right-4 -bottom-4 w-12 h-12 bg-brand-accent/5 rounded-full blur-xl"></div>
+          </div>
+          <div class="bg-brand-card/40 border border-brand-border/60 rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden">
+            <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest block mb-2">Max LTC Ratio</span>
+            <span class="text-2xl font-black text-brand-neonPurple font-mono" x-text="activeLender.LTC || '85%'">85%</span>
+            <div class="absolute -right-4 -bottom-4 w-12 h-12 bg-brand-neonPurple/5 rounded-full blur-xl"></div>
+          </div>
+          <div class="bg-brand-card/40 border border-brand-border/60 rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden">
+            <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest block mb-2">Min Credit Score</span>
+            <span class="text-2xl font-black text-brand-neonGreen font-mono" x-text="activeLender.MinCreditScore || 'No Min'">600</span>
+            <div class="absolute -right-4 -bottom-4 w-12 h-12 bg-brand-neonGreen/5 rounded-full blur-xl"></div>
+          </div>
+          <div class="bg-brand-card/40 border border-brand-border/60 rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden">
+            <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest block mb-2">Lending Limits</span>
+            <span class="text-xs font-black text-slate-200 font-mono mt-2" x-text="`${activeLender.MinLoan || 'N/A'} - ${activeLender.MaxLoan || 'N/A'}`">$150K - $2.0M</span>
+          </div>
+        </div>
+
+        <!-- Dynamic Detailed Parameters Tabs -->
+        <div class="bg-brand-card/30 border border-brand-border/50 rounded-2xl p-6">
+          <div class="flex border-b border-brand-border/60 pb-3 mb-6 gap-6 overflow-x-auto">
+            <button 
+              @click="activeTab = 'parameters'" 
+              :class="activeTab === 'parameters' ? 'text-brand-accent border-b-2 border-brand-accent font-bold pb-3 -mb-[14px]' : 'text-slate-400 hover:text-white pb-3'"
+              class="font-mono text-xs uppercase tracking-widest transition-all whitespace-nowrap">
+              [01] Lending Parameters
+            </button>
+            <button 
+              @click="activeTab = 'underwriting'" 
+              :class="activeTab === 'underwriting' ? 'text-brand-accent border-b-2 border-brand-accent font-bold pb-3 -mb-[14px]' : 'text-slate-400 hover:text-white pb-3'"
+              class="font-mono text-xs uppercase tracking-widest transition-all whitespace-nowrap">
+              [02] Underwriting & Docs
+            </button>
+            <button 
+              @click="activeTab = 'geography'" 
+              :class="activeTab === 'geography' ? 'text-brand-accent border-b-2 border-brand-accent font-bold pb-3 -mb-[14px]' : 'text-slate-400 hover:text-white pb-3'"
+              class="font-mono text-xs uppercase tracking-widest transition-all whitespace-nowrap">
+              [03] Coverage & Scope
+            </button>
+          </div>
+
+          <!-- Parameters Panel -->
+          <div x-show="activeTab === 'parameters'" class="space-y-6">
+            <h3 class="text-lg font-bold flex items-center gap-2 text-white">
+              <span class="w-1.5 h-1.5 rounded-full bg-brand-accent"></span> Detailed Underwriting Terms
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="space-y-4">
+                <div class="p-4 bg-brand-black/40 border border-brand-border rounded-xl">
+                  <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest block mb-1">Interest Rates</span>
+                  <span class="text-sm font-bold text-slate-100" x-text="activeLender.InterestRates || '7.99% - 11.5%'">7.99% - 11.5%</span>
+                </div>
+                <div class="p-4 bg-brand-black/40 border border-brand-border rounded-xl">
+                  <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest block mb-1">Permissible Properties</span>
+                  <p class="text-sm font-bold text-slate-100 mt-1" x-text="activeLender['Property Types'] || 'N/A'"></p>
+                </div>
+              </div>
+              
+              <div class="space-y-4">
+                <div class="p-4 bg-brand-black/40 border border-brand-border rounded-xl">
+                  <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest block mb-1">Speed to Close</span>
+                  <span class="text-sm font-bold text-slate-100" x-text="activeLender.SpeedToClose || '5-7 business days'">5-7 days</span>
+                </div>
+                <div class="p-4 bg-brand-black/40 border border-brand-border rounded-xl">
+                  <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest block mb-1">Loan Types Offered</span>
+                  <p class="text-sm font-bold text-slate-100 mt-1" x-text="activeLender['Loan Types Offered'] || 'N/A'"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Underwriting Panel -->
+          <div x-show="activeTab === 'underwriting'" class="space-y-6">
+            <h3 class="text-lg font-bold flex items-center gap-2 text-white">
+              <span class="w-1.5 h-1.5 rounded-full bg-brand-neonPurple"></span> Documentation & Underwriting Framework
+            </h3>
+            
+            <div class="bg-brand-black/40 border border-brand-border/60 rounded-xl p-5 space-y-4">
+              <div>
+                <span class="text-[10px] font-mono text-slate-400 uppercase block mb-1">Primary Documentation Scope</span>
+                <p class="text-xs text-slate-200 leading-relaxed font-mono" x-text="activeLender.UnderwritingDocs || 'Asset statements, corporate organization entities, security appraisals, direct property valuations. No personal income verification required.'"></p>
+              </div>
+              <div class="border-t border-brand-border/40 pt-4">
+                <span class="text-[10px] font-mono text-slate-400 uppercase block mb-2">Approval Vector Parameters</span>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <div class="flex items-center gap-2 text-xs text-slate-300">
+                    <span class="w-1.5 h-1.5 rounded-full bg-brand-neonGreen"></span> No Tax Returns Required
+                  </div>
+                  <div class="flex items-center gap-2 text-xs text-slate-300">
+                    <span class="w-1.5 h-1.5 rounded-full bg-brand-neonGreen"></span> Entity Vesting Permitted
+                  </div>
+                  <div class="flex items-center gap-2 text-xs text-slate-300">
+                    <span class="w-1.5 h-1.5 rounded-full bg-brand-neonGreen"></span> Desktop Appraisals Accepted
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Geography Panel -->
+          <div x-show="activeTab === 'geography'" class="space-y-6">
+            <h3 class="text-lg font-bold flex items-center gap-2 text-white">
+              <span class="w-1.5 h-1.5 rounded-full bg-brand-highlight"></span> Dynamic State Coverage Map
+            </h3>
+            
+            <div class="bg-brand-black/40 border border-brand-border/60 rounded-xl p-6">
+              <div class="flex justify-between items-center mb-4">
+                <span class="text-xs font-mono text-slate-400 uppercase">National Licensing Vector</span>
+                <span class="text-xs font-mono text-brand-accent" x-text="`Core Territory: ${activeLender.State}`">Core Territory</span>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed mb-4">
+                This capital node covers developers within the states displayed below. Connections are automatically dynamically routed.
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <template x-for="state in (activeLender.StatesServiced || [activeLender.State])" :key="state">
+                  <span class="px-3 py-1 bg-brand-highlight/10 border border-brand-highlight/30 text-brand-accent text-xs font-mono rounded-lg" x-text="state"></span>
+                </template>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- System Narrative Overview -->
+        <div class="bg-brand-card/20 border border-brand-border/40 rounded-2xl p-6">
+          <h4 class="text-xs font-mono text-slate-400 uppercase tracking-widest mb-3">Institutional Overview</h4>
+          <p class="text-sm text-slate-300 leading-relaxed" x-text="activeLender['About the Lender']"></p>
+        </div>
+
+      </main>
+
+      <!-- Right Column: Institutional Contact Channels & Compare Checklist (4 Columns) -->
+      <aside class="lg:col-span-4 space-y-6">
+        
+        <!-- Action Box -->
+        <div class="bg-gradient-to-br from-brand-highlight/10 to-brand-neonPurple/5 border border-brand-border/60 rounded-2xl p-6 shadow-neon-blue relative overflow-hidden">
+          <div class="absolute -right-12 -bottom-12 w-28 h-28 bg-brand-accent/10 rounded-full blur-2xl"></div>
+          
+          <h4 class="font-mono text-xs uppercase tracking-widest text-brand-accent font-bold mb-4">System Routing Panel</h4>
+          
+          <div class="space-y-4 mb-6">
+            <div class="border-b border-brand-border/40 pb-3">
+              <span class="text-[10px] font-mono text-slate-400 uppercase">Principal Phone</span>
+              <p class="text-sm font-bold text-slate-200 mt-1" x-text="activeLender['Lender Phone'] || 'N/A'"></p>
+            </div>
+            <div class="border-b border-brand-border/40 pb-3">
+              <span class="text-[10px] font-mono text-slate-400 uppercase">Postal Headquarters</span>
+              <p class="text-xs font-bold text-slate-200 mt-1 font-mono" x-text="activeLender['Lender Street Address'] || 'N/A'"></p>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <template x-if="activeLender['Lender Website']">
+              <a :href="activeLender['Lender Website']" target="_blank" class="block w-full text-center bg-brand-accent text-brand-black hover:bg-brand-accent/90 transition-all font-mono text-xs font-bold uppercase py-4 rounded-xl shadow-lg">
+                ACTIVATE ROUTING LINK
+              </a>
+            </template>
+            <button @click="triggerAllocationRequest()" class="w-full text-center border border-brand-border hover:border-brand-neonPurple hover:text-brand-neonPurple transition-all font-mono text-xs py-3 rounded-xl block bg-brand-black/30">
+              REQUEST TERM SHEET LOCK
+            </button>
+          </div>
+        </div>
+
+        <!-- Rapid Comparison Side Module -->
+        <div class="bg-brand-card/30 border border-brand-border/50 rounded-2xl p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h4 class="font-bold text-xs uppercase font-mono tracking-widest text-slate-300">Diagnostics Pool</h4>
+            <button @click="clearComparison()" class="text-[10px] font-mono text-brand-neonPurple hover:underline" x-show="compareList.length > 0">Clear</button>
+          </div>
+          
+          <p class="text-xs text-slate-400 leading-relaxed mb-4">
+            Evaluate metrics side-by-side. Add this or other profile records below to instantly run diagnostics comparisons.
+          </p>
+
+          <div class="space-y-3 mb-4">
+            <template x-for="item in compareList" :key="item.Lender">
+              <div class="flex items-center justify-between bg-brand-black/60 border border-brand-border p-3 rounded-xl">
+                <span class="text-xs font-mono font-bold truncate max-w-[150px] text-white" x-text="item.Lender"></span>
+                <button @click="toggleCompare(item)" class="text-[10px] font-mono text-brand-neonPurple hover:text-white px-2 py-1">✕ Remove</button>
+              </div>
+            </template>
+            <template x-if="compareList.length === 0">
+              <div class="border border-dashed border-brand-border p-4 text-center text-xs text-slate-500 font-mono rounded-xl">
+                Pool Empty. Use "Add to Compare" actions.
+              </div>
+            </template>
+          </div>
+
+          <button 
+            @click="showComparisonModal = true" 
+            :disabled="compareList.length === 0"
+            :class="compareList.length > 0 ? 'bg-brand-neonPurple/20 border-brand-neonPurple/50 text-brand-neonPurple hover:bg-brand-neonPurple/30' : 'opacity-40 cursor-not-allowed border-brand-border text-slate-500'"
+            class="w-full text-center border font-mono text-xs py-3 rounded-xl transition-all">
+            RUN COMPARISON MATRIX →
+          </button>
+        </div>
+
+      </aside>
+
+    </div>
+
+    <!-- Capital Vault Dynamic Footer -->
+    <footer class="border-t border-brand-border/60 bg-brand-black py-12 mt-auto">
+      <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-brand-border rounded-lg flex items-center justify-center font-bold text-slate-300">C</div>
+          <div>
+            <span class="font-mono text-xs text-brand-accent tracking-widest uppercase font-bold block">CAPITAL_VAULT</span>
+            <span class="text-xs text-slate-400">900+ Records Structured Securely</span>
+          </div>
+        </div>
+        <p class="text-xs text-slate-500 font-mono text-center md:text-right">
+          VAULT SYSTEM SECURED // NO INSTITUTIONAL ENDORSEMENT REPRESENTED.
+        </p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Dynamic Bottom Floating Comparison Drawer bar (sticky at bottom screen) -->
+  <div 
+    x-show="compareList.length > 0" 
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0 translate-y-20"
+    x-transition:enter-end="opacity-100 translate-y-0"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100 translate-y-0"
+    x-transition:leave-end="opacity-0 translate-y-20"
+    class="fixed bottom-0 left-0 right-0 bg-brand-black/90 border-t border-brand-accent/40 backdrop-blur-md py-4 px-6 z-40 shadow-neon-blue"
+    style="display: none;">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <div class="w-3 h-3 rounded-full bg-brand-accent animate-ping hidden sm:block"></div>
+        <div>
+          <span class="font-mono text-xs text-brand-accent block uppercase">Matrix Diagnostic Queue</span>
+          <span class="text-xs text-slate-300 font-bold" x-text="`${compareList.length} of 3 profiles staged for direct structural comparison`"></span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 w-full sm:w-auto">
+        <button @click="clearComparison()" class="text-xs font-mono text-slate-400 hover:text-white px-3 py-2">Clear Pool</button>
+        <button 
+          @click="showComparisonModal = true"
+          class="flex-grow sm:flex-grow-0 bg-brand-accent text-brand-black hover:bg-brand-accent/90 px-6 py-2.5 rounded-xl font-mono text-xs font-bold uppercase transition-all shadow-neon-blue">
+          DEPLOY DIAGNOSTIC COMPARE
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full-Screen Comparison Matrix Modal Overlay -->
+  <div 
+    x-show="showComparisonModal" 
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100"
+    x-transition:leave-end="opacity-0"
+    class="fixed inset-0 bg-brand-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4"
+    style="display: none;"
+    @keydown.window.escape="showComparisonModal = false">
+    
+    <div class="bg-brand-dark border border-brand-accent/40 rounded-3xl w-full max-w-5xl h-[85vh] flex flex-col justify-between shadow-2xl relative">
+      
+      <!-- Top header bar in comparison matrix -->
+      <div class="p-6 border-b border-brand-border/60 flex items-center justify-between">
+        <div>
+          <span class="text-xs font-mono text-brand-accent uppercase tracking-widest">[SYS_DIAG_MATRIX]</span>
+          <h2 class="text-xl md:text-2xl font-black text-white mt-1">Lender Underwriting Compare Tool</h2>
+        </div>
+        <button @click="showComparisonModal = false" class="w-10 h-10 border border-brand-border rounded-full flex items-center justify-center hover:border-brand-accent transition-all text-slate-400 hover:text-white">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <!-- Scrollable Comparison Structure Matrix Content -->
+      <div class="p-6 md:p-8 overflow-y-auto flex-grow space-y-8">
+        
+        <!-- If comparison pool is empty -->
+        <template x-if="compareList.length === 0">
+          <div class="text-center py-16 space-y-4">
+            <svg class="w-16 h-16 text-brand-border mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            <h3 class="text-lg font-bold">No Records Staged</h3>
+            <p class="text-xs text-slate-400 max-w-sm mx-auto">Please add profile records using the "Add to Compare" actions to run side-by-side structures.</p>
+          </div>
+        </template>
+
+        <!-- If compareList contains items -->
+        <template x-if="compareList.length > 0">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left font-mono text-xs border-collapse">
+              <thead>
+                <tr class="border-b border-brand-border/60">
+                  <th class="p-4 text-slate-400 tracking-wider text-[10px] w-1/4 uppercase">Diagnostic Metric</th>
+                  <template x-for="item in compareList" :key="item.Lender">
+                    <th class="p-4 w-1/4">
+                      <div class="text-brand-accent text-sm font-black font-sans" x-text="item.Lender"></div>
+                      <div class="text-[9px] text-slate-400 mt-1" x-text="item['Lender City & State']"></div>
+                    </th>
+                  </template>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-brand-border/30">
+                <tr>
+                  <td class="p-4 font-bold text-slate-300">MAX LTV RATIO</td>
+                  <template x-for="item in compareList" :key="item.Lender">
+                    <td class="p-4 text-sm font-bold text-brand-neonGreen" x-text="item.LTV || '75%'"></td>
+                  </template>
+                </tr>
+                <tr>
+                  <td class="p-4 font-bold text-slate-300">MAX LTC RATIO</td>
+                  <template x-for="item in compareList" :key="item.Lender">
+                    <td class="p-4 text-sm font-bold text-brand-neonPurple" x-text="item.LTC || '85%'"></td>
+                  </template>
+                </tr>
+                <tr>
+                  <td class="p-4 font-bold text-slate-300">MIN CREDIT SCORE</td>
+                  <template x-for="item in compareList" :key="item.Lender">
+                    <td class="p-4 text-sm font-bold text-slate-200" x-text="item.MinCreditScore || 'No Min'"></td>
+                  </template>
+                </tr>
+                <tr>
+                  <td class="p-4 font-bold text-slate-300">INTEREST RATES</td>
+                  <template x-for="item in compareList" :key="item.Lender">
+                    <td class="p-4 text-slate-200" x-text="item.InterestRates || '7.99% - 11.5%'"></td>
+                  </template>
+                </tr>
+                <tr>
+                  <td class="p-4 font-bold text-slate-300">LENDING LIMITS</td>
+                  <template x-for="item in compareList" :key="item.Lender">
+                    <td class="p-4 text-slate-200" x-text="`${item.MinLoan || 'N/A'} - ${item.MaxLoan || 'N/A'}`"></td>
+                  </template>
+                </tr>
+                <tr>
+                  <td class="p-4 font-bold text-slate-300">SPEED TO CLOSE</td>
+                  <template x-for="item in compareList" :key="item.Lender">
+                    <td class="p-4 text-slate-200" x-text="item.SpeedToClose || '5-7 days'"></td>
+                  </template>
+                </tr>
+                <tr>
+                  <td class="p-4 font-bold text-slate-300">PROPERTY CLASSES</td>
+                  <template x-for="item in compareList" :key="item.Lender">
+                    <td class="p-4 text-slate-400 font-sans text-[11px] leading-relaxed" x-text="item['Property Types'] || 'N/A'"></td>
+                  </template>
+                </tr>
+                <tr>
+                  <td class="p-4 font-bold text-slate-300">LOAN TYPES</td>
+                  <template x-for="item in compareList" :key="item.Lender">
+                    <td class="p-4 text-slate-400 font-sans text-[11px] leading-relaxed" x-text="item['Loan Types Offered'] || 'N/A'"></td>
+                  </template>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </template>
+
+      </div>
+
+      <!-- Action panel inside the comparison modal -->
+      <div class="p-6 border-t border-brand-border/60 flex flex-col sm:flex-row items-center justify-between gap-4 bg-brand-black/40">
+        <span class="text-xs font-mono text-slate-400">Diag Metrics dynamically generated off active state vectors.</span>
+        <div class="flex gap-3">
+          <button @click="showComparisonModal = false" class="px-5 py-2.5 border border-brand-border rounded-xl font-mono text-xs text-slate-300 hover:text-white transition-all">
+            EXIT DIAGNOSTIC
+          </button>
+          <button @click="clearComparison(); showComparisonModal = false;" class="px-5 py-2.5 bg-brand-neonPurple/20 text-brand-neonPurple rounded-xl font-mono text-xs transition-all hover:bg-brand-neonPurple/30">
+            RESET COMPARISONS
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Real-time Toast Notifications -->
+  <div x-data="toastState()" @toast-notify.window="showToast($event.detail)" class="fixed bottom-24 left-6 z-50 space-y-3 pointer-events-none">
+    <template x-for="toast in toasts" :key="toast.id">
+      <div 
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 translate-y-2"
+        x-transition:enter-end="opacity-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        class="bg-brand-card border border-brand-border/80 rounded-xl p-4 shadow-2xl flex items-center gap-3 max-w-sm pointer-events-auto">
+        <div class="w-2 h-2 rounded-full bg-brand-neonGreen animate-pulse"></div>
+        <span class="text-xs font-mono text-slate-200" x-text="toast.message"></span>
+      </div>
+    </template>
+  </div>
+
+  <script>
+    function profileState() {
+      return {
+        lenders: [
+          {
+            "Lender": "Colony American Finance",
+            "About the Lender": "Colony American Finance is a private money lender in Los Angeles, CA providing funding all across the country. They provide loans for single family and multi-family units with terms up to 10 years and max LTV of 75%.",
+            "City": "Anchorage",
+            "Lender City & State": "Los Angeles, CA 90071",
+            "Lender Phone": "(844) 223-2231",
+            "Lender Street Address": "515 South Flower Street, 44th Floor",
+            "Lender Website": "https://www.colonyamericanfinance.com",
+            "Lending Location": "National",
+            "Loan Types Offered": "Investment Property Loans, Refinance / Cash Out Loans",
+            "Property Types": "Multi Family, Single Family",
+            "State": "Alaska",
+            "LTV": "75%",
+            "LTC": "85%",
+            "MinCreditScore": "620",
+            "MinLoan": "$150,000",
+            "MaxLoan": "$2,000,000",
+            "InterestRates": "7.99% - 11.5%",
+            "SpeedToClose": "5-7 days",
+            "UnderwritingDocs": "Liquid assets summary, Corporate formation records, Property appraisal statement. No personal income verify required.",
+            "StatesServiced": ["AK", "CA", "TX", "FL", "NY"]
+          },
+          {
+            "Lender": "Asset Avenue",
+            "About the Lender": "Asset Avenue is private money lender based in Los Angeles, CA. They provide loans in 44 states across the United States. Loan amounts ranging from $150,000 to $2,000,000 with a maximum LTV of 85%.",
+            "City": "Birmingham",
+            "Lender City & State": "Los Angeles, CA 90024",
+            "Lender Phone": "(310) 905-3050",
+            "Lender Street Address": "1100 Glendon Ave, 18th Floor",
+            "Lender Website": "https://www.assetavenue.com/",
+            "Lending Location": "AL, AR, CA, CO, CT, FL, GA",
+            "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans",
+            "Property Types": "Multi Family, Single Family",
+            "State": "Alabama",
+            "LTV": "85%",
+            "LTC": "90%",
+            "MinCreditScore": "600",
+            "MinLoan": "$150,000",
+            "MaxLoan": "$2,500,000",
+            "InterestRates": "8.50% - 12.0%",
+            "SpeedToClose": "7-10 days",
+            "UnderwritingDocs": "Full track record logs, standard down payment source details, asset assessment report.",
+            "StatesServiced": ["AL", "AR", "CA", "CO", "CT", "FL", "GA"]
+          },
+          {
+            "Lender": "Jason Wheeler",
+            "About the Lender": "Jason Wheeler is a Pleasant Hill, CA based private money lender. They offer lending solutions for rental properties and cash out hard money loans up to $3,000,000 with 70% max LTV.",
+            "City": "San Jose",
+            "Lender City & State": "Pleasant Hill, CA 94523",
+            "Lender Phone": "(925) 285-0777",
+            "Lender Street Address": "25 Crescent Drive A #513",
+            "Lender Website": "http://www.jasonwheeler.biz",
+            "Lending Location": "CA",
+            "Loan Types Offered": "Investment Property Loans, Refinance / Cash Out Loans",
+            "Property Types": "Multi Family, Single Family",
+            "State": "California",
+            "LTV": "70%",
+            "LTC": "80%",
+            "MinCreditScore": "No Minimum",
+            "MinLoan": "$100,000",
+            "MaxLoan": "$3,000,000",
+            "InterestRates": "7.50% - 10.5%",
+            "SpeedToClose": "5 business days",
+            "UnderwritingDocs": "Asset equity-focused review. Standard identification and title property documentation required.",
+            "StatesServiced": ["CA", "NV", "OR", "WA"]
+          },
+          {
+            "Lender": "Source Capital",
+            "About the Lender": "Source Capital is an asset-based lender offering loans in California, Arizona, and Minnesota. Max LTV of 70% and rates starting at 7.99% for office, retail, residential, and mixed use.",
+            "City": "Phoenix",
+            "Lender City & State": "Los Angeles, CA 90071",
+            "Lender Phone": "(323) 352-9292",
+            "Lender Street Address": "445 S. Figueroa Street, Suite 3199",
+            "Lender Website": "http://www.hardmoneyfirst.com",
+            "Lending Location": "CA, AZ, MN",
+            "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans",
+            "Property Types": "Apartment, Industrial, Mixed Use, Multi Family, Office, Retail, Single Family",
+            "State": "Arizona",
+            "LTV": "70%",
+            "LTC": "75%",
+            "MinCreditScore": "580",
+            "MinLoan": "$250,000",
+            "MaxLoan": "$5,000,000",
+            "InterestRates": "7.99% - 11.0%",
+            "SpeedToClose": "4-6 days",
+            "UnderwritingDocs": "Security collateral structure details, project summary layout, property insurance file.",
+            "StatesServiced": ["CA", "AZ", "MN", "TX"]
+          },
+          {
+            "Lender": "CIVIC Private Money Lending",
+            "About the Lender": "CIVIC Private Money Lending is a Redondo Beach, CA based hard money lender offering funding in 10 states throughout the country with terms up to 48 months and max LTV of 80%.",
+            "City": "Mesa",
+            "Lender City & State": "Redondo Beach, CA 90278",
+            "Lender Phone": "(877) 589-7533",
+            "Lender Street Address": "2015 Manhattan Beach Blvd",
+            "Lender Website": "http://www.civicfs.com/",
+            "Lending Location": "AZ, CA, CO, FL, GA, NV, OR, TX, WA",
+            "Loan Types Offered": "Bridge Loans, Fix and Flip Loans, Investment Property Loans",
+            "Property Types": "Multi Family, Single Family",
+            "State": "Arizona",
+            "LTV": "80%",
+            "LTC": "85%",
+            "MinCreditScore": "600",
+            "MinLoan": "$200,000",
+            "MaxLoan": "$4,500,000",
+            "InterestRates": "8.25% - 11.9%",
+            "SpeedToClose": "5-8 business days",
+            "UnderwritingDocs": "LLC business structure documentation, liquid balance updates, title protection papers.",
+            "StatesServiced": ["AZ", "CA", "CO", "FL", "GA", "NV", "OR", "TX", "WA"]
+          }
+        ],
+        
+        activeLenderIndex: 0,
+        compareList: [],
+        showComparisonModal: false,
+        activeTab: 'parameters',
+        
+        get activeLender() {
+          return this.lenders[this.activeLenderIndex];
+        },
+        
+        setActiveLender(index) {
+          this.activeLenderIndex = index;
+          this.activeTab = 'parameters';
+          this.showToast(`Switched active profile context to ${this.lenders[index].Lender}`);
+        },
+        
+        toggleCompare(lender) {
+          const index = this.compareList.findIndex(item => item.Lender === lender.Lender);
+          if (index > -1) {
+            this.compareList.splice(index, 1);
+            this.showToast(`Removed ${lender.Lender} from compare metrics.`);
+          } else {
+            if (this.compareList.length >= 3) {
+              this.showToast("Diagnostic queue capacity reached (Max 3 lenders).");
+              return;
+            }
+            this.compareList.push(lender);
+            this.showToast(`Staged ${lender.Lender} into compare matrices.`);
+          }
+        },
+        
+        isInCompare(lender) {
+          return this.compareList.some(item => item.Lender === lender.Lender);
+        },
+        
+        clearComparison() {
+          this.compareList = [];
+          this.showToast("Staged comparison vectors cleared.");
+        },
+
+        triggerAllocationRequest() {
+          window.dispatchEvent(new CustomEvent('toast-notify', {
+            detail: `SECURE LINK: Routing term sheets request pathway for ${this.activeLender.Lender}.`
+          }));
+        },
+
+        showToast(message) {
+          window.dispatchEvent(new CustomEvent('toast-notify', {
+            detail: message
+          }));
+        }
+      }
+    }
+
+    function toastState() {
+      return {
+        toasts: [],
+        showToast(message) {
+          const id = Date.now();
+          this.toasts.push({ id, message });
+          setTimeout(() => {
+            this.toasts = this.toasts.filter(t => t.id !== id);
+          }, 3500);
+        }
+      }
+    }
+  </script>
+</body>
+</html>
+```

@@ -1,0 +1,220 @@
+{
+  "_meta": {
+    "engine_version": "0.2.3-operational-routing-draft",
+    "source_version": "0.2.2 provider/product verification draft",
+    "source_files": [
+      "providers.json",
+      "products.json",
+      "verification_report.md",
+      "unresolved_conflicts_report.csv",
+      "high_priority_missing_data_report.csv"
+    ],
+    "generated_date": "2026-05-20",
+    "file_name": "partner_fit_scoring.json",
+    "purpose": "Executable scoring model for product/provider match ranking, confidence adjustment, manual review, and recommendation output.",
+    "logic_precedence": [
+      "product_rules",
+      "provider_defaults",
+      "funding_family_defaults",
+      "global_fallback_logic"
+    ],
+    "status": "draft_for_operational_testing_not_final_underwriting_policy"
+  },
+  "schema": [
+    "component_id",
+    "component_name",
+    "max_points",
+    "calculation",
+    "required_inputs",
+    "override_notes",
+    "manual_review_triggers"
+  ],
+  "records": [
+    {
+      "component_id": "hard_exclusion_gate",
+      "component_name": "Hard Exclusion Gate",
+      "max_points": 0,
+      "calculation": "Before scoring, exclude product if active_status != active, explicit exclusion flag is true, geography not served, industry restricted, product disqualifier directly conflicts, or borrower fails a non-waivable product-level minimum.",
+      "required_inputs": [
+        "product.active_status",
+        "product.disqualifier_ids",
+        "borrower.geography",
+        "borrower.industry",
+        "borrower.risk_flags"
+      ],
+      "override_notes": "Product-level exclusions override provider/family/global logic.",
+      "manual_review_triggers": [
+        "conflicting product criteria",
+        "unknown geography",
+        "unknown industry restriction"
+      ]
+    },
+    {
+      "component_id": "eligibility_fit",
+      "component_name": "Eligibility Fit",
+      "max_points": 100,
+      "calculation": "Credit pass 30, revenue pass 30, TIB pass 20, geography pass 10, entity/sole-prop/startup pass 10. Hard required rules can force score to 0.",
+      "required_inputs": [
+        "borrower.credit_score",
+        "borrower.monthly_revenue",
+        "borrower.time_in_business_months",
+        "borrower.state",
+        "borrower.business_structure",
+        "product.qualification"
+      ],
+      "override_notes": "Use product qualification first; if null use provider_defaults; if null use family_defaults.",
+      "manual_review_triggers": [
+        "borrower within 10% of min threshold",
+        "missing credit/revenue/TIB"
+      ]
+    },
+    {
+      "component_id": "fundability_fit",
+      "component_name": "Fundability Fit",
+      "max_points": 100,
+      "calculation": "Use fundability_score plus product-specific compensators. Revenue-first products give extra credit for bankability; credit-first products give extra credit for credit readiness; asset-first gives extra credit for collateral/docs.",
+      "required_inputs": [
+        "fundability_score",
+        "bankability_score",
+        "credit_readiness_score",
+        "collateral_docs",
+        "family_id"
+      ],
+      "override_notes": "Family appetite changes weight within fundability; not a hard qualification pass.",
+      "manual_review_triggers": [
+        "fundability 45-60",
+        "critical risk flags"
+      ]
+    },
+    {
+      "component_id": "use_case_fit",
+      "component_name": "Use-Case Fit",
+      "max_points": 100,
+      "calculation": "100 direct product/family match, 75 adjacent use case, 50 unclear but plausible, 25 weak, 0 incompatible.",
+      "required_inputs": [
+        "borrower.funding_purpose",
+        "product.use_case_ids",
+        "product.funding_family_id",
+        "family_defaults.primary_use_cases"
+      ],
+      "override_notes": "If product use_case_ids are populated, use them before family defaults.",
+      "manual_review_triggers": [
+        "not_sure funding purpose",
+        "multiple competing use cases"
+      ]
+    },
+    {
+      "component_id": "risk_fit",
+      "component_name": "Risk Fit",
+      "max_points": 100,
+      "calculation": "Start 100; subtract risk flag penalties. Critical conflict can force exclusion. High conflicts require manual review. Product-specific tolerances can reduce penalty only if source-backed.",
+      "required_inputs": [
+        "borrower.risk_flags",
+        "risk_flags.json",
+        "product.disqualifier_ids",
+        "provider.disqualifiers_raw"
+      ],
+      "override_notes": "Never waive a disqualifier unless product/provider record explicitly supports the exception.",
+      "manual_review_triggers": [
+        "any high or critical risk",
+        "conflicting source evidence"
+      ]
+    },
+    {
+      "component_id": "documentation_fit",
+      "component_name": "Documentation Fit",
+      "max_points": 100,
+      "calculation": "100 if borrower has required product docs; 75 if major docs ready; 50 if bank statements only; 25 minimal docs; 0 required docs unavailable.",
+      "required_inputs": [
+        "borrower.docs_available",
+        "product.documents_required",
+        "family_defaults.documentation_burden"
+      ],
+      "override_notes": "Product docs override family-level document assumptions.",
+      "manual_review_triggers": [
+        "real estate docs missing",
+        "SBA docs missing",
+        "platform API unavailable"
+      ]
+    },
+    {
+      "component_id": "speed_fit",
+      "component_name": "Speed Fit",
+      "max_points": 100,
+      "calculation": "If urgency high: instant/24h=100, 1-3d=90, 3-10d=70, 2-4w=40, 1-3m=15. If urgency low, speed contributes less and does not penalize slower products heavily.",
+      "required_inputs": [
+        "borrower.urgency",
+        "product.terms.time_to_funding_band"
+      ],
+      "override_notes": "Do not over-rank fast expensive products when urgency is low.",
+      "manual_review_triggers": [
+        "borrower asks for same-day but only structured products fit"
+      ]
+    },
+    {
+      "component_id": "geography_fit",
+      "component_name": "Geography Fit",
+      "max_points": 100,
+      "calculation": "100 if state/country explicitly served; 70 if national/US assumed from source; 40 unknown; 0 not served.",
+      "required_inputs": [
+        "borrower.state",
+        "provider.geographic_coverage",
+        "product.geography_overrides"
+      ],
+      "override_notes": "Product geography overrides provider geography.",
+      "manual_review_triggers": [
+        "geography unknown",
+        "Canada/international routing"
+      ]
+    },
+    {
+      "component_id": "relationship_priority",
+      "component_name": "Relationship Priority",
+      "max_points": 100,
+      "calculation": "Use provider operational referral_priority / affiliate_status / monetization weight. Default 50 when unknown. Never outrank eligibility or risk.",
+      "required_inputs": [
+        "provider.operational.affiliate_status",
+        "provider.operational.referral_priority",
+        "provider.recommendation_weights"
+      ],
+      "override_notes": "Relationship priority is a tie-breaker, not an eligibility lever.",
+      "manual_review_triggers": [
+        "affiliate status missing for otherwise strong match"
+      ]
+    },
+    {
+      "component_id": "confidence_adjustment",
+      "component_name": "Confidence Adjustment",
+      "max_points": 100,
+      "calculation": "Apply confidence multiplier after weighted score: borrower data confidence + product verification status + source confidence + conflict status.",
+      "required_inputs": [
+        "data_confidence_score",
+        "product.verification_status",
+        "product.source_confidence",
+        "provider.verification_status"
+      ],
+      "override_notes": "A verified product receives slight bonus; conflicting criteria receive meaningful penalty and manual review.",
+      "manual_review_triggers": [
+        "confidence below 60",
+        "product verification_status conflicting"
+      ]
+    },
+    {
+      "component_id": "final_rank_score",
+      "component_name": "Final Rank Score",
+      "max_points": 100,
+      "calculation": "weighted_score = \u03a3(component_score * weight); adjusted_score = weighted_score * confidence_multiplier + verification_bonus_penalty; sort descending; suppress excluded products; show top 3 plus fallback/prep route.",
+      "required_inputs": [
+        "recommendation_weights.json",
+        "component_scores",
+        "confidence_adjustment"
+      ],
+      "override_notes": "Use family-specific weights when applicable; otherwise global weights.",
+      "manual_review_triggers": [
+        "top score below 55",
+        "top results conflict by family",
+        "no product clears hard gate"
+      ]
+    }
+  ]
+}

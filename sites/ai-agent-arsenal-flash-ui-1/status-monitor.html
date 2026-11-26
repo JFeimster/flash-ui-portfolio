@@ -1,0 +1,1466 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Operator Performance Matrix // AI Agent Arsenal</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Space+Grotesk:wght@400;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* Neo-Brutalist & Cyberpunk Global Variables */
+    :root {
+      --deep-black: #050505;
+      --carbon-black: #0A0B0F;
+      --graphite: #171821;
+      --off-white: #F4F1E8;
+      
+      /* Primary Accents */
+      --cyan: #00E5FF;
+      --acid-green: #B6FF00;
+      --magenta: #FF2BD6;
+      --orange: #FF7A00;
+      --yellow: #FFE600;
+      --red: #FF1744;
+      --blue: #245BFF;
+
+      /* Shadows */
+      --neo-shadow-cyan: 5px 5px 0px var(--cyan);
+      --neo-shadow-green: 5px 5px 0px var(--acid-green);
+      --neo-shadow-magenta: 5px 5px 0px var(--magenta);
+      --neo-shadow-orange: 5px 5px 0px var(--orange);
+      --neo-shadow-yellow: 7px 7px 0px var(--yellow);
+      --neo-shadow-white: 5px 5px 0px var(--off-white);
+      --neo-shadow-black: 6px 6px 0px rgba(0,0,0,1);
+    }
+
+    /* Reset & Base */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    ::selection {
+      background-color: var(--magenta);
+      color: var(--off-white);
+    }
+
+    ::-webkit-scrollbar {
+      width: 12px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--carbon-black);
+      border-left: 3px solid var(--graphite);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--graphite);
+      border: 3px solid var(--carbon-black);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--magenta);
+    }
+
+    body {
+      background-color: var(--deep-black);
+      color: var(--off-white);
+      font-family: 'Space Grotesk', -apple-system, sans-serif;
+      overflow-x: hidden;
+      background-image: 
+        linear-gradient(rgba(23, 24, 33, 0.4) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(23, 24, 33, 0.4) 1px, transparent 1px);
+      background-size: 30px 30px;
+      background-position: center;
+    }
+
+    /* Utilities */
+    .mono {
+      font-family: 'Share Tech Mono', monospace;
+      text-transform: uppercase;
+    }
+
+    .glow-cyan { text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
+    .glow-green { text-shadow: 0 0 10px rgba(182, 255, 0, 0.5); }
+    .glow-magenta { text-shadow: 0 0 10px rgba(255, 43, 214, 0.5); }
+    .glow-yellow { text-shadow: 0 0 10px rgba(255, 230, 0, 0.5); }
+    .glow-red { text-shadow: 0 0 10px rgba(255, 23, 68, 0.6); }
+
+    /* Top Navigation Bar */
+    .terminal-nav {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: var(--carbon-black);
+      border-bottom: 4px solid var(--off-white);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .brand-logo {
+      background: var(--magenta);
+      color: var(--off-white);
+      font-weight: 800;
+      padding: 0.5rem 1rem;
+      border: 2px solid var(--deep-black);
+      box-shadow: 3px 3px 0px var(--off-white);
+      font-size: 1.2rem;
+      text-transform: uppercase;
+      letter-spacing: -1px;
+    }
+
+    .brand-meta {
+      font-size: 0.8rem;
+      color: #888;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .nav-link {
+      color: var(--off-white);
+      text-decoration: none;
+      font-weight: 700;
+      padding: 0.5rem 0.8rem;
+      border: 2px solid transparent;
+      transition: all 0.15s ease;
+    }
+
+    .nav-link:hover {
+      border: 2px solid var(--magenta);
+      background: var(--graphite);
+      color: var(--magenta);
+    }
+
+    .nav-cta {
+      background: var(--cyan);
+      color: var(--deep-black);
+      font-weight: 800;
+      padding: 0.6rem 1.2rem;
+      border: 2px solid var(--off-white);
+      box-shadow: 4px 4px 0px var(--magenta);
+      text-decoration: none;
+      transition: all 0.1s ease;
+    }
+
+    .nav-cta:hover {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0px var(--magenta);
+    }
+
+    /* Main Container Grid */
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Section Headers */
+    .section-header {
+      border-left: 8px solid var(--accent, var(--magenta));
+      padding-left: 1.5rem;
+      margin-top: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .section-eyebrow {
+      color: var(--accent, var(--magenta));
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      line-height: 0.95;
+      letter-spacing: -1.5px;
+    }
+
+    .section-subtitle {
+      font-size: 1.2rem;
+      color: #bbb;
+      max-width: 850px;
+      margin-top: 0.75rem;
+    }
+
+    /* System Status Jumbotron */
+    .jumbotron-status {
+      background: var(--carbon-black);
+      border: 4px solid var(--off-white);
+      padding: 2.5rem;
+      box-shadow: var(--neo-shadow-cyan);
+      margin-bottom: 2.5rem;
+      position: relative;
+    }
+
+    .corner-tag {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: var(--cyan);
+      color: var(--deep-black);
+      font-weight: bold;
+      padding: 0.25rem 1rem;
+      font-size: 0.75rem;
+      border-bottom: 3px solid var(--off-white);
+      border-left: 3px solid var(--off-white);
+    }
+
+    .jumbo-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    @media (max-width: 1024px) {
+      .jumbo-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+    }
+
+    .metric-big-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--cyan);
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .metric-big-value {
+      font-size: 4rem;
+      font-weight: 900;
+      line-height: 1;
+      font-family: 'Share Tech Mono', monospace;
+      color: var(--off-white);
+    }
+
+    .system-bar-wrap {
+      background: var(--graphite);
+      border: 2px solid var(--off-white);
+      height: 25px;
+      margin-top: 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .system-bar-fill {
+      height: 100%;
+      background: var(--acid-green);
+      width: 92%;
+      transition: width 0.5s cubic-bezier(0.1, 0.8, 0.2, 1);
+    }
+
+    .system-bar-text {
+      position: absolute;
+      top: 50%;
+      left: 10px;
+      transform: translateY(-50%);
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--deep-black);
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    /* Core Diagnostic Split Layout */
+    .diagnostic-split {
+      display: grid;
+      grid-template-columns: 1.3fr 0.7fr;
+      gap: 2rem;
+      margin-bottom: 2.5rem;
+    }
+
+    @media (max-width: 1100px) {
+      .diagnostic-split {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Left Side: Agent Terminal Grid */
+    .agent-matrix-container {
+      background: var(--carbon-black);
+      border: 4px solid var(--off-white);
+      box-shadow: var(--neo-shadow-black);
+      padding: 2rem;
+    }
+
+    .block-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid var(--off-white);
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .block-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .matrix-control-bar {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .control-btn {
+      background: var(--graphite);
+      color: var(--off-white);
+      border: 2px solid var(--off-white);
+      padding: 0.5rem 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.1s ease;
+    }
+
+    .control-btn:hover {
+      background: var(--off-white);
+      color: var(--deep-black);
+    }
+
+    .control-btn.active {
+      background: var(--magenta);
+      color: var(--off-white);
+      box-shadow: 2px 2px 0px var(--cyan);
+    }
+
+    /* Status Table */
+    .status-table-wrap {
+      overflow-x: auto;
+    }
+
+    .status-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .status-table th {
+      border-bottom: 3px solid var(--off-white);
+      padding: 0.8rem 1rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--cyan);
+    }
+
+    .status-table td {
+      border-bottom: 1px solid var(--graphite);
+      padding: 1rem;
+      font-size: 0.95rem;
+      vertical-align: middle;
+    }
+
+    .status-table tr:hover td {
+      background: var(--graphite);
+    }
+
+    .agent-id-badge {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem;
+      background: var(--graphite);
+      color: var(--off-white);
+      padding: 0.2rem 0.5rem;
+      border: 1px solid var(--off-white);
+    }
+
+    .state-dot-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .state-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2px solid var(--off-white);
+      display: inline-block;
+    }
+
+    .state-live { background: var(--acid-green); animation: pulse-green 1.5s infinite; }
+    .state-proto { background: var(--magenta); }
+    .state-error { background: var(--red); animation: pulse-red 1s infinite; }
+
+    @keyframes pulse-green {
+      0% { box-shadow: 0 0 0 0 rgba(182, 255, 0, 0.7); }
+      70% { box-shadow: 0 0 0 6px rgba(182, 255, 0, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(182, 255, 0, 0); }
+    }
+
+    @keyframes pulse-red {
+      0% { box-shadow: 0 0 0 0 rgba(255, 23, 68, 0.8); }
+      70% { box-shadow: 0 0 0 6px rgba(255, 23, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 23, 68, 0); }
+    }
+
+    .table-btn {
+      background: var(--cyan);
+      color: var(--deep-black);
+      border: 2px solid var(--off-white);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 0.3rem 0.6rem;
+      cursor: pointer;
+      box-shadow: 2px 2px 0px var(--deep-black);
+      transition: all 0.1s ease;
+    }
+
+    .table-btn:hover {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px var(--deep-black);
+      background: var(--off-white);
+    }
+
+    .table-btn-err {
+      background: var(--red);
+      color: var(--off-white);
+    }
+
+    /* Right Side: Network Ping & Audit Logs Console */
+    .console-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .sidebar-panel {
+      background: var(--carbon-black);
+      border: 4px solid var(--off-white);
+      padding: 1.5rem;
+      box-shadow: var(--neo-shadow-magenta);
+    }
+
+    .panel-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      border-bottom: 2px solid var(--off-white);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      color: var(--magenta);
+    }
+
+    .ping-input-grp {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .ping-select {
+      flex: 1;
+      background: var(--deep-black);
+      border: 2px solid var(--off-white);
+      color: var(--off-white);
+      padding: 0.5rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .ping-select:focus {
+      border-color: var(--magenta);
+    }
+
+    .ping-btn {
+      background: var(--yellow);
+      color: var(--deep-black);
+      border: 2px solid var(--off-white);
+      font-family: 'Share Tech Mono', monospace;
+      font-weight: 800;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      box-shadow: 2px 2px 0px var(--deep-black);
+    }
+
+    .ping-btn:hover {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px var(--deep-black);
+      background: var(--off-white);
+    }
+
+    /* Live Output Monitor Console */
+    .ping-console {
+      background: var(--deep-black);
+      border: 2px solid var(--off-white);
+      padding: 0.8rem;
+      font-family: 'Share Tech Mono', monospace;
+      color: var(--cyan);
+      font-size: 0.8rem;
+      height: 180px;
+      overflow-y: auto;
+      box-shadow: inset 0 0 10px rgba(0, 229, 255, 0.1);
+    }
+
+    .ping-line {
+      margin-bottom: 0.3rem;
+    }
+
+    .ping-line-err {
+      color: var(--red);
+    }
+
+    /* Dependency Outage Alert widget */
+    .alert-panel {
+      background: var(--graphite);
+      border: 4px solid var(--off-white);
+      padding: 1.5rem;
+      box-shadow: var(--neo-shadow-orange);
+    }
+
+    .alert-header-wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--off-white);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .alert-banner {
+      background: var(--red);
+      color: var(--off-white);
+      font-family: 'Share Tech Mono', monospace;
+      font-weight: bold;
+      font-size: 0.8rem;
+      padding: 0.2rem 0.5rem;
+    }
+
+    .alert-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      border-left: 4px solid var(--red);
+      padding-left: 0.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .alert-item-title {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--off-white);
+      text-transform: uppercase;
+    }
+
+    .alert-item-desc {
+      font-size: 0.75rem;
+      color: #aaa;
+    }
+
+    .recovery-btn-heavy {
+      width: 100%;
+      background: var(--orange);
+      color: var(--deep-black);
+      border: 3px solid var(--off-white);
+      padding: 0.8rem;
+      font-size: 0.95rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 4px 4px 0px var(--deep-black);
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    .recovery-btn-heavy:hover {
+      background: var(--off-white);
+      box-shadow: 2px 2px 0px var(--deep-black);
+      transform: translate(2px, 2px);
+    }
+
+    /* Master Terminal Real-time Logs Block */
+    .master-logs-section {
+      background: var(--carbon-black);
+      border: 4px solid var(--off-white);
+      box-shadow: var(--neo-shadow-green);
+      padding: 2rem;
+      margin-bottom: 4rem;
+    }
+
+    .log-filter-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .log-badge-filters {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .log-filter-btn {
+      background: var(--graphite);
+      color: var(--off-white);
+      border: 2px solid var(--off-white);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      padding: 0.3rem 0.7rem;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .log-filter-btn.active {
+      background: var(--acid-green);
+      color: var(--deep-black);
+      box-shadow: 2px 2px 0px var(--deep-black);
+    }
+
+    .log-display-area {
+      background: var(--deep-black);
+      border: 2px solid var(--off-white);
+      height: 300px;
+      overflow-y: auto;
+      padding: 1rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      color: var(--acid-green);
+      box-shadow: inset 0 0 15px rgba(182, 255, 0, 0.1);
+    }
+
+    .log-row {
+      display: grid;
+      grid-template-columns: 180px 100px 1fr;
+      gap: 1rem;
+      border-bottom: 1px solid rgba(23, 24, 33, 0.5);
+      padding: 0.4rem 0;
+    }
+
+    .log-row-warn { color: var(--yellow); }
+    .log-row-crit { color: var(--red); }
+    .log-row-success { color: var(--cyan); }
+
+    .log-timestamp { color: #888; }
+    .log-level {
+      font-weight: bold;
+      text-align: center;
+      border-radius: 2px;
+      padding: 0 4px;
+    }
+    .level-info { background: #1a3a40; color: var(--cyan); }
+    .level-warn { background: #403a1a; color: var(--yellow); }
+    .level-crit { background: #401a1a; color: var(--red); }
+    .level-success { background: #1a401a; color: var(--acid-green); }
+
+    .log-msg { word-break: break-all; }
+
+    /* Operational Statistics Grid */
+    .stats-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 4rem;
+    }
+
+    @media (max-width: 768px) {
+      .stats-strip {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .stat-card {
+      background: var(--carbon-black);
+      border: 3px solid var(--off-white);
+      padding: 1.5rem;
+      box-shadow: var(--neo-shadow-black);
+      position: relative;
+    }
+
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      right: -3px;
+      width: 15px;
+      height: 15px;
+      background: var(--off-white);
+      border-top: 3px solid var(--deep-black);
+      border-left: 3px solid var(--deep-black);
+    }
+
+    .stat-num {
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-num.c1 { color: var(--acid-green); }
+    .stat-num.c2 { color: var(--cyan); }
+    .stat-num.c3 { color: var(--magenta); }
+    .stat-num.c4 { color: var(--yellow); }
+
+    .stat-label {
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: var(--off-white);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Terminal Footer */
+    footer {
+      background: var(--carbon-black);
+      border-top: 4px solid var(--off-white);
+      padding: 3rem 2rem;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    .footer-grid {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 4rem;
+    }
+
+    @media (max-width: 768px) {
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+    }
+
+    .footer-brand {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--magenta);
+      text-transform: uppercase;
+    }
+
+    .footer-col-title {
+      color: var(--cyan);
+      font-weight: bold;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .footer-links {
+      list-style-type: none;
+    }
+
+    .footer-links li {
+      margin-bottom: 0.8rem;
+    }
+
+    .footer-links a {
+      color: #8c8b88;
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--off-white);
+    }
+
+    .footer-bottom {
+      border-top: 2px solid var(--graphite);
+      max-width: 1400px;
+      margin: 3rem auto 0 auto;
+      padding-top: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- STICKY TOP NAVIGATION BAR -->
+  <nav class="terminal-nav">
+    <div class="brand-group">
+      <div class="brand-logo">ARSENAL_MONITOR</div>
+      <div class="brand-meta mono">[ PERF: matrix-active-v2 ]</div>
+    </div>
+    <div class="nav-links">
+      <a href="#overview" class="nav-link mono">OVERVIEW</a>
+      <a href="#diagnostics" class="nav-link mono">DIAGNOSTICS</a>
+      <a href="#logs" class="nav-link mono">AUDIT_LOGS</a>
+      <a href="index.html" class="nav-cta mono">MAIN_ARMORY_GUI</a>
+    </div>
+  </nav>
+
+  <!-- MAIN WRAPPER -->
+  <div class="container">
+
+    <!-- PAGE HEADER -->
+    <header id="overview" class="section-header">
+      <div class="section-eyebrow mono">COGNITIVE ENGINE DIAGNOSTICS</div>
+      <h1 class="section-title">Operational Live Diagnostics Terminal</h1>
+      <p class="section-subtitle">A high-performance retro monitoring grid querying physical API pings, database routing nodes, authentication wrappers, and memory metrics of your deployed agent systems.</p>
+    </header>
+
+    <!-- LIVE MONITORING JUMBOTRON -->
+    <section class="jumbotron-status">
+      <div class="corner-tag mono">MONITORING ENGINE STATUS: ONLINE</div>
+      
+      <div class="jumbo-grid">
+        <!-- Main stats status level -->
+        <div>
+          <div class="metric-big-title mono">System Integrity Score</div>
+          <div class="metric-big-value" id="integrityValue">92%</div>
+          <div class="system-bar-wrap">
+            <div class="system-bar-fill" id="integrityFillBar"></div>
+            <div class="system-bar-text" id="integrityFillLabel">SYSTEM ROUTINGS DETECTED HEALTHY</div>
+          </div>
+        </div>
+
+        <!-- Metric card A -->
+        <div style="border-left: 2px solid var(--graphite); padding-left: 2rem;">
+          <div class="mono" style="color:var(--magenta); font-size: 0.85rem; font-weight:800; margin-bottom:0.5rem;">Average Response Limit</div>
+          <div class="mono" style="font-size: 2.2rem; font-weight:900;" id="avgResponseValue">105 ms</div>
+          <p style="font-size:0.8rem; color:#888; margin-top:0.3rem;">Calculated across active client pings on all API pipelines.</p>
+        </div>
+
+        <!-- Metric card B -->
+        <div style="border-left: 2px solid var(--graphite); padding-left: 2rem;">
+          <div class="mono" style="color:var(--yellow); font-size: 0.85rem; font-weight:800; margin-bottom:0.5rem;">Secure Handshakes</div>
+          <div class="mono" style="font-size: 2.2rem; font-weight:900;" id="handshakeCount">14,802</div>
+          <p style="font-size:0.8rem; color:#888; margin-top:0.3rem;">Encrypted verification responses served via Supabase Guard.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CORE DIAGNOSTICS SPLIT -->
+    <div id="diagnostics" class="diagnostic-split">
+      
+      <!-- LEFT PANEL: Dynamic Agent Grid & Diagnostics -->
+      <section class="agent-matrix-container">
+        <div class="block-header">
+          <h2 class="block-title mono">Agent Status Matrix</h2>
+          <span class="mono" style="font-size: 0.8rem; background: var(--deep-black); color: var(--magenta); padding: 0.3rem 0.6rem; border: 1px solid var(--off-white);">SECURE REGISTRY: 10 ENGINES</span>
+        </div>
+
+        <!-- Control filters -->
+        <div class="matrix-control-bar">
+          <button class="control-btn active" onclick="filterTable('all', this)">ALL_DEVICES</button>
+          <button class="control-btn" onclick="filterTable('Live', this)">LIVE_ONLY</button>
+          <button class="control-btn" onclick="filterTable('Prototype', this)">PROTOTYPES</button>
+          <button class="control-btn" onclick="filterTable('Needs Update', this)">ANOMALIES</button>
+        </div>
+
+        <!-- Diagnostic Table -->
+        <div class="status-table-wrap">
+          <table class="status-table">
+            <thead>
+              <tr>
+                <th class="mono">Agent Target ID</th>
+                <th class="mono">Platform Type</th>
+                <th class="mono">Current Integrity State</th>
+                <th class="mono">Latency Ping</th>
+                <th class="mono">CPU / Mem</th>
+                <th class="mono" style="text-align: right;">Manual Diagnostics</th>
+              </tr>
+            </thead>
+            <tbody id="agentDiagnosticBody">
+              <!-- Dynamically populated rows via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- RIGHT PANEL: Sidebar Utilities (Ping Console & Alerts) -->
+      <div class="console-sidebar">
+        
+        <!-- Interactive Ping Tool Panel -->
+        <section class="sidebar-panel">
+          <h3 class="panel-title mono">Tactical Handshake Ping</h3>
+          <p style="font-size: 0.8rem; color:#aaa; margin-bottom: 1rem;">Select any registry target configuration to send an indicative diagnostics payload.</p>
+          
+          <div class="ping-input-grp">
+            <select class="ping-select" id="pingTargetSelector">
+              <!-- Generated from JS dynamically -->
+            </select>
+            <button class="ping-btn mono" onclick="executeManualPing()">PING</button>
+          </div>
+
+          <!-- Console log -->
+          <div class="ping-console" id="miniPingConsole">
+            <div class="ping-line">> READY FOR HANDSHAKE SIMULATION...</div>
+          </div>
+        </section>
+
+        <!-- Active Alerts Alert Panel -->
+        <section class="alert-panel">
+          <div class="alert-header-wrap">
+            <h3 class="mono" style="font-size: 1.1rem; font-weight: 800; color: var(--orange);">System Outages Alert</h3>
+            <span class="alert-banner" id="activeAlertCountLabel">0 ALERTS ACTIVE</span>
+          </div>
+
+          <div id="alertsContainer">
+            <!-- Dynamically populated when toggling dependency connections to error states -->
+            <p style="font-size: 0.85rem; color:#ccc;" id="noAlertsMessage">● All external dependencies reporting secure status. Core architecture stable.</p>
+          </div>
+
+          <button class="recovery-btn-heavy" onclick="triggerRecoveryProtocol()">INITIATE SYSTEM RECOVERY DEPLOYMENT</button>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- REVENUE STATS STRIP -->
+    <div class="stats-strip">
+      <div class="stat-card">
+        <div class="stat-num c1" id="totalActivePingsCount">142,504</div>
+        <div class="stat-label">Diagnostic Telemetry Pings</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num c2" id="avgHealthRate">100%</div>
+        <div class="stat-label">Handshake Success Ratio</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num c3" id="activeErrorCount">0</div>
+        <div class="stat-label">Active Connection Outages</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num c4">1.2ms</div>
+        <div class="stat-label">Average Jitter Rate</div>
+      </div>
+    </div>
+
+    <!-- MASTER REAL-TIME AUDIT LOGS -->
+    <section id="logs" class="master-logs-section">
+      <div class="log-filter-row">
+        <div>
+          <h2 class="mono" style="font-size: 1.8rem; font-weight: 800; line-height: 1;">Live Event Log Stream</h2>
+          <p style="font-size: 0.85rem; color: #888; margin-top: 0.25rem;">Real-time execution outputs derived directly from the active n8n webhooks and API routing controllers.</p>
+        </div>
+        
+        <div class="log-badge-filters">
+          <button class="log-filter-btn active" onclick="filterLogs('all', this)">ALL_LOGS</button>
+          <button class="log-filter-btn" onclick="filterLogs('INFO', this)">INFO</button>
+          <button class="log-filter-btn" onclick="filterLogs('WARN', this)">WARN</button>
+          <button class="log-filter-btn" onclick="filterLogs('SUCCESS', this)">SUCCESS</button>
+          <button class="log-filter-btn" onclick="filterLogs('CRIT', this)">CRITICAL</button>
+        </div>
+      </div>
+
+      <!-- Real-time logs area -->
+      <div class="log-display-area" id="masterLogDisplay">
+        <!-- Log rows populated dynamically -->
+      </div>
+    </section>
+
+  </div> <!-- /CONTAINER -->
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">// AI_AGENT_ARSENAL</div>
+        <p style="color: #8c8b88; margin-top: 1rem; line-height: 1.5; font-size: 0.95rem;">
+          Performance monitoring suite constructed by Jason Feimster. Keeps visual operations secure, reporting live diagnostic runtimes with zero SaaS framework overhead.
+        </p>
+      </div>
+      <div>
+        <div class="footer-col-title">Terminal Nodes</div>
+        <ul class="footer-links">
+          <li><a href="#overview">Overviews Monitor</a></li>
+          <li><a href="#diagnostics">Device Integrity Table</a></li>
+          <li><a href="#logs">Real-time Logging Output</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Core Systems</div>
+        <ul class="footer-links">
+          <li><a href="https://github.com/jasonfeimster/ai-agent-arsenal" target="_blank">Open Source Repo</a></li>
+          <li><a href="#">Stripe Webhook Integrations</a></li>
+          <li><a href="#">Supabase Authentications</a></li>
+          <li><a href="#">Notion Storage CRM</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>AI AGENT ARSENAL IS OPEN-SOURCE UNDER MIT LICENSE. COPYRIGHT JASON FEIMSTER 2025.</span>
+      <span>DIAGNOSTICS STATE: ACTIVE CLIENT ROUTING</span>
+    </div>
+  </footer>
+
+  <!-- REAL-TIME JS MONITOR ENGINE -->
+  <script>
+    // Live Diagnostics Database representing tools in Base Component
+    const activeDiagnosticsDatabase = [
+      {
+        id: "ecommerce-cash-flow",
+        name: "Ecommerce Cash Flow Forecaster",
+        platform: "Static App",
+        status: "Live",
+        latency: 42,
+        cpu: "8%",
+        mem: "14MB",
+        dependencies: ["Static", "Notion"]
+      },
+      {
+        id: "get-my-funding-offer",
+        name: "Get My Funding Offer",
+        platform: "Vercel App",
+        status: "Live",
+        latency: 86,
+        cpu: "24%",
+        mem: "58MB",
+        dependencies: ["ChatGPT", "Notion"]
+      },
+      {
+        id: "funding-pathfinder",
+        name: "Funding Pathfinder GPT",
+        platform: "CustomGPT",
+        status: "Live",
+        latency: 124,
+        cpu: "12%",
+        mem: "112MB",
+        dependencies: ["ChatGPT", "Supabase"]
+      },
+      {
+        id: "realtime-cash-flow",
+        name: "Real-Time Cash Flow Analyzer",
+        platform: "Gemini Gem",
+        status: "Prototype",
+        latency: 245,
+        cpu: "45%",
+        mem: "340MB",
+        dependencies: ["ChatGPT", "Supabase"]
+      },
+      {
+        id: "funding-goal-tracker",
+        name: "Funding Goal Tracker",
+        platform: "AI Studio App",
+        status: "Live",
+        latency: 78,
+        cpu: "18%",
+        mem: "42MB",
+        dependencies: ["Notion"]
+      },
+      {
+        id: "mrr-to-money",
+        name: "MRR to Money GPT",
+        platform: "CustomGPT",
+        status: "Live",
+        latency: 110,
+        cpu: "5%",
+        mem: "98MB",
+        dependencies: ["ChatGPT"]
+      },
+      {
+        id: "vc-backup-plan",
+        name: "VC Backup Plan GPT",
+        platform: "CustomGPT",
+        status: "Prototype",
+        latency: 140,
+        cpu: "3%",
+        mem: "88MB",
+        dependencies: ["ChatGPT", "Supabase"]
+      },
+      {
+        id: "bizcredit-builder",
+        name: "BizCredit Builder GPT",
+        platform: "CustomGPT",
+        status: "Live",
+        latency: 98,
+        cpu: "4%",
+        mem: "92MB",
+        dependencies: ["ChatGPT"]
+      },
+      {
+        id: "gpt-stack-builder",
+        name: "GPT Stack Builder",
+        platform: "Prompt System",
+        status: "Live",
+        latency: 35,
+        cpu: "1%",
+        mem: "4MB",
+        dependencies: ["ChatGPT"]
+      },
+      {
+        id: "flash-ui-portfolio",
+        name: "Flash UI Portfolio",
+        platform: "Static App",
+        status: "Needs Update",
+        latency: 0,
+        cpu: "0%",
+        mem: "0MB",
+        dependencies: ["Supabase"]
+      }
+    ];
+
+    // Global Operational Parameters
+    let selectedTableFilter = 'all';
+    let selectedLogFilter = 'all';
+    let totalPings = 142504;
+    let alertsList = [];
+    const logsHistory = [];
+
+    // Selectors
+    const tableBody = document.getElementById('agentDiagnosticBody');
+    const pingTargetSelector = document.getElementById('pingTargetSelector');
+    const miniConsole = document.getElementById('miniPingConsole');
+    const alertsContainer = document.getElementById('alertsContainer');
+    const alertCountLabel = document.getElementById('activeAlertCountLabel');
+    const noAlertsMessage = document.getElementById('noAlertsMessage');
+    const totalPingsCounter = document.getElementById('totalActivePingsCount');
+    const avgHealthRate = document.getElementById('avgHealthRate');
+    const activeErrorCounter = document.getElementById('activeErrorCount');
+    const masterLogDisplay = document.getElementById('masterLogDisplay');
+    const integrityValue = document.getElementById('integrityValue');
+    const integrityFillBar = document.getElementById('integrityFillBar');
+    const integrityFillLabel = document.getElementById('integrityFillLabel');
+    const avgResponseValue = document.getElementById('avgResponseValue');
+    const handshakeCountNode = document.getElementById('handshakeCount');
+
+    // State Colors Utility
+    function getStatusConfig(status) {
+      if (status === 'Live') return { class: 'state-live', label: 'OPERATIONAL' };
+      if (status === 'Prototype') return { class: 'state-proto', label: 'STABLE_PROTOTYPE' };
+      return { class: 'state-error', label: 'ANOMALY_DETECTED' };
+    }
+
+    // Populate the Diagnostics table matching criteria
+    function renderDiagnosticsTable() {
+      tableBody.innerHTML = '';
+      
+      const filtered = activeDiagnosticsDatabase.filter(agent => {
+        if (selectedTableFilter === 'all') return true;
+        return agent.status === selectedTableFilter;
+      });
+
+      filtered.forEach(agent => {
+        const stateConfig = getStatusConfig(agent.status);
+        const hasOutage = alertsList.some(alert => alert.agentId === agent.id);
+        
+        const rowStateClass = hasOutage ? 'state-error' : stateConfig.class;
+        const rowStateLabel = hasOutage ? 'DEP_OUTAGE' : stateConfig.label;
+        const rowLatency = hasOutage ? 'ERR_CONN' : `${agent.latency}ms`;
+        const rowCpuMem = hasOutage ? '0% / 0MB' : `${agent.cpu} / ${agent.mem}`;
+        const actionBtnClass = hasOutage ? 'table-btn table-btn-err' : 'table-btn';
+        const actionBtnLabel = hasOutage ? 'DISCONNECTED' : (agent.status === 'Needs Update' ? 'ATTENTION' : 'LIVE_AUDIT');
+
+        tableBody.innerHTML += `
+          <tr>
+            <td>
+              <div style="font-weight: 800; text-transform: uppercase;">${agent.name}</div>
+              <span class="agent-id-badge mono">${agent.id}</span>
+            </td>
+            <td class="mono" style="font-size: 0.8rem; font-weight: bold; color: var(--magenta);">${agent.platform}</td>
+            <td>
+              <div class="state-dot-wrap">
+                <span class="state-indicator ${rowStateClass}"></span>
+                <span class="mono" style="font-size: 0.75rem; font-weight: bold;">${rowStateLabel}</span>
+              </div>
+            </td>
+            <td class="mono" style="font-weight: bold;">${rowLatency}</td>
+            <td class="mono" style="font-size: 0.8rem; color: #888;">${rowCpuMem}</td>
+            <td style="text-align: right;">
+              <button class="${actionBtnClass}" onclick="triggerCustomAudit('${agent.id}')">${actionBtnLabel}</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    // Populate Selector options for Tactical Ping UI
+    function renderPingDropdown() {
+      pingTargetSelector.innerHTML = '';
+      activeDiagnosticsDatabase.forEach(agent => {
+        pingTargetSelector.innerHTML += `<option value="${agent.id}">${agent.id.toUpperCase()} (${agent.platform})</option>`;
+      });
+    }
+
+    // Switch categories in table view
+    function filterTable(category, button) {
+      selectedTableFilter = category;
+      const btns = document.querySelectorAll('.control-btn');
+      btns.forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+      renderDiagnosticsTable();
+    }
+
+    // Ping mechanism simulations
+    function executeManualPing() {
+      const targetId = pingTargetSelector.value;
+      const agent = activeDiagnosticsDatabase.find(a => a.id === targetId);
+      if (!agent) return;
+
+      const hasOutage = alertsList.some(alert => alert.agentId === agent.id);
+
+      addMiniConsoleLine(`INITIATING TARGET TRACEROUTE FOR [${targetId.toUpperCase()}]`);
+      addMiniConsoleLine(`PAYLOAD SCHEMA TYPE: ping-diagnostics-v3`);
+
+      setTimeout(() => {
+        totalPings += 1;
+        totalPingsCounter.textContent = totalPings.toLocaleString();
+
+        if (hasOutage || agent.status === 'Needs Update') {
+          addMiniConsoleLine(`ERROR HANDSHAKE TIMED OUT TO HOST: [${targetId}]`, true);
+          addMiniConsoleLine(`STATUS CODE: 502 BAD GATEWAY`, true);
+          generateLogEntry('CRIT', `Handshake timeout Exception routed on Endpoint [${targetId}]. HTTP CODE: 502`);
+        } else {
+          addMiniConsoleLine(`STABLE HANDSHAKE GRANTED IN ${agent.latency}ms`);
+          addMiniConsoleLine(`RESOURCES STABLE: [CPU: ${agent.cpu} | MEM: ${agent.mem}]`);
+          generateLogEntry('SUCCESS', `Diagnostic traceroute ping returned optimal parameters on [${targetId}]. Handshake OK`);
+        }
+      }, 800);
+    }
+
+    function addMiniConsoleLine(text, isError = false) {
+      const line = document.createElement('div');
+      line.className = `ping-line ${isError ? 'ping-line-err' : ''}`;
+      line.textContent = `> ${text}`;
+      miniConsole.appendChild(line);
+      miniConsole.scrollTop = miniConsole.scrollHeight;
+
+      if (miniConsole.children.length > 20) {
+        miniConsole.removeChild(miniConsole.firstChild);
+      }
+    }
+
+    // Trigger individual tool manual outage audits (simulating breaking connections)
+    function triggerCustomAudit(agentId) {
+      const agent = activeDiagnosticsDatabase.find(a => a.id === agentId);
+      if (!agent) return;
+
+      const alertIndex = alertsList.findIndex(alert => alert.agentId === agentId);
+      
+      if (alertIndex > -1) {
+        // Recover individual
+        alertsList.splice(alertIndex, 1);
+        generateLogEntry('SUCCESS', `Outage on dependency resolved for target: ${agentId.toUpperCase()}`);
+        addMiniConsoleLine(`RESOLVED PIPELINE BLOCKAGE ON: ${agentId.toUpperCase()}`);
+      } else {
+        // Inject Outage
+        const errorMsg = `CRITICAL EXCEPTION: API wrapper timeout mismatch. Target [${agentId.toUpperCase()}] failed authentication verification.`;
+        alertsList.push({
+          agentId: agent.id,
+          name: agent.name,
+          error: errorMsg
+        });
+        generateLogEntry('CRIT', errorMsg);
+        addMiniConsoleLine(`WARNING: SEVERED PIPE SIGNAL ON ${agentId.toUpperCase()}`, true);
+      }
+
+      updateSystemCalculations();
+      renderDiagnosticsTable();
+      renderAlertsBlock();
+    }
+
+    // Handle Alerts Block population
+    function renderAlertsBlock() {
+      alertsContainer.innerHTML = '';
+      if (alertsList.length === 0) {
+        alertsContainer.appendChild(noAlertsMessage);
+        noAlertsMessage.style.display = 'block';
+        alertCountLabel.textContent = '0 ALERTS ACTIVE';
+        alertCountLabel.style.background = 'transparent';
+        alertCountLabel.style.color = 'var(--cyan)';
+        alertCountLabel.style.border = '2px solid var(--off-white)';
+      } else {
+        noAlertsMessage.style.display = 'none';
+        alertCountLabel.textContent = `${alertsList.length} ALERTS ACTIVE`;
+        alertCountLabel.style.background = 'var(--red)';
+        alertCountLabel.style.color = 'var(--off-white)';
+        alertCountLabel.style.border = '2px solid var(--red)';
+
+        alertsList.forEach(alert => {
+          const item = document.createElement('div');
+          item.className = 'alert-item';
+          item.innerHTML = `
+            <div class="alert-item-title">${alert.agentId.toUpperCase()} OUTAGE</div>
+            <div class="alert-item-desc">${alert.error}</div>
+            <span class="mono" style="font-size:0.65rem; color: var(--magenta); cursor:pointer; text-decoration: underline;" onclick="triggerCustomAudit('${alert.agentId}')">[ DISMISS / RESOLVE OUTAGE ]</span>
+          `;
+          alertsContainer.appendChild(item);
+        });
+      }
+    }
+
+    // Master Live Audit Log Injections
+    function generateLogEntry(level, message) {
+      const date = new Date();
+      const timestamp = date.toISOString().replace('T', ' ').substring(0, 19);
+      
+      const newEntry = {
+        timestamp,
+        level,
+        message
+      };
+
+      logsHistory.unshift(newEntry);
+      if (logsHistory.length > 100) logsHistory.pop();
+
+      renderLogsView();
+    }
+
+    function renderLogsView() {
+      masterLogDisplay.innerHTML = '';
+      
+      const filteredLogs = logsHistory.filter(entry => {
+        if (selectedLogFilter === 'all') return true;
+        return entry.level === selectedLogFilter;
+      });
+
+      filteredLogs.forEach(entry => {
+        let levelClass = 'level-info';
+        let rowClass = '';
+        if (entry.level === 'WARN') { levelClass = 'level-warn'; rowClass = 'log-row-warn'; }
+        if (entry.level === 'CRIT') { levelClass = 'level-crit'; rowClass = 'log-row-crit'; }
+        if (entry.level === 'SUCCESS') { levelClass = 'level-success'; rowClass = 'log-row-success'; }
+
+        masterLogDisplay.innerHTML += `
+          <div class="log-row ${rowClass}">
+            <div class="log-timestamp">${entry.timestamp}</div>
+            <div><span class="log-level ${levelClass}">${entry.level}</span></div>
+            <div class="log-msg">${entry.message}</div>
+          </div>
+        `;
+      });
+    }
+
+    function filterLogs(level, button) {
+      selectedLogFilter = level;
+      const btns = document.querySelectorAll('.log-filter-btn');
+      btns.forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+      renderLogsView();
+    }
+
+    // Dynamic computations for top score metrics
+    function updateSystemCalculations() {
+      // Outage affects calculations
+      let score = 92;
+      let activeOutages = alertsList.length;
+      
+      score = score - (activeOutages * 12);
+      score = Math.max(0, Math.min(100, score));
+
+      integrityValue.textContent = `${score}%`;
+      integrityFillBar.style.width = `${score}%`;
+      
+      activeErrorCounter.textContent = activeOutages;
+      
+      // Update health percentage display
+      const operationalCount = activeDiagnosticsDatabase.length - activeOutages;
+      const ratio = Math.round((operationalCount / activeDiagnosticsDatabase.length) * 100);
+      avgHealthRate.textContent = `${ratio}%`;
+
+      if (score === 100) {
+        integrityFillLabel.textContent = "SYSTEM DEPLOYMENTS REPORTING MAXIMUM INTEGRITY STATS";
+        integrityValue.style.color = "var(--acid-green)";
+        integrityFillBar.style.background = "var(--acid-green)";
+      } else if (score >= 70) {
+        integrityFillLabel.textContent = "MINOR ANOMALIES DETECTED WITHIN SUBSYSTEM PIPELINES";
+        integrityValue.style.color = "var(--yellow)";
+        integrityFillBar.style.background = "var(--yellow)";
+      } else {
+        integrityFillLabel.textContent = "CRITICAL OUTAGE COMPROMISING ARSENAL HANDSHAKES";
+        integrityValue.style.color = "var(--red)";
+        integrityFillBar.style.background = "var(--red)";
+      }
+
+      // Calculate dynamic average latency
+      let totalLatency = 0;
+      let divider = 0;
+      activeDiagnosticsDatabase.forEach(agent => {
+        const hasOutage = alertsList.some(alert => alert.agentId === agent.id);
+        if(!hasOutage && agent.latency > 0) {
+          totalLatency += agent.latency;
+          divider++;
+        }
+      });
+      const finalLatency = divider > 0 ? Math.round(totalLatency / divider) : 0;
+      avgResponseValue.textContent = finalLatency > 0 ? `${finalLatency} ms` : 'ERR_CONN';
+    }
+
+    // Trigger Heavy Recovery protocol (fixing all alerts in one command)
+    function triggerRecoveryProtocol() {
+      if (alertsList.length === 0) {
+        addMiniConsoleLine("DIAGNOSTICS REPORT: No outages detected. Core bypassed.");
+        generateLogEntry('INFO', "Manual deployment bypass. System integrity reporting maximum potential.");
+        return;
+      }
+
+      addMiniConsoleLine("INITIATING SYSTEM RECOVERY PROTOCOLS...");
+      generateLogEntry('WARN', "Master recovery protocols triggered manually. Restructuring edge bindings...");
+
+      setTimeout(() => {
+        alertsList = [];
+        updateSystemCalculations();
+        renderDiagnosticsTable();
+        renderAlertsBlock();
+        
+        addMiniConsoleLine("RECOVERY SUCCESSFUL. SYSTEM STABLE.");
+        generateLogEntry('SUCCESS', "Operational systems fully restored. Edge parameters locked.");
+      }, 1500);
+    }
+
+    // Loop simulating continuous production logs
+    const mockLogStatements = [
+      { lvl: "INFO", msg: "Supabase authentication guard updated tokens successfully." },
+      { lvl: "SUCCESS", msg: "Notion database CRM directory sync finished execution without exceptions." },
+      { lvl: "INFO", msg: "POST /api/v1/trigger-agent-test completed with payload confirmation index." },
+      { lvl: "WARN", msg: "High latency detected on Gemini pipeline, adjusting threshold buffer (+40ms)." },
+      { lvl: "INFO", msg: "Stripe-gated authentication verified customer invoice transaction ID: ch_3M..." },
+      { lvl: "SUCCESS", msg: "Automated archive ingestion task fetched 1 new target entity configuration." }
+    ];
+
+    function startProductionLogsLoop() {
+      setInterval(() => {
+        // Randomly choose an entry to output
+        const randomItem = mockLogStatements[Math.floor(Math.random() * mockLogStatements.length)];
+        
+        // Random check to mutate metrics
+        if (Math.random() > 0.8) {
+          totalPings += Math.floor(Math.random() * 5) + 1;
+          totalPingsCounter.textContent = totalPings.toLocaleString();
+          
+          const handshakes = parseInt(handshakeCountNode.textContent.replace(/,/g, ''));
+          handshakeCountNode.textContent = (handshakes + Math.floor(Math.random() * 10) + 1).toLocaleString();
+        }
+
+        generateLogEntry(randomItem.lvl, randomItem.msg);
+      }, 4000);
+    }
+
+    // Load setup
+    window.addEventListener('DOMContentLoaded', () => {
+      // Build initial log items
+      generateLogEntry('INFO', 'Operator Performance Matrix successfully initialized.');
+      generateLogEntry('SUCCESS', 'Supabase guard configurations validated against production schemas.');
+      generateLogEntry('SUCCESS', 'Notion CRM webhook pipeline active and polling target records.');
+      generateLogEntry('WARN', 'Anomalous deployment detected on target [flash-ui-portfolio]. Attention required.');
+
+      renderDiagnosticsTable();
+      renderPingDropdown();
+      renderAlertsBlock();
+      updateSystemCalculations();
+      startProductionLogsLoop();
+    });
+  </script>
+</body>
+</html>
+```

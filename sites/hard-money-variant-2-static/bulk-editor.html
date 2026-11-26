@@ -1,0 +1,1035 @@
+```html
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bulk Metadata & Permission Editor</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            slate: {
+              950: '#07070a',
+              900: '#0f0f15',
+              800: '#181824',
+              700: '#252538',
+              600: '#383854',
+            },
+            indigo: {
+              500: '#6366f1',
+              400: '#818cf8',
+              600: '#4f46e5',
+            },
+            emerald: {
+              500: '#10b981',
+              400: '#34d399',
+            },
+            amber: {
+              500: '#f59e0b',
+              400: '#fbbf24',
+            }
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #07070a;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+        radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
+        linear-gradient(rgba(255, 255, 255, 0.003) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.003) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 24px 24px, 24px 24px;
+    }
+    .glow-border:hover, .glow-border-focus:focus-within {
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+      border-color: rgba(99, 102, 241, 0.4);
+    }
+    .node-pulse {
+      box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
+      animation: pulse 2s infinite cubic-bezier(0.66, 0, 0, 1);
+    }
+    @keyframes pulse {
+      to {
+        box-shadow: 0 0 0 8px rgba(99, 102, 241, 0);
+      }
+    }
+    /* Custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f0f15;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #252538;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #6366f1;
+    }
+  </style>
+</head>
+<body class="text-slate-100 min-h-screen antialiased overflow-x-hidden">
+
+  <!-- Main Navigation -->
+  <header class="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-emerald-500 flex items-center justify-center shadow-lg shadow-indigo-500/10">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+        </div>
+        <div>
+          <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-slate-100 to-indigo-300 bg-clip-text text-transparent">FLOW</span>
+          <span class="text-indigo-400 font-bold text-xs uppercase tracking-widest ml-1 px-1.5 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/20 font-mono">META</span>
+        </div>
+      </div>
+      
+      <!-- Quick Status Indicators -->
+      <div class="hidden md:flex items-center gap-6 text-sm">
+        <div class="flex items-center gap-2 border-r border-slate-800/80 pr-6">
+          <span class="w-2 h-2 rounded-full bg-indigo-400 node-pulse"></span>
+          <span class="text-slate-400">Selected Attachments:</span>
+          <span id="selected-counter" class="text-white font-semibold">0 Files</span>
+        </div>
+        <div class="flex items-center gap-2 border-r border-slate-800/80 pr-6">
+          <span class="text-slate-400">Total Buffer</span>
+          <span class="text-emerald-400 font-semibold" id="total-buffer-size">56.5 MB</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-slate-400">Unsaved Changes</span>
+          <span id="unsaved-badge" class="px-2 py-0.5 rounded text-[11px] font-bold bg-slate-900 border border-slate-800 text-slate-500">0 pending</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button onclick="resetData()" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white border border-slate-800 bg-slate-950 hover:bg-slate-900 transition-all">
+          Discard Draft
+        </button>
+        <button onclick="saveAllChanges()" class="px-4 py-2 text-xs font-bold bg-gradient-to-r from-indigo-600 to-emerald-500 hover:from-indigo-500 hover:to-emerald-400 text-white rounded-lg shadow-lg shadow-indigo-500/15 transition-all">
+          Save All Metadata
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero / Description System -->
+  <section class="relative pt-8 pb-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="absolute inset-0 top-0 left-1/2 -translate-x-1/2 w-3/4 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
+    
+    <div class="relative text-center max-w-3xl mx-auto space-y-3 mb-8">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs text-slate-400">
+        <span class="flex h-2 w-2 rounded-full bg-indigo-500"></span>
+        <span>Secure Transaction Vault Metadata Tool</span>
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white leading-tight">
+        Bulk Metadata & <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-emerald-400 bg-clip-text text-transparent">Permissions Editor</span>
+      </h1>
+      <p class="text-slate-400 text-xs sm:text-sm max-w-2xl mx-auto leading-relaxed">
+        Fast, spreadsheet-style workflow to batch-rename attachments, apply loan folders, append underwriting tags, and adjust privacy permissions on multiple files simultaneously.
+      </p>
+    </div>
+
+    <!-- Active Batch Command Console -->
+    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl backdrop-blur-sm relative z-10 mb-8 overflow-hidden">
+      <!-- Glow effect inside -->
+      <div class="absolute top-0 right-0 w-48 h-48 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none"></div>
+      
+      <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-800/60">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center">
+            <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-white">Batch Operation Controls</h3>
+            <p class="text-[11px] text-slate-400">Apply rules to all items currently checked below</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-slate-500 hidden sm:inline">Selected for Batch:</span>
+          <span id="batch-sel-badge" class="px-2.5 py-0.5 rounded-full bg-slate-950 border border-slate-800 text-[11px] font-semibold text-slate-300">
+            0 Files Selected
+          </span>
+        </div>
+      </div>
+
+      <!-- Batch Actions Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 relative z-10">
+        <!-- Action 1: Suffix / Prefix Rename -->
+        <div class="space-y-2">
+          <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Step 1. Batch Append Name</label>
+          <div class="flex gap-2">
+            <input type="text" id="batch-prefix" placeholder="Prefix_" class="w-1/2 bg-slate-950 border border-slate-800 rounded p-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+            <input type="text" id="batch-suffix" placeholder="_Suffix" class="w-1/2 bg-slate-950 border border-slate-800 rounded p-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+          </div>
+          <button onclick="applyBatchRename()" class="w-full py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded text-[11px] transition-all">
+            Append to Names
+          </button>
+        </div>
+
+        <!-- Action 2: Change Category -->
+        <div class="space-y-2">
+          <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Step 2. Batch Category</label>
+          <select id="batch-category" class="w-full bg-slate-950 border border-slate-800 rounded p-1.5 text-xs text-white focus:outline-none focus:border-indigo-500 cursor-pointer">
+            <option value="">-- Choose Category --</option>
+            <option value="Underwriting">Underwriting Models</option>
+            <option value="Term Sheets">Term Sheets & Offers</option>
+            <option value="Appraisal">Property Appraisal</option>
+            <option value="Closing Docs">Closing Instructions</option>
+            <option value="Due Diligence">Due Diligence Vault</option>
+            <option value="Legal">Legal & Corporate</option>
+          </select>
+          <button onclick="applyBatchCategory()" class="w-full py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded text-[11px] transition-all">
+            Assign Category
+          </button>
+        </div>
+
+        <!-- Action 3: Batch Tags Addition -->
+        <div class="space-y-2">
+          <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Step 3. Inject Tag</label>
+          <input type="text" id="batch-tag-input" placeholder="e.g. Verified, Q1-Approved" class="w-full bg-slate-950 border border-slate-800 rounded p-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+          <button onclick="applyBatchTags()" class="w-full py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded text-[11px] transition-all">
+            Append Tag
+          </button>
+        </div>
+
+        <!-- Action 4: Batch Permissions -->
+        <div class="space-y-2">
+          <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Step 4. Access Security</label>
+          <select id="batch-access" class="w-full bg-slate-950 border border-slate-800 rounded p-1.5 text-xs text-white focus:outline-none focus:border-indigo-500 cursor-pointer">
+            <option value="">-- Choose Access --</option>
+            <option value="Public">Public (Anyone with deal link)</option>
+            <option value="Internal">Internal (Lender Underwriters)</option>
+            <option value="Confidential">Confidential (Executive Only)</option>
+          </select>
+          <button onclick="applyBatchAccess()" class="w-full py-1.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-semibold text-[11px] rounded transition-all">
+            Lock Permissions
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Layout Interface -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      
+      <!-- Left Sidebar: Filters & Quick Search / Stats -->
+      <aside class="space-y-6 lg:col-span-1">
+        <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-5 space-y-6">
+          <div class="flex items-center justify-between">
+            <h4 class="font-bold text-xs text-white uppercase tracking-wider">Search & Filters</h4>
+            <button onclick="clearSearchFilters()" class="text-[10px] text-slate-400 hover:text-white transition-colors">Clear All</button>
+          </div>
+
+          <!-- Direct Name Search -->
+          <div class="space-y-2">
+            <label class="text-xs text-slate-400 font-medium">Filename Keyword</label>
+            <div class="relative">
+              <input type="text" id="file-search" placeholder="Search file name..." class="w-full bg-slate-900 border border-slate-800 rounded-lg pl-8 pr-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 transition-colors">
+              <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+              </span>
+            </div>
+          </div>
+
+          <!-- Filter Category -->
+          <div class="space-y-2">
+            <label class="text-xs text-slate-400 font-medium">Transaction Folder</label>
+            <select id="filter-category" onchange="applyFilters()" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors cursor-pointer">
+              <option value="All">All Categories</option>
+              <option value="Underwriting">Underwriting</option>
+              <option value="Term Sheets">Term Sheets</option>
+              <option value="Appraisal">Appraisal</option>
+              <option value="Closing Docs">Closing Docs</option>
+              <option value="Due Diligence">Due Diligence</option>
+              <option value="Legal">Legal</option>
+              <option value="Unassigned">Unassigned</option>
+            </select>
+          </div>
+
+          <!-- Access Level Selectors -->
+          <div class="space-y-2">
+            <label class="text-xs text-slate-400 font-medium">Access Restriction</label>
+            <div class="grid grid-cols-3 gap-1.5 bg-slate-900 p-1 rounded-lg border border-slate-800/85 text-center">
+              <button onclick="filterByAccess('Public')" id="access-btn-Public" class="access-filter-btn py-1.5 text-[10px] rounded font-medium text-slate-400 hover:text-white transition-all">Public</button>
+              <button onclick="filterByAccess('Internal')" id="access-btn-Internal" class="access-filter-btn py-1.5 text-[10px] rounded font-medium text-slate-400 hover:text-white transition-all">Internal</button>
+              <button onclick="filterByAccess('Confidential')" id="access-btn-Confidential" class="access-filter-btn py-1.5 text-[10px] rounded font-medium text-slate-400 hover:text-white transition-all">Strict</button>
+            </div>
+          </div>
+
+          <!-- Quick Statistics Widgets -->
+          <div class="border-t border-slate-800/60 pt-4 mt-4 space-y-2.5">
+            <span class="text-[10px] text-slate-500 uppercase font-bold tracking-wider block">Realtime Vault Stats</span>
+            <div class="bg-indigo-950/20 border border-indigo-500/10 rounded-lg p-2.5 text-xs text-slate-300 space-y-2">
+              <div class="flex justify-between">
+                <span>Total Items:</span>
+                <span id="stat-total-items" class="font-mono text-white font-semibold">8</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Unassigned Folder:</span>
+                <span id="stat-unassigned" class="font-mono text-amber-400 font-semibold">2</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Confidential Restricted:</span>
+                <span id="stat-confidential" class="font-mono text-indigo-400 font-semibold">3</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Meta Tag Helper Library -->
+        <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-5 space-y-3">
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <h4 class="font-bold text-xs text-white uppercase tracking-wider">Quick Preset Tags</h4>
+          </div>
+          <p class="text-[11px] text-slate-400 leading-normal">
+            Click any tag preset to insert into search bar or append to checked files:
+          </p>
+          <div class="flex flex-wrap gap-1.5 pt-1">
+            <button onclick="insertPresetTag('Underwriting')" class="text-[10px] bg-slate-900 border border-slate-800 hover:border-indigo-500 text-indigo-300 px-2 py-1 rounded transition-colors">Underwriting</button>
+            <button onclick="insertPresetTag('CA-Property')" class="text-[10px] bg-slate-900 border border-slate-800 hover:border-indigo-500 text-indigo-300 px-2 py-1 rounded transition-colors">CA-Property</button>
+            <button onclick="insertPresetTag('Signed')" class="text-[10px] bg-slate-900 border border-slate-800 hover:border-indigo-500 text-indigo-300 px-2 py-1 rounded transition-colors">Signed</button>
+            <button onclick="insertPresetTag('KYC-Verified')" class="text-[10px] bg-slate-900 border border-slate-800 hover:border-indigo-500 text-indigo-300 px-2 py-1 rounded transition-colors">KYC-Verified</button>
+            <button onclick="insertPresetTag('Q1-Deal')" class="text-[10px] bg-slate-900 border border-slate-800 hover:border-indigo-500 text-indigo-300 px-2 py-1 rounded transition-colors">Q1-Deal</button>
+            <button onclick="insertPresetTag('Audited')" class="text-[10px] bg-slate-900 border border-slate-800 hover:border-indigo-500 text-indigo-300 px-2 py-1 rounded transition-colors">Audited</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Right Panel: Spreadsheet-style Editor workspace -->
+      <section class="lg:col-span-3 space-y-4">
+        
+        <!-- Workspace Active State banner -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-slate-950 border border-slate-800/80 rounded-xl p-4">
+          <div>
+            <span class="text-slate-400 text-xs">Spreadsheet Workdeck / Attachment Manifest</span>
+            <div class="flex items-center gap-2 mt-1">
+              <span id="active-results-count" class="text-lg font-extrabold text-white">0</span>
+              <span class="text-slate-500 text-xs">visible files</span>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-3">
+            <button onclick="triggerCSVImportSim()" class="text-xs bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 px-3 py-1.5 rounded flex items-center gap-1.5 transition-colors">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+              </svg>
+              Simulate CSV Import
+            </button>
+            <button onclick="selectAllDocuments(true)" class="text-[11px] text-indigo-400 hover:text-indigo-300 font-semibold transition-colors">
+              Select All
+            </button>
+            <span class="text-slate-700">|</span>
+            <button onclick="selectAllDocuments(false)" class="text-[11px] text-slate-400 hover:text-slate-300 font-semibold transition-colors">
+              Clear Choice
+            </button>
+          </div>
+        </div>
+
+        <!-- Spreadsheet Grid Container -->
+        <div class="overflow-x-auto bg-slate-950 border border-slate-800/80 rounded-xl">
+          <table class="w-full text-left border-collapse min-w-[800px]">
+            <thead>
+              <tr class="border-b border-slate-800 bg-slate-950/90 text-[10px] text-slate-400 uppercase tracking-widest">
+                <th class="p-3.5 text-center w-12">
+                  <input type="checkbox" id="header-select-all" onchange="toggleHeaderSelectAll(this)" class="w-3.5 h-3.5 rounded bg-slate-900 border-slate-800 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-slate-950">
+                </th>
+                <th class="p-3.5">Filename <span class="text-indigo-400 font-normal lowercase">(Editable)</span></th>
+                <th class="p-3.5 w-44">Transaction Category</th>
+                <th class="p-3.5 w-48">Tags <span class="text-indigo-400 font-normal lowercase">(Enter to add)</span></th>
+                <th class="p-3.5 w-40">Privacy Permission</th>
+                <th class="p-3.5 w-24 text-right">Size</th>
+              </tr>
+            </thead>
+            <tbody id="document-rows-container">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty State Component -->
+        <div id="empty-state" class="hidden text-center py-16 bg-slate-950 border border-dashed border-slate-800 rounded-xl space-y-4">
+          <div class="w-12 h-12 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto text-slate-500">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <div>
+            <h4 class="font-bold text-white text-sm">No Matching Files Found</h4>
+            <p class="text-xs text-slate-400 max-w-sm mx-auto mt-1">Try resetting your category options, clearing search criteria, or appending sample attachments.</p>
+          </div>
+          <button onclick="clearSearchFilters()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg transition-colors">
+            Reset Layout Filters
+          </button>
+        </div>
+
+        <!-- Quick Help Legend -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-950 border border-slate-800/60 rounded-xl p-4 text-xs text-slate-400">
+          <div class="flex items-start gap-2">
+            <span class="w-2 h-2 mt-1.5 rounded-full bg-indigo-500"></span>
+            <div>
+              <h5 class="font-bold text-slate-200">Real-time Inline Edits</h5>
+              <p class="text-[11px] mt-0.5">Simply modify any filename directly in the grid. It flags the system queue automatically.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="w-2 h-2 mt-1.5 rounded-full bg-emerald-500"></span>
+            <div>
+              <h5 class="font-bold text-slate-200">Interactive Tags Input</h5>
+              <p class="text-[11px] mt-0.5">Type key terms inside the input field and press <span class="bg-slate-900 px-1 border border-slate-800 rounded">Enter</span> to commit instantly.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="w-2 h-2 mt-1.5 rounded-full bg-amber-500"></span>
+            <div>
+              <h5 class="font-bold text-slate-200">Encryption Handshakes</h5>
+              <p class="text-[11px] mt-0.5">Confidential restricts metadata viewing and generates customized secure links.</p>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 ease-out bg-slate-900 border border-indigo-500/30 text-white rounded-lg px-4 py-3 shadow-2xl max-w-sm flex items-center gap-3">
+    <div class="w-6 h-6 rounded-full bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+      </svg>
+    </div>
+    <div>
+      <h5 class="text-xs font-bold text-white" id="toast-title">Batch Applied</h5>
+      <p class="text-[10px] text-slate-400 mt-0.5" id="toast-body">Metadata parameters updated across checked attachments.</p>
+    </div>
+  </div>
+
+  <!-- Pure JS Application Logic -->
+  <script>
+    // In-Memory Simulated Transaction Vault Database
+    let ATTACHMENTS_DATABASE = [
+      {
+        id: "doc-1",
+        name: "Apex_CA_Loan_Underwriting_Draft",
+        ext: "xlsx",
+        category: "Underwriting",
+        tags: ["Model", "CA-Property", "Q1-Deal"],
+        access: "Confidential",
+        size: "4.2 MB",
+        selected: false,
+        dirty: false
+      },
+      {
+        id: "doc-2",
+        name: "Veritas_Commercial_FL_TermSheet",
+        ext: "pdf",
+        category: "Term Sheets",
+        tags: ["Florida", "Draft-Offer"],
+        access: "Internal",
+        size: "1.8 MB",
+        selected: false,
+        dirty: false
+      },
+      {
+        id: "doc-3",
+        name: "Oak_Hill_Residential_Appraisal_Rep",
+        ext: "pdf",
+        category: "Appraisal",
+        tags: ["Valuation", "CA-Property"],
+        access: "Public",
+        size: "12.4 MB",
+        selected: false,
+        dirty: false
+      },
+      {
+        id: "doc-4",
+        name: "Lumina_Closing_EscrowInstructions_Sgd",
+        ext: "pdf",
+        category: "Closing Docs",
+        tags: ["Signed", "Escrow"],
+        access: "Confidential",
+        size: "850 KB",
+        selected: false,
+        dirty: false
+      },
+      {
+        id: "doc-5",
+        name: "Phase1_Environmental_Report_GA_Macon",
+        ext: "pdf",
+        category: "Due Diligence",
+        tags: ["Georgia", "Audited"],
+        access: "Internal",
+        size: "22.1 MB",
+        selected: false,
+        dirty: false
+      },
+      {
+        id: "doc-6",
+        name: "Borrower_Entity_LLC_Incorporation",
+        ext: "zip",
+        category: "Legal",
+        tags: ["KYC-Verified", "Corporate"],
+        access: "Confidential",
+        size: "15.3 MB",
+        selected: false,
+        dirty: false
+      },
+      {
+        id: "doc-7",
+        name: "Untitled_Draft_Upload_229",
+        ext: "docx",
+        category: "",
+        tags: ["Draft"],
+        access: "Public",
+        size: "200 KB",
+        selected: false,
+        dirty: false
+      },
+      {
+        id: "doc-8",
+        name: "Additional_Exhibits_Unclassified",
+        ext: "pdf",
+        category: "",
+        tags: [],
+        access: "Internal",
+        size: "3.2 MB",
+        selected: false,
+        dirty: false
+      }
+    ];
+
+    // Copy used to revert/reset changes back to stable state
+    let STABLE_COPY = JSON.parse(JSON.stringify(ATTACHMENTS_DATABASE));
+
+    // Current Navigation / Filters State
+    let activeFilters = {
+      searchQuery: "",
+      category: "All",
+      access: "" // can be Public, Internal, Confidential
+    };
+
+    // Initialize View on Page Load
+    document.addEventListener("DOMContentLoaded", () => {
+      initSearchInput();
+      renderManifest();
+    });
+
+    // Setup input listeners
+    function initSearchInput() {
+      const searchBox = document.getElementById("file-search");
+      searchBox.addEventListener("input", (e) => {
+        activeFilters.searchQuery = e.target.value.toLowerCase();
+        renderManifest();
+      });
+    }
+
+    // Dynamic rendering of rows with interactive UI bindings
+    function renderManifest() {
+      const container = document.getElementById("document-rows-container");
+      const emptyState = document.getElementById("empty-state");
+      
+      // Filter list
+      let filtered = ATTACHMENTS_DATABASE.filter(item => {
+        // Name / search keyword match
+        if (activeFilters.searchQuery && !item.name.toLowerCase().includes(activeFilters.searchQuery)) {
+          return false;
+        }
+
+        // Category folder match
+        if (activeFilters.category !== "All") {
+          if (activeFilters.category === "Unassigned") {
+            if (item.category !== "") return false;
+          } else if (item.category !== activeFilters.category) {
+            return false;
+          }
+        }
+
+        // Privacy Access level match
+        if (activeFilters.access && item.access !== activeFilters.access) {
+          return false;
+        }
+
+        return true;
+      });
+
+      // UI Counter adjustments
+      document.getElementById("active-results-count").textContent = filtered.length;
+      
+      // Sync check counts
+      updateCounterBadges();
+
+      if (filtered.length === 0) {
+        container.innerHTML = "";
+        emptyState.classList.remove("hidden");
+        return;
+      } else {
+        emptyState.classList.add("hidden");
+      }
+
+      // Generate HTML list
+      container.innerHTML = filtered.map((item, index) => {
+        // Determine file type icon
+        let typeBadgeColor = "text-indigo-400 bg-indigo-500/10";
+        if (item.ext === "xlsx") typeBadgeColor = "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
+        if (item.ext === "zip") typeBadgeColor = "text-amber-400 bg-amber-500/10 border-amber-500/20";
+
+        // Access indicator badge styling
+        let accessStyle = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/10";
+        if (item.access === "Internal") accessStyle = "bg-indigo-500/10 text-indigo-400 border border-indigo-500/10";
+        if (item.access === "Confidential") accessStyle = "bg-amber-500/10 text-amber-400 border border-amber-500/10";
+
+        // Tags markup template
+        const tagsMarkup = item.tags.map(tag => `
+          <span class="inline-flex items-center gap-1 text-[10px] bg-slate-900 border border-slate-800 text-slate-300 px-1.5 py-0.5 rounded">
+            <span>${tag}</span>
+            <button onclick="removeIndividualTag('${item.id}', '${tag}')" class="text-[9px] hover:text-red-400 focus:outline-none transition-colors">&times;</button>
+          </span>
+        `).join('');
+
+        return `
+          <tr class="border-b border-slate-800/60 hover:bg-slate-900/40 transition-colors duration-150 ${item.selected ? 'bg-indigo-500/5' : ''}">
+            <!-- Selection Checkbox -->
+            <td class="p-3 text-center">
+              <input type="checkbox" ${item.selected ? 'checked' : ''} onchange="toggleSelectDocument('${item.id}', this.checked)" class="w-3.5 h-3.5 rounded bg-slate-900 border-slate-800 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-slate-950 cursor-pointer">
+            </td>
+            
+            <!-- Filename Input -->
+            <td class="p-3">
+              <div class="flex items-center gap-2">
+                <span class="text-[9px] font-mono uppercase font-bold tracking-wider px-1.5 py-0.5 rounded ${typeBadgeColor}">
+                  .${item.ext}
+                </span>
+                <div class="w-full relative glow-border-focus transition-all rounded">
+                  <input type="text" value="${item.name}" onchange="updateFilename('${item.id}', this.value)" class="w-full bg-transparent border-b border-transparent focus:border-indigo-500/80 px-1 py-1 text-xs text-white focus:outline-none font-medium">
+                  ${item.dirty ? `
+                    <span class="absolute -right-2 top-1.5 w-1.5 h-1.5 rounded-full bg-indigo-400 animate-ping" title="Unsaved edit"></span>
+                  ` : ''}
+                </div>
+              </div>
+            </td>
+
+            <!-- Category dropdown selection -->
+            <td class="p-3">
+              <select onchange="updateCategory('${item.id}', this.value)" class="bg-slate-900 border border-slate-800 rounded p-1.5 text-xs text-slate-300 focus:outline-none focus:border-indigo-500 transition-all cursor-pointer w-full">
+                <option value="" ${item.category === "" ? 'selected' : ''}>-- Unassigned --</option>
+                <option value="Underwriting" ${item.category === "Underwriting" ? 'selected' : ''}>Underwriting Models</option>
+                <option value="Term Sheets" ${item.category === "Term Sheets" ? 'selected' : ''}>Term Sheets & Offers</option>
+                <option value="Appraisal" ${item.category === "Appraisal" ? 'selected' : ''}>Property Appraisal</option>
+                <option value="Closing Docs" ${item.category === "Closing Docs" ? 'selected' : ''}>Closing Instructions</option>
+                <option value="Due Diligence" ${item.category === "Due Diligence" ? 'selected' : ''}>Due Diligence Vault</option>
+                <option value="Legal" ${item.category === "Legal" ? 'selected' : ''}>Legal & Corporate</option>
+              </select>
+            </td>
+
+            <!-- Tags display & instant addition text input -->
+            <td class="p-3">
+              <div class="space-y-1.5">
+                <div class="flex flex-wrap gap-1">
+                  ${tagsMarkup || '<span class="text-[9px] text-slate-600 italic">No Tags</span>'}
+                </div>
+                <input type="text" placeholder="Add tag..." onkeypress="handleTagInput(event, '${item.id}')" class="w-full bg-slate-900 border border-slate-800/80 rounded px-1.5 py-0.5 text-[10px] text-slate-300 focus:outline-none focus:border-indigo-500 transition-colors">
+              </div>
+            </td>
+
+            <!-- Access restriction permission toggler -->
+            <td class="p-3">
+              <select onchange="updateAccess('${item.id}', this.value)" class="bg-slate-900 border border-slate-800 rounded p-1.5 text-xs text-slate-300 focus:outline-none focus:border-indigo-500 transition-all cursor-pointer w-full font-medium ${item.access === 'Confidential' ? 'text-amber-400' : (item.access === 'Internal' ? 'text-indigo-400' : 'text-emerald-400')}">
+                <option value="Public" ${item.access === "Public" ? 'selected' : ''}>🌐 Public Link</option>
+                <option value="Internal" ${item.access === "Internal" ? 'selected' : ''}>🔒 Internal Team</option>
+                <option value="Confidential" ${item.access === "Confidential" ? 'selected' : ''}>⚠️ Confidential</option>
+              </select>
+            </td>
+
+            <!-- Size (Static metadata details) -->
+            <td class="p-3 text-right text-xs font-mono text-slate-400">
+              ${item.size}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Direct change handlers for Inline Editing cells
+    function updateFilename(id, value) {
+      const item = ATTACHMENTS_DATABASE.find(x => x.id === id);
+      if (item && item.name !== value) {
+        item.name = value;
+        item.dirty = true;
+        showToast("Filename draft changed", "Dirty edit logged to table.");
+        renderManifest();
+      }
+    }
+
+    function updateCategory(id, value) {
+      const item = ATTACHMENTS_DATABASE.find(x => x.id === id);
+      if (item && item.category !== value) {
+        item.category = value;
+        item.dirty = true;
+        showToast("Category folder assigned", "Assigned row to " + value);
+        renderManifest();
+      }
+    }
+
+    function updateAccess(id, value) {
+      const item = ATTACHMENTS_DATABASE.find(x => x.id === id);
+      if (item && item.access !== value) {
+        item.access = value;
+        item.dirty = true;
+        showToast("Permissions restricted", "Set access level to: " + value);
+        renderManifest();
+      }
+    }
+
+    // Handle tag additions from typing inside rows
+    function handleTagInput(event, id) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        const value = event.target.value.trim();
+        if (value) {
+          const item = ATTACHMENTS_DATABASE.find(x => x.id === id);
+          if (item && !item.tags.includes(value)) {
+            item.tags.push(value);
+            item.dirty = true;
+            event.target.value = "";
+            showToast("Tag appended", "Added tag '" + value + "' to document.");
+            renderManifest();
+          }
+        }
+      }
+    }
+
+    function removeIndividualTag(id, tagValue) {
+      const item = ATTACHMENTS_DATABASE.find(x => x.id === id);
+      if (item) {
+        item.tags = item.tags.filter(t => t !== tagValue);
+        item.dirty = true;
+        showToast("Tag removed", "Deleted tag: " + tagValue);
+        renderManifest();
+      }
+    }
+
+    // Toggle document selection checkbox
+    function toggleSelectDocument(id, isSelected) {
+      const item = ATTACHMENTS_DATABASE.find(x => x.id === id);
+      if (item) {
+        item.selected = isSelected;
+        renderManifest();
+      }
+    }
+
+    // Toggle all documents matching the current view header check
+    function toggleHeaderSelectAll(headerCheckbox) {
+      const isChecked = headerCheckbox.checked;
+      ATTACHMENTS_DATABASE.forEach(item => {
+        // Only select items that match search filters to match UX logic
+        const matchesSearch = !activeFilters.searchQuery || item.name.toLowerCase().includes(activeFilters.searchQuery);
+        const matchesCategory = activeFilters.category === "All" || item.category === activeFilters.category;
+        const matchesAccess = !activeFilters.access || item.access === activeFilters.access;
+
+        if (matchesSearch && matchesCategory && matchesAccess) {
+          item.selected = isChecked;
+        }
+      });
+      renderManifest();
+    }
+
+    // Manual helper buttons to clear or select all manifest
+    function selectAllDocuments(boolValue) {
+      ATTACHMENTS_DATABASE.forEach(item => item.selected = boolValue);
+      document.getElementById("header-select-all").checked = boolValue;
+      renderManifest();
+      showToast(boolValue ? "All items selected" : "Selection cleared", boolValue ? "Applied to entire metadata deck" : "Reset selection state");
+    }
+
+    // Dynamic stats badges updater logic
+    function updateCounterBadges() {
+      const selected = ATTACHMENTS_DATABASE.filter(x => x.selected);
+      const dirty = ATTACHMENTS_DATABASE.filter(x => x.dirty);
+      
+      // Update header counters
+      document.getElementById("selected-counter").textContent = selected.length + " Files Checked";
+      document.getElementById("batch-sel-badge").textContent = selected.length + " Selected attachments";
+      
+      const unsaved = document.getElementById("unsaved-badge");
+      unsaved.textContent = dirty.length + " pending";
+      if (dirty.length > 0) {
+        unsaved.className = "px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/10 border border-amber-500/30 text-amber-400";
+      } else {
+        unsaved.className = "px-2 py-0.5 rounded text-[11px] font-bold bg-slate-900 border border-slate-800 text-slate-500";
+      }
+
+      // Update sidebar real-time widget stats
+      document.getElementById("stat-total-items").textContent = ATTACHMENTS_DATABASE.length;
+      document.getElementById("stat-unassigned").textContent = ATTACHMENTS_DATABASE.filter(x => x.category === "").length;
+      document.getElementById("stat-confidential").textContent = ATTACHMENTS_DATABASE.filter(x => x.access === "Confidential").length;
+    }
+
+    // ACCESS FILTER OPTION SYSTEM
+    function filterByAccess(level) {
+      const btns = document.querySelectorAll(".access-filter-btn");
+      btns.forEach(btn => btn.classList.remove("bg-indigo-600", "text-white"));
+
+      if (activeFilters.access === level) {
+        activeFilters.access = ""; // Toggle off
+      } else {
+        activeFilters.access = level;
+        document.getElementById("access-btn-" + level).classList.add("bg-indigo-600", "text-white");
+      }
+      renderManifest();
+    }
+
+    // Preset Tags helper
+    function insertPresetTag(tagName) {
+      // Look for selected documents and append
+      const selected = ATTACHMENTS_DATABASE.filter(x => x.selected);
+      if (selected.length > 0) {
+        selected.forEach(item => {
+          if (!item.tags.includes(tagName)) {
+            item.tags.push(tagName);
+            item.dirty = true;
+          }
+        });
+        showToast("Preset Appended", "Appended '" + tagName + "' tag into " + selected.length + " checked items.");
+        renderManifest();
+      } else {
+        // Or inject into keyword search bar
+        document.getElementById("file-search").value = tagName;
+        activeFilters.searchQuery = tagName.toLowerCase();
+        renderManifest();
+        showToast("Filter Prefilled", "Updated active filters to keyword search: " + tagName);
+      }
+    }
+
+    // Apply Active Filters changes on category updates
+    function applyFilters() {
+      const select = document.getElementById("filter-category");
+      activeFilters.category = select.value;
+      renderManifest();
+    }
+
+    function clearSearchFilters() {
+      activeFilters.searchQuery = "";
+      activeFilters.category = "All";
+      activeFilters.access = "";
+
+      document.getElementById("file-search").value = "";
+      document.getElementById("filter-category").value = "All";
+      
+      const btns = document.querySelectorAll(".access-filter-btn");
+      btns.forEach(btn => btn.classList.remove("bg-indigo-600", "text-white"));
+
+      renderManifest();
+      showToast("Cleared Deck Filters", "Manifest re-rendered using core database.");
+    }
+
+    // BATCH COMMAND DECK LOGIC
+    function applyBatchRename() {
+      const selected = ATTACHMENTS_DATABASE.filter(x => x.selected);
+      if (selected.length === 0) {
+        showWarning("No Files Checked", "You must select files below before applying batch metadata operations.");
+        return;
+      }
+
+      const prefix = document.getElementById("batch-prefix").value.trim();
+      const suffix = document.getElementById("batch-suffix").value.trim();
+
+      if (!prefix && !suffix) {
+        showWarning("No Affix Values Provided", "Enter a suffix or prefix value first.");
+        return;
+      }
+
+      selected.forEach(item => {
+        item.name = prefix + item.name + suffix;
+        item.dirty = true;
+      });
+
+      // Clear values after apply
+      document.getElementById("batch-prefix").value = "";
+      document.getElementById("batch-suffix").value = "";
+
+      showToast("Batch Rename Completed", "Appended prefix/suffix across " + selected.length + " files.");
+      renderManifest();
+    }
+
+    function applyBatchCategory() {
+      const selected = ATTACHMENTS_DATABASE.filter(x => x.selected);
+      if (selected.length === 0) {
+        showWarning("No Files Checked", "Make a selection first.");
+        return;
+      }
+
+      const catVal = document.getElementById("batch-category").value;
+      if (catVal === "") {
+        showWarning("Folder Empty", "Please select a valid folder option from the batch dropdown.");
+        return;
+      }
+
+      selected.forEach(item => {
+        item.category = catVal;
+        item.dirty = true;
+      });
+
+      showToast("Batch Folders Appended", "Set category to " + catVal + " for checked files.");
+      renderManifest();
+    }
+
+    function applyBatchTags() {
+      const selected = ATTACHMENTS_DATABASE.filter(x => x.selected);
+      if (selected.length === 0) {
+        showWarning("No Files Checked", "Select attachments to inject tags.");
+        return;
+      }
+
+      const tagInput = document.getElementById("batch-tag-input").value.trim();
+      if (!tagInput) {
+        showWarning("Tag Value Missing", "Specify a tag parameter value.");
+        return;
+      }
+
+      selected.forEach(item => {
+        if (!item.tags.includes(tagInput)) {
+          item.tags.push(tagInput);
+          item.dirty = true;
+        }
+      });
+
+      document.getElementById("batch-tag-input").value = "";
+      showToast("Batch Tags Embedded", "Injected tags across " + selected.length + " items.");
+      renderManifest();
+    }
+
+    function applyBatchAccess() {
+      const selected = ATTACHMENTS_DATABASE.filter(x => x.selected);
+      if (selected.length === 0) {
+        showWarning("No Selection Identified", "No checked documents.");
+        return;
+      }
+
+      const accessVal = document.getElementById("batch-access").value;
+      if (!accessVal) {
+        showWarning("Access Parameter Empty", "Choose an access permission type.");
+        return;
+      }
+
+      selected.forEach(item => {
+        item.access = accessVal;
+        item.dirty = true;
+      });
+
+      showToast("Security Clearances Updated", "Locked selected files to: " + accessVal);
+      renderManifest();
+    }
+
+    // GLOBAL DATABASE COMMITS
+    function saveAllChanges() {
+      const dirtyItems = ATTACHMENTS_DATABASE.filter(x => x.dirty);
+      if (dirtyItems.length === 0) {
+        showToast("No Changes Identified", "Manifest matches stored parameters.");
+        return;
+      }
+
+      // Commit changes to core db stable baseline
+      ATTACHMENTS_DATABASE.forEach(x => {
+        x.dirty = false;
+        x.selected = false;
+      });
+
+      // Update baseline copy
+      STABLE_COPY = JSON.parse(JSON.stringify(ATTACHMENTS_DATABASE));
+
+      showToast("Secure Save Successful", "Committed draft updates to global secure server vaults.");
+      renderManifest();
+    }
+
+    function resetData() {
+      // Revert from baseline
+      ATTACHMENTS_DATABASE = JSON.parse(JSON.stringify(STABLE_COPY));
+      showToast("Draft Changes Discarded", "Reverted metadata back to original index levels.");
+      renderManifest();
+    }
+
+    // CSV Simulation Tool
+    function triggerCSVImportSim() {
+      // Injects 2 simulated raw items representing a mock CSV upload mapping
+      const csvImport1 = {
+        id: "csv-1",
+        name: "IMPORTED_AUDIT_SCHED_CA_PROPERTY_TAXES",
+        ext: "xlsx",
+        category: "Underwriting",
+        tags: ["Imported", "CA-Property"],
+        access: "Internal",
+        size: "1.1 MB",
+        selected: true,
+        dirty: true
+      };
+      const csvImport2 = {
+        id: "csv-2",
+        name: "VALUATION_SUPPLEMENT_A_OAK_HILL",
+        ext: "pdf",
+        category: "Appraisal",
+        tags: ["Imported", "Valuation"],
+        access: "Public",
+        size: "3.5 MB",
+        selected: true,
+        dirty: true
+      };
+
+      ATTACHMENTS_DATABASE.push(csvImport1, csvImport2);
+      showToast("CSV Payload Injected", "2 new rows mapped from sample transaction system logs.");
+      renderManifest();
+    }
+
+    // Toast notification UI helper
+    function showToast(title, body) {
+      const toast = document.getElementById("toast");
+      document.getElementById("toast-title").textContent = title;
+      document.getElementById("toast-body").textContent = body;
+
+      toast.classList.remove("translate-y-20", "opacity-0");
+      setTimeout(() => {
+        toast.classList.add("translate-y-20", "opacity-0");
+      }, 3500);
+    }
+
+    function showWarning(title, body) {
+      const toast = document.getElementById("toast");
+      document.getElementById("toast-title").innerHTML = `<span class="text-amber-400">⚠ ${title}</span>`;
+      document.getElementById("toast-body").textContent = body;
+
+      toast.classList.remove("translate-y-20", "opacity-0");
+      setTimeout(() => {
+        toast.classList.add("translate-y-20", "opacity-0");
+      }, 3500);
+    }
+  </script>
+</body>
+</html>
+```

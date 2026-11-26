@@ -1,0 +1,1102 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funding Readiness Scorecard | Moonshine Partner Profile Engine</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-black: #08090A;
+            --bg-matte: #0D0E11;
+            --bg-card: #14161D;
+            --bone-white: #F5F5F7;
+            --electric-green: #00FF66;
+            --electric-green-hover: #00E054;
+            --signal-orange: #FF5500;
+            --cobalt-blue: #0055FF;
+            --graphite-gray: #1C1E24;
+            --chrome-border: #2D3139;
+            --chrome-border-bright: #444B5A;
+            --text-muted: #8E96A5;
+            
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            --shadow-neo: 4px 4px 0px 0px var(--chrome-border);
+            --shadow-neo-green: 4px 4px 0px 0px var(--electric-green);
+            --shadow-neo-blue: 4px 4px 0px 0px var(--cobalt-blue);
+            --shadow-green: 0px 0px 20px 0px rgba(0, 255, 102, 0.25);
+            --shadow-blue: 0px 0px 20px 0px rgba(0, 85, 255, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-black);
+            color: var(--bone-white);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        .mono { font-family: var(--font-mono); }
+        .text-green { color: var(--electric-green); }
+        .text-orange { color: var(--signal-orange); }
+        .text-blue { color: var(--cobalt-blue); }
+        .text-muted { color: var(--text-muted); }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-black);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--graphite-gray);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--chrome-border-bright);
+        }
+
+        /* Sticky Header styling */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(8, 9, 10, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 2px solid var(--chrome-border);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 2rem;
+        }
+
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--bone-white);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--cobalt-blue), var(--electric-green));
+            border: 2px solid var(--bone-white);
+            transform: rotate(45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.5s ease;
+        }
+
+        .logo-group:hover .logo-icon {
+            transform: rotate(225deg);
+        }
+
+        .logo-text {
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-tag {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            background: var(--graphite-gray);
+            color: var(--electric-green);
+            padding: 2px 6px;
+            border: 1px solid var(--chrome-border);
+        }
+
+        .back-link {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: var(--electric-green);
+        }
+
+        /* Main Workspace container */
+        main {
+            padding-top: 100px;
+            min-height: calc(100vh - 80px);
+        }
+
+        .workspace-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Referral Badge Banner */
+        .referral-banner {
+            background: var(--bg-card);
+            border: 2px solid var(--cobalt-blue);
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-neo-blue);
+        }
+
+        .referral-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .partner-avatar {
+            width: 42px;
+            height: 42px;
+            background: var(--graphite-gray);
+            border: 2px solid var(--electric-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-weight: 800;
+            font-size: 1rem;
+        }
+
+        .referral-title {
+            font-size: 0.8rem;
+            font-family: var(--font-mono);
+            color: var(--electric-green);
+            text-transform: uppercase;
+        }
+
+        .referral-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .referral-tag {
+            background: var(--graphite-gray);
+            border: 1px solid var(--chrome-border);
+            padding: 4px 10px;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* Layout Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 2.5rem;
+            align-items: start;
+        }
+
+        /* Interactive Card styling */
+        .control-panel, .results-panel {
+            background: var(--bg-matte);
+            border: 2px solid var(--chrome-border);
+            padding: 2.5rem;
+            position: relative;
+            box-shadow: var(--shadow-neo);
+        }
+
+        .results-panel {
+            background: var(--bg-card);
+            position: sticky;
+            top: 100px;
+        }
+
+        .panel-header {
+            border-bottom: 2px solid var(--chrome-border);
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .panel-status-tag {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            background: rgba(0, 255, 102, 0.1);
+            color: var(--electric-green);
+            border: 1px solid var(--electric-green);
+            padding: 4px 10px;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .form-label {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--bone-white);
+            text-transform: uppercase;
+        }
+
+        .form-val-display {
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--electric-green);
+            background: var(--bg-black);
+            padding: 4px 12px;
+            border: 1px solid var(--chrome-border);
+        }
+
+        /* Custom Range Slider styling */
+        .slider-wrapper {
+            position: relative;
+        }
+
+        .range-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            background: var(--graphite-gray);
+            border: 1px solid var(--chrome-border);
+            outline: none;
+            transition: background 0.3s;
+        }
+
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--electric-green);
+            border: 2px solid var(--bone-white);
+            cursor: pointer;
+            box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 0.5);
+            transition: transform 0.1s;
+        }
+
+        .range-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+
+        /* Block Segmented Selectors */
+        .block-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        .block-selector.quad {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .selector-item {
+            position: relative;
+        }
+
+        .selector-item input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .selector-label {
+            display: block;
+            background: var(--bg-black);
+            border: 2px solid var(--chrome-border);
+            color: var(--text-muted);
+            padding: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .selector-item input:checked + .selector-label {
+            border-color: var(--cobalt-blue);
+            color: var(--bone-white);
+            background: rgba(0, 85, 255, 0.1);
+            box-shadow: var(--shadow-neo-blue);
+        }
+
+        .selector-item input:focus + .selector-label {
+            border-color: var(--electric-green);
+        }
+
+        /* Visual Score Display (Right Panel) */
+        .score-circle-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .score-radial {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .score-radial svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+
+        .score-radial circle {
+            fill: none;
+            stroke-width: 12;
+        }
+
+        .score-radial .bg {
+            stroke: var(--graphite-gray);
+        }
+
+        .score-radial .progress {
+            stroke: var(--electric-green);
+            stroke-dasharray: 440;
+            stroke-dashoffset: 440;
+            transition: stroke-dashoffset 0.5s ease-out, stroke 0.3s;
+        }
+
+        .score-text-box {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .score-num {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1;
+            font-family: var(--font-mono);
+        }
+
+        .score-max {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        .tier-badge {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 6px 16px;
+            border: 2px solid var(--chrome-border-bright);
+            background: var(--bg-black);
+            margin-bottom: 1.5rem;
+            display: inline-block;
+        }
+
+        .score-status-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            max-width: 380px;
+            line-height: 1.5;
+            margin-bottom: 2rem;
+        }
+
+        /* Matched Programs Display */
+        .matches-container {
+            border-top: 2px solid var(--chrome-border);
+            padding-top: 2rem;
+        }
+
+        .matches-header {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.25rem;
+        }
+
+        .program-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .program-card {
+            background: var(--bg-black);
+            border: 1px solid var(--chrome-border);
+            padding: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .program-card:hover {
+            border-color: var(--electric-green);
+            transform: translateX(4px);
+        }
+
+        .program-card.locked {
+            opacity: 0.4;
+            pointer-events: none;
+            background: rgba(13, 14, 17, 0.4);
+            border: 1px dashed var(--chrome-border);
+        }
+
+        .program-card.locked:hover {
+            transform: none;
+        }
+
+        .program-meta h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .program-meta p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .program-badge {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border: 1px solid var(--chrome-border);
+            background: var(--graphite-gray);
+            font-weight: normal;
+        }
+
+        .program-badge.match {
+            border-color: var(--electric-green);
+            color: var(--electric-green);
+            background: rgba(0, 255, 102, 0.1);
+        }
+
+        .program-badge.disabled {
+            border-color: var(--chrome-border);
+            color: var(--text-muted);
+        }
+
+        .action-column {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .program-limit {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--bone-white);
+            font-family: var(--font-mono);
+        }
+
+        .program-rate-estimate {
+            font-size: 0.75rem;
+            color: var(--electric-green);
+            font-family: var(--font-mono);
+        }
+
+        /* CTA block footer */
+        .results-cta-block {
+            margin-top: 2rem;
+            border-top: 2px solid var(--chrome-border);
+            padding-top: 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 1rem;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid var(--electric-green);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            text-decoration: none;
+        }
+
+        .btn-action.primary {
+            background: var(--electric-green);
+            color: var(--bg-black);
+            box-shadow: var(--shadow-neo-green);
+        }
+
+        .btn-action.primary:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px 0px rgba(0, 255, 102, 0.4), var(--shadow-green);
+        }
+
+        .btn-action.secondary {
+            background: transparent;
+            border-color: var(--chrome-border);
+            color: var(--bone-white);
+        }
+
+        .btn-action.secondary:hover {
+            border-color: var(--bone-white);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Toast notifications container */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 10001;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            border: 2px solid var(--electric-green);
+            color: var(--bone-white);
+            padding: 1rem 1.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            box-shadow: var(--shadow-green);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(100%) scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Disclaimer segment */
+        .disclaimer-block {
+            margin-top: 3rem;
+            padding: 1.5rem;
+            background: var(--bg-matte);
+            border: 1px solid var(--chrome-border);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Mobile configurations */
+        @media (max-width: 1100px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .results-panel {
+                position: static;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .workspace-container {
+                padding: 1rem;
+            }
+            .block-selector.quad {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .results-cta-block {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sticky Header -->
+    <header>
+        <div class="nav-container">
+            <a href="../../index.html" class="logo-group">
+                <div class="logo-icon"></div>
+                <div>
+                    <span class="logo-text">MOONSHINE</span>
+                    <span class="logo-tag">DIAGNOSTIC PANEL</span>
+                </div>
+            </a>
+            <a href="../../index.html#profiles" class="back-link">&larr; Back to Directory</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="workspace-container">
+            
+            <!-- Dynamic Referral Partner Frame -->
+            <div class="referral-banner" id="referralBanner" style="display: none;">
+                <div class="referral-info">
+                    <div class="partner-avatar" id="partnerInitials">MV</div>
+                    <div>
+                        <div class="referral-title">Active Referral desk</div>
+                        <div class="referral-name" id="partnerName">Marcus Vance</div>
+                    </div>
+                </div>
+                <div class="referral-tag" id="partnerMarket">Ecommerce Capital specialist</div>
+            </div>
+
+            <!-- Page Meta Title block -->
+            <div style="margin-bottom: 2.5rem;">
+                <span class="mono text-green" style="font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase;">Diagnostic Toolset v1.1</span>
+                <h1 style="font-size: 2.75rem; font-weight: 800; letter-spacing: -1.5px; margin-top: 0.5rem; line-height: 1.1;">Funding Readiness Scorecard</h1>
+                <p class="text-muted" style="font-size: 1.1rem; max-width: 720px; margin-top: 0.5rem;">
+                    Configure your business parameters instantly to evaluate capitalization pathways and scan options across Moonshine's standard product programs.
+                </p>
+            </div>
+
+            <div class="dashboard-grid">
+                
+                <!-- Left Control Column: Inputs -->
+                <div class="control-panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Business Parameters</h2>
+                        <span class="panel-status-tag">Realtime Scan</span>
+                    </div>
+
+                    <!-- Input 1: Monthly Revenue -->
+                    <div class="form-group">
+                        <div class="form-label-row">
+                            <label class="form-label">Monthly Gross Revenue</label>
+                            <span class="form-val-display" id="revenueValue">$120,000</span>
+                        </div>
+                        <div class="slider-wrapper">
+                            <input type="range" id="revenueInput" class="range-slider" min="5000" max="500000" step="5000" value="120000">
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); margin-top: 0.5rem;">
+                            <span>$5,000</span>
+                            <span>$250,000</span>
+                            <span>$500,000+</span>
+                        </div>
+                    </div>
+
+                    <!-- Input 2: Time in Business -->
+                    <div class="form-group">
+                        <div class="form-label-row">
+                            <label class="form-label">Operating History</label>
+                        </div>
+                        <div class="block-selector quad" id="timeInBusinessSelector">
+                            <div class="selector-item">
+                                <input type="radio" id="tib1" name="time_in_business" value="new" checked>
+                                <label for="tib1" class="selector-label">&lt; 6 Months</label>
+                            </div>
+                            <div class="selector-item">
+                                <input type="radio" id="tib2" name="time_in_business" value="early">
+                                <label for="tib2" class="selector-label">6-12 Months</label>
+                            </div>
+                            <div class="selector-item">
+                                <input type="radio" id="tib3" name="time_in_business" value="mid">
+                                <label for="tib3" class="selector-label">1-2 Years</label>
+                            </div>
+                            <div class="selector-item">
+                                <input type="radio" id="tib4" name="time_in_business" value="established">
+                                <label for="tib4" class="selector-label">2+ Years</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Input 3: Credit Segment -->
+                    <div class="form-group">
+                        <div class="form-label-row">
+                            <label class="form-label">Personal Credit Profile</label>
+                        </div>
+                        <div class="block-selector quad" id="creditSelector">
+                            <div class="selector-item">
+                                <input type="radio" id="cr1" name="credit_score" value="poor">
+                                <label for="cr1" class="selector-label">Poor (&lt;600)</label>
+                            </div>
+                            <div class="selector-item">
+                                <input type="radio" id="cr2" name="credit_score" value="fair" checked>
+                                <label for="cr2" class="selector-label">Fair (600-650)</label>
+                            </div>
+                            <div class="selector-item">
+                                <input type="radio" id="cr3" name="credit_score" value="good">
+                                <label for="cr3" class="selector-label">Good (650-720)</label>
+                            </div>
+                            <div class="selector-item">
+                                <input type="radio" id="cr4" name="credit_score" value="excellent">
+                                <label for="cr4" class="selector-label">Super (720+)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Input 4: Industry vertical -->
+                    <div class="form-group">
+                        <div class="form-label-row">
+                            <label class="form-label">Strategic Industry Target</label>
+                        </div>
+                        <div class="block-selector" id="industrySelector">
+                            <div class="selector-item">
+                                <input type="radio" id="ind1" name="industry_type" value="saas_tech">
+                                <label for="ind1" class="selector-label">SaaS & Technology</label>
+                            </div>
+                            <div class="selector-item">
+                                <input type="radio" id="ind2" name="industry_type" value="ecommerce" checked>
+                                <label for="ind2" class="selector-label">Ecommerce & DTC</label>
+                            </div>
+                            <div class="selector-item">
+                                <input type="radio" id="ind3" name="industry_type" value="logistics">
+                                <label for="ind3" class="selector-label">Logistics & Fleets</label>
+                            </div>
+                            <div class="selector-item">
+                                <input type="radio" id="ind4" name="industry_type" value="contracting">
+                                <label for="ind4" class="selector-label">Contractors & Supply</label>
+                            </div>
+                            <div class="selector-item">
+                                <input type="radio" id="ind5" name="industry_type" value="realestate">
+                                <label for="ind5" class="selector-label">Real Estate Investment</label>
+                            </div>
+                            <div class="selector-item">
+                                <input type="radio" id="ind6" name="industry_type" value="other">
+                                <label for="ind6" class="selector-label">Standard Services / Other</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Diagnostic Output Column -->
+                <div class="results-panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Diagnostic Metrics</h2>
+                        <span class="panel-status-tag" style="background: rgba(0, 85, 255, 0.1); color: var(--cobalt-blue); border-color: var(--cobalt-blue);">Score Panel</span>
+                    </div>
+
+                    <!-- Score Radial Indicator -->
+                    <div class="score-circle-container">
+                        <div class="score-radial">
+                            <svg>
+                                <circle class="bg" cx="90" cy="90" r="70"></circle>
+                                <circle class="progress" id="progressCircle" cx="90" cy="90" r="70"></circle>
+                            </svg>
+                            <div class="score-text-box">
+                                <span class="score-num" id="scoreDisplay">0</span>
+                                <span class="score-max">OUT OF 100</span>
+                            </div>
+                        </div>
+                        <div class="tier-badge" id="tierDisplay">Tier 3: Advisory Required</div>
+                        <p class="score-status-desc" id="statusDesc">
+                            Parameters indicate highly restricted matching prospects. Reach out to coordinate custom asset portfolio modeling with our risk solutions desk.
+                        </p>
+                    </div>
+
+                    <!-- Matched Loans Display -->
+                    <div class="matches-container">
+                        <div class="matches-header">Compatible System Pathways</div>
+                        <div class="program-list" id="programList">
+                            <!-- Populated Dynamically by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Action Segment -->
+                    <div class="results-cta-block">
+                        <button class="btn-action secondary" onclick="printScorecard()">Export Metrics</button>
+                        <a href="mailto:underwriting@moonshine.capital?subject=Ready%20Partner%20Scorecard%20Submission" class="btn-action primary" id="underwritingSubmitCta">Lock Matching Programs</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Disclaimer Panel footer -->
+            <div class="disclaimer-block">
+                <strong>DIAGNOSTIC CALIBRATION NOTICE:</strong> Calculated metrics generated via this interface represent indicative, non-binding score guidelines based on standard systemic weighting parameters. True eligibility matches require direct operational account integrations, formal third-party background reviews, verification of banking accounts, and primary credit underwriting reviews by Moonshine Capital desk specialists. Product limits and interest structures are determined following complete review of submitted legal documentation.
+            </div>
+        </div>
+    </main>
+
+    <!-- Dynamic System Alerts -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Live Logic Handling -->
+    <script>
+        // Preset Reference Directory partners to detect if referred via slug ?ref=marcus-vance
+        const partnerDb = {
+            'danielle-hart': { initials: 'DH', name: 'Danielle Hart', market: 'SaaS & Tech Capital Partner' },
+            'darwin-hanneman': { initials: 'DH', name: 'Darwin Hanneman', market: 'Real Estate Investor Funding' },
+            'marcus-vance': { initials: 'MV', name: 'Marcus Vance', market: 'Ecommerce Capital Specialist' },
+            'elena-rostova': { initials: 'ER', name: 'Elena Rostova', market: 'Logistics & Fleet Advisory' },
+            'jack-sterling': { initials: 'JS', name: 'Jack Sterling', market: 'Contractor Funding Partner' },
+            'sarah-jenkins': { initials: 'SJ', name: 'Sarah Jenkins', market: 'Real Estate Investor Specialist' },
+            'devon-mills': { initials: 'DM', name: 'Devon Mills', market: 'Merchant Capital Specialist' }
+        };
+
+        // UI Alert Triggering
+        function triggerToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<span>⚡</span> <span>${message}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(20px) scale(0.9)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Detect and style for dynamic Partner profiles via parameters
+        function checkReferral() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const refParam = urlParams.get('ref') || urlParams.get('partner');
+            
+            if (refParam && partnerDb[refParam]) {
+                const partner = partnerDb[refParam];
+                document.getElementById('partnerInitials').textContent = partner.initials;
+                document.getElementById('partnerName').textContent = partner.name;
+                document.getElementById('partnerMarket').textContent = partner.market;
+                document.getElementById('referralBanner').style.display = 'flex';
+                
+                // Update Email CTA parameters dynamically
+                document.getElementById('underwritingSubmitCta').href = `mailto:underwriting@moonshine.capital?subject=Ready%20Partner%20Scorecard%20Submission&body=Referred%20By:%20${encodeURIComponent(partner.name)}%0D%0A`;
+                triggerToast(`Matched configuration with ${partner.name}'s referral desk.`);
+            }
+        }
+
+        // Format Dynamic Money display values
+        function formatMoney(amount) {
+            if (amount >= 1000000) {
+                return '$' + (amount / 1000000).toFixed(1) + 'M';
+            } else if (amount >= 1000) {
+                return '$' + (amount / 1000).toFixed(0) + 'k';
+            }
+            return '$' + amount;
+        }
+
+        // Logic Calculations setup
+        const revenueInput = document.getElementById('revenueInput');
+        const revenueDisplay = document.getElementById('revenueValue');
+        const progressCircle = document.getElementById('progressCircle');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const tierDisplay = document.getElementById('tierDisplay');
+        const statusDesc = document.getElementById('statusDesc');
+        const programList = document.getElementById('programList');
+
+        // Capture checked parameter fields
+        function getRadioValue(name) {
+            const selected = document.querySelector(`input[name="${name}"]:checked`);
+            return selected ? selected.value : null;
+        }
+
+        function calculateScore() {
+            const rev = parseInt(revenueInput.value);
+            const tib = getRadioValue('time_in_business');
+            const credit = getRadioValue('credit_score');
+            const industry = getRadioValue('industry_type');
+
+            revenueDisplay.textContent = '$' + rev.toLocaleString();
+
+            let score = 0;
+
+            // 1. Revenue weight scoring (Max 35 points)
+            if (rev >= 350000) score += 35;
+            else if (rev >= 200000) score += 30;
+            else if (rev >= 100000) score += 25;
+            else if (rev >= 50000) score += 18;
+            else if (rev >= 25000) score += 12;
+            else score += 5;
+
+            // 2. Business History weight scoring (Max 25 points)
+            if (tib === 'established') score += 25;
+            else if (tib === 'mid') score += 20;
+            else if (tib === 'early') score += 12;
+            else score += 4;
+
+            // 3. Credit Profile weight scoring (Max 25 points)
+            if (credit === 'excellent') score += 25;
+            else if (credit === 'good') score += 18;
+            else if (credit === 'fair') score += 10;
+            else score += 2;
+
+            // 4. Strategic Industry alignment (Max 15 points)
+            if (industry === 'saas_tech' || industry === 'realestate') score += 15;
+            else if (industry === 'ecommerce' || industry === 'logistics') score += 12;
+            else if (industry === 'contracting') score += 8;
+            else score += 5;
+
+            updateUI(score, rev, tib, credit, industry);
+        }
+
+        function updateUI(score, rev, tib, credit, industry) {
+            // Update Score Ring stroke
+            const circumference = 2 * Math.PI * 70; // 439.8
+            const strokeDashoffset = circumference - (score / 100) * circumference;
+            progressCircle.style.strokeDashoffset = strokeDashoffset;
+            scoreDisplay.textContent = score;
+
+            // Color status shifts based on results
+            if (score >= 75) {
+                progressCircle.style.stroke = 'var(--electric-green)';
+                tierDisplay.style.borderColor = 'var(--electric-green)';
+                tierDisplay.style.color = 'var(--electric-green)';
+                tierDisplay.textContent = 'Tier 1: High Readiness';
+                statusDesc.textContent = 'Excellent diagnostic matching. Parameters fall directly within prime operational tiers for major credit paths and immediate deployment options.';
+            } else if (score >= 45) {
+                progressCircle.style.stroke = 'var(--cobalt-blue)';
+                tierDisplay.style.borderColor = 'var(--cobalt-blue)';
+                tierDisplay.style.color = 'var(--cobalt-blue)';
+                tierDisplay.textContent = 'Tier 2: Good Matching';
+                statusDesc.textContent = 'Solid candidate metrics. Ready for primary systemic integrations, equipment programs, or secondary asset lending paths.';
+            } else {
+                progressCircle.style.stroke = 'var(--signal-orange)';
+                tierDisplay.style.borderColor = 'var(--signal-orange)';
+                tierDisplay.style.color = 'var(--signal-orange)';
+                tierDisplay.textContent = 'Tier 3: Advisory Required';
+                statusDesc.textContent = 'Metrics show active structural friction. Customized asset profiles and advisory desk consultations suggested to outline bridging strategies.';
+            }
+
+            // Program Match matrix evaluation
+            renderPrograms(rev, tib, credit, industry);
+        }
+
+        function renderPrograms(rev, tib, credit, industry) {
+            // Setup static standard programs with rules
+            const programs = [
+                {
+                    id: 'rev_share',
+                    name: 'Revenue-Based Financing',
+                    tag: 'Non-Dilutive Cap',
+                    maxVal: rev * 4,
+                    rate: 'Starts at 1.12 factor',
+                    allowed: (rev >= 15000 && tib !== 'new')
+                },
+                {
+                    id: 'line_credit',
+                    name: 'Sovereign Revolving Line',
+                    tag: 'On-Demand Capital',
+                    maxVal: rev * 1.5,
+                    rate: 'Prime + 2.5%',
+                    allowed: (tib !== 'new' && tib !== 'early' && credit !== 'poor')
+                },
+                {
+                    id: 'asset_bridge',
+                    name: 'Asset-Backed Bridge Desk',
+                    tag: 'Structured Debt',
+                    maxVal: rev * 6,
+                    rate: 'Custom collateral factors',
+                    allowed: (industry === 'realestate' || industry === 'logistics' || credit === 'excellent')
+                },
+                {
+                    id: 'merchant_advance',
+                    name: 'Merchant Liquid Stream',
+                    tag: 'Fast Cash Access',
+                    maxVal: rev * 1.1,
+                    rate: 'Flexible daily logic',
+                    allowed: (rev >= 8000)
+                }
+            ];
+
+            programList.innerHTML = '';
+
+            programs.forEach(program => {
+                const card = document.createElement('div');
+                
+                if (program.allowed) {
+                    card.className = 'program-card';
+                    card.innerHTML = `
+                        <div class="program-meta">
+                            <h4>${program.name} <span class="program-badge match">${program.tag}</span></h4>
+                            <p>Pre-qualification guidelines fulfilled</p>
+                        </div>
+                        <div class="action-column">
+                            <span class="program-limit">${formatMoney(program.maxVal)}</span>
+                            <span class="program-rate-estimate">${program.rate}</span>
+                        </div>
+                    `;
+                } else {
+                    card.className = 'program-card locked';
+                    card.innerHTML = `
+                        <div class="program-meta">
+                            <h4>${program.name} <span class="program-badge disabled">Restricted</span></h4>
+                            <p>Missing criteria checkpoints</p>
+                        </div>
+                        <div class="action-column">
+                            <span class="program-limit">--</span>
+                            <span class="program-rate-estimate">Friction detected</span>
+                        </div>
+                    `;
+                }
+                
+                programList.appendChild(card);
+            });
+        }
+
+        // Export data to print/PDF simulation
+        function printScorecard() {
+            window.print();
+            triggerToast('Printed matching report layout successfully.');
+        }
+
+        // Setup event listener controls
+        revenueInput.addEventListener('input', calculateScore);
+        
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', calculateScore);
+        });
+
+        // Initialize setup states on startup
+        document.addEventListener('DOMContentLoaded', () => {
+            checkReferral();
+            calculateScore();
+        });
+    </script>
+</body>
+</html>
+```

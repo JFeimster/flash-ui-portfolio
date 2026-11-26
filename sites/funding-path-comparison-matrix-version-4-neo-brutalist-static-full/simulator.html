@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neo-Capital Markets | Cost & Dilution Simulator</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brutalBlack: '#000000',
+                        brutalWhite: '#ffffff',
+                        brutalDark: '#0a0a0f',
+                        brutalCard: '#12121c',
+                        neoMagenta: '#ff007a',
+                        neoTeal: '#00f0ff',
+                        neoLime: '#39ff14',
+                        neoYellow: '#fffb00',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                        mono: ['Courier New', 'Courier', 'monospace']
+                    },
+                    boxShadow: {
+                        'brutal-pink': '6px 6px 0px 0px #ff007a',
+                        'brutal-teal': '6px 6px 0px 0px #00f0ff',
+                        'brutal-lime': '6px 6px 0px 0px #39ff14',
+                        'brutal-yellow': '6px 6px 0px 0px #fffb00',
+                        'brutal-black': '8px 8px 0px 0px #000000',
+                        'brutal-white-sm': '3px 3px 0px 0px #ffffff',
+                        'brutal-white': '6px 6px 0px 0px #ffffff',
+                        'brutal-active': '2px 2px 0px 0px #000000',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #050508;
+            background-image: radial-gradient(#1c1c28 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+        }
+        
+        /* Brutalist Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000000;
+            border-left: 3px solid #ff007a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ff007a;
+            border: 2px solid #000000;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f0ff;
+        }
+
+        /* Danger Warning / Dilution Alert Stripe Pattern */
+        .stripe-alert {
+            background-color: #12121c;
+            background-image: repeating-linear-gradient(
+                -45deg,
+                #000000,
+                #000000 10px,
+                #ff0055 10px,
+                #ff0055 20px
+            );
+            background-size: 28px 28px;
+        }
+
+        /* Safe / Saved Premium Stripe Pattern */
+        .stripe-safe {
+            background-color: #0a0a0f;
+            background-image: repeating-linear-gradient(
+                -45deg,
+                #000000,
+                #000000 10px,
+                #39ff14 10px,
+                #39ff14 20px
+            );
+            background-size: 28px 28px;
+        }
+
+        /* Range Slider Styling Overrides */
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #fffb00;
+            border: 3px solid #000000;
+            box-shadow: 3px 3px 0px 0px #000000;
+            cursor: pointer;
+            border-radius: 0;
+            transition: transform 0.1s ease;
+        }
+        input[type="range"]::-webkit-slider-thumb:active {
+            transform: scale(1.1);
+            background: #ff007a;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: #fffb00;
+            border: 3px solid #000000;
+            box-shadow: 3px 3px 0px 0px #000000;
+            cursor: pointer;
+            border-radius: 0;
+        }
+    </style>
+</head>
+<body class="text-zinc-100 min-h-screen flex flex-col justify-between antialiased selection:bg-neoMagenta selection:text-black p-4 md:p-8">
+
+    <!-- Top Floating Marquee Banner -->
+    <div class="w-full bg-neoTeal text-black font-black py-2.5 px-4 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-8 overflow-hidden whitespace-nowrap flex items-center gap-12 text-xs md:text-sm uppercase tracking-widest">
+        <div class="flex items-center gap-4 shrink-0">
+            <span>⚡ COMPILATION SUITE: COST & DILUTION ENGINE v1.2 ⚡</span>
+            <span class="h-2 w-2 bg-black rounded-full"></span>
+            <span>REAL-TIME CAPITAL COMPARISON RUNNING</span>
+            <span class="h-2 w-2 bg-black rounded-full"></span>
+            <span>FOUNDER EQUITY OPTIMIZATION RATIOS STABLE</span>
+        </div>
+        <div class="hidden md:flex items-center gap-4 shrink-0">
+            <span>⚡ COMPILATION SUITE: COST & DILUTION ENGINE v1.2 ⚡</span>
+            <span class="h-2 w-2 bg-black rounded-full"></span>
+            <span>REAL-TIME CAPITAL COMPARISON RUNNING</span>
+            <span class="h-2 w-2 bg-black rounded-full"></span>
+            <span>FOUNDER EQUITY OPTIMIZATION RATIOS STABLE</span>
+        </div>
+    </div>
+
+    <!-- Container -->
+    <div class="max-w-7xl mx-auto w-full space-y-12">
+        
+        <!-- Header Section -->
+        <div class="flex flex-col lg:flex-row lg:items-stretch gap-6 pb-8 border-b-4 border-black">
+            <div class="flex-1 space-y-4">
+                <div class="inline-flex items-center gap-3">
+                    <span class="px-4 py-1.5 text-xs font-black bg-neoYellow text-black border-2 border-black uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000]">
+                        SIMULATOR ACTIVE
+                    </span>
+                    <span class="w-3.5 h-3.5 bg-neoMagenta border border-black animate-ping"></span>
+                    <span class="text-xs font-mono font-bold text-neoTeal">NEO-MARKETS CALCULATOR</span>
+                </div>
+                <h1 class="text-4xl md:text-6xl font-black uppercase tracking-tight text-white leading-none">
+                    DILUTION & <span class="text-transparent bg-clip-text bg-gradient-to-r from-neoMagenta via-neoTeal to-neoYellow underline decoration-4 decoration-white">REPAYMENT MODEL</span>
+                </h1>
+                <p class="text-sm md:text-base text-zinc-300 max-w-2xl font-semibold leading-relaxed">
+                    Evaluate equity loss versus non-dilutive repayment terms side-by-side. Slide capital thresholds and valuation ceilings to find your optimal funding route.
+                </p>
+            </div>
+            
+            <!-- Quick Metrics Overview Block -->
+            <div class="bg-brutalCard border-4 border-black p-6 w-full lg:w-[420px] space-y-4 shadow-brutal-pink relative overflow-hidden flex flex-col justify-center">
+                <div class="absolute top-0 right-0 bg-neoMagenta text-white text-[9px] font-black px-2 py-0.5 border-b-2 border-l-2 border-black uppercase tracking-wider">
+                    SYSTEM LEDGER
+                </div>
+                <div class="flex justify-between items-center border-b-2 border-zinc-800 pb-2">
+                    <span class="text-xs font-black text-zinc-400 uppercase font-mono">DILUTIVE LIQUIDITY COST</span>
+                    <span id="metrics-vc-cost" class="text-lg font-black text-neoMagenta font-mono">$1,500,000</span>
+                </div>
+                <div class="flex justify-between items-center border-b-2 border-zinc-800 pb-2">
+                    <span class="text-xs font-black text-zinc-400 uppercase font-mono">DEBT CAPITAL PREMIUM</span>
+                    <span id="metrics-debt-cost" class="text-lg font-black text-neoYellow font-mono">$200,000</span>
+                </div>
+                <div class="flex justify-between items-center pt-1 bg-black p-2 border border-zinc-800">
+                    <span class="text-xs font-black text-neoLime uppercase font-mono">ESTIMATED FOUNDER SAVINGS</span>
+                    <span id="metrics-savings" class="text-xl font-black text-neoLime font-mono">+$1,300,000</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Simulator Working Interface -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- CONTROLLER MODULE (LEFT PANEL - 5 COLS) -->
+            <div class="lg:col-span-5 bg-zinc-950 border-4 border-black p-6 space-y-6 shadow-brutal-black">
+                <div class="border-b-4 border-black pb-4 flex items-center justify-between">
+                    <h2 class="text-xl font-black text-white uppercase tracking-tight">[ SIMULATOR INPUTS ]</h2>
+                    <span class="text-xs font-mono font-bold bg-zinc-900 border border-zinc-800 text-zinc-400 py-1 px-2 uppercase">Core Inputs</span>
+                </div>
+
+                <!-- Slider 1: Funding Requested -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-end">
+                        <label class="text-xs font-black text-white uppercase tracking-wide">1. FUNDING REQUIREMENT</label>
+                        <span id="slider-funding-val" class="text-xl font-black text-neoTeal font-mono">$2,000,000</span>
+                    </div>
+                    <input 
+                        type="range" 
+                        id="slider-funding" 
+                        min="250000" 
+                        max="10000000" 
+                        step="250000" 
+                        value="2000000" 
+                        class="w-full h-3 bg-black border-2 border-zinc-700 appearance-none cursor-pointer focus:outline-none"
+                    >
+                    <div class="flex justify-between text-[10px] text-zinc-500 font-mono font-bold">
+                        <span>$250K</span>
+                        <span>$5.0M</span>
+                        <span>$10.0M</span>
+                    </div>
+                </div>
+
+                <!-- Slider 2: Current Pre-Money Valuation -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-end">
+                        <label class="text-xs font-black text-white uppercase tracking-wide">2. TARGET VALUATION</label>
+                        <span id="slider-val-val" class="text-xl font-black text-neoYellow font-mono">$10,000,000</span>
+                    </div>
+                    <input 
+                        type="range" 
+                        id="slider-val" 
+                        min="2000000" 
+                        max="50000000" 
+                        step="1000000" 
+                        value="10000000" 
+                        class="w-full h-3 bg-black border-2 border-zinc-700 appearance-none cursor-pointer focus:outline-none"
+                    >
+                    <div class="flex justify-between text-[10px] text-zinc-500 font-mono font-bold">
+                        <span>$2.0M</span>
+                        <span>$25.0M</span>
+                        <span>$50.0M</span>
+                    </div>
+                </div>
+
+                <!-- Slider 3: Interest Rate / Flat Fee -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-end">
+                        <label class="text-xs font-black text-white uppercase tracking-wide">3. NON-DILUTIVE COST OF CAPITAL (FEE)</label>
+                        <span id="slider-fee-val" class="text-xl font-black text-neoLime font-mono">8%</span>
+                    </div>
+                    <input 
+                        type="range" 
+                        id="slider-fee" 
+                        min="4" 
+                        max="20" 
+                        step="0.5" 
+                        value="8" 
+                        class="w-full h-3 bg-black border-2 border-zinc-700 appearance-none cursor-pointer focus:outline-none"
+                    >
+                    <div class="flex justify-between text-[10px] text-zinc-500 font-mono font-bold">
+                        <span>4.0% Min</span>
+                        <span>12.0% Avg</span>
+                        <span>20.0% Max</span>
+                    </div>
+                </div>
+
+                <!-- Slider 4: Repayment Window (Months) -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-end">
+                        <label class="text-xs font-black text-white uppercase tracking-wide">4. DEBT REPAYMENT WINDOW</label>
+                        <span id="slider-months-val" class="text-xl font-black text-neoMagenta font-mono">12 Months</span>
+                    </div>
+                    <input 
+                        type="range" 
+                        id="slider-months" 
+                        min="6" 
+                        max="36" 
+                        step="6" 
+                        value="12" 
+                        class="w-full h-3 bg-black border-2 border-zinc-700 appearance-none cursor-pointer focus:outline-none"
+                    >
+                    <div class="flex justify-between text-[10px] text-zinc-500 font-mono font-bold">
+                        <span>6 Mo</span>
+                        <span>18 Mo</span>
+                        <span>36 Mo</span>
+                    </div>
+                </div>
+
+                <!-- Slider 5: VC Exit Multiple (Visual Dilution Value Projection) -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-end">
+                        <label class="text-xs font-black text-white uppercase tracking-wide">5. PROJECTED EXIT MULTIPLE</label>
+                        <span id="slider-exit-val" class="text-xl font-black text-white font-mono">5x</span>
+                    </div>
+                    <input 
+                        type="range" 
+                        id="slider-exit" 
+                        min="2" 
+                        max="10" 
+                        step="1" 
+                        value="5" 
+                        class="w-full h-3 bg-black border-2 border-zinc-700 appearance-none cursor-pointer focus:outline-none"
+                    >
+                    <div class="flex justify-between text-[10px] text-zinc-500 font-mono font-bold">
+                        <span>2x Min</span>
+                        <span>5x Mid</span>
+                        <span>10x Max</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMPARISON LEDGER (RIGHT PANEL - 7 COLS) -->
+            <div class="lg:col-span-7 space-y-8">
+                
+                <!-- Dual Path Cost Metrics Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Dilutive Path Card (VC) -->
+                    <div id="path-vc-card" class="bg-brutalCard border-4 border-black p-6 relative shadow-brutal-white transition-all duration-300">
+                        <div class="absolute top-0 right-0 bg-neoMagenta text-black text-[9px] font-black px-2 py-0.5 border-b-2 border-l-2 border-black uppercase tracking-wider font-mono">
+                            PATH // VC DILUTION
+                        </div>
+                        <h3 class="text-sm font-black text-zinc-400 uppercase tracking-widest font-mono">VENTURE CAPITAL PATH</h3>
+                        <p class="text-[11px] text-zinc-400 font-semibold mb-3">Permanent equity handoff at current enterprise valuation.</p>
+                        
+                        <div class="space-y-2 mb-4">
+                            <span class="text-xs font-black uppercase text-zinc-300 block">Immediate Equity Diluted</span>
+                            <span id="output-vc-dilution" class="text-3xl font-black text-neoMagenta font-mono">16.7%</span>
+                        </div>
+
+                        <div class="space-y-1">
+                            <span class="text-xs font-black uppercase text-zinc-300 block">Value of Equity Sold at Exit Multiple</span>
+                            <span id="output-vc-cost-exit" class="text-2xl font-black text-white font-mono">$10,000,000</span>
+                        </div>
+                    </div>
+
+                    <!-- Non-Dilutive Path Card (RBF / Venture Debt) -->
+                    <div class="bg-brutalCard border-4 border-black p-6 relative shadow-brutal-teal">
+                        <div class="absolute top-0 right-0 bg-neoTeal text-black text-[9px] font-black px-2 py-0.5 border-b-2 border-l-2 border-black uppercase tracking-wider font-mono">
+                            PATH // NON-DILUTIVE
+                        </div>
+                        <h3 class="text-sm font-black text-zinc-400 uppercase tracking-widest font-mono">REVENUE-BASED & DEBT</h3>
+                        <p class="text-[11px] text-zinc-300 font-semibold mb-3">Structured operational repayment over targeted duration window.</p>
+                        
+                        <div class="space-y-2 mb-4">
+                            <span class="text-xs font-black uppercase text-zinc-300 block">Immediate Equity Diluted</span>
+                            <span class="text-3xl font-black text-neoLime font-mono">0.0%</span>
+                        </div>
+
+                        <div class="space-y-1">
+                            <span class="text-xs font-black uppercase text-zinc-300 block">Total Fixed Cost of Capital</span>
+                            <span id="output-debt-total-repay" class="text-2xl font-black text-white font-mono">$2,160,000</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual Meter: Dilution Danger Zone Bar -->
+                <div class="bg-zinc-950 border-4 border-black p-6 space-y-4 shadow-brutal-black">
+                    <div class="flex justify-between items-center text-xs font-black uppercase font-mono">
+                        <span class="text-white">Equity Retained (Founder Stake Comparison)</span>
+                        <span id="output-dilution-warning" class="text-neoLime">OPTIMAL DILUTION ZONE</span>
+                    </div>
+
+                    <!-- Visual Progress Bar Stack -->
+                    <div class="space-y-3">
+                        <!-- Path A (Debt) Stake Remaining -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-[11px] font-bold font-mono">
+                                <span class="text-neoTeal">NON-DILUTIVE STAKE RETAINED</span>
+                                <span>100.0%</span>
+                            </div>
+                            <div class="h-6 w-full bg-black border-2 border-black p-0.5">
+                                <div class="h-full bg-neoTeal"></div>
+                            </div>
+                        </div>
+
+                        <!-- Path B (VC) Stake Remaining -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-[11px] font-bold font-mono">
+                                <span class="text-neoMagenta">VENTURE CAPITAL STAKE RETAINED</span>
+                                <span id="output-vc-retained-percent">83.3%</span>
+                            </div>
+                            <div class="h-6 w-full bg-black border-2 border-black p-0.5">
+                                <div id="meter-vc-bar" class="h-full bg-neoMagenta" style="width: 83.3%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-zinc-400 font-semibold leading-normal font-mono">
+                        *When equity stake falls below 80% in single funding rounds, founders lose core board sovereignty parameters dynamically. Ensure non-dilutive structures bridge crucial growth points.
+                    </p>
+                </div>
+
+                <!-- Action Button Redirect back to engine comparison -->
+                <div class="bg-neoYellow text-black border-4 border-black p-4 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-brutal-white-sm">
+                    <div class="space-y-1 text-center sm:text-left">
+                        <h4 class="text-sm font-black uppercase font-mono">SIMULATION ALIGNS WITH RBF CRITERIA</h4>
+                        <p class="text-xs font-bold leading-none text-zinc-800">Your configuration can yield significant capital savings versus standard series structures.</p>
+                    </div>
+                    <button onclick="window.history.back();" class="shrink-0 font-black text-xs uppercase bg-black hover:bg-zinc-800 text-white py-2 px-4 border-2 border-black tracking-widest shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] transition-all">
+                        SELECT COMPATIBILITY RUNWAY
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- REPAYMENT SCHEDULER & VALUE LOSS COMPARISON LEDGER -->
+        <div class="bg-black border-4 border-black shadow-brutal-white overflow-hidden">
+            <div class="bg-zinc-950 p-6 border-b-4 border-black flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <h3 class="text-lg font-black uppercase text-white tracking-wide">[ DYNAMIC FINANCIAL MODEL LEDGER ]</h3>
+                    <p class="text-xs text-zinc-400 font-semibold">Repayment schedule metrics computed against custom timeline slider allocations.</p>
+                </div>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-black bg-neoTeal text-black border-2 border-black uppercase shadow-brutal-white-sm">
+                    REPAYMENT INTERVAL: MONTHLY
+                </span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse min-w-[900px]">
+                    <thead>
+                        <tr class="bg-zinc-900 border-b-2 border-black text-xs font-black uppercase text-zinc-300 font-mono">
+                            <th class="p-4">INTEREST CYCLE</th>
+                            <th class="p-4">DEBT: MONTHLY AMORTIZATION</th>
+                            <th class="p-4">DEBT: PRINCIPAL REMAINING</th>
+                            <th class="p-4">VC: VALUE CONCEDED AT MULTIPLE</th>
+                            <th class="p-4">NET SAVINGS RETAINED (MONTHLY)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ledger-body" class="divide-y border-zinc-800 bg-zinc-950 text-xs font-semibold text-zinc-300 font-mono">
+                        <!-- Dynamic Ledger Rows will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Metric Insights Footer Info Blocks -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Card 1 -->
+            <div class="bg-brutalCard border-4 border-black p-6 shadow-brutal-pink hover:-translate-y-1 transition-transform relative overflow-hidden">
+                <div class="absolute -top-6 -right-6 text-9xl text-neoMagenta/5 font-black font-mono select-none">01</div>
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="p-3 bg-neoMagenta text-black border-2 border-black font-black text-xl shadow-[3px_3px_0px_0px_#ffffff]">
+                        ★
+                    </span>
+                    <h4 class="text-base font-black text-white uppercase tracking-wider">COMPOUND VALUE SAVED</h4>
+                </div>
+                <p class="text-xs text-zinc-300 font-semibold leading-relaxed">
+                    By choosing non-dilutive structures, you lock in core company equity, which translates to monumental wealth gains during exit liquidity events.
+                </p>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="bg-brutalCard border-4 border-black p-6 shadow-brutal-teal hover:-translate-y-1 transition-transform relative overflow-hidden">
+                <div class="absolute -top-6 -right-6 text-9xl text-neoTeal/5 font-black font-mono select-none">02</div>
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="p-3 bg-neoTeal text-black border-2 border-black font-black text-xl shadow-[3px_3px_0px_0px_#ffffff]">
+                        ◆
+                    </span>
+                    <h4 class="text-base font-black text-white uppercase tracking-wider">EFFICIENT REPAYMENTS</h4>
+                </div>
+                <p class="text-xs text-zinc-300 font-semibold leading-relaxed">
+                    Rather than compounding indefinitely, non-dilutive debt finishes with zero remaining principal, freeing up baseline revenues.
+                </p>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="bg-brutalCard border-4 border-black p-6 shadow-brutal-yellow hover:-translate-y-1 transition-transform relative overflow-hidden">
+                <div class="absolute -top-6 -right-6 text-9xl text-neoYellow/5 font-black font-mono select-none">03</div>
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="p-3 bg-neoYellow text-black border-2 border-black font-black text-xl shadow-[3px_3px_0px_0px_#ffffff]">
+                        ▲
+                    </span>
+                    <h4 class="text-base font-black text-white uppercase tracking-wider">YIELD RISK MATRIX</h4>
+                </div>
+                <p class="text-xs text-zinc-300 font-semibold leading-relaxed">
+                    The model scales risk coefficients based on baseline valuations, warning founders immediately when equity stakes approach critical dilution risks.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bottom Footer Sign-off -->
+    <div class="mt-12 text-center text-xs font-mono text-zinc-600 font-bold tracking-widest border-t border-zinc-900 pt-6">
+        NEO-FINANCIAL COOP © ALL METRICS STOCHASTICALLY COMPUTED UNDER MIT-12 LICENSE BLOCK
+    </div>
+
+    <!-- JavaScript Interactive Calculations Engine -->
+    <script>
+        // Slider inputs
+        const fundingSlider = document.getElementById('slider-funding');
+        const valSlider = document.getElementById('slider-val');
+        const feeSlider = document.getElementById('slider-fee');
+        const monthsSlider = document.getElementById('slider-months');
+        const exitSlider = document.getElementById('slider-exit');
+
+        // Target displays
+        const fundingValDisp = document.getElementById('slider-funding-val');
+        const valValDisp = document.getElementById('slider-val-val');
+        const feeValDisp = document.getElementById('slider-fee-val');
+        const monthsValDisp = document.getElementById('slider-months-val');
+        const exitValDisp = document.getElementById('slider-exit-val');
+
+        // Dynamic metrics
+        const metricsVCCost = document.getElementById('metrics-vc-cost');
+        const metricsDebtCost = document.getElementById('metrics-debt-cost');
+        const metricsSavings = document.getElementById('metrics-savings');
+
+        // Dynamic output elements
+        const outputVCDilution = document.getElementById('output-vc-dilution');
+        const outputVCCostExit = document.getElementById('output-vc-cost-exit');
+        const outputDebtTotalRepay = document.getElementById('output-debt-total-repay');
+        const outputDilutionWarning = document.getElementById('output-dilution-warning');
+        const outputVCRetainedPercent = document.getElementById('output-vc-retained-percent');
+        const meterVCBar = document.getElementById('meter-vc-bar');
+        const pathVCCard = document.getElementById('path-vc-card');
+        const ledgerBody = document.getElementById('ledger-body');
+
+        // Currency Formatter
+        const formatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            maximumFractionDigits: 0
+        });
+
+        function calculateMetrics() {
+            const funding = parseFloat(fundingSlider.value);
+            const valuation = parseFloat(valSlider.value);
+            const feePercent = parseFloat(feeSlider.value);
+            const months = parseInt(monthsSlider.value);
+            const exitMultiple = parseInt(exitSlider.value);
+
+            // Update sliders indicator values
+            fundingValDisp.textContent = formatter.format(funding);
+            valValDisp.textContent = formatter.format(valuation);
+            feeValDisp.textContent = `${feePercent.toFixed(1)}%`;
+            monthsValDisp.textContent = `${months} Months`;
+            exitValDisp.textContent = `${exitMultiple}x`;
+
+            // Calculate VC parameters (post-money dilution model)
+            // Dilution % = Funding / (Valuation + Funding)
+            const postMoneyVal = valuation + funding;
+            const dilutionPercent = (funding / postMoneyVal) * 100;
+            const vcRetainedPercent = 100 - dilutionPercent;
+
+            // Value conceded at exit multiple
+            const futureValuation = postMoneyVal * exitMultiple;
+            const vcValueAtExit = futureValuation * (dilutionPercent / 100);
+
+            // Non-dilutive params
+            const debtTotalRepay = funding * (1 + (feePercent / 100));
+            const debtCostPremium = funding * (feePercent / 100);
+            const netFounderSavings = vcValueAtExit - debtTotalRepay;
+
+            // Render Output values
+            outputVCDilution.textContent = `${dilutionPercent.toFixed(1)}%`;
+            outputVCCostExit.textContent = formatter.format(vcValueAtExit);
+            outputDebtTotalRepay.textContent = formatter.format(debtTotalRepay);
+            outputVCRetainedPercent.textContent = `${vcRetainedPercent.toFixed(1)}%`;
+            meterVCBar.style.width = `${vcRetainedPercent}%`;
+
+            // System ledger card values
+            metricsVCCost.textContent = formatter.format(vcValueAtExit);
+            metricsDebtCost.textContent = formatter.format(debtCostPremium);
+            metricsSavings.textContent = (netFounderSavings > 0 ? '+' : '') + formatter.format(netFounderSavings);
+
+            // Status checks & Warnings
+            if (dilutionPercent > 25) {
+                pathVCCard.className = "bg-brutalCard border-4 border-black p-6 relative stripe-alert text-white transition-all duration-300 shadow-brutal-pink";
+                outputDilutionWarning.textContent = "EXTREME DILUTION CRITICAL WARNING";
+                outputDilutionWarning.className = "text-neoMagenta animate-pulse font-black";
+                metricsSavings.className = "text-xl font-black text-neoYellow font-mono";
+            } else if (dilutionPercent > 15) {
+                pathVCCard.className = "bg-brutalCard border-4 border-black p-6 relative transition-all duration-300 shadow-brutal-yellow";
+                outputDilutionWarning.textContent = "ELEVATED DILUTION ZONE";
+                outputDilutionWarning.className = "text-neoYellow font-black";
+                metricsSavings.className = "text-xl font-black text-neoLime font-mono";
+            } else {
+                pathVCCard.className = "bg-brutalCard border-4 border-black p-6 relative transition-all duration-300 shadow-brutal-white";
+                outputDilutionWarning.textContent = "OPTIMAL FOUNDER STAKE CONTROL";
+                outputDilutionWarning.className = "text-neoLime font-black";
+                metricsSavings.className = "text-xl font-black text-neoLime font-mono";
+            }
+
+            // Generate Monthly Dynamic Ledger Rows
+            generateLedger(funding, debtTotalRepay, months, vcValueAtExit);
+        }
+
+        function generateLedger(funding, debtTotalRepay, months, vcValueAtExit) {
+            let html = '';
+            const monthlyAmortization = debtTotalRepay / months;
+            const monthlyVCCost = vcValueAtExit / months;
+
+            for (let i = 1; i <= months; i++) {
+                const principalRemaining = debtTotalRepay - (monthlyAmortization * i);
+                const currentVCDilutedAccumulated = monthlyVCCost * i;
+                const monthlySavings = currentVCDilutedAccumulated - (monthlyAmortization * i);
+
+                html += `
+                    <tr class="hover:bg-zinc-900 border-b border-zinc-800 transition-colors">
+                        <td class="p-4 font-black text-neoTeal font-mono">CYCLE ${i.toString().padStart(2, '0')}</td>
+                        <td class="p-4 text-white font-mono">${formatter.format(monthlyAmortization)}</td>
+                        <td class="p-4 font-mono text-zinc-400">${formatter.format(Math.max(0, principalRemaining))}</td>
+                        <td class="p-4 text-neoMagenta font-mono">${formatter.format(currentVCDilutedAccumulated)}</td>
+                        <td class="p-4 ${monthlySavings >= 0 ? 'text-neoLime' : 'text-neoMagenta'} font-bold font-mono">
+                            ${monthlySavings >= 0 ? '+' : ''}${formatter.format(monthlySavings)}
+                        </td>
+                    </tr>
+                `;
+            }
+
+            ledgerBody.innerHTML = html;
+        }
+
+        // Event Listeners for Live Calculation
+        fundingSlider.addEventListener('input', calculateMetrics);
+        valSlider.addEventListener('input', calculateMetrics);
+        feeSlider.addEventListener('input', calculateMetrics);
+        monthsSlider.addEventListener('input', calculateMetrics);
+        exitSlider.addEventListener('input', calculateMetrics);
+
+        // Initial compute trigger
+        calculateMetrics();
+    </script>
+</body>
+</html>

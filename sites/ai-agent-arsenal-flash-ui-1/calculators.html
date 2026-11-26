@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fintech Command Center // Jason Feimster</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Space+Grotesk:wght@400;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* Neo-Brutalist & Cyberpunk Global Variables */
+    :root {
+      --deep-black: #050505;
+      --carbon-black: #0A0B0F;
+      --graphite: #171821;
+      --off-white: #F4F1E8;
+      
+      /* Primary Accents */
+      --cyan: #00E5FF;
+      --acid-green: #B6FF00;
+      --magenta: #FF2BD6;
+      --orange: #FF7A00;
+      --yellow: #FFE600;
+      --red: #FF1744;
+      --blue: #245BFF;
+
+      /* Shadows */
+      --neo-shadow-cyan: 5px 5px 0px var(--cyan);
+      --neo-shadow-green: 5px 5px 0px var(--acid-green);
+      --neo-shadow-magenta: 5px 5px 0px var(--magenta);
+      --neo-shadow-orange: 5px 5px 0px var(--orange);
+      --neo-shadow-yellow: 7px 7px 0px var(--yellow);
+      --neo-shadow-white: 5px 5px 0px var(--off-white);
+      --neo-shadow-black: 6px 6px 0px rgba(0,0,0,1);
+    }
+
+    /* Reset & Base */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    ::selection {
+      background-color: var(--acid-green);
+      color: var(--deep-black);
+    }
+
+    ::-webkit-scrollbar {
+      width: 12px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--carbon-black);
+      border-left: 3px solid var(--graphite);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--graphite);
+      border: 3px solid var(--carbon-black);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--cyan);
+    }
+
+    body {
+      background-color: var(--deep-black);
+      color: var(--off-white);
+      font-family: 'Space Grotesk', -apple-system, sans-serif;
+      overflow-x: hidden;
+      background-image: 
+        linear-gradient(rgba(23, 24, 33, 0.4) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(23, 24, 33, 0.4) 1px, transparent 1px);
+      background-size: 30px 30px;
+      background-position: center;
+    }
+
+    .mono {
+      font-family: 'Share Tech Mono', monospace;
+      text-transform: uppercase;
+    }
+
+    /* Top Sticky Navigation Bar */
+    .terminal-nav {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: var(--carbon-black);
+      border-bottom: 4px solid var(--off-white);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .brand-logo {
+      background: var(--magenta);
+      color: var(--off-white);
+      font-weight: 800;
+      padding: 0.5rem 1rem;
+      border: 2px solid var(--off-white);
+      box-shadow: 3px 3px 0px var(--cyan);
+      font-size: 1.2rem;
+      text-transform: uppercase;
+      letter-spacing: -1px;
+    }
+
+    .brand-meta {
+      font-size: 0.8rem;
+      color: #888;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .nav-link {
+      color: var(--off-white);
+      text-decoration: none;
+      font-weight: 700;
+      padding: 0.5rem 0.8rem;
+      border: 2px solid transparent;
+      transition: all 0.15s ease;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      border: 2px solid var(--magenta);
+      background: var(--graphite);
+      color: var(--magenta);
+    }
+
+    .nav-cta {
+      background: var(--acid-green);
+      color: var(--deep-black);
+      font-weight: 800;
+      padding: 0.6rem 1.2rem;
+      border: 2px solid var(--off-white);
+      box-shadow: 4px 4px 0px var(--magenta);
+      text-decoration: none;
+      transition: all 0.1s ease;
+    }
+
+    .nav-cta:hover {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0px var(--magenta);
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Header Panel */
+    .console-header-panel {
+      background: var(--carbon-black);
+      border: 4px solid var(--off-white);
+      padding: 2.5rem;
+      box-shadow: var(--neo-shadow-cyan);
+      position: relative;
+      margin-top: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .corner-tag {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: var(--cyan);
+      color: var(--deep-black);
+      font-weight: bold;
+      padding: 0.25rem 1rem;
+      font-size: 0.75rem;
+      border-bottom: 3px solid var(--off-white);
+      border-left: 3px solid var(--off-white);
+    }
+
+    .panel-eyebrow {
+      color: var(--magenta);
+      font-size: 1rem;
+      letter-spacing: 3px;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .panel-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      background: var(--magenta);
+      animation: blink 1s infinite steps(2);
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .panel-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -2px;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+    }
+
+    .panel-desc {
+      font-size: 1.2rem;
+      line-height: 1.4;
+      color: var(--off-white);
+      font-weight: 700;
+      border-left: 6px solid var(--cyan);
+      padding-left: 1.2rem;
+      max-width: 900px;
+    }
+
+    /* Calculator Selector Matrix */
+    .calculator-selector-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .calculator-selector-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .selector-card {
+      background: var(--graphite);
+      border: 3px solid var(--off-white);
+      padding: 1.5rem;
+      box-shadow: var(--neo-shadow-black);
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .selector-card:hover {
+      transform: translate(-3px, -3px);
+      box-shadow: 8px 8px 0px var(--accent-color, var(--cyan));
+    }
+
+    .selector-card.active {
+      background: var(--carbon-black);
+      border-color: var(--accent-color, var(--cyan));
+      box-shadow: 6px 6px 0px var(--accent-color, var(--cyan));
+    }
+
+    .selector-card.active::after {
+      content: '● ACTIVE_CONVENT';
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--accent-color, var(--cyan));
+      font-weight: bold;
+    }
+
+    .selector-num {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.2rem;
+      color: var(--accent-color, var(--cyan));
+      font-weight: 900;
+      margin-bottom: 0.5rem;
+    }
+
+    .selector-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      line-height: 1.1;
+      margin-bottom: 0.5rem;
+    }
+
+    .selector-desc {
+      font-size: 0.85rem;
+      color: #b0afab;
+      line-height: 1.4;
+    }
+
+    /* Main Workspace Interface Layout */
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    @media (max-width: 1100px) {
+      .workspace-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Calculator Control Inputs Column */
+    .controls-panel {
+      background: var(--carbon-black);
+      border: 4px solid var(--off-white);
+      padding: 2.5rem;
+      box-shadow: var(--neo-shadow-black);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .controls-title-bar {
+      border-bottom: 3px solid var(--off-white);
+      padding-bottom: 1rem;
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .controls-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .calc-input-group {
+      margin-bottom: 1.8rem;
+    }
+
+    .calc-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+      margin-bottom: 0.6rem;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      color: var(--cyan);
+    }
+
+    .calc-label-val {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.1rem;
+      color: var(--acid-green);
+    }
+
+    .calc-range {
+      width: 100%;
+      accent-color: var(--accent-color, var(--cyan));
+      margin-top: 0.5rem;
+      cursor: pointer;
+    }
+
+    .calc-select {
+      width: 100%;
+      background: var(--deep-black);
+      border: 2px solid var(--off-white);
+      color: var(--off-white);
+      padding: 0.8rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .calc-select:focus {
+      border-color: var(--accent-color, var(--cyan));
+    }
+
+    /* Cyber Matrix Readouts & Dynamic Chart */
+    .outputs-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .kpi-matrix-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.2rem;
+    }
+
+    .kpi-card {
+      background: var(--graphite);
+      border: 3px solid var(--off-white);
+      padding: 1.5rem;
+      box-shadow: 4px 4px 0px var(--deep-black);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .kpi-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.8rem;
+    }
+
+    .kpi-title {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem;
+      color: #9f9e9a;
+      font-weight: bold;
+    }
+
+    .kpi-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent-color, var(--cyan));
+    }
+
+    .kpi-value {
+      font-size: 2.2rem;
+      font-weight: 800;
+      line-height: 1;
+      margin: 0.5rem 0;
+      color: var(--off-white);
+    }
+
+    .kpi-desc {
+      font-size: 0.75rem;
+      color: #b0afab;
+      line-height: 1.3;
+    }
+
+    /* Cyber Visual Chart Engine */
+    .chart-container {
+      background: var(--carbon-black);
+      border: 4px solid var(--off-white);
+      padding: 1.5rem;
+      box-shadow: var(--neo-shadow-magenta);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--graphite);
+      padding-bottom: 0.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .chart-title-text {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--magenta);
+      font-weight: 800;
+    }
+
+    .chart-axis-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      color: #888;
+    }
+
+    .chart-stage {
+      height: 200px;
+      position: relative;
+      border-left: 2px solid var(--off-white);
+      border-bottom: 2px solid var(--off-white);
+      margin-left: 1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      padding-top: 10px;
+    }
+
+    .chart-grid-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      border-top: 1px dashed rgba(244, 241, 232, 0.15);
+      pointer-events: none;
+    }
+
+    .chart-bar-wrap {
+      width: 12%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      position: relative;
+    }
+
+    .chart-bar {
+      width: 100%;
+      background: var(--accent-color, var(--cyan));
+      border: 2px solid var(--off-white);
+      transition: height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+    }
+
+    .chart-bar:hover::before {
+      content: attr(data-value);
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--deep-black);
+      color: var(--off-white);
+      border: 1px solid var(--off-white);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.4rem;
+      white-space: nowrap;
+      z-index: 100;
+    }
+
+    .chart-label-x {
+      position: absolute;
+      bottom: -22px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      color: #888;
+      text-transform: uppercase;
+    }
+
+    /* System Operational Trace Log Panel */
+    .trace-log-panel {
+      background: var(--graphite);
+      border: 4px solid var(--off-white);
+      padding: 1.5rem;
+      box-shadow: var(--neo-shadow-black);
+      margin-bottom: 4rem;
+    }
+
+    .trace-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--off-white);
+      padding-bottom: 0.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .trace-terminal {
+      background: var(--deep-black);
+      border: 2px solid var(--off-white);
+      padding: 1rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--acid-green);
+      height: 150px;
+      overflow-y: auto;
+      box-shadow: inset 0 0 10px rgba(182, 255, 0, 0.1);
+    }
+
+    .trace-line {
+      margin-bottom: 0.4rem;
+      word-break: break-all;
+    }
+
+    .trace-prefix {
+      color: var(--magenta);
+    }
+
+    /* Action Buttons Area */
+    .actions-row {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .btn-brutal {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: 3px solid var(--off-white);
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.1s;
+      flex: 1;
+    }
+
+    .btn-cyan {
+      background: var(--cyan);
+      color: var(--deep-black);
+      box-shadow: 6px 6px 0px var(--off-white);
+    }
+
+    .btn-cyan:hover {
+      transform: translate(2px, 2px);
+      box-shadow: 4px 4px 0px var(--off-white);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--off-white);
+      box-shadow: 6px 6px 0px var(--magenta);
+    }
+
+    .btn-outline:hover {
+      transform: translate(2px, 2px);
+      box-shadow: 4px 4px 0px var(--magenta);
+      background: rgba(255, 43, 214, 0.1);
+    }
+
+    /* Terminal Footer */
+    footer {
+      background: var(--carbon-black);
+      border-top: 4px solid var(--off-white);
+      padding: 3rem 2rem;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    .footer-grid {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 4rem;
+    }
+
+    @media (max-width: 768px) {
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+    }
+
+    .footer-brand {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--acid-green);
+      text-transform: uppercase;
+    }
+
+    .footer-col-title {
+      color: var(--cyan);
+      font-weight: bold;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .footer-links {
+      list-style-type: none;
+    }
+
+    .footer-links li {
+      margin-bottom: 0.8rem;
+    }
+
+    .footer-links a {
+      color: #8c8b88;
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--off-white);
+    }
+
+    .footer-bottom {
+      border-top: 2px solid var(--graphite);
+      max-width: 1400px;
+      margin: 3rem auto 0 auto;
+      padding-top: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- STICKY TOP NAVIGATION BAR -->
+  <nav class="terminal-nav">
+    <div class="brand-group">
+      <div class="brand-logo">FIN_CALC_CONSOLE</div>
+      <div class="brand-meta mono">[ REPO: fintech-command-center ]</div>
+    </div>
+    <div class="nav-links">
+      <a href="#ecommerce" class="nav-link active mono" onclick="activateConsole('ecommerce', event)">ECOMMERCE</a>
+      <a href="#mrr" class="nav-link mono" onclick="activateConsole('mrr', event)">MRR_CONVERSION</a>
+      <a href="#bizcredit" class="nav-link mono" onclick="activateConsole('bizcredit', event)">BIZCREDIT_BUILDER</a>
+      <a href="index.html" class="nav-cta mono">BACK_TO_ARMORY</a>
+    </div>
+  </nav>
+
+  <!-- MAIN WRAPPER -->
+  <div class="container">
+
+    <!-- HEADER PANEL -->
+    <header class="console-header-panel">
+      <div class="corner-tag mono">FINTECH OPERATIONS LEVEL: MAXIMUM</div>
+      <div class="panel-eyebrow mono">FINTECH COMMAND CENTER</div>
+      <h1 class="panel-title">Multi-Calculator Console</h1>
+      <p class="panel-desc">
+        Evaluate live business runway, leverage limits, factoring terms, and cash conversions instantly. Tune control inputs to output tactical reports.
+      </p>
+    </header>
+
+    <!-- CALCULATOR SELECTOR GRID -->
+    <section class="calculator-selector-grid">
+      <!-- Selector Card 1 -->
+      <div id="sel-ecommerce" class="selector-card active" style="--accent-color: var(--cyan);" onclick="switchCalculator('ecommerce')">
+        <div class="selector-num">SEC_01</div>
+        <h3 class="selector-title">Ecommerce Cash Flow</h3>
+        <p class="selector-desc">Forecasts your 90-day inventory capital runways, holdback risks, and sales buffers.</p>
+      </div>
+
+      <!-- Selector Card 2 -->
+      <div id="sel-mrr" class="selector-card" style="--accent-color: var(--magenta);" onclick="switchCalculator('mrr')">
+        <div class="selector-num">SEC_02</div>
+        <h3 class="selector-title">MRR to Cash Conversion</h3>
+        <p class="selector-desc">Calculates debt-free non-dilutive capital factoring targets for recurring SaaS platforms.</p>
+      </div>
+
+      <!-- Selector Card 3 -->
+      <div id="sel-bizcredit" class="selector-card" style="--accent-color: var(--orange);" onclick="switchCalculator('bizcredit')">
+        <div class="selector-num">SEC_03</div>
+        <h3 class="selector-title">BizCredit Limit Builder</h3>
+        <p class="selector-desc">Maps Dun & Bradstreet, bank volume criteria, and leverage limits for maximum SBA trade routes.</p>
+      </div>
+    </section>
+
+    <!-- MAIN CALCULATOR WORKSPACE -->
+    <main class="workspace-grid" id="mainWorkspace">
+      
+      <!-- CONTROLS PANEL (INPUTS) -->
+      <section class="controls-panel" id="controlsPanel" style="--accent-color: var(--cyan);">
+        <div>
+          <div class="controls-title-bar">
+            <h2 class="controls-title" id="calcTitle">Ecommerce Cash Flow Forecaster</h2>
+            <span class="mono" style="font-size: 0.8rem; color: #888;">INPUT_METRICS</span>
+          </div>
+
+          <!-- DYNAMIC INPUT FIELDS CONTAINER -->
+          <div id="inputsContainer">
+            <!-- Rendered Dynamically by JS -->
+          </div>
+        </div>
+
+        <!-- CSV EXPORT TRIGGER -->
+        <div class="actions-row">
+          <button class="btn-brutal btn-cyan" onclick="exportCalculationCSV()">Export Calculations CSV</button>
+          <button class="btn-brutal btn-outline" onclick="resetCalculatorDefaults()">Reset Defaults</button>
+        </div>
+      </section>
+
+      <!-- OUTPUTS PANEL (KPIs & VISUAL CHART) -->
+      <section class="outputs-panel">
+        
+        <!-- HIGH-CONTRAST MATRIX READOUTS -->
+        <div class="kpi-matrix-grid" id="kpiGrid">
+          <!-- Rendered Dynamically by JS -->
+        </div>
+
+        <!-- RETRO-CYBER CHART ENGINE -->
+        <div class="chart-container">
+          <div class="chart-header">
+            <span class="chart-title-text" id="chartTitle">PROJECTED 6-MONTH REVENUE EXPONENTS</span>
+            <span class="chart-axis-label">METRIC RANGE (UNIT RELATIVE)</span>
+          </div>
+
+          <!-- Dynamic Bar Elements -->
+          <div class="chart-stage" id="chartStage">
+            <div class="chart-grid-line" style="top: 25%;"></div>
+            <div class="chart-grid-line" style="top: 50%;"></div>
+            <div class="chart-grid-line" style="top: 75%;"></div>
+            
+            <!-- Bars rendered dynamically by JavaScript -->
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- SYSTEM OPERATIONAL TRACE LOGS -->
+    <section class="trace-log-panel">
+      <div class="trace-header">
+        <span class="mono" style="font-size: 0.85rem; color: var(--acid-green); font-weight: bold;">[ SYSTEM MONITOR: LOCAL CALCULATION PIPELINES ]</span>
+        <span class="mono" style="font-size: 0.75rem; color: #888;">LOGGING ACTIVE</span>
+      </div>
+      <div class="trace-terminal" id="traceTerminal">
+        <div class="trace-line"><span class="trace-prefix">></span> ESTABLISHING MULTI-CALCULATOR DEPLOYMENT PROTOCOL...</div>
+        <div class="trace-line"><span class="trace-prefix">></span> SUCCESS: LOCAL ENGINE STABILITY GUARANTEED AT 100%.</div>
+        <div class="trace-line"><span class="trace-prefix">></span> READY FOR OPERATOR SIMULATIONS.</div>
+      </div>
+    </section>
+
+  </div> <!-- /CONTAINER -->
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">// AI_AGENT_ARSENAL</div>
+        <p style="color: #8c8b88; margin-top: 1rem; line-height: 1.5; font-size: 0.95rem;">
+          Created by Jason Feimster. A production-ready, tactical open-source armory designed for modern operators. Build lean, deploy fast, and run automated systems.
+        </p>
+      </div>
+      <div>
+        <div class="footer-col-title">Navigation</div>
+        <ul class="footer-links">
+          <li><a href="index.html#tactical-terminal">Tactical Terminal</a></li>
+          <li><a href="index.html#lead-maximizer">Fintech Maximizer Gate</a></li>
+          <li><a href="index.html#directory">Weapons Matrix</a></li>
+          <li><a href="index.html#api-documentation">API Stencils</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Target Systems</div>
+        <ul class="footer-links">
+          <li><a href="https://github.com/jasonfeimster/ai-agent-arsenal" target="_blank">Open Source Repo</a></li>
+          <li><a href="#">CustomGPT Portal</a></li>
+          <li><a href="#">Gemini Labs</a></li>
+          <li><a href="#">Operator Frameworks</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>AI AGENT ARSENAL IS OPEN-SOURCE UNDER MIT LICENSE. COPYRIGHT JASON FEIMSTER 2025.</span>
+      <span>STATUS: OPERATIONAL [127.0.0.1]</span>
+    </div>
+  </footer>
+
+  <!-- DYNAMIC JAVASCRIPT CALCULATION ENGINE -->
+  <script>
+    // State variables
+    let currentCalcMode = 'ecommerce';
+
+    // Base values configurations
+    const calcConfigs = {
+      ecommerce: {
+        title: "Ecommerce Cash Flow Forecaster",
+        accent: "var(--cyan)",
+        inputs: [
+          { id: 'monthlyRev', label: 'Monthly Cash Inflow ($)', min: 10000, max: 1000000, step: 10000, val: 120000, isCurrency: true },
+          { id: 'inventoryLag', label: 'Inventory Order Lag (Days)', min: 15, max: 120, step: 5, val: 45, isCurrency: false, unit: ' Days' },
+          { id: 'adRatio', label: 'Ad Spend Allocation (%)', min: 10, max: 60, step: 5, val: 30, isCurrency: false, unit: '%' },
+          { id: 'holdbackRatio', label: 'Gateway Holdback Reserve (%)', min: 0, max: 20, step: 1, val: 5, isCurrency: false, unit: '%' }
+        ],
+        kpis: [
+          { id: 'runway', label: '90-Day Cash Runway Estimate', value: '$0', desc: 'Predicted liquid buffer based on inventory and ad ratio friction.' },
+          { id: 'safetyFactor', label: 'Safety Buffer Index', value: '0.0x', desc: 'Capacity of inflows to outlast operational holdbacks.' },
+          { id: 'profitMargin', label: 'Target Cash Margin', value: '0%', desc: 'Estimated net operational margins excluding hardware assets.' },
+          { id: 'riskRatio', label: 'Capital Leak Risk Level', value: 'LOW', desc: 'Indicates susceptibility to processing channel blockage.' }
+        ]
+      },
+      mrr: {
+        title: "MRR to Cash Conversion Tool",
+        accent: "var(--magenta)",
+        inputs: [
+          { id: 'mrrVal', label: 'Monthly Recurring Revenue ($)', min: 5000, max: 250000, step: 5000, val: 65000, isCurrency: true },
+          { id: 'churnVal', label: 'Annual Churn Factor (%)', min: 1, max: 30, step: 1, val: 8, isCurrency: false, unit: '%' },
+          { id: 'grossMargin', label: 'Gross Margins (%)', min: 40, max: 95, step: 5, val: 85, isCurrency: false, unit: '%' },
+          { id: 'ltvCac', label: 'LTV to CAC Efficiency Rate', min: 1.0, max: 10.0, step: 0.5, val: 3.5, isCurrency: false, unit: 'x' }
+        ],
+        kpis: [
+          { id: 'factoringCap', label: 'Debt-Free Factoring Capital Cap', value: '$0', desc: 'Non-dilutive limit available against raw billing volumes.' },
+          { id: 'impliedVal', label: 'Computed Net Valuation', value: '$0', desc: 'Indicative Enterprise Valuation mapped via operational efficiency.' },
+          { id: 'leverageCost', label: 'Factoring Discount Rate', value: '0%', desc: 'Indicative fee percentage calculated based on target churn metrics.' },
+          { id: 'repayTerm', label: 'Suggested Payback Window', value: '12 Months', desc: 'Term mapping parameters optimized to match gross income streams.' }
+        ]
+      },
+      bizcredit: {
+        title: "BizCredit Limit Builder",
+        accent: "var(--orange)",
+        inputs: [
+          { id: 'paydexScore', label: 'Dun & Bradstreet Paydex Score', min: 30, max: 100, step: 1, val: 78, isCurrency: false, unit: ' Score' },
+          { id: 'bankVolume', label: 'Monthly Deposited Volume ($)', min: 5000, max: 500000, step: 5000, val: 95000, isCurrency: true },
+          { id: 'yearsBiz', label: 'Years Operating under FEIN', min: 1, max: 15, step: 1, val: 3, isCurrency: false, unit: ' Years' },
+          { id: 'personalGuarantee', label: 'Exclude Personal Guarantee (PG)', min: 0, max: 1, step: 1, val: 0, isDropdown: true, options: [{text: 'Provide PG (High Limit Boost)', value: 0}, {text: 'Strict Corporate Only (No PG Limit Cap)', value: 1}] }
+        ],
+        kpis: [
+          { id: 'tradeLimit', label: 'Unsecured Corporate Trade Cap', value: '$0', desc: 'Indicated limit allocation for dynamic non-PG trade credit lines.' },
+          { id: 'sbaEstimator', label: 'SBA 7(a) Capacity Gauge', value: '$0', desc: 'Underwritten volume capacity limits optimized for SBA financing.' },
+          { id: 'leverageRatio', label: 'Lending Leverage Ratio', value: '0.0x', desc: 'Multiplication capacity applied to recurring baseline monthly operations.' },
+          { id: 'fundingReadiness', label: 'Operator Funding Readiness Tier', value: 'B', desc: 'Consolidated performance grade calculated for funding pathways.' }
+        ]
+      }
+    };
+
+    // Initialize Log Screen Elements
+    const traceTerminal = document.getElementById('traceTerminal');
+
+    function logTrace(text, source = 'SYSTEM') {
+      const row = document.createElement('div');
+      row.className = 'trace-line';
+      row.innerHTML = `<span class="trace-prefix">[${source}]</span> ${text}`;
+      traceTerminal.appendChild(row);
+      traceTerminal.scrollTop = traceTerminal.scrollHeight;
+
+      if (traceTerminal.children.length > 20) {
+        traceTerminal.removeChild(traceTerminal.firstChild);
+      }
+    }
+
+    // Dynamic Navigation Header Link Selection
+    function activateConsole(key, event) {
+      if(event) event.preventDefault();
+      switchCalculator(key);
+    }
+
+    // Switch Calculator Mode
+    function switchCalculator(modeKey) {
+      currentCalcMode = modeKey;
+      logTrace(`SWITCHED CALCULATION MODE TO: [${modeKey.toUpperCase()}]`);
+
+      // Update Nav Class Links
+      document.querySelectorAll('.nav-link').forEach(link => {
+        if(link.getAttribute('href') === `#${modeKey}`) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+
+      // Update Selector Cards Class active
+      document.querySelectorAll('.selector-card').forEach(card => {
+        if(card.id === `sel-${modeKey}`) {
+          card.classList.add('active');
+        } else {
+          card.classList.remove('active');
+        }
+      });
+
+      // Load Config UI Elements
+      renderCalculatorUI();
+    }
+
+    // Generate Dynamic Input Slider Blocks
+    function renderCalculatorUI() {
+      const config = calcConfigs[currentCalcMode];
+      
+      // Update Title Bar and Border accent coloring styles
+      const calcTitle = document.getElementById('calcTitle');
+      calcTitle.textContent = config.title;
+      
+      const controlsPanel = document.getElementById('controlsPanel');
+      controlsPanel.style.setProperty('--accent-color', config.accent);
+      
+      // Build Inputs
+      const container = document.getElementById('inputsContainer');
+      container.innerHTML = '';
+
+      config.inputs.forEach(inp => {
+        const wrap = document.createElement('div');
+        wrap.className = 'calc-input-group';
+        
+        if (inp.isDropdown) {
+          wrap.innerHTML = `
+            <label class="calc-label" style="color: ${config.accent}">${inp.label}</label>
+            <select class="calc-select" id="input-${inp.id}" onchange="triggerRecalculate()">
+              ${inp.options.map(opt => `<option value="${opt.value}" ${opt.value === inp.val ? 'selected' : ''}>${opt.text}</option>`).join('')}
+            </select>
+          `;
+        } else {
+          const valDisplay = inp.isCurrency ? `$${inp.val.toLocaleString()}` : `${inp.val}${inp.unit || ''}`;
+          wrap.innerHTML = `
+            <label class="calc-label" style="color: ${config.accent}">
+              <span>${inp.label}</span>
+              <span class="calc-label-val" id="val-${inp.id}" style="color: var(--acid-green)">${valDisplay}</span>
+            </label>
+            <input type="range" class="calc-range" id="input-${inp.id}" min="${inp.min}" max="${inp.max}" step="${inp.step}" value="${inp.val}" oninput="updateLabelValue('${inp.id}', ${inp.isCurrency}, '${inp.unit || ''}'); triggerRecalculate();">
+          `;
+        }
+        container.appendChild(wrap);
+      });
+
+      // Build KPI Matrix Columns
+      const kpiGrid = document.getElementById('kpiGrid');
+      kpiGrid.innerHTML = '';
+      
+      config.kpis.forEach(kpi => {
+        const card = document.createElement('div');
+        card.className = 'kpi-card';
+        card.innerHTML = `
+          <div class="kpi-header">
+            <span class="kpi-title">${kpi.label}</span>
+            <div class="kpi-indicator" style="background: ${config.accent}"></div>
+          </div>
+          <div class="kpi-value" id="kpi-val-${kpi.id}">-</div>
+          <p class="kpi-desc">${kpi.desc}</p>
+        `;
+        kpiGrid.appendChild(card);
+      });
+
+      // Update Chart Accent Base Variable Color
+      document.getElementById('chartStage').parentElement.style.setProperty('--accent-color', config.accent);
+
+      // Trigger Math calculations engine
+      triggerRecalculate();
+    }
+
+    // Helper functions to convert/format numbers
+    function updateLabelValue(id, isCurrency, unit) {
+      const val = parseFloat(document.getElementById(`input-${id}`).value);
+      const targetLabel = document.getElementById(`val-${id}`);
+      if(isCurrency) {
+        targetLabel.textContent = `$${val.toLocaleString()}`;
+      } else {
+        targetLabel.textContent = `${val}${unit}`;
+      }
+    }
+
+    // Primary Arithmetic Calculation Hub Routing
+    function triggerRecalculate() {
+      if(currentCalcMode === 'ecommerce') {
+        runEcommerceMath();
+      } else if (currentCalcMode === 'mrr') {
+        runMrrMath();
+      } else if (currentCalcMode === 'bizcredit') {
+        runBizCreditMath();
+      }
+    }
+
+    // 1. Ecommerce Cash Flow Math
+    function runEcommerceMath() {
+      const monthlyRev = parseFloat(document.getElementById('input-monthlyRev').value);
+      const inventoryLag = parseFloat(document.getElementById('input-inventoryLag').value);
+      const adRatio = parseFloat(document.getElementById('input-adRatio').value);
+      const holdbackRatio = parseFloat(document.getElementById('input-holdbackRatio').value);
+
+      // Math derivations
+      const adSpend = monthlyRev * (adRatio / 100);
+      const holdbackReserved = monthlyRev * (holdbackRatio / 100);
+      const calculatedProfit = monthlyRev * 0.35 - (adSpend * 0.1) - (holdbackReserved * 0.2); // synthetic margin formula
+      
+      const safetyBufferMultiplier = (monthlyRev / ((adSpend + holdbackReserved + (monthlyRev * 0.4)) || 1)).toFixed(2);
+      
+      // Runway: 90 days total projections
+      const grossThreeMonthOutflow = (adSpend * 3) + (holdbackReserved * 1.5) + ((monthlyRev * 0.3) * (inventoryLag / 45));
+      const runwayLimit = Math.max(0, (monthlyRev * 3) - grossThreeMonthOutflow);
+
+      // Risk profiling trigger
+      let riskLvl = "STABLE OPERATOR";
+      if (inventoryLag >= 90 || holdbackRatio >= 12 || adRatio >= 45) {
+        riskLvl = "CRITICAL BUFFER BREACH";
+      } else if (inventoryLag >= 60 || adRatio >= 35) {
+        riskLvl = "ELEVATED RISK WARN";
+      }
+
+      // DOM UI bindings
+      document.getElementById('kpi-val-runway').textContent = `$${Math.round(runwayLimit).toLocaleString()}`;
+      document.getElementById('kpi-val-safetyFactor').textContent = `${safetyBufferMultiplier}x`;
+      document.getElementById('kpi-val-profitMargin').textContent = `${Math.round((calculatedProfit / monthlyRev) * 100)}%`;
+      
+      const riskEl = document.getElementById('kpi-val-riskRatio');
+      riskEl.textContent = riskLvl;
+      riskEl.style.color = riskLvl.includes('CRITICAL') ? 'var(--red)' : (riskLvl.includes('ELEVATED') ? 'var(--orange)' : 'var(--acid-green)');
+
+      // Update Custom Visual Chart Points
+      renderChartData([
+        monthlyRev,
+        monthlyRev * 0.95 - adSpend,
+        monthlyRev * 1.10 - (adSpend * 1.2),
+        runwayLimit * 0.45,
+        runwayLimit * 0.55,
+        runwayLimit * 0.65
+      ], "REVENUE ($)");
+
+      logTrace(`Recalculated Ecommerce KPIs. Safety: ${safetyBufferMultiplier}x, Margin: ${Math.round((calculatedProfit / monthlyRev) * 100)}%`, 'MATH');
+    }
+
+    // 2. MRR SaaS Conversion Factoring Math
+    function runMrrMath() {
+      const mrrVal = parseFloat(document.getElementById('input-mrrVal').value);
+      const churnVal = parseFloat(document.getElementById('input-churnVal').value);
+      const grossMargin = parseFloat(document.getElementById('input-grossMargin').value);
+      const ltvCac = parseFloat(document.getElementById('input-ltvCac').value);
+
+      // Calculations
+      const churnMultiplier = Math.max(0.1, 1 - (churnVal / 100));
+      const baselineLimit = mrrVal * 12 * (grossMargin / 100) * churnMultiplier;
+      const factoringLimit = Math.min(2000000, baselineLimit * (ltvCac / 3));
+
+      // Implied Enterprise Valuation mapping (e.g. 6x to 12x multiples based on unit metrics)
+      const multipleRate = Math.min(15, (ltvCac * 2) * churnMultiplier);
+      const enterpriseVal = mrrVal * 12 * multipleRate;
+
+      // Factoring Fee discount rate mapping
+      const discountPercentage = Math.max(2, (churnVal * 0.5) + (10 - ltvCac));
+
+      // Suggest terms payback scale
+      const paybackTimeline = churnVal > 15 ? "8 Months (Rapid Repay)" : "14 Months (Flexible Terms)";
+
+      // Updates
+      document.getElementById('kpi-val-factoringCap').textContent = `$${Math.round(factoringLimit).toLocaleString()}`;
+      document.getElementById('kpi-val-impliedVal').textContent = `$${Math.round(enterpriseVal).toLocaleString()}`;
+      document.getElementById('kpi-val-leverageCost').textContent = `${discountPercentage.toFixed(1)}%`;
+      document.getElementById('kpi-val-repayTerm').textContent = paybackTimeline;
+
+      // Update Chart points demonstrating factor projections
+      renderChartData([
+        mrrVal,
+        mrrVal * (1 + (churnMultiplier * 0.1)),
+        mrrVal * (1 + (churnMultiplier * 0.2)),
+        factoringLimit * 0.1,
+        factoringLimit * 0.2,
+        factoringLimit * 0.25
+      ], "FACTOR SCALE ($)");
+
+      logTrace(`Recalculated MRR Factoring KPIs. Factoring Cap: $${Math.round(factoringLimit).toLocaleString()}`, 'MATH');
+    }
+
+    // 3. BizCredit Leverage Criteria Math
+    function runBizCreditMath() {
+      const paydexScore = parseFloat(document.getElementById('input-paydexScore').value);
+      const bankVolume = parseFloat(document.getElementById('input-bankVolume').value);
+      const yearsBiz = parseFloat(document.getElementById('input-yearsBiz').value);
+      const isExcludePG = parseFloat(document.getElementById('input-personalGuarantee').value);
+
+      // Calculations
+      const paydexFactor = paydexScore / 80; // normalized score weighting
+      const pgMultiplier = isExcludePG === 1 ? 0.45 : 1.25;
+
+      const baseCreditLineLimit = bankVolume * 0.75 * paydexFactor * pgMultiplier * (1 + (yearsBiz * 0.05));
+      const sbaEstimatedAmount = Math.max(0, bankVolume * 10 * paydexFactor * pgMultiplier * (yearsBiz >= 2 ? 1.2 : 0.6));
+      
+      const aggregateLeverageRate = ((baseCreditLineLimit / (bankVolume || 1)) * pgMultiplier).toFixed(2);
+
+      // Operational Funding Readiness Grade Letter mapping
+      let grade = 'C';
+      if (paydexScore >= 80 && yearsBiz >= 3 && bankVolume >= 50000) {
+        grade = 'A+ MAX_READY';
+      } else if (paydexScore >= 70 && yearsBiz >= 2) {
+        grade = 'B PREMIUM_RESERVES';
+      } else if (paydexScore < 50) {
+        grade = 'D DEFICIT_LIMITS';
+      }
+
+      document.getElementById('kpi-val-tradeLimit').textContent = `$${Math.round(baseCreditLineLimit).toLocaleString()}`;
+      document.getElementById('kpi-val-sbaEstimator').textContent = `$${Math.round(sbaEstimatedAmount).toLocaleString()}`;
+      document.getElementById('kpi-val-leverageRatio').textContent = `${aggregateLeverageRate}x`;
+      
+      const gradeNode = document.getElementById('kpi-val-fundingReadiness');
+      gradeNode.textContent = grade;
+      gradeNode.style.color = grade.includes('A') ? 'var(--acid-green)' : (grade.includes('B') ? 'var(--cyan)' : 'var(--red)');
+
+      // Update Credit expansion chart bars
+      renderChartData([
+        bankVolume,
+        bankVolume * paydexFactor,
+        baseCreditLineLimit * 0.4,
+        baseCreditLineLimit * 0.8,
+        sbaEstimatedAmount * 0.2,
+        sbaEstimatedAmount * 0.5
+      ], "LEVERAGE LIMITS ($)");
+
+      logTrace(`Recalculated BizCredit KPIs. Grade: ${grade}, Cap Limit: $${Math.round(baseCreditLineLimit).toLocaleString()}`, 'MATH');
+    }
+
+    // Dynamic Render Elements inside custom Cyber Chart Area
+    function renderChartData(points, unitLabel) {
+      const chartStage = document.getElementById('chartStage');
+      
+      // Retain the structural lines, clear old bars
+      const elementsToRemove = chartStage.querySelectorAll('.chart-bar-wrap');
+      elementsToRemove.forEach(el => el.remove());
+
+      // Update Chart header label text based on units
+      document.querySelector('.chart-axis-label').textContent = `AXIS MAP: ${unitLabel}`;
+
+      const maxVal = Math.max(...points) || 1;
+      const monthNames = ['Month 1', 'Month 2', 'Month 3', 'Target A', 'Target B', 'Target C'];
+
+      points.forEach((val, index) => {
+        const percentHeight = Math.min(100, Math.max(10, (val / maxVal) * 90));
+        
+        const barWrap = document.createElement('div');
+        barWrap.className = 'chart-bar-wrap';
+        
+        barWrap.innerHTML = `
+          <div class="chart-bar" style="height: ${percentHeight}%;" data-value="$${Math.round(val).toLocaleString()}"></div>
+          <span class="chart-label-x">${monthNames[index]}</span>
+        `;
+        
+        chartStage.appendChild(barWrap);
+      });
+    }
+
+    // Reset UI fields to default settings based on active calculator type
+    function resetCalculatorDefaults() {
+      logTrace(`RESTORING CONFIG DEFAULT CONTROLS ...`, 'SYSTEM');
+      renderCalculatorUI();
+    }
+
+    // Compile inputs and KPIs into raw CSV layout and trigger a client-side download
+    function exportCalculationCSV() {
+      const config = calcConfigs[currentCalcMode];
+      let csvContent = "data:text/csv;charset=utf-8,";
+      
+      // Header rows
+      csvContent += `FINTECH COMMAND CENTER REPORT,${config.title.toUpperCase()}\r\n`;
+      csvContent += "METRIC PROPERTY,PARAMETER VALUE\r\n";
+
+      // Append Current Input Values
+      config.inputs.forEach(inp => {
+        const elementVal = document.getElementById(`input-${inp.id}`).value;
+        csvContent += `${inp.label.replace(',', '')},${elementVal}\r\n`;
+      });
+
+      csvContent += "\r\nComputed Operator KPIs\r\n";
+      csvContent += "KPI OUTLINE NAME,CURRENT CALCULATED OUTCOME\r\n";
+
+      // Append Calculated Metrics
+      config.kpis.forEach(kpi => {
+        const kpiVal = document.getElementById(`kpi-val-${kpi.id}`).textContent;
+        csvContent += `${kpi.label.replace(',', '')},${kpiVal.replace(',', '')}\r\n`;
+      });
+
+      // Execute Virtual Trigger Download Event
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `FintechCommandCenter_${currentCalcMode}_Report.csv`);
+      document.body.appendChild(link);
+      
+      link.click();
+      document.body.removeChild(link);
+
+      logTrace(`GENERATED AND DOWNLOADED DETAILED CALCULATIONS CSV EXPORT SUCCESSFULLY.`, 'SYSTEM');
+    }
+
+    // On Load Initializations
+    window.addEventListener('DOMContentLoaded', () => {
+      renderCalculatorUI();
+    });
+  </script>
+</body>
+</html>

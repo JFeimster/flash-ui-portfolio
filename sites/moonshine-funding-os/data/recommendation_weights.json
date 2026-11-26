@@ -1,0 +1,160 @@
+{
+  "_meta": {
+    "engine_version": "0.2.3-operational-routing-draft",
+    "source_version": "0.2.2 provider/product verification draft",
+    "source_files": [
+      "providers.json",
+      "products.json",
+      "verification_report.md",
+      "unresolved_conflicts_report.csv",
+      "high_priority_missing_data_report.csv"
+    ],
+    "generated_date": "2026-05-20",
+    "file_name": "recommendation_weights.json",
+    "purpose": "Global, funding-family, confidence, monetization, and tie-breaker weights used to rank provider/product recommendations.",
+    "logic_precedence": [
+      "product_rules",
+      "provider_defaults",
+      "funding_family_defaults",
+      "global_fallback_logic"
+    ],
+    "status": "draft_for_operational_testing_not_final_underwriting_policy"
+  },
+  "schema": [
+    "weight_id",
+    "scope",
+    "description",
+    "weights",
+    "manual_review_policy",
+    "notes"
+  ],
+  "records": [
+    {
+      "weight_id": "global_product_match_v1",
+      "scope": "global",
+      "description": "Default product-ranking formula. Product-level hard exclusions run before scoring.",
+      "weights": {
+        "eligibility_fit": 0.3,
+        "fundability_fit": 0.2,
+        "use_case_fit": 0.15,
+        "risk_fit": 0.12,
+        "documentation_fit": 0.08,
+        "speed_fit": 0.06,
+        "geography_fit": 0.04,
+        "relationship_priority": 0.03,
+        "monetization_fit": 0.02
+      },
+      "manual_review_policy": "manual_review_if_confidence_below_60_or_any_critical_conflict",
+      "notes": "Eligibility checks threshold fit; fundability estimates applicant ability to complete funding; fit measures qualitative suitability."
+    },
+    {
+      "weight_id": "fast_capital_override_v1",
+      "scope": "family:working_capital_emergency_capital",
+      "description": "Urgency and deposit strength matter more for fast-capital paths.",
+      "weights": {
+        "eligibility_fit": 0.28,
+        "fundability_fit": 0.22,
+        "use_case_fit": 0.16,
+        "risk_fit": 0.14,
+        "documentation_fit": 0.05,
+        "speed_fit": 0.1,
+        "geography_fit": 0.03,
+        "relationship_priority": 0.01,
+        "monetization_fit": 0.01
+      },
+      "manual_review_policy": "manual_review_if_recent_nsfs_or_existing_mca_stack",
+      "notes": "Do not bury NSF/MCA risk inside a high revenue score."
+    },
+    {
+      "weight_id": "startup_credit_override_v1",
+      "scope": "family:startup_credit_leverage",
+      "description": "Credit quality dominates startup/credit-leverage product fit.",
+      "weights": {
+        "eligibility_fit": 0.35,
+        "fundability_fit": 0.18,
+        "use_case_fit": 0.13,
+        "risk_fit": 0.15,
+        "documentation_fit": 0.07,
+        "speed_fit": 0.03,
+        "geography_fit": 0.03,
+        "relationship_priority": 0.03,
+        "monetization_fit": 0.03
+      },
+      "manual_review_policy": "manual_review_if_credit_band_missing_or_recent_derogatory_credit",
+      "notes": "Revenue cannot compensate for bad personal credit in credit-stacking lanes."
+    },
+    {
+      "weight_id": "ecommerce_platform_override_v1",
+      "scope": "family:platform_marketplace_seller_capital",
+      "description": "Platform connection and seller revenue drive marketplace funding.",
+      "weights": {
+        "eligibility_fit": 0.25,
+        "fundability_fit": 0.18,
+        "use_case_fit": 0.2,
+        "risk_fit": 0.12,
+        "documentation_fit": 0.1,
+        "speed_fit": 0.08,
+        "geography_fit": 0.03,
+        "relationship_priority": 0.02,
+        "monetization_fit": 0.02
+      },
+      "manual_review_policy": "manual_review_if_platform_connection_missing_or_account_suspended",
+      "notes": "A suspended platform account can override good revenue."
+    },
+    {
+      "weight_id": "real_estate_override_v1",
+      "scope": "family:real_estate_asset_secured",
+      "description": "Collateral and project data dominate real-estate routing.",
+      "weights": {
+        "eligibility_fit": 0.24,
+        "fundability_fit": 0.16,
+        "use_case_fit": 0.18,
+        "risk_fit": 0.15,
+        "documentation_fit": 0.12,
+        "speed_fit": 0.02,
+        "geography_fit": 0.05,
+        "relationship_priority": 0.04,
+        "monetization_fit": 0.04
+      },
+      "manual_review_policy": "manual_review_by_default_until_property_data_verified",
+      "notes": "Real estate files should not be auto-routed without LTV, property, and project details."
+    },
+    {
+      "weight_id": "confidence_adjustments_v1",
+      "scope": "global",
+      "description": "Confidence multiplier and penalties applied after product fit score.",
+      "weights": {
+        "confidence_90_100_multiplier": 1.0,
+        "confidence_75_89_multiplier": 0.94,
+        "confidence_60_74_multiplier": 0.86,
+        "confidence_45_59_multiplier": 0.72,
+        "confidence_below_45_multiplier": 0.55,
+        "verified_product_bonus": 3,
+        "verified_partial_bonus": 1,
+        "needs_verification_penalty": -3,
+        "conflicting_penalty": -10
+      },
+      "manual_review_policy": "manual_review_if_final_confidence_below_60",
+      "notes": "Confidence does not replace qualification; it controls rank strength and escalation."
+    },
+    {
+      "weight_id": "tie_breakers_v1",
+      "scope": "global",
+      "description": "Tie-breaker order after weighted score.",
+      "weights": {
+        "tie_breaker_order": [
+          "hard_eligibility_pass_count",
+          "higher_confidence",
+          "lower_risk_severity",
+          "stronger_use_case_fit",
+          "faster_funding_speed_if_urgency_high",
+          "lower_documentation_burden_if_docs_weak",
+          "relationship_priority",
+          "manual_review_last_unless_only_safe_route"
+        ]
+      },
+      "manual_review_policy": "if_top_3_scores_within_5_points_and_different_families_trigger_strategy_review",
+      "notes": "Close scores across families usually mean the borrower needs human routing, not fake precision."
+    }
+  ]
+}

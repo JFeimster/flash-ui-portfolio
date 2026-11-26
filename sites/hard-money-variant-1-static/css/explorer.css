@@ -1,0 +1,285 @@
+:root {
+    --cyber-bg: #07090e;
+    --cyber-card: #0e131f;
+    --cyber-border: #1e293b;
+    --cyber-accent: #00f0ff;
+    --cyber-purple: #bd00ff;
+    --cyber-emerald: #05ffc4;
+    --cyber-error: #ff0055;
+    --cyber-warning: #ffb700;
+    --cyber-glow: rgba(0, 240, 255, 0.15);
+}
+
+/* Base Explorer Layout Adjustments */
+.explorer-container {
+    background-color: var(--cyber-bg);
+}
+
+/* Custom Interactive File/Asset Card Grid vs List toggle */
+.explorer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.explorer-container.list-view .explorer-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+}
+
+/* Unified Asset Card */
+.asset-card {
+    background: var(--cyber-card);
+    border: 1px solid var(--cyber-border);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.asset-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyber-border), transparent);
+    transition: all 0.3s ease;
+}
+
+/* Card States & Hover Effects */
+.asset-card:hover {
+    border-color: var(--cyber-accent);
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+.asset-card:hover::before {
+    background: linear-gradient(90deg, transparent, var(--cyber-accent), transparent);
+}
+
+.asset-card.is-selected {
+    border-color: var(--cyber-purple);
+    background: rgba(189, 0, 255, 0.04);
+    box-shadow: 0 0 25px rgba(189, 0, 255, 0.15);
+}
+
+.asset-card.is-selected::before {
+    background: linear-gradient(90deg, var(--cyber-purple), var(--cyber-accent));
+}
+
+/* Cyber Edge Clip implementation for cards inside the explorer */
+.asset-edge-clip {
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+}
+
+/* View Mode Switcher Transitions */
+.explorer-container.list-view .asset-card {
+    flex-direction: row;
+    align-items: center;
+    padding: 0.75rem 1.25rem;
+    clip-path: none;
+}
+
+.explorer-container.list-view .asset-preview-container {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    margin-bottom: 0 !important;
+}
+
+.explorer-container.list-view .asset-details {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-grow: 1;
+    margin-left: 1rem;
+}
+
+.explorer-container.list-view .asset-meta {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 0 !important;
+}
+
+/* Holographic Media Previews */
+.asset-preview-container {
+    position: relative;
+    background: rgba(0, 0, 0, 0.4);
+    aspect-ratio: 16/10;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(30, 41, 59, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.explorer-container.list-view .asset-preview-container {
+    aspect-ratio: 1/1;
+    border-bottom: none;
+    border-radius: 4px;
+}
+
+.asset-preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.asset-card:hover .asset-preview-image {
+    transform: scale(1.05);
+}
+
+/* Cyberpunk Glass Document Icon Placeholders */
+.asset-icon-placeholder {
+    font-family: 'JetBrains Mono', monospace;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--cyber-accent);
+    text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+}
+
+/* Advanced Drag & Drop Zone */
+.explorer-dropzone {
+    border: 2px dashed var(--cyber-border);
+    background: rgba(14, 19, 31, 0.3);
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.explorer-dropzone::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(0, 240, 255, 0.05) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.explorer-dropzone.dragover {
+    border-color: var(--cyber-accent);
+    background: rgba(14, 19, 31, 0.7);
+    box-shadow: inset 0 0 20px rgba(0, 240, 255, 0.1);
+}
+
+.explorer-dropzone.dragover::after {
+    opacity: 1;
+}
+
+/* Dynamic Scanlines Overlay for media preview modals */
+.cyber-scanlines {
+    position: relative;
+    overflow: hidden;
+}
+
+.cyber-scanlines::before {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    z-index: 10;
+    background-size: 100% 4px, 6px 100%;
+    pointer-events: none;
+}
+
+/* Custom Checkbox Alignment with Cyber Theme */
+.explorer-checkbox {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--cyber-border);
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 3px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.explorer-checkbox:checked {
+    border-color: var(--cyber-accent);
+    background: var(--cyber-accent);
+}
+
+.explorer-checkbox:checked::after {
+    content: '';
+    position: absolute;
+    left: 4.5px;
+    top: 1px;
+    width: 5px;
+    height: 9px;
+    border: solid black;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* Hologram Glitch Pulse Animation */
+@keyframes hologram-pulse {
+    0% { opacity: 0.85; }
+    50% { opacity: 1; text-shadow: 0 0 12px var(--cyber-accent), 0 0 2px var(--cyber-accent); }
+    100% { opacity: 0.85; }
+}
+
+.cyber-hologram-text {
+    animation: hologram-pulse 2s infinite ease-in-out;
+}
+
+/* Meta Data Badges matching Direct Balance Sheet design */
+.asset-badge {
+    padding: 0.15rem 0.5rem;
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    border-radius: 4px;
+    background: rgba(14, 19, 31, 0.8);
+    border: 1px solid var(--cyber-border);
+}
+
+.asset-badge-image { color: var(--cyber-purple); border-color: rgba(189, 0, 255, 0.3); }
+.asset-badge-doc { color: var(--cyber-accent); border-color: rgba(0, 240, 255, 0.3); }
+.asset-badge-archive { color: var(--cyber-warning); border-color: rgba(255, 183, 0, 0.3); }
+.asset-badge-video { color: var(--cyber-emerald); border-color: rgba(5, 255, 196, 0.3); }
+
+/* Custom Scrollbar for file list side-scroll controls */
+.explorer-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+.explorer-scrollbar::-webkit-scrollbar-track {
+    background: rgba(7, 9, 14, 0.8);
+}
+.explorer-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--cyber-border);
+    border-radius: 2px;
+}
+.explorer-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--cyber-accent);
+}
+
+/* Bulk actions bar styling matching floating system bar */
+.bulk-actions-panel {
+    border-top: 1px solid rgba(0, 240, 255, 0.3);
+    background: rgba(7, 9, 14, 0.95);
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.8);
+}
+
+/* File Activity Chart bars */
+.cyber-activity-bar {
+    background: linear-gradient(180deg, var(--cyber-accent) 0%, rgba(0, 240, 255, 0.1) 100%);
+    transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cyber-activity-bar-purple {
+    background: linear-gradient(180deg, var(--cyber-purple) 0%, rgba(189, 0, 255, 0.1) 100%);
+}

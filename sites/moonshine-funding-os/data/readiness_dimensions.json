@@ -1,0 +1,263 @@
+{
+  "_meta": {
+    "engine_version": "0.2.3-operational-routing-draft",
+    "source_version": "0.2.2 provider/product verification draft",
+    "source_files": [
+      "providers.json",
+      "products.json",
+      "verification_report.md",
+      "unresolved_conflicts_report.csv",
+      "high_priority_missing_data_report.csv"
+    ],
+    "generated_date": "2026-05-20",
+    "file_name": "readiness_dimensions.json",
+    "purpose": "Scoring dimensions that separate fundability, readiness, eligibility, fit, and confidence.",
+    "logic_precedence": [
+      "product_rules",
+      "provider_defaults",
+      "funding_family_defaults",
+      "global_fallback_logic"
+    ],
+    "status": "draft_for_operational_testing_not_final_underwriting_policy"
+  },
+  "schema": [
+    "dimension_id",
+    "label",
+    "max_points",
+    "score_type",
+    "input_fields",
+    "formula",
+    "routing_impact",
+    "notes"
+  ],
+  "records": [
+    {
+      "dimension_id": "revenue_strength_score",
+      "label": "Revenue Strength",
+      "max_points": 15,
+      "score_type": "readiness",
+      "input_fields": [
+        "monthly_revenue",
+        "deposit_consistency"
+      ],
+      "formula": "0 if no revenue; 4 if $3k+; 8 if $8.5k+; 11 if $15k+; 13 if $20k+; 15 if $100k+; subtract 2-5 for inconsistent deposits.",
+      "routing_impact": [
+        "fundability",
+        "eligibility",
+        "ranking"
+      ],
+      "notes": "Revenue thresholds mirror recurring product patterns in verified products."
+    },
+    {
+      "dimension_id": "time_in_business_score",
+      "label": "Time in Business",
+      "max_points": 12,
+      "score_type": "eligibility",
+      "input_fields": [
+        "time_in_business_months"
+      ],
+      "formula": "0 for not launched; 3 for 0-3 months; 5 for 4-5 months; 7 for 6-11 months; 10 for 12-23 months; 12 for 24+ months.",
+      "routing_impact": [
+        "eligibility",
+        "funding_family_routing"
+      ],
+      "notes": "Do not treat short TIB as an auto-decline; route to startup or revenue-first paths when other signals support it."
+    },
+    {
+      "dimension_id": "credit_readiness_score",
+      "label": "Credit Readiness",
+      "max_points": 15,
+      "score_type": "fundability",
+      "input_fields": [
+        "credit_score_band",
+        "recent_derogatory_credit"
+      ],
+      "formula": "1 below 500; 4 for 500-579; 7 for 580-599; 10 for 600-659; 12 for 660-679; 14 for 680-699; 15 for 700+; subtract for recent derogatory events.",
+      "routing_impact": [
+        "eligibility",
+        "ranking",
+        "risk_escalation"
+      ],
+      "notes": "Credit matters more for SBA, LOC, startup stacking, unsecured finance, and personal products."
+    },
+    {
+      "dimension_id": "bankability_score",
+      "label": "Bankability",
+      "max_points": 12,
+      "score_type": "fundability",
+      "input_fields": [
+        "business_bank_account",
+        "average_bank_balance",
+        "nsf_count",
+        "deposit_trend"
+      ],
+      "formula": "0 no bank account; 4 low/inconsistent deposits; 8 consistent deposits; 12 strong clean deposits; cap at 5 if recent NSFs are present.",
+      "routing_impact": [
+        "fundability",
+        "risk_escalation",
+        "documentation_fit"
+      ],
+      "notes": "Bank data is the practical underwriting center for fast capital."
+    },
+    {
+      "dimension_id": "documentation_readiness_score",
+      "label": "Documentation Readiness",
+      "max_points": 10,
+      "score_type": "readiness",
+      "input_fields": [
+        "docs_available",
+        "platform_connection_available",
+        "tax_returns_available",
+        "bank_statements_available"
+      ],
+      "formula": "2 minimal docs; 5 bank statements ready; 7 platform/API or asset docs ready; 10 full financials/tax returns/debt schedule ready.",
+      "routing_impact": [
+        "readiness",
+        "ranking",
+        "manual_review"
+      ],
+      "notes": "Readiness is not the same as eligibility; strong borrowers can still be operationally unready."
+    },
+    {
+      "dimension_id": "entity_readiness_score",
+      "label": "Entity Readiness",
+      "max_points": 8,
+      "score_type": "readiness",
+      "input_fields": [
+        "business_structure",
+        "ein",
+        "business_bank_account"
+      ],
+      "formula": "1 no formal business; 4 sole prop; 5 entity/no bank; 7 entity+bank; 8 entity+bank+EIN+clean records.",
+      "routing_impact": [
+        "readiness",
+        "fundability",
+        "monetization_branching"
+      ],
+      "notes": "Sole proprietors can be eligible for some paths, but entity readiness improves operational quality."
+    },
+    {
+      "dimension_id": "use_case_fit_score",
+      "label": "Use-Case Fit",
+      "max_points": 10,
+      "score_type": "fit",
+      "input_fields": [
+        "funding_purpose",
+        "desired_funding_amount",
+        "business_persona"
+      ],
+      "formula": "Score product/family match to funding purpose: 10 direct match; 7 adjacent; 4 unclear; 0 incompatible.",
+      "routing_impact": [
+        "funding_family_routing",
+        "ranking"
+      ],
+      "notes": "Use case should route first to family, then to products."
+    },
+    {
+      "dimension_id": "risk_adjusted_score",
+      "label": "Risk-Adjusted Strength",
+      "max_points": 12,
+      "score_type": "fundability",
+      "input_fields": [
+        "risk_flags"
+      ],
+      "formula": "Start at 12; subtract critical 12, high 6-9, medium 3-5, low 1-2; cannot drop below 0.",
+      "routing_impact": [
+        "fundability",
+        "manual_review",
+        "exclusions"
+      ],
+      "notes": "Risk flags are severity-weighted, not linear fluff tokens."
+    },
+    {
+      "dimension_id": "data_confidence_score",
+      "label": "Data Confidence",
+      "max_points": 100,
+      "score_type": "confidence",
+      "input_fields": [
+        "missing_fields",
+        "contradictory_answers",
+        "source_confidence",
+        "verification_status"
+      ],
+      "formula": "Start at 100; subtract 5 per missing critical input; 10-20 for contradictory answers; 15 for unverifiable claims; product confidence modifies final match score.",
+      "routing_impact": [
+        "ranking",
+        "manual_review"
+      ],
+      "notes": "Low confidence does not equal bad borrower; it means do not over-rank recommendations."
+    },
+    {
+      "dimension_id": "operational_readiness_score",
+      "label": "Operational Readiness",
+      "max_points": 100,
+      "score_type": "readiness",
+      "input_fields": [
+        "documentation_readiness_score",
+        "entity_readiness_score",
+        "bankability_score",
+        "data_confidence_score"
+      ],
+      "formula": "documentation*0.35 + entity*0.20 + bankability*0.30 + confidence*0.15 normalized to 100.",
+      "routing_impact": [
+        "monetization_branching",
+        "manual_review"
+      ],
+      "notes": "This tells whether the borrower can survive the underwriting process."
+    },
+    {
+      "dimension_id": "fundability_score",
+      "label": "Fundability",
+      "max_points": 100,
+      "score_type": "fundability",
+      "input_fields": [
+        "revenue_strength_score",
+        "credit_readiness_score",
+        "time_in_business_score",
+        "bankability_score",
+        "risk_adjusted_score"
+      ],
+      "formula": "revenue*0.25 + credit*0.22 + TIB*0.18 + bankability*0.20 + risk_adjusted*0.15 normalized to 100.",
+      "routing_impact": [
+        "lead_priority",
+        "ranking"
+      ],
+      "notes": "This estimates access to capital, separate from documentation readiness."
+    },
+    {
+      "dimension_id": "eligibility_score",
+      "label": "Eligibility",
+      "max_points": 100,
+      "score_type": "eligibility",
+      "input_fields": [
+        "product_minimums",
+        "borrower_inputs"
+      ],
+      "formula": "For each product: credit pass, revenue pass, TIB pass, geography pass, industry pass, disqualifier pass. Hard fail if any non-waivable required rule fails.",
+      "routing_impact": [
+        "product_inclusion",
+        "exclusion"
+      ],
+      "notes": "Eligibility is product-specific and must use product rules before provider/family defaults."
+    },
+    {
+      "dimension_id": "fit_score",
+      "label": "Fit",
+      "max_points": 100,
+      "score_type": "fit",
+      "input_fields": [
+        "use_case_fit",
+        "archetype_fit",
+        "urgency_fit",
+        "documentation_fit",
+        "cost_tolerance_fit"
+      ],
+      "formula": "Weighted qualitative compatibility after eligibility. Fit can be high even if readiness needs work, but recommendations should show caveats.",
+      "routing_impact": [
+        "recommendation_ranking",
+        "explanation"
+      ],
+      "notes": "Fit answers whether this is the right path, not merely possible."
+    }
+  ]
+}

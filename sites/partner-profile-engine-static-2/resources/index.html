@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Referral Partner Resource Hub & Link Builder | Moonshine Engine</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-black: #08090A;
+            --bg-matte: #0D0E11;
+            --bg-card: #14161D;
+            --bone-white: #F5F5F7;
+            --electric-green: #00FF66;
+            --electric-green-hover: #00E054;
+            --signal-orange: #FF5500;
+            --cobalt-blue: #0055FF;
+            --graphite-gray: #1C1E24;
+            --chrome-border: #2D3139;
+            --chrome-border-bright: #444B5A;
+            --text-muted: #8E96A5;
+            
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            --shadow-neo: 4px 4px 0px 0px var(--chrome-border);
+            --shadow-green: 0px 0px 20px 0px rgba(0, 255, 102, 0.25);
+            --shadow-blue: 0px 0px 20px 0px rgba(0, 85, 255, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-black);
+            color: var(--bone-white);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        /* Utility classes */
+        .mono { font-family: var(--font-mono); }
+        .text-green { color: var(--electric-green); }
+        .text-orange { color: var(--signal-orange); }
+        .text-blue { color: var(--cobalt-blue); }
+        .border-neon-hover:hover { border-color: var(--electric-green); }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-black);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--graphite-gray);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--chrome-border-bright);
+        }
+
+        /* Sticky Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(8, 9, 10, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 2px solid var(--chrome-border);
+            transition: border-color 0.3s ease;
+        }
+        
+        header.scrolled {
+            border-color: var(--cobalt-blue);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 2rem;
+        }
+
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--bone-white);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--cobalt-blue), var(--electric-green));
+            border: 2px solid var(--bone-white);
+            transform: rotate(45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.5s ease;
+        }
+
+        .logo-group:hover .logo-icon {
+            transform: rotate(225deg);
+        }
+
+        .logo-text {
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-tag {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            background: var(--graphite-gray);
+            color: var(--electric-green);
+            padding: 2px 6px;
+            border: 1px solid var(--chrome-border);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        nav a:hover {
+            color: var(--bone-white);
+        }
+
+        .header-cta {
+            background: transparent;
+            border: 2px solid var(--electric-green);
+            color: var(--electric-green);
+            padding: 0.5rem 1.25rem;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .header-cta:hover {
+            background: var(--electric-green);
+            color: var(--bg-black);
+            box-shadow: var(--shadow-green);
+        }
+
+        /* Main Container layout */
+        main {
+            padding-top: 80px;
+        }
+
+        /* Section Global Layout */
+        section.container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .section-header {
+            margin-bottom: 3rem;
+            max-width: 800px;
+        }
+
+        .section-pre {
+            font-family: var(--font-mono);
+            color: var(--electric-green);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: block;
+            margin-bottom: 0.75rem;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -1.5px;
+        }
+
+        .section-sub {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            margin-top: 0.75rem;
+            line-height: 1.6;
+        }
+
+        /* Link Builder Specific Styles */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 3rem;
+            align-items: flex-start;
+        }
+
+        @media (max-width: 1024px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel-card {
+            background: var(--bg-card);
+            border: 2px solid var(--chrome-border);
+            padding: 2.5rem;
+            position: relative;
+            box-shadow: var(--shadow-neo);
+        }
+
+        .panel-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--chrome-border);
+            padding-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .form-control {
+            width: 100%;
+            background: var(--bg-black);
+            border: 2px solid var(--chrome-border);
+            color: var(--bone-white);
+            padding: 0.85rem 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--electric-green);
+        }
+
+        .select-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg fill='%238E96A5' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 10px fill-center;
+            background-position-x: calc(100% - 12px);
+            background-position-y: 50%;
+        }
+
+        .builder-output-box {
+            background: var(--bg-black);
+            border: 2px dashed var(--chrome-border-bright);
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .output-label {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--electric-green);
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .output-text {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--bone-white);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            resize: none;
+            outline: none;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+            height: 60px;
+        }
+
+        .output-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Preset pills */
+        .preset-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .preset-pill {
+            background: var(--graphite-gray);
+            border: 1px solid var(--chrome-border);
+            color: var(--text-muted);
+            padding: 0.25rem 0.6rem;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .preset-pill:hover {
+            color: var(--bone-white);
+            border-color: var(--chrome-border-bright);
+        }
+
+        /* Resource Library Section */
+        .library-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+            padding: 1rem;
+            background: var(--bg-card);
+            border: 2px solid var(--chrome-border);
+        }
+
+        .resource-tabs {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .resource-tab {
+            background: transparent;
+            border: 1px solid var(--chrome-border);
+            color: var(--text-muted);
+            padding: 0.5rem 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .resource-tab:hover, .resource-tab.active {
+            border-color: var(--electric-green);
+            color: var(--electric-green);
+            background: rgba(0, 255, 102, 0.05);
+        }
+
+        .grid-3col {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 2rem;
+        }
+
+        @media (max-width: 600px) {
+            .grid-3col {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Swipe Copy Card */
+        .swipe-card {
+            background: var(--bg-matte);
+            border: 2px solid var(--chrome-border);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .swipe-card:hover {
+            border-color: var(--cobalt-blue);
+            transform: translateY(-4px);
+        }
+
+        .swipe-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .swipe-badge {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            background: var(--graphite-gray);
+            color: var(--cobalt-blue);
+            padding: 2px 6px;
+            border: 1px solid var(--chrome-border);
+            text-transform: uppercase;
+        }
+
+        .swipe-badge.compliance-safe {
+            color: var(--electric-green);
+            border-color: rgba(0, 255, 102, 0.2);
+        }
+
+        .swipe-badge.promo-badge {
+            color: var(--signal-orange);
+            border-color: rgba(255, 85, 0, 0.2);
+        }
+
+        .swipe-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .swipe-preview {
+            background: var(--bg-black);
+            border: 1px solid var(--chrome-border);
+            padding: 1rem;
+            font-family: var(--font-sans);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-left: 3px solid var(--cobalt-blue);
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+            max-height: 150px;
+            overflow-y: auto;
+            white-space: pre-line;
+        }
+
+        .swipe-preview::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .swipe-card .btn {
+            width: 100%;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            padding: 0.75rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--graphite-gray);
+            color: var(--bone-white);
+            border: 1px solid var(--chrome-border-bright);
+        }
+
+        .swipe-card .btn:hover {
+            background: var(--chrome-border-bright);
+            border-color: var(--bone-white);
+        }
+
+        /* Banner Card Component */
+        .banner-card {
+            background: var(--bg-matte);
+            border: 2px solid var(--chrome-border);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .banner-preview {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, var(--bg-black) 0%, var(--graphite-gray) 100%);
+            border: 1px solid var(--chrome-border);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .banner-preview-content {
+            text-align: center;
+            z-index: 2;
+            padding: 1rem;
+        }
+
+        .banner-preview-content h4 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .banner-preview-content p {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--electric-green);
+        }
+
+        .banner-decor {
+            position: absolute;
+            bottom: -20px;
+            right: -20px;
+            width: 100px;
+            height: 100px;
+            border: 2px solid rgba(0, 85, 255, 0.3);
+            transform: rotate(45deg);
+        }
+
+        .banner-spec-row {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--chrome-border);
+            padding-bottom: 0.5rem;
+        }
+
+        .banner-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .banner-btn {
+            flex: 1;
+            padding: 0.6rem;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            text-align: center;
+            cursor: pointer;
+            border: 1px solid var(--chrome-border);
+            background: transparent;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .banner-btn:hover {
+            border-color: var(--electric-green);
+            color: var(--electric-green);
+        }
+
+        .banner-btn-primary {
+            background: var(--cobalt-blue);
+            color: var(--bone-white);
+            border-color: var(--cobalt-blue);
+        }
+
+        .banner-btn-primary:hover {
+            background: #0040d9;
+            color: var(--bone-white);
+            border-color: #0040d9;
+        }
+
+        /* Buttons matching core system */
+        .btn-primary {
+            background: var(--electric-green);
+            color: var(--bg-black);
+            border: 2px solid var(--electric-green);
+            padding: 0.85rem 1.5rem;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 4px 4px 0px 0px rgba(0, 255, 102, 0.2);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px 0px rgba(0, 255, 102, 0.4), var(--shadow-green);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--bone-white);
+            border: 2px solid var(--chrome-border);
+            padding: 0.85rem 1.5rem;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--bone-white);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Toast notifications styling */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 10001;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            border: 2px solid var(--electric-green);
+            color: var(--bone-white);
+            padding: 1rem 1.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            box-shadow: var(--shadow-green);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(100%) scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Footer matching exactly */
+        footer {
+            background: var(--bg-black);
+            border-top: 2px solid var(--chrome-border);
+            padding: 4rem 2rem 2rem 2rem;
+            margin-top: 6rem;
+        }
+
+        .footer-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 4rem;
+            margin-bottom: 4rem;
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .footer-brand p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            max-width: 320px;
+            line-height: 1.5;
+        }
+
+        .footer-links-col {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .footer-links-title {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--bone-white);
+            text-transform: uppercase;
+        }
+
+        .footer-links-col ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .footer-links-col a {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links-col a:hover {
+            color: var(--electric-green);
+        }
+
+        .compliance-box {
+            max-width: 1400px;
+            margin: 0 auto;
+            border-top: 1px solid var(--chrome-border);
+            padding-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .compliance-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .compliance-copyright {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sticky Header -->
+    <header id="header">
+        <div class="nav-container">
+            <a href="../index.html" class="logo-group">
+                <div class="logo-icon"></div>
+                <div>
+                    <span class="logo-text">MOONSHINE</span>
+                    <span class="logo-tag">RESOURCE HUB</span>
+                </div>
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="#link-builder">Link Builder</a></li>
+                    <li><a href="#copy-swipes">Copy Kits</a></li>
+                    <li><a href="#banners">Banners</a></li>
+                    <li><a href="#compliance">Compliance Rules</a></li>
+                </ul>
+            </nav>
+            <a href="../index.html#request" class="header-cta">Back to Engine</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="container" style="padding-top: 5rem;">
+            <div class="section-header">
+                <span class="section-pre">OPERATIONAL ASSETS</span>
+                <h2 class="section-title">Referral Partner Resource Hub & Campaign Builder</h2>
+                <p class="section-sub">
+                    Empowering Moonshine Capital affiliates with high-performance tracking instrumentation and compliance-approved deployment resources. Generate precise UTM-encoded links, deploy high-converting copy patterns, and access professional media.
+                </p>
+            </div>
+        </section>
+
+        <!-- Interactive Link Builder Section -->
+        <section class="container" id="link-builder" style="border-top: 1px solid var(--chrome-border);">
+            <div class="workspace-grid">
+                
+                <!-- Link Builder Configurations Form -->
+                <div class="panel-card">
+                    <h3 class="panel-title"><span class="text-green">■</span> Static UTM Campaign Builder</h3>
+                    
+                    <div class="input-group">
+                        <label for="partnerSlug">Partner Path (Slug) *</label>
+                        <input type="text" id="partnerSlug" class="form-control" placeholder="e.g. danielle-hart" value="danielle-hart">
+                        <div class="preset-group">
+                            <span class="preset-pill" onclick="setSlug('danielle-hart')">Danielle Hart</span>
+                            <span class="preset-pill" onclick="setSlug('darwin-hanneman')">Darwin Hanneman</span>
+                            <span class="preset-pill" onclick="setSlug('marcus-vance')">Marcus Vance</span>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="destination">Landing Node Target</label>
+                        <select id="destination" class="form-control select-control">
+                            <option value="index.html">Personalized Profile (Home)</option>
+                            <option value="scorecard.html">Interactive Funding Scorecard</option>
+                            <option value="apply.html">Secure Intake Portal</option>
+                            <option value="book.html">Strategy Call Scheduler</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="utmSource">Campaign Source (utm_source) *</label>
+                        <input type="text" id="utmSource" class="form-control" placeholder="e.g. linkedin, email, newsletter" value="linkedin">
+                        <div class="preset-group">
+                            <span class="preset-pill" onclick="setField('utmSource', 'linkedin')">Linkedin</span>
+                            <span class="preset-pill" onclick="setField('utmSource', 'email-sequence')">Email Sequence</span>
+                            <span class="preset-pill" onclick="setField('utmSource', 'cpa-partner')">CPA Network</span>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="utmMedium">Campaign Medium (utm_medium)</label>
+                        <input type="text" id="utmMedium" class="form-control" placeholder="e.g. social, direct, referral" value="social">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="utmCampaign">Campaign Name (utm_campaign)</label>
+                        <input type="text" id="utmCampaign" class="form-control" placeholder="e.g. enterprise-q4, local-saas" value="saas-scale">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="utmContent">Campaign Content (utm_content)</label>
+                        <input type="text" id="utmContent" class="form-control" placeholder="e.g. header-cta, sidebar-banner" value="profile-banner">
+                    </div>
+                </div>
+
+                <!-- Live Dynamic Output Display Panel -->
+                <div class="panel-card" style="align-self: stretch; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <h3 class="panel-title"><span class="text-blue">■</span> Tracked Target String</h3>
+                        <p class="section-sub" style="font-size: 0.9rem; margin-top: 0; margin-bottom: 1.5rem;">
+                            Your link is compiled dynamically on-the-fly. This tracking design routes the client securely while guaranteeing correct lead attribution on our backend databases.
+                        </p>
+
+                        <div class="builder-output-box">
+                            <div class="output-label">
+                                <span>COMPILED UTM URL</span>
+                                <span class="text-green">READY</span>
+                            </div>
+                            <textarea id="compiledUrl" class="output-text" readonly></textarea>
+                            
+                            <div class="output-actions">
+                                <button class="btn-primary" style="flex: 1.5;" onclick="copyCompiledUrl()">
+                                    <span>📋</span> Copy Campaign Link
+                                </button>
+                                <button class="btn-secondary" style="flex: 1;" onclick="testCompiledUrl()">
+                                    Test Link &nearr;
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="border-top: 1px solid var(--chrome-border); padding-top: 1.5rem; margin-top: 1.5rem;">
+                        <span class="section-pre" style="color: var(--signal-orange); margin-bottom: 0.5rem;">Engine Integration Status</span>
+                        <div class="preset-group" style="gap: 1rem;">
+                            <span class="mono" style="font-size: 0.75rem; display: flex; align-items: center; gap: 0.25rem;">
+                                <span class="text-green">●</span> Google Sheets: Active
+                            </span>
+                            <span class="mono" style="font-size: 0.75rem; display: flex; align-items: center; gap: 0.25rem;">
+                                <span class="text-green">●</span> Tally Forms: Integrated
+                            </span>
+                            <span class="mono" style="font-size: 0.75rem; display: flex; align-items: center; gap: 0.25rem;">
+                                <span class="text-blue">●</span> Vercel SSR: Safe
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Compliance-Approved Copy Swipes -->
+        <section class="container" id="copy-swipes" style="border-top: 1px solid var(--chrome-border);">
+            <div class="section-header">
+                <span class="section-pre">DEPLOYMENT SWIPES</span>
+                <h2 class="section-title">Compliance-Approved Copy Packs</h2>
+                <p class="section-sub">
+                    Deploy standard-aligned outreach kits configured to avoid advertising flag risks. Click to copy copy streams built to secure quick leads.
+                </p>
+            </div>
+
+            <!-- Resource Library Tabs -->
+            <div class="library-controls">
+                <div class="resource-tabs">
+                    <button class="resource-tab active" onclick="filterResources('all', this)">All Outlines</button>
+                    <button class="resource-tab" onclick="filterResources('email', this)">Email Sequence</button>
+                    <button class="resource-tab" onclick="filterResources('linkedin', this)">Linkedin Swipe</button>
+                    <button class="resource-tab" onclick="filterResources('cpa', this)">CPA Advisories</button>
+                </div>
+            </div>
+
+            <div class="grid-3col" id="resourcesGrid">
+                
+                <!-- Swipe 1 -->
+                <div class="swipe-card" data-category="email">
+                    <div>
+                        <div class="swipe-meta">
+                            <span class="swipe-badge compliance-safe">Email / Campaign Intro</span>
+                            <span class="mono" style="font-size: 0.7rem; color: var(--text-muted);">OUTLINE [01]</span>
+                        </div>
+                        <h3 class="swipe-title">SaaS Growth Liquidity Hook</h3>
+                        <div class="swipe-preview" id="swipeText1">Subject: Non-dilutive capital option for {Company_Name}
+
+Hi {First_Name},
+
+I was looking at {Company_Name}’s development trajectory and wanted to share a structured funding desk route we deployed recently. 
+
+Instead of traditional VC dilution or slow bank loans, we specialize in revenue-backed lines of credit up to $5,000,000 linked to raw scaling volume.
+
+You can preview our evaluation tool directly:
+{YOUR_DYNAMIC_URL}
+
+Best,
+{Partner_Name}</div>
+                    </div>
+                    <button class="btn" onclick="copySwipeText('swipeText1')">Copy Message Body</button>
+                </div>
+
+                <!-- Swipe 2 -->
+                <div class="swipe-card" data-category="linkedin">
+                    <div>
+                        <div class="swipe-meta">
+                            <span class="swipe-badge promo-badge">Social Swipe</span>
+                            <span class="mono" style="font-size: 0.7rem; color: var(--text-muted);">OUTLINE [02]</span>
+                        </div>
+                        <h3 class="swipe-title">LinkedIn Enterprise Asset Bio</h3>
+                        <div class="swipe-preview" id="swipeText2">Too many operators scaling SaaS systems limit dynamic options to dilutive VC models or high-risk personal debt.
+
+I built a dedicated Funding Desk powered by Moonshine Capital designed to help operations secure alternative non-dilutive liquidity lines.
+
+Run your balance sheet metrics instantly using our evaluation engine:
+{YOUR_DYNAMIC_URL}
+
+#NonDilutive #Fintech #SaaSScale</div>
+                    </div>
+                    <button class="btn" onclick="copySwipeText('swipeText2')">Copy Message Body</button>
+                </div>
+
+                <!-- Swipe 3 -->
+                <div class="swipe-card" data-category="cpa">
+                    <div>
+                        <div class="swipe-meta">
+                            <span class="swipe-badge compliance-safe">Professional Networks</span>
+                            <span class="mono" style="font-size: 0.7rem; color: var(--text-muted);">OUTLINE [03]</span>
+                        </div>
+                        <h3 class="swipe-title">Accounting & CPA Intro Sequence</h3>
+                        <div class="swipe-preview" id="swipeText3">Subject: Streamlined client capital access pipeline
+
+Hello {Professional_Partner},
+
+As we balance strategic planning and operational cash allocations for our clients, access to fast non-bank bridge routes is critical.
+
+I run a personal dynamic Desk allowing business partners to evaluate liquidity options up to $5M within 48 hours without compromising core credit files. 
+
+Our compliance parameters are fully mapped here:
+{YOUR_DYNAMIC_URL}
+
+Sincerely,
+{Partner_Name}</div>
+                    </div>
+                    <button class="btn" onclick="copySwipeText('swipeText3')">Copy Message Body</button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Media Kits & Banners Section -->
+        <section class="container" id="banners" style="border-top: 1px solid var(--chrome-border);">
+            <div class="section-header">
+                <span class="section-pre">BRAND MATRICES</span>
+                <h2 class="section-title">Approved Layout Assets & Banners</h2>
+                <p class="section-sub">
+                    Clean SVG layouts and graphic backdrops formatted specifically for LinkedIn, Twitter header modules, and website integrations.
+                </p>
+            </div>
+
+            <div class="grid-3col">
+                
+                <!-- Banner 1 -->
+                <div class="banner-card">
+                    <div class="banner-preview">
+                        <div class="banner-preview-content">
+                            <h4>FAST ENTERPRISE DEBT</h4>
+                            <p>MOONSHINE PARTNERS // $5M CAP</p>
+                        </div>
+                        <div class="banner-decor"></div>
+                    </div>
+                    <div class="banner-spec-row">
+                        <span>FORMAT</span>
+                        <span>LinkedIn Cover (1584x396)</span>
+                    </div>
+                    <div class="banner-spec-row">
+                        <span>SIZE</span>
+                        <span>42 KB (SVG Vector)</span>
+                    </div>
+                    <div class="banner-actions">
+                        <button class="banner-btn" onclick="triggerToast('Loading custom vector source code...')">View Code</button>
+                        <button class="banner-btn banner-btn-primary" onclick="triggerToast('Download triggered: linkedin_cover_01.png')">Download PNG</button>
+                    </div>
+                </div>
+
+                <!-- Banner 2 -->
+                <div class="banner-card">
+                    <div class="banner-preview" style="background: linear-gradient(135deg, var(--bg-card) 0%, var(--cobalt-blue) 100%);">
+                        <div class="banner-preview-content">
+                            <h4>EVALUATE YOUR FUNDING</h4>
+                            <p>Scorecard Widget Embedded Inside</p>
+                        </div>
+                        <div class="banner-decor" style="border-color: var(--electric-green);"></div>
+                    </div>
+                    <div class="banner-spec-row">
+                        <span>FORMAT</span>
+                        <span>Twitter Header (1500x500)</span>
+                    </div>
+                    <div class="banner-spec-row">
+                        <span>SIZE</span>
+                        <span>28 KB (SVG Vector)</span>
+                    </div>
+                    <div class="banner-actions">
+                        <button class="banner-btn" onclick="triggerToast('Loading custom vector source code...')">View Code</button>
+                        <button class="banner-btn banner-btn-primary" onclick="triggerToast('Download triggered: twitter_cover_02.png')">Download PNG</button>
+                    </div>
+                </div>
+
+                <!-- Banner 3 -->
+                <div class="banner-card">
+                    <div class="banner-preview" style="background: var(--bg-black); border-color: var(--electric-green);">
+                        <div class="banner-preview-content">
+                            <span style="font-family: var(--font-mono); color: var(--electric-green); font-size: 1.5rem;">❖</span>
+                            <h4 style="color: var(--bone-white);">VERIFIED PARTNER</h4>
+                            <p>Direct Portal Connection</p>
+                        </div>
+                    </div>
+                    <div class="banner-spec-row">
+                        <span>FORMAT</span>
+                        <span>Website Badge (300x250)</span>
+                    </div>
+                    <div class="banner-spec-row">
+                        <span>SIZE</span>
+                        <span>14 KB (SVG Asset)</span>
+                    </div>
+                    <div class="banner-actions">
+                        <button class="banner-btn" onclick="triggerToast('Loading custom vector source code...')">View Code</button>
+                        <button class="banner-btn banner-btn-primary" onclick="triggerToast('Download triggered: partner_badge_03.png')">Download PNG</button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Compliance & Regulatory Protocol Section -->
+        <section class="container" id="compliance" style="border-top: 1px solid var(--chrome-border);">
+            <div class="panel-card" style="border-color: var(--signal-orange); box-shadow: 4px 4px 0px 0px rgba(255, 85, 0, 0.2);">
+                <h3 class="panel-title" style="color: var(--signal-orange); border-bottom-color: var(--signal-orange);">
+                    ⚠️ Advertising Compliance Protocol & Legal Policy
+                </h3>
+                <p class="section-sub" style="color: var(--bone-white); font-size: 0.95rem; margin-bottom: 1.5rem;">
+                    As an active marketing partner of Moonshine Capital, you must strictly align outreach campaigns with institutional financial regulations. Review the core operational boundaries detailed below:
+                </p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+                    <div>
+                        <strong class="mono text-orange" style="display: block; margin-bottom: 0.5rem;">🚫 DO NOT GUARANTEE RATES</strong>
+                        <p class="mono" style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.5;">
+                            Avoid expressing guarantees regarding terms, approval timelines, or interest structures. All underwriting approvals depend entirely on system evaluation criteria and provider assessments.
+                        </p>
+                    </div>
+                    <div>
+                        <strong class="mono text-orange" style="display: block; margin-bottom: 0.5rem;">🚫 NO AGGRESSIVE DEBT CLAIMS</strong>
+                        <p class="mono" style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.5;">
+                            Do not present dynamic alternative growth lines as "risk-free" or "guaranteed cash". State clearly that alternative lines are designed exclusively for business entity operational purposes.
+                        </p>
+                    </div>
+                    <div>
+                        <strong class="mono text-orange" style="display: block; margin-bottom: 0.5rem;">✅ VERIFIED BRAND IDENTIFIERS</strong>
+                        <p class="mono" style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.5;">
+                            Ensure your dedicated desk profiles are correctly customized with clear, non-deceptive representation regarding your external partner classification with the main Moonshine office.
+                        </p>
+                    </div>
+                </div>
+                <div style="border-top: 1px solid var(--chrome-border); padding-top: 1rem; text-align: center;">
+                    <span class="mono" style="font-size: 0.7rem; color: var(--text-muted);">
+                        VIOLATIONS OF THESE PRINCIPLES WILL RESULT IN IMMEDIATE TERMINATION OF TRACKING CODES & COMMISSION FLOWS.
+                    </span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer matching exact base -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="../index.html" class="logo-group">
+                    <div class="logo-icon"></div>
+                    <div>
+                        <span class="logo-text">MOONSHINE</span>
+                    </div>
+                </a>
+                <p>
+                    Premium static partner deployment architectures, customized valuation toolsets, and institutional operations support for capital affiliates.
+                </p>
+            </div>
+            <div class="footer-links-col">
+                <span class="footer-links-title">System</span>
+                <ul>
+                    <li><a href="../index.html#profiles">Profiles</a></li>
+                    <li><a href="../index.html#tools">Diagnostic Tools</a></li>
+                    <li><a href="../index.html#how-it-works">Implementation</a></li>
+                </ul>
+            </div>
+            <div class="footer-links-col">
+                <span class="footer-links-title">Resources</span>
+                <ul>
+                    <li><a href="https://moonshine.capital" target="_blank">Moonshine Capital</a></li>
+                    <li><a href="../index.html#anatomy">Blueprint Details</a></li>
+                    <li><a href="../index.html#build-modes">Build Architectures</a></li>
+                </ul>
+            </div>
+            <div class="footer-links-col">
+                <span class="footer-links-title">Engine Control</span>
+                <ul>
+                    <li><a href="../index.html#request">Engine Intake</a></li>
+                    <li><a href="https://github.com" target="_blank">Partner Repo</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="compliance-box">
+            <p class="compliance-text">
+                <strong>COMPLIANCE NOTE & LEGAL DISCLAIMER:</strong> Moonshine Capital helps business owners explore funding options including working capital, revenue-based financing, instant micro funding, lines of credit, equipment financing, merchant cash advances, invoice financing, SBA loans, and real estate funding. Funding options, approvals, terms, and commissions depend on provider review, applicant profile, and applicable program rules. This site is for partner education, lead routing, and resource access only.
+            </p>
+            <p class="compliance-copyright">
+                &copy; <span id="currentYear"></span> Moonshine Capital. Powered by Moonshine Partner Profile Engine. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Dynamic Alert Notifications Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // Set Year in Footer Dynamically
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Sticky Header scroll styling effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Dynamic System Notifications Trigger
+        function triggerToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<span>⚡</span> <span>${message}</span>`;
+            container.appendChild(toast);
+
+            // Auto-destruction of toast element after delay
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(20px) scale(0.9)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // URL COMPILING LOGIC
+        const partnerSlugInput = document.getElementById('partnerSlug');
+        const destinationSelect = document.getElementById('destination');
+        const utmSourceInput = document.getElementById('utmSource');
+        const utmMediumInput = document.getElementById('utmMedium');
+        const utmCampaignInput = document.getElementById('utmCampaign');
+        const utmContentInput = document.getElementById('utmContent');
+        const compiledUrlTextArea = document.getElementById('compiledUrl');
+
+        function updateCompiledUrl() {
+            const slug = partnerSlugInput.value.trim().toLowerCase().replace(/\s+/g, '-');
+            const destination = destinationSelect.value;
+            const utmSource = utmSourceInput.value.trim();
+            const utmMedium = utmMediumInput.value.trim();
+            const utmCampaign = utmCampaignInput.value.trim();
+            const utmContent = utmContentInput.value.trim();
+
+            let url = `https://moonshine.partners/partners/${slug}/${destination}`;
+            
+            let params = [];
+            if (utmSource) params.push(`utm_source=${encodeURIComponent(utmSource)}`);
+            if (utmMedium) params.push(`utm_medium=${encodeURIComponent(utmMedium)}`);
+            if (utmCampaign) params.push(`utm_campaign=${encodeURIComponent(utmCampaign)}`);
+            if (utmContent) params.push(`utm_content=${encodeURIComponent(utmContent)}`);
+
+            if (params.length > 0) {
+                url += `?${params.join('&')}`;
+            }
+
+            compiledUrlTextArea.value = url;
+            
+            // Dynamically replace text template in UI copy files
+            updateSwipePreviews(url);
+        }
+
+        function setSlug(val) {
+            partnerSlugInput.value = val;
+            updateCompiledUrl();
+            triggerToast(`Partner Slug set to: ${val}`);
+        }
+
+        function setField(fieldId, val) {
+            document.getElementById(fieldId).value = val;
+            updateCompiledUrl();
+            triggerToast(`Updated configuration parameter.`);
+        }
+
+        // Copy dynamic URL output
+        function copyCompiledUrl() {
+            compiledUrlTextArea.select();
+            compiledUrlTextArea.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(compiledUrlTextArea.value).then(() => {
+                triggerToast('Copied compiled campaign URL to clipboard!');
+            }).catch(err => {
+                triggerToast('Failed to copy. Inspect browser credentials.');
+            });
+        }
+
+        // Test dynamic URL trigger
+        function testCompiledUrl() {
+            const url = compiledUrlTextArea.value;
+            triggerToast(`Opening dynamic endpoint simulation: ${url}`);
+            setTimeout(() => {
+                window.open(url, '_blank');
+            }, 500);
+        }
+
+        // Replace swipe files URLs placeholders dynamically
+        function updateSwipePreviews(url) {
+            const initialSwipeTexts = {
+                swipeText1: `Subject: Non-dilutive capital option for {Company_Name}\n\nHi {First_Name},\n\nI was looking at {Company_Name}’s development trajectory and wanted to share a structured funding desk route we deployed recently. \n\nInstead of traditional VC dilution or slow bank loans, we specialize in revenue-backed lines of credit up to $5,000,000 linked to raw scaling volume.\n\nYou can preview our evaluation tool directly:\n${url}\n\nBest,\n{Partner_Name}`,
+                
+                swipeText2: `Too many operators scaling SaaS systems limit dynamic options to dilutive VC models or high-risk personal debt.\n\nI built a dedicated Funding Desk powered by Moonshine Capital designed to help operations secure alternative non-dilutive liquidity lines.\n\nRun your balance sheet metrics instantly using our evaluation engine:\n${url}\n\n#NonDilutive #Fintech #SaaSScale`,
+                
+                swipeText3: `Subject: Streamlined client capital access pipeline\n\nHello {Professional_Partner},\n\nAs we balance strategic planning and operational cash allocations for our clients, access to fast non-bank bridge routes is critical.\n\nI run a personal dynamic Desk allowing business partners to evaluate liquidity options up to $5M within 48 hours without compromising core credit files. \n\nOur compliance parameters are fully mapped here:\n${url}\n\nSincerely,\n{Partner_Name}`
+            };
+
+            for (const [id, value] of Object.entries(initialSwipeTexts)) {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                }
+            }
+        }
+
+        // Copy Swipes helper function
+        function copySwipeText(elementId) {
+            const element = document.getElementById(elementId);
+            navigator.clipboard.writeText(element.textContent).then(() => {
+                triggerToast('Copied compliance swipe to clipboard!');
+            }).catch(err => {
+                triggerToast('Error copying text content.');
+            });
+        }
+
+        // Filter Resource Hub Swipes
+        function filterResources(category, tabBtn) {
+            // Update Active tab
+            const tabs = document.querySelectorAll('.resource-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            tabBtn.classList.add('active');
+
+            const cards = document.querySelectorAll('.swipe-card');
+            cards.forEach(card => {
+                if (category === 'all' || card.getAttribute('data-category') === category) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Listeners for inputs
+        [partnerSlugInput, destinationSelect, utmSourceInput, utmMediumInput, utmCampaignInput, utmContentInput].forEach(element => {
+            element.addEventListener('input', updateCompiledUrl);
+            element.addEventListener('change', updateCompiledUrl);
+        });
+
+        // Initialize building output on boot
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCompiledUrl();
+        });
+    </script>
+</body>
+</html>

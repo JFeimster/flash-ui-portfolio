@@ -1,0 +1,1541 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The War Room // Operator Cash Flow Simulator</title>
+    <!-- Google Fonts for High-Impact Brutalism -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Space+Grotesk:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --base-black: #050505;
+            --carbon-black: #0A0B0F;
+            --graphite: #171821;
+            --off-white: #F4F1E8;
+            
+            /* Accents */
+            --cyan: #00E5FF;
+            --green: #B6FF00;
+            --magenta: #FF2BD6;
+            --orange: #FF7A00;
+            --yellow: #FFE600;
+            --red: #FF1744;
+            --blue: #245BFF;
+            
+            --font-sans: 'Space Grotesk', -apple-system, sans-serif;
+            --font-mono: 'Share Tech Mono', monospace;
+            --border-width: 3px;
+        }
+
+        /* Reset & Base Styling */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            selection-background-color: var(--magenta);
+            selection-color: var(--base-black);
+        }
+        
+        ::-moz-selection { background: var(--magenta); color: var(--base-black); }
+        ::selection { background: var(--magenta); color: var(--base-black); }
+
+        body {
+            background-color: var(--base-black);
+            color: var(--off-white);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+            line-height: 1.4;
+            background-image: 
+                linear-gradient(rgba(23, 24, 33, 0.4) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(23, 24, 33, 0.4) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-position: center top;
+        }
+
+        /* Scanline Cyber Effect Overlay */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            z-index: 99999;
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.03em;
+        }
+
+        .mono-text {
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Header Style Match */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background-color: var(--carbon-black);
+            border-bottom: var(--border-width) solid var(--off-white);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .logo-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--off-white);
+        }
+
+        .logo-box {
+            background-color: var(--magenta);
+            color: var(--base-black);
+            font-family: var(--font-mono);
+            font-weight: 900;
+            padding: 0.3rem 0.6rem;
+            border: var(--border-width) solid var(--base-black);
+            box-shadow: 3px 3px 0 var(--off-white);
+            transform: rotate(-1deg);
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: -0.05em;
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 2px solid var(--graphite);
+            padding: 4px 12px;
+            background: rgba(23, 24, 33, 0.8);
+            font-size: 0.8rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--magenta);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--magenta);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
+
+        .btn-brutal {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--off-white);
+            color: var(--base-black);
+            border: var(--border-width) solid var(--base-black);
+            padding: 0.6rem 1.2rem;
+            font-weight: 700;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            box-shadow: 4px 4px 0 var(--magenta);
+            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            font-family: var(--font-sans);
+        }
+
+        .btn-brutal:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 var(--cyan);
+        }
+
+        .btn-brutal:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0 var(--green);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--off-white);
+            border-color: var(--off-white);
+            box-shadow: 4px 4px 0 var(--graphite);
+        }
+
+        /* Layout Grid */
+        .calculator-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 3rem;
+        }
+
+        @media (max-width: 1024px) {
+            .calculator-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Intro Section */
+        .intro-banner {
+            grid-column: 1 / -1;
+            border: var(--border-width) solid var(--off-white);
+            background-color: var(--carbon-black);
+            padding: 2rem;
+            box-shadow: 8px 8px 0 var(--cyan);
+            margin-bottom: 1rem;
+        }
+
+        .intro-eyebrow {
+            color: var(--cyan);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .intro-title {
+            font-size: 2.5rem;
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+
+        .intro-title span.outline {
+            color: transparent;
+            -webkit-text-stroke: 1.5px var(--off-white);
+        }
+
+        .intro-desc {
+            color: rgba(244, 241, 232, 0.8);
+            font-size: 1.1rem;
+            max-width: 900px;
+        }
+
+        /* Brutalist Tabs */
+        .tab-menu {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .tab-btn {
+            background-color: var(--graphite);
+            color: var(--off-white);
+            border: 2px solid var(--off-white);
+            padding: 0.75rem 1.25rem;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .tab-btn:hover {
+            background-color: var(--off-white);
+            color: var(--base-black);
+        }
+
+        .tab-btn.active {
+            background-color: var(--magenta);
+            color: var(--base-black);
+            border-color: var(--magenta);
+            box-shadow: 4px 4px 0 var(--yellow);
+        }
+
+        /* Simulator Left Panel Box */
+        .control-panel {
+            border: var(--border-width) solid var(--off-white);
+            background-color: var(--carbon-black);
+            padding: 2rem;
+            box-shadow: 8px 8px 0 var(--graphite);
+            position: relative;
+        }
+
+        .control-panel::before {
+            content: "SIMULATOR SYSTEM v2.1";
+            position: absolute;
+            top: 5px;
+            right: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: rgba(244, 241, 232, 0.3);
+        }
+
+        .panel-header {
+            border-bottom: 2px dashed var(--graphite);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .panel-title {
+            font-size: 1.5rem;
+            color: var(--green);
+        }
+
+        /* Slider & Input Groups */
+        .input-group {
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-label-wrap {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .input-label {
+            font-weight: 700;
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+
+        .input-value-display {
+            font-family: var(--font-mono);
+            color: var(--cyan);
+            font-weight: bold;
+            font-size: 1.1rem;
+            border: 1px solid var(--cyan);
+            background: rgba(0, 229, 255, 0.05);
+            padding: 2px 8px;
+        }
+
+        .input-desc {
+            font-size: 0.8rem;
+            color: rgba(244, 241, 232, 0.5);
+            margin-top: -4px;
+        }
+
+        /* Custom Brutalist Sliders */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 12px;
+            background: var(--graphite);
+            border: 2px solid var(--off-white);
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            background: var(--green);
+            border: 2px solid var(--base-black);
+            cursor: pointer;
+            box-shadow: 3px 3px 0 var(--magenta);
+            transition: all 0.1s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: var(--magenta);
+            box-shadow: 3px 3px 0 var(--cyan);
+        }
+
+        /* Number/Text Inputs inside Panel */
+        .brutal-input {
+            background-color: rgba(5, 5, 5, 0.9);
+            border: 2px solid var(--off-white);
+            padding: 0.75rem;
+            color: var(--off-white);
+            font-family: var(--font-sans);
+            font-weight: bold;
+            font-size: 1.1rem;
+            width: 100%;
+        }
+
+        .brutal-input:focus {
+            outline: none;
+            border-color: var(--magenta);
+            box-shadow: 0 0 10px rgba(255, 43, 214, 0.2);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 2rem;
+            cursor: pointer;
+        }
+
+        .brutal-checkbox {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--off-white);
+            background-color: var(--graphite);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .brutal-checkbox:checked {
+            background-color: var(--magenta);
+        }
+
+        .brutal-checkbox:checked::after {
+            content: "X";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--base-black);
+            font-weight: bold;
+        }
+
+        /* Right Dashboard Display */
+        .display-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Metrics Grid */
+        .metrics-card {
+            border: var(--border-width) solid var(--off-white);
+            background-color: var(--carbon-black);
+            padding: 1.5rem;
+            box-shadow: 8px 8px 0 var(--magenta);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .metric-item {
+            border: 2px solid var(--graphite);
+            padding: 1rem;
+            background: rgba(23, 24, 33, 0.5);
+        }
+
+        .metric-title {
+            font-size: 0.8rem;
+            color: rgba(244, 241, 232, 0.6);
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--yellow);
+            font-family: var(--font-mono);
+            line-height: 1;
+        }
+
+        .metric-subtext {
+            font-size: 0.75rem;
+            color: var(--cyan);
+            margin-top: 5px;
+            font-family: var(--font-mono);
+        }
+
+        /* Visual Graphic Screen (SVG-based dynamic readout) */
+        .chart-card {
+            border: var(--border-width) solid var(--off-white);
+            background-color: var(--base-black);
+            padding: 1.5rem;
+            box-shadow: 8px 8px 0 var(--cyan);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chart-title {
+            font-size: 1rem;
+            color: var(--cyan);
+        }
+
+        .chart-window {
+            height: 250px;
+            border: 2px solid var(--graphite);
+            background: #020202;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            overflow: hidden;
+        }
+
+        .svg-chart {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        /* Simulation Log Console */
+        .terminal-panel {
+            border: var(--border-width) solid var(--off-white);
+            background-color: rgba(5, 5, 5, 0.95);
+            padding: 1.5rem;
+            box-shadow: 8px 8px 0 var(--green);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--green);
+        }
+
+        .terminal-title {
+            border-bottom: 1px solid var(--graphite);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            color: var(--off-white);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .terminal-lines {
+            height: 140px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .terminal-line {
+            line-height: 1.3;
+        }
+
+        .terminal-line.warn {
+            color: var(--red);
+            font-weight: bold;
+            animation: flash 1s infinite alternate;
+        }
+
+        .terminal-line.success {
+            color: var(--green);
+        }
+
+        .terminal-line.info {
+            color: var(--yellow);
+        }
+
+        @keyframes flash {
+            from { opacity: 0.5; }
+            to { opacity: 1; }
+        }
+
+        /* Action/Qualifying Box */
+        .decision-engine {
+            border: var(--border-width) solid var(--off-white);
+            background: var(--graphite);
+            padding: 2rem;
+            box-shadow: 8px 8px 0 var(--yellow);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .qual-score-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--base-black);
+            padding: 1rem;
+            border: 2px solid var(--off-white);
+        }
+
+        .qual-label {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .qual-badge {
+            font-size: 2.5rem;
+            font-family: var(--font-mono);
+            font-weight: 900;
+            color: var(--green);
+            line-height: 1;
+        }
+
+        .qual-desc {
+            font-size: 0.95rem;
+            color: rgba(244, 241, 232, 0.8);
+        }
+
+        /* Back to top brutalist style button */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 99;
+            background: var(--yellow);
+            color: var(--base-black);
+            border: 2px solid var(--base-black);
+            font-weight: 900;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 3px 3px 0 var(--base-black);
+            text-decoration: none;
+        }
+
+        .back-to-top:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0 var(--magenta);
+        }
+
+        /* Hide segments utility */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Footer elements */
+        footer {
+            background-color: var(--base-black);
+            padding: 4rem 2rem;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            border-top: var(--border-width) solid var(--off-white);
+            margin-top: 5rem;
+        }
+
+        .footer-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .footer-copyright {
+            color: rgba(244, 241, 232, 0.4);
+        }
+
+        .footer-links-title {
+            color: var(--cyan);
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+        }
+
+        .footer-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .footer-list a {
+            color: rgba(244, 241, 232, 0.7);
+            text-decoration: none;
+            transition: color 0.15s;
+        }
+
+        .footer-list a:hover {
+            color: var(--green);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- STICKY NAVIGATION -->
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo-wrap">
+                <div class="logo-box">A.A.A.</div>
+                <div class="logo-text">AI AGENT ARSENAL</div>
+            </a>
+            
+            <div class="system-status">
+                <div class="status-pill">
+                    <div class="status-dot"></div>
+                    <span class="mono-text">WAR ROOM CALC: STABLE</span>
+                </div>
+                <div class="status-pill" style="border-color: var(--magenta);">
+                    <span class="mono-text" style="color: var(--magenta);">v2.0.4-beta</span>
+                </div>
+            </div>
+
+            <div class="nav-links">
+                <a href="index.html" class="btn-brutal btn-secondary mono-text">&larr; Back to Arsenal</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- INTRO SECTION -->
+    <div class="calculator-container" style="padding-bottom: 1rem;">
+        <div class="intro-banner">
+            <div class="intro-eyebrow mono-text">// CORE OPERATIONAL INTELLIGENCE</div>
+            <h1 class="intro-title">The War Room <span class="outline">Calculator</span></h1>
+            <p class="intro-desc">
+                Stress-test capital structures, evaluate marketing performance, audit Merchant Cash Advances (MCA), model high-velocity recurring revenues, and calculate precise loan paths instantly. Use sliders to run immediate programmatic assessments.
+            </p>
+        </div>
+    </div>
+
+    <!-- CALCULATOR INTERACTIVE AREA -->
+    <div class="calculator-container" style="padding-top: 0;">
+        <!-- Left inputs panel -->
+        <div>
+            <!-- Simulator Selector Tab Menu -->
+            <div class="tab-menu" id="sim-tabs">
+                <button class="tab-btn active" data-tab="mca">MCA Stress-Tester</button>
+                <button class="tab-btn" data-tab="mrr">MRR Churn Matrix</button>
+                <button class="tab-btn" data-tab="marketing">Ad Spend & CAC Engine</button>
+                <button class="tab-btn" data-tab="loan">SBA Qualification</button>
+            </div>
+
+            <div class="control-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title" id="sim-title">MCA repayment stress test</h2>
+                    <p style="font-size: 0.85rem; color: rgba(244, 241, 232, 0.6); margin-top: 5px;" id="sim-subtitle">Simulate real daily bank ACH pulls against average operational revenue.</p>
+                </div>
+
+                <!-- FORM ENGINE INTERACTIVE SLIDERS / FIELDS -->
+                <form id="simulator-form" onsubmit="event.preventDefault();">
+                    
+                    <!-- TAB GROUP: MCA -->
+                    <div class="tab-group" id="group-mca">
+                        <div class="input-group">
+                            <div class="input-label-wrap">
+                                <span class="input-label">Funding Amount</span>
+                                <span class="input-value-display" id="val-mca-funding">$50,000</span>
+                            </div>
+                            <input type="range" id="input-mca-funding" min="10000" max="500000" step="5000" value="50000">
+                            <span class="input-desc">Total raw cash advanced to your operating account.</span>
+                        </div>
+
+                        <div class="input-group">
+                            <div class="input-label-wrap">
+                                <span class="input-label">Factor Rate</span>
+                                <span class="input-value-display" id="val-mca-factor">1.28</span>
+                            </div>
+                            <input type="range" id="input-mca-factor" min="1.05" max="1.50" step="0.01" value="1.28">
+                            <span class="input-desc">Multiplicative factor determining the absolute payback amount.</span>
+                        </div>
+
+                        <div class="input-group">
+                            <div class="input-label-wrap">
+                                <span class="input-label">Daily Business Revenue</span>
+                                <span class="input-value-display" id="val-mca-rev">$3,500</span>
+                            </div>
+                            <input type="range" id="input-mca-rev" min="500" max="30000" step="250" value="3500">
+                            <span class="input-desc">Estimated average gross cash receipts cleared daily.</span>
+                        </div>
+
+                        <div class="input-group">
+                            <div class="input-label-wrap">
+                                <span class="input-label">Repayment Terms (Days)</span>
+                                <span class="input-value-display" id="val-mca-days">140 Days</span>
+                            </div>
+                            <input type="range" id="input-mca-days" min="60" max="360" step="10" value="140">
+                            <span class="input-desc">Length of the ACH program in operational business days.</span>
+                        </div>
+
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="input-mca-weekend" class="brutal-checkbox">
+                            <label for="input-mca-weekend" class="mono-text" style="font-size: 0.85rem; font-weight: bold;">Simulate weekend debiting (rare)</label>
+                        </div>
+                    </div>
+
+                    <!-- TAB GROUP: MRR -->
+                    <div class="tab-group hidden" id="group-mrr">
+                        <div class="input-group">
+                            <div class="input-label-wrap">
+                                <span class="input-label">Current MRR</span>
+                                <span class="input-value-display" id="val-mrr-current">$25,000</span>
+                            </div>
+                            <input type="range" id="input-mrr-current" min="0" max="250000" step="5000" value="25000">
+                            <span class="input-desc">Current stable monthly recurring revenue starting base.</span>
+                        </div>
+
+                        <div class="input-group">
+                            <div class="input-label-wrap">
+                                <span class="input-label">New MRR Bookings / Mo</span>
+                                <span class="input-value-display" id="val-mrr-new">$4,000</span>
+                            </div>
+                            <input type="range" id="input-mrr-new" min="500" max="50000" step="500" value="4000">
+                            <span class="input-desc">New contracts signed or accounts upgraded each month.</span>
+                        </div>
+
+                        <div class="input-group">
+                            <div class="input-label-wrap">
+                                <span class="input-label">Monthly Revenue Churn</span>
+                                <span class="input-value-display" id="val-mrr-churn">5.5%</span>
+                            </div>
+                            <input type="range" id="input-mrr-churn" min="0" max="30" step="0.5" value="5.5">
+                            <span class="input-desc">Percentage of MRR terminated by users each month.</span>
+                        </div>
+
+                        <div class="input-group">
+                            <div class="input-label-wrap">
+                                <span class="input-label">ARPU (Average Revenue per User)</span>
+                                <span class="input-value-display" id="val-mrr-arpu">$150</span>
+                            </div>
+                            <input type="range" id="input-mrr-arpu" min="10" max="2000" step="10" value="150">
+                            <span class="input-desc">The average monthly billable payment per business customer.</span>
+                        </div>
+                    </div>
+
+                    <!-- TAB GROUP: MARKETING -->
+                    <div class="tab-group hidden" id="group-marketing">
+                        <div class="input-group">
+                            <div class="input-label-wrap">
+                                <span class="input-label">Monthly Ad Spend</span>
+                                <span class="input-value-display" id="val-mkt-spend">$12,000</span>
+                            </div>
+                            <input type="range" id="input-mkt-spend" min="500" max="100000" step="500" value="12000">
+                            <span class="input-desc">Total capital budgeted for outbound programmatic media acquisition.</span>
+                        </div>
+
+                        <div class="input-group">
+                            <div class="input-label-wrap">
+                                <span class="input-label">Cost Per Lead (CPL)</span>
+                                <span class="input-value-display" id="val-mkt-cpl">$45</span>
+                            </div>
+                            <input type="range" id="input-mkt-cpl" min="2" max="250" step="1" value="45">
+                            <span class="input-desc">Blended cost associated with acquiring one opt-in or booking.</span>
+                        </div>
+
+                        <div class="input-group">
+                            <div class="input-label-wrap">
+                                <span class="input-label">Sales Conversion Rate</span>
+                                <span class="input-value-display" id="val-mkt-conv">8%</span>
+                            </div>
+                            <input type="range" id="input-mkt-conv" min="0.5" max="30" step="0.5" value="8">
+                            <span class="input-desc">Percentage of total leads converted to paid clients.</span>
+                        </div>
+
+                        <div class="input-group">
+                            <div class="input-label-wrap">
+                                <span class="input-label">Contract Lifetime Value (LTV)</span>
+                                <span class="input-value-display" id="val-mkt-ltv">$2,800</span>
+                            </div>
+                            <input type="range" id="input-mkt-ltv" min="100" max="25000" step="100" value="2800">
+                            <span class="input-desc">Net dynamic revenue accrued from customer lifecycle contract.</span>
+                        </div>
+                    </div>
+
+                    <!-- TAB GROUP: LOAN / SBA -->
+                    <div class="tab-group hidden" id="group-loan">
+                        <div class="input-group">
+                            <div class="input-label-wrap">
+                                <span class="input-label">Annual Gross Revenue</span>
+                                <span class="input-value-display" id="val-loan-rev">$450,000</span>
+                            </div>
+                            <input type="range" id="input-loan-rev" min="50000" max="3000000" step="25000" value="450000">
+                            <span class="input-desc">Total gross business collections reported on taxes.</span>
+                        </div>
+
+                        <div class="input-group">
+                            <div class="input-label-wrap">
+                                <span class="input-label">Personal Credit Score</span>
+                                <span class="input-value-display" id="val-loan-credit">680</span>
+                            </div>
+                            <input type="range" id="input-loan-credit" min="400" max="850" step="5" value="680">
+                            <span class="input-desc">Experian/FICO scoring tier of guarantor operator.</span>
+                        </div>
+
+                        <div class="input-group">
+                            <div class="input-label-wrap">
+                                <span class="input-label">Years in Business</span>
+                                <span class="input-value-display" id="val-loan-years">2 Years</span>
+                            </div>
+                            <input type="range" id="input-loan-years" min="0" max="15" step="1" value="2">
+                            <span class="input-desc">Length of time operating with active business entity.</span>
+                        </div>
+
+                        <div class="input-group">
+                            <div class="input-label-wrap">
+                                <span class="input-label">Existing Monthly Debt</span>
+                                <span class="input-value-display" id="val-loan-debt">$1,500</span>
+                            </div>
+                            <input type="range" id="input-loan-debt" min="0" max="30000" step="250" value="1500">
+                            <span class="input-desc">Existing commercial rent, card lines, or equipment lease payouts.</span>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+        <!-- Right Output Dashboard Panel -->
+        <div class="display-panel">
+            
+            <!-- Real-Time Metrics -->
+            <div class="metrics-card">
+                <div class="mono-text" style="color: var(--yellow); font-size: 0.9rem; margin-bottom: 1rem; font-weight: bold;">[SIMULATION READOUTS]</div>
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <div class="metric-title" id="metric-title-1">Payback Total</div>
+                        <div class="metric-value" id="metric-val-1">$64,000</div>
+                        <div class="metric-subtext" id="metric-sub-1">FACTOR INCLUDED</div>
+                    </div>
+                    <div class="metric-item" style="border-color: var(--magenta);">
+                        <div class="metric-title" id="metric-title-2">Daily Repayment</div>
+                        <div class="metric-value" id="metric-val-2" style="color: var(--magenta);">$457.14</div>
+                        <div class="metric-subtext" id="metric-sub-2">ACH DRAW RATE</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-title" id="metric-title-3">Revenue Impact</div>
+                        <div class="metric-value" id="metric-val-3" style="color: var(--orange);">13.1%</div>
+                        <div class="metric-subtext" id="metric-sub-3">OF OPERATIONAL CASH</div>
+                    </div>
+                    <div class="metric-item" style="border-color: var(--cyan);">
+                        <div class="metric-title" id="metric-title-4">Effective APR</div>
+                        <div class="metric-value" id="metric-val-4" style="color: var(--cyan);">73.1%</div>
+                        <div class="metric-subtext" id="metric-sub-4">EST. ANNUALIZED COST</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic SVG Data Visualization Grid -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <span class="chart-title mono-text" id="chart-graph-title">12-Month Projections // Cumulative Expense</span>
+                    <span class="mono-text" style="font-size: 0.75rem; color: rgba(244, 241, 232, 0.4);">ACTIVE RENDERING</span>
+                </div>
+                <div class="chart-window">
+                    <svg class="svg-chart" id="sim-chart-svg" viewBox="0 0 500 250" preserveAspectRatio="none">
+                        <!-- Background Grid lines -->
+                        <line x1="0" y1="50" x2="500" y2="50" stroke="#171821" stroke-width="1" />
+                        <line x1="0" y1="100" x2="500" y2="100" stroke="#171821" stroke-width="1" />
+                        <line x1="0" y1="150" x2="500" y2="150" stroke="#171821" stroke-width="1" stroke-dasharray="5,5" />
+                        <line x1="0" y1="200" x2="500" y2="200" stroke="#171821" stroke-width="1" />
+                        
+                        <!-- X Axis Marks -->
+                        <line x1="125" y1="0" x2="125" y2="250" stroke="#171821" stroke-width="1" />
+                        <line x1="250" y1="0" x2="250" y2="250" stroke="#171821" stroke-width="1" />
+                        <line x1="375" y1="0" x2="375" y2="250" stroke="#171821" stroke-width="1" />
+
+                        <!-- Data Path Polyline -->
+                        <path id="chart-path" d="M0,250 L125,200 L250,150 L375,100 L500,50" fill="none" stroke="var(--cyan)" stroke-width="3" />
+                        <path id="chart-area-path" d="M0,250 L125,200 L250,150 L375,100 L500,50 L500,250 L0,250 Z" fill="rgba(0, 229, 255, 0.05)" />
+                    </svg>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.75rem; color: rgba(244, 241, 232, 0.5);">
+                    <span id="label-x-start">DAY 0</span>
+                    <span id="label-x-mid">HALF Repayment</span>
+                    <span id="label-x-end">MATURITY</span>
+                </div>
+            </div>
+
+            <!-- Dynamic Decision Score / Recommendation Engine -->
+            <div class="decision-engine">
+                <div class="mono-text" style="color: var(--yellow); font-size: 0.9rem; font-weight: bold;">[OPERATOR RECOMMENDATION ENGINE]</div>
+                <div class="qual-score-container">
+                    <span class="qual-label">Risk Rating Score</span>
+                    <span class="qual-badge" id="qual-badge-score">82%</span>
+                </div>
+                <p class="qual-desc" id="qual-verdict-desc">
+                    Risk metrics are within standard boundaries. Direct cash flows are sufficient to clear repayments, but high exposure limits operations.
+                </p>
+                <div style="margin-top: 10px;">
+                    <a href="https://github.com/jasonfeimster/ai-agent-arsenal" target="_blank" class="btn-brutal" id="btn-qual-action" style="background-color: var(--green); color: var(--base-black); width: 100%; justify-content: center; box-shadow: 4px 4px 0 var(--base-black);">
+                        Submit Application for Matching Alternate Funding
+                    </a>
+                </div>
+            </div>
+
+            <!-- Terminal Logger Output simulation -->
+            <div class="terminal-panel">
+                <div class="terminal-title">
+                    <span>OPERATIONAL AUDIT TERMINAL FEED</span>
+                    <span style="color: var(--cyan);">SYSTEM OK</span>
+                </div>
+                <div class="terminal-lines" id="terminal-lines">
+                    <div class="terminal-line success">&gt; INITIALIZING SIMULATION COUPLING ENGINE... SUCCESS.</div>
+                    <div class="terminal-line">&gt; DETECTED VALUE CHANGEOVER IN INPUT METRICS FIELD.</div>
+                    <div class="terminal-line info">&gt; RUNNING STRESS TEST AT TARGET LEVEL...</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- CALL TO ACTION FOOTER ZONE -->
+    <section style="margin-top: 5rem; background-color: var(--magenta); color: var(--base-black); border-top: var(--border-width) solid var(--base-black); border-bottom: var(--border-width) solid var(--base-black); padding: 4rem 2rem; text-align: center; position: relative;">
+        <h2 style="font-size: clamp(2.5rem, 6vw, 4.5rem); line-height: 0.9; margin-bottom: 1.5rem; text-transform: uppercase;">DON'T BLINDLY EXECUTE CONTRACTS</h2>
+        <p style="font-size: 1.25rem; max-width: 800px; margin: 0 auto 2.5rem auto; font-weight: bold;">
+            We build and test tools to establish high margin defense lines around founder assets. Simulate variables, understand the math, and run your business like a military operational terminal.
+        </p>
+        <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 1.5rem;">
+            <a href="index.html#directory" class="btn-brutal" style="background-color: var(--base-black); color: var(--off-white); border-color: var(--base-black); box-shadow: 4px 4px 0 var(--yellow);">Explore Deployed Agents</a>
+            <a href="https://github.com/jasonfeimster/ai-agent-arsenal" target="_blank" class="btn-brutal" style="background-color: var(--green); border-color: var(--base-black); box-shadow: 4px 4px 0 var(--base-black);">Fork the Code Stack</a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="logo-wrap">
+                    <div class="logo-box">A.A.A.</div>
+                    <div class="logo-text">AI AGENT ARSENAL</div>
+                </div>
+                <p style="color: rgba(244, 241, 232, 0.6); line-height: 1.6;">
+                    A decentralized public workspace containing Jason Feimster's battle-tested CustomGPTs, Gemini Gems, static tools, calculators, and system prompt matrices.
+                </p>
+                <p class="footer-copyright">
+                    &copy; <span id="current-year"></span> AI Agent Arsenal. Built for Operators. MIT License.
+                </p>
+            </div>
+
+            <div>
+                <h4 class="footer-links-title">RESOURCES</h4>
+                <ul class="footer-list">
+                    <li><a href="https://github.com/jasonfeimster/ai-agent-arsenal" target="_blank">GitHub Repo</a></li>
+                    <li><a href="index.html#directory">Interactive Search</a></li>
+                    <li><a href="https://github.com/jasonfeimster/ai-agent-arsenal#submitting" target="_blank">Submit An Agent</a></li>
+                    <li><a href="https://github.com/jasonfeimster/ai-agent-arsenal/blob/main/LICENSE" target="_blank">MIT License</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="footer-links-title">SIMULATORS</h4>
+                <ul class="footer-list">
+                    <li><a href="#" onclick="switchTab('mca'); return false;">MCA Payback</a></li>
+                    <li><a href="#" onclick="switchTab('mrr'); return false;">MRR Churn</a></li>
+                    <li><a href="#" onclick="switchTab('marketing'); return false;">Marketing ROI</a></li>
+                    <li><a href="#" onclick="switchTab('loan'); return false;">SBA Qualification</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to top trigger -->
+    <a href="#" class="back-to-top" title="Back to top">↑</a>
+
+    <!-- VANILLA JAVASCRIPT SIMULATOR CALCULATIONS -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Setup dynamic copyright year
+            document.getElementById("current-year").textContent = new Date().getFullYear();
+
+            // Setup state & references
+            let activeTab = "mca";
+            const tabs = document.querySelectorAll("#sim-tabs .tab-btn");
+            const terminalLines = document.getElementById("terminal-lines");
+
+            // Register Input listeners for live updates
+            const inputs = document.querySelectorAll("input[type='range'], input[type='checkbox']");
+            inputs.forEach(input => {
+                input.addEventListener("input", (e) => {
+                    updateValueLabel(e.target);
+                    runCalculations();
+                });
+            });
+
+            // Tab Navigation Click Handler
+            tabs.forEach(tab => {
+                tab.addEventListener("click", () => {
+                    tabs.forEach(t => t.classList.remove("active"));
+                    tab.classList.add("active");
+                    
+                    const tabValue = tab.getAttribute("data-filter") || tab.getAttribute("data-tab");
+                    switchTab(tabValue);
+                });
+            });
+
+            // Global tab switcher function
+            window.switchTab = function(tabName) {
+                activeTab = tabName;
+                
+                // Set Tab active classes
+                tabs.forEach(t => {
+                    if (t.getAttribute("data-tab") === tabName) {
+                        t.classList.add("active");
+                    } else {
+                        t.classList.remove("active");
+                    }
+                });
+
+                // Update tab visibility
+                document.querySelectorAll(".tab-group").forEach(group => {
+                    group.classList.add("hidden");
+                });
+                document.getElementById(`group-${tabName}`).classList.remove("hidden");
+
+                // Update simulator metadata
+                const title = document.getElementById("sim-title");
+                const subtitle = document.getElementById("sim-subtitle");
+
+                if (tabName === "mca") {
+                    title.textContent = "MCA payback stress test";
+                    subtitle.textContent = "Simulate real daily bank ACH pulls against average operational revenue.";
+                } else if (tabName === "mrr") {
+                    title.textContent = "SaaS MRR Growth Matrix";
+                    subtitle.textContent = "Forecast complex pipeline compounding over 12 months with absolute net churn models.";
+                } else if (tabName === "marketing") {
+                    title.textContent = "Paid Acquisition & LTV Engine";
+                    subtitle.textContent = "Break down outbound ad spend, cost per lead, lifetime values, and payback speeds.";
+                } else if (tabName === "loan") {
+                    title.textContent = "Alternative Loan & SBA Qualification";
+                    subtitle.textContent = "Verify metrics against typical guidelines for high-leverage bank or alternative lines.";
+                }
+
+                writeLog(`Switched console matrix channel to [${tabName.toUpperCase()} MODE]`, "info");
+                runCalculations();
+            }
+
+            // Updates display overlay labels beside inputs
+            function updateValueLabel(el) {
+                const id = el.id;
+                const value = el.value;
+
+                if (id === "input-mca-funding") {
+                    document.getElementById("val-mca-funding").textContent = `$${parseInt(value).toLocaleString()}`;
+                } else if (id === "input-mca-factor") {
+                    document.getElementById("val-mca-factor").textContent = parseFloat(value).toFixed(2);
+                } else if (id === "input-mca-rev") {
+                    document.getElementById("val-mca-rev").textContent = `$${parseInt(value).toLocaleString()}`;
+                } else if (id === "input-mca-days") {
+                    document.getElementById("val-mca-days").textContent = `${value} Days`;
+                } else if (id === "input-mrr-current") {
+                    document.getElementById("val-mrr-current").textContent = `$${parseInt(value).toLocaleString()}`;
+                } else if (id === "input-mrr-new") {
+                    document.getElementById("val-mrr-new").textContent = `$${parseInt(value).toLocaleString()}`;
+                } else if (id === "input-mrr-churn") {
+                    document.getElementById("val-mrr-churn").textContent = `${parseFloat(value).toFixed(1)}%`;
+                } else if (id === "input-mrr-arpu") {
+                    document.getElementById("val-mrr-arpu").textContent = `$${parseInt(value).toLocaleString()}`;
+                } else if (id === "input-mkt-spend") {
+                    document.getElementById("val-mkt-spend").textContent = `$${parseInt(value).toLocaleString()}`;
+                } else if (id === "input-mkt-cpl") {
+                    document.getElementById("val-mkt-cpl").textContent = `$${parseInt(value).toLocaleString()}`;
+                } else if (id === "input-mkt-conv") {
+                    document.getElementById("val-mkt-conv").textContent = `${parseFloat(value).toFixed(1)}%`;
+                } else if (id === "input-mkt-ltv") {
+                    document.getElementById("val-mkt-ltv").textContent = `$${parseInt(value).toLocaleString()}`;
+                } else if (id === "input-loan-rev") {
+                    document.getElementById("val-loan-rev").textContent = `$${parseInt(value).toLocaleString()}`;
+                } else if (id === "input-loan-credit") {
+                    document.getElementById("val-loan-credit").textContent = value;
+                } else if (id === "input-loan-years") {
+                    document.getElementById("val-loan-years").textContent = `${value} Year${value != 1 ? 's' : ''}`;
+                } else if (id === "input-loan-debt") {
+                    document.getElementById("val-loan-debt").textContent = `$${parseInt(value).toLocaleString()}`;
+                }
+            }
+
+            // Write logs to console screen
+            function writeLog(text, type = "normal") {
+                const line = document.createElement("div");
+                line.className = `terminal-line ${type}`;
+                line.textContent = `> ${new Date().toLocaleTimeString()} || ${text}`;
+                terminalLines.appendChild(line);
+                terminalLines.scrollTop = terminalLines.scrollHeight;
+
+                // cap terminal lines total inside console screen to avoid DOM bog down
+                if (terminalLines.children.length > 25) {
+                    terminalLines.removeChild(terminalLines.firstChild);
+                }
+            }
+
+            // core math calculator engines mapping
+            function runCalculations() {
+                if (activeTab === "mca") {
+                    calculateMCA();
+                } else if (activeTab === "mrr") {
+                    calculateMRR();
+                } else if (activeTab === "marketing") {
+                    calculateMarketing();
+                } else if (activeTab === "loan") {
+                    calculateLoan();
+                }
+            }
+
+            // CALCULATOR 1: MCA CALCULATOR CORE
+            function calculateMCA() {
+                const funding = parseFloat(document.getElementById("input-mca-funding").value);
+                const factor = parseFloat(document.getElementById("input-mca-factor").value);
+                const dailyRev = parseFloat(document.getElementById("input-mca-rev").value);
+                const days = parseFloat(document.getElementById("input-mca-days").value);
+                const simulateWeekend = document.getElementById("input-mca-weekend").checked;
+
+                // Calculations
+                const paybackTotal = funding * factor;
+                const dailyPayment = paybackTotal / days;
+                const revImpact = (dailyPayment / dailyRev) * 100;
+                
+                // Calculated annualized interest estimation rate (APR proxy value)
+                const totalCostPercentage = (paybackTotal - funding) / funding;
+                const estimatedYears = days / 252; // business clearing days average
+                const effectiveAPR = (totalCostPercentage / estimatedYears) * 100;
+
+                // Update UI metrics displays
+                document.getElementById("metric-title-1").textContent = "Total Payback";
+                document.getElementById("metric-val-1").textContent = `$${Math.round(paybackTotal).toLocaleString()}`;
+                document.getElementById("metric-sub-1").textContent = `FEE COST: $${Math.round(paybackTotal - funding).toLocaleString()}`;
+
+                document.getElementById("metric-title-2").textContent = "Daily Pull Rate";
+                document.getElementById("metric-val-2").textContent = `$${dailyPayment.toFixed(2)}`;
+                document.getElementById("metric-sub-2").textContent = `${days} DRAW DAYS TOTAL`;
+
+                document.getElementById("metric-title-3").textContent = "Revenue Burn Rate";
+                document.getElementById("metric-val-3").textContent = `${revImpact.toFixed(1)}%`;
+                document.getElementById("metric-val-3").style.color = revImpact > 15 ? "var(--red)" : "var(--orange)";
+                document.getElementById("metric-sub-3").textContent = "OF TOTAL GROSS DEBITS";
+
+                document.getElementById("metric-title-4").textContent = "Equivalent APR";
+                document.getElementById("metric-val-4").textContent = `${effectiveAPR.toFixed(1)}%`;
+                document.getElementById("metric-sub-4").textContent = "ESTIMATED FUNDING APR";
+
+                // Visual Graph Rendering
+                document.getElementById("chart-graph-title").textContent = "Payback Trajectory // Capital Outstanding Remaining";
+                document.getElementById("label-x-start").textContent = "DAY 0";
+                document.getElementById("label-x-mid").textContent = `DAY ${Math.round(days / 2)}`;
+                document.getElementById("label-x-end").textContent = `DAY ${days}`;
+
+                // Render dynamic SVG curve
+                const points = [];
+                for (let i = 0; i <= 4; i++) {
+                    const progress = i / 4;
+                    const x = progress * 500;
+                    const remainingBalance = paybackTotal - (dailyPayment * days * progress);
+                    const y = 230 - ((remainingBalance / paybackTotal) * 200);
+                    points.push(`${x},${y}`);
+                }
+                const pathD = `M${points.join(" L")}`;
+                document.getElementById("chart-path").setAttribute("d", pathD);
+                document.getElementById("chart-area-path").setAttribute("d", `${pathD} L500,230 L0,230 Z`);
+                document.getElementById("chart-path").setAttribute("stroke", "var(--magenta)");
+
+                // Recommendation Logic
+                const score = Math.max(10, Math.min(100, Math.round(100 - (revImpact * 4.5))));
+                const badge = document.getElementById("qual-badge-score");
+                badge.textContent = `${score}%`;
+
+                const verdict = document.getElementById("qual-verdict-desc");
+                const actionBtn = document.getElementById("btn-qual-action");
+
+                if (revImpact > 20) {
+                    badge.style.color = "var(--red)";
+                    verdict.textContent = `[CRITICAL IMPACT WARNING] Daily payback eats ${revImpact.toFixed(1)}% of your gross daily revenue. This factor exposure rate creates high cash flow insolvency risks. System recommends debt restructuring.`;
+                    actionBtn.textContent = "Explore Alternative Rescue Capital";
+                    actionBtn.style.backgroundColor = "var(--red)";
+                    writeLog(`ALERT: Factor repayment velocity stress test shows dangerous cash burn risk.`, "warn");
+                } else if (revImpact > 10) {
+                    badge.style.color = "var(--orange)";
+                    verdict.textContent = `[MODERATE CAUTION ALERT] Daily exposure consumes ${revImpact.toFixed(1)}% of daily operational sales. Workable but highly constricting to operational scalability.`;
+                    actionBtn.textContent = "View SBA Refinance Paths";
+                    actionBtn.style.backgroundColor = "var(--orange)";
+                    writeLog(`System Audit: Repayment impact within baseline boundaries.`, "info");
+                } else {
+                    badge.style.color = "var(--green)";
+                    verdict.textContent = `[OPTIMAL PROFILE] Repayment profile accounts for only ${revImpact.toFixed(1)}% of daily gross income. Secure baseline margins present. Liquid risk levels low.`;
+                    actionBtn.textContent = "Secure Expansion Line of Credit";
+                    actionBtn.style.backgroundColor = "var(--green)";
+                    writeLog(`System Audit: Exposure metrics verified optimal.`, "success");
+                }
+            }
+
+            // CALCULATOR 2: MRR GROWTH CORE
+            function calculateMRR() {
+                const currentMrr = parseFloat(document.getElementById("input-mrr-current").value);
+                const newMrr = parseFloat(document.getElementById("input-mrr-new").value);
+                const churnRate = parseFloat(document.getElementById("input-mrr-churn").value) / 100;
+                const arpu = parseFloat(document.getElementById("input-mrr-arpu").value);
+
+                // Run 12-month projections iteration
+                let projectedMrr = currentMrr;
+                let totalChurntRevenue = 0;
+                const points = [];
+
+                for (let month = 1; month <= 12; month++) {
+                    const lostRevenue = projectedMrr * churnRate;
+                    totalChurntRevenue += lostRevenue;
+                    projectedMrr = projectedMrr + newMrr - lostRevenue;
+                    if (projectedMrr < 0) projectedMrr = 0;
+
+                    const x = ((month - 1) / 11) * 500;
+                    const maxScale = currentMrr + (newMrr * 12);
+                    const y = maxScale > 0 ? 230 - ((projectedMrr / maxScale) * 180) : 230;
+                    points.push(`${x},${y}`);
+                }
+
+                const finalClientsCount = Math.round(projectedMrr / arpu);
+                const netMonthlyGain = newMrr - (projectedMrr * churnRate);
+
+                // Update UI metrics displays
+                document.getElementById("metric-title-1").textContent = "Year 1 MRR Result";
+                document.getElementById("metric-val-1").textContent = `$${Math.round(projectedMrr).toLocaleString()}`;
+                document.getElementById("metric-sub-1").textContent = `CLIENT BASE: ${finalClientsCount} OPERATORS`;
+
+                document.getElementById("metric-title-2").textContent = "Monthly Net Pace";
+                document.getElementById("metric-val-2").textContent = `$${Math.round(netMonthlyGain).toLocaleString()}/Mo`;
+                document.getElementById("metric-val-2").style.color = netMonthlyGain > 0 ? "var(--green)" : "var(--red)";
+                document.getElementById("metric-sub-2").textContent = `CHURN DRAG: -$${Math.round(projectedMrr * churnRate).toLocaleString()}/MO`;
+
+                document.getElementById("metric-title-3").textContent = "Year 1 Churn Loss";
+                document.getElementById("metric-val-3").textContent = `$${Math.round(totalChurntRevenue).toLocaleString()}`;
+                document.getElementById("metric-val-3").style.color = "var(--red)";
+                document.getElementById("metric-sub-3").textContent = "CUMULATIVE CANCEL VALUE";
+
+                document.getElementById("metric-title-4").textContent = "Effective LTV";
+                const mrrLtv = churnRate > 0 ? arpu / churnRate : 0;
+                document.getElementById("metric-val-4").textContent = `$${Math.round(mrrLtv).toLocaleString()}`;
+                document.getElementById("metric-sub-4").textContent = "AVERAGE OPERATOR VALUE";
+
+                // Visual Graph Rendering
+                document.getElementById("chart-graph-title").textContent = "12-Month Compounding MRR Forecast Vector";
+                document.getElementById("label-x-start").textContent = "MONTH 1";
+                document.getElementById("label-x-mid").textContent = "MONTH 6";
+                document.getElementById("label-x-end").textContent = "MONTH 12";
+
+                const pathD = `M${points.join(" L")}`;
+                document.getElementById("chart-path").setAttribute("d", pathD);
+                document.getElementById("chart-area-path").setAttribute("d", `${pathD} L500,230 L0,230 Z`);
+                document.getElementById("chart-path").setAttribute("stroke", "var(--green)");
+
+                // Recommendation Score logic
+                const growthScore = Math.max(10, Math.min(100, Math.round(100 - (churnRate * 100 * 2.5))));
+                document.getElementById("qual-badge-score").textContent = `${growthScore}%`;
+
+                const verdict = document.getElementById("qual-verdict-desc");
+                const actionBtn = document.getElementById("btn-qual-action");
+
+                if (churnRate > 0.08) {
+                    document.getElementById("qual-badge-score").style.color = "var(--red)";
+                    verdict.textContent = `[CHURN THREAT IDENTIFIED] Customer monthly churn exceeds optimal baselines. Churn of ${(churnRate * 100).toFixed(1)}% will limit growth capacity. Standard recommendations focus on loyalty programs and product onboarding optimizations before expansion spend.`;
+                    actionBtn.textContent = "Deploy Retention Audit Workflows";
+                    actionBtn.style.backgroundColor = "var(--orange)";
+                    writeLog(`WARNING: High customer attrition speed discovered. Review customer success loops.`, "warn");
+                } else {
+                    document.getElementById("qual-badge-score").style.color = "var(--green)";
+                    verdict.textContent = `[HEALTHY EXPANSION PROFILE] Solid churn metrics at ${(churnRate * 100).toFixed(1)}%. Core recurring engine is stable and primed for cash investment or acquisition scaling.`;
+                    actionBtn.textContent = "Unlock Ad Spend Scaling Prompts";
+                    actionBtn.style.backgroundColor = "var(--green)";
+                    writeLog(`SaaS System Audit: Compounding forecast positive. Zero leakage risk.`, "success");
+                }
+            }
+
+            // CALCULATOR 3: MARKETING ROI
+            function calculateMarketing() {
+                const spend = parseFloat(document.getElementById("input-mkt-spend").value);
+                const cpl = parseFloat(document.getElementById("input-mkt-cpl").value);
+                const convRate = parseFloat(document.getElementById("input-mkt-conv").value) / 100;
+                const ltv = parseFloat(document.getElementById("input-mkt-ltv").value);
+
+                // Calculations
+                const totalLeads = spend / cpl;
+                const newAcquisitions = totalLeads * convRate;
+                const cac = newAcquisitions > 0 ? spend / newAcquisitions : spend;
+                const grossValueGenerated = newAcquisitions * ltv;
+                const netMarketingReturn = grossValueGenerated - spend;
+                const roas = spend > 0 ? grossValueGenerated / spend : 0;
+
+                // Update UI metrics displays
+                document.getElementById("metric-title-1").textContent = "New Clients Won";
+                document.getElementById("metric-val-1").textContent = `${Math.round(newAcquisitions).toLocaleString()}`;
+                document.getElementById("metric-sub-1").textContent = `ACQUIRED FROM ${Math.round(totalLeads).toLocaleString()} LEADS`;
+
+                document.getElementById("metric-title-2").textContent = "Acquisition Cost (CAC)";
+                document.getElementById("metric-val-2").textContent = `$${Math.round(cac).toLocaleString()}`;
+                document.getElementById("metric-val-2").style.color = cac < (ltv * 0.3) ? "var(--green)" : "var(--orange)";
+                document.getElementById("metric-sub-2").textContent = `TARGET BUDGET: $${spend.toLocaleString()}`;
+
+                document.getElementById("metric-title-3").textContent = "Return on Spend (ROAS)";
+                document.getElementById("metric-val-3").textContent = `${roas.toFixed(2)}x`;
+                document.getElementById("metric-val-3").style.color = roas > 2 ? "var(--green)" : "var(--red)";
+                document.getElementById("metric-sub-3").textContent = `NET ROI: $${Math.round(netMarketingReturn).toLocaleString()}`;
+
+                document.getElementById("metric-title-4").textContent = "LTV to CAC Ratio";
+                const ratio = cac > 0 ? ltv / cac : 0;
+                document.getElementById("metric-val-4").textContent = `${ratio.toFixed(1)}:1`;
+                document.getElementById("metric-sub-4").textContent = ratio > 3 ? "HIGHLY PROFITABLE" : "MARGIN EXPOSURE LIMIT";
+
+                // Visual Graph Rendering
+                document.getElementById("chart-graph-title").textContent = "Ad Spend vs Projected Customer Equity Value";
+                document.getElementById("label-x-start").textContent = "BUDGET MIN";
+                document.getElementById("label-x-mid").textContent = "CURRENT SPEND";
+                document.getElementById("label-x-end").textContent = "BUDGET STRETCH";
+
+                // Map logarithmic growth visual bounds
+                const points = [];
+                for (let i = 0; i <= 4; i++) {
+                    const x = (i / 4) * 500;
+                    const simulatedSpend = spend * (i / 2);
+                    const simulatedGrossValue = (simulatedSpend / cpl * convRate) * ltv;
+                    const maxScale = (spend * 2) * 5;
+                    const y = maxScale > 0 ? 230 - ((simulatedGrossValue / maxScale) * 190) : 230;
+                    points.push(`${x},${y}`);
+                }
+
+                const pathD = `M${points.join(" L")}`;
+                document.getElementById("chart-path").setAttribute("d", pathD);
+                document.getElementById("chart-area-path").setAttribute("d", `${pathD} L500,230 L0,230 Z`);
+                document.getElementById("chart-path").setAttribute("stroke", "var(--cyan)");
+
+                // Recommendation Engine
+                const marketingScore = Math.max(10, Math.min(100, Math.round(ratio * 20)));
+                document.getElementById("qual-badge-score").textContent = `${marketingScore}%`;
+
+                const verdict = document.getElementById("qual-verdict-desc");
+                const actionBtn = document.getElementById("btn-qual-action");
+
+                if (ratio < 2.0) {
+                    document.getElementById("qual-badge-score").style.color = "var(--red)";
+                    verdict.textContent = `[PROFIT MARGIN CRISIS] Customer acquisition cost ($${Math.round(cac)}) is too high relative to client Lifetime Value ($${ltv}). Current ratio sits at ${ratio.toFixed(1)}:1. Media scaling is currently burning operating margins. Fix conversion rate optimization loops.`;
+                    actionBtn.textContent = "Deploy Lead-Magnet Optimization Script";
+                    actionBtn.style.backgroundColor = "var(--orange)";
+                    writeLog(`WARNING: High client acquisition costs eating margins. Optimization needed.`, "warn");
+                } else {
+                    document.getElementById("qual-badge-score").style.color = "var(--green)";
+                    verdict.textContent = `[SCALABLE VALUE PIPELINE DETECTED] Excellent unit economics. LTV:CAC Ratio of ${ratio.toFixed(1)}:1 exceeds optimal threshold targets. Immediate capital scaling is recommended.`;
+                    actionBtn.textContent = "Access Rapid Ad-Scaling Capital Lines";
+                    actionBtn.style.backgroundColor = "var(--green)";
+                    writeLog(`Marketing Audit: ROAS performance exceeds baseline standard. Ready for scale.`, "success");
+                }
+            }
+
+            // CALCULATOR 4: LOAN / SBA QUALIFICATION
+            function calculateLoan() {
+                const annualRev = parseFloat(document.getElementById("input-loan-rev").value);
+                const credit = parseFloat(document.getElementById("input-loan-credit").value);
+                const years = parseFloat(document.getElementById("input-loan-years").value);
+                const existingDebt = parseFloat(document.getElementById("input-loan-debt").value);
+
+                // Custom Qualification scoring formula
+                let scoreMultiplier = 0;
+                if (credit >= 720) scoreMultiplier += 40;
+                else if (credit >= 650) scoreMultiplier += 25;
+                else scoreMultiplier += 10;
+
+                if (years >= 3) scoreMultiplier += 30;
+                else if (years >= 1) scoreMultiplier += 15;
+                else scoreMultiplier += 5;
+
+                const annualDebtService = existingDebt * 12;
+                const estimatedOperatingIncome = annualRev * 0.20; // assumed 20% margin
+                const dscr = annualDebtService > 0 ? estimatedOperatingIncome / annualDebtService : 5.0;
+
+                if (dscr >= 1.5) scoreMultiplier += 30;
+                else if (dscr >= 1.1) scoreMultiplier += 15;
+                else scoreMultiplier += 0;
+
+                const maxPotentialLoan = Math.round(annualRev * 0.15 * (scoreMultiplier / 100));
+
+                // Update UI metrics displays
+                document.getElementById("metric-title-1").textContent = "Max Borrow Estimate";
+                document.getElementById("metric-val-1").textContent = `$${maxPotentialLoan.toLocaleString()}`;
+                document.getElementById("metric-sub-1").textContent = "PROPRIETARY ESTIMATE ENGINE";
+
+                document.getElementById("metric-title-2").textContent = "Operational DSCR";
+                document.getElementById("metric-val-2").textContent = `${dscr.toFixed(2)}x`;
+                document.getElementById("metric-val-2").style.color = dscr > 1.25 ? "var(--green)" : "var(--red)";
+                document.getElementById("metric-sub-2").textContent = "DEBT SERVICE COVERAGE";
+
+                document.getElementById("metric-title-3").textContent = "Borrow Eligibility";
+                let eligibilityStatus = "Alternative Cash Lines";
+                if (credit >= 680 && years >= 2 && dscr > 1.3) eligibilityStatus = "SBA 7(a) & Traditional Bank";
+                else if (credit < 550) eligibilityStatus = "Restricted Micro MCA";
+                document.getElementById("metric-val-3").textContent = eligibilityStatus;
+                document.getElementById("metric-val-3").style.fontSize = "1.1rem"; // smaller text fit
+                document.getElementById("metric-val-3").style.color = "var(--cyan)";
+                document.getElementById("metric-sub-3").textContent = "OPTIMAL LENDER CHANNEL";
+
+                document.getElementById("metric-title-4").textContent = "Est. Minimum Credit Limit";
+                const creditLimit = Math.round(annualRev * 0.08);
+                document.getElementById("metric-val-4").textContent = `$${creditLimit.toLocaleString()}`;
+                document.getElementById("metric-sub-4").textContent = "REVENUE RECURRING BANK LINE";
+
+                // Visual Graph Rendering (SVG step curve showing approval confidence)
+                document.getElementById("chart-graph-title").textContent = "Guarantor Profile Strength Curve";
+                document.getElementById("label-x-start").textContent = "SUB-PRIME";
+                document.getElementById("label-x-mid").textContent = "AVERAGE MID-TIER";
+                document.getElementById("label-x-end").textContent = "OPERATOR SUPREME";
+
+                const points = [];
+                for (let i = 0; i <= 4; i++) {
+                    const x = (i / 4) * 500;
+                    const factorY = (i * scoreMultiplier * 0.6);
+                    const y = Math.max(10, Math.min(230, 230 - factorY));
+                    points.push(`${x},${y}`);
+                }
+
+                const pathD = `M${points.join(" L")}`;
+                document.getElementById("chart-path").setAttribute("d", pathD);
+                document.getElementById("chart-area-path").setAttribute("d", `${pathD} L500,230 L0,230 Z`);
+                document.getElementById("chart-path").setAttribute("stroke", "var(--yellow)");
+
+                // Qualification decision output update
+                document.getElementById("qual-badge-score").textContent = `${scoreMultiplier}%`;
+
+                const verdict = document.getElementById("qual-verdict-desc");
+                const actionBtn = document.getElementById("btn-qual-action");
+
+                if (scoreMultiplier < 40) {
+                    document.getElementById("qual-badge-score").style.color = "var(--red)";
+                    verdict.textContent = `[HIGH LENDER BARRIER RISK] Low score metric profile at ${scoreMultiplier}%. Typical reasons include low guarantor personal credit score (<620) or limited company operational duration. Traditional capital routes will present rejection blocks. High risk alert.`;
+                    actionBtn.textContent = "Match Alternative Revenue Funding Lines";
+                    actionBtn.style.backgroundColor = "var(--orange)";
+                    writeLog(`Lending Audit: Guarantor profile falls short of standard banking guidelines.`, "warn");
+                } else if (scoreMultiplier < 70) {
+                    document.getElementById("qual-badge-score").style.color = "var(--orange)";
+                    verdict.textContent = `[MID-TIER WORKABLE RATING] Profile strength at ${scoreMultiplier}%. Strong potential for rapid receivables financing, asset-backed leverage, and alternative online lines of credit. SBA 7(a) paths possible but require extensive corporate documentation.`;
+                    actionBtn.textContent = "Connect to Alternative Credit Brokers";
+                    actionBtn.style.backgroundColor = "var(--cyan)";
+                    writeLog(`Lending Audit: Moderate guarantor status established. Alternative solutions matching.`, "info");
+                } else {
+                    document.getElementById("qual-badge-score").style.color = "var(--green)";
+                    verdict.textContent = `[PRESTIGE OPERATOR LEVEL] Elite status rating at ${scoreMultiplier}%. High capability verified. Guarantee profiles match top traditional tier business loans and SBA pathways with optimal low APR rates.`;
+                    actionBtn.textContent = "Launch Automated SBA Application Wizard";
+                    actionBtn.style.backgroundColor = "var(--green)";
+                    writeLog(`Lending Audit: Guarantor profile cleared. Ready for standard SBA routing pipelines.`, "success");
+                }
+            }
+
+            // Run baseline simulation calculation automatically at loading runtime
+            runCalculations();
+        });
+    </script>
+</body>
+</html>
+```

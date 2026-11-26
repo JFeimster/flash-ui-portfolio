@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash UI Export</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- ROOT TERMINAL CONTAINER -->
+  <div x-data="{
+    search: '',
+    vertical: 'ALL',
+    minCashFlow: 300000,
+    maxMultiple: 4.5,
+    saved: [],
+    mobileFiltersOpen: false,
+    modalOpen: false,
+    selectedDeal: null,
+
+    // SBA Calculator State
+    downPaymentPercent: 10,
+    interestRate: 10.5,
+    termYears: 10,
+
+    deals: [
+      {
+        id: 'DL-8902',
+        codename: 'Project Delta',
+        industry: 'B2B Logistics Agency',
+        vertical: 'Logistics',
+        revenue: 2400000,
+        ebitda: 620000,
+        asking: 1800000,
+        multiple: 2.9,
+        location: 'Southeast Regional',
+        tags: ['SBA Pre-Qualified', '1031 Exchange Ready', 'High Customer Concentration'],
+        highlights: [
+          'Sole provider of precision logistics for high-density automotive corridors.',
+          'Experienced middle management tier prepared to transition post-acquisition.',
+          'Risk profile: Key customer accounts for 35% of gross operational revenue.'
+        ],
+        healthIndex: 84
+      },
+      {
+        id: 'DL-4411',
+        codename: 'Project Cobalt',
+        industry: 'HVAC & Air Treatment Systems',
+        vertical: 'HVAC',
+        revenue: 3800000,
+        ebitda: 950000,
+        asking: 3200000,
+        multiple: 3.4,
+        location: 'Texas Triangle Corridor',
+        tags: ['SBA Pre-Qualified', 'Real Estate Included', 'High Margin'],
+        highlights: [
+          '92% recurring service agreements in commercial logistics hubs.',
+          'Owner retiring after 24 years; full standard 12-month transition agreement offered.',
+          'Risk profile: Highly localized labor shortages require active recruiting pipeline.'
+        ],
+        healthIndex: 96
+      },
+      {
+        id: 'DL-5520',
+        codename: 'Project Cipher',
+        industry: 'SaaS Property Management Suite',
+        vertical: 'SaaS',
+        revenue: 1100000,
+        ebitda: 420000,
+        asking: 1600000,
+        multiple: 3.8,
+        location: 'Remote-First Architecture',
+        tags: ['High Margin', 'Single Founder', 'Clean Code Audited'],
+        highlights: [
+          '88% Gross Margin with fully automated server deployment pipelines.',
+          'Negligible churn rate of <1.2% across real-estate operator vertical.',
+          'Risk profile: Transition requires handoff of proprietary database logic.'
+        ],
+        healthIndex: 91
+      },
+      {
+        id: 'DL-7109',
+        codename: 'Project Horizon',
+        industry: 'Precision Tooling & Molding Shop',
+        vertical: 'Manufacturing',
+        revenue: 5200000,
+        ebitda: 1200000,
+        asking: 4200000,
+        multiple: 3.5,
+        location: 'Midwest Rust Belt',
+        tags: ['SBA Approved Network', 'Asset Rich', 'Key Man Dependency'],
+        highlights: [
+          'Machinery asset value evaluated independently at $1.9M.',
+          'Defense and medical contract base locked in for adjacent 3 fiscal cycles.',
+          'Risk profile: High capital expenditure required for next-gen machine updates.'
+        ],
+        healthIndex: 78
+      },
+      {
+        id: 'DL-1102',
+        codename: 'Project Apex',
+        industry: 'Multi-Unit Residential Landscaping',
+        vertical: 'Home Services',
+        revenue: 1700000,
+        ebitda: 380000,
+        asking: 950000,
+        multiple: 2.5,
+        location: 'Coastal Florida Region',
+        tags: ['Low Customer Concentration', 'Substantial Vehicle Assets'],
+        highlights: [
+          '14 specialized service crews executing commercial and master community agreements.',
+          'Predictable fuel contracts buffered against volatility through late next year.',
+          'Risk profile: Seasonality curves trigger negative working capital cycles in winter.'
+        ],
+        healthIndex: 89
+      }
+    ],
+
+    get filteredDeals() {
+      return this.deals.filter(d => {
+        const matchSearch = d.codename.toLowerCase().includes(this.search.toLowerCase()) || 
+                            d.industry.toLowerCase().includes(this.search.toLowerCase()) || 
+                            d.location.toLowerCase().includes(this.search.toLowerCase());
+        const matchVertical = this.vertical === 'ALL' || d.vertical === this.vertical;
+        const matchMultiple = d.multiple <= this.maxMultiple;
+        const matchCashFlow = d.ebitda >= this.minCashFlow;
+        return matchSearch && matchVertical && matchMultiple && matchCashFlow;
+      });
+    },
+
+    toggleSave(id) {
+      if (this.saved.includes(id)) {
+        this.saved = this.saved.filter(i => i !== id);
+      } else {
+        this.saved.push(id);
+      }
+    },
+
+    openDeal(deal) {
+      this.selectedDeal = deal;
+      this.modalOpen = true;
+    },
+
+    // SBA Live Calculator Getters
+    get sbaCashRequired() {
+      if (!this.selectedDeal) return 0;
+      return Math.round(this.selectedDeal.asking * (this.downPaymentPercent / 100));
+    },
+
+    get sbaLoanAmount() {
+      if (!this.selectedDeal) return 0;
+      return Math.round(this.selectedDeal.asking - this.sbaCashRequired);
+    },
+
+    get sbaAnnualDebtService() {
+      if (!this.selectedDeal || this.sbaLoanAmount <= 0) return 0;
+      // Standard monthly amortization formula: P * (r * (1+r)^n) / ((1+r)^n - 1)
+      const r = (this.interestRate / 100) / 12;
+      const n = this.termYears * 12;
+      const p = this.sbaLoanAmount;
+      if (r === 0) return Math.round(p / this.termYears);
+      const monthly = p * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+      return Math.round(monthly * 12);
+    },
+
+    get sbaDscr() {
+      if (!this.selectedDeal || this.sbaAnnualDebtService === 0) return '0.00';
+      return (this.selectedDeal.ebitda / this.sbaAnnualDebtService).toFixed(2);
+    },
+
+    get postDebtCashFlow() {
+      if (!this.selectedDeal) return 0;
+      return Math.round(this.selectedDeal.ebitda - this.sbaAnnualDebtService);
+    },
+
+    formatCurrency(val) {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
+    }
+  }" class="min-h-screen flex flex-col justify-between">
+
+    <!-- 1. GLOBAL TICKER HEADER -->
+    <header class="border-b border-borderGray bg-terminalBlack sticky top-0 z-40">
+      <!-- Upper Marquee -->
+      <div class="overflow-hidden border-b border-borderGray bg-[#0a0a0a] py-1 text-[10px] tracking-[0.2em] text-copperTeal uppercase">
+        <div class="flex whitespace-nowrap animate-marquee">
+          <span class="mx-4">[ACQUIRED: $1.2M EBITDA Manufacturing, Atlanta]</span>
+          <span class="mx-4 text-warningCrimson">[UNDER CONTRACT: $450K SaaS, Remote]</span>
+          <span class="mx-4 text-acidGreen">[NEW LISTING: $800K HVAC, Franconia, VA]</span>
+          <span class="mx-4">[ACQUIRED: $3.1M EBITDA Distribution, Chicago]</span>
+          <span class="mx-4 text-acidGreen">[VALUATION SHIFT: Multiple baseline trends to 3.2x average]</span>
+          <!-- Repeat for smooth loop -->
+          <span class="mx-4">[ACQUIRED: $1.2M EBITDA Manufacturing, Atlanta]</span>
+          <span class="mx-4 text-warningCrimson">[UNDER CONTRACT: $450K SaaS, Remote]</span>
+          <span class="mx-4 text-acidGreen">[NEW LISTING: $800K HVAC, Franconia, VA]</span>
+          <span class="mx-4">[ACQUIRED: $3.1M EBITDA Distribution, Chicago]</span>
+          <span class="mx-4 text-acidGreen">[VALUATION SHIFT: Multiple baseline trends to 3.2x average]</span>
+        </div>
+      </div>
+
+      <!-- Main Header Bar -->
+      <div class="max-w-[1600px] mx-auto px-4 md:px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center space-x-4 w-full md:w-auto justify-between md:justify-start">
+          <div class="flex items-center space-x-3">
+            <div class="w-3 h-3 bg-acidGreen animate-pulse"></div>
+            <span class="text-lg font-bold tracking-wider text-boneWhite">ACQUIRE<span class="text-acidGreen">META</span></span>
+          </div>
+          <span class="text-[10px] px-2 py-0.5 border border-borderGray text-lightMuted bg-[#0c0c0c] uppercase">System v1.08 / Live Feed</span>
+        </div>
+
+        <!-- Terminal Status Metadata -->
+        <div class="flex flex-wrap items-center gap-6 text-[11px] text-lightMuted justify-center md:justify-end">
+          <div>FEED INDEX: <span class="text-acidGreen font-bold">SECURE LOG_ON</span></div>
+          <div class="hidden sm:block">EST. DEBT LIQUIDITY: <span class="text-[#0EA5E9]">$240M+ (SBA 7a Pool)</span></div>
+          <div class="border border-borderGray px-2 py-1 bg-darkMuted text-boneWhite flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-acidGreen block animate-ping"></span>
+            ACTIVE BUYERS ONLINE: 1,482
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN TERMINAL WORKING LAYOUT -->
+    <main class="flex-grow max-w-[1600px] w-full mx-auto px-4 md:px-6 py-6 flex flex-col lg:grid lg:grid-cols-12 gap-6">
+
+      <!-- 2. SEARCH & DRILL-DOWN BENTO FILTERS (Left Rail) -->
+      <aside class="lg:col-span-3 flex flex-col space-y-6">
+        
+        <!-- Mobile Trigger for Filters -->
+        <button 
+          @click="mobileFiltersOpen = !mobileFiltersOpen"
+          class="lg:hidden w-full flex items-center justify-between border border-borderGray p-4 bg-[#0a0a0a] text-xs font-bold uppercase hover:border-acidGreen transition-colors duration-200"
+        >
+          <span>System Filter Diagnostics</span>
+          <span class="text-acidGreen" x-text="mobileFiltersOpen ? '[-] COLLAPSE' : '[+] EXPAND'">[+] EXPAND</span>
+        </button>
+
+        <!-- Filter Bento Box Content -->
+        <div 
+          :class="mobileFiltersOpen ? 'block' : 'hidden lg:block'"
+          class="space-y-6 transition-all duration-300"
+        >
+          <!-- Live Terminal Search Panel -->
+          <div class="border border-borderGray bg-[#0a0a0a] p-4 flex flex-col">
+            <div class="flex justify-between items-center mb-3">
+              <span class="text-xs text-lightMuted uppercase tracking-wider">// System Query</span>
+              <span class="text-[9px] text-acidGreen">[ACTIVE]</span>
+            </div>
+            <div class="relative">
+              <input 
+                type="text" 
+                x-model="search"
+                placeholder="Search verified cash flow..." 
+                class="w-full bg-terminalBlack border border-borderGray text-boneWhite text-xs focus:border-acidGreen focus:outline-none p-3 placeholder-lightMuted uppercase font-mono tracking-wider transition-colors"
+              />
+              <div class="absolute right-3 top-3 text-[10px] text-lightMuted pointer-events-none">CMD+F</div>
+            </div>
+          </div>
+
+          <!-- Vertical Selector -->
+          <div class="border border-borderGray bg-[#0a0a0a] p-4 flex flex-col">
+            <span class="text-xs text-lightMuted uppercase tracking-wider mb-4">// Sector Filtering Matrix</span>
+            <div class="flex flex-col space-y-1">
+              <template x-for="cat in ['ALL', 'SaaS', 'Home Services', 'Logistics', 'Manufacturing', 'HVAC']">
+                <button 
+                  @click="vertical = cat"
+                  :class="vertical === cat ? 'bg-acidGreen text-terminalBlack font-bold border-acidGreen' : 'bg-transparent text-boneWhite border-borderGray hover:bg-darkMuted hover:text-acidGreen hover:border-acidGreen'"
+                  class="w-full text-left text-xs p-2 border uppercase tracking-wider transition-all duration-150 flex justify-between items-center"
+                >
+                  <span x-text="cat"></span>
+                  <span x-show="vertical === cat" class="text-[10px]">■ ACTIVE</span>
+                  <span x-show="vertical !== cat" class="text-[10px] text-lightMuted">□ LOCK</span>
+                </button>
+              </template>
+            </div>
+          </div>
+
+          <!-- Metric Constraints Box (Slidables) -->
+          <div class="border border-borderGray bg-[#0a0a0a] p-4 space-y-6">
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-lightMuted uppercase tracking-wider">// Limit Thresholds</span>
+              <span class="text-[9px] text-copperTeal">DIAG-04</span>
+            </div>
+
+            <!-- EBITDA Multiplier limit -->
+            <div class="space-y-2">
+              <div class="flex justify-between text-xs font-mono">
+                <span class="text-lightMuted">MAX MULTIPLE:</span>
+                <span class="text-acidGreen font-bold" x-text="maxMultiple.toFixed(1) + 'x'"></span>
+              </div>
+              <input 
+                type="range" 
+                min="1.5" 
+                max="5.0" 
+                step="0.1" 
+                x-model="maxMultiple"
+                class="w-full accent-acidGreen"
+              />
+              <div class="flex justify-between text-[9px] text-lightMuted">
+                <span>1.5x</span>
+                <span>5.0x</span>
+              </div>
+            </div>
+
+            <!-- Cash Flow min selection -->
+            <div class="space-y-2">
+              <div class="flex justify-between text-xs font-mono">
+                <span class="text-lightMuted">MIN EBITDA / CF:</span>
+                <span class="text-copperTeal font-bold" x-text="formatCurrency(minCashFlow)"></span>
+              </div>
+              <input 
+                type="range" 
+                min="300000" 
+                max="1000000" 
+                step="50000" 
+                x-model="minCashFlow"
+                class="w-full accent-copperTeal"
+              />
+              <div class="flex justify-between text-[9px] text-lightMuted">
+                <span>$300K</span>
+                <span>$1.0M</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Watchlist Quick Status Block -->
+          <div class="border border-borderGray bg-[#0a0a0a] p-4 text-xs space-y-3">
+            <span class="text-xs text-lightMuted uppercase tracking-wider block">// SYSTEM BOARD WATCH</span>
+            <div class="flex items-center justify-between">
+              <span class="text-lightMuted">DEALS BOOKMARKED:</span>
+              <span class="text-acidGreen font-bold" x-text="saved.length">0</span>
+            </div>
+            <div class="text-[10px] text-lightMuted border-t border-borderGray pt-2">
+              Click <span class="text-copperTeal">"SAVE TO BOARD"</span> to flag a listing index for automated asset structural modeling.
+            </div>
+          </div>
+
+        </div>
+      </aside>
+
+      <!-- 3. PREMIUM DEAL STREAM FLOW (Center Feed) -->
+      <section class="lg:col-span-9 space-y-6">
+        
+        <!-- Stream Header / System Count -->
+        <div class="border border-borderGray bg-[#0a0a0a] p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+          <div class="text-xs">
+            <span class="text-lightMuted">VERIFIED ASSET DATA STREAM (LIVE STATUS: </span>
+            <span class="text-acidGreen animate-pulse font-bold">ONLINE</span>
+            <span class="text-lightMuted">)</span>
+          </div>
+          <div class="text-xs">
+            INDEX SELECTION: <span class="text-copperTeal font-bold" x-text="filteredDeals.length">0</span> OF <span x-text="deals.length">5</span> MATCHES FOR CRITERIA
+          </div>
+        </div>
+
+        <!-- Empty State Handling -->
+        <div 
+          x-show="filteredDeals.length === 0" 
+          class="border border-warningCrimson bg-[#0f0707] p-8 text-center space-y-4"
+          style="display: none;"
+        >
+          <div class="text-warningCrimson text-lg font-bold">⚠️ SYSTEM ZERO MATCH OUTCOME</div>
+          <p class="text-xs text-lightMuted max-w-md mx-auto">
+            Your technical parameters for EBITDA minimum and maximum multiple pricing limits yielded zero viable market entries. Reduce strict constraints to re-engage transmission channels.
+          </p>
+          <button 
+            @click="search = ''; vertical = 'ALL'; minCashFlow = 300000; maxMultiple = 5.0"
+            class="px-4 py-2 border border-warningCrimson text-warningCrimson hover:bg-warningCrimson hover:text-terminalBlack text-xs font-bold transition-all duration-200 uppercase"
+          >
+            Reset Signal Matrix
+          </button>
+        </div>
+
+        <!-- Deal Cards Stream -->
+        <div class="space-y-6">
+          <template x-for="deal in filteredDeals" :key="deal.id">
+            
+            <!-- Dynamic Deal Card Frame -->
+            <div 
+              class="border border-borderGray bg-[#0a0a0a] transition-all duration-300 hover:border-[#0EA5E9] relative flex flex-col justify-between"
+              :class="saved.includes(deal.id) ? 'shadow-[0_0_15px_rgba(14,165,233,0.15)] border-[#0EA5E9]' : ''"
+            >
+              
+              <!-- Card Header Bar -->
+              <div class="border-b border-borderGray p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-[#0c0c0c]">
+                <div class="flex items-center space-x-3">
+                  <span class="text-xs font-bold px-2 py-0.5 bg-darkMuted border border-borderGray text-copperTeal" x-text="deal.id">DL-xxxx</span>
+                  <span class="text-xs tracking-[0.15em] uppercase text-boneWhite font-bold" x-text="deal.codename + ' — ' + deal.industry">Project Codename</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="text-[10px] text-lightMuted uppercase" x-text="deal.location">Location</span>
+                  <span class="w-1.5 h-1.5 bg-acidGreen rounded-full"></span>
+                </div>
+              </div>
+
+              <!-- Main Card Body Bento Sub-grid -->
+              <div class="grid grid-cols-1 md:grid-cols-3 border-b border-borderGray">
+                <!-- Column 1: Revenue -->
+                <div class="p-4 border-b md:border-b-0 md:border-r border-borderGray bg-[#080808]">
+                  <span class="text-[10px] text-lightMuted uppercase block mb-1">AUDITED REVENUE REVENUE (TTM)</span>
+                  <span class="text-xl font-bold tracking-tight text-boneWhite" x-text="formatCurrency(deal.revenue)">$0.00</span>
+                </div>
+                <!-- Column 2: Adjusted EBITDA -->
+                <div class="p-4 border-b md:border-b-0 md:border-r border-borderGray bg-[#080808]">
+                  <span class="text-[10px] text-lightMuted uppercase block mb-1">ADJUSTED OPERATING EBITDA</span>
+                  <span class="text-xl font-bold tracking-tight text-acidGreen" x-text="formatCurrency(deal.ebitda)">$0.00</span>
+                </div>
+                <!-- Column 3: Asking Price / Val -->
+                <div class="p-4 bg-[#0c0c0c] flex flex-col justify-between">
+                  <div>
+                    <span class="text-[10px] text-lightMuted uppercase block mb-1">ASKING PRICE (MULTIPLE)</span>
+                    <div class="flex items-baseline gap-2">
+                      <span class="text-xl font-bold tracking-tight text-[#0EA5E9]" x-text="formatCurrency(deal.asking)">$0.00</span>
+                      <span class="text-xs text-lightMuted" x-text="'(' + deal.multiple + 'x)'"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Badges & High-Visibility Structural Tags -->
+              <div class="p-4 flex flex-wrap gap-2 border-b border-borderGray bg-[#050505]">
+                <template x-for="tag in deal.tags" :key="tag">
+                  <span 
+                    :class="{
+                      'border-acidGreen text-acidGreen bg-acidGreen/5': tag.includes('SBA'),
+                      'border-copperTeal text-copperTeal bg-copperTeal/5': tag.includes('1031') || tag.includes('Margin'),
+                      'border-warningCrimson text-warningCrimson bg-warningCrimson/5': tag.includes('Concentration') || tag.includes('Risk') || tag.includes('Dependency')
+                    }"
+                    class="text-[9px] uppercase tracking-wider px-2.5 py-1 border font-bold" 
+                    x-text="tag"
+                  >
+                    Tag
+                  </span>
+                </template>
+              </div>
+
+              <!-- Interactive Deal Row Trigger Bars -->
+              <div class="p-4 bg-[#0a0a0a] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+                <div class="flex items-center space-x-4">
+                  <!-- Risk Analysis Spark Meter -->
+                  <div class="flex items-center space-x-2">
+                    <span class="text-[10px] text-lightMuted">RISK LEVEL:</span>
+                    <div class="w-16 bg-[#222] h-2">
+                      <div class="h-full bg-acidGreen" :style="'width: ' + deal.healthIndex + '%'"></div>
+                    </div>
+                    <span class="text-[10px] text-boneWhite" x-text="deal.healthIndex + '/100'"></span>
+                  </div>
+                </div>
+
+                <div class="flex items-center space-x-3 w-full sm:w-auto">
+                  <!-- Watch toggle -->
+                  <button 
+                    @click="toggleSave(deal.id)"
+                    class="p-3 border border-borderGray text-lightMuted hover:border-[#0EA5E9] hover:text-[#0EA5E9] transition-colors focus:outline-none flex items-center justify-center bg-[#070707]"
+                    title="Toggle Save State"
+                  >
+                    <svg class="w-4.5 h-4.5" :class="saved.includes(deal.id) ? 'text-[#0EA5E9] fill-current' : 'none'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
+                  </button>
+
+                  <!-- Primary Route Action Trigger -->
+                  <button 
+                    @click="openDeal(deal)"
+                    class="flex-grow sm:flex-none text-xs text-terminalBlack bg-acidGreen hover:bg-terminalBlack hover:text-acidGreen hover:shadow-[4px_4px_0px_0px_rgba(0,255,102,1)] border border-acidGreen font-bold px-6 py-3 transition-all duration-200 uppercase tracking-widest text-center"
+                  >
+                    Analyze Deal Mechanics
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </template>
+        </div>
+
+      </section>
+    </main>
+
+    <!-- 4. TRANSACTION NEXT-STEPS MODAL (Drill-Down Trigger) -->
+    <div 
+      x-show="modalOpen" 
+      class="fixed inset-0 z-50 overflow-y-auto"
+      style="display: none;"
+      x-transition:enter="transition ease-out duration-150"
+      x-transition:enter-start="opacity-0"
+      x-transition:enter-end="opacity-100"
+      x-transition:leave="transition ease-in duration-100"
+      x-transition:leave-start="opacity-100"
+      x-transition:leave-end="opacity-0"
+    >
+      <!-- Backdrop -->
+      <div class="fixed inset-0 bg-terminalBlack/95 backdrop-blur-sm" @click="modalOpen = false"></div>
+
+      <!-- Modal Content Area -->
+      <div class="relative min-h-screen flex items-center justify-center p-4 md:p-6">
+        <div 
+          class="relative w-full max-w-4xl border border-borderGray bg-[#0a0a0a] text-boneWhite p-6 md:p-8 space-y-6 focus:outline-none"
+          @click.stop
+        >
+          
+          <!-- Modal Top Header bar -->
+          <div class="border-b border-borderGray pb-4 flex items-center justify-between">
+            <div class="space-y-1">
+              <span class="text-[10px] text-[#0EA5E9] font-bold" x-text="'TRANSACTION DIAGNOSTICS DEAL: ' + (selectedDeal ? selectedDeal.id : '')">DEAL TRANSACTION DIAGNOSTICS</span>
+              <h2 class="text-xl font-bold uppercase tracking-wider" x-text="selectedDeal ? (selectedDeal.codename + ' — ' + selectedDeal.industry) : ''"></h2>
+            </div>
+            <button 
+              @click="modalOpen = false" 
+              class="border border-borderGray text-lightMuted hover:border-warningCrimson hover:text-warningCrimson p-2 text-xs uppercase transition-colors"
+            >
+              [ESC] CLOSE
+            </button>
+          </div>
+
+          <!-- Quick Metadata Box -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 border border-borderGray bg-[#060606]">
+            <div>
+              <span class="text-[9px] text-lightMuted uppercase block">ASKING PRICE</span>
+              <span class="text-sm font-bold text-[#0EA5E9]" x-text="selectedDeal ? formatCurrency(selectedDeal.asking) : ''"></span>
+            </div>
+            <div>
+              <span class="text-[9px] text-lightMuted uppercase block">CURRENT EBITDA</span>
+              <span class="text-sm font-bold text-acidGreen" x-text="selectedDeal ? formatCurrency(selectedDeal.ebitda) : ''"></span>
+            </div>
+            <div>
+              <span class="text-[9px] text-lightMuted uppercase block">STATED MULTIPLE</span>
+              <span class="text-sm font-bold text-boneWhite" x-text="selectedDeal ? selectedDeal.multiple + 'x' : ''"></span>
+            </div>
+            <div>
+              <span class="text-[9px] text-lightMuted uppercase block">LOCATION</span>
+              <span class="text-sm font-bold text-boneWhite" x-text="selectedDeal ? selectedDeal.location : ''"></span>
+            </div>
+          </div>
+
+          <!-- Dual-Column Interactive Debt Modeling Core -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Left Side: Dynamic Parameters Selection -->
+            <div class="lg:col-span-5 space-y-4 border-r border-borderGray pr-0 lg:pr-6 border-b lg:border-b-0 pb-6 lg:pb-0">
+              <h3 class="text-xs font-bold text-[#0EA5E9] uppercase tracking-widest">// MODEL PARAMETERS</h3>
+              <p class="text-[11px] text-lightMuted leading-relaxed">
+                Configure down payment and interest boundaries to calculate SBA 7(a) 10-year term debt capacity guidelines.
+              </p>
+
+              <!-- Variable Slide: Down Payment -->
+              <div class="space-y-2 pt-2">
+                <div class="flex justify-between text-xs">
+                  <span class="text-lightMuted">DOWN PAYMENT (%):</span>
+                  <span class="text-acidGreen font-bold" x-text="downPaymentPercent + '%'"></span>
+                </div>
+                <input 
+                  type="range" 
+                  min="10" 
+                  max="25" 
+                  step="2.5" 
+                  x-model="downPaymentPercent"
+                  class="w-full accent-acidGreen"
+                />
+                <div class="flex justify-between text-[9px] text-lightMuted">
+                  <span>10% (SBA Min)</span>
+                  <span>25%</span>
+                </div>
+              </div>
+
+              <!-- Variable Slide: SBA Base Interest Rate -->
+              <div class="space-y-2">
+                <div class="flex justify-between text-xs">
+                  <span class="text-lightMuted">SBA INTEREST RATE (%):</span>
+                  <span class="text-acidGreen font-bold" x-text="interestRate + '%'"></span>
+                </div>
+                <input 
+                  type="range" 
+                  min="8.5" 
+                  max="12.5" 
+                  step="0.25" 
+                  x-model="interestRate"
+                  class="w-full accent-acidGreen"
+                />
+                <div class="flex justify-between text-[9px] text-lightMuted">
+                  <span>8.5%</span>
+                  <span>12.5%</span>
+                </div>
+              </div>
+
+              <!-- Fixed Amortization Details -->
+              <div class="border border-borderGray p-3 bg-darkMuted text-[10px] space-y-1.5 text-lightMuted">
+                <div>AMORTIZATION TIMELINE: <span class="text-boneWhite font-bold">10 YEARS (STRICT LIMIT)</span></div>
+                <div>PROJECTED RE-FINANCE: <span class="text-boneWhite font-bold">PERMITTED POST YR-3</span></div>
+                <div>STANDBY SELLER NOTE: <span class="text-[#00FF66] font-bold">MAX 5.0% TO 10.0% CO-FUND</span></div>
+              </div>
+            </div>
+
+            <!-- Right Side: Live Calculated Output Mechanics -->
+            <div class="lg:col-span-7 space-y-4">
+              <h3 class="text-xs font-bold text-acidGreen uppercase tracking-widest">// DEBT CAP MODEL OUTFLOWS</h3>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div class="border border-borderGray bg-[#080808] p-3">
+                  <span class="text-[9px] text-lightMuted block">EQUITY REQ. (CASH AT CLOSE)</span>
+                  <span class="text-base font-bold text-boneWhite" x-text="formatCurrency(sbaCashRequired)"></span>
+                </div>
+                <div class="border border-borderGray bg-[#080808] p-3">
+                  <span class="text-[9px] text-lightMuted block">SBA 7(a) PROPOSED LOAN</span>
+                  <span class="text-base font-bold text-boneWhite" x-text="formatCurrency(sbaLoanAmount)"></span>
+                </div>
+                <div class="border border-borderGray bg-[#080808] p-3">
+                  <span class="text-[9px] text-lightMuted block">EST. ANNUAL DEBT SERVICE</span>
+                  <span class="text-base font-bold text-warningCrimson" x-text="formatCurrency(sbaAnnualDebtService)"></span>
+                </div>
+                <div class="border border-borderGray bg-[#080808] p-3">
+                  <span class="text-[9px] text-lightMuted block">POST-DEBT CASH FLOW</span>
+                  <span class="text-base font-bold text-acidGreen" x-text="formatCurrency(postDebtCashFlow)"></span>
+                </div>
+              </div>
+
+              <!-- High Value Indicators: DSCR & SBA Viability -->
+              <div class="border border-borderGray p-4 bg-darkMuted flex items-center justify-between">
+                <div>
+                  <span class="text-[10px] text-lightMuted uppercase block">DEBT SERVICE COVERAGE RATIO (DSCR)</span>
+                  <div class="flex items-center space-x-2 mt-1">
+                    <span class="text-2xl font-bold font-mono tracking-tight" 
+                          :class="parseFloat(sbaDscr) >= 1.50 ? 'text-acidGreen' : (parseFloat(sbaDscr) >= 1.25 ? 'text-[#0EA5E9]' : 'text-warningCrimson')"
+                          x-text="sbaDscr + 'x'">
+                    </span>
+                    <span class="text-[10px] px-2 py-0.5 border"
+                          :class="parseFloat(sbaDscr) >= 1.50 ? 'border-acidGreen text-acidGreen' : (parseFloat(sbaDscr) >= 1.25 ? 'border-[#0EA5E9] text-[#0EA5E9]' : 'border-warningCrimson text-warningCrimson')"
+                          x-text="parseFloat(sbaDscr) >= 1.50 ? 'EXCELLENT' : (parseFloat(sbaDscr) >= 1.25 ? 'PASS' : 'RISKY / REFUSED')">
+                    </span>
+                  </div>
+                </div>
+                <div class="text-right hidden sm:block">
+                  <span class="text-[9px] text-lightMuted block">SBA BANK FEASIBILITY</span>
+                  <span class="text-xs font-bold text-boneWhite uppercase tracking-wide">
+                    SBA Preferred Net Checked
+                  </span>
+                </div>
+              </div>
+
+              <!-- Blinded Operational Strengths and Weaknesses -->
+              <div class="space-y-2">
+                <span class="text-[10px] text-lightMuted uppercase block">// UNDERGROUND DOSSIER REMARKS</span>
+                <ul class="text-[11px] text-lightMuted space-y-1.5 list-none pl-0">
+                  <template x-for="highlight in (selectedDeal ? selectedDeal.highlights : [])" :key="highlight">
+                    <li class="flex items-start gap-2">
+                      <span class="text-acidGreen font-bold">»</span>
+                      <span x-text="highlight"></span>
+                    </li>
+                  </template>
+                </ul>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Bottom Action CTAs -->
+          <div class="border-t border-borderGray pt-4 flex flex-col sm:flex-row gap-4 justify-between items-center">
+            <div class="text-[9px] text-lightMuted max-w-sm text-center sm:text-left">
+              *All estimations are structural simulations under standard SBA rules and do not constitute formal lending mandates.
+            </div>
+            <button 
+              @click="alert('Routing process initialized... redirecting structural transaction data models to your terminal board account.')"
+              class="w-full sm:w-auto text-xs text-terminalBlack bg-[#0EA5E9] hover:bg-terminalBlack hover:text-[#0EA5E9] border border-[#0EA5E9] hover:shadow-[4px_4px_0px_0px_rgba(14,165,233,1)] font-bold px-6 py-3 transition-all duration-200 uppercase tracking-widest text-center"
+            >
+              Model Acquisition Structure & Debt Service Capacity
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. COMPLIANCE DISCLAIMERS & TRUST SIGNALS -->
+    <footer class="border-t border-borderGray bg-[#030303] mt-12 py-8 px-4 md:px-6">
+      <div class="max-w-[1600px] mx-auto space-y-8">
+        
+        <!-- Trust Network Icons Row -->
+        <div class="flex flex-wrap items-center justify-between gap-6 pb-6 border-b border-borderGray">
+          <div class="text-xs tracking-[0.2em] text-lightMuted uppercase font-mono">
+            SECURE ACQUISITION NETWORKS
+          </div>
+          <div class="flex flex-wrap gap-4 md:gap-8 items-center text-[10px] text-lightMuted">
+            <div class="flex items-center space-x-2 border border-borderGray px-3 py-2 bg-darkMuted">
+              <svg class="w-4 h-4 text-acidGreen" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              <span>FINCEN COMPLIANT REGISTRATION</span>
+            </div>
+            <div class="flex items-center space-x-2 border border-borderGray px-3 py-2 bg-darkMuted">
+              <svg class="w-4 h-4 text-copperTeal" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              <span>PLAID DATA CONNECTIONS VERIFIED</span>
+            </div>
+            <div class="flex items-center space-x-2 border border-borderGray px-3 py-2 bg-darkMuted">
+              <svg class="w-4 h-4 text-acidGreen" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+              </svg>
+              <span>SBA PREFERRED ADVISORY HUB</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Legal Disclaimer Block -->
+        <div class="text-[10px] text-lightMuted leading-relaxed max-w-7xl space-y-3 font-mono">
+          <p class="uppercase tracking-wider text-boneWhite">// COMPLIANCE WARNING & STRUCTURAL NOTICE</p>
+          <p>
+            Disclaimer: AcquireMeta and Moonshine Capital are financial advisory networks and private transaction directories. All listing structures, parameters, codenames, and localized geographic indices are structurally simulated, aggregated, or fully blinded for educational reference and system origin modeling. This is not an offering of security certificates, real estate broker transactions, or direct financial assurances.
+          </p>
+          <p>
+            Past operational performance parameters do not yield standard assurances for future investment return profiles. All financial calculations, metrics, SBA 7(a) limits, and models within are strictly estimations provided for preliminary exploration. Searchers, buyers, and independent micro-private equity groups assume absolute accountability for verification of active capital and business structures under applicable national and local regulations.
+          </p>
+          <div class="flex justify-between items-center text-[9px] text-lightMuted pt-4">
+            <span>© 2026 ACQUIRE_META GLOBAL LTD. REGISTRY IN TRANSIT.</span>
+            <span>DATA CONSTRAINTS SECURE [NODE: 489-TX]</span>
+          </div>
+        </div>
+
+      </div>
+    </footer>
+
+  </div>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,292 @@
+/* ==========================================================================
+   Moonshine Partner Profile Engine - Interactive Funding Readiness Scorecard
+   File: tools/readiness/scorecard.css
+   ========================================================================== */
+
+/* Scorecard Container & Layout */
+.scorecard-outer {
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(18, 18, 20, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.scorecard-outer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #39FF14, #2979FF, #FF5722);
+    z-index: 10;
+}
+
+/* Step Progress Navigation */
+.scorecard-progress-bar {
+    height: 3px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+}
+
+.scorecard-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #39FF14, #2979FF);
+    width: 0%;
+    transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.step-node {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #1E1E24;
+    color: rgba(245, 245, 247, 0.4);
+}
+
+.step-node.active {
+    background: #39FF14;
+    color: #0B0B0C;
+    border-color: #39FF14;
+    box-shadow: 0 0 15px rgba(57, 255, 20, 0.3);
+}
+
+.step-node.completed {
+    background: rgba(57, 255, 20, 0.1);
+    color: #39FF14;
+    border-color: rgba(57, 255, 20, 0.3);
+}
+
+/* Step Layout Switchers */
+.scorecard-step {
+    display: none;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.scorecard-step.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Neobrutalist Custom Selection Cards */
+.selection-card {
+    background: rgba(30, 30, 36, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+}
+
+.selection-card:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(30, 30, 36, 0.7);
+    transform: translateY(-2px);
+}
+
+.selection-card.selected {
+    border-color: #39FF14;
+    background: rgba(57, 255, 20, 0.03);
+    box-shadow: 0 0 20px rgba(57, 255, 20, 0.08);
+}
+
+.selection-card.selected-orange {
+    border-color: #FF5722;
+    background: rgba(255, 87, 34, 0.03);
+    box-shadow: 0 0 20px rgba(255, 87, 34, 0.08);
+}
+
+.selection-card.selected-blue {
+    border-color: #2979FF;
+    background: rgba(41, 121, 255, 0.03);
+    box-shadow: 0 0 20px rgba(41, 121, 255, 0.08);
+}
+
+/* Custom Styled Range Sliders */
+.scorecard-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.08);
+    outline: none;
+    transition: background 0.2s;
+}
+
+.scorecard-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    background: #39FF14;
+    cursor: pointer;
+    border: 3px solid #0B0B0C;
+    box-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+    transition: transform 0.1s, background-color 0.2s;
+}
+
+.scorecard-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.25);
+    background: #ffffff;
+}
+
+.scorecard-slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    background: #39FF14;
+    cursor: pointer;
+    border: 3px solid #0B0B0C;
+    box-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+    transition: transform 0.1s;
+}
+
+.scorecard-slider::-moz-range-thumb:hover {
+    transform: scale(1.25);
+}
+
+/* Radial Gauge Indicator */
+.gauge-wrapper {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    margin: 0 auto;
+}
+
+.gauge-svg {
+    transform: rotate(-90deg);
+}
+
+.gauge-track {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.05);
+    stroke-width: 10;
+}
+
+.gauge-fill {
+    fill: none;
+    stroke: url(#gauge-gradient);
+    stroke-width: 10;
+    stroke-linecap: round;
+    stroke-dasharray: 472;
+    stroke-dashoffset: 472; /* Calculates based on score dynamic values */
+    transition: stroke-dashoffset 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.gauge-value {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+/* Animated Document Checklist Block */
+.checklist-wrapper {
+    background: rgba(11, 11, 12, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+}
+
+.checklist-card {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    transition: background-color 0.2s ease;
+}
+
+.checklist-card:last-child {
+    border-bottom: none;
+}
+
+.checklist-card.required {
+    border-left: 3px solid #FF5722;
+}
+
+.checklist-card.recommended {
+    border-left: 3px solid #2979FF;
+}
+
+.checklist-card.optional {
+    border-left: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Micro-animations and utility effects */
+.score-badge {
+    animation: badgePulse 2s infinite alternate;
+}
+
+@keyframes badgePulse {
+    0% {
+        box-shadow: 0 0 8px rgba(57, 255, 20, 0.1);
+        border-color: rgba(57, 255, 20, 0.3);
+    }
+    100% {
+        box-shadow: 0 0 16px rgba(57, 255, 20, 0.3);
+        border-color: rgba(57, 255, 20, 0.8);
+    }
+}
+
+.glow-orange-pulse {
+    animation: orangePulse 2s infinite alternate;
+}
+
+@keyframes orangePulse {
+    0% {
+        box-shadow: 0 0 8px rgba(255, 87, 34, 0.1);
+    }
+    100% {
+        box-shadow: 0 0 20px rgba(255, 87, 34, 0.4);
+    }
+}
+
+/* High Fidelity Interactive Elements Form Elements styling overrides */
+.form-input-neobrutal {
+    background: #1E1E24;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #F5F5F7;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.25s ease;
+}
+
+.form-input-neobrutal:focus {
+    outline: none;
+    border-color: #39FF14;
+    box-shadow: 0 0 10px rgba(57, 255, 20, 0.2);
+    background: rgba(30, 30, 36, 0.8);
+}
+
+/* Print Friendly formatting for dynamic document checklists */
+@media print {
+    .scorecard-outer {
+        background: #fff !important;
+        color: #000 !important;
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+    }
+    .scorecard-step {
+        display: block !important;
+        opacity: 1 !important;
+        page-break-inside: avoid;
+    }
+    .scorecard-progress-bar, .step-node, button {
+        display: none !important;
+    }
+}

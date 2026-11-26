@@ -1,0 +1,850 @@
+```html
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fintech Commission & Route Calculator | Moonshine Partner OS</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Space Grotesk (Display) & Inter (Body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        matteBlack: '#0B0B0C',
+                        boneWhite: '#F5F5F7',
+                        electricGreen: '#39FF14',
+                        signalOrange: '#FF5722',
+                        cobaltBlue: '#2979FF',
+                        graphiteGray: '#1E1E24',
+                        glassBorder: 'rgba(255, 255, 255, 0.08)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style type="text/css">
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0B0B0C;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1E1E24;
+            border: 2px solid #0B0B0C;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #39FF14;
+        }
+
+        /* Neobrutalist & Dark Luxe Accents */
+        .glass-panel {
+            background: rgba(18, 18, 20, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .glass-panel-hover:hover {
+            border-color: #39FF14;
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .brutal-border {
+            border: 3px solid #000;
+            box-shadow: 4px 4px 0px #000;
+        }
+
+        .neo-glow-green {
+            box-shadow: 0px 0px 25px 0px rgba(57, 255, 20, 0.25);
+        }
+
+        .neo-glow-orange {
+            box-shadow: 0px 0px 25px 0px rgba(255, 87, 34, 0.25);
+        }
+
+        .chrome-accent {
+            background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%);
+        }
+
+        .text-stroke {
+            -webkit-text-stroke: 1px rgba(245, 245, 247, 0.2);
+            color: transparent;
+        }
+        
+        /* Grid background pattern */
+        .bg-grid-pattern {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+        }
+
+        /* Tool Range Input Styling */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: #1E1E24;
+            height: 6px;
+            border-radius: 3px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #39FF14;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+            transition: transform 0.1s ease;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body class="bg-matteBlack text-boneWhite font-sans antialiased overflow-x-hidden bg-grid-pattern selection:bg-electricGreen selection:text-matteBlack min-h-screen flex flex-col justify-between">
+
+    <!-- STICKY HEADER -->
+    <header class="sticky top-0 z-50 w-full glass-panel border-b border-glassBorder transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="../../index.html" class="flex items-center gap-3 group">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-signalOrange via-matteBlack to-electricGreen p-[1px] transition-transform duration-300 group-hover:scale-105">
+                    <div class="w-full h-full bg-matteBlack rounded-lg flex items-center justify-center font-display font-black text-xs text-electricGreen">
+                        M
+                    </div>
+                </div>
+                <div>
+                    <span class="font-display font-bold text-lg tracking-tight block">MOONSHINE</span>
+                    <span class="text-[9px] font-mono tracking-widest uppercase text-boneWhite/40 block -mt-1">Partner Engine</span>
+                </div>
+            </a>
+
+            <!-- Navigation Links -->
+            <nav class="hidden md:flex items-center gap-8 font-mono text-xs uppercase tracking-wider text-boneWhite/70">
+                <a href="../../index.html#profiles" class="hover:text-electricGreen transition-colors">Profiles</a>
+                <a href="../../index.html#tools" class="hover:text-electricGreen transition-colors text-electricGreen">Tools</a>
+                <a href="../../index.html#how-it-works" class="hover:text-electricGreen transition-colors">How It Works</a>
+                <a href="../../index.html#anatomy" class="hover:text-electricGreen transition-colors">Anatomy</a>
+            </nav>
+
+            <!-- Header CTA -->
+            <div class="flex items-center gap-4">
+                <a href="../../index.html#directory" class="hidden sm:inline-block font-mono text-xs text-boneWhite/60 hover:text-white transition-colors">
+                    Search Directory
+                </a>
+                <a href="../../index.html#request" class="relative group overflow-hidden bg-electricGreen hover:bg-white text-matteBlack font-display font-bold text-xs uppercase tracking-wider px-5 py-3 rounded transition-all duration-300 neo-glow-green">
+                    <span class="relative z-10">Request Profile</span>
+                    <div class="absolute inset-0 -translate-x-full group-hover:translate-x-0 bg-white transition-transform duration-300"></div>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- CALCULATOR CONTENT CONTAINER -->
+    <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-grow">
+        
+        <!-- TOP BREIFING PANEL -->
+        <div class="mb-12 border-b border-glassBorder pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="bg-electricGreen/10 text-electricGreen border border-electricGreen/30 font-mono text-[10px] uppercase tracking-widest px-2.5 py-0.5 rounded">
+                        INTELLIGENT ROUTER V2.4
+                    </span>
+                    <span class="bg-glassBorder text-boneWhite/60 font-mono text-[10px] uppercase tracking-wider px-2.5 py-0.5 rounded border border-white/5">
+                        Real-Time Economics
+                    </span>
+                </div>
+                <h1 class="font-display font-extrabold text-3xl sm:text-5xl tracking-tight text-white leading-tight">
+                    Commission & <span class="text-electricGreen">Route Calculator</span>
+                </h1>
+                <p class="text-boneWhite/50 mt-2 font-light max-w-2xl text-sm sm:text-base">
+                    Model commercial client metrics, view match routing probabilities across three institutional vehicles, and track direct dynamic referral commissions and tier thresholds.
+                </p>
+            </div>
+            
+            <!-- Quick Network Status Badge -->
+            <div class="glass-panel p-4 rounded-lg flex items-center gap-4 border border-glassBorder max-w-sm">
+                <div class="w-3 h-3 rounded-full bg-electricGreen animate-pulse"></div>
+                <div class="font-mono text-xs">
+                    <span class="block text-boneWhite/40 uppercase tracking-wider text-[9px]">MOONSHINE CORE SYSTEM</span>
+                    <span class="text-white font-bold">UNDERWRITING PIPELINE ONLINE</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN GRID WORKSPACE -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- LEFT COLUMN: OPERATIONAL CONTROLS (5 Cols) -->
+            <div class="lg:col-span-5 space-y-6">
+                <div class="glass-panel p-6 rounded-xl border border-glassBorder space-y-6">
+                    <div class="flex items-center justify-between border-b border-glassBorder pb-4">
+                        <span class="font-display font-bold text-white text-base">Client Parameters</span>
+                        <span class="text-[10px] font-mono text-electricGreen uppercase tracking-wider">Dynamic Input</span>
+                    </div>
+
+                    <!-- Input 1: Monthly Gross Revenue -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <label for="revRange" class="font-mono text-boneWhite/70 uppercase tracking-wider">Monthly Gross Revenue</label>
+                            <span class="text-electricGreen font-mono font-bold text-sm" id="revValDisplay">$150,000</span>
+                        </div>
+                        <input type="range" id="revRange" min="10000" max="1000000" step="5000" value="150000" class="w-full">
+                        <div class="flex justify-between text-[9px] font-mono text-boneWhite/30">
+                            <span>$10,000</span>
+                            <span>$500k</span>
+                            <span>$1,000,000+</span>
+                        </div>
+                    </div>
+
+                    <!-- Input 2: FICO Credit Score -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <label for="ficoRange" class="font-mono text-boneWhite/70 uppercase tracking-wider">FICO Credit Score</label>
+                            <span class="text-cobaltBlue font-mono font-bold text-sm" id="ficoValDisplay">680</span>
+                        </div>
+                        <input type="range" id="ficoRange" min="500" max="850" step="10" value="680" class="w-full">
+                        <div class="flex justify-between text-[9px] font-mono text-boneWhite/30">
+                            <span>500 (Subprime)</span>
+                            <span>680 (Good)</span>
+                            <span>850 (Excellent)</span>
+                        </div>
+                    </div>
+
+                    <!-- Input 3: Time In Business -->
+                    <div class="space-y-2">
+                        <label class="block font-mono text-xs text-boneWhite/70 uppercase tracking-wider">Time in Business</label>
+                        <div class="grid grid-cols-3 gap-2" id="tibSelector">
+                            <button data-val="3" class="tib-btn bg-graphiteGray text-boneWhite text-xs font-mono py-2 rounded border border-glassBorder hover:border-white/20 transition-all">
+                                &lt; 6 Mos
+                            </button>
+                            <button data-val="12" class="tib-btn bg-graphiteGray text-boneWhite text-xs font-mono py-2 rounded border border-glassBorder hover:border-white/20 transition-all">
+                                1 Year
+                            </button>
+                            <button data-val="24" class="tib-btn active bg-electricGreen text-matteBlack text-xs font-mono py-2 rounded border border-black font-bold transition-all">
+                                2+ Years
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Input 4: Dynamic Referral Tier Selector -->
+                    <div class="pt-4 border-t border-glassBorder space-y-3">
+                        <div class="flex justify-between items-center text-xs">
+                            <label class="font-mono text-boneWhite/70 uppercase tracking-wider">Your Referral Tier</label>
+                            <span class="text-signalOrange font-mono font-bold text-xs" id="tierDisplay">Elite Core (2.5%)</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 text-center" id="tierSelector">
+                            <button data-pct="0.015" data-label="Bronze (1.5%)" class="tier-btn bg-graphiteGray text-boneWhite text-[10px] font-mono py-2 rounded border border-glassBorder transition-all">
+                                1.5%<br><span class="text-[8px] text-boneWhite/40">Bronze</span>
+                            </button>
+                            <button data-pct="0.025" data-label="Elite Core (2.5%)" class="tier-btn active bg-signalOrange text-white text-[10px] font-mono py-2 rounded border border-black font-bold transition-all">
+                                2.5%<br><span class="text-[8px] text-white/70">Elite</span>
+                            </button>
+                            <button data-pct="0.035" data-label="Apex Partner (3.5%)" class="tier-btn bg-graphiteGray text-boneWhite text-[10px] font-mono py-2 rounded border border-glassBorder transition-all">
+                                3.5%<br><span class="text-[8px] text-boneWhite/40">Apex</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DYNAMIC EXPLAINER CARD -->
+                <div class="glass-panel p-6 rounded-xl border border-glassBorder bg-gradient-to-tr from-cobaltBlue/5 to-transparent space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-cobaltBlue/10 flex items-center justify-center font-mono text-cobaltBlue text-sm border border-cobaltBlue/20">i</div>
+                        <h4 class="font-display font-bold text-white text-sm">Underwriting Parameters</h4>
+                    </div>
+                    <p class="text-xs text-boneWhite/60 leading-relaxed">
+                        Moonshine Partner profiles utilize institutional-grade pricing matrices. Eligibility and match scores recalculate instantly when you scale variables. Once satisfied, save this model profile to compile a static link.
+                    </p>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: ANALYTICS HUB & OFFERS (7 Cols) -->
+            <div class="lg:col-span-7 space-y-6">
+                
+                <!-- TOP MATCH ROUTING CARDS -->
+                <div class="glass-panel p-6 rounded-xl border border-glassBorder space-y-6">
+                    <div class="flex items-center justify-between border-b border-glassBorder pb-4">
+                        <span class="font-display font-bold text-white text-base">Best-Fit Deal Structure</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-mono text-boneWhite/40 uppercase">Best Fit:</span>
+                            <span id="bestRouteBadge" class="bg-electricGreen/10 text-electricGreen font-mono text-[10px] font-bold uppercase border border-electricGreen/30 px-2 py-0.5 rounded">
+                                SBA 7(A) LOAN
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- PRODUCT RESULTS MATRIX -->
+                    <div class="space-y-4" id="resultsMatrix">
+                        
+                        <!-- Product 1: SBA 7(a) Loan -->
+                        <div class="p-4 bg-matteBlack/50 rounded-lg border border-glassBorder flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all duration-300 hover:border-white/10" id="cardSba">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-electricGreen inline-block" id="statusDotSba"></span>
+                                    <h4 class="font-display font-bold text-sm text-white">SBA 7(a) Term Loan</h4>
+                                </div>
+                                <p class="text-[10px] font-mono text-boneWhite/40">Tier 1 institutional liquidity. Low interest rate, long terms.</p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 text-right w-full sm:w-auto">
+                                <div>
+                                    <span class="block text-[9px] font-mono text-boneWhite/30 uppercase tracking-wider">MAX FUNDING</span>
+                                    <span class="text-xs sm:text-sm font-display font-bold text-white" id="valSbaFund">$450,000</span>
+                                </div>
+                                <div>
+                                    <span class="block text-[9px] font-mono text-boneWhite/30 uppercase tracking-wider">EST. COMM.</span>
+                                    <span class="text-xs sm:text-sm font-mono font-bold text-electricGreen" id="valSbaComm">$11,250</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product 2: Merchant Cash Advance (MCA) -->
+                        <div class="p-4 bg-matteBlack/50 rounded-lg border border-glassBorder flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all duration-300 hover:border-white/10" id="cardMca">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-electricGreen inline-block" id="statusDotMca"></span>
+                                    <h4 class="font-display font-bold text-sm text-white">Merchant Cash Advance (MCA)</h4>
+                                </div>
+                                <p class="text-[10px] font-mono text-boneWhite/40">Fast high-velocity capital. Repayment linked to card sales.</p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 text-right w-full sm:w-auto">
+                                <div>
+                                    <span class="block text-[9px] font-mono text-boneWhite/30 uppercase tracking-wider">MAX FUNDING</span>
+                                    <span class="text-xs sm:text-sm font-display font-bold text-white" id="valMcaFund">$180,000</span>
+                                </div>
+                                <div>
+                                    <span class="block text-[9px] font-mono text-boneWhite/30 uppercase tracking-wider">EST. COMM.</span>
+                                    <span class="text-xs sm:text-sm font-mono font-bold text-electricGreen" id="valMcaComm">$4,500</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product 3: Invoice Factoring & RBF -->
+                        <div class="p-4 bg-matteBlack/50 rounded-lg border border-glassBorder flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all duration-300 hover:border-white/10" id="cardFact">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-electricGreen inline-block" id="statusDotFact"></span>
+                                    <h4 class="font-display font-bold text-sm text-white">Invoice Factoring & RBF</h4>
+                                </div>
+                                <p class="text-[10px] font-mono text-boneWhite/40">Leverage accounts receivable or recurring commercial revenue pools.</p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 text-right w-full sm:w-auto">
+                                <div>
+                                    <span class="block text-[9px] font-mono text-boneWhite/30 uppercase tracking-wider">MAX FUNDING</span>
+                                    <span class="text-xs sm:text-sm font-display font-bold text-white" id="valFactFund">$300,000</span>
+                                </div>
+                                <div>
+                                    <span class="block text-[9px] font-mono text-boneWhite/30 uppercase tracking-wider">EST. COMM.</span>
+                                    <span class="text-xs sm:text-sm font-mono font-bold text-electricGreen" id="valFactComm">$7,500</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- PROGRESS BAR: COMMISSION REFERRAL INCENTIVE TIER LEVELS -->
+                <div class="glass-panel p-6 rounded-xl border border-glassBorder space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="font-display font-bold text-white text-base">Referral Tier Milestone Progress</span>
+                        <span class="text-xs font-mono text-boneWhite/40" id="volumeIndicator">Single Deal Volume: $180,000</span>
+                    </div>
+                    
+                    <!-- Dynamic Progress Bar Grid -->
+                    <div class="relative w-full h-4 bg-graphiteGray rounded-full overflow-hidden border border-white/5 flex">
+                        <div id="volumeBarSba" class="h-full bg-electricGreen transition-all duration-300" style="width: 30%"></div>
+                        <div id="volumeBarMca" class="h-full bg-cobaltBlue transition-all duration-300" style="width: 15%"></div>
+                        <div id="volumeBarFact" class="h-full bg-signalOrange transition-all duration-300" style="width: 20%"></div>
+                    </div>
+
+                    <!-- Milestone Tiers Label Block -->
+                    <div class="grid grid-cols-3 gap-2 text-center text-[10px] font-mono pt-2 border-t border-glassBorder">
+                        <div class="space-y-1">
+                            <span class="block text-boneWhite/40">TIER 1 (BRONZE)</span>
+                            <span class="block text-white font-bold">&lt; $100k Vol</span>
+                            <span class="text-electricGreen">1.5% Commission</span>
+                        </div>
+                        <div class="space-y-1 border-x border-glassBorder">
+                            <span class="block text-boneWhite/40">TIER 2 (ELITE)</span>
+                            <span class="block text-white font-bold">$100k - $500k Vol</span>
+                            <span class="text-cobaltBlue">2.5% Commission</span>
+                        </div>
+                        <div class="space-y-1">
+                            <span class="block text-boneWhite/40">TIER 3 (APEX)</span>
+                            <span class="block text-white font-bold">$500k+ Vol</span>
+                            <span class="text-signalOrange">3.5% Commission</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SYSTEM CTAS -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <button id="saveDealBtn" class="bg-electricGreen hover:bg-white text-matteBlack font-display font-bold text-sm uppercase tracking-wider py-4 rounded transition-all duration-300 neo-glow-green border border-electricGreen hover:border-white">
+                        Save Deal to Pipeline
+                    </button>
+                    <button id="copyShareBtn" class="border border-glassBorder hover:border-white text-boneWhite font-display font-semibold text-sm uppercase tracking-wider py-4 rounded transition-all duration-300 flex items-center justify-center gap-2">
+                        <span>Copy Deal Scenario Brief</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+                        </svg>
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- RECENT DEAL PIPELINE LOG (LOCAL STORAGE SYNC) -->
+        <section class="mt-16 glass-panel rounded-xl border border-glassBorder p-6 sm:p-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-glassBorder pb-6 mb-6">
+                <div>
+                    <h3 class="font-display font-bold text-lg text-white">Your Saved Deal Scenarios</h3>
+                    <p class="text-xs text-boneWhite/50">Stored locally in your Partner OS deployment.</p>
+                </div>
+                <button id="clearPipelineBtn" class="text-xs font-mono text-signalOrange hover:text-white border border-signalOrange/20 hover:border-signalOrange px-3 py-1.5 rounded transition-all">
+                    Clear Scenario Logs
+                </button>
+            </div>
+
+            <!-- Table or empty state logs -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs font-mono text-boneWhite/70 min-w-[600px]">
+                    <thead>
+                        <tr class="border-b border-glassBorder text-boneWhite/40 uppercase tracking-widest text-[9px]">
+                            <th class="pb-3">Deal ID</th>
+                            <th class="pb-3">Client Monthly Revenue</th>
+                            <th class="pb-3">Min FICO Required</th>
+                            <th class="pb-3">Routed Product</th>
+                            <th class="pb-3">Est. Funding</th>
+                            <th class="pb-3">Your Commission</th>
+                            <th class="pb-3 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pipelineLogBody" class="divide-y divide-white/5">
+                        <!-- Dynamic content injected here -->
+                    </tbody>
+                </table>
+                <div id="pipelineEmptyState" class="text-center py-8 text-boneWhite/30 text-xs flex flex-col items-center justify-center gap-2">
+                    <svg class="w-8 h-8 opacity-30 text-boneWhite" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <span>No simulated deals found in dynamic logs. Match metrics above and save.</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-matteBlack border-t border-glassBorder py-12 text-boneWhite/60 mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+                <!-- Branding column -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-signalOrange via-matteBlack to-electricGreen p-[1px]">
+                            <div class="w-full h-full bg-matteBlack rounded-lg flex items-center justify-center font-display font-black text-xs text-electricGreen">
+                                M
+                            </div>
+                        </div>
+                        <span class="font-display font-bold text-white tracking-tight">MOONSHINE CAPITAL</span>
+                    </div>
+                    <p class="text-xs text-boneWhite/40 leading-relaxed">
+                        Leading provider of commercial cash flow, equipment, and real estate acquisition funding.
+                    </p>
+                </div>
+
+                <!-- Column 2 -->
+                <div class="space-y-3">
+                    <h5 class="text-xs font-mono uppercase text-white tracking-wider">Engine Links</h5>
+                    <ul class="text-xs space-y-2 text-boneWhite/40">
+                        <li><a href="../../index.html#profiles" class="hover:text-electricGreen">Profiles Directory</a></li>
+                        <li><a href="../../index.html#tools" class="hover:text-electricGreen">Interactive Tools</a></li>
+                        <li><a href="../../index.html#how-it-works" class="hover:text-electricGreen">Portal Anatomy</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 3 -->
+                <div class="space-y-3">
+                    <h5 class="text-xs font-mono uppercase text-white tracking-wider">Developer & Ops</h5>
+                    <ul class="text-xs space-y-2 text-boneWhite/40">
+                        <li><a href="../../index.html#static-first" class="hover:text-electricGreen">Vercel Deployment</a></li>
+                        <li><a href="https://github.com" target="_blank" class="hover:text-electricGreen">GitHub Repo</a></li>
+                        <li><a href="../../index.html#static-first" class="hover:text-electricGreen">Clerk Auth Sync</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 4 -->
+                <div class="space-y-3">
+                    <h5 class="text-xs font-mono uppercase text-white tracking-wider">Underwriting Network</h5>
+                    <ul class="text-xs space-y-2 text-boneWhite/40">
+                        <li><a href="javascript:void(0)" class="hover:text-electricGreen">Partner Login</a></li>
+                        <li><a href="javascript:void(0)" class="hover:text-electricGreen">Direct Support</a></li>
+                        <li><a href="javascript:void(0)" class="hover:text-electricGreen">Submit Lead Direct</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Compliance disclaimer & terms -->
+            <div class="pt-8 border-t border-glassBorder space-y-4">
+                <p class="text-[10px] leading-relaxed text-boneWhite/30 font-mono">
+                    COMPLIANCE NOTE: Funding options, approvals, terms, and commissions depend on provider review, applicant profile, and applicable program rules. This site is for partner education, lead routing, and resource access only.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-between items-center text-[10px] font-mono text-boneWhite/40 gap-4">
+                    <span>© 2026 Moonshine Capital. All Rights Reserved.</span>
+                    <div class="flex gap-4">
+                        <a href="javascript:void(0)" class="hover:text-white">Privacy Policy</a>
+                        <span>•</span>
+                        <a href="javascript:void(0)" class="hover:text-white">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- LOGIC INTEGRATION SCRIPT -->
+    <script type="text/javascript">
+        // DOM Elements
+        const revRange = document.getElementById('revRange');
+        const ficoRange = document.getElementById('ficoRange');
+        const revValDisplay = document.getElementById('revValDisplay');
+        const ficoValDisplay = document.getElementById('ficoValDisplay');
+        const tibButtons = document.querySelectorAll('.tib-btn');
+        const tierButtons = document.querySelectorAll('.tier-btn');
+        const tierDisplay = document.getElementById('tierDisplay');
+        const bestRouteBadge = document.getElementById('bestRouteBadge');
+        
+        // Products Specific Elements
+        const valSbaFund = document.getElementById('valSbaFund');
+        const valSbaComm = document.getElementById('valSbaComm');
+        const statusDotSba = document.getElementById('statusDotSba');
+        const cardSba = document.getElementById('cardSba');
+
+        const valMcaFund = document.getElementById('valMcaFund');
+        const valMcaComm = document.getElementById('valMcaComm');
+        const statusDotMca = document.getElementById('statusDotMca');
+        const cardMca = document.getElementById('cardMca');
+
+        const valFactFund = document.getElementById('valFactFund');
+        const valFactComm = document.getElementById('valFactComm');
+        const statusDotFact = document.getElementById('statusDotFact');
+        const cardFact = document.getElementById('cardFact');
+
+        // Progress bar Elements
+        const volumeIndicator = document.getElementById('volumeIndicator');
+        const volumeBarSba = document.getElementById('volumeBarSba');
+        const volumeBarMca = document.getElementById('volumeBarMca');
+        const volumeBarFact = document.getElementById('volumeBarFact');
+
+        // Log Pipeline Elements
+        const saveDealBtn = document.getElementById('saveDealBtn');
+        const copyShareBtn = document.getElementById('copyShareBtn');
+        const clearPipelineBtn = document.getElementById('clearPipelineBtn');
+        const pipelineLogBody = document.getElementById('pipelineLogBody');
+        const pipelineEmptyState = document.getElementById('pipelineEmptyState');
+
+        // Dynamic State
+        let currentRevenue = 150000;
+        let currentFico = 680;
+        let currentTimeInBusiness = 24; // Months
+        let currentCommissionPercent = 0.025;
+        let currentCommissionLabel = "Elite Core (2.5%)";
+
+        // Format Currency Helper
+        function formatCurrency(num) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                maximumFractionDigits: 0
+            }).format(num);
+        }
+
+        // Logic Recalculations
+        function calculateMetrics() {
+            // Updated Values View
+            revValDisplay.innerText = formatCurrency(currentRevenue);
+            ficoValDisplay.innerText = currentFico;
+
+            // 1. SBA Core logic
+            let sbaEligible = true;
+            let sbaMaxFund = 0;
+            let sbaComm = 0;
+
+            if (currentFico < 660 || currentTimeInBusiness < 24 || currentRevenue < 15000) {
+                sbaEligible = false;
+            } else {
+                sbaMaxFund = currentRevenue * 3.5;
+                if (sbaMaxFund > 5000000) sbaMaxFund = 5000000;
+                sbaComm = sbaMaxFund * currentCommissionPercent;
+            }
+
+            // 2. MCA Core logic
+            let mcaEligible = true;
+            let mcaMaxFund = 0;
+            let mcaComm = 0;
+
+            if (currentRevenue < 8000) {
+                mcaEligible = false;
+            } else {
+                mcaMaxFund = currentRevenue * 1.5;
+                if (mcaMaxFund > 750000) mcaMaxFund = 750000;
+                mcaComm = mcaMaxFund * currentCommissionPercent;
+            }
+
+            // 3. Factoring/RBF logic
+            let factEligible = true;
+            let factMaxFund = 0;
+            let factComm = 0;
+
+            if (currentFico < 550 || currentTimeInBusiness < 6 || currentRevenue < 12000) {
+                factEligible = false;
+            } else {
+                factMaxFund = currentRevenue * 2.2;
+                if (factMaxFund > 2500000) factMaxFund = 2500000;
+                factComm = factMaxFund * currentCommissionPercent;
+            }
+
+            // Update DOM Classes & Text
+            // SBA
+            if (sbaEligible) {
+                valSbaFund.innerText = formatCurrency(sbaMaxFund);
+                valSbaComm.innerText = formatCurrency(sbaComm);
+                valSbaFund.classList.remove('opacity-30');
+                valSbaComm.classList.remove('opacity-30');
+                statusDotSba.className = "w-2 h-2 rounded-full bg-electricGreen inline-block";
+                cardSba.classList.remove('opacity-50');
+            } else {
+                valSbaFund.innerText = "NOT ELIGIBLE";
+                valSbaComm.innerText = "$0";
+                valSbaFund.classList.add('opacity-30');
+                valSbaComm.classList.add('opacity-30');
+                statusDotSba.className = "w-2 h-2 rounded-full bg-signalOrange inline-block";
+                cardSba.classList.add('opacity-50');
+            }
+
+            // MCA
+            if (mcaEligible) {
+                valMcaFund.innerText = formatCurrency(mcaMaxFund);
+                valMcaComm.innerText = formatCurrency(mcaComm);
+                valMcaFund.classList.remove('opacity-30');
+                valMcaComm.classList.remove('opacity-30');
+                statusDotMca.className = "w-2 h-2 rounded-full bg-electricGreen inline-block";
+                cardMca.classList.remove('opacity-50');
+            } else {
+                valMcaFund.innerText = "NOT ELIGIBLE";
+                valMcaComm.innerText = "$0";
+                valMcaFund.classList.add('opacity-30');
+                valMcaComm.classList.add('opacity-30');
+                statusDotMca.className = "w-2 h-2 rounded-full bg-signalOrange inline-block";
+                cardMca.classList.add('opacity-50');
+            }
+
+            // Factoring
+            if (factEligible) {
+                valFactFund.innerText = formatCurrency(factMaxFund);
+                valFactComm.innerText = formatCurrency(factComm);
+                valFactFund.classList.remove('opacity-30');
+                valFactComm.classList.remove('opacity-30');
+                statusDotFact.className = "w-2 h-2 rounded-full bg-electricGreen inline-block";
+                cardFact.classList.remove('opacity-50');
+            } else {
+                valFactFund.innerText = "NOT ELIGIBLE";
+                valFactComm.innerText = "$0";
+                valFactFund.classList.add('opacity-30');
+                valFactComm.classList.add('opacity-30');
+                statusDotFact.className = "w-2 h-2 rounded-full bg-signalOrange inline-block";
+                cardFact.classList.add('opacity-50');
+            }
+
+            // Best-fit Badge Decision Matrix
+            let bestProductLabel = "INSUFFICIENT DATA";
+            let bestProductColor = "text-signalOrange bg-signalOrange/10 border-signalOrange/30";
+
+            if (sbaEligible) {
+                bestProductLabel = "SBA 7(a) Loan";
+                bestProductColor = "text-electricGreen bg-electricGreen/10 border-electricGreen/30";
+            } else if (factEligible && currentRevenue > 40000) {
+                bestProductLabel = "Invoice Factoring & RBF";
+                bestProductColor = "text-cobaltBlue bg-cobaltBlue/10 border-cobaltBlue/30";
+            } else if (mcaEligible) {
+                bestProductLabel = "Merchant Cash Advance";
+                bestProductColor = "text-signalOrange bg-signalOrange/10 border-signalOrange/30";
+            }
+
+            bestRouteBadge.innerText = bestProductLabel.toUpperCase();
+            bestRouteBadge.className = `font-mono text-[10px] font-bold uppercase border px-2.5 py-0.5 rounded ${bestProductColor}`;
+
+            // Progress bar and Single Deal Volume Indicator Calculations
+            let maxActiveVolume = Math.max(sbaMaxFund, mcaMaxFund, factMaxFund);
+            volumeIndicator.innerText = `Single Deal Volume Max: ${formatCurrency(maxActiveVolume)}`;
+
+            // Ratio of volume on Bar
+            let sbaPctBar = sbaEligible ? Math.min((sbaMaxFund / 1000000) * 100, 100) : 0;
+            let mcaPctBar = mcaEligible ? Math.min((mcaMaxFund / 1000000) * 100, 100) : 0;
+            let factPctBar = factEligible ? Math.min((factMaxFund / 1000000) * 100, 100) : 0;
+
+            // Simple stacked proportional rendering on dynamic view
+            volumeBarSba.style.width = `${sbaPctBar / 3.3}%`;
+            volumeBarMca.style.width = `${mcaPctBar / 3.3}%`;
+            volumeBarFact.style.width = `${factPctBar / 3.3}%`;
+        }
+
+        // Operational Selectors (Months)
+        tibButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tibButtons.forEach(b => {
+                    b.className = "tib-btn bg-graphiteGray text-boneWhite text-xs font-mono py-2 rounded border border-glassBorder hover:border-white/20 transition-all";
+                });
+                btn.className = "tib-btn active bg-electricGreen text-matteBlack text-xs font-mono py-2 rounded border border-black font-bold transition-all";
+                currentTimeInBusiness = parseInt(btn.getAttribute('data-val'));
+                calculateMetrics();
+            });
+        });
+
+        // Referral Tier Selectors
+        tierButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tierButtons.forEach(b => {
+                    b.className = "tier-btn bg-graphiteGray text-boneWhite text-[10px] font-mono py-2 rounded border border-glassBorder transition-all";
+                    b.querySelector('span').className = "text-[8px] text-boneWhite/40";
+                });
+                btn.className = "tier-btn active bg-signalOrange text-white text-[10px] font-mono py-2 rounded border border-black font-bold transition-all";
+                btn.querySelector('span').className = "text-[8px] text-white/70";
+                
+                currentCommissionPercent = parseFloat(btn.getAttribute('data-pct'));
+                currentCommissionLabel = btn.getAttribute('data-label');
+                tierDisplay.innerText = currentCommissionLabel;
+                calculateMetrics();
+            });
+        });
+
+        // Event listeners for Sliders
+        revRange.addEventListener('input', (e) => {
+            currentRevenue = parseInt(e.target.value);
+            calculateMetrics();
+        });
+
+        ficoRange.addEventListener('input', (e) => {
+            currentFico = parseInt(e.target.value);
+            calculateMetrics();
+        });
+
+        // Local Storage Pipeline Mechanics
+        function getSavedPipeline() {
+            return JSON.parse(localStorage.getItem('moonshinePipeline')) || [];
+        }
+
+        function renderPipeline() {
+            const pipeline = getSavedPipeline();
+            if (pipeline.length === 0) {
+                pipelineEmptyState.classList.remove('hidden');
+                pipelineLogBody.innerHTML = '';
+                return;
+            }
+            pipelineEmptyState.classList.add('hidden');
+
+            pipelineLogBody.innerHTML = pipeline.map((deal, idx) => `
+                <tr class="hover:bg-white/5 transition-all">
+                    <td class="py-4 font-mono text-[10px] text-boneWhite/50">${deal.id}</td>
+                    <td class="py-4 text-white font-bold">${formatCurrency(deal.rev)}</td>
+                    <td class="py-4">${deal.fico} FICO</td>
+                    <td class="py-4 text-cobaltBlue font-semibold uppercase tracking-wider text-[10px]">${deal.product}</td>
+                    <td class="py-4 text-white font-bold">${formatCurrency(deal.maxFund)}</td>
+                    <td class="py-4 text-electricGreen font-bold font-mono">${formatCurrency(deal.comm)}</td>
+                    <td class="py-4 text-right">
+                        <button onclick="deleteDeal('${deal.id}')" class="text-signalOrange hover:underline text-[10px]">Remove</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Save pipeline deal event
+        saveDealBtn.addEventListener('click', () => {
+            const pipeline = getSavedPipeline();
+            const dealId = `M-${Math.floor(100000 + Math.random() * 900000)}`;
+            
+            // Best route properties determined dynamically
+            let bestRoute = bestRouteBadge.innerText;
+            let bestMaxFund = 0;
+            
+            if (bestRoute.includes("SBA") && (currentRevenue * 3.5 > 15000)) {
+                bestMaxFund = Math.min(currentRevenue * 3.5, 5000000);
+            } else if (bestRoute.includes("FACTORING")) {
+                bestMaxFund = Math.min(currentRevenue * 2.2, 2500000);
+            } else {
+                bestMaxFund = Math.min(currentRevenue * 1.5, 750000);
+            }
+
+            const estimatedCommissionVal = bestMaxFund * currentCommissionPercent;
+
+            const newDeal = {
+                id: dealId,
+                rev: currentRevenue,
+                fico: currentFico,
+                product: bestRoute,
+                maxFund: bestMaxFund,
+                comm: estimatedCommissionVal
+            };
+
+            pipeline.push(newDeal);
+            localStorage.setItem('moonshinePipeline', JSON.stringify(pipeline));
+            renderPipeline();
+            alert(`Scenario saved successfully! Allocated Deal ID: ${dealId}`);
+        });
+
+        // Export/Share copy scenario
+        copyShareBtn.addEventListener('click', () => {
+            const scenarioText = `
+-- MOONSHINE CAPITAL SCENARIO BRIEF --
+Deal Mode ID: MS-CALC-PRE
+Gross Monthly Income: ${formatCurrency(currentRevenue)}
+FICO Benchmark: ${currentFico}
+Calculated Dynamic Route: ${bestRouteBadge.innerText}
+Estimated Referral Commission Pool: ${formatCurrency(Math.max(currentRevenue * 3.5, currentRevenue * 1.5) * currentCommissionPercent)}
+Current Active Tier Match: ${currentCommissionLabel}
+            `;
+            navigator.clipboard.writeText(scenarioText.trim()).then(() => {
+                alert("Copied Deal Scenario parameters to clipboard!");
+            });
+        });
+
+        // Delete action item from log
+        window.deleteDeal = function(id) {
+            let pipeline = getSavedPipeline();
+            pipeline = pipeline.filter(d => d.id !== id);
+            localStorage.setItem('moonshinePipeline', JSON.stringify(pipeline));
+            renderPipeline();
+        };
+
+        // Clear pipeline logs
+        clearPipelineBtn.addEventListener('click', () => {
+            localStorage.removeItem('moonshinePipeline');
+            renderPipeline();
+        });
+
+        // Initialize Engine
+        document.addEventListener('DOMContentLoaded', () => {
+            calculateMetrics();
+            renderPipeline();
+        });
+    </script>
+</body>
+</html>
+```

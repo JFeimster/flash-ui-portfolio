@@ -1,0 +1,265 @@
+{
+  "_meta": {
+    "engine_version": "0.2.3-operational-routing-draft",
+    "source_version": "0.2.2 provider/product verification draft",
+    "source_files": [
+      "providers.json",
+      "products.json",
+      "verification_report.md",
+      "unresolved_conflicts_report.csv",
+      "high_priority_missing_data_report.csv"
+    ],
+    "generated_date": "2026-05-20",
+    "file_name": "risk_flags.json",
+    "purpose": "Severity-weighted risk flags for exclusion, score penalty, confidence adjustment, and manual review escalation.",
+    "logic_precedence": [
+      "product_rules",
+      "provider_defaults",
+      "funding_family_defaults",
+      "global_fallback_logic"
+    ],
+    "status": "draft_for_operational_testing_not_final_underwriting_policy"
+  },
+  "schema": [
+    "risk_flag_id",
+    "risk_name",
+    "severity",
+    "affected_funding_families",
+    "routing_action",
+    "score_penalty",
+    "manual_review_required",
+    "recommended_handling"
+  ],
+  "records": [
+    {
+      "risk_flag_id": "risk_open_bankruptcy",
+      "risk_name": "Open Bankruptcy",
+      "severity": "critical",
+      "affected_funding_families": [
+        "all"
+      ],
+      "routing_action": "automatic_exclusion_for_most_products",
+      "score_penalty": 30,
+      "manual_review_required": true,
+      "recommended_handling": "Route to manual review / funding prep. Do not recommend standard funding products unless verified specialty exception exists."
+    },
+    {
+      "risk_flag_id": "risk_no_current_revenue",
+      "risk_name": "No Current Revenue",
+      "severity": "critical",
+      "affected_funding_families": [
+        "working_capital_emergency_capital",
+        "structured_growth_capital",
+        "platform_marketplace_seller_capital",
+        "lines_of_credit_revolving_access"
+      ],
+      "routing_action": "exclude_revenue_based_products",
+      "score_penalty": 25,
+      "manual_review_required": true,
+      "recommended_handling": "Route to startup credit, business credit builder, ROBS, or prep path if credit/assets support."
+    },
+    {
+      "risk_flag_id": "risk_platform_account_suspended",
+      "risk_name": "Suspended Marketplace Account",
+      "severity": "critical",
+      "affected_funding_families": [
+        "platform_marketplace_seller_capital"
+      ],
+      "routing_action": "exclude_platform_products",
+      "score_penalty": 25,
+      "manual_review_required": true,
+      "recommended_handling": "Do not recommend marketplace seller capital until account health is restored."
+    },
+    {
+      "risk_flag_id": "risk_recent_tax_lien",
+      "risk_name": "Recent Tax Lien / Judgment",
+      "severity": "high",
+      "affected_funding_families": [
+        "structured_growth_capital",
+        "lines_of_credit_revolving_access",
+        "startup_credit_leverage"
+      ],
+      "routing_action": "conditional_exclusion_or_manual_review",
+      "score_penalty": 15,
+      "manual_review_required": true,
+      "recommended_handling": "May still fit revenue-first or prep routes depending on deposits, but should not be auto-routed to prime paths."
+    },
+    {
+      "risk_flag_id": "risk_recent_nsfs",
+      "risk_name": "Recent NSFs / Overdrafts",
+      "severity": "high",
+      "affected_funding_families": [
+        "working_capital_emergency_capital",
+        "lines_of_credit_revolving_access"
+      ],
+      "routing_action": "manual_review_required",
+      "score_penalty": 12,
+      "manual_review_required": true,
+      "recommended_handling": "Cap bankability score and push bank statement review."
+    },
+    {
+      "risk_flag_id": "risk_existing_mca_stack",
+      "risk_name": "Existing MCA / Daily Payment Advance",
+      "severity": "high",
+      "affected_funding_families": [
+        "working_capital_emergency_capital",
+        "lines_of_credit_revolving_access"
+      ],
+      "routing_action": "manual_review_required",
+      "score_penalty": 12,
+      "manual_review_required": true,
+      "recommended_handling": "Flag stacking risk; recommend only if lender explicitly accepts stacked positions."
+    },
+    {
+      "risk_flag_id": "risk_recent_late_payments",
+      "risk_name": "Recent Missed Payments",
+      "severity": "medium",
+      "affected_funding_families": [
+        "startup_credit_leverage",
+        "structured_growth_capital",
+        "lines_of_credit_revolving_access"
+      ],
+      "routing_action": "score_penalty",
+      "score_penalty": 8,
+      "manual_review_required": true,
+      "recommended_handling": "May impair credit-dependent products."
+    },
+    {
+      "risk_flag_id": "risk_new_bank_account",
+      "risk_name": "Business Bank Account Recently Opened",
+      "severity": "medium",
+      "affected_funding_families": [
+        "working_capital_emergency_capital",
+        "lines_of_credit_revolving_access"
+      ],
+      "routing_action": "score_penalty",
+      "score_penalty": 7,
+      "manual_review_required": false,
+      "recommended_handling": "Bank history may be insufficient for deposit-based underwriting."
+    },
+    {
+      "risk_flag_id": "risk_desired_amount_too_high",
+      "risk_name": "Requested Amount Disproportionate to Revenue",
+      "severity": "medium",
+      "affected_funding_families": [
+        "all"
+      ],
+      "routing_action": "rank_penalty_and_manual_review_if_extreme",
+      "score_penalty": 8,
+      "manual_review_required": true,
+      "recommended_handling": "If requested amount exceeds annualized revenue, lower confidence and require strategy review."
+    },
+    {
+      "risk_flag_id": "risk_low_credit",
+      "risk_name": "Credit Below Common Minimums",
+      "severity": "medium",
+      "affected_funding_families": [
+        "startup_credit_leverage",
+        "structured_growth_capital",
+        "lines_of_credit_revolving_access"
+      ],
+      "routing_action": "family_specific_exclusion",
+      "score_penalty": 10,
+      "manual_review_required": false,
+      "recommended_handling": "May still be okay for revenue-first options if deposits are strong."
+    },
+    {
+      "risk_flag_id": "risk_missing_docs",
+      "risk_name": "Missing Critical Documents",
+      "severity": "medium",
+      "affected_funding_families": [
+        "structured_growth_capital",
+        "real_estate_asset_secured",
+        "equipment_truck_asset_backed"
+      ],
+      "routing_action": "readiness_penalty",
+      "score_penalty": 8,
+      "manual_review_required": false,
+      "recommended_handling": "Branch to document prep instead of killing lead."
+    },
+    {
+      "risk_flag_id": "risk_industry_restricted",
+      "risk_name": "Restricted or High-Risk Industry",
+      "severity": "high",
+      "affected_funding_families": [
+        "all"
+      ],
+      "routing_action": "product_specific_exclusion",
+      "score_penalty": 18,
+      "manual_review_required": true,
+      "recommended_handling": "Exclude only products where restricted industry conflict exists; otherwise manual review."
+    },
+    {
+      "risk_flag_id": "risk_low_ltv_support",
+      "risk_name": "Weak Equity / LTV Support",
+      "severity": "high",
+      "affected_funding_families": [
+        "real_estate_asset_secured"
+      ],
+      "routing_action": "exclude_asset_secured_until_verified",
+      "score_penalty": 18,
+      "manual_review_required": true,
+      "recommended_handling": "Real-estate files need equity/down payment/project data before routing."
+    },
+    {
+      "risk_flag_id": "risk_obsolete_or_salvage_asset",
+      "risk_name": "Obsolete Equipment / Salvage Title",
+      "severity": "high",
+      "affected_funding_families": [
+        "equipment_truck_asset_backed"
+      ],
+      "routing_action": "exclude_or_manual_review",
+      "score_penalty": 15,
+      "manual_review_required": true,
+      "recommended_handling": "Asset quality can kill equipment/truck finance."
+    },
+    {
+      "risk_flag_id": "risk_conflicting_verified_data",
+      "risk_name": "Conflicting Provider/Product Criteria",
+      "severity": "medium",
+      "affected_funding_families": [
+        "all"
+      ],
+      "routing_action": "manual_review_required",
+      "score_penalty": 10,
+      "manual_review_required": true,
+      "recommended_handling": "This is a data-quality risk: lower recommendation confidence, not necessarily borrower quality."
+    },
+    {
+      "risk_flag_id": "risk_missing_critical_input",
+      "risk_name": "Missing Critical Borrower Input",
+      "severity": "medium",
+      "affected_funding_families": [
+        "all"
+      ],
+      "routing_action": "confidence_penalty",
+      "score_penalty": 10,
+      "manual_review_required": true,
+      "recommended_handling": "Do not rank aggressively when borrower data is incomplete."
+    },
+    {
+      "risk_flag_id": "risk_state_not_served",
+      "risk_name": "Geography Not Served",
+      "severity": "critical",
+      "affected_funding_families": [
+        "all"
+      ],
+      "routing_action": "automatic_product_exclusion",
+      "score_penalty": 30,
+      "manual_review_required": false,
+      "recommended_handling": "Never recommend products unavailable in the borrower geography."
+    },
+    {
+      "risk_flag_id": "risk_product_inactive_or_excluded",
+      "risk_name": "Inactive / Excluded Product",
+      "severity": "critical",
+      "affected_funding_families": [
+        "all"
+      ],
+      "routing_action": "automatic_product_exclusion",
+      "score_penalty": 100,
+      "manual_review_required": false,
+      "recommended_handling": "Never recommend inactive or explicitly excluded products."
+    }
+  ]
+}
