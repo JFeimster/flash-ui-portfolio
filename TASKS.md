@@ -1,5 +1,17 @@
 # Flash UI Portfolio OS — Task Tracker
 
+> Active development program (2026-11-26): see the release ledger below and `PROJECT_STATUS.md`. The historical batch roadmap remains for traceability; its earlier "next execution" text is superseded by this program.
+
+## Active release ledger
+
+- [ ] Release 1 — importer v1.1: manifest and variants; duplicate detection; relative dependencies; registration modes; Catalog v2 metadata; preview discovery; rollback; idempotence; bulk intake; isolated apply tests.
+- [ ] Release 2 — detailed asset workspace, explainable relationships, comparison, advanced search and saved views; canonical Design Theme Gallery; Integration & MCP Advisor; existing handoffs.
+- [ ] Release 3 — offline, provider-neutral Creation Copilot connecting Generator and Workbench with suggestions, prompt drafts, revision history, brief portability, and build handoff.
+- [ ] Release 4 — configurable dry-run automation recipes, promotion and product lifecycle, evidence-based opportunity and readiness recommendations, distribution preparation, exportable decisions, and existing handoffs.
+- [ ] Each release: focused checks, protected-data hashes, live-route preservation, commit, PR/merge where appropriate, deployment revision and production URL verification.
+
+Implementation notes and actual evidence belong in `PROJECT_STATUS.md`; check an item only when its acceptance work is complete.
+
 **Repository:** [JFeimster/flash-ui-portfolio](https://github.com/JFeimster/flash-ui-portfolio)  
 **Production:** https://flash-ui-portfolio.vercel.app/  
 **Status:** Batches 19B–20 squash-merged as PR [#91](https://github.com/JFeimster/flash-ui-portfolio/pull/91). Next priority: import/registry intake, then reusable product pipelines.

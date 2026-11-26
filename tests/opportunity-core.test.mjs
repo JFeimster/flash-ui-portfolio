@@ -1,0 +1,7 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readiness,dryRun,discoverOpportunities,decisionBrief} from '../assets/js/opportunity-core.mjs';
+const asset={title:'Fixture',sourcePath:'sites/fixture/index.html',previewPath:'/sites/fixture/',files:[{name:'index.html'}],missingFiles:[],externalDependencies:['analytics.example']};
+test('readiness scores recorded evidence rather than product quality',()=>{const result=readiness(asset);assert.equal(result.score,4);assert.equal(result.maximum,5);assert.match(result.meaning,/not quality/)});
+test('recipe previews never execute and expose missing configuration',()=>{const result=dryRun(asset,'embed',{audience:'Makers'});assert.equal(result.mode,'dry-run');assert.deepEqual(result.missingInputs,['Primary action','Target host']);assert.match(result.execution,/No files/);assert.equal(result.handoffs.package,'/use-asset/?asset=%2Fsites%2Ffixture%2F')});
+test('opportunities cite local ideas and leave market evidence unverified',()=>{const output=discoverOpportunities({entries:{'/sites/a/':{title:'Built',category:'Tool'}}},[{id:'one',name:'New idea',type:'Tool'},{id:'two',name:'Built',type:'Tool'}]);assert.equal(output[0].ideaCount,1);assert.equal(output[0].externalMarketEvidence,'unverified');const brief=decisionBrief(dryRun(asset,'lead-magnet',{audience:'Makers',action:'Open'}),output[0]);assert.equal(brief.claims.revenue,'not estimated')});
