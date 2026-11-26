@@ -103,13 +103,14 @@ function inventory() {
 }
 function duplicateEvidence(id, manifest, fp, inventory) {
  const matches=[], repo=url(manifest.repositoryUrl||manifest.repository), production=url(manifest.productionUrl);
- const add=(kind,source,value)=>matches.push({kind,source,value});
+ const add=(kind,source,value,owner)=>matches.push({kind,source,value,owner});
  for(const row of inventory.records){
-  if(row.slug===id||row.projectId===id)add('slug',row.registrySource,row.slug||row.projectId);
-  if(norm(row.path)===`sites/${id}`||norm(row.livePath)===`/sites/${id}`)add('route',row.registrySource,row.livePath||row.path);
-  if(fp&&row.sourceFingerprint===fp)add('fingerprint',row.registrySource,fp);
-  if(repo&&url(row.repositoryUrl||row.repository)===repo)add('repository',row.registrySource,repo);
-  if(production&&url(row.productionUrl)===production)add('production',row.registrySource,production);
+  const owner=row.slug||row.projectId;
+  if(owner===id)add('slug',row.registrySource,owner,owner);
+  if(norm(row.path)===`sites/${id}`||norm(row.livePath)===`/sites/${id}`)add('route',row.registrySource,row.livePath||row.path,owner);
+  if(fp&&row.sourceFingerprint===fp)add('fingerprint',row.registrySource,fp,owner);
+  if(repo&&url(row.repositoryUrl||row.repository)===repo)add('repository',row.registrySource,repo,owner);
+  if(production&&url(row.productionUrl)===production)add('production',row.registrySource,production,owner);
  }
  for(const row of inventory.routes.entries||[]){
   if(row.slug===id||row.canonicalGroupId===id)add('route-owner',routeFile,row.resolvedPath||row.slug);
@@ -119,12 +120,12 @@ function duplicateEvidence(id, manifest, fp, inventory) {
   if(row.groupId===id)add('canonical-group','asset groups or contracts',id);
  }
  for(const [key,row] of Object.entries(inventory.showcase.projects||{})){
-  if(key===id)add('catalog',showcaseFile,key);
-  if(repo&&url(row.catalog?.repositoryUrl)===repo)add('repository',showcaseFile,repo);
-  if(production&&url(row.catalog?.productionUrl)===production)add('production',showcaseFile,production);
-  if(fp&&row.catalog?.sourceFingerprint===fp)add('fingerprint',showcaseFile,fp);
+  if(key===id)add('catalog',showcaseFile,key,key);
+  if(repo&&url(row.catalog?.repositoryUrl)===repo)add('repository',showcaseFile,repo,key);
+  if(production&&url(row.catalog?.productionUrl)===production)add('production',showcaseFile,production,key);
+  if(fp&&row.catalog?.sourceFingerprint===fp)add('fingerprint',showcaseFile,fp,key);
  }
- for(const row of inventory.external){if(repo&&url(row.repository_url||row.repositoryUrl)===repo)add('repository','data/project-links.json',repo);if(production&&url(row.production_url||row.productionUrl)===production)add('production','data/project-links.json',production);}
+ for(const row of inventory.external){if(repo&&url(row.repository_url||row.repositoryUrl)===repo)add('repository','data/project-links.json',repo,row.id);if(production&&url(row.production_url||row.productionUrl)===production)add('production','data/project-links.json',production,row.id);}
  return matches;
 }
 function catalogFrom(manifest,themeIds,variants,fp,previous={}) {
@@ -213,9 +214,9 @@ async function importOne(sourceInput,manifestInput,slugInput,bulk=false) {
   if(mode==='tool'&&!inside&&!url(project.productionUrl))warnings.push('Reusable tool must reference an existing sites/ source or HTTPS production URL');
   if(themeSuggestions.length)warnings.push('Unrecognized theme IDs require review');
   if(validation.missing.length)warnings.push('Missing relative dependencies: '+validation.missing.join('; '));
-  const identityMatches=matches.filter(x=>!same||!['slug','route','route-owner','canonical-group','catalog','fingerprint'].includes(x.kind));
+  const identityMatches=matches.filter(x=>x.owner!==id&&['repository','production','fingerprint'].includes(x.kind));
   if((mode==='static'||mode==='grouped')&&matches.length&&!same)warnings.push('Existing identity, route, source, repository, production URL, or fingerprint collision');
-  if(identityMatches.some(x=>['repository','production','fingerprint'].includes(x.kind))&&!same)warnings.push('Duplicate source identity requires review');
+  if(identityMatches.length&&!same)warnings.push('Duplicate source identity requires review');
   const destRel=`sites/${id}`,dest=path.join(root,destRel);
   if((mode==='static'||mode==='grouped')&&fs.existsSync(dest)&&!same)warnings.push('Destination exists; refusing overwrite');
   const record={title:project.name||project.title||id.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase()),slug:id,category:project.category||'Imported Static Sites',type:mode==='grouped'?'group-hub':'static-site',status:'portfolio-site',source:staged.archiveSha256?'source-archive:'+path.basename(source):'source-directory:'+source,path:destRel,livePath:`/sites/${id}/`,hasIndex:true,variantNumbers:variants.map(v=>v.number),sourceFingerprint:fp,entrySha256:hasEntry?sha(entry):null,archiveSha256:staged.archiveSha256,files:files.map(f=>f.path),repositoryUrl:project.repositoryUrl||project.repository||null,productionUrl:project.productionUrl||null};
