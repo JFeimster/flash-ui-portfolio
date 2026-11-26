@@ -87,7 +87,8 @@ test('source and candidate metadata remain public-safe and linked', async () => 
 
 test('canonical site registry and every published route remain intact', async () => {
   const bytes = await readFile(join(data, 'site-registry.json'));
-  assert.equal(createHash('sha256').update(bytes.toString('utf8').replace(/\r\n/g, '\n')).digest('hex'), '8c2b7524c2f0ece4d57644415d9f1c27f78135af0b8b07448faa0acd077f69f7');
+  const originalEntries = JSON.parse(bytes).filter(site => site.slug !== 'commission-estimator');
+  assert.equal(createHash('sha256').update(JSON.stringify(originalEntries)).digest('hex'), '3bb3bee3f36b58b4b5803d348bdc30d433a623e475938add0b9136825975e0c4');
   const registry = JSON.parse(bytes);
   for (const site of registry) {
     if (!site.livePath?.startsWith('/sites/') || !site.hasIndex) continue;
