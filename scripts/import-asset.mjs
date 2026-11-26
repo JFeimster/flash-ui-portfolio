@@ -79,7 +79,16 @@ function localRefs(file) {
  if(/\.css$/i.test(file)){for(const m of body.matchAll(/(?:url\(\s*|@import\s+)(?:["']?)([^"'\)\s]+)["']?\s*\)?/gi))refs.push(m[1]);}
  else if(/\.html?$/i.test(file)){for(const m of body.matchAll(/\b(?:src|href|poster|data-src)\s*=\s*["']([^"']+)["']/gi))refs.push(m[1]);for(const m of body.matchAll(/\bsrcset\s*=\s*["']([^"']+)["']/gi))refs.push(...m[1].split(',').map(x=>x.trim().split(/\s+/)[0]));}
  else if(/\.[cm]?js$/i.test(file)){for(const m of body.matchAll(/\b(?:import|export)\s*(?:[^"']*?from\s*)?["'](\.[^"']+)["']/g))refs.push(m[1]);}
- return refs.filter(x=>x&&!x.includes("${")&&!/^(?:[a-z]+:|\/|#|data:|\/\/)/i.test(x));
+ return refs.filter(x=>{
+  if(!x||x.includes('${'))return false;
+  let decoded=x;try{decoded=decodeURIComponent(x);}catch{}
+  if(/^(?:[a-z]+:|\/|#|data:|\/\/)/i.test(decoded))return false;
+  // Fragment URLs and bracket tokens are anchors/placeholders, not local files.
+  if(/^#[^\s]*$/.test(decoded)||/^\[[A-Z][A-Z0-9_:-]*\]$/.test(decoded))return false;
+  // The dependency scanner can encounter these as syntax fragments, not paths.
+  if(/^url\($/i.test(x)||/^[A-Za-z_$][\w$]*\?\.\[$/.test(x))return false;
+  return true;
+ });
 }
 function validateEntries(base, entries) {
  const missing=[], visited=new Set(), checked=[];
@@ -89,6 +98,7 @@ function validateEntries(base, entries) {
    let target;
    try{target=path.resolve(path.dirname(file),decodeURIComponent(ref.split(/[?#]/)[0]));}catch{missing.push(ref);continue;}
    if(!within(target,base)){missing.push(ref+' (escapes project)');continue;}
+   if(fs.existsSync(target)&&fs.statSync(target).isDirectory())target=path.join(target,'index.html');
    if(!fs.existsSync(target)||!fs.statSync(target).isFile()){missing.push(ref);continue;}
    if(/\.(?:html?|css|[cm]?js)$/i.test(target))inspect(target);
   }

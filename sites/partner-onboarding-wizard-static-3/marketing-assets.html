@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonshine Capital Partners - Marketing Vault & Terminal</title>
+    <!-- Tailwind CSS CDN for structure/layout utility -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Neo-Brutalist Custom Styles matching Prism Logic aesthetic */
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&family=Syne:wght@700;800&display=swap');
+
+        :root {
+            --bg-color: #000000;
+            --card-bg: #ffffff;
+            --accent: #E2FF00; /* Toxic Neon Volt Yellow */
+            --accent-muted: #b5cc00;
+            --accent-pink: #FF0055; /* Hot Neon Pink secondary */
+            --border-width: 4px;
+            --shadow-offset: 8px;
+            --font-display: 'Syne', 'Space Grotesk', sans-serif;
+            --font-body: 'Space Grotesk', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: #000000;
+            font-family: var(--font-body);
+            background-image: 
+                radial-gradient(circle at 90% 10%, rgba(255, 0, 85, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 10% 80%, rgba(226, 255, 0, 0.15) 0%, transparent 40%),
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 20px 20px, 20px 20px;
+        }
+
+        h1, h2, h3, h4, h5, h6, .brutalist-header {
+            font-family: var(--font-display);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.03em;
+        }
+
+        /* Thick Border & Hard Shadow Custom Utility classes */
+        .brutalist-border {
+            border: var(--border-width) solid #000000;
+        }
+
+        .brutalist-shadow-accent {
+            box-shadow: var(--shadow-offset) var(--shadow-offset) 0px 0px var(--accent);
+        }
+
+        .brutalist-shadow-black {
+            box-shadow: var(--shadow-offset) var(--shadow-offset) 0px 0px #000000;
+        }
+
+        .brutalist-shadow-pink {
+            box-shadow: var(--shadow-offset) var(--shadow-offset) 0px 0px var(--accent-pink);
+        }
+
+        .brutalist-btn {
+            border: var(--border-width) solid #000000;
+            font-weight: 900;
+            text-transform: uppercase;
+            transition: all 0.1s ease;
+            position: relative;
+        }
+
+        .brutalist-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 10px 10px 0px 0px #000000;
+        }
+
+        .brutalist-btn:active {
+            transform: translate(4px, 4px);
+            box-shadow: 2px 2px 0px 0px #000000;
+        }
+
+        .brutalist-btn-accent {
+            background-color: var(--accent);
+            color: #000000;
+        }
+
+        .brutalist-btn-accent:hover {
+            box-shadow: 10px 10px 0px 0px var(--accent-pink);
+        }
+
+        .brutalist-btn-pink {
+            background-color: var(--accent-pink);
+            color: #ffffff;
+        }
+
+        .brutalist-btn-pink:hover {
+            box-shadow: 10px 10px 0px 0px var(--accent);
+        }
+
+        .brutalist-btn-white {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        /* Input styling */
+        .brutalist-input {
+            border: var(--border-width) solid #000000;
+            font-weight: 700;
+            outline: none;
+            transition: all 0.15s ease;
+        }
+
+        .brutalist-input:focus {
+            background-color: #fafdf0;
+            box-shadow: 4px 4px 0px 0px var(--accent);
+            transform: translate(-2px, -2px);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000000;
+            border-left: var(--border-width) solid #ffffff;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border: 3px solid #000000;
+        }
+
+        /* Raw vector pattern */
+        .brutalist-pattern {
+            background-color: #ffffff;
+            background-image: radial-gradient(#000000 20%, transparent 20%),
+                              radial-gradient(#000000 20%, transparent 20%);
+            background-size: 8px 8px;
+            background-position: 0 0, 4px 4px;
+        }
+
+        /* Terminal Blink cursor */
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .terminal-blink {
+            animation: blink 1s infinite;
+        }
+
+        /* Dynamic Notification Toast */
+        #notification-toast {
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col justify-between">
+
+    <!-- Toast Notification System (Fixed Position) -->
+    <div id="notification-toast" class="fixed bottom-6 right-6 z-50 bg-[#E2FF00] text-black brutalist-border brutalist-shadow-black p-4 max-w-sm flex items-center gap-3 transform translate-y-24 opacity-0 pointer-events-none">
+        <span class="text-2xl font-black bg-black text-[#E2FF00] px-2 py-0.5 brutalist-border border-black">✓</span>
+        <div>
+            <h5 class="font-black text-xs uppercase tracking-wider">// REPLICATED SUCCESSFULY</h5>
+            <p class="text-xs font-bold uppercase text-gray-800" id="notification-msg">ASSET COPIED TO SYSTEM CLIPBOARD</p>
+        </div>
+    </div>
+
+    <!-- Top Navigation Header -->
+    <header class="w-full bg-white brutalist-border brutalist-shadow-accent p-4 mb-8 flex flex-col sm:flex-row justify-between items-center gap-4 z-10">
+        <div class="flex items-center gap-4">
+            <div class="bg-black text-white p-2 brutalist-border flex items-center justify-center font-black text-xl tracking-tighter">
+                MC⚡️
+            </div>
+            <div>
+                <h1 class="text-2xl md:text-3xl font-black tracking-tight leading-none">MOONSHINE CAPITAL</h1>
+                <p class="text-xs font-bold tracking-widest text-gray-500 uppercase mt-1">// AFFILIATE INTEGRATION ENGINE v3.4</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <span class="inline-block w-3 h-3 bg-red-500 rounded-none border border-black terminal-blink"></span>
+            <span class="text-xs font-black uppercase tracking-wider bg-black text-[#FF0055] px-3 py-1 brutalist-border">
+                VAULT: ONLINE
+            </span>
+        </div>
+    </header>
+
+    <!-- Main Content Layout -->
+    <main class="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-8">
+        
+        <!-- Left Column: Terminal Tracking Link Generator (UTM Customizer) -->
+        <section class="lg:col-span-5 flex flex-col gap-6 w-full">
+            
+            <!-- Terminal Tool -->
+            <div class="bg-black text-[#E2FF00] p-6 brutalist-border brutalist-shadow-black relative overflow-hidden">
+                <!-- Dot overlay grid background -->
+                <div class="absolute inset-0 opacity-5 pointer-events-none brutalist-pattern"></div>
+                
+                <div class="border-b-4 border-[#E2FF00] pb-4 mb-6 flex justify-between items-center relative z-10">
+                    <div>
+                        <span class="text-xs font-black bg-[#E2FF00] text-black px-2 py-0.5">// LINK ENGINE v2.0</span>
+                        <h3 class="text-2xl font-black text-white mt-1">LINK COMPILER</h3>
+                    </div>
+                    <span class="text-3xl">💻</span>
+                </div>
+
+                <div class="space-y-4 relative z-10">
+                    <div>
+                        <label class="block text-xs font-black tracking-widest text-white uppercase mb-1">AFFILIATE ID [REQUIRED]</label>
+                        <input type="text" id="term-aff-id" oninput="generateLink()" value="ALPHA_PARTNER" class="w-full bg-[#111] text-[#E2FF00] border-2 border-[#E2FF00] p-3 font-mono text-sm uppercase outline-none focus:bg-[#1a1a1a]">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-black tracking-widest text-white uppercase mb-1">UTM SOURCE</label>
+                        <input type="text" id="term-source" oninput="generateLink()" placeholder="e.g. newsletter, twitter" class="w-full bg-[#111] text-[#E2FF00] border-2 border-[#E2FF00] p-3 font-mono text-sm uppercase outline-none focus:bg-[#1a1a1a]">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-black tracking-widest text-white uppercase mb-1">UTM MEDIUM</label>
+                            <input type="text" id="term-medium" oninput="generateLink()" placeholder="e.g. cpc, email" class="w-full bg-[#111] text-[#E2FF00] border-2 border-[#E2FF00] p-3 font-mono text-sm uppercase outline-none focus:bg-[#1a1a1a]">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-black tracking-widest text-white uppercase mb-1">UTM CAMPAIGN</label>
+                            <input type="text" id="term-campaign" oninput="generateLink()" placeholder="e.g. q3_liquidity" class="w-full bg-[#111] text-[#E2FF00] border-2 border-[#E2FF00] p-3 font-mono text-sm uppercase outline-none focus:bg-[#1a1a1a]">
+                        </div>
+                    </div>
+
+                    <!-- Live Compiler Readout -->
+                    <div class="border-4 border-[#FF0055] bg-[#000] p-4 text-white mt-6">
+                        <span class="text-xs font-mono text-[#FF0055] block mb-2 font-black">// STABLE REDIRECT ENDPOINT:</span>
+                        <div class="bg-zinc-900 p-3 brutalist-border border-[#FF0055] break-all font-mono text-xs text-white selection:bg-[#E2FF00] selection:text-black">
+                            <span id="compiled-output">https://moonshine.capital/?ref=ALPHA_PARTNER</span><span class="text-[#E2FF00] terminal-blink font-black">_</span>
+                        </div>
+                    </div>
+
+                    <!-- Action buttons -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                        <button onclick="copyGeneratedLink()" class="brutalist-btn brutalist-btn-accent py-3 text-xs font-black tracking-wider flex items-center justify-center gap-2">
+                            📋 COPY TRACKING LINK
+                        </button>
+                        <button onclick="testTargetLink()" class="brutalist-btn brutalist-btn-pink py-3 text-xs font-black tracking-wider flex items-center justify-center gap-2 text-white">
+                            ⚡️ TEST LINK DEST
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vector Branding Kit (Asset Quick Downloader) -->
+            <div class="bg-white p-6 brutalist-border brutalist-shadow-accent">
+                <div class="border-b-4 border-black pb-3 mb-4">
+                    <h4 class="text-lg font-black uppercase">// SYSTEM ASSET EXPORTS</h4>
+                </div>
+                <p class="text-xs font-bold text-gray-600 uppercase mb-4 leading-relaxed">
+                    Deploy raw branding assets across custom landing systems. High fidelity SVG constructs built for maximum page performance.
+                </p>
+
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between p-3 bg-gray-50 brutalist-border border-black">
+                        <div>
+                            <span class="text-xs font-black uppercase block">Vector Branding Kit (Dark / Light)</span>
+                            <span class="text-[10px] text-gray-500 uppercase font-bold">SVG Vector Archives • 1.4 MB</span>
+                        </div>
+                        <button onclick="triggerDownload('vector_kit.svg', 'Moonshine SVGs')" class="brutalist-btn brutalist-btn-white p-2 text-xs font-black">📁 SVG</button>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-gray-50 brutalist-border border-black">
+                        <div>
+                            <span class="text-xs font-black uppercase block">Affiliate Badge Pack (Neon Volt)</span>
+                            <span class="text-[10px] text-gray-500 uppercase font-bold">PNG transparent overlays • 2.8 MB</span>
+                        </div>
+                        <button onclick="triggerDownload('badge_volt.zip', 'Volt Badges')" class="brutalist-btn brutalist-btn-white p-2 text-xs font-black">📁 ZIP</button>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-gray-50 brutalist-border border-black">
+                        <div>
+                            <span class="text-xs font-black uppercase block">Display Banner Collection</span>
+                            <span class="text-[10px] text-gray-500 uppercase font-bold">Comprehensive standard ads • 12 MB</span>
+                        </div>
+                        <button onclick="triggerDownload('banner_pack.zip', 'Display Banners')" class="brutalist-btn brutalist-btn-white p-2 text-xs font-black">📁 ZIP</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Column: Swipe Copy Vault & Dynamic Banner Preview -->
+        <section class="lg:col-span-7 flex flex-col gap-6 w-full">
+            
+            <!-- SWIPE COPY SWIFT PORTAL -->
+            <div class="bg-white brutalist-border brutalist-shadow-pink flex flex-col justify-between overflow-hidden">
+                <div class="bg-black text-[#E2FF00] p-4 border-b-4 border-black flex justify-between items-center">
+                    <div>
+                        <span class="text-[10px] font-mono block leading-none">// CONVERSION COMPONENT</span>
+                        <h3 class="text-xl font-black text-white">SWIPE COPY VAULT</h3>
+                    </div>
+                    <span class="bg-white text-black font-black text-xs px-2 py-0.5 brutalist-border border-[#E2FF00]">READY FOR DEPLOYMENT</span>
+                </div>
+
+                <!-- Tabs for Swipe categories -->
+                <div class="flex border-b-4 border-black bg-gray-100 overflow-x-auto">
+                    <button onclick="switchSwipeTab('email')" id="swipe-tab-email" class="swipe-tab px-6 py-3 font-black text-xs uppercase brutalist-border border-t-0 border-b-0 border-l-0 bg-black text-white mr-1 whitespace-nowrap">
+                        📨 EMAIL COLD CALL
+                    </button>
+                    <button onclick="switchSwipeTab('social')" id="swipe-tab-social" class="swipe-tab px-6 py-3 font-black text-xs uppercase brutalist-border border-t-0 border-b-0 border-l-0 bg-white text-black mr-1 whitespace-nowrap">
+                        ⚡️ X/TWITTER DISPATCH
+                    </button>
+                    <button onclick="switchSwipeTab('linkedin')" id="swipe-tab-linkedin" class="swipe-tab px-6 py-3 font-black text-xs uppercase brutalist-border border-t-0 border-b-0 border-l-0 bg-white text-black whitespace-nowrap">
+                        💼 LINKEDIN PITCH
+                    </button>
+                </div>
+
+                <div class="p-6">
+                    <!-- EMAIL TAB -->
+                    <div id="swipe-content-email" class="swipe-content-panel space-y-4">
+                        <div class="bg-gray-50 p-3 brutalist-border border-black">
+                            <span class="text-[10px] text-gray-500 uppercase font-black block">// SUBJECT LINE ALTERNATIVES:</span>
+                            <span class="text-xs font-bold uppercase text-black block mt-1">🔑 Alternative Yield Structure: $500k - $20M+ liquidity pipelines</span>
+                            <span class="text-xs font-bold uppercase text-black block mt-1">💼 Access Capital: Non-dilutive bridge options inside 48h</span>
+                        </div>
+                        
+                        <div class="relative">
+                            <textarea id="swipe-txt-email" readonly class="w-full min-h-[180px] bg-white brutalist-border p-4 font-mono text-xs uppercase leading-relaxed text-gray-800 outline-none select-all">Hi [Client Name],
+
+I noticed your active pipeline projects and wanted to bridge a quick mechanism for securing high-liquidity capital directly. 
+
+Moonshine Capital Partners provides streamlined, non-dilutive asset bridges and technology debt structures ranging from $500K up to $20M+ with direct underwriting clearing inside 48 hours.
+
+You can run an instant project simulation test directly through our intake portal:
+https://moonshine.capital/?ref=ALPHA_PARTNER
+
+Let me know if your team is open for an immediate direct clearance evaluate.
+
+Regards,
+[Your Name]</textarea>
+                        </div>
+                        <button onclick="copySwipeText('swipe-txt-email', 'Email swipe template copied!')" class="brutalist-btn brutalist-btn-accent w-full py-3 text-xs font-black uppercase tracking-wider">
+                            📋 COPY EMAIL TEMPLATE DATA
+                        </button>
+                    </div>
+
+                    <!-- SOCIAL TAB -->
+                    <div id="swipe-content-social" class="swipe-content-panel hidden space-y-4">
+                        <div class="relative">
+                            <textarea id="swipe-txt-social" readonly class="w-full min-h-[120px] bg-white brutalist-border p-4 font-mono text-xs uppercase leading-relaxed text-gray-800 outline-none select-all">Stop waiting weeks on slow legacy banking term sheets. Secure non-dilutive bridge capital ($500K-$20M+) for operations in 48 hours. 
+
+Ingest your project profile now ⚡️
+
+👉 https://moonshine.capital/?ref=ALPHA_PARTNER</textarea>
+                        </div>
+                        <button onclick="copySwipeText('swipe-txt-social', 'Social post swipe template copied!')" class="brutalist-btn brutalist-btn-accent w-full py-3 text-xs font-black uppercase tracking-wider">
+                            📋 COPY SOCIAL BLAST DATA
+                        </button>
+                    </div>
+
+                    <!-- LINKEDIN TAB -->
+                    <div id="swipe-content-linkedin" class="swipe-content-panel hidden space-y-4">
+                        <div class="relative">
+                            <textarea id="swipe-txt-linkedin" readonly class="w-full min-h-[160px] bg-white brutalist-border p-4 font-mono text-xs uppercase leading-relaxed text-gray-800 outline-none select-all">Hi [First Name],
+
+I specialize in structuring corporate capital solutions for high-growth operations requiring quick leverage bridges. 
+
+We are currently deploying debt solutions and non-dilutive capital structures from $500k to $20M+ via Moonshine Capital Partners. Our underwriting mechanism routes decisions inside 48 hours.
+
+Run a preliminary project evaluation securely:
+https://moonshine.capital/?ref=ALPHA_PARTNER
+
+Best,
+[Your Name]</textarea>
+                        </div>
+                        <button onclick="copySwipeText('swipe-txt-linkedin', 'LinkedIn template copied!')" class="brutalist-btn brutalist-btn-accent w-full py-3 text-xs font-black uppercase tracking-wider">
+                            📋 COPY PROFESSIONAL PITCH
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DYNAMIC DISPLAY BANNER BUILDER -->
+            <div class="bg-white brutalist-border brutalist-shadow-black p-6">
+                <div class="border-b-4 border-black pb-4 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <div>
+                        <span class="text-xs font-black bg-black text-white px-2 py-0.5 uppercase">// REAL-TIME ASSET GENERATOR</span>
+                        <h3 class="text-2xl font-black mt-1">DASHBOARD BANNER CREATIVES</h3>
+                    </div>
+                    <!-- Toggle colors widget -->
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] font-black uppercase">THEME:</span>
+                        <button onclick="toggleBannerColor('#E2FF00')" class="w-6 h-6 bg-[#E2FF00] brutalist-border border-black" title="Neon Volt"></button>
+                        <button onclick="toggleBannerColor('#FF0055')" class="w-6 h-6 bg-[#FF0055] brutalist-border border-black" title="Neon Pink"></button>
+                        <button onclick="toggleBannerColor('#FFFFFF')" class="w-6 h-6 bg-white brutalist-border border-black" title="Plain White"></button>
+                    </div>
+                </div>
+
+                <p class="text-xs font-bold text-gray-600 uppercase mb-6 leading-relaxed">
+                    Live dynamic preview of banner assets embedded with your Affiliate ID. Customize the appearance above, preview the layout below, then instantly export the responsive HTML embed snippet.
+                </p>
+
+                <!-- Banner Preview Box 1 (Leaderboard 728x90) -->
+                <div class="space-y-6">
+                    <div>
+                        <span class="text-xs font-black uppercase block mb-2">// EMBED PREVIEW: LEADERBOARD AD (728x90)</span>
+                        <div id="ad-banner-leaderboard" class="w-full bg-[#E2FF00] text-black brutalist-border p-4 flex flex-col sm:flex-row justify-between items-center gap-4 transition-colors duration-200">
+                            <div>
+                                <h4 class="text-lg md:text-xl font-black tracking-tighter leading-none uppercase">⚡️ MOONSHINE LIQUIDITY DEPOT</h4>
+                                <p class="text-[10px] font-bold uppercase tracking-wider mt-1">NON-DILUTIVE LIQUIDITY IN 48H • SECURE PIPELINE</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="bg-black text-white text-[10px] font-mono px-2 py-1 brutalist-border border-black">REF_ID: <span class="dynamic-aff-slug font-black">ALPHA_PARTNER</span></span>
+                                <div class="bg-white border-2 border-black px-3 py-1 font-black text-xs uppercase hover:bg-black hover:text-white transition-all cursor-pointer">
+                                    APPLY NOW →
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- HTML Embed Code Copy Section 1 -->
+                    <div>
+                        <span class="text-xs font-black uppercase block mb-1">EMBED SNIPPET FOR LEADERBOARD:</span>
+                        <div class="relative">
+                            <pre id="banner-code-1" class="bg-black text-gray-300 p-3 brutalist-border font-mono text-[10px] overflow-x-auto whitespace-pre-wrap select-all break-all">&lt;a href="https://moonshine.capital/?ref=ALPHA_PARTNER" target="_blank"&gt;&lt;img src="https://moonshine.capital/assets/banner_728x90.gif" alt="Moonshine Capital Partners" /&gt;&lt;/a&gt;</pre>
+                            <button onclick="copySwipeText('banner-code-1', 'Leaderboard embed code copied!')" class="absolute right-2 top-2 bg-white text-black font-black text-[10px] px-2 py-1 brutalist-border border-black hover:bg-[#E2FF00]">
+                                COPY CODE
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Banner Preview Box 2 (Square 300x250) -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end pt-4 border-t-2 border-gray-200">
+                        <div>
+                            <span class="text-xs font-black uppercase block mb-2">// EMBED PREVIEW: SQUARE AD (300x250)</span>
+                            <div id="ad-banner-square" class="w-full max-w-[300px] h-[250px] bg-black text-[#E2FF00] brutalist-border p-6 flex flex-col justify-between transition-colors duration-200 mx-auto">
+                                <div class="flex justify-between items-start">
+                                    <span class="bg-[#FF0055] text-white text-[9px] font-black px-1.5 py-0.5 brutalist-border border-white">CAPITAL</span>
+                                    <span class="text-sm font-black">MC⚡️</span>
+                                </div>
+                                <div>
+                                    <h4 class="text-2xl font-black uppercase leading-tight tracking-tighter">NEED BRIDGING CAPITAL?</h4>
+                                    <p class="text-[9px] font-mono text-gray-300 mt-2">UNDERWRITING COMPLETED WITHIN 48 HOURS.</p>
+                                </div>
+                                <div class="flex justify-between items-center border-t border-[#E2FF00] pt-3">
+                                    <span class="text-[9px] font-mono uppercase">ID: <span class="dynamic-aff-slug text-white font-black">ALPHA_PARTNER</span></span>
+                                    <span class="bg-[#E2FF00] text-black font-black text-[10px] px-2 py-1 brutalist-border border-black">RUN DEPLOYMENT</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- HTML Embed Code Copy Section 2 -->
+                        <div class="space-y-3">
+                            <div>
+                                <span class="text-xs font-black uppercase block mb-1">EMBED SNIPPET FOR SQUARE AD:</span>
+                                <div class="relative">
+                                    <pre id="banner-code-2" class="bg-black text-gray-300 p-3 brutalist-border font-mono text-[10px] overflow-x-auto whitespace-pre-wrap select-all break-all">&lt;a href="https://moonshine.capital/?ref=ALPHA_PARTNER" target="_blank"&gt;&lt;img src="https://moonshine.capital/assets/banner_300x250.gif" alt="Invest With Moonshine" /&gt;&lt;/a&gt;</pre>
+                                    <button onclick="copySwipeText('banner-code-2', 'Square ad embed code copied!')" class="absolute right-2 top-2 bg-white text-black font-black text-[10px] px-2 py-1 brutalist-border border-black hover:bg-[#E2FF00]">
+                                        COPY CODE
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="bg-gray-100 p-3 brutalist-border border-black text-xs font-bold uppercase leading-tight text-gray-700">
+                                💡 CUSTOM DESIGN NOTE: Dynamic overlay fields compile affiliate routes recursively. Simply copy the code and push it straight live!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer System Status Ledger -->
+    <footer class="w-full bg-black text-white p-4 brutalist-border flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-mono mt-8">
+        <div>
+            <span>SYSTEM CONTEXT: MOONSHINE CAPITAL CAPITAL ROUTING SYSTEMS v3.44</span>
+        </div>
+        <div class="flex gap-4">
+            <a href="#" class="hover:text-[#E2FF00] underline font-bold">LEDGER STATUS</a>
+            <span>|</span>
+            <a href="#" class="hover:text-[#E2FF00] underline font-bold">API INTEGRATION MANUAL</a>
+            <span>|</span>
+            <a href="#" class="hover:text-[#E2FF00] underline font-bold">SECURITY GATE</a>
+        </div>
+    </footer>
+
+    <!-- INTERACTION LOGIC LAYER (VANILLA JAVASCRIPT) -->
+    <script>
+        // Default values
+        let affiliateId = "ALPHA_PARTNER";
+
+        /**
+         * Initialize page actions
+         */
+        window.onload = function() {
+            generateLink();
+        };
+
+        /**
+         * Dynamically compiles target link containing all user injected parameters
+         */
+        function generateLink() {
+            const rawId = document.getElementById('term-aff-id').value;
+            // Filter to safe characters only, format uppercase
+            affiliateId = rawId.toUpperCase().replace(/[^A-Z0-9_-]/g, '') || "ALPHA_PARTNER";
+            document.getElementById('term-aff-id').value = affiliateId;
+
+            const utmSource = document.getElementById('term-source').value.toLowerCase().replace(/[^a-z0-9_-]/g, '');
+            const utmMedium = document.getElementById('term-medium').value.toLowerCase().replace(/[^a-z0-9_-]/g, '');
+            const utmCampaign = document.getElementById('term-campaign').value.toLowerCase().replace(/[^a-z0-9_-]/g, '');
+
+            // Construct Link
+            let finalLink = `https://moonshine.capital/?ref=${affiliateId}`;
+            if (utmSource) finalLink += `&utm_source=${utmSource}`;
+            if (utmMedium) finalLink += `&utm_medium=${utmMedium}`;
+            if (utmCampaign) finalLink += `&utm_campaign=${utmCampaign}`;
+
+            // Update compiled readout
+            document.getElementById('compiled-output').innerText = finalLink;
+
+            // Propagate identifier value to all live layout preview components
+            const dynamicOvlList = document.querySelectorAll('.dynamic-aff-slug');
+            dynamicOvlList.forEach(el => {
+                el.innerText = affiliateId;
+            });
+
+            // Update Swipe texts dynamically
+            updateSwipeTexts(finalLink);
+
+            // Update Embedded Copy-Paste Embed Codes
+            document.getElementById('banner-code-1').innerText = `<a href="${finalLink}" target="_blank"><img src="https://moonshine.capital/assets/banner_728x90.gif" alt="Moonshine Capital Partners" /></a>`;
+            document.getElementById('banner-code-2').innerText = `<a href="${finalLink}" target="_blank"><img src="https://moonshine.capital/assets/banner_300x250.gif" alt="Invest With Moonshine" /></a>`;
+        }
+
+        /**
+         * Propagates active dynamic URL directly inside Swipe Copy textarea elements
+         */
+        function updateSwipeTexts(compiledUrl) {
+            // Update email template text
+            const emailBox = document.getElementById('swipe-txt-email');
+            emailBox.value = `Hi [Client Name],\n\nI noticed your active pipeline projects and wanted to bridge a quick mechanism for securing high-liquidity capital directly. \n\nMoonshine Capital Partners provides streamlined, non-dilutive asset bridges and technology debt structures ranging from $500K up to $20M+ with direct underwriting clearing inside 48 hours.\n\nYou can run an instant project simulation test directly through our intake portal:\n${compiledUrl}\n\nLet me know if your team is open for an immediate direct clearance evaluate.\n\nRegards,\n[Your Name]`;
+
+            // Update Social media template text
+            const socialBox = document.getElementById('swipe-txt-social');
+            socialBox.value = `Stop waiting weeks on slow legacy banking term sheets. Secure non-dilutive bridge capital ($500K-$20M+) for operations in 48 hours. \n\nIngest your project profile now ⚡️\n\n👉 ${compiledUrl}`;
+
+            // Update LinkedIn template text
+            const linkedinBox = document.getElementById('swipe-txt-linkedin');
+            linkedinBox.value = `Hi [First Name],\n\nI specialize in structuring corporate capital solutions for high-growth operations requiring quick leverage bridges. \n\nWe are currently deploying debt solutions and non-dilutive capital structures from $500k to $20M+ via Moonshine Capital Partners. Our underwriting mechanism routes decisions inside 48 hours.\n\nRun a preliminary project evaluation securely:\n${compiledUrl}\n\nBest,\n[Your Name]`;
+        }
+
+        /**
+         * Switch tab panels inside Swipe Copy widget
+         */
+        function switchSwipeTab(tabName) {
+            // Un-highlight active tab styling
+            const tabs = document.querySelectorAll('.swipe-tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('bg-black', 'text-white');
+                tab.classList.add('bg-white', 'text-black');
+            });
+
+            // Highlight chosen tab
+            const chosenTab = document.getElementById(`swipe-tab-${tabName}`);
+            chosenTab.classList.remove('bg-white', 'text-black');
+            chosenTab.classList.add('bg-black', 'text-white');
+
+            // Hide all tab panels
+            const panels = document.querySelectorAll('.swipe-content-panel');
+            panels.forEach(panel => {
+                panel.classList.add('hidden');
+            });
+
+            // Display current panel
+            const targetPanel = document.getElementById(`swipe-content-${tabName}`);
+            targetPanel.classList.remove('hidden');
+        }
+
+        /**
+         * Action triggers copy operation & triggers notification toast alert
+         */
+        function copyGeneratedLink() {
+            const targetText = document.getElementById('compiled-output').innerText;
+            navigator.clipboard.writeText(targetText).then(() => {
+                triggerToastAlert("COMPILED AFFILIATE TARGET LINK COPIED TO CLIPBOARD!");
+            });
+        }
+
+        /**
+         * Tests generated link destination by spawning virtual iframe or alert routing simulation
+         */
+        function testTargetLink() {
+            const finalLink = document.getElementById('compiled-output').innerText;
+            alert(`[ROUTING DIAGNOSTIC SIMULATION]\nTARGET: ${finalLink}\nSTATUS: 302 STABLE DIRECT ROUTE COMPILING SUCCESSFUL.`);
+        }
+
+        /**
+         * General swipe copy utility
+         */
+        function copySwipeText(elementId, successMessage) {
+            const targetElement = document.getElementById(elementId);
+            let val = "";
+            if (targetElement.tagName === "TEXTAREA" || targetElement.tagName === "INPUT") {
+                val = targetElement.value;
+            } else {
+                val = targetElement.innerText;
+            }
+            navigator.clipboard.writeText(val).then(() => {
+                triggerToastAlert(successMessage.toUpperCase());
+            });
+        }
+
+        /**
+         * Real-time Banner theme color switches
+         */
+        function toggleBannerColor(hexCode) {
+            const leaderboard = document.getElementById('ad-banner-leaderboard');
+            const squareBanner = document.getElementById('ad-banner-square');
+
+            // Apply modifications depending on color scheme selector choice
+            if (hexCode === '#E2FF00') {
+                leaderboard.style.backgroundColor = '#E2FF00';
+                leaderboard.style.color = '#000000';
+                squareBanner.style.backgroundColor = '#000000';
+                squareBanner.style.color = '#E2FF00';
+            } else if (hexCode === '#FF0055') {
+                leaderboard.style.backgroundColor = '#FF0055';
+                leaderboard.style.color = '#ffffff';
+                squareBanner.style.backgroundColor = '#FF0055';
+                squareBanner.style.color = '#ffffff';
+            } else {
+                leaderboard.style.backgroundColor = '#ffffff';
+                leaderboard.style.color = '#000000';
+                squareBanner.style.backgroundColor = '#ffffff';
+                squareBanner.style.color = '#000000';
+            }
+            triggerToastAlert(`BANNER THEME UPDATED!`);
+        }
+
+        /**
+         * Simulates package download interactions
+         */
+        function triggerDownload(fileName, packName) {
+            alert(`[INITIALIZING TRANSFER PROTOCOL]\nPACKAGE: ${packName.toUpperCase()}\nFILENAME: ${fileName}\nSTATUS: TRANSMITTING PACKET OVER HIGH SPEED PIPELINE.`);
+            triggerToastAlert(`${packName.toUpperCase()} INGESTION STARTED.`);
+        }
+
+        /**
+         * Displays brutalist toast notification dynamically
+         */
+        function triggerToastAlert(msgText) {
+            const toast = document.getElementById('notification-toast');
+            document.getElementById('notification-msg').innerText = msgText;
+            
+            toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-24');
+            toast.classList.add('opacity-100', 'translate-y-0');
+
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-24');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funding Readiness Scorecard | Moonshine Capital Partner Portal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Space Grotesk (Modern/Neobrutalist) & Plus Jakarta Sans (Premium Sans) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        matteblack: '#0D0D0D',
+                        bonewhite: '#F4F3EF',
+                        electricgreen: '#00E676',
+                        signalorange: '#FF6D00',
+                        cobaltblue: '#2979FF',
+                        graphitegray: '#1E1E1E',
+                        softgray: '#2C2C2C',
+                        accentgold: '#D4AF37'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0D0D0D;
+            color: #F4F3EF;
+            overflow-x: hidden;
+        }
+
+        /* Neobrutalist custom shadows */
+        .neo-shadow-green {
+            box-shadow: 4px 4px 0px 0px #00E676;
+        }
+        .neo-shadow-orange {
+            box-shadow: 4px 4px 0px 0px #FF6D00;
+        }
+        .neo-shadow-black {
+            box-shadow: 4px 4px 0px 0px #1E1E1E;
+        }
+        .neo-shadow-white {
+            box-shadow: 4px 4px 0px 0px #F4F3EF;
+        }
+        .neo-shadow-cobalt {
+            box-shadow: 4px 4px 0px 0px #2979FF;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0D0D0D;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1E1E1E;
+            border: 2px solid #0D0D0D;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00E676;
+        }
+
+        /* Glitchy status pulse */
+        .status-pulse {
+            position: relative;
+        }
+        .status-pulse::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: #00E676;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: pulse 1.8s infinite ease-in-out;
+        }
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(3.5); opacity: 0; }
+        }
+
+        /* Custom Transition for calculated values */
+        .score-transition {
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+    </style>
+</head>
+<body class="font-sans antialiased selection:bg-electricgreen selection:text-matteblack">
+
+    <!-- TOP BAR / CONCIERGE STATUS -->
+    <div class="border-b border-graphitegray bg-matteblack text-xs font-mono py-2 px-4 sticky top-0 z-50 backdrop-blur-md bg-opacity-95">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div class="flex items-center gap-3">
+                <span class="inline-block w-2.5 h-2.5 bg-electricgreen rounded-full status-pulse"></span>
+                <span class="text-zinc-400 tracking-wider uppercase">PORTAL NODE: <span class="text-white font-bold">[PARTNER_COMPANY] // [PARTNER_NAME]</span></span>
+            </div>
+            <div class="flex items-center gap-4 text-zinc-400">
+                <span class="hidden md:inline">UTILITY: LIVE DIAGNOSTIC ENGINE</span>
+                <span class="hidden sm:inline">|</span>
+                <a href="../" class="hover:text-electricgreen transition-colors flex items-center gap-1.5 focus:outline-none">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    <span>BACK TO PARTNER DESK</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONCIERGE HEADER -->
+    <header class="bg-matteblack border-b border-graphitegray py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <!-- Branding -->
+                <div class="flex items-center gap-3">
+                    <div class="bg-bonewhite text-matteblack px-3 py-1.5 font-display font-extrabold text-lg tracking-tighter uppercase border border-white neo-shadow-green">
+                        MOONSHINE <span class="text-electricgreen">★</span> CAP
+                    </div>
+                    <span class="text-zinc-600 font-mono text-sm hidden sm:inline">/ / READINESS DIAGNOSTICS</span>
+                </div>
+                <!-- Network Badge -->
+                <div class="border border-graphitegray bg-graphitegray bg-opacity-30 rounded-lg px-4 py-2 flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center font-mono text-xs font-bold text-electricgreen">RD</div>
+                    <div>
+                        <p class="text-[10px] text-zinc-500 font-mono uppercase tracking-widest leading-none">VERIFIED CALCULATOR INSTANCE</p>
+                        <p class="text-xs font-semibold text-zinc-300 font-mono">[PARTNER_EMAIL]</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO PROFILE SECTION -->
+    <section class="relative pt-12 pb-16 border-b border-graphitegray bg-gradient-to-b from-matteblack to-[#121212] overflow-hidden">
+        <!-- Graphic Grid Accent -->
+        <div class="absolute inset-0 bg-[linear-gradient(to_right,#1f1f1f_1px,transparent_1px),linear-gradient(to_bottom,#1f1f1f_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-25"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center max-w-3xl">
+            <span class="font-mono text-electricgreen text-xs uppercase tracking-widest bg-zinc-900/80 px-3 py-1.5 rounded border border-zinc-800 inline-block mb-4">UNDERWRITING ENGINE V2.4</span>
+            <h1 class="font-display text-4xl sm:text-5xl font-black text-bonewhite tracking-tight leading-none mb-6">
+                Funding Readiness <span class="text-transparent bg-clip-text bg-gradient-to-r from-electricgreen to-cobaltblue font-mono font-medium">Scorecard</span>
+            </h1>
+            <p class="text-zinc-300 text-lg font-light leading-relaxed">
+                Before filing institutional submissions, evaluate your corporate capital standing. Answer these basic metrics questions to locate potential compliance friction, view prioritized tips, and reveal real-time funding matches tailored to you and <span class="text-white font-semibold underline decoration-electricgreen decoration-2">[PARTNER_NAME]</span>.
+            </p>
+        </div>
+    </section>
+
+    <!-- CALCULATOR & SCOREBOARD WORKSPACE -->
+    <section class="py-16 bg-matteblack border-b border-graphitegray relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                <!-- Left Side: Interactive Metrics Form -->
+                <div class="lg:col-span-6 bg-graphitegray border border-zinc-800 p-6 sm:p-8 neo-shadow-black">
+                    <div class="border-b border-zinc-800 pb-4 mb-6">
+                        <h3 class="font-display font-extrabold text-xl text-white">1. Input Core Financial Metrics</h3>
+                        <p class="text-zinc-400 text-xs font-mono mt-1">Underwriters evaluate these critical baselines to structure placements.</p>
+                    </div>
+
+                    <form id="scorecard-form" class="space-y-6" onsubmit="event.preventDefault();">
+                        
+                        <!-- Credit Score Band -->
+                        <div>
+                            <label class="block font-mono text-xs uppercase text-zinc-400 tracking-wider mb-2">Estimated Personal Credit Score Band</label>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                <button type="button" onclick="selectScorecardMetric('credit', 'under600', 5, this)" class="form-metric-btn py-3 px-2 bg-zinc-900 border border-zinc-800 text-center font-mono text-xs text-zinc-400 hover:border-zinc-500 transition-all rounded">
+                                    &lt; 600
+                                    <span class="block text-[9px] text-zinc-500 mt-0.5">Challenging</span>
+                                </button>
+                                <button type="button" onclick="selectScorecardMetric('credit', '600to649', 15, this)" class="form-metric-btn py-3 px-2 bg-zinc-900 border border-zinc-800 text-center font-mono text-xs text-zinc-400 hover:border-zinc-500 transition-all rounded">
+                                    600 - 649
+                                    <span class="block text-[9px] text-zinc-500 mt-0.5">Fair</span>
+                                </button>
+                                <button type="button" onclick="selectScorecardMetric('credit', '650to719', 25, this)" class="form-metric-btn py-3 px-2 bg-zinc-900 border border-zinc-800 text-center font-mono text-xs text-zinc-400 hover:border-zinc-500 transition-all rounded">
+                                    650 - 719
+                                    <span class="block text-[9px] text-zinc-500 mt-0.5">Good</span>
+                                </button>
+                                <button type="button" onclick="selectScorecardMetric('credit', '720plus', 35, this)" class="form-metric-btn py-3 px-2 bg-zinc-900 border border-zinc-800 text-center font-mono text-xs text-zinc-400 hover:border-zinc-500 transition-all rounded">
+                                    720+
+                                    <span class="block text-[9px] text-zinc-500 mt-0.5">Excellent</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Average Monthly Deposits -->
+                        <div>
+                            <label class="block font-mono text-xs uppercase text-zinc-400 tracking-wider mb-2">Average Monthly Deposits / Revenue</label>
+                            <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                                <button type="button" onclick="selectScorecardMetric('deposits', 'under5k', 5, this)" class="form-metric-btn py-3 px-2 bg-zinc-900 border border-zinc-800 text-center font-mono text-xs text-zinc-400 hover:border-zinc-500 transition-all rounded">
+                                    Under $5k
+                                    <span class="block text-[9px] text-zinc-500 mt-0.5">Micro</span>
+                                </button>
+                                <button type="button" onclick="selectScorecardMetric('deposits', '5to15k', 15, this)" class="form-metric-btn py-3 px-2 bg-zinc-900 border border-zinc-800 text-center font-mono text-xs text-zinc-400 hover:border-zinc-500 transition-all rounded">
+                                    $5k - $15k
+                                    <span class="block text-[9px] text-zinc-500 mt-0.5">Steady</span>
+                                </button>
+                                <button type="button" onclick="selectScorecardMetric('deposits', '15to50k', 25, this)" class="form-metric-btn py-3 px-2 bg-zinc-900 border border-zinc-800 text-center font-mono text-xs text-zinc-400 hover:border-zinc-500 transition-all rounded">
+                                    $15k - $50k
+                                    <span class="block text-[9px] text-zinc-500 mt-0.5">Established</span>
+                                </button>
+                                <button type="button" onclick="selectScorecardMetric('deposits', 'over50k', 35, this)" class="form-metric-btn py-3 px-2 bg-zinc-900 border border-zinc-800 text-center font-mono text-xs text-zinc-400 hover:border-zinc-500 transition-all rounded">
+                                    Over $50k
+                                    <span class="block text-[9px] text-zinc-500 mt-0.5">Priority</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Age of Business -->
+                        <div>
+                            <label class="block font-mono text-xs uppercase text-zinc-400 tracking-wider mb-2">Age of Business Operations</label>
+                            <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                                <button type="button" onclick="selectScorecardMetric('age', 'under6m', 2, this)" class="form-metric-btn py-3 px-2 bg-zinc-900 border border-zinc-800 text-center font-mono text-xs text-zinc-400 hover:border-zinc-500 transition-all rounded">
+                                    Under 6 Mo
+                                    <span class="block text-[9px] text-zinc-500 mt-0.5">Startup</span>
+                                </button>
+                                <button type="button" onclick="selectScorecardMetric('age', '6to12m', 10, this)" class="form-metric-btn py-3 px-2 bg-zinc-900 border border-zinc-800 text-center font-mono text-xs text-zinc-400 hover:border-zinc-500 transition-all rounded">
+                                    6 - 12 Mo
+                                    <span class="block text-[9px] text-zinc-500 mt-0.5">Early Stage</span>
+                                </button>
+                                <button type="button" onclick="selectScorecardMetric('age', '1to2y', 20, this)" class="form-metric-btn py-3 px-2 bg-zinc-900 border border-zinc-800 text-center font-mono text-xs text-zinc-400 hover:border-zinc-500 transition-all rounded">
+                                    1 - 2 Years
+                                    <span class="block text-[9px] text-zinc-500 mt-0.5">Developed</span>
+                                </button>
+                                <button type="button" onclick="selectScorecardMetric('age', 'over2y', 30, this)" class="form-metric-btn py-3 px-2 bg-zinc-900 border border-zinc-800 text-center font-mono text-xs text-zinc-400 hover:border-zinc-500 transition-all rounded">
+                                    2+ Years
+                                    <span class="block text-[9px] text-zinc-500 mt-0.5">Mature</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Industry Profile Class (Bonus Modifiers) -->
+                        <div>
+                            <label class="block font-mono text-xs uppercase text-zinc-400 tracking-wider mb-2">Industry Risk Profile Code</label>
+                            <select id="industry-select" onchange="runUnderwritingAlgorithm()" class="w-full bg-zinc-900 border border-zinc-800 rounded p-3 text-zinc-300 font-mono text-xs focus:border-electricgreen focus:outline-none">
+                                <option value="neutral">General Business / Services (Standard Risk)</option>
+                                <option value="low-risk">Professional Firms (CPA, Legal, Medical, B2B) [Low Risk]</option>
+                                <option value="mid-risk">Logistics, Trucking, Heavy Equipment [Moderate Risk]</option>
+                                <option value="high-risk">Construction, Real Estate Development [Higher Underwriting Hurdles]</option>
+                                <option value="extremely-high">Cannabis, Crypto, Adult Entertainment [Strict Restricted Lists]</option>
+                            </select>
+                        </div>
+
+                        <!-- Compliance Multipliers (Toggles) -->
+                        <div>
+                            <p class="font-mono text-xs uppercase text-zinc-400 tracking-wider mb-3">Institutional Baseline Verification Checkboxes</p>
+                            <div class="space-y-2">
+                                <label class="flex items-center gap-3 p-3 bg-zinc-950 border border-zinc-900 rounded cursor-pointer select-none">
+                                    <input type="checkbox" id="check-bank" onchange="runUnderwritingAlgorithm()" class="form-checkbox w-4 h-4 text-electricgreen bg-matteblack border-zinc-700 focus:ring-0 rounded" checked>
+                                    <div>
+                                        <span class="font-mono text-xs text-zinc-300 block">Dedicated Corporate Business Bank Account Established</span>
+                                        <span class="text-[10px] text-zinc-500 font-mono">Personal account routing is rejected by commercial lines of credit.</span>
+                                    </div>
+                                </label>
+                                <label class="flex items-center gap-3 p-3 bg-zinc-950 border border-zinc-900 rounded cursor-pointer select-none">
+                                    <input type="checkbox" id="check-tax" onchange="runUnderwritingAlgorithm()" class="form-checkbox w-4 h-4 text-electricgreen bg-matteblack border-zinc-700 focus:ring-0 rounded">
+                                    <div>
+                                        <span class="font-mono text-xs text-zinc-300 block">Eins/Business Tax Filings are Up-to-Date</span>
+                                        <span class="text-[10px] text-zinc-500 font-mono">Having current year files unlocked maximizes alternative lending bands.</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+
+                <!-- Right Side: Real-Time Scoring & Diagnosis -->
+                <div class="lg:col-span-6 space-y-6">
+                    
+                    <!-- Scoring Box -->
+                    <div id="results-panel" class="bg-zinc-950 border border-zinc-800 p-8 neo-shadow-black score-transition relative">
+                        <!-- Score visual indicator -->
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 pb-6 border-b border-zinc-800">
+                            <div>
+                                <span class="font-mono text-xs text-zinc-500 uppercase tracking-widest leading-none block">REAL-TIME POSITIONING METRIC</span>
+                                <h3 class="font-display font-extrabold text-2xl text-white mt-1">Calculated Capacity Score</h3>
+                            </div>
+                            <!-- Live Score Badge -->
+                            <div class="bg-zinc-900 border-2 border-zinc-800 px-6 py-4 flex flex-col items-center justify-center neo-shadow-black min-w-[120px]">
+                                <span class="text-[10px] font-mono text-zinc-500 uppercase">SCORE</span>
+                                <span id="readiness-score" class="font-display font-black text-4xl text-zinc-500">00</span>
+                                <span class="text-[9px] font-mono text-zinc-400">OUT OF 100</span>
+                            </div>
+                        </div>
+
+                        <!-- Status Alert Area -->
+                        <div class="mt-6">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span id="status-pulse-dot" class="inline-block w-2.5 h-2.5 bg-zinc-500 rounded-full status-pulse"></span>
+                                <span id="status-label" class="font-mono text-xs text-zinc-400 uppercase tracking-widest">AWAITING SYSTEM PARAMETERS</span>
+                            </div>
+                            <p id="status-description" class="text-zinc-300 text-sm leading-relaxed">
+                                Select metrics options on the left to activate the localized underwriting algorithm.
+                            </p>
+                        </div>
+
+                        <!-- Dynamic Progress bar -->
+                        <div class="mt-6 bg-zinc-900 h-3 border border-zinc-800 rounded overflow-hidden">
+                            <div id="score-fill-bar" class="bg-zinc-600 h-full w-0 transition-all duration-500"></div>
+                        </div>
+                    </div>
+
+                    <!-- Personalized Priority Roadmap -->
+                    <div class="bg-graphitegray border border-zinc-800 p-6 sm:p-8 neo-shadow-black">
+                        <h4 class="font-display font-bold text-lg text-white mb-4 uppercase tracking-tight border-b border-zinc-800 pb-2">PRIORITY REDUCTION STEPS</h4>
+                        
+                        <div id="roadmap-empty" class="text-xs text-zinc-500 font-mono italic">
+                            Awaiting financial input values...
+                        </div>
+
+                        <ul id="roadmap-items" class="space-y-4 text-xs font-mono hidden">
+                            <!-- Dynamic recommendations go here -->
+                        </ul>
+                    </div>
+
+                    <!-- Program Suitability Index -->
+                    <div class="bg-graphitegray border border-zinc-800 p-6 sm:p-8 neo-shadow-black">
+                        <h4 class="font-display font-bold text-lg text-white mb-4 uppercase tracking-tight border-b border-zinc-800 pb-2">SUITABILITY DIRECTORY MATCHES</h4>
+                        
+                        <div id="suitability-empty" class="text-xs text-zinc-500 font-mono italic">
+                            Select parameters to identify qualified lanes...
+                        </div>
+
+                        <div id="suitability-container" class="space-y-3 hidden">
+                            <!-- Working Capital Lane suitability indicator -->
+                            <div class="flex items-center justify-between p-3 bg-zinc-900 border border-zinc-800 rounded">
+                                <div class="font-mono text-xs">
+                                    <span class="block text-zinc-300 font-bold">Revenue-Based &amp; Working Capital</span>
+                                    <span class="text-[10px] text-zinc-500">Dynamic scaling lines of credit</span>
+                                </div>
+                                <span id="suitability-wcap" class="font-mono text-[10px] px-2 py-1 rounded bg-zinc-800 text-zinc-400">UNMATCHED</span>
+                            </div>
+                            <!-- Equipment Financing suitability indicator -->
+                            <div class="flex items-center justify-between p-3 bg-zinc-900 border border-zinc-800 rounded">
+                                <div class="font-mono text-xs">
+                                    <span class="block text-zinc-300 font-bold">Heavy Machinery &amp; Equipment Lanes</span>
+                                    <span class="text-[10px] text-zinc-500">Utilize target collateral assets</span>
+                                </div>
+                                <span id="suitability-equip" class="font-mono text-[10px] px-2 py-1 rounded bg-zinc-800 text-zinc-400">UNMATCHED</span>
+                            </div>
+                            <!-- Business Credit Prep suitability indicator -->
+                            <div class="flex items-center justify-between p-3 bg-zinc-900 border border-zinc-800 rounded">
+                                <div class="font-mono text-xs">
+                                    <span class="block text-zinc-300 font-bold">EIN Identity Structure Alignment</span>
+                                    <span class="text-[10px] text-zinc-500">Prepare base non-personal indicators</span>
+                                </div>
+                                <span id="suitability-prep" class="font-mono text-[10px] px-2 py-1 rounded bg-zinc-800 text-zinc-400">UNMATCHED</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Direct Action / Submit Results CTA Card -->
+                    <div id="cta-card" class="bg-gradient-to-tr from-zinc-950 to-graphitegray border border-zinc-800 p-6 flex flex-col justify-between hidden">
+                        <div>
+                            <span class="font-mono text-[10px] text-zinc-400 uppercase tracking-widest block mb-1">LOCK IN PLACEMENT DIAGNOSIS</span>
+                            <h4 class="font-display font-bold text-lg text-white mb-2">Proceed with Verified Dashboard Parameters</h4>
+                            <p class="text-zinc-400 text-xs leading-relaxed font-mono mb-4">
+                                Route your calculated results profile into the priority processing loop verified directly for [PARTNER_NAME]'s portfolio clients.
+                            </p>
+                        </div>
+                        <a id="score-cta-btn" href="[APPLICATION_LINK]" class="w-full py-3 bg-electricgreen hover:bg-white text-matteblack hover:text-matteblack transition-colors text-center font-display text-xs font-black tracking-tight flex items-center justify-center gap-1.5 neo-shadow-white uppercase">
+                            EXECUTE INTENSE REVIEW WITH PROFILE
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SCORE ENHANCEMENT BENCHMARKS -->
+    <section class="py-24 bg-zinc-950 border-b border-graphitegray">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-3xl mx-auto text-center mb-16">
+                <span class="font-mono text-xs uppercase tracking-widest text-zinc-500 bg-zinc-900 px-3 py-1 border border-zinc-800 rounded">CAPITAL COMPLIANCE DECK</span>
+                <h2 class="font-display text-3xl sm:text-4xl font-extrabold text-white mt-4">Understanding the Score Parameters</h2>
+                <p class="text-zinc-400 mt-2">Every metric acts as a crucial gatekeeper. Address standard compliance friction early.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Column 1 -->
+                <div class="bg-matteblack border border-zinc-800 p-6 rounded hover:border-zinc-700 transition-colors">
+                    <span class="font-mono text-xs text-electricgreen font-bold">01 // THE LEDGER VELOCITY</span>
+                    <h3 class="font-display font-bold text-lg text-white mt-2 mb-3">Deposit Frequencies &amp; Gaps</h3>
+                    <p class="text-zinc-400 text-xs font-mono leading-relaxed">
+                        Underwriters prioritize the number of monthly invoice clearings. Multiple regular transfers present healthier viability than a single high-value monthly deposit. Maintain low negative day periods inside commercial ledgers.
+                    </p>
+                </div>
+
+                <!-- Column 2 -->
+                <div class="bg-matteblack border border-zinc-800 p-6 rounded hover:border-zinc-700 transition-colors">
+                    <span class="font-mono text-xs text-cobaltblue font-bold">02 // CREDIT PROFILE ALIGNMENT</span>
+                    <h3 class="font-display font-bold text-lg text-white mt-2 mb-3">Entity Isolation Structures</h3>
+                    <p class="text-zinc-400 text-xs font-mono leading-relaxed">
+                        Do not blend business metrics inside personal household statements. Setting up distinct corporate phone directories, EIN identities, and active business trading lines protects high capacity profiles from sudden individual score shifts.
+                    </p>
+                </div>
+
+                <!-- Column 3 -->
+                <div class="bg-matteblack border border-zinc-800 p-6 rounded hover:border-zinc-700 transition-colors">
+                    <span class="font-mono text-xs text-signalorange font-bold">03 // OPERATIONAL TIMELINE WND</span>
+                    <h3 class="font-display font-bold text-lg text-white mt-2 mb-3">Historical Risk Thresholds</h3>
+                    <p class="text-zinc-400 text-xs font-mono leading-relaxed">
+                        Surpassing critical operational markers (6 months, 1 year, and 2 years) dynamically unlocks alternative lender directories. Younger startups rely on active commercial merchant accounts or structured hardware asset valuations.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TRUST / POWERED BY SECTION -->
+    <section class="py-16 bg-zinc-950 border-t border-graphitegray">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto">
+                <div class="inline-block bg-zinc-900 border border-zinc-800 px-4 py-2 mb-4">
+                    <p class="text-xs font-mono tracking-widest text-zinc-400">POWERED BY MOONSHINE CAPITAL</p>
+                </div>
+                <p class="text-xs text-zinc-500 leading-relaxed font-mono">
+                    Moonshine Capital provides diagnostic utilities, structural checklists, and administrative intake paths. [PARTNER_NAME] is a verified affiliate operator authorized to route calculated profiles directly to select underwriting desks.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-matteblack border-t border-graphitegray py-12 text-xs font-mono text-zinc-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex flex-col items-center md:items-start gap-1">
+                <p class="text-zinc-300 font-bold">[PARTNER_COMPANY] &amp; [PARTNER_NAME]</p>
+                <p>All Rights Reserved. © <span id="currentYear"></span></p>
+            </div>
+            <div class="flex items-center gap-6">
+                <a href="../" class="hover:text-electricgreen transition-colors">DESK HOME</a>
+                <span>•</span>
+                <a href="[APPLICATION_LINK]" class="hover:text-electricgreen transition-colors">DIRECT INTAKE</a>
+                <span>•</span>
+                <a href="[BOOKING_LINK]" class="hover:text-electricgreen transition-colors">STRATEGY SCHEDULER</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- INTERACTIVE ALGORITHMS ENGINE -->
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Metric State Stores
+        const selectedMetrics = {
+            credit: { val: 0, key: null },
+            deposits: { val: 0, key: null },
+            age: { val: 0, key: null }
+        };
+
+        // Selector micro handler
+        function selectScorecardMetric(metricKey, optionKey, scoreVal, element) {
+            // Uncheck previous elements in matching grid block
+            const siblings = element.parentNode.querySelectorAll('.form-metric-btn');
+            siblings.forEach(btn => {
+                btn.classList.remove('bg-bonewhite', 'text-matteblack', 'border-white', 'neo-shadow-green');
+                btn.classList.add('bg-zinc-900', 'text-zinc-400', 'border-zinc-800');
+            });
+
+            // Activate chosen target
+            element.classList.remove('bg-zinc-900', 'text-zinc-400', 'border-zinc-800');
+            element.classList.add('bg-bonewhite', 'text-matteblack', 'border-white', 'neo-shadow-green');
+
+            // Store value
+            selectedMetrics[metricKey].val = scoreVal;
+            selectedMetrics[metricKey].key = optionKey;
+
+            // Recalculate whole underwriting scorecard
+            runUnderwritingAlgorithm();
+        }
+
+        // Live calculation engine based on traditional credit/revenue heuristics
+        function runUnderwritingAlgorithm() {
+            // If any metric is not set, don't show calculation results yet
+            if (selectedMetrics.credit.val === 0 || selectedMetrics.deposits.val === 0 || selectedMetrics.age.val === 0) {
+                return;
+            }
+
+            // Unhide items
+            document.getElementById('roadmap-empty').classList.add('hidden');
+            document.getElementById('roadmap-items').classList.remove('hidden');
+            document.getElementById('suitability-empty').classList.add('hidden');
+            document.getElementById('suitability-container').classList.remove('hidden');
+            document.getElementById('cta-card').classList.remove('hidden');
+
+            let baseScore = selectedMetrics.credit.val + selectedMetrics.deposits.val + selectedMetrics.age.val;
+
+            // Apply compliance checkbox modifiers
+            if (document.getElementById('check-bank').checked) {
+                baseScore += 5; // corporate account advantage
+            } else {
+                baseScore -= 15; // Penalty for lack of dedicated banking
+            }
+
+            if (document.getElementById('check-tax').checked) {
+                baseScore += 5; // tax documents advantage
+            }
+
+            // Apply Industry Risk Multipliers
+            const industry = document.getElementById('industry-select').value;
+            let riskModifierText = "";
+            if (industry === 'low-risk') {
+                baseScore += 5;
+            } else if (industry === 'mid-risk') {
+                baseScore -= 2;
+            } else if (industry === 'high-risk') {
+                baseScore -= 10;
+                riskModifierText = "Construction and structural materials suffer higher collateral oversight restrictions.";
+            } else if (industry === 'extremely-high') {
+                baseScore -= 25;
+                riskModifierText = "Extremely high restricted category triggers strict underwriting bounds.";
+            }
+
+            // Constrain score between 5 and 100
+            const calculatedScore = Math.max(5, Math.min(100, baseScore));
+
+            // Display update
+            const scoreLabel = document.getElementById('readiness-score');
+            const scoreFill = document.getElementById('score-fill-bar');
+            const pulseDot = document.getElementById('status-pulse-dot');
+            const statusLabel = document.getElementById('status-label');
+            const statusDesc = document.getElementById('status-description');
+            const resultsPanel = document.getElementById('results-panel');
+
+            scoreLabel.textContent = calculatedScore;
+            scoreFill.style.width = `${calculatedScore}%`;
+
+            // Reset dynamic borders
+            resultsPanel.className = "bg-zinc-950 border p-8 neo-shadow-black score-transition relative";
+
+            // Determine output state bands
+            if (calculatedScore < 50) {
+                resultsPanel.classList.add('border-signalorange', 'neo-shadow-orange');
+                scoreLabel.className = "font-display font-black text-4xl text-signalorange";
+                scoreFill.className = "bg-signalorange h-full transition-all duration-500";
+                pulseDot.className = "inline-block w-2.5 h-2.5 bg-signalorange rounded-full status-pulse";
+                statusLabel.textContent = "RESTRICTED CAP VALUE PREP REQ";
+                statusLabel.className = "font-mono text-xs text-signalorange uppercase tracking-widest";
+                statusDesc.textContent = "Your metrics fall underneath standard commercial credit and deposit bands. Underwriting will highlight substantial risk. Focus immediately on non-credit identity prep pipelines.";
+            } else if (calculatedScore >= 50 && calculatedScore < 80) {
+                resultsPanel.classList.add('border-cobaltblue', 'neo-shadow-cobalt');
+                scoreLabel.className = "font-display font-black text-4xl text-cobaltblue";
+                scoreFill.className = "bg-cobaltblue h-full transition-all duration-500";
+                pulseDot.className = "inline-block w-2.5 h-2.5 bg-cobaltblue rounded-full status-pulse";
+                statusLabel.textContent = "DIVERSIFIED STRATEGIC CAPACITY";
+                statusLabel.className = "font-mono text-xs text-cobaltblue uppercase tracking-widest";
+                statusDesc.textContent = "Viable operational indicators found. You possess baseline qualifications for asset-backed paths and medium-term revenue capital matching.";
+            } else {
+                resultsPanel.classList.add('border-electricgreen', 'neo-shadow-green');
+                scoreLabel.className = "font-display font-black text-4xl text-electricgreen";
+                scoreFill.className = "bg-electricgreen h-full transition-all duration-500";
+                pulseDot.className = "inline-block w-2.5 h-2.5 bg-electricgreen rounded-full status-pulse";
+                statusLabel.textContent = "INSTITUTIONAL GRADE STANDING";
+                statusLabel.className = "font-mono text-xs text-electricgreen uppercase tracking-widest";
+                statusDesc.textContent = "Prime risk parameters established. Highly compatible with optimized working capital options, equipment lines, and rapid processing rates.";
+            }
+
+            // Generate Priority Roadmap Items
+            const roadmapList = document.getElementById('roadmap-items');
+            roadmapList.innerHTML = ''; // reset
+
+            // Low Credit recommendation
+            if (selectedMetrics.credit.key === 'under600' || selectedMetrics.credit.key === '600to649') {
+                addRoadmapItem("⚠️ PERSONAL CREDIT DRAG", "Primary gatekeeper issues. Target rapid business credit lines built specifically around corporate entity trade routes to separate and preserve personal scores.");
+            }
+
+            // Startup age recommendation
+            if (selectedMetrics.age.key === 'under6m' || selectedMetrics.age.key === '6to12m') {
+                addRoadmapItem("⏱️ UNDER-STAGE OPERATIONS", "Young historical windows constrain classic banking terms. Maximize alternative asset ledgers, point-of-sale integrations, and equipment invoicing routes.");
+            }
+
+            // Low revenue recommendation
+            if (selectedMetrics.deposits.key === 'under5k') {
+                addRoadmapItem("📈 DEPOSIT FREQUENCY OVERHAUL", "Underwriting flags low overall deposits. Ensure client transactions route exclusively into a corporate ledger daily. Avoid holding physical cash values.");
+            }
+
+            // Corporate bank account warnings
+            if (!document.getElementById('check-bank').checked) {
+                addRoadmapItem("🚨 CRITICAL BLOCK: ACCOUNT ISOLATION", "You must open a commercial business checking account immediately. Routing corporate assets into personal cards results in systemic auto-rejections.");
+            }
+
+            // If no specific issues, provide optimization guidance
+            if (calculatedScore >= 80) {
+                addRoadmapItem("⚡ OPTIMIZATION: ACCELERATED RATES", "Excellent baseline metrics. Prepare immediate PDF statements for the last 3 billing intervals to verify maximum capacity options and fast deployment.");
+            }
+
+            // Industry-specific warnings
+            if (riskModifierText !== "") {
+                addRoadmapItem("📌 SPECIFIC SECTOR LIMITATIONS", riskModifierText);
+            }
+
+
+            // Generate suitability indicators
+            updateSuitabilityBadge('suitability-wcap', calculatedScore >= 70 ? 'HIGH MATCH' : (calculatedScore >= 50 ? 'VIABLE' : 'LOW MATCH'), calculatedScore >= 70 ? 'bg-emerald-950/40 text-electricgreen border border-emerald-800' : (calculatedScore >= 50 ? 'bg-blue-950/40 text-cobaltblue border border-blue-800' : 'bg-orange-950/40 text-signalorange border border-orange-800'));
+            updateSuitabilityBadge('suitability-equip', calculatedScore >= 50 ? 'MATCHED' : 'LIMITED', calculatedScore >= 50 ? 'bg-blue-950/40 text-cobaltblue border border-blue-800' : 'bg-zinc-900 text-zinc-500');
+            updateSuitabilityBadge('suitability-prep', calculatedScore < 60 ? 'HIGH RECOMMENDATION' : 'OPTIONAL', calculatedScore < 60 ? 'bg-purple-950/40 text-purple-400 border border-purple-800' : 'bg-zinc-900 text-zinc-500');
+        }
+
+        // Add item to custom recommendations array
+        function addRoadmapItem(title, text) {
+            const list = document.getElementById('roadmap-items');
+            const item = document.createElement('li');
+            item.className = "flex items-start gap-3 p-3 bg-zinc-900/60 border border-zinc-800 rounded";
+            item.innerHTML = `
+                <div class="mt-0.5 text-zinc-400 font-bold">•</div>
+                <div>
+                    <strong class="text-zinc-200 block mb-0.5">${title}</strong>
+                    <p class="text-zinc-400 text-[11px] leading-relaxed">${text}</p>
+                </div>
+            `;
+            list.appendChild(item);
+        }
+
+        // Util to update match badges color classes
+        function updateSuitabilityBadge(id, text, classList) {
+            const element = document.getElementById(id);
+            element.textContent = text;
+            element.className = `font-mono text-[10px] px-2.5 py-1 rounded ${classList}`;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capital_Vault | Education Hub & Calculators</title>
+  
+  <!-- Inter & Plus Jakarta Sans Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#312e81',
+              accent: '#818cf8'
+            },
+            darkbg: '#090D16',
+            panelbg: 'rgba(17, 24, 39, 0.7)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #090D16;
+      color: #F3F4F6;
+      overflow-x: hidden;
+    }
+    
+    .glow-orb-1 {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0) 70%);
+      top: -10%;
+      right: -10%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .glow-orb-2 {
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0) 70%);
+      bottom: 20%;
+      left: -10%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.3);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(99, 102, 241, 0.3);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(99, 102, 241, 0.5);
+    }
+
+    .glass-panel {
+      background: rgba(13, 20, 35, 0.65);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .glass-input {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-input:focus {
+      border-color: rgba(99, 102, 241, 0.6);
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+    }
+  </style>
+</head>
+<body class="font-sans antialiased" x-data="educationHub()">
+
+  <!-- Background Decorative Orbs -->
+  <div class="glow-orb-1"></div>
+  <div class="glow-orb-2"></div>
+
+  <!-- Main Grid Wrapper -->
+  <div class="relative z-10 flex flex-col min-h-screen">
+    
+    <!-- Top Premium Navigation -->
+    <header class="w-full glass-panel border-b border-gray-800/40 px-6 py-4 sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto flex items-center justify-between">
+        
+        <!-- Logo & Brand -->
+        <a href="index.html" class="flex items-center space-x-3 group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center shadow-lg shadow-brand-500/20 group-hover:scale-105 transition">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.168.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="font-display font-extrabold text-lg tracking-tight flex items-center space-x-2">
+              <span>Capital<span class="text-brand-500">_Vault</span></span>
+              <span class="text-[10px] bg-brand-500/10 text-brand-400 border border-brand-500/20 px-2 py-0.5 rounded uppercase font-bold">Academy</span>
+            </div>
+            <p class="text-[10px] text-gray-400 tracking-widest uppercase">Borrower Education & Resource Center</p>
+          </div>
+        </a>
+
+        <!-- System Active Directory Link -->
+        <div class="hidden md:flex items-center space-x-4">
+          <a href="index.html" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-gray-800/80 text-gray-300 hover:bg-gray-700/80 transition-all duration-200 flex items-center space-x-2">
+            <svg class="w-4 h-4 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            <span>Back to Lender Directory</span>
+          </a>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Main Workspace Content -->
+    <div class="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-6 py-6 lg:py-10 grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- LEFT COLUMN: Advanced Rental & Hard Money Analyzer Calculator -->
+      <section class="lg:col-span-5 flex flex-col space-y-6">
+        
+        <!-- Calculator Panel -->
+        <div class="glass-panel rounded-3xl p-6 relative overflow-hidden">
+          <div class="absolute -right-16 -top-16 w-36 h-36 bg-emerald-500/5 rounded-full blur-2xl"></div>
+          
+          <div class="flex items-center justify-between mb-2">
+            <div class="text-xs uppercase tracking-widest text-emerald-400 font-bold">Analysis Suite</div>
+            <span class="text-[10px] bg-emerald-400/10 text-emerald-400 px-2.5 py-1 rounded-full font-bold uppercase">Dynamic Estimator</span>
+          </div>
+          <h2 class="text-xl font-extrabold text-white tracking-tight mb-6 font-display">Capital Cost & Yield Analyzer</h2>
+
+          <div class="space-y-4">
+            
+            <!-- Purchase Price -->
+            <div>
+              <label class="block text-xs font-semibold text-gray-300 uppercase mb-2 flex justify-between">
+                <span>Property Purchase Price</span>
+                <span class="text-white font-bold" x-text="formatCurrency(calc.purchasePrice)"></span>
+              </label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-500 text-sm">$</span>
+                <input type="number" x-model.number="calc.purchasePrice" class="w-full glass-input text-sm rounded-xl pl-8 pr-4 py-3 text-white focus:outline-none">
+              </div>
+            </div>
+
+            <!-- Rehab Cost -->
+            <div>
+              <label class="block text-xs font-semibold text-gray-300 uppercase mb-2 flex justify-between">
+                <span>Est. Rehab / CapEx</span>
+                <span class="text-white font-bold" x-text="formatCurrency(calc.rehabCost)"></span>
+              </label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-500 text-sm">$</span>
+                <input type="number" x-model.number="calc.rehabCost" class="w-full glass-input text-sm rounded-xl pl-8 pr-4 py-3 text-white focus:outline-none">
+              </div>
+            </div>
+
+            <!-- Double Sliders Grid -->
+            <div class="grid grid-cols-2 gap-4">
+              <!-- LTV -->
+              <div>
+                <label class="block text-xs font-semibold text-gray-300 uppercase mb-2 flex justify-between">
+                  <span>Loan LTV</span>
+                  <span class="text-brand-400 font-bold" x-text="calc.ltv + '%'">75%</span>
+                </label>
+                <input type="range" min="50" max="90" step="5" x-model="calc.ltv" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-brand-500">
+              </div>
+              
+              <!-- Points -->
+              <div>
+                <label class="block text-xs font-semibold text-gray-300 uppercase mb-2 flex justify-between">
+                  <span>Lender Points</span>
+                  <span class="text-brand-400 font-bold" x-text="calc.points + ' pts'">2 pts</span>
+                </label>
+                <input type="range" min="0" max="5" step="0.25" x-model="calc.points" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-brand-500">
+              </div>
+            </div>
+
+            <!-- Hard Money Interest Rate -->
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-gray-300 uppercase mb-2 flex justify-between">
+                  <span>Interest Rate (APR)</span>
+                  <span class="text-brand-400 font-bold" x-text="calc.interestRate + '%'"></span>
+                </label>
+                <input type="range" min="6" max="15" step="0.25" x-model="calc.interestRate" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-brand-500">
+              </div>
+
+              <!-- Term Duration -->
+              <div>
+                <label class="block text-xs font-semibold text-gray-300 uppercase mb-2 flex justify-between">
+                  <span>Est. Term (Months)</span>
+                  <span class="text-brand-400 font-bold" x-text="calc.term + ' mo'"></span>
+                </label>
+                <input type="range" min="3" max="36" step="3" x-model="calc.term" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-brand-500">
+              </div>
+            </div>
+
+            <!-- Pro-Forma Income / Expenses (For rental Yield Analysis) -->
+            <div class="pt-4 border-t border-gray-800/60 grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-gray-300 uppercase mb-2">Monthly Target Rent</label>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 text-xs">$</span>
+                  <input type="number" x-model.number="calc.monthlyRent" class="w-full glass-input text-xs rounded-xl pl-7 pr-3 py-2.5 text-white focus:outline-none">
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-300 uppercase mb-2">Operating Expenses</label>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 text-xs">$</span>
+                  <input type="number" x-model.number="calc.monthlyExpenses" class="w-full glass-input text-xs rounded-xl pl-7 pr-3 py-2.5 text-white focus:outline-none">
+                </div>
+              </div>
+            </div>
+
+            <!-- Live Calculated Outputs Matrix -->
+            <div class="mt-6 p-4 bg-gray-900/60 rounded-2xl border border-gray-800/80 space-y-3.5">
+              
+              <!-- Core Loan Sizing -->
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-gray-400 uppercase">Estimated Loan Amount</span>
+                <span class="text-white font-mono font-bold text-sm" x-text="formatCurrency(loanAmount)"></span>
+              </div>
+
+              <!-- Upfront Capital Outlay -->
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-gray-400 uppercase">Est. Down Payment <span class="text-[9px] text-gray-500" x-text="'(' + (100 - calc.ltv) + '%)'"></span></span>
+                <span class="text-white font-mono" x-text="formatCurrency(downPayment)"></span>
+              </div>
+
+              <!-- Points Cost -->
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-gray-400 uppercase">Lender Point Cost</span>
+                <span class="text-white font-mono" x-text="formatCurrency(pointCost)"></span>
+              </div>
+
+              <!-- Upfront Cash Needed -->
+              <div class="flex justify-between items-center text-xs pt-2 border-t border-gray-800/40">
+                <span class="text-emerald-400 uppercase font-bold">Estimated Cash Required</span>
+                <span class="text-emerald-400 font-mono font-bold text-sm" x-text="formatCurrency(cashRequired)"></span>
+              </div>
+
+              <!-- Interest Payment -->
+              <div class="flex justify-between items-center text-xs pt-2 border-t border-gray-800/40">
+                <div>
+                  <span class="text-brand-300 uppercase font-bold block">Monthly Payment</span>
+                  <span class="text-[9px] text-gray-500 uppercase font-medium">Interest-Only Capital</span>
+                </div>
+                <span class="text-brand-300 font-mono font-bold text-base" x-text="formatCurrency(monthlyInterestPayment)"></span>
+              </div>
+
+              <!-- Rental Return Estimates -->
+              <div class="pt-3 border-t border-gray-800/40 grid grid-cols-2 gap-2 text-center">
+                <div class="p-2 bg-gray-950/55 rounded-xl border border-gray-900">
+                  <span class="text-[9px] text-gray-500 uppercase font-bold block">Pro-Forma Cap Rate</span>
+                  <span class="text-xs font-bold font-mono text-white" x-text="capRate + '%'"></span>
+                </div>
+                <div class="p-2 bg-gray-950/55 rounded-xl border border-gray-900">
+                  <span class="text-[9px] text-gray-500 uppercase font-bold block">Cash-on-Cash Yield</span>
+                  <span class="text-xs font-bold font-mono" :class="cashOnCash >= 0 ? 'text-emerald-400' : 'text-rose-400'" x-text="cashOnCash + '%'"></span>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Loan Document Tracker Checklist -->
+        <div class="glass-panel rounded-3xl p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="text-xs uppercase tracking-widest text-brand-400 font-bold">Borrower Readiness</div>
+            <span class="text-[10px] text-gray-400 font-mono" x-text="completedChecklistCount() + '/' + checklist.length + ' Completed'"></span>
+          </div>
+          
+          <h3 class="text-lg font-bold text-white tracking-tight font-display">Fast-Track Loan Checklist</h3>
+          <p class="text-xs text-gray-400">Hard money lenders prioritize speed. Pre-assembling these assets guarantees institutional approval inside 72 hours.</p>
+
+          <!-- Checklist Progress bar -->
+          <div class="w-full bg-gray-900 rounded-full h-1.5">
+            <div class="bg-gradient-to-r from-brand-500 to-emerald-400 h-1.5 rounded-full transition-all duration-300" :style="'width: ' + checklistProgress() + '%'"></div>
+          </div>
+
+          <!-- Checklist Items -->
+          <div class="space-y-2.5 pt-2">
+            <template x-for="(item, idx) in checklist" :key="idx">
+              <label class="flex items-start space-x-3 p-3 bg-gray-900/40 rounded-xl border border-gray-800/50 hover:border-gray-700/60 cursor-pointer transition">
+                <input type="checkbox" x-model="item.checked" class="mt-0.5 rounded bg-gray-950 border-gray-800 text-brand-600 focus:ring-brand-500">
+                <div>
+                  <span class="text-xs font-semibold text-gray-200 block" :class="item.checked ? 'line-through text-gray-500' : ''" x-text="item.label"></span>
+                  <span class="text-[10px] text-gray-500 block" x-text="item.desc"></span>
+                </div>
+              </label>
+            </template>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- RIGHT COLUMN: Premium Guides Tabs & Core Explainer Resources -->
+      <section class="lg:col-span-7 flex flex-col space-y-6">
+
+        <!-- Tab Controls Navigation -->
+        <div class="glass-panel rounded-2xl p-2 flex space-x-2">
+          <button @click="activeTab = 'comparison'" class="flex-1 py-3 text-xs font-bold uppercase tracking-wider rounded-xl transition-all duration-200"
+                  :class="activeTab === 'comparison' ? 'bg-brand-600 text-white shadow-md' : 'text-gray-400 hover:text-white hover:bg-gray-900/40'">
+            Hard Money Vs. Bank
+          </button>
+          <button @click="activeTab = 'glossary'" class="flex-1 py-3 text-xs font-bold uppercase tracking-wider rounded-xl transition-all duration-200"
+                  :class="activeTab === 'glossary' ? 'bg-brand-600 text-white shadow-md' : 'text-gray-400 hover:text-white hover:bg-gray-900/40'">
+            Capital Glossary
+          </button>
+          <button @click="activeTab = 'draw'" class="flex-1 py-3 text-xs font-bold uppercase tracking-wider rounded-xl transition-all duration-200"
+                  :class="activeTab === 'draw' ? 'bg-brand-600 text-white shadow-md' : 'text-gray-400 hover:text-white hover:bg-gray-900/40'">
+            Draw Schedule 101
+          </button>
+        </div>
+
+        <!-- TAB CONTENT: Comparison Guide -->
+        <div x-show="activeTab === 'comparison'" class="glass-panel rounded-3xl p-6 lg:p-8 space-y-6 transition duration-300">
+          <div>
+            <span class="text-xs uppercase tracking-widest text-brand-400 font-bold block mb-1">Strategic Architecture</span>
+            <h2 class="text-2xl font-extrabold text-white tracking-tight font-display">Hard Money vs. Traditional Financing</h2>
+            <p class="text-xs text-gray-400 mt-2 leading-relaxed">Understanding when to deploy bridge capital versus long-term conventional lending is the key to maximizing cash velocity and project scaling.</p>
+          </div>
+
+          <!-- Comparison Table Structure -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="border-b border-gray-800/80 text-gray-400 font-bold">
+                  <th class="pb-3 text-left">PARAMETER</th>
+                  <th class="pb-3 text-brand-400 text-left">PRIVATE HARD MONEY</th>
+                  <th class="pb-3 text-gray-300 text-left">CONVENTIONAL BANKS</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-800/40 text-gray-300 font-medium">
+                <tr>
+                  <td class="py-4 font-semibold text-white">Approval Metric</td>
+                  <td class="py-4 text-brand-300">Asset value, LTV & property profitability</td>
+                  <td class="py-4">FICO score, debt-to-income (DTI), cash reserves</td>
+                </tr>
+                <tr>
+                  <td class="py-4 font-semibold text-white">Funding Velocity</td>
+                  <td class="py-4 text-emerald-400 font-bold">3 to 10 Business Days</td>
+                  <td class="py-4">45 to 90 Calendar Days</td>
+                </tr>
+                <tr>
+                  <td class="py-4 font-semibold text-white">Target Interest Rates</td>
+                  <td class="py-4 text-brand-300">7.99% - 13.00% (Interest-Only)</td>
+                  <td class="py-4">6.00% - 8.50% (Fully Amortized)</td>
+                </tr>
+                <tr>
+                  <td class="py-4 font-semibold text-white">Loan Term Limits</td>
+                  <td class="py-4 text-brand-300">6 Months to 3 Years (Flexible Exit)</td>
+                  <td class="py-4">15 to 30 Years (Long Term)</td>
+                </tr>
+                <tr>
+                  <td class="py-4 font-semibold text-white">Rehab Financing</td>
+                  <td class="py-4 text-emerald-400 font-bold">Up to 100% of Rehab Costs (Escrow Draw)</td>
+                  <td class="py-4">Rarely supported, paid out-of-pocket</td>
+                </tr>
+                <tr>
+                  <td class="py-4 font-semibold text-white">Property Condition</td>
+                  <td class="py-4 text-brand-300">Distressed, raw land, teardowns allowed</td>
+                  <td class="py-4">Must be move-in ready, strict occupancy codes</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Strategic Takeaway Box -->
+          <div class="p-5 bg-brand-500/10 rounded-2xl border border-brand-500/20 flex items-start space-x-4">
+            <div class="w-10 h-10 rounded-xl bg-brand-500/20 text-brand-300 flex items-center justify-center shrink-0 mt-0.5">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="text-xs leading-relaxed text-gray-300">
+              <strong class="text-white block font-bold uppercase tracking-wider mb-1">PRO-TIP: THE VELOCITY OF MULTIPLIER</strong>
+              Hard money is not designed for permanent hold strategies. It is used as short-term acquisition and rehabilitation capital. Once the asset value is stabilized, the property is refinanced into a long-term conventional DSCR or bank loan, returning your working capital to seek new acquisitions.
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB CONTENT: Capital Glossary -->
+        <div x-show="activeTab === 'glossary'" class="glass-panel rounded-3xl p-6 lg:p-8 space-y-6 transition duration-300">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <span class="text-xs uppercase tracking-widest text-brand-400 font-bold block mb-1">Lexicon Matrix</span>
+              <h2 class="text-2xl font-extrabold text-white tracking-tight font-display">Capital Terms & Glossaries</h2>
+            </div>
+            
+            <!-- Glossary Search Filter -->
+            <div class="relative w-full md:w-64">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                <svg class="h-3.5 w-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+              </span>
+              <input type="text" x-model="glossarySearch" placeholder="Search terms (points, LTV...)" class="w-full pl-9 pr-4 py-2 bg-gray-900/60 text-xs rounded-xl text-white outline-none border border-gray-800/80 focus:border-brand-500 placeholder-gray-500 transition">
+            </div>
+          </div>
+
+          <!-- Dynamic Terms Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <template x-for="term in filteredGlossary()" :key="term.word">
+              <div class="p-4 bg-gray-900/30 rounded-2xl border border-gray-800/55 hover:border-gray-700/60 transition">
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="text-xs font-bold text-white uppercase tracking-wider" x-text="term.word"></span>
+                  <span class="text-[9px] bg-brand-500/10 text-brand-400 px-2 py-0.5 rounded uppercase font-semibold" x-text="term.category"></span>
+                </div>
+                <p class="text-[11px] text-gray-400 leading-relaxed" x-text="term.definition"></p>
+              </div>
+            </template>
+          </div>
+
+          <!-- Empty state search -->
+          <div class="p-8 text-center" x-show="filteredGlossary().length === 0">
+            <p class="text-xs text-gray-500">No glossary term found matching "<span x-text="glossarySearch"></span>"</p>
+          </div>
+        </div>
+
+        <!-- TAB CONTENT: Draw Schedule explainer -->
+        <div x-show="activeTab === 'draw'" class="glass-panel rounded-3xl p-6 lg:p-8 space-y-6 transition duration-300">
+          <div>
+            <span class="text-xs uppercase tracking-widest text-emerald-400 font-bold block mb-1">rehab execution</span>
+            <h2 class="text-2xl font-extrabold text-white tracking-tight font-display">Draw Schedule & Fund Disbursement</h2>
+            <p class="text-xs text-gray-400 mt-2 leading-relaxed">Unlike a standard consumer mortgage, your rehab funds are held in a secure escrow account and released in segments called "Draws". Master this flow to prevent construction bottlenecks.</p>
+          </div>
+
+          <!-- Draw Schedule Process Roadmap -->
+          <div class="space-y-4">
+            <div class="flex items-start space-x-4 relative">
+              <div class="w-8 h-8 rounded-full bg-brand-500/20 text-brand-400 font-bold text-xs flex items-center justify-center shrink-0">1</div>
+              <div class="bg-gray-900/40 p-4 rounded-2xl border border-gray-800/60 flex-1">
+                <h4 class="text-xs font-bold text-white uppercase tracking-wider">Feasibility & SOW (Scope of Work) Approval</h4>
+                <p class="text-[11px] text-gray-400 mt-1">Before closing, the lender inspects and approves your itemized list of materials, labor costs, and project milestones. This becomes the legal timeline for fund distribution.</p>
+              </div>
+            </div>
+
+            <div class="flex items-start space-x-4 relative">
+              <div class="w-8 h-8 rounded-full bg-brand-500/20 text-brand-400 font-bold text-xs flex items-center justify-center shrink-0">2</div>
+              <div class="bg-gray-900/40 p-4 rounded-2xl border border-gray-800/60 flex-1">
+                <h4 class="text-xs font-bold text-white uppercase tracking-wider">Self-Funding Milestone Execution</h4>
+                <p class="text-[11px] text-gray-400 mt-1">Lenders issue funds in arrears. You execute Draw Phase 1 (e.g., demolition and rough plumbing) using your cash reserves. Lenders do not wire cash up front for unfinished work.</p>
+              </div>
+            </div>
+
+            <div class="flex items-start space-x-4 relative">
+              <div class="w-8 h-8 rounded-full bg-brand-500/20 text-brand-400 font-bold text-xs flex items-center justify-center shrink-0">3</div>
+              <div class="bg-gray-900/40 p-4 rounded-2xl border border-gray-800/60 flex-1">
+                <h4 class="text-xs font-bold text-white uppercase tracking-wider">Inspector Audits & Disbursement</h4>
+                <p class="text-[11px] text-gray-400 mt-1">Once Phase 1 is done, request a draw. The lender dispatches an inspector to verify completion. Upon approval, escrow releases Draw 1 funds directly to you, replenishing your reserves to start Phase 2.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Tip Panel -->
+          <div class="bg-emerald-500/5 p-4 rounded-2xl border border-emerald-500/20 flex space-x-3 text-xs text-gray-300">
+            <svg class="w-5 h-5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div>
+              <strong class="text-white uppercase font-bold tracking-wider block mb-1">Strategic Reserve Recommendation</strong>
+              Always maintain a working capital buffer representing at least 15% to 20% of your total construction budget to fund materials upfront before your first inspection draw clears.
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+
+  </div>
+
+  <script>
+    function educationHub() {
+      return {
+        activeTab: 'comparison',
+        glossarySearch: '',
+        
+        // Calculator states
+        calc: {
+          purchasePrice: 280000,
+          rehabCost: 45000,
+          ltv: 75,
+          points: 1.5,
+          interestRate: 9.5,
+          term: 12,
+          monthlyRent: 2400,
+          monthlyExpenses: 650
+        },
+
+        // Fast Track checklists
+        checklist: [
+          { label: 'Detailed Scope of Work (SOW)', desc: 'Itemized material & labor costs breakdown.', checked: true },
+          { label: 'Entity Formation Docs', desc: 'LLC Articles of Organization and EIN Letter.', checked: true },
+          { label: 'Purchase Contract', desc: 'Fully executed purchase and sale agreement.', checked: false },
+          { label: 'Prior Transaction Track Record', desc: 'Photos or settlement sheets of previous deals.', checked: false },
+          { label: 'Proof of Funds', desc: 'Recent liquid bank statements to cover reserves.', checked: false },
+        ],
+
+        // Comprehensive Glossary Items
+        glossary: [
+          { word: 'Points', category: 'Cost', definition: 'Origination fees paid to the lender at closing. 1 point is equal to 1% of the total loan amount.' },
+          { word: 'Draw Schedule', category: 'Rehab', definition: 'A detailed timeline outlining when rehabilitation funds will be released from escrow as construction milestones are completed.' },
+          { word: 'Interest-Only', category: 'Payment', definition: 'A payment structure where monthly fees cover only generated interest costs, preserving principal balance for a lump sum payoff.' },
+          { word: 'LTV (Loan-to-Value)', category: 'Leverage', definition: 'The ratio of the loan size compared directly to the current purchase price or market value of the underlying real estate asset.' },
+          { word: 'ARV (After Repair Value)', category: 'Leverage', definition: 'The projected real estate valuation of a rehabilitated property once all upgrades and renovations have been certified finished.' },
+          { word: 'LTC (Loan-to-Cost)', category: 'Leverage', definition: 'The proportion of funding compared directly to the entire purchase cost plus rehab expenses.' },
+          { word: 'DSCR', category: 'Ratio', definition: 'Debt Service Coverage Ratio. Measures a property\'s rental income against its monthly debt costs. A ratio of 1.2+ is preferred.' },
+          { word: 'Exit Strategy', category: 'Execution', definition: 'The borrower\'s premeditated pipeline to pay off the short-term hard money loan, typically via cash sale or conventional refinance.' }
+        ],
+
+        // Computed values
+        get loanAmount() {
+          return Math.round(this.calc.purchasePrice * (this.calc.ltv / 100));
+        },
+
+        get downPayment() {
+          return this.calc.purchasePrice - this.loanAmount;
+        },
+
+        get pointCost() {
+          return Math.round(this.loanAmount * (this.calc.points / 100));
+        },
+
+        get cashRequired() {
+          return Math.max(0, this.downPayment + this.calc.rehabCost + this.pointCost);
+        },
+
+        get monthlyInterestPayment() {
+          return Math.round((this.loanAmount * (this.calc.interestRate / 100)) / 12);
+        },
+
+        // Yield computations
+        get capRate() {
+          const annualRent = this.calc.monthlyRent * 12;
+          const annualExpenses = this.calc.monthlyExpenses * 12;
+          const netOperatingIncome = annualRent - annualExpenses;
+          const totalBasis = this.calc.purchasePrice + this.calc.rehabCost;
+          if (totalBasis === 0) return 0;
+          return ((netOperatingIncome / totalBasis) * 100).toFixed(2);
+        },
+
+        get cashOnCash() {
+          const annualRent = this.calc.monthlyRent * 12;
+          const annualExpenses = this.calc.monthlyExpenses * 12;
+          const annualDebtService = this.monthlyInterestPayment * 12;
+          const cashFlow = annualRent - annualExpenses - annualDebtService;
+          const cashRequiredToClose = this.cashRequired;
+          if (cashRequiredToClose <= 0) return 0;
+          return ((cashFlow / cashRequiredToClose) * 100).toFixed(2);
+        },
+
+        // Methods
+        formatCurrency(val) {
+          return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
+        },
+
+        completedChecklistCount() {
+          return this.checklist.filter(item => item.checked).length;
+        },
+
+        checklistProgress() {
+          if (this.checklist.length === 0) return 0;
+          return (this.completedChecklistCount() / this.checklist.length) * 100;
+        },
+
+        filteredGlossary() {
+          if (this.glossarySearch.trim() === '') return this.glossary;
+          const search = this.glossarySearch.toLowerCase();
+          return this.glossary.filter(item => 
+            item.word.toLowerCase().includes(search) || 
+            item.definition.toLowerCase().includes(search) || 
+            item.category.toLowerCase().includes(search)
+          );
+        }
+      };
+    }
+  </script>
+</body>
+</html>
