@@ -23,3 +23,13 @@ Updated: 2026-11-26 (America/New_York)
 
 No program commit, PR, merge, or verified production deployment yet. Update this section with exact checks, commits, PRs, revisions, and URLs as work completes.
 
+
+## Production release
+
+- PR: https://github.com/JFeimster/flash-ui-portfolio/pull/127 (merged).
+- Merge commit: 46786806d83dcfa19da1661791d4f0cfd0c38ec4.
+- Vercel deployment: READY, revision matches merge commit; alias https://flash-ui-portfolio.vercel.app/.
+- Live HTTP 200: /, /ecosystem/, /themes/, /copilot/, /opportunities/.
+- Browser acceptance passed in GitHub Actions on the updated PR head; local browser test not executed due environment port restriction (WinError 10013).
+- Limitation: Copilot is offline/rule-based; canonical theme examples only appear for explicitly associated projects; screenshot generation requires reachable preview route.
+
