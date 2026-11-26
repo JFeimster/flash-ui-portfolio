@@ -65,11 +65,20 @@ export function discoverOpportunities(packages = {}, ideas = []) {
   const entries = Object.values(packages.entries || {});
   const counts = new Map();
   for (const entry of entries) {const key=clean(entry.category) || 'Uncategorized';counts.set(key,(counts.get(key)||0)+1);}
+  const categoryForType = type => {
+    const value=clean(type).toLowerCase();
+    if (/calculator|scorecard|quiz|widget/.test(value)) return 'Funding Tools';
+    if (/portal|dashboard|console/.test(value)) return 'Partner Sites';
+    if (/directory|library|blog|archive|media hub/.test(value)) return 'Content Hubs';
+    if (/landing|funnel|local seo/.test(value)) return 'Lead Magnets';
+    if (/generator|toolkit/.test(value)) return 'Widgets';
+    return 'Experiments';
+  };
   const builtNames = new Set(entries.map(e=>norm(e.title)));
   const candidates = ideas.filter(i=>i && i.name && !builtNames.has(norm(i.name))).slice(0,100);
   const byType = new Map();
   for (const idea of candidates) {const key=clean(idea.type) || 'Unclassified';if(!byType.has(key))byType.set(key,[]);byType.get(key).push(idea);}
-  return [...byType].map(([category,items])=>({category,ideaCount:items.length,packagedCategoryCount:counts.get(category)||0,examples:items.slice(0,5).map(i=>({id:i.id,name:i.name,source:'data/site-generator-prompts.json'})),basis:'Catalog coverage and existing idea records only',externalMarketEvidence:'unverified'})).sort((a,b)=>a.packagedCategoryCount-b.packagedCategoryCount || b.ideaCount-a.ideaCount || a.category.localeCompare(b.category));
+  return [...byType].map(([capability,items])=>{const category=categoryForType(capability);return {capability,category,ideaCount:items.length,packagedCategoryCount:counts.get(category)||0,examples:items.slice(0,5).map(i=>({id:i.id,name:i.name,source:'data/site-generator-prompts.json'})),basis:'Idea type mapped to a broad package category by local rules; unmatched names are possible coverage gaps, not proof of missing products',externalMarketEvidence:'unverified'}}).sort((a,b)=>a.packagedCategoryCount-b.packagedCategoryCount || b.ideaCount-a.ideaCount || a.capability.localeCompare(b.capability));
 }
 export function decisionBrief(preview, opportunity) {
   return {schemaVersion:'flash-ui-decision-brief/v1',createdAt:new Date().toISOString(),source:'Flash UI local catalog',recommendation:preview.recipe,asset:preview.asset,readiness:preview.readiness,missingInputs:preview.missingInputs,requiredReview:preview.checklist,lifecycle:preview.lifecycle,curation:preview.curation,distributionOptions:preview.distribution,steps:preview.steps,opportunity:opportunity || null,distribution:recipes[preview.recipe]?.label,claims:{marketDemand:'unverified',revenue:'not estimated',productionQuality:'not independently verified'},handoffs:preview.handoffs};
