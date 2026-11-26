@@ -92,6 +92,8 @@ function Read-HtmlMetadata([string]$File) {
 
 $baseRegistry = As-Array (Read-Json "data/site-registry.json")
 $staticRegistry = As-Array (Read-Json "data/site-registry-static-extractions.json")
+$approvedImports = Read-Json "data/batch-19c-approved-imports.json"
+$approvedEntries = As-Array (Get-Value $approvedImports "entries" @())
 $batch = Read-Json "data/site-registry-batch-5-additions.json"
 $groupsData = Read-Json "data/asset-groups.json"
 $routeContractsData = Read-Json "data/variant-route-contracts.json"
@@ -125,6 +127,7 @@ foreach ($item in $staticRegistry) {
   $allEntries += $item
 }
 $allEntries += $batchItems
+$allEntries += $approvedEntries
 
 $groupByKey = @{}
 $groupDefinitions = @{}
@@ -148,6 +151,15 @@ foreach ($item in $baseRegistry | Where-Object { $_.type -eq "group-hub" }) {
   }
   foreach ($key in @($item.slug, $item.title, $item.path)) { $groupByKey[(Normalize-Key $key)] = $groupId }
 }
+foreach ($item in $approvedEntries | Where-Object { $_.type -eq 'group-hub' }) {
+  if ($groupDefinitions.ContainsKey([string]$item.slug)) { throw "Approved import collides with group: $($item.slug)" }
+  $groupDefinitions[[string]$item.slug] = [pscustomobject]@{
+    groupId = [string]$item.slug; displayTitle = [string]$item.title; category = [string]$item.category
+    groupType = 'variant-set'; confidence = 'approved-import'; recommendedPrimary = ''
+    items = @(); hubPath = [string]$item.livePath
+  }
+  foreach ($key in @($item.slug,$item.title,$item.path)) { $groupByKey[(Normalize-Key $key)] = [string]$item.slug }
+}
 
 $migrationByKey = @{}
 foreach ($group in As-Array (Get-Value $migrationData "groups" @())) {
@@ -165,7 +177,7 @@ foreach ($result in As-Array (Get-Value $verificationData "results" @())) {
 }
 
 $merged = [ordered]@{}
-foreach ($item in @($baseRegistry) + @($staticRegistry) + @($batchItems)) {
+foreach ($item in @($baseRegistry) + @($staticRegistry) + @($batchItems) + @($approvedEntries)) {
   $key = [string](Get-Value $item "path" (Get-Value $item "slug" (Get-Value $item "title" "")))
   if ($key -and -not $merged.Contains($key)) { $merged[$key] = $item }
 }

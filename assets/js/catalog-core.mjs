@@ -62,6 +62,10 @@ export function normalizeCatalog({ routes = {}, showcase = {}, previews = {}, th
     if (!ref.production_url || records.some(r => r.id === ref.id || r.path === ref.production_url)) continue;
     records.push(make(ref.id,[{slug:ref.id,title:ref.name,resolutionStatus:'external',type:'external'}]));
   }
+  for (const [id,copy] of Object.entries(showcase.projects || {})) {
+    if (!copy.catalog?.productionUrl || records.some(r => r.id === id || r.path === copy.catalog.productionUrl)) continue;
+    records.push(make(id,[{slug:id,title:copy.title || id,resolutionStatus:'external',type:'external'}]));
+  }
   return records;
 }
 export function matchesCatalog(row, filters = {}) {

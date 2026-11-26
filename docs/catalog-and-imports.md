@@ -31,3 +31,22 @@ Baseline: 109 Node tests, 108 passed; the existing `batch-20-reuse` test expects
 ## Validation matrix
 
 Pure normalization/filter tests cover source immutability, deterministic output, membership/default identity, theme union and unknown mappings, metadata search, missing dates, canonical destinations and duplicate suppression. Browser checks cover real favorites, dialogs, URL state and responsive navigation. Importer integration fixtures exercise staging, archive rejection, filesystem collisions, no-overwrite behavior, rollback, stale plans and idempotence. Local structural/reference validation does not establish live integrations or production availability. Production acceptance follows a separately authorized deployment.
+
+## Import commands (Windows PowerShell)
+
+```powershell
+node scripts/import-asset.mjs --source="C:\Exports\site.zip" --slug=my-site --dry-run
+node scripts/import-asset.mjs --source="C:\Exports\site.zip" --slug=my-site --apply
+node scripts/import-static-zip.mjs "C:\Exports\site.zip" --slug=my-site --apply
+node scripts/import-asset.mjs --manifest="C:\Exports\external-project.json" --mode=external --dry-run
+```
+
+The importer defaults to dry-run. ZIPs are checked for signature, unsafe paths, symlinks, collisions and expansion limits, then extracted to an isolated temporary directory. Static and grouped imports write an additive approved-import record and regenerate route resolution. Existing and external modes add only showcase catalog metadata; external records require an HTTPS production URL. Reports can be saved with `--report=docs/my-import-report.json`. Apply rejects unresolved warnings. Do not run package scripts from imported source.
+
+Commission Estimator's four variant folders and manifests are present only as uncommitted files in the original checkout at this revision. That separate import must land before registration in this branch. Once landed, run from the target checkout:
+
+```powershell
+node scripts/import-asset.mjs --source=".\sites\commission-estimator" --mode=existing --dry-run --report=docs/commission-estimator-import.json
+```
+
+Review the report and explicit theme IDs first. `brokers-manifesto` in the imported manifest is not in the canonical theme master, so it must remain an unresolved suggestion. The catalog must retain one group, four verified routes, and variant 1 as the selected design after the separate import is integrated.
