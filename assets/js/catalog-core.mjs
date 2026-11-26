@@ -25,7 +25,7 @@ export function normalizeCatalog({ routes = {}, showcase = {}, previews = {}, th
       const meta = explicit.variants?.[variantId] || {};
       const resolved = resolveThemes(meta.designThemeIds || contract?.designThemeIds || e.designThemeIds, themes);
       const capture = Object.values(previews.projects || {}).find(p => p.target === e.resolvedPath && (!p.familyId || p.familyId === id));
-      return { ...e, id: variantId, designThemeIds: resolved.ids, themeSuggestions: resolved.suggestions, preview: capture ? {...capture} : e.screenshot ? {image:e.screenshot,target:e.resolvedPath} : null };
+      return { ...e, id: variantId, designThemeIds: resolved.ids, themeIdentifier: meta.themeIdentifier || null, themeSuggestions: resolved.suggestions, preview: capture ? {...capture} : e.screenshot ? {image:e.screenshot,target:e.resolvedPath} : null };
     });
     const hub = members.find(e => e.type === 'group-hub') || members.find(e => e.resolvedPath === group?.hubPath);
     const item = hub || variants[0] || members[0] || {};
