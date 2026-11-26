@@ -94,3 +94,13 @@ Implementation notes and actual evidence belong in `PROJECT_STATUS.md`; check an
 
 **Next execution:** Start with [Issue #92](https://github.com/JFeimster/flash-ui-portfolio/issues/92) and the continuous-import prompt; process one verified import cohort, not the entire backlog at once.
 
+
+## Batch 41 — Live Creation Copilot
+
+- [x] Disabled-by-default /api/copilot, ten-action allowlist, bounded context and structured/reference validation.
+- [x] Operator Bearer auth and Upstash atomic per-operator minute/day caps; fail closed if unavailable.
+- [x] UI controls, cancellation, memory-only token, preview apply, offline fallback and history/handoffs preserved.
+- [x] Mocked tests 13 pass; syntax passes. No provider calls.
+- [ ] Publish PR and verify deployment.
+- Activation requires COPILOT_AI_ENABLED=true, COPILOT_OPERATOR_TOKEN, OPENAI_API_KEY, OPENAI_MODEL, UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN in Vercel server env.
+

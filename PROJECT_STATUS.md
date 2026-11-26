@@ -23,3 +23,8 @@ Updated: 2026-11-26 (America/New_York)
 
 No program commit, PR, merge, or verified production deployment yet. Update this section with exact checks, commits, PRs, revisions, and URLs as work completes.
 
+
+## Batch 41
+
+Branch batch-41-live-creation-copilot based on 9d2918f6. API defaults disabled; requires operator bearer, OpenAI configuration and Upstash durable limits (8/min, 40/day). Mocked tests: 13 passed. No credentials provisioned or paid calls made. PR and deployment pending.
+
