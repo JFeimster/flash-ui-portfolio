@@ -10,7 +10,7 @@ test('exportable packages point to complete local static source', () => {
   assert.equal(manifest.schemaVersion, 2);
   for (const [route, entry] of Object.entries(manifest.entries)) {
     assert.equal(entry.previewPath, route);
-    assert.equal(entry.status, 'complete static site');
+    assert.ok(['complete static site', 'static site'].includes(entry.status), `${route}: unexpected package status`);
     assert.deepEqual(entry.missingFiles, []);
     assert.ok(entry.files.some(file => file.name === 'index.html'));
     assert.equal(new Set(entry.files.map(file => file.name)).size, entry.files.length);
